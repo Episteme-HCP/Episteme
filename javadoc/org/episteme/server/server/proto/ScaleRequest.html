@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -62,6 +62,9 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#SCALAR_FIELD_NUMBER" tabindex="0">SCALAR_FIELD_NUMBER</a></li>
 <li><a href="#MATRIX_FIELD_NUMBER" tabindex="0">MATRIX_FIELD_NUMBER</a></li>
+<li><a href="#IMAGINARY_FIELD_NUMBER" tabindex="0">IMAGINARY_FIELD_NUMBER</a></li>
+<li><a href="#IS_COMPLEX_FIELD_NUMBER" tabindex="0">IS_COMPLEX_FIELD_NUMBER</a></li>
+<li><a href="#HP_SCALAR_FIELD_NUMBER" tabindex="0">HP_SCALAR_FIELD_NUMBER</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -73,6 +76,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#hasMatrix()" tabindex="0">hasMatrix()</a></li>
 <li><a href="#getMatrix()" tabindex="0">getMatrix()</a></li>
 <li><a href="#getMatrixOrBuilder()" tabindex="0">getMatrixOrBuilder()</a></li>
+<li><a href="#getImaginary()" tabindex="0">getImaginary()</a></li>
+<li><a href="#getIsComplex()" tabindex="0">getIsComplex()</a></li>
+<li><a href="#getHpScalar()" tabindex="0">getHpScalar()</a></li>
+<li><a href="#getHpScalarBytes()" tabindex="0">getHpScalarBytes()</a></li>
 <li><a href="#isInitialized()" tabindex="0">isInitialized()</a></li>
 <li><a href="#writeTo(com.google.protobuf.CodedOutputStream)" tabindex="0">writeTo(CodedOutputStream)</a></li>
 <li><a href="#getSerializedSize()" tabindex="0">getSerializedSize()</a></li>
@@ -173,11 +180,20 @@ implements <a href="ScaleRequestOrBuilder.html" title="interface in org.episteme
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final int</code></div>
-<div class="col-second even-row-color"><code><a href="#MATRIX_FIELD_NUMBER" class="member-name-link">MATRIX_FIELD_NUMBER</a></code></div>
+<div class="col-second even-row-color"><code><a href="#HP_SCALAR_FIELD_NUMBER" class="member-name-link">HP_SCALAR_FIELD_NUMBER</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final int</code></div>
-<div class="col-second odd-row-color"><code><a href="#SCALAR_FIELD_NUMBER" class="member-name-link">SCALAR_FIELD_NUMBER</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#IMAGINARY_FIELD_NUMBER" class="member-name-link">IMAGINARY_FIELD_NUMBER</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final int</code></div>
+<div class="col-second even-row-color"><code><a href="#IS_COMPLEX_FIELD_NUMBER" class="member-name-link">IS_COMPLEX_FIELD_NUMBER</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final int</code></div>
+<div class="col-second odd-row-color"><code><a href="#MATRIX_FIELD_NUMBER" class="member-name-link">MATRIX_FIELD_NUMBER</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final int</code></div>
+<div class="col-second even-row-color"><code><a href="#SCALAR_FIELD_NUMBER" class="member-name-link">SCALAR_FIELD_NUMBER</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-com.google.protobuf.GeneratedMessageV3">Fields inherited from class&nbsp;com.google.protobuf.GeneratedMessageV3</h3>
@@ -213,6 +229,28 @@ implements <a href="ScaleRequestOrBuilder.html" title="interface in org.episteme
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static final com.google.protobuf.Descriptors.Descriptor</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDescriptor()" class="member-name-link">getDescriptor</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpScalar()" class="member-name-link">getHpScalar</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">
+For high-precision scalars (RealBig)</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpScalarBytes()" class="member-name-link">getHpScalarBytes</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">
+For high-precision scalars (RealBig)</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getImaginary()" class="member-name-link">getImaginary</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block"><code>double imaginary = 3;</code></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getIsComplex()" class="member-name-link">getIsComplex</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block"><code>bool is_complex = 4;</code></div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMatrix()" class="member-name-link">getMatrix</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -378,6 +416,54 @@ implements <a href="ScaleRequestOrBuilder.html" title="interface in org.episteme
 </div>
 </section>
 </li>
+<li>
+<section class="detail" id="IMAGINARY_FIELD_NUMBER">
+<h3>IMAGINARY_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">IMAGINARY_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.ScaleRequest.IMAGINARY_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="IS_COMPLEX_FIELD_NUMBER">
+<h3>IS_COMPLEX_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">IS_COMPLEX_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.ScaleRequest.IS_COMPLEX_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="HP_SCALAR_FIELD_NUMBER">
+<h3>HP_SCALAR_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">HP_SCALAR_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.ScaleRequest.HP_SCALAR_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -472,6 +558,74 @@ implements <a href="ScaleRequestOrBuilder.html" title="interface in org.episteme
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ScaleRequestOrBuilder.html#getMatrixOrBuilder()">getMatrixOrBuilder</a></code>&nbsp;in interface&nbsp;<code><a href="ScaleRequestOrBuilder.html" title="interface in org.episteme.server.server.proto">ScaleRequestOrBuilder</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getImaginary()">
+<h3>getImaginary</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getImaginary</span>()</div>
+<div class="block"><code>double imaginary = 3;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScaleRequestOrBuilder.html#getImaginary()">getImaginary</a></code>&nbsp;in interface&nbsp;<code><a href="ScaleRequestOrBuilder.html" title="interface in org.episteme.server.server.proto">ScaleRequestOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The imaginary.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getIsComplex()">
+<h3>getIsComplex</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">getIsComplex</span>()</div>
+<div class="block"><code>bool is_complex = 4;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScaleRequestOrBuilder.html#getIsComplex()">getIsComplex</a></code>&nbsp;in interface&nbsp;<code><a href="ScaleRequestOrBuilder.html" title="interface in org.episteme.server.server.proto">ScaleRequestOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The isComplex.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpScalar()">
+<h3>getHpScalar</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHpScalar</span>()</div>
+<div class="block"><pre>
+For high-precision scalars (RealBig)
+</pre>
+
+<code>string hp_scalar = 5;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScaleRequestOrBuilder.html#getHpScalar()">getHpScalar</a></code>&nbsp;in interface&nbsp;<code><a href="ScaleRequestOrBuilder.html" title="interface in org.episteme.server.server.proto">ScaleRequestOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The hpScalar.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpScalarBytes()">
+<h3>getHpScalarBytes</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getHpScalarBytes</span>()</div>
+<div class="block"><pre>
+For high-precision scalars (RealBig)
+</pre>
+
+<code>string hp_scalar = 5;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScaleRequestOrBuilder.html#getHpScalarBytes()">getHpScalarBytes</a></code>&nbsp;in interface&nbsp;<code><a href="ScaleRequestOrBuilder.html" title="interface in org.episteme.server.server.proto">ScaleRequestOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The bytes for hpScalar.</dd>
 </dl>
 </div>
 </section>

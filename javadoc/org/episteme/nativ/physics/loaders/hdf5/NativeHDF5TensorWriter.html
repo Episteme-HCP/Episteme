@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -83,7 +83,9 @@ loadScripts(document, 'script');</script>
 <h1 title="Class NativeHDF5TensorWriter" class="title">Class NativeHDF5TensorWriter</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
+<div class="inheritance"><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">org.episteme.core.io.AbstractResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;
 <div class="inheritance">org.episteme.nativ.physics.loaders.hdf5.NativeHDF5TensorWriter</div>
+</div>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
@@ -93,10 +95,9 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">NativeHDF5TensorWriter</span>
-<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../../../../core/io/ResourceWriter.html" title="interface in org.episteme.core.io">ResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</span></div>
+<span class="extends-implements">extends <a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</span></div>
 <div class="block">Adapter to save Tensors to HDF5 files.
-Currently supports Rank-2 Tensors (Matrices) by converting to NativeMatrix.
+Currently supports Rank-2 Tensors (Matrices) by converting to NativeDoubleMatrixStorage.
 Future versions will support N-Dimensional arrays directly.</div>
 </div>
 </section>
@@ -176,6 +177,9 @@ Future versions will support N-Dimensional arrays directly.</div>
 </div>
 </div>
 <div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.io.AbstractResourceWriter">Methods inherited from class&nbsp;<a href="../../../../core/io/AbstractResourceWriter.html#method-summary" title="class in org.episteme.core.io">AbstractResourceWriter</a></h3>
+<code><a href="../../../../core/io/AbstractResourceWriter.html#createBufferedStream(java.io.OutputStream)" title="createBufferedStream(OutputStream)">createBufferedStream</a></code></div>
+<div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
@@ -222,6 +226,8 @@ MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../core/io/ResourceIO.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getName()">getName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the display name</dd>
 </dl>
@@ -239,6 +245,8 @@ MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../core/io/ResourceIO.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getDescription()">getDescription</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the description</dd>
 </dl>
@@ -256,6 +264,8 @@ MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../core/io/ResourceIO.html#getCategory()">getCategory</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getCategory()">getCategory</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the category name</dd>
 </dl>
@@ -269,10 +279,6 @@ MUST be implemented with I18N support.</div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</span>&nbsp;<span class="element-name">getResourceType</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../core/io/ResourceIO.html#getResourceType()">ResourceIO</a></code></span></div>
 <div class="block">Returns the type of resource.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getResourceType()">getResourceType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
-</dl>
 </div>
 </section>
 </li>
@@ -283,10 +289,6 @@ MUST be implemented with I18N support.</div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getResourcePath</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../core/io/ResourceIO.html#getResourcePath()">ResourceIO</a></code></span></div>
 <div class="block">Returns the base path where this resource is located.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getResourcePath()">getResourcePath</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
-</dl>
 </div>
 </section>
 </li>
@@ -301,6 +303,8 @@ MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../core/io/ResourceIO.html#getLongDescription()">getLongDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getLongDescription()">getLongDescription</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the long description</dd>
 </dl>
@@ -328,8 +332,6 @@ Examples:
 </ul>
 </p></div>
 <dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getSupportedVersions()">getSupportedVersions</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>array of supported version strings, never null (empty array if version-agnostic)</dd>
 </dl>
@@ -343,10 +345,6 @@ Examples:
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>[]</span>&nbsp;<span class="element-name">getSupportedExtensions</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../core/io/ResourceIO.html#getSupportedExtensions()">ResourceIO</a></code></span></div>
 <div class="block">Returns the supported file extensions (e.g., ".h5", ".fits").</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getSupportedExtensions()">getSupportedExtensions</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
-</dl>
 </div>
 </section>
 </li>
@@ -360,8 +358,6 @@ Examples:
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../core/io/ResourceWriter.html#save(T,java.lang.String)">ResourceWriter</a></code></span></div>
 <div class="block">Saves the resource to a destination.</div>
 <dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceWriter.html#save(T,java.lang.String)">save</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceWriter.html" title="interface in org.episteme.core.io">ResourceWriter</a>&lt;<a href="../../../../core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;?&gt;&gt;</code></dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
 </dl>

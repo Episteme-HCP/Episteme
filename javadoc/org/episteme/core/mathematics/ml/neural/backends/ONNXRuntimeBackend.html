@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -71,8 +71,11 @@ loadScripts(document, 'script');</script>
 <li><a href="#getDescription()" tabindex="0">getDescription()</a></li>
 <li><a href="#isAvailable()" tabindex="0">isAvailable()</a></li>
 <li><a href="#getPriority()" tabindex="0">getPriority()</a></li>
+<li><a href="#getAlgorithmType()" tabindex="0">getAlgorithmType()</a></li>
+<li><a href="#score(org.episteme.core.technical.algorithm.OperationContext)" tabindex="0">score(OperationContext)</a></li>
 <li><a href="#createBackend()" tabindex="0">createBackend()</a></li>
 <li><a href="#loadModel(java.nio.file.Path)" tabindex="0">loadModel(Path)</a></li>
+<li><a href="#shutdown()" tabindex="0">shutdown()</a></li>
 </ol>
 </li>
 </ol>
@@ -88,17 +91,18 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, <a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
-<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">ONNXRuntimeBackend</span>
+<div class="type-signature"><span class="annotations">@AutoService({<a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>.class,<a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>.class})
+</span><span class="modifiers">public class </span><span class="element-name type-name-label">ONNXRuntimeBackend</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></span></div>
+implements <a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>, <a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></span></div>
 <div class="block">Provider for running ONNX (Open Neural Network Exchange) models.
 <p>
 Allows executing pre-trained models (e.g., from PyTorch/TensorFlow) within Episteme.
-Implements <a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend"><code>Backend</code></a> for standardized discovery.
+Implements <a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend"><code>Backend</code></a> and <a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm"><code>AlgorithmProvider</code></a> for standardized discovery.
 </p></div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -158,41 +162,57 @@ Implements <a href="../../../../technical/backend/Backend.html" title="interface
 backend).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDescription()" class="member-name-link">getDescription</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAlgorithmType()" class="member-name-link">getAlgorithmType</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns a description of the backend.</div>
+<div class="block">Returns the unique category of the algorithm.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getId()" class="member-name-link">getId</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDescription()" class="member-name-link">getDescription</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a description of the backend.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getId()" class="member-name-link">getId</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the unique identifier for this backend (e.g., "javafx", "jmol",
 "cuda").</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the display name for UI presentation.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPriority()" class="member-name-link">getPriority</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPriority()" class="member-name-link">getPriority</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the priority for auto-selection (higher = preferred).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the backend type category (e.g., "plotting", "molecular", "tensor",
 "math").</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAvailable()" class="member-name-link">isAvailable</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAvailable()" class="member-name-link">isAvailable</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ONNXRuntimeBackend.ONNXSession.html" title="class in org.episteme.core.mathematics.ml.neural.backends">ONNXRuntimeBackend.ONNXSession</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#loadModel(java.nio.file.Path)" class="member-name-link">loadModel</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;modelPath)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ONNXRuntimeBackend.ONNXSession.html" title="class in org.episteme.core.mathematics.ml.neural.backends">ONNXRuntimeBackend.ONNXSession</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#loadModel(java.nio.file.Path)" class="member-name-link">loadModel</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;modelPath)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Loads an ONNX model from the specified path.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#score(org.episteme.core.technical.algorithm.OperationContext)" class="member-name-link">score</a><wbr>(<a href="../../../../technical/algorithm/OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Scores this provider for a specific operation context.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shutdown()" class="member-name-link">shutdown</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.</div>
 </div>
 </div>
 </div>
@@ -201,8 +221,11 @@ backend).</div>
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.technical.algorithm.AlgorithmProvider">Methods inherited from interface&nbsp;<a href="../../../../technical/algorithm/AlgorithmProvider.html#method-summary" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></h3>
+<code><a href="../../../../technical/algorithm/AlgorithmProvider.html#getMetadata()" title="getMetadata()">getMetadata</a></code></div>
+<div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.Backend">Methods inherited from interface&nbsp;<a href="../../../../technical/backend/Backend.html#method-summary" title="interface in org.episteme.core.technical.backend">Backend</a></h3>
-<code><a href="../../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a></code></div>
+<code><a href="../../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a>, <a href="../../../../technical/backend/Backend.html#getStatusMessage()" title="getStatusMessage()">getStatusMessage</a>, <a href="../../../../technical/backend/Backend.html#isExplicitlyDisabled()" title="isExplicitlyDisabled()">isExplicitlyDisabled</a></code></div>
 </section>
 </li>
 </ul>
@@ -269,6 +292,8 @@ backend).</div>
 <div class="block">Returns the display name for UI presentation.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
 <dd><code><a href="../../../../technical/backend/Backend.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
 </dl>
 </div>
@@ -294,8 +319,14 @@ backend).</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isAvailable</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../technical/backend/Backend.html#isAvailable()">Backend</a></code></span></div>
-<div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
+<div class="block">Checks if this backend is currently available (libraries loaded, etc.).
+<p>
+Default implementation checks <a href="../../../../technical/backend/Backend.html#isExplicitlyDisabled()"><code>Backend.isExplicitlyDisabled()</code></a> and returns
+false if it is.
+</p></div>
 <dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../technical/backend/Backend.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
 </dl>
@@ -312,7 +343,49 @@ backend).</div>
 Used when multiple backends are available.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
 <dd><code><a href="../../../../technical/backend/Backend.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getAlgorithmType()">
+<h3>getAlgorithmType</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getAlgorithmType</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html#getAlgorithmType()">AlgorithmProvider</a></code></span></div>
+<div class="block">Returns the unique category of the algorithm.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#getAlgorithmType()">getAlgorithmType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="score(org.episteme.core.technical.algorithm.OperationContext)">
+<h3>score</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">score</span><wbr><span class="parameters">(<a href="../../../../technical/algorithm/OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)">AlgorithmProvider</a></code></span></div>
+<div class="block">Scores this provider for a specific operation context.
+<p>
+Higher scores indicate better suitability. Used by
+<a href="../../../../technical/algorithm/ProviderSelector.html" title="class in org.episteme.core.technical.algorithm"><code>ProviderSelector</code></a> for context-aware selection.
+</p>
+<p>
+Default implementation returns <a href="../../../../technical/algorithm/AlgorithmProvider.html#getPriority()"><code>AlgorithmProvider.getPriority()</code></a>, so existing
+providers behave identically without changes.
+</p></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)">score</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>context</code> - the operation context (data size, hints, etc.)</dd>
+<dt>Returns:</dt>
+<dd>suitability score (higher = better)</dd>
 </dl>
 </div>
 </section>
@@ -345,6 +418,25 @@ backend).</div>
 <dd><code>modelPath</code> - path to .onnx file.</dd>
 <dt>Returns:</dt>
 <dd>a runnable Model session.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="shutdown()">
+<h3>shutdown</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">shutdown</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../technical/backend/Backend.html#shutdown()">Backend</a></code></span></div>
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.
+Use this to release hardware resources, close file handles, or stop
+background threads.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/backend/Backend.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
 </dl>
 </div>
 </section>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -61,12 +61,13 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(java.lang.String,int)" tabindex="0">GrpcDistributedContext(String, int)</a></li>
+<li><a href="#%3Cinit%3E(io.grpc.ManagedChannel)" tabindex="0">GrpcDistributedContext(ManagedChannel)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#submit(java.util.concurrent.Callable)" tabindex="0">submit(Callable)</a></li>
-<li><a href="#submit(java.util.concurrent.Callable,org.episteme.core.distributed.DistributedContext.Priority)" tabindex="0">submit(Callable, DistributedContext.Priority)</a></li>
+<li><a href="#submit(java.util.concurrent.Callable,org.episteme.core.technical.backend.distributed.DistributedContext.Priority)" tabindex="0">submit(Callable, DistributedContext.Priority)</a></li>
 <li><a href="#invokeAll(java.util.List)" tabindex="0">invokeAll(List)</a></li>
 <li><a href="#getParallelism()" tabindex="0">getParallelism()</a></li>
 <li><a href="#shutdown()" tabindex="0">shutdown()</a></li>
@@ -85,13 +86,13 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../../../core/distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></code></dd>
+<dd><code><a href="../../../core/technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GrpcDistributedContext</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../../../core/distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></span></div>
+implements <a href="../../../core/technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></span></div>
 <div class="block">DistributedContext implementation that delegates to a remote gRPC server.
 <p>
 Moved to episteme-client as this is client-side logic.
@@ -111,8 +112,8 @@ Moved to episteme-client as this is client-side logic.
 <section class="nested-class-summary" id="nested-class-summary">
 <h2>Nested Class Summary</h2>
 <div class="inherited-list">
-<h3 id="nested-classes-inherited-from-class-org.episteme.core.distributed.DistributedContext">Nested classes/interfaces inherited from interface&nbsp;<a href="../../../core/distributed/DistributedContext.html#nested-class-summary" title="interface in org.episteme.core.distributed">DistributedContext</a></h3>
-<code><a href="../../../core/distributed/DistributedContext.Priority.html" title="enum class in org.episteme.core.distributed">DistributedContext.Priority</a></code></div>
+<h3 id="nested-classes-inherited-from-class-org.episteme.core.technical.backend.distributed.DistributedContext">Nested classes/interfaces inherited from interface&nbsp;<a href="../../../core/technical/backend/distributed/DistributedContext.html#nested-class-summary" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></h3>
+<code><a href="../../../core/technical/backend/distributed/DistributedContext.Priority.html" title="enum class in org.episteme.core.technical.backend.distributed">DistributedContext.Priority</a></code></div>
 </section>
 </li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
@@ -123,9 +124,11 @@ Moved to episteme-client as this is client-side logic.
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,int)" class="member-name-link">GrpcDistributedContext</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;host,
- int&nbsp;port)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.grpc.ManagedChannel)" class="member-name-link">GrpcDistributedContext</a><wbr>(io.grpc.ManagedChannel&nbsp;channel)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.lang.String,int)" class="member-name-link">GrpcDistributedContext</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;host,
+ int&nbsp;port)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -161,8 +164,8 @@ Moved to episteme-client as this is client-side logic.
 <div class="block">Submits a task for execution with NORMAL priority.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;<br><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html" title="class or interface in java.util.concurrent" class="external-link">Future</a><wbr>&lt;T&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#submit(java.util.concurrent.Callable,org.episteme.core.distributed.DistributedContext.Priority)" class="member-name-link">submit</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Callable.html" title="class or interface in java.util.concurrent" class="external-link">Callable</a>&lt;T&gt;&nbsp;task,
- <a href="../../../core/distributed/DistributedContext.Priority.html" title="enum class in org.episteme.core.distributed">DistributedContext.Priority</a>&nbsp;priority)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#submit(java.util.concurrent.Callable,org.episteme.core.technical.backend.distributed.DistributedContext.Priority)" class="member-name-link">submit</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Callable.html" title="class or interface in java.util.concurrent" class="external-link">Callable</a>&lt;T&gt;&nbsp;task,
+ <a href="../../../core/technical/backend/distributed/DistributedContext.Priority.html" title="enum class in org.episteme.core.technical.backend.distributed">DistributedContext.Priority</a>&nbsp;priority)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Submits a task for execution with a specific priority.</div>
 </div>
@@ -173,8 +176,8 @@ Moved to episteme-client as this is client-side logic.
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.episteme.core.distributed.DistributedContext">Methods inherited from interface&nbsp;<a href="../../../core/distributed/DistributedContext.html#method-summary" title="interface in org.episteme.core.distributed">DistributedContext</a></h3>
-<code><a href="../../../core/distributed/DistributedContext.html#allGather(java.nio.DoubleBuffer,java.nio.DoubleBuffer)" title="allGather(DoubleBuffer, DoubleBuffer)">allGather</a>, <a href="../../../core/distributed/DistributedContext.html#barrier()" title="barrier()">barrier</a>, <a href="../../../core/distributed/DistributedContext.html#broadcast(java.nio.DoubleBuffer,int)" title="broadcast(DoubleBuffer, int)">broadcast</a>, <a href="../../../core/distributed/DistributedContext.html#fence()" title="fence()">fence</a>, <a href="../../../core/distributed/DistributedContext.html#get(java.nio.DoubleBuffer,int,long)" title="get(DoubleBuffer, int, long)">get</a>, <a href="../../../core/distributed/DistributedContext.html#put(java.nio.DoubleBuffer,int,long)" title="put(DoubleBuffer, int, long)">put</a></code></div>
+<h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.distributed.DistributedContext">Methods inherited from interface&nbsp;<a href="../../../core/technical/backend/distributed/DistributedContext.html#method-summary" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></h3>
+<code><a href="../../../core/technical/backend/distributed/DistributedContext.html#allGather(java.nio.ByteBuffer,java.nio.ByteBuffer)" title="allGather(ByteBuffer, ByteBuffer)">allGather</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#allGather(java.nio.DoubleBuffer,java.nio.DoubleBuffer)" title="allGather(DoubleBuffer, DoubleBuffer)">allGather</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#barrier()" title="barrier()">barrier</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#broadcast(java.nio.ByteBuffer,int)" title="broadcast(ByteBuffer, int)">broadcast</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#broadcast(java.nio.DoubleBuffer,int)" title="broadcast(DoubleBuffer, int)">broadcast</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#fence()" title="fence()">fence</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#get(java.nio.ByteBuffer,int,long)" title="get(ByteBuffer, int, long)">get</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#get(java.nio.DoubleBuffer,int,long)" title="get(DoubleBuffer, int, long)">get</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#put(java.nio.ByteBuffer,int,long)" title="put(ByteBuffer, int, long)">put</a>, <a href="../../../core/technical/backend/distributed/DistributedContext.html#put(java.nio.DoubleBuffer,int,long)" title="put(DoubleBuffer, int, long)">put</a></code></div>
 </section>
 </li>
 </ul>
@@ -195,6 +198,14 @@ Moved to episteme-client as this is client-side logic.
 </div>
 </section>
 </li>
+<li>
+<section class="detail" id="&lt;init&gt;(io.grpc.ManagedChannel)">
+<h3>GrpcDistributedContext</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GrpcDistributedContext</span><wbr><span class="parameters">(io.grpc.ManagedChannel&nbsp;channel)</span></div>
+</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -208,11 +219,11 @@ Moved to episteme-client as this is client-side logic.
 <h3>submit</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="type-parameters">&lt;T extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html" title="class or interface in java.util.concurrent" class="external-link">Future</a>&lt;T&gt;</span>&nbsp;<span class="element-name">submit</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Callable.html" title="class or interface in java.util.concurrent" class="external-link">Callable</a>&lt;T&gt;&nbsp;task)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/distributed/DistributedContext.html#submit(java.util.concurrent.Callable)">DistributedContext</a></code></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html#submit(java.util.concurrent.Callable)">DistributedContext</a></code></span></div>
 <div class="block">Submits a task for execution with NORMAL priority.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../core/distributed/DistributedContext.html#submit(java.util.concurrent.Callable)">submit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></code></dd>
+<dd><code><a href="../../../core/technical/backend/distributed/DistributedContext.html#submit(java.util.concurrent.Callable)">submit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></code></dd>
 <dt>Type Parameters:</dt>
 <dd><span id="submit(java.util.concurrent.Callable)-type-param-T"><code>T</code> - Result type</span></dd>
 <dt>Parameters:</dt>
@@ -224,18 +235,18 @@ Moved to episteme-client as this is client-side logic.
 </section>
 </li>
 <li>
-<section class="detail" id="submit(java.util.concurrent.Callable,org.episteme.core.distributed.DistributedContext.Priority)">
+<section class="detail" id="submit(java.util.concurrent.Callable,org.episteme.core.technical.backend.distributed.DistributedContext.Priority)">
 <h3>submit</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="type-parameters">&lt;T extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html" title="class or interface in java.util.concurrent" class="external-link">Future</a>&lt;T&gt;</span>&nbsp;<span class="element-name">submit</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Callable.html" title="class or interface in java.util.concurrent" class="external-link">Callable</a>&lt;T&gt;&nbsp;task,
- <a href="../../../core/distributed/DistributedContext.Priority.html" title="enum class in org.episteme.core.distributed">DistributedContext.Priority</a>&nbsp;priority)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/distributed/DistributedContext.html#submit(java.util.concurrent.Callable,org.episteme.core.distributed.DistributedContext.Priority)">DistributedContext</a></code></span></div>
+ <a href="../../../core/technical/backend/distributed/DistributedContext.Priority.html" title="enum class in org.episteme.core.technical.backend.distributed">DistributedContext.Priority</a>&nbsp;priority)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html#submit(java.util.concurrent.Callable,org.episteme.core.technical.backend.distributed.DistributedContext.Priority)">DistributedContext</a></code></span></div>
 <div class="block">Submits a task for execution with a specific priority.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../core/distributed/DistributedContext.html#submit(java.util.concurrent.Callable,org.episteme.core.distributed.DistributedContext.Priority)">submit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></code></dd>
+<dd><code><a href="../../../core/technical/backend/distributed/DistributedContext.html#submit(java.util.concurrent.Callable,org.episteme.core.technical.backend.distributed.DistributedContext.Priority)">submit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></code></dd>
 <dt>Type Parameters:</dt>
-<dd><span id="submit(java.util.concurrent.Callable,org.episteme.core.distributed.DistributedContext.Priority)-type-param-T"><code>T</code> - Result type</span></dd>
+<dd><span id="submit(java.util.concurrent.Callable,org.episteme.core.technical.backend.distributed.DistributedContext.Priority)-type-param-T"><code>T</code> - Result type</span></dd>
 <dt>Parameters:</dt>
 <dd><code>task</code> - Task to execute</dd>
 <dd><code>priority</code> - Priority level</dd>
@@ -250,11 +261,11 @@ Moved to episteme-client as this is client-side logic.
 <h3>invokeAll</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="type-parameters">&lt;T extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Future.html" title="class or interface in java.util.concurrent" class="external-link">Future</a>&lt;T&gt;&gt;</span>&nbsp;<span class="element-name">invokeAll</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/Callable.html" title="class or interface in java.util.concurrent" class="external-link">Callable</a>&lt;T&gt;&gt;&nbsp;tasks)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/distributed/DistributedContext.html#invokeAll(java.util.List)">DistributedContext</a></code></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html#invokeAll(java.util.List)">DistributedContext</a></code></span></div>
 <div class="block">Submits a collection of tasks for execution.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../core/distributed/DistributedContext.html#invokeAll(java.util.List)">invokeAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></code></dd>
+<dd><code><a href="../../../core/technical/backend/distributed/DistributedContext.html#invokeAll(java.util.List)">invokeAll</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></code></dd>
 <dt>Type Parameters:</dt>
 <dd><span id="invokeAll(java.util.List)-type-param-T"><code>T</code> - Result type</span></dd>
 <dt>Parameters:</dt>
@@ -270,11 +281,11 @@ Moved to episteme-client as this is client-side logic.
 <h3>getParallelism</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getParallelism</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/distributed/DistributedContext.html#getParallelism()">DistributedContext</a></code></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html#getParallelism()">DistributedContext</a></code></span></div>
 <div class="block">Returns the number of available processing nodes or cores.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../core/distributed/DistributedContext.html#getParallelism()">getParallelism</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></code></dd>
+<dd><code><a href="../../../core/technical/backend/distributed/DistributedContext.html#getParallelism()">getParallelism</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></code></dd>
 </dl>
 </div>
 </section>
@@ -284,11 +295,11 @@ Moved to episteme-client as this is client-side logic.
 <h3>shutdown</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">shutdown</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/distributed/DistributedContext.html#shutdown()">DistributedContext</a></code></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html#shutdown()">DistributedContext</a></code></span></div>
 <div class="block">Shuts down the context.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../core/distributed/DistributedContext.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></code></dd>
+<dd><code><a href="../../../core/technical/backend/distributed/DistributedContext.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../core/technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a></code></dd>
 </dl>
 </div>
 </section>

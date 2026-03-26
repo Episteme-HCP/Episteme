@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,9 +60,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#getInstance()" tabindex="0">getInstance()</a></li>
-<li><a href="#staticGetDefault()" tabindex="0">staticGetDefault()</a></li>
+<li><a href="#staticDefault()" tabindex="0">staticDefault()</a></li>
 <li><a href="#staticSelect(java.lang.String)" tabindex="0">staticSelect(String)</a></li>
-<li><a href="#staticGetAll()" tabindex="0">staticGetAll()</a></li>
+<li><a href="#staticAll()" tabindex="0">staticAll()</a></li>
 </ol>
 </li>
 </ol>
@@ -104,7 +104,7 @@ Extends <a href="../technical/backend/AbstractBackendManager.html" title="class 
 <h2>Field Summary</h2>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.episteme.core.technical.backend.AbstractBackendManager">Fields inherited from class&nbsp;<a href="../technical/backend/AbstractBackendManager.html#field-summary" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a></h3>
-<code><a href="../technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a></code></div>
+<code><a href="../technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a>, <a href="../technical/backend/AbstractBackendManager.html#logger">logger</a></code></div>
 </section>
 </li>
 <!-- ========== METHOD SUMMARY =========== -->
@@ -122,10 +122,10 @@ Extends <a href="../technical/backend/AbstractBackendManager.html" title="class 
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticGetAll()" class="member-name-link">staticGetAll</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticAll()" class="member-name-link">staticAll</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticGetDefault()" class="member-name-link">staticGetDefault</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticDefault()" class="member-name-link">staticDefault</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticSelect(java.lang.String)" class="member-name-link">staticSelect</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nameOrId)</code></div>
@@ -159,10 +159,10 @@ Extends <a href="../technical/backend/AbstractBackendManager.html" title="class 
 </section>
 </li>
 <li>
-<section class="detail" id="staticGetDefault()">
-<h3>staticGetDefault</h3>
+<section class="detail" id="staticDefault()">
+<h3>staticDefault</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a></span>&nbsp;<span class="element-name">staticGetDefault</span>()</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a></span>&nbsp;<span class="element-name">staticDefault</span>()</div>
 </div>
 </section>
 </li>
@@ -175,10 +175,10 @@ Extends <a href="../technical/backend/AbstractBackendManager.html" title="class 
 </section>
 </li>
 <li>
-<section class="detail" id="staticGetAll()">
-<h3>staticGetAll</h3>
+<section class="detail" id="staticAll()">
+<h3>staticAll</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a>&gt;</span>&nbsp;<span class="element-name">staticGetAll</span>()</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a>&gt;</span>&nbsp;<span class="element-name">staticAll</span>()</div>
 </div>
 </section>
 </li>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -66,11 +66,11 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.media.audio.backends">org.episteme.core.media.audio.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.media.backends">org.episteme.core.media.backends</a></div>
-<div class="col-last even-row-color">
-<div class="block">Core functionality for the org.episteme.core.media.backends package in the Episteme library.</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.nativ.media.audio.backends">org.episteme.nativ.media.audio.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.media.backends">org.episteme.nativ.media.backends</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
@@ -97,7 +97,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><span class="type-name-label">AudioBackendSystem.</span><code><a href="../AudioBackendSystem.html#getAudioBackend()" class="member-name-link">getAudioBackend</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static <a href="../AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">AudioBackendManager.</span><code><a href="../AudioBackendManager.html#staticGetDefault()" class="member-name-link">staticGetDefault</a>()</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">AudioBackendManager.</span><code><a href="../AudioBackendManager.html#staticDefault()" class="member-name-link">staticDefault</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="caption"><span>Methods in <a href="../package-summary.html">org.episteme.core.media</a> that return types with arguments of type <a href="../AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a></span></div>
@@ -106,7 +106,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">AudioBackendManager.</span><code><a href="../AudioBackendManager.html#staticGetAll()" class="member-name-link">staticGetAll</a>()</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">AudioBackendManager.</span><code><a href="../AudioBackendManager.html#staticAll()" class="member-name-link">staticAll</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -120,9 +120,24 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../audio/backends/JavaSoundBackend.html" class="type-name-link" title="class in org.episteme.core.media.audio.backends">JavaSoundBackend</a></code></div>
+<div class="col-second even-row-color"><code><a href="../audio/backends/JavaSoundAudioBackend.html" class="type-name-link" title="class in org.episteme.core.media.audio.backends">JavaSoundAudioBackend</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">Standard backend using JavaSound API.</div>
+</div>
+<div class="col-first odd-row-color"><code>class&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../audio/backends/MinimAudioBackend.html" class="type-name-link" title="class in org.episteme.core.media.audio.backends">MinimAudioBackend</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Minim Backend (Creative Coding).</div>
+</div>
+<div class="col-first even-row-color"><code>class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../audio/backends/MulticoreAudioBackend.html" class="type-name-link" title="class in org.episteme.core.media.audio.backends">MulticoreAudioBackend</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">High-performance AudioBackend using Java Parallel Streams.</div>
+</div>
+<div class="col-first odd-row-color"><code>class&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../audio/backends/TarsosAudioBackend.html" class="type-name-link" title="class in org.episteme.core.media.audio.backends">TarsosAudioBackend</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">TarsosDSP Backend (Scientific Analysis).</div>
 </div>
 </div>
 </section>
@@ -136,24 +151,14 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../backends/JavaCVBackend.html" class="type-name-link" title="class in org.episteme.core.media.backends">JavaCVBackend</a></code></div>
+<div class="col-second even-row-color"><code><a href="../backends/JavaCVMediaBackend.html" class="type-name-link" title="class in org.episteme.core.media.backends">JavaCVMediaBackend</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">JavaCV (FFmpeg) Backend for audio/video.</div>
+<div class="block">JavaCV (FFmpeg) Media Backend for multi-purpose usage (audio/video/vision).</div>
 </div>
 <div class="col-first odd-row-color"><code>class&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../backends/MinimBackend.html" class="type-name-link" title="class in org.episteme.core.media.backends">MinimBackend</a></code></div>
+<div class="col-second odd-row-color"><code><a href="../backends/VLCJMediaBackend.html" class="type-name-link" title="class in org.episteme.core.media.backends">VLCJMediaBackend</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">Minim Backend (Creative Coding).</div>
-</div>
-<div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../backends/TarsosBackend.html" class="type-name-link" title="class in org.episteme.core.media.backends">TarsosBackend</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">TarsosDSP Backend (Scientific Analysis).</div>
-</div>
-<div class="col-first odd-row-color"><code>class&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../backends/VLCJBackend.html" class="type-name-link" title="class in org.episteme.core.media.backends">VLCJBackend</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">VLCJ (Native VLC) Backend for audio/video.</div>
+<div class="block">VLCJ (Native VLC) Media Backend for multi-purpose usage (audio/video/vision).</div>
 </div>
 </div>
 </section>
@@ -167,9 +172,25 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../nativ/media/audio/backends/NativeAudioBackend.html" class="type-name-link" title="class in org.episteme.nativ.media.audio.backends">NativeAudioBackend</a></code></div>
+<div class="col-second even-row-color"><code><a href="../../../nativ/media/audio/backends/NativeMiniAudioBackend.html" class="type-name-link" title="class in org.episteme.nativ.media.audio.backends">NativeMiniAudioBackend</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">Native Audio Backend using miniaudio (via Panama FFM) for low-latency playback.</div>
+<div class="block">Native Audio Backend using standalone miniaudio library (via Panama FFM).</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.nativ.media.backends">
+<h2>Uses of <a href="../AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a> in <a href="../../../nativ/media/backends/package-summary.html">org.episteme.nativ.media.backends</a></h2>
+<div class="caption"><span>Classes in <a href="../../../nativ/media/backends/package-summary.html">org.episteme.nativ.media.backends</a> that implement <a href="../AudioBackend.html" title="interface in org.episteme.core.media">AudioBackend</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../../../nativ/media/backends/NativeJavaCVMediaBackend.html" class="type-name-link" title="class in org.episteme.nativ.media.backends">NativeJavaCVMediaBackend</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Native Media Backend using JavaCV (OpenCV/FFmpeg) for multi-purpose tasks.</div>
 </div>
 </div>
 </section>

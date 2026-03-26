@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -83,7 +83,10 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">RealDoubleStrassenAlgorithm</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Implementation of the Strassen Algorithm specialized for the double primitive type.
-Uses SIMDRealDoubleMatrix for optimized additions and subtractions.</div>
+<p>
+This version uses optimized sub-matrix operations and index-based splitting
+to reduce garbage collection overhead during recursive steps.
+</p></div>
 </div>
 </section>
 <section class="summary">

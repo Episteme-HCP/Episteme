@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,6 +60,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(int,int,E)" tabindex="0">SparseMatrixStorage(int, int, E)</a></li>
+<li><a href="#%3Cinit%3E(int,int,E,int%5B%5D,int%5B%5D,java.lang.Object%5B%5D)" tabindex="0">SparseMatrixStorage(int, int, E, int[], int[], Object[])</a></li>
+<li><a href="#%3Cinit%3E(int,int,E,java.util.List)" tabindex="0">SparseMatrixStorage(int, int, E, List)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -121,6 +123,18 @@ empty.
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(int,int,E)" class="member-name-link">SparseMatrixStorage</a><wbr>(int&nbsp;rows,
  int&nbsp;cols,
  <a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&nbsp;zeroValue)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(int,int,E,int%5B%5D,int%5B%5D,java.lang.Object%5B%5D)" class="member-name-link">SparseMatrixStorage</a><wbr>(int&nbsp;rows,
+ int&nbsp;cols,
+ <a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&nbsp;zeroValue,
+ int[]&nbsp;rowPointers,
+ int[]&nbsp;colIndices,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;values)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(int,int,E,java.util.List)" class="member-name-link">SparseMatrixStorage</a><wbr>(int&nbsp;rows,
+ int&nbsp;cols,
+ <a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&nbsp;zeroValue,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/TreeMap.html" title="class or interface in java.util" class="external-link">TreeMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr><a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&gt;&gt;&nbsp;rowMaps)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -200,6 +214,30 @@ empty.
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">SparseMatrixStorage</span><wbr><span class="parameters">(int&nbsp;rows,
  int&nbsp;cols,
  <a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&nbsp;zeroValue)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(int,int,E,int[],int[],java.lang.Object[])">
+<h3 id="&lt;init&gt;(int,int,java.lang.Object,int[],int[],java.lang.Object[])">SparseMatrixStorage</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">SparseMatrixStorage</span><wbr><span class="parameters">(int&nbsp;rows,
+ int&nbsp;cols,
+ <a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&nbsp;zeroValue,
+ int[]&nbsp;rowPointers,
+ int[]&nbsp;colIndices,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>[]&nbsp;values)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(int,int,E,java.util.List)">
+<h3 id="&lt;init&gt;(int,int,java.lang.Object,java.util.List)">SparseMatrixStorage</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">SparseMatrixStorage</span><wbr><span class="parameters">(int&nbsp;rows,
+ int&nbsp;cols,
+ <a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&nbsp;zeroValue,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/TreeMap.html" title="class or interface in java.util" class="external-link">TreeMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr><a href="#type-param-E" title="type parameter in SparseMatrixStorage">E</a>&gt;&gt;&nbsp;rowMaps)</span></div>
 </div>
 </section>
 </li>

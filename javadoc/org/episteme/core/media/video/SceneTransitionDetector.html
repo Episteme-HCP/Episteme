@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,6 +60,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#detectCuts(java.util.List,double)" tabindex="0">detectCuts(List, double)</a></li>
+<li><a href="#calculateHistogramDiff(float%5B%5D%5B%5D,float%5B%5D%5B%5D)" tabindex="0">calculateHistogramDiff(float[][], float[][])</a></li>
 <li><a href="#fadeToBlackIntensity(float%5B%5D%5B%5D)" tabindex="0">fadeToBlackIntensity(float[][])</a></li>
 </ol>
 </li>
@@ -78,7 +79,13 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">SceneTransitionDetector</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Detects hard cuts and scene changes in video sequences.</div>
+<div class="block">Utility for detecting scene transitions in video streams.</div>
+<dl class="notes">
+<dt>Since:</dt>
+<dd>1.2</dd>
+<dt>Author:</dt>
+<dd>Silvere Martin-Michiellot, Gemini AI (Google DeepMind)</dd>
+</dl>
 </div>
 </section>
 <section class="summary">
@@ -109,17 +116,19 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#detectCuts(java.util.List,double)" class="member-name-link">detectCuts</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;float[][]&gt;&nbsp;frames,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#calculateHistogramDiff(float%5B%5D%5B%5D,float%5B%5D%5B%5D)" class="member-name-link">calculateHistogramDiff</a><wbr>(float[][]&nbsp;f1,
+ float[][]&nbsp;f2)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#detectCuts(java.util.List,double)" class="member-name-link">detectCuts</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;float[][]&gt;&nbsp;frames,
  double&nbsp;threshold)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Detects hard cuts using histogram differences.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#fadeToBlackIntensity(float%5B%5D%5B%5D)" class="member-name-link">fadeToBlackIntensity</a><wbr>(float[][]&nbsp;frame)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Estimates likelihood of a Fade-to-Black.</div>
-</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#fadeToBlackIntensity(float%5B%5D%5B%5D)" class="member-name-link">fadeToBlackIntensity</a><wbr>(float[][]&nbsp;frame)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -148,11 +157,19 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="calculateHistogramDiff(float[][],float[][])">
+<h3>calculateHistogramDiff</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">calculateHistogramDiff</span><wbr><span class="parameters">(float[][]&nbsp;f1,
+ float[][]&nbsp;f2)</span></div>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="fadeToBlackIntensity(float[][])">
 <h3>fadeToBlackIntensity</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">fadeToBlackIntensity</span><wbr><span class="parameters">(float[][]&nbsp;frame)</span></div>
-<div class="block">Estimates likelihood of a Fade-to-Black.</div>
 </div>
 </section>
 </li>

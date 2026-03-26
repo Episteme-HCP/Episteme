@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -63,6 +63,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#ROWS_FIELD_NUMBER" tabindex="0">ROWS_FIELD_NUMBER</a></li>
 <li><a href="#COLS_FIELD_NUMBER" tabindex="0">COLS_FIELD_NUMBER</a></li>
 <li><a href="#DATA_FIELD_NUMBER" tabindex="0">DATA_FIELD_NUMBER</a></li>
+<li><a href="#IS_COMPLEX_FIELD_NUMBER" tabindex="0">IS_COMPLEX_FIELD_NUMBER</a></li>
+<li><a href="#HP_DATA_FIELD_NUMBER" tabindex="0">HP_DATA_FIELD_NUMBER</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -72,9 +74,12 @@ loadScripts(document, 'script');</script>
 <li><a href="#internalGetFieldAccessorTable()" tabindex="0">internalGetFieldAccessorTable()</a></li>
 <li><a href="#getRows()" tabindex="0">getRows()</a></li>
 <li><a href="#getCols()" tabindex="0">getCols()</a></li>
-<li><a href="#getDataList()" tabindex="0">getDataList()</a></li>
-<li><a href="#getDataCount()" tabindex="0">getDataCount()</a></li>
-<li><a href="#getData(int)" tabindex="0">getData(int)</a></li>
+<li><a href="#getData()" tabindex="0">getData()</a></li>
+<li><a href="#getIsComplex()" tabindex="0">getIsComplex()</a></li>
+<li><a href="#getHpDataList()" tabindex="0">getHpDataList()</a></li>
+<li><a href="#getHpDataCount()" tabindex="0">getHpDataCount()</a></li>
+<li><a href="#getHpData(int)" tabindex="0">getHpData(int)</a></li>
+<li><a href="#getHpDataBytes(int)" tabindex="0">getHpDataBytes(int)</a></li>
 <li><a href="#isInitialized()" tabindex="0">isInitialized()</a></li>
 <li><a href="#writeTo(com.google.protobuf.CodedOutputStream)" tabindex="0">writeTo(CodedOutputStream)</a></li>
 <li><a href="#getSerializedSize()" tabindex="0">getSerializedSize()</a></li>
@@ -181,6 +186,12 @@ implements <a href="MatrixDataOrBuilder.html" title="interface in org.episteme.s
 <div class="col-second odd-row-color"><code><a href="#DATA_FIELD_NUMBER" class="member-name-link">DATA_FIELD_NUMBER</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final int</code></div>
+<div class="col-second even-row-color"><code><a href="#HP_DATA_FIELD_NUMBER" class="member-name-link">HP_DATA_FIELD_NUMBER</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final int</code></div>
+<div class="col-second odd-row-color"><code><a href="#IS_COMPLEX_FIELD_NUMBER" class="member-name-link">IS_COMPLEX_FIELD_NUMBER</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final int</code></div>
 <div class="col-second even-row-color"><code><a href="#ROWS_FIELD_NUMBER" class="member-name-link">ROWS_FIELD_NUMBER</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
@@ -214,23 +225,11 @@ implements <a href="MatrixDataOrBuilder.html" title="interface in org.episteme.s
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block"><code>int32 cols = 2;</code></div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getData(int)" class="member-name-link">getData</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getData()" class="member-name-link">getData</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">
-Row-major order</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDataCount()" class="member-name-link">getDataCount</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">
-Row-major order</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDataList()" class="member-name-link">getDataList</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">
-Row-major order</div>
+Raw double data (Zero-copy payload)</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDefaultInstance()" class="member-name-link">getDefaultInstance</a>()</code></div>
@@ -241,92 +240,121 @@ Row-major order</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static final com.google.protobuf.Descriptors.Descriptor</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDescriptor()" class="member-name-link">getDescriptor</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.Parser<wbr>&lt;<a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getParserForType()" class="member-name-link">getParserForType</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRows()" class="member-name-link">getRows</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpData(int)" class="member-name-link">getHpData</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">
+For high-precision elements (RealBig)</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpDataBytes(int)" class="member-name-link">getHpDataBytes</a><wbr>(int&nbsp;index)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block"><code>int32 rows = 1;</code></div>
+<div class="block">
+For high-precision elements (RealBig)</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSerializedSize()" class="member-name-link">getSerializedSize</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpDataCount()" class="member-name-link">getHpDataCount</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">
+For high-precision elements (RealBig)</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.ProtocolStringList</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpDataList()" class="member-name-link">getHpDataList</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">
+For high-precision elements (RealBig)</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getIsComplex()" class="member-name-link">getIsComplex</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block"><code>bool is_complex = 4;</code></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.Parser<wbr>&lt;<a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getParserForType()" class="member-name-link">getParserForType</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRows()" class="member-name-link">getRows</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block"><code>int32 rows = 1;</code></div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSerializedSize()" class="member-name-link">getSerializedSize</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#internalGetFieldAccessorTable()" class="member-name-link">internalGetFieldAccessorTable</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isInitialized()" class="member-name-link">isInitialized</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#internalGetFieldAccessorTable()" class="member-name-link">internalGetFieldAccessorTable</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#newBuilder()" class="member-name-link">newBuilder</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isInitialized()" class="member-name-link">isInitialized</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#newBuilder(org.episteme.server.server.proto.MatrixData)" class="member-name-link">newBuilder</a><wbr>(<a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&nbsp;prototype)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#newBuilder()" class="member-name-link">newBuilder</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#newBuilderForType()" class="member-name-link">newBuilderForType</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#newBuilderForType(com.google.protobuf.GeneratedMessageV3.BuilderParent)" class="member-name-link">newBuilderForType</a><wbr>(com.google.protobuf.GeneratedMessageV3.BuilderParent&nbsp;parent)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#newBuilder(org.episteme.server.server.proto.MatrixData)" class="member-name-link">newBuilder</a><wbr>(<a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&nbsp;prototype)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#newBuilderForType()" class="member-name-link">newBuilderForType</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#newInstance(com.google.protobuf.GeneratedMessageV3.UnusedPrivateParameter)" class="member-name-link">newInstance</a><wbr>(com.google.protobuf.GeneratedMessageV3.UnusedPrivateParameter&nbsp;unused)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#newBuilderForType(com.google.protobuf.GeneratedMessageV3.BuilderParent)" class="member-name-link">newBuilderForType</a><wbr>(com.google.protobuf.GeneratedMessageV3.BuilderParent&nbsp;parent)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseDelimitedFrom(java.io.InputStream)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseDelimitedFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(byte%5B%5D)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(byte%5B%5D,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.ByteString)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.ByteString,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.CodedInputStream)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.CodedInputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.io.InputStream)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.nio.ByteBuffer)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.nio.ByteBuffer,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static com.google.protobuf.Parser<wbr>&lt;<a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parser()" class="member-name-link">parser</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toBuilder()" class="member-name-link">toBuilder</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo</a><wbr>(com.google.protobuf.CodedOutputStream&nbsp;output)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#newInstance(com.google.protobuf.GeneratedMessageV3.UnusedPrivateParameter)" class="member-name-link">newInstance</a><wbr>(com.google.protobuf.GeneratedMessageV3.UnusedPrivateParameter&nbsp;unused)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseDelimitedFrom(java.io.InputStream)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseDelimitedFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(byte%5B%5D)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(byte%5B%5D,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.ByteString)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.ByteString,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.CodedInputStream)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(com.google.protobuf.CodedInputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.io.InputStream)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.nio.ByteBuffer)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseFrom(java.nio.ByteBuffer,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static com.google.protobuf.Parser<wbr>&lt;<a href="MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parser()" class="member-name-link">parser</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toBuilder()" class="member-name-link">toBuilder</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo</a><wbr>(com.google.protobuf.CodedOutputStream&nbsp;output)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -407,6 +435,38 @@ Row-major order</div>
 </div>
 </section>
 </li>
+<li>
+<section class="detail" id="IS_COMPLEX_FIELD_NUMBER">
+<h3>IS_COMPLEX_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">IS_COMPLEX_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.MatrixData.IS_COMPLEX_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="HP_DATA_FIELD_NUMBER">
+<h3>HP_DATA_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">HP_DATA_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.MatrixData.HP_DATA_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -478,60 +538,115 @@ Row-major order</div>
 </section>
 </li>
 <li>
-<section class="detail" id="getDataList()">
-<h3>getDataList</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;</span>&nbsp;<span class="element-name">getDataList</span>()</div>
-<div class="block"><pre>
-Row-major order
-</pre>
-
-<code>repeated double data = 3;</code></div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="MatrixDataOrBuilder.html#getDataList()">getDataList</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
-<dt>Returns:</dt>
-<dd>A list containing the data.</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getDataCount()">
-<h3>getDataCount</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getDataCount</span>()</div>
-<div class="block"><pre>
-Row-major order
-</pre>
-
-<code>repeated double data = 3;</code></div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="MatrixDataOrBuilder.html#getDataCount()">getDataCount</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
-<dt>Returns:</dt>
-<dd>The count of data.</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getData(int)">
+<section class="detail" id="getData()">
 <h3>getData</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getData</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getData</span>()</div>
 <div class="block"><pre>
-Row-major order
+Raw double data (Zero-copy payload)
 </pre>
 
-<code>repeated double data = 3;</code></div>
+<code>bytes data = 3;</code></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="MatrixDataOrBuilder.html#getData(int)">getData</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
+<dd><code><a href="MatrixDataOrBuilder.html#getData()">getData</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The data.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getIsComplex()">
+<h3>getIsComplex</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">getIsComplex</span>()</div>
+<div class="block"><code>bool is_complex = 4;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="MatrixDataOrBuilder.html#getIsComplex()">getIsComplex</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The isComplex.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpDataList()">
+<h3>getHpDataList</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.protobuf.ProtocolStringList</span>&nbsp;<span class="element-name">getHpDataList</span>()</div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="MatrixDataOrBuilder.html#getHpDataList()">getHpDataList</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>A list containing the hpData.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpDataCount()">
+<h3>getHpDataCount</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getHpDataCount</span>()</div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="MatrixDataOrBuilder.html#getHpDataCount()">getHpDataCount</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The count of hpData.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpData(int)">
+<h3>getHpData</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHpData</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="MatrixDataOrBuilder.html#getHpData(int)">getHpData</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>index</code> - The index of the element to return.</dd>
 <dt>Returns:</dt>
-<dd>The data at the given index.</dd>
+<dd>The hpData at the given index.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpDataBytes(int)">
+<h3>getHpDataBytes</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getHpDataBytes</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="MatrixDataOrBuilder.html#getHpDataBytes(int)">getHpDataBytes</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixDataOrBuilder.html" title="interface in org.episteme.server.server.proto">MatrixDataOrBuilder</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>index</code> - The index of the value to return.</dd>
+<dt>Returns:</dt>
+<dd>The bytes of the hpData at the given index.</dd>
 </dl>
 </div>
 </section>

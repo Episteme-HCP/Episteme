@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,17 +60,13 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="#org.episteme.benchmarks.benchmark.benchmarks">org.episteme.benchmarks.benchmark.benchmarks</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.client.client.distributed">org.episteme.client.client.distributed</a></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core">org.episteme.core</a></div>
-<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.distributed">org.episteme.core.distributed</a></div>
 <div class="col-last odd-row-color">
 <div class="block">Distributed computing infrastructure for Episteme.</div>
 </div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.distributed.providers">org.episteme.core.distributed.providers</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.distributed.backends">org.episteme.core.distributed.backends</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.algorithms">org.episteme.core.mathematics.linearalgebra.algorithms</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.backend.distributed">org.episteme.core.technical.backend.distributed</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.server.server.biology.structure">org.episteme.server.server.biology.structure</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -109,36 +105,6 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.client.client.distributed">
-<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.distributed</a> used by <a href="../../client/client/distributed/package-summary.html">org.episteme.client.client.distributed</a></span></div>
-<div class="summary-table two-column-summary">
-<div class="table-header col-first">Class</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/DistributedContext.html#org.episteme.client.client.distributed">DistributedContext</a></div>
-<div class="col-last even-row-color">
-<div class="block">Defines the contract for distributed computing contexts.</div>
-</div>
-<div class="col-first odd-row-color"><a href="class-use/DistributedContext.Priority.html#org.episteme.client.client.distributed">DistributedContext.Priority</a></div>
-<div class="col-last odd-row-color">
-<div class="block">Priority levels for distributed tasks.</div>
-</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.core">
-<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.distributed</a> used by <a href="../package-summary.html">org.episteme.core</a></span></div>
-<div class="summary-table two-column-summary">
-<div class="table-header col-first">Class</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/DistributedContext.html#org.episteme.core">DistributedContext</a></div>
-<div class="col-last even-row-color">
-<div class="block">Defines the contract for distributed computing contexts.</div>
-</div>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="org.episteme.core.distributed">
 <div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.distributed</a> used by <a href="package-summary.html">org.episteme.core.distributed</a></span></div>
 <div class="summary-table two-column-summary">
@@ -147,14 +113,6 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><a href="class-use/ComputationException.html#org.episteme.core.distributed">ComputationException</a></div>
 <div class="col-last even-row-color">
 <div class="block">Exception thrown when a distributed task computation fails.</div>
-</div>
-<div class="col-first odd-row-color"><a href="class-use/DistributedContext.html#org.episteme.core.distributed">DistributedContext</a></div>
-<div class="col-last odd-row-color">
-<div class="block">Defines the contract for distributed computing contexts.</div>
-</div>
-<div class="col-first even-row-color"><a href="class-use/DistributedContext.Priority.html#org.episteme.core.distributed">DistributedContext.Priority</a></div>
-<div class="col-last even-row-color">
-<div class="block">Priority levels for distributed tasks.</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/DistributedTask.html#org.episteme.core.distributed">DistributedTask</a></div>
 <div class="col-last odd-row-color">
@@ -176,31 +134,27 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.distributed.providers">
-<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.distributed</a> used by <a href="providers/package-summary.html">org.episteme.core.distributed.providers</a></span></div>
+<section class="detail" id="org.episteme.core.distributed.backends">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.distributed</a> used by <a href="backends/package-summary.html">org.episteme.core.distributed.backends</a></span></div>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/DistributedComputingProvider.html#org.episteme.core.distributed.providers">DistributedComputingProvider</a></div>
+<div class="col-first even-row-color"><a href="class-use/DistributedComputingProvider.html#org.episteme.core.distributed.backends">DistributedComputingProvider</a></div>
 <div class="col-last even-row-color">
 <div class="block">Service provider interface for distributed computing backends.</div>
-</div>
-<div class="col-first odd-row-color"><a href="class-use/DistributedContext.html#org.episteme.core.distributed.providers">DistributedContext</a></div>
-<div class="col-last odd-row-color">
-<div class="block">Defines the contract for distributed computing contexts.</div>
 </div>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.mathematics.linearalgebra.algorithms">
-<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.distributed</a> used by <a href="../mathematics/linearalgebra/algorithms/package-summary.html">org.episteme.core.mathematics.linearalgebra.algorithms</a></span></div>
+<section class="detail" id="org.episteme.core.technical.backend.distributed">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.distributed</a> used by <a href="../technical/backend/distributed/package-summary.html">org.episteme.core.technical.backend.distributed</a></span></div>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/DistributedContext.html#org.episteme.core.mathematics.linearalgebra.algorithms">DistributedContext</a></div>
+<div class="col-first even-row-color"><a href="class-use/DistributedComputingProvider.html#org.episteme.core.technical.backend.distributed">DistributedComputingProvider</a></div>
 <div class="col-last even-row-color">
-<div class="block">Defines the contract for distributed computing contexts.</div>
+<div class="block">Service provider interface for distributed computing backends.</div>
 </div>
 </div>
 </section>

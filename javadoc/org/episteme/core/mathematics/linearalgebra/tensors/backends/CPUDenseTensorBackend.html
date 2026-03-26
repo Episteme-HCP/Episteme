@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -69,11 +69,13 @@ loadScripts(document, 'script');</script>
 <li><a href="#create(T%5B%5D,int...)" tabindex="0">create(T[], int...)</a></li>
 <li><a href="#supportsGPU()" tabindex="0">supportsGPU()</a></li>
 <li><a href="#getName()" tabindex="0">getName()</a></li>
+<li><a href="#getType()" tabindex="0">getType()</a></li>
 <li><a href="#getPriority()" tabindex="0">getPriority()</a></li>
 <li><a href="#createContext()" tabindex="0">createContext()</a></li>
 <li><a href="#supportsParallelOps()" tabindex="0">supportsParallelOps()</a></li>
 <li><a href="#isAvailable()" tabindex="0">isAvailable()</a></li>
 <li><a href="#getId()" tabindex="0">getId()</a></li>
+<li><a href="#shutdown()" tabindex="0">shutdown()</a></li>
 <li><a href="#getAcceleratorType()" tabindex="0">getAcceleratorType()</a></li>
 <li><a href="#getDescription()" tabindex="0">getDescription()</a></li>
 </ol>
@@ -91,13 +93,14 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a>, <a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, <a href="../../../../technical/algorithm/TensorProvider.html" title="interface in org.episteme.core.technical.algorithm">TensorProvider</a>, <a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>, <a href="../../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dd><code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a>, <a href="../TensorProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorProvider</a>, <a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, <a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>, <a href="../../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>, <a href="../../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
-<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">CPUDenseTensorBackend</span>
+<div class="type-signature"><span class="annotations">@AutoService({<a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>.class,<a href="../../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a>.class})
+</span><span class="modifiers">public class </span><span class="element-name type-name-label">CPUDenseTensorBackend</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span></div>
+implements <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a>, <a href="../../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></span></div>
 <div class="block">Native (pure Java) tensor provider.
 <li>Small to medium tensors</li>
 <li>Type-safe operations with Field&lt;T&gt;</li>
@@ -175,16 +178,28 @@ implements <a href="../TensorBackend.html" title="interface in org.episteme.core
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the priority of this provider (higher = preferred).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAvailable()" class="member-name-link">isAvailable</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the backend type category (e.g., "plotting", "molecular", "tensor",
+"math").</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAvailable()" class="member-name-link">isAvailable</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;<a href="../../Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;T&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ones(java.lang.Class,int...)" class="member-name-link">ones</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;elementType,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;<a href="../../Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;T&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ones(java.lang.Class,int...)" class="member-name-link">ones</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;elementType,
  int...&nbsp;shape)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Creates a tensor with the given shape, filled with ones.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shutdown()" class="member-name-link">shutdown</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#supportsGPU()" class="member-name-link">supportsGPU</a>()</code></div>
@@ -210,16 +225,19 @@ implements <a href="../TensorBackend.html" title="interface in org.episteme.core
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.technical.algorithm.AlgorithmProvider">Methods inherited from interface&nbsp;<a href="../../../../technical/algorithm/AlgorithmProvider.html#method-summary" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></h3>
-<code><a href="../../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)" title="score(OperationContext)">score</a></code></div>
+<code><a href="../../../../technical/algorithm/AlgorithmProvider.html#getMetadata()" title="getMetadata()">getMetadata</a>, <a href="../../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)" title="score(OperationContext)">score</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.Backend">Methods inherited from interface&nbsp;<a href="../../../../technical/backend/Backend.html#method-summary" title="interface in org.episteme.core.technical.backend">Backend</a></h3>
-<code><a href="../../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a></code></div>
+<code><a href="../../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a>, <a href="../../../../technical/backend/Backend.html#getStatusMessage()" title="getStatusMessage()">getStatusMessage</a>, <a href="../../../../technical/backend/Backend.html#isExplicitlyDisabled()" title="isExplicitlyDisabled()">isExplicitlyDisabled</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.ComputeBackend">Methods inherited from interface&nbsp;<a href="../../../../technical/backend/ComputeBackend.html#method-summary" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></h3>
-<code><a href="../../../../technical/backend/ComputeBackend.html#createBackend()" title="createBackend()">createBackend</a>, <a href="../../../../technical/backend/ComputeBackend.html#getType()" title="getType()">getType</a>, <a href="../../../../technical/backend/ComputeBackend.html#supportsComplexNumbers()" title="supportsComplexNumbers()">supportsComplexNumbers</a>, <a href="../../../../technical/backend/ComputeBackend.html#supportsFloatingPoint()" title="supportsFloatingPoint()">supportsFloatingPoint</a></code></div>
+<code><a href="../../../../technical/backend/ComputeBackend.html#createBackend()" title="createBackend()">createBackend</a></code></div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.episteme.core.technical.algorithm.TensorProvider">Methods inherited from interface&nbsp;<a href="../../../../technical/algorithm/TensorProvider.html#method-summary" title="interface in org.episteme.core.technical.algorithm">TensorProvider</a></h3>
-<code><a href="../../../../technical/algorithm/TensorProvider.html#getAlgorithmType()" title="getAlgorithmType()">getAlgorithmType</a></code></div>
+<h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.cpu.CPUBackend">Methods inherited from interface&nbsp;<a href="../../../../technical/backend/cpu/CPUBackend.html#method-summary" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></h3>
+<code><a href="../../../../technical/backend/cpu/CPUBackend.html#supportsComplexNumbers()" title="supportsComplexNumbers()">supportsComplexNumbers</a>, <a href="../../../../technical/backend/cpu/CPUBackend.html#supportsFloatingPoint()" title="supportsFloatingPoint()">supportsFloatingPoint</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.mathematics.linearalgebra.tensors.TensorProvider">Methods inherited from interface&nbsp;<a href="../TensorProvider.html#method-summary" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorProvider</a></h3>
+<code><a href="../TensorProvider.html#getAlgorithmType()" title="getAlgorithmType()">getAlgorithmType</a></code></div>
 </section>
 </li>
 </ul>
@@ -259,7 +277,7 @@ implements <a href="../TensorBackend.html" title="interface in org.episteme.core
 <dt>Specified by:</dt>
 <dd><code><a href="../TensorBackend.html#zeros(java.lang.Class,int...)">zeros</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></dd>
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../technical/algorithm/TensorProvider.html#zeros(java.lang.Class,int...)">zeros</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/TensorProvider.html" title="interface in org.episteme.core.technical.algorithm">TensorProvider</a></code></dd>
+<dd><code><a href="../TensorProvider.html#zeros(java.lang.Class,int...)">zeros</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorProvider</a></code></dd>
 <dt>Type Parameters:</dt>
 <dd><span id="zeros(java.lang.Class,int...)-type-param-T"><code>T</code> - the element type</span></dd>
 <dt>Parameters:</dt>
@@ -283,7 +301,7 @@ implements <a href="../TensorBackend.html" title="interface in org.episteme.core
 <dt>Specified by:</dt>
 <dd><code><a href="../TensorBackend.html#ones(java.lang.Class,int...)">ones</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></dd>
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../technical/algorithm/TensorProvider.html#ones(java.lang.Class,int...)">ones</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/TensorProvider.html" title="interface in org.episteme.core.technical.algorithm">TensorProvider</a></code></dd>
+<dd><code><a href="../TensorProvider.html#ones(java.lang.Class,int...)">ones</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorProvider</a></code></dd>
 <dt>Type Parameters:</dt>
 <dd><span id="ones(java.lang.Class,int...)-type-param-T"><code>T</code> - the element type</span></dd>
 <dt>Parameters:</dt>
@@ -307,7 +325,7 @@ implements <a href="../TensorBackend.html" title="interface in org.episteme.core
 <dt>Specified by:</dt>
 <dd><code><a href="../TensorBackend.html#create(T%5B%5D,int...)">create</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></dd>
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../technical/algorithm/TensorProvider.html#create(T%5B%5D,int...)">create</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/TensorProvider.html" title="interface in org.episteme.core.technical.algorithm">TensorProvider</a></code></dd>
+<dd><code><a href="../TensorProvider.html#create(T%5B%5D,int...)">create</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorProvider</a></code></dd>
 <dt>Type Parameters:</dt>
 <dd><span id="create(T[],int...)-type-param-T"><code>T</code> - the element type</span></dd>
 <dt>Parameters:</dt>
@@ -350,9 +368,28 @@ implements <a href="../TensorBackend.html" title="interface in org.episteme.core
 <dt>Specified by:</dt>
 <dd><code><a href="../TensorBackend.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></dd>
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../technical/algorithm/TensorProvider.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/TensorProvider.html" title="interface in org.episteme.core.technical.algorithm">TensorProvider</a></code></dd>
+<dd><code><a href="../TensorProvider.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorProvider</a></code></dd>
 <dt>Returns:</dt>
 <dd>provider name (e.g., "Native", "ND4J", "DJL")</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getType()">
+<h3>getType</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getType</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../technical/backend/Backend.html#getType()">Backend</a></code></span></div>
+<div class="block">Returns the backend type category (e.g., "plotting", "molecular", "tensor",
+"math").</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/backend/Backend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/backend/ComputeBackend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/backend/cpu/CPUBackend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -410,6 +447,8 @@ proper cleanup of resources.
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../technical/backend/ComputeBackend.html#supportsParallelOps()">supportsParallelOps</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/backend/cpu/CPUBackend.html#supportsParallelOps()">supportsParallelOps</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
 <dt>Returns:</dt>
 <dd>true if parallel execution is supported</dd>
 </dl>
@@ -422,7 +461,11 @@ proper cleanup of resources.
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isAvailable</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../technical/backend/Backend.html#isAvailable()">Backend</a></code></span></div>
-<div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
+<div class="block">Checks if this backend is currently available (libraries loaded, etc.).
+<p>
+Default implementation checks <a href="../../../../technical/backend/Backend.html#isExplicitlyDisabled()"><code>Backend.isExplicitlyDisabled()</code></a> and returns
+false if it is.
+</p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
@@ -452,6 +495,27 @@ proper cleanup of resources.
 </section>
 </li>
 <li>
+<section class="detail" id="shutdown()">
+<h3>shutdown</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">shutdown</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../technical/backend/Backend.html#shutdown()">Backend</a></code></span></div>
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.
+Use this to release hardware resources, close file handles, or stop
+background threads.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/algorithm/AlgorithmProvider.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/backend/Backend.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../TensorBackend.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="getAcceleratorType()">
 <h3>getAcceleratorType</h3>
 <div class="horizontal-scroll">
@@ -461,6 +525,8 @@ proper cleanup of resources.
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../../technical/backend/ComputeBackend.html#getAcceleratorType()">getAcceleratorType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../../technical/backend/cpu/CPUBackend.html#getAcceleratorType()">getAcceleratorType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
 <dt>Returns:</dt>
 <dd>the accelerator type</dd>
 </dl>

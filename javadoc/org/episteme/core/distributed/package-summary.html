@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -96,7 +96,7 @@ abstraction</li>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="../package-summary.html">org.episteme.core</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="providers/package-summary.html">org.episteme.core.distributed.providers</a></div>
+<div class="col-first odd-row-color"><a href="backends/package-summary.html">org.episteme.core.distributed.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </div>
@@ -120,44 +120,41 @@ abstraction</li>
 <div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Service provider interface for distributed computing backends.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
-<div class="block">Defines the contract for distributed computing contexts.</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="DistributedExecutionContext.html" title="class in org.episteme.core.distributed">DistributedExecutionContext</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">Execution context adapter that bridges <a href="../technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed"><code>DistributedContext</code></a> with 
+the <a href="../technical/backend/ExecutionContext.html" title="interface in org.episteme.core.technical.backend"><code>ExecutionContext</code></a> interface.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab3"><a href="DistributedContext.Priority.html" title="enum class in org.episteme.core.distributed">DistributedContext.Priority</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab3">
-<div class="block">Priority levels for distributed tasks.</div>
-</div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="DistributedTask.html" title="interface in org.episteme.core.distributed">DistributedTask</a>&lt;I extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, O extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="DistributedTask.html" title="interface in org.episteme.core.distributed">DistributedTask</a>&lt;I extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, O extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Core interface for distributed scientific computation tasks.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="LocalDistributedContext.html" title="class in org.episteme.core.distributed">LocalDistributedContext</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="LocalDistributedContext.html" title="class in org.episteme.core.distributed">LocalDistributedContext</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Local implementation of DistributedContext using ForkJoinPool.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="MPIDistributedContext.html" title="class in org.episteme.core.distributed">MPIDistributedContext</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="MPIDistributedContext.html" title="class in org.episteme.core.distributed">MPIDistributedContext</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">MPI-based implementation of DistributedContext.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="RemoteDistributedContext.html" title="class in org.episteme.core.distributed">RemoteDistributedContext</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="RemoteDistributedContext.html" title="class in org.episteme.core.distributed">RemoteDistributedContext</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Remote implementation of DistributedContext (stub).</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="SparkDistributedContext.html" title="class in org.episteme.core.distributed">SparkDistributedContext</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="SparkDistributedContext.html" title="class in org.episteme.core.distributed">SparkDistributedContext</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Apache Spark-based implementation of DistributedContext.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="TaskProvider.html" title="interface in org.episteme.core.distributed">TaskProvider</a>&lt;I extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, O extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="TaskProvider.html" title="interface in org.episteme.core.distributed">TaskProvider</a>&lt;I extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, O extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Provider interface for creating distributed task instances.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="TaskRegistry.html" title="class in org.episteme.core.distributed">TaskRegistry</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="TaskRegistry.html" title="class in org.episteme.core.distributed">TaskRegistry</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Registry for distributed task implementations.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab3"><a href="TaskRegistry.PrecisionMode.html" title="enum class in org.episteme.core.distributed">TaskRegistry.PrecisionMode</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab3">
+<div class="col-first odd-row-color class-summary class-summary-tab3"><a href="TaskRegistry.PrecisionMode.html" title="enum class in org.episteme.core.distributed">TaskRegistry.PrecisionMode</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab3">
 <div class="block">Precision mode for task execution.</div>
 </div>
 </div>

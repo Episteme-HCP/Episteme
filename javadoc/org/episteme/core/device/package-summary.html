@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -88,29 +88,53 @@ loadScripts(document, 'script');</script>
 </li>
 <li>
 <div id="class-summary">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="class-summary-tab0" role="tab" aria-selected="true" aria-controls="class-summary.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary', 2)" class="active-table-tab">All Classes and Interfaces</button><button id="class-summary-tab1" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab1', 2)" class="table-tab">Interfaces</button><button id="class-summary-tab2" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab2', 2)" class="table-tab">Classes</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="class-summary-tab0" role="tab" aria-selected="true" aria-controls="class-summary.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary', 2)" class="active-table-tab">All Classes and Interfaces</button><button id="class-summary-tab1" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab1', 2)" class="table-tab">Interfaces</button><button id="class-summary-tab2" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab2', 2)" class="table-tab">Classes</button><button id="class-summary-tab3" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab3', 2)" class="table-tab">Enum Classes</button><button id="class-summary-tab4" role="tab" aria-selected="false" aria-controls="class-summary.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('class-summary', 'class-summary-tab4', 2)" class="table-tab">Record Classes</button></div>
 <div id="class-summary.tabpanel" role="tabpanel" aria-labelledby="class-summary-tab0">
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="AbstractActuator.html" title="class in org.episteme.core.device">AbstractActuator</a>&lt;C&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="block">Base implementation for actuator devices.</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="AbstractDevice.html" title="class in org.episteme.core.device">AbstractDevice</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">Base implementation for the <a href="Device.html" title="interface in org.episteme.core.device"><code>Device</code></a> interface.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab4"><a href="AbstractDevice.Record.html" title="class in org.episteme.core.device">AbstractDevice.Record</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab4">
+<div class="block">Represents a single record in the device history.</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="AbstractSensor.html" title="class in org.episteme.core.device">AbstractSensor</a>&lt;Q extends <a href="../measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;Q&gt;&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">Base implementation for sensor devices.</div>
+</div>
 <div class="col-first even-row-color class-summary class-summary-tab1"><a href="Actuator.html" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;</div>
 <div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Represents an actuator device that accepts commands.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Device.html" title="interface in org.episteme.core.device">Device</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
-<div class="block">Represents a physical or virtual device.</div>
-</div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="GPIBDevice.html" title="class in org.episteme.core.device">GPIBDevice</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
-<div class="block">Abstract base class for GPIB (IEEE-488) devices.</div>
-</div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Instrument.html" title="interface in org.episteme.core.device">Instrument</a></div>
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="ComplexInstrument.html" title="interface in org.episteme.core.device">ComplexInstrument</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Represents a complex instrument that may contain multiple sensors or
 actuators.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Sensor.html" title="interface in org.episteme.core.device">Sensor</a>&lt;D&gt;</div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Device.html" title="interface in org.episteme.core.device">Device</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="block">Primary interface for all hardware and software devices in the Episteme ecosystem.</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Device.Record.html" title="interface in org.episteme.core.device">Device.Record</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="block">Represents a single record in the device history.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab3"><a href="Device.Status.html" title="enum class in org.episteme.core.device">Device.Status</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab3">
+<div class="block">Device connection and operational status.</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="GPIBDevice.html" title="class in org.episteme.core.device">GPIBDevice</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">Abstract base class for GPIB (IEEE-488) devices.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Sensor.html" title="interface in org.episteme.core.device">Sensor</a>&lt;Q extends <a href="../measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;Q&gt;&gt;</div>
 <div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Represents a sensor device that produces data.</div>
 </div>

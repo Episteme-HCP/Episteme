@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -69,6 +69,21 @@ loadScripts(document, 'script');</script>
 <li><a href="#DETERMINISTIC" tabindex="0">DETERMINISTIC</a></li>
 <li><a href="#FLOAT32_OK" tabindex="0">FLOAT32_OK</a></li>
 <li><a href="#BATCH" tabindex="0">BATCH</a></li>
+<li><a href="#MAT_MUL" tabindex="0">MAT_MUL</a></li>
+<li><a href="#MAT_DIV" tabindex="0">MAT_DIV</a></li>
+<li><a href="#MAT_INV" tabindex="0">MAT_INV</a></li>
+<li><a href="#MAT_DET" tabindex="0">MAT_DET</a></li>
+<li><a href="#MAT_SOLVE" tabindex="0">MAT_SOLVE</a></li>
+<li><a href="#MAT_TRANSPOSE" tabindex="0">MAT_TRANSPOSE</a></li>
+<li><a href="#MAT_SCALE" tabindex="0">MAT_SCALE</a></li>
+<li><a href="#MAT_ADD" tabindex="0">MAT_ADD</a></li>
+<li><a href="#MAT_SUBTRACT" tabindex="0">MAT_SUBTRACT</a></li>
+<li><a href="#MAT_QR" tabindex="0">MAT_QR</a></li>
+<li><a href="#MAT_SVD" tabindex="0">MAT_SVD</a></li>
+<li><a href="#MAT_CHOLESKY" tabindex="0">MAT_CHOLESKY</a></li>
+<li><a href="#MAT_LU" tabindex="0">MAT_LU</a></li>
+<li><a href="#MAT_EIGEN" tabindex="0">MAT_EIGEN</a></li>
+<li><a href="#HIGH_PRECISION" tabindex="0">HIGH_PRECISION</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -150,16 +165,76 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Data fits in GPU memory</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#HIGH_THROUGHPUT" class="member-name-link">HIGH_THROUGHPUT</a></code></div>
+<div class="col-first odd-row-color"><code><a href="#HIGH_PRECISION" class="member-name-link">HIGH_PRECISION</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">High precision required (e.g. for RealBig/Complex)</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#HIGH_THROUGHPUT" class="member-name-link">HIGH_THROUGHPUT</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Operation is throughput-sensitive</div>
 </div>
-<div class="col-first even-row-color"><code><a href="#LOW_LATENCY" class="member-name-link">LOW_LATENCY</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code><a href="#LOW_LATENCY" class="member-name-link">LOW_LATENCY</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Operation is latency-sensitive</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="#SPARSE" class="member-name-link">SPARSE</a></code></div>
+<div class="col-first even-row-color"><code><a href="#MAT_ADD" class="member-name-link">MAT_ADD</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Matrix Addition</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#MAT_CHOLESKY" class="member-name-link">MAT_CHOLESKY</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">Cholesky Decomposition</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#MAT_DET" class="member-name-link">MAT_DET</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Matrix Determinant</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#MAT_DIV" class="member-name-link">MAT_DIV</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Matrix Division / Solve</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#MAT_EIGEN" class="member-name-link">MAT_EIGEN</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Eigenvalue Decomposition</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#MAT_INV" class="member-name-link">MAT_INV</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Matrix Inversion</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#MAT_LU" class="member-name-link">MAT_LU</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">LU Decomposition</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#MAT_MUL" class="member-name-link">MAT_MUL</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Matrix Multiplication</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#MAT_QR" class="member-name-link">MAT_QR</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">QR Decomposition</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#MAT_SCALE" class="member-name-link">MAT_SCALE</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Matrix Scaling</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#MAT_SOLVE" class="member-name-link">MAT_SOLVE</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Matrix/Vector Solve</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#MAT_SUBTRACT" class="member-name-link">MAT_SUBTRACT</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Matrix Subtraction</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#MAT_SVD" class="member-name-link">MAT_SVD</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">SVD Decomposition</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="#MAT_TRANSPOSE" class="member-name-link">MAT_TRANSPOSE</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Matrix Transpose</div>
+</div>
+<div class="col-first even-row-color"><code><a href="#SPARSE" class="member-name-link">SPARSE</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Sparse matrix/vector data</div>
 </div>
 </div>
@@ -276,6 +351,141 @@ the order they are declared.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">BATCH</span></div>
 <div class="block">Operation will be repeated many times (amortize setup)</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_MUL">
+<h3>MAT_MUL</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_MUL</span></div>
+<div class="block">Matrix Multiplication</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_DIV">
+<h3>MAT_DIV</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_DIV</span></div>
+<div class="block">Matrix Division / Solve</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_INV">
+<h3>MAT_INV</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_INV</span></div>
+<div class="block">Matrix Inversion</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_DET">
+<h3>MAT_DET</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_DET</span></div>
+<div class="block">Matrix Determinant</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_SOLVE">
+<h3>MAT_SOLVE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_SOLVE</span></div>
+<div class="block">Matrix/Vector Solve</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_TRANSPOSE">
+<h3>MAT_TRANSPOSE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_TRANSPOSE</span></div>
+<div class="block">Matrix Transpose</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_SCALE">
+<h3>MAT_SCALE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_SCALE</span></div>
+<div class="block">Matrix Scaling</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_ADD">
+<h3>MAT_ADD</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_ADD</span></div>
+<div class="block">Matrix Addition</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_SUBTRACT">
+<h3>MAT_SUBTRACT</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_SUBTRACT</span></div>
+<div class="block">Matrix Subtraction</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_QR">
+<h3>MAT_QR</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_QR</span></div>
+<div class="block">QR Decomposition</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_SVD">
+<h3>MAT_SVD</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_SVD</span></div>
+<div class="block">SVD Decomposition</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_CHOLESKY">
+<h3>MAT_CHOLESKY</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_CHOLESKY</span></div>
+<div class="block">Cholesky Decomposition</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_LU">
+<h3>MAT_LU</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_LU</span></div>
+<div class="block">LU Decomposition</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="MAT_EIGEN">
+<h3>MAT_EIGEN</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">MAT_EIGEN</span></div>
+<div class="block">Eigenvalue Decomposition</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="HIGH_PRECISION">
+<h3>HIGH_PRECISION</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.Hint.html" title="enum class in org.episteme.core.technical.algorithm">OperationContext.Hint</a></span>&nbsp;<span class="element-name">HIGH_PRECISION</span></div>
+<div class="block">High precision required (e.g. for RealBig/Complex)</div>
 </div>
 </section>
 </li>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -65,11 +65,19 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.media.audio.backends">org.episteme.core.media.audio.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.media.backends">org.episteme.core.media.backends</a></div>
-<div class="col-last even-row-color">
-<div class="block">Core functionality for the org.episteme.core.media.backends package in the Episteme library.</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.media.video.backends">org.episteme.core.media.video.backends</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.media.vision.backends">org.episteme.core.media.vision.backends</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.nativ.media.audio.backends">org.episteme.nativ.media.audio.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.media.backends">org.episteme.nativ.media.backends</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.nativ.media.video.backends">org.episteme.nativ.media.video.backends</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.media.vision.backends">org.episteme.nativ.media.vision.backends</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="package-uses">
 <ul class="block-list">
@@ -86,6 +94,22 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><a href="class-use/AudioBackendManager.html#org.episteme.core.media">AudioBackendManager</a></div>
 <div class="col-last odd-row-color">
 <div class="block">Manager for <a href="AudioBackend.html" title="interface in org.episteme.core.media"><code>AudioBackend</code></a> instances.</div>
+</div>
+<div class="col-first even-row-color"><a href="class-use/VideoBackend.html#org.episteme.core.media">VideoBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Universal interface for video backends (playback, frame grabbing, analysis).</div>
+</div>
+<div class="col-first odd-row-color"><a href="class-use/VideoBackendManager.html#org.episteme.core.media">VideoBackendManager</a></div>
+<div class="col-last odd-row-color">
+<div class="block">Manager for <a href="VideoBackend.html" title="interface in org.episteme.core.media"><code>VideoBackend</code></a> instances.</div>
+</div>
+<div class="col-first even-row-color"><a href="class-use/VisionBackend.html#org.episteme.core.media">VisionBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Interface for Vision Backends.</div>
+</div>
+<div class="col-first odd-row-color"><a href="class-use/VisionBackendManager.html#org.episteme.core.media">VisionBackendManager</a></div>
+<div class="col-last odd-row-color">
+<div class="block">Manager for <a href="vision/VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision"><code>VisionAlgorithmProvider</code></a> instances.</div>
 </div>
 </div>
 </section>
@@ -113,9 +137,39 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Universal interface for audio backends (standard, scientific, creative).</div>
 </div>
-<div class="col-first odd-row-color"><a href="class-use/AudioEngine.html#org.episteme.core.media.backends">AudioEngine</a></div>
+<div class="col-first odd-row-color"><a href="class-use/VideoBackend.html#org.episteme.core.media.backends">VideoBackend</a></div>
 <div class="col-last odd-row-color">
-<div class="block">Interface definition for a generic Audio Engine.</div>
+<div class="block">Universal interface for video backends (playback, frame grabbing, analysis).</div>
+</div>
+<div class="col-first even-row-color"><a href="class-use/VisionBackend.html#org.episteme.core.media.backends">VisionBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Interface for Vision Backends.</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.media.video.backends">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.media</a> used by <a href="video/backends/package-summary.html">org.episteme.core.media.video.backends</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/VideoBackend.html#org.episteme.core.media.video.backends">VideoBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Universal interface for video backends (playback, frame grabbing, analysis).</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.media.vision.backends">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.media</a> used by <a href="vision/backends/package-summary.html">org.episteme.core.media.vision.backends</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/VisionBackend.html#org.episteme.core.media.vision.backends">VisionBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Interface for Vision Backends.</div>
 </div>
 </div>
 </section>
@@ -129,6 +183,53 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><a href="class-use/AudioBackend.html#org.episteme.nativ.media.audio.backends">AudioBackend</a></div>
 <div class="col-last even-row-color">
 <div class="block">Universal interface for audio backends (standard, scientific, creative).</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.nativ.media.backends">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.media</a> used by <a href="../../nativ/media/backends/package-summary.html">org.episteme.nativ.media.backends</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/AudioBackend.html#org.episteme.nativ.media.backends">AudioBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Universal interface for audio backends (standard, scientific, creative).</div>
+</div>
+<div class="col-first odd-row-color"><a href="class-use/VideoBackend.html#org.episteme.nativ.media.backends">VideoBackend</a></div>
+<div class="col-last odd-row-color">
+<div class="block">Universal interface for video backends (playback, frame grabbing, analysis).</div>
+</div>
+<div class="col-first even-row-color"><a href="class-use/VisionBackend.html#org.episteme.nativ.media.backends">VisionBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Interface for Vision Backends.</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.nativ.media.video.backends">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.media</a> used by <a href="../../nativ/media/video/backends/package-summary.html">org.episteme.nativ.media.video.backends</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/VideoBackend.html#org.episteme.nativ.media.video.backends">VideoBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Universal interface for video backends (playback, frame grabbing, analysis).</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.nativ.media.vision.backends">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.media</a> used by <a href="../../nativ/media/vision/backends/package-summary.html">org.episteme.nativ.media.vision.backends</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/VisionBackend.html#org.episteme.nativ.media.vision.backends">VisionBackend</a></div>
+<div class="col-last even-row-color">
+<div class="block">Interface for Vision Backends.</div>
 </div>
 </div>
 </section>

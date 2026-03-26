@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -67,7 +67,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#rows()" tabindex="0">rows()</a></li>
 <li><a href="#cols()" tabindex="0">cols()</a></li>
 <li><a href="#get(int,int)" tabindex="0">get(int, int)</a></li>
-<li><a href="#set(int,int,org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">set(int, int, Real)</a></li>
+<li><a href="#set(int,int,E)" tabindex="0">set(int, int, E)</a></li>
 <li><a href="#getTile(int,int)" tabindex="0">getTile(int, int)</a></li>
 <li><a href="#setTile(int,int,org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">setTile(int, int, Matrix)</a></li>
 <li><a href="#clone()" tabindex="0">clone()</a></li>
@@ -78,21 +78,21 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<h1 title="Class TiledMatrixStorage" class="title">Class TiledMatrixStorage</h1>
+<h1 title="Class TiledMatrixStorage" class="title">Class TiledMatrixStorage&lt;<span id="type-param-E">E</span>&gt;</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance">org.episteme.core.mathematics.linearalgebra.matrices.storage.TiledMatrixStorage</div>
+<div class="inheritance">org.episteme.core.mathematics.linearalgebra.matrices.storage.TiledMatrixStorage&lt;E&gt;</div>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;E&gt;</code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
-<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">TiledMatrixStorage</span>
+<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">TiledMatrixStorage&lt;E&gt;</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span></div>
+implements <a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;E&gt;</span></div>
 <div class="block">Storage implementation for tiled matrices.
 <p>
 This storage organizes matrix data into smaller tiles (blocks) for improved
@@ -116,7 +116,7 @@ cache locality and parallel processing efficiency.
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.linearalgebra.Matrix%5B%5D%5B%5D,int,int,int,int)" class="member-name-link">TiledMatrixStorage</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;[][]&nbsp;tiles,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.linearalgebra.Matrix%5B%5D%5B%5D,int,int,int,int)" class="member-name-link">TiledMatrixStorage</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;[][]&nbsp;tiles,
  int&nbsp;rows,
  int&nbsp;cols,
  int&nbsp;tileRows,
@@ -138,7 +138,7 @@ cache locality and parallel processing efficiency.
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clone()" class="member-name-link">clone</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Creates a deep copy of this storage.</div>
@@ -148,13 +148,13 @@ cache locality and parallel processing efficiency.
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the number of columns.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#get(int,int)" class="member-name-link">get</a><wbr>(int&nbsp;row,
  int&nbsp;col)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the element at the specified position.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTile(int,int)" class="member-name-link">getTile</a><wbr>(int&nbsp;tileRow,
  int&nbsp;tileCol)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -166,16 +166,16 @@ cache locality and parallel processing efficiency.
 <div class="block">Returns the number of rows.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,int,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">set</a><wbr>(int&nbsp;row,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,int,E)" class="member-name-link">set</a><wbr>(int&nbsp;row,
  int&nbsp;col,
- <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;value)</code></div>
+ <a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&nbsp;value)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the element at the specified position.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTile(int,int,org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">setTile</a><wbr>(int&nbsp;tileRow,
  int&nbsp;tileCol,
- <a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;tile)</code></div>
+ <a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;&nbsp;tile)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets a tile at the specified position.</div>
 </div>
@@ -200,7 +200,7 @@ cache locality and parallel processing efficiency.
 <section class="detail" id="&lt;init&gt;(org.episteme.core.mathematics.linearalgebra.Matrix[][],int,int,int,int)">
 <h3>TiledMatrixStorage</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TiledMatrixStorage</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;[][]&nbsp;tiles,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TiledMatrixStorage</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;[][]&nbsp;tiles,
  int&nbsp;rows,
  int&nbsp;cols,
  int&nbsp;tileRows,
@@ -234,7 +234,7 @@ cache locality and parallel processing efficiency.
 <div class="block">Returns the number of rows.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="MatrixStorage.html#rows()">rows</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="MatrixStorage.html#rows()">rows</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the row count</dd>
 </dl>
@@ -250,7 +250,7 @@ cache locality and parallel processing efficiency.
 <div class="block">Returns the number of columns.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="MatrixStorage.html#cols()">cols</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="MatrixStorage.html#cols()">cols</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the column count</dd>
 </dl>
@@ -261,13 +261,13 @@ cache locality and parallel processing efficiency.
 <section class="detail" id="get(int,int)">
 <h3>get</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(int&nbsp;row,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(int&nbsp;row,
  int&nbsp;col)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="MatrixStorage.html#get(int,int)">MatrixStorage</a></code></span></div>
 <div class="block">Returns the element at the specified position.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="MatrixStorage.html#get(int,int)">get</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="MatrixStorage.html#get(int,int)">get</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>row</code> - the row index</dd>
 <dd><code>col</code> - the column index</dd>
@@ -278,17 +278,17 @@ cache locality and parallel processing efficiency.
 </section>
 </li>
 <li>
-<section class="detail" id="set(int,int,org.episteme.core.mathematics.numbers.real.Real)">
-<h3>set</h3>
+<section class="detail" id="set(int,int,E)">
+<h3 id="set(int,int,java.lang.Object)">set</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">set</span><wbr><span class="parameters">(int&nbsp;row,
  int&nbsp;col,
- <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;value)</span></div>
+ <a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&nbsp;value)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="MatrixStorage.html#set(int,int,E)">MatrixStorage</a></code></span></div>
 <div class="block">Sets the element at the specified position.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="MatrixStorage.html#set(int,int,E)">set</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="MatrixStorage.html#set(int,int,E)">set</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>row</code> - the row index</dd>
 <dd><code>col</code> - the column index</dd>
@@ -301,7 +301,7 @@ cache locality and parallel processing efficiency.
 <section class="detail" id="getTile(int,int)">
 <h3>getTile</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">getTile</span><wbr><span class="parameters">(int&nbsp;tileRow,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</span>&nbsp;<span class="element-name">getTile</span><wbr><span class="parameters">(int&nbsp;tileRow,
  int&nbsp;tileCol)</span></div>
 <div class="block">Gets a tile at the specified position.</div>
 <dl class="notes">
@@ -320,7 +320,7 @@ cache locality and parallel processing efficiency.
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setTile</span><wbr><span class="parameters">(int&nbsp;tileRow,
  int&nbsp;tileCol,
- <a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;tile)</span></div>
+ <a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;&nbsp;tile)</span></div>
 <div class="block">Sets a tile at the specified position.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -335,12 +335,12 @@ cache locality and parallel processing efficiency.
 <section class="detail" id="clone()">
 <h3>clone</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">clone</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</span>&nbsp;<span class="element-name">clone</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="MatrixStorage.html#clone()">MatrixStorage</a></code></span></div>
 <div class="block">Creates a deep copy of this storage.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="MatrixStorage.html#clone()">clone</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="MatrixStorage.html#clone()">clone</a></code>&nbsp;in interface&nbsp;<code><a href="MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></dd>
 <dt>Overrides:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></dd>
 <dt>Returns:</dt>

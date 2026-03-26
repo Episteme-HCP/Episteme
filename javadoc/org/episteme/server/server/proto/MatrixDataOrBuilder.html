@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,9 +60,12 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#getRows()" tabindex="0">getRows()</a></li>
 <li><a href="#getCols()" tabindex="0">getCols()</a></li>
-<li><a href="#getDataList()" tabindex="0">getDataList()</a></li>
-<li><a href="#getDataCount()" tabindex="0">getDataCount()</a></li>
-<li><a href="#getData(int)" tabindex="0">getData(int)</a></li>
+<li><a href="#getData()" tabindex="0">getData()</a></li>
+<li><a href="#getIsComplex()" tabindex="0">getIsComplex()</a></li>
+<li><a href="#getHpDataList()" tabindex="0">getHpDataList()</a></li>
+<li><a href="#getHpDataCount()" tabindex="0">getHpDataCount()</a></li>
+<li><a href="#getHpData(int)" tabindex="0">getHpData(int)</a></li>
+<li><a href="#getHpDataBytes(int)" tabindex="0">getHpDataBytes(int)</a></li>
 </ol>
 </li>
 </ol>
@@ -105,27 +108,44 @@ extends com.google.protobuf.MessageOrBuilder</span></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block"><code>int32 cols = 2;</code></div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getData(int)" class="member-name-link">getData</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getData()" class="member-name-link">getData</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">
-Row-major order</div>
+Raw double data (Zero-copy payload)</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getDataCount()" class="member-name-link">getDataCount</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpData(int)" class="member-name-link">getHpData</a><wbr>(int&nbsp;index)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">
-Row-major order</div>
+For high-precision elements (RealBig)</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getDataList()" class="member-name-link">getDataList</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpDataBytes(int)" class="member-name-link">getHpDataBytes</a><wbr>(int&nbsp;index)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">
-Row-major order</div>
+For high-precision elements (RealBig)</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRows()" class="member-name-link">getRows</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpDataCount()" class="member-name-link">getHpDataCount</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">
+For high-precision elements (RealBig)</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpDataList()" class="member-name-link">getHpDataList</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">
+For high-precision elements (RealBig)</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getIsComplex()" class="member-name-link">getIsComplex</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block"><code>bool is_complex = 4;</code></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRows()" class="member-name-link">getRows</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block"><code>int32 rows = 1;</code></div>
 </div>
 </div>
@@ -175,54 +195,103 @@ Row-major order</div>
 </section>
 </li>
 <li>
-<section class="detail" id="getDataList()">
-<h3>getDataList</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Double.html" title="class or interface in java.lang" class="external-link">Double</a>&gt;</span>&nbsp;<span class="element-name">getDataList</span>()</div>
-<div class="block"><pre>
-Row-major order
-</pre>
-
-<code>repeated double data = 3;</code></div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>A list containing the data.</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getDataCount()">
-<h3>getDataCount</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type">int</span>&nbsp;<span class="element-name">getDataCount</span>()</div>
-<div class="block"><pre>
-Row-major order
-</pre>
-
-<code>repeated double data = 3;</code></div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>The count of data.</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getData(int)">
+<section class="detail" id="getData()">
 <h3>getData</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type">double</span>&nbsp;<span class="element-name">getData</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="member-signature"><span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getData</span>()</div>
 <div class="block"><pre>
-Row-major order
+Raw double data (Zero-copy payload)
 </pre>
 
-<code>repeated double data = 3;</code></div>
+<code>bytes data = 3;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The data.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getIsComplex()">
+<h3>getIsComplex</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">getIsComplex</span>()</div>
+<div class="block"><code>bool is_complex = 4;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The isComplex.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpDataList()">
+<h3>getHpDataList</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">getHpDataList</span>()</div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>A list containing the hpData.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpDataCount()">
+<h3>getHpDataCount</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">int</span>&nbsp;<span class="element-name">getHpDataCount</span>()</div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The count of hpData.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpData(int)">
+<h3>getHpData</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHpData</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>index</code> - The index of the element to return.</dd>
 <dt>Returns:</dt>
-<dd>The data at the given index.</dd>
+<dd>The hpData at the given index.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpDataBytes(int)">
+<h3>getHpDataBytes</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getHpDataBytes</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block"><pre>
+For high-precision elements (RealBig)
+</pre>
+
+<code>repeated string hp_data = 5;</code></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>index</code> - The index of the value to return.</dd>
+<dt>Returns:</dt>
+<dd>The bytes of the hpData at the given index.</dd>
 </dl>
 </div>
 </section>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -67,7 +67,7 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#getModelType()" tabindex="0">getModelType()</a></li>
 <li><a href="#addGroup(int,int,long,long)" tabindex="0">addGroup(int, int, long, long)</a></li>
-<li><a href="#addGroup(org.episteme.social.sociology.Group)" tabindex="0">addGroup(Group)</a></li>
+<li><a href="#addGroup(org.episteme.social.sociology.SociologicalGroup)" tabindex="0">addGroup(SociologicalGroup)</a></li>
 <li><a href="#getPopulationName()" tabindex="0">getPopulationName()</a></li>
 <li><a href="#setPopulationName(java.lang.String)" tabindex="0">setPopulationName(String)</a></li>
 <li><a href="#getConsolidatedGroups(int)" tabindex="0">getConsolidatedGroups(int)</a></li>
@@ -96,7 +96,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="../../core/util/UniversalDataModel.html" title="interface in org.episteme.core.util">UniversalDataModel</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></span></div>
 <div class="block">Data model for demographic population structures.
-Supports representation via individual age-group cohorts or aggregation from social groups.
+Supports representation via individual age-SociologicalGroup cohorts or aggregation from social groups.
 Provides consolidated segments for population pyramid visualizations.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -166,9 +166,9 @@ Provides consolidated segments for population pyramid visualizations.</div>
 <div class="block">Manually adds an age cohort to the model.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addGroup(org.episteme.social.sociology.Group)" class="member-name-link">addGroup</a><wbr>(<a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&nbsp;group)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addGroup(org.episteme.social.sociology.SociologicalGroup)" class="member-name-link">addGroup</a><wbr>(<a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&nbsp;SociologicalGroup)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Adds a social group to the model for automated aggregation.</div>
+<div class="block">Adds a social SociologicalGroup to the model for automated aggregation.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="DemographicData.AgeGroup.html" title="class in org.episteme.social.sociology">DemographicData.AgeGroup</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getConsolidatedGroups(int)" class="member-name-link">getConsolidatedGroups</a><wbr>(int&nbsp;bucketSize)</code></div>
@@ -271,14 +271,14 @@ Examples: "SPATIAL_GEOMETRY", "ECONOMIC_PORTFOLIO", "ARCHITECTURAL_PLAN".</div>
 </section>
 </li>
 <li>
-<section class="detail" id="addGroup(org.episteme.social.sociology.Group)">
+<section class="detail" id="addGroup(org.episteme.social.sociology.SociologicalGroup)">
 <h3>addGroup</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addGroup</span><wbr><span class="parameters">(<a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&nbsp;group)</span></div>
-<div class="block">Adds a social group to the model for automated aggregation.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addGroup</span><wbr><span class="parameters">(<a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&nbsp;SociologicalGroup)</span></div>
+<div class="block">Adds a social SociologicalGroup to the model for automated aggregation.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>group</code> - the group to add</dd>
+<dd><code>SociologicalGroup</code> - the SociologicalGroup to add</dd>
 </dl>
 </div>
 </section>

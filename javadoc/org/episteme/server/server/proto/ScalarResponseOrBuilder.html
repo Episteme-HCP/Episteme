@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -59,6 +59,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#getValue()" tabindex="0">getValue()</a></li>
+<li><a href="#getImaginary()" tabindex="0">getImaginary()</a></li>
+<li><a href="#getIsComplex()" tabindex="0">getIsComplex()</a></li>
+<li><a href="#getHpValue()" tabindex="0">getHpValue()</a></li>
+<li><a href="#getHpValueBytes()" tabindex="0">getHpValueBytes()</a></li>
 </ol>
 </li>
 </ol>
@@ -96,6 +100,28 @@ extends com.google.protobuf.MessageOrBuilder</span></div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpValue()" class="member-name-link">getHpValue</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">
+For high-precision result</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpValueBytes()" class="member-name-link">getHpValueBytes</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">
+For high-precision result</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getImaginary()" class="member-name-link">getImaginary</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block"><code>double imaginary = 2;</code></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getIsComplex()" class="member-name-link">getIsComplex</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block"><code>bool is_complex = 3;</code></div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getValue()" class="member-name-link">getValue</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -130,6 +156,66 @@ extends com.google.protobuf.MessageOrBuilder</span></div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>The value.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getImaginary()">
+<h3>getImaginary</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">double</span>&nbsp;<span class="element-name">getImaginary</span>()</div>
+<div class="block"><code>double imaginary = 2;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The imaginary.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getIsComplex()">
+<h3>getIsComplex</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">getIsComplex</span>()</div>
+<div class="block"><code>bool is_complex = 3;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The isComplex.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpValue()">
+<h3>getHpValue</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHpValue</span>()</div>
+<div class="block"><pre>
+For high-precision result
+</pre>
+
+<code>string hp_value = 4;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The hpValue.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpValueBytes()">
+<h3>getHpValueBytes</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getHpValueBytes</span>()</div>
+<div class="block"><pre>
+For high-precision result
+</pre>
+
+<code>string hp_value = 4;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The bytes for hpValue.</dd>
 </dl>
 </div>
 </section>

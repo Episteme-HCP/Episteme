@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -59,6 +59,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#select(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext)" tabindex="0">select(Class, OperationContext)</a></li>
+<li><a href="#select(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Predicate)" tabindex="0">select(Class, OperationContext, Predicate)</a></li>
+<li><a href="#execute(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Function)" tabindex="0">execute(Class, OperationContext, Function)</a></li>
 <li><a href="#select(java.lang.Class)" tabindex="0">select(Class)</a></li>
 </ol>
 </li>
@@ -114,16 +116,30 @@ LinearAlgebraProvider best = ProviderSelector.select(
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;<br>P</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#select(java.lang.Class)" class="member-name-link">select</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, R&gt;<br>R</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#execute(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Function)" class="member-name-link">execute</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;P,<wbr>R&gt;&nbsp;operation)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Selects using static priority (delegates to <a href="AlgorithmManager.html" title="class in org.episteme.core.technical.algorithm"><code>AlgorithmManager</code></a>).</div>
+<div class="block">Executes an operation using the best available provider, with automatic fallback.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;<br>P</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#select(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext)" class="member-name-link">select</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
- <a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#select(java.lang.Class)" class="member-name-link">select</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Selects using static priority (delegates to <a href="AlgorithmManager.html" title="class in org.episteme.core.technical.algorithm"><code>AlgorithmManager</code></a>).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;<br>P</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#select(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext)" class="member-name-link">select</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Selects the best provider for the given operation context.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;<br>P</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#select(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Predicate)" class="member-name-link">select</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;P&gt;&nbsp;filter)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Selects the best provider for the given operation context, with an optional filter.</div>
 </div>
 </div>
 </div>
@@ -163,6 +179,45 @@ and returns the one with the highest score.
 <dd>the best-scoring available provider</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/NoSuchElementException.html" title="class or interface in java.util" class="external-link">NoSuchElementException</a></code> - if no provider is available</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="select(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Predicate)">
+<h3>select</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;</span>&nbsp;<span class="return-type">P</span>&nbsp;<span class="element-name">select</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;P&gt;&nbsp;filter)</span></div>
+<div class="block">Selects the best provider for the given operation context, with an optional filter.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="execute(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Function)">
+<h3>execute</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, R&gt;</span>&nbsp;<span class="return-type">R</span>&nbsp;<span class="element-name">execute</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;P,<wbr>R&gt;&nbsp;operation)</span></div>
+<div class="block">Executes an operation using the best available provider, with automatic fallback.
+<p>
+Iterates through all available providers (sorted by score) and attempts the operation.
+If a provider fails, it logs the warning and tries the next best provider.
+</p></div>
+<dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><span id="execute(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Function)-type-param-P"><code>P</code> - the provider type</span></dd>
+<dd><span id="execute(java.lang.Class,org.episteme.core.technical.algorithm.OperationContext,java.util.function.Function)-type-param-R"><code>R</code> - the return type</span></dd>
+<dt>Parameters:</dt>
+<dd><code>providerClass</code> - the interface class of the provider</dd>
+<dd><code>context</code> - the operation context</dd>
+<dd><code>operation</code> - the operation to execute</dd>
+<dt>Returns:</dt>
+<dd>the result of the operation</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/RuntimeException.html" title="class or interface in java.lang" class="external-link">RuntimeException</a></code> - if all providers fail</dd>
 </dl>
 </div>
 </section>

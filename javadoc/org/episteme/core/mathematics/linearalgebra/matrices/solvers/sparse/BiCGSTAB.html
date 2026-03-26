@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -84,8 +84,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">BiCGSTAB (BiConjugate Gradient Stabilized) solver.
 <p>
-Works for general non-symmetric matrices.
-Often faster than GMRES for well-conditioned systems.
+This class now delegates to the active <a href="../../../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra"><code>LinearAlgebraProvider</code></a> via <a href="../../../../../technical/algorithm/AlgorithmManager.html" title="class in org.episteme.core.technical.algorithm"><code>AlgorithmManager</code></a>.
 </p></div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -173,16 +172,6 @@ Often faster than GMRES for well-conditioned systems.
  <a href="../../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;tolerance,
  int&nbsp;maxIterations)</span></div>
 <div class="block">Solves Ax = b using BiCGSTAB.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>A</code> - matrix (can be non-symmetric)</dd>
-<dd><code>b</code> - right-hand side</dd>
-<dd><code>x0</code> - initial guess</dd>
-<dd><code>tolerance</code> - convergence tolerance</dd>
-<dd><code>maxIterations</code> - maximum iterations</dd>
-<dt>Returns:</dt>
-<dd>approximate solution</dd>
-</dl>
 </div>
 </section>
 </li>

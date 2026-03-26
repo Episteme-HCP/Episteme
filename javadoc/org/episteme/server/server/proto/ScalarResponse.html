@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -61,6 +61,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#field-detail" tabindex="0">Field Details</a>
 <ol class="toc-list">
 <li><a href="#VALUE_FIELD_NUMBER" tabindex="0">VALUE_FIELD_NUMBER</a></li>
+<li><a href="#IMAGINARY_FIELD_NUMBER" tabindex="0">IMAGINARY_FIELD_NUMBER</a></li>
+<li><a href="#IS_COMPLEX_FIELD_NUMBER" tabindex="0">IS_COMPLEX_FIELD_NUMBER</a></li>
+<li><a href="#HP_VALUE_FIELD_NUMBER" tabindex="0">HP_VALUE_FIELD_NUMBER</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -69,6 +72,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#getDescriptor()" tabindex="0">getDescriptor()</a></li>
 <li><a href="#internalGetFieldAccessorTable()" tabindex="0">internalGetFieldAccessorTable()</a></li>
 <li><a href="#getValue()" tabindex="0">getValue()</a></li>
+<li><a href="#getImaginary()" tabindex="0">getImaginary()</a></li>
+<li><a href="#getIsComplex()" tabindex="0">getIsComplex()</a></li>
+<li><a href="#getHpValue()" tabindex="0">getHpValue()</a></li>
+<li><a href="#getHpValueBytes()" tabindex="0">getHpValueBytes()</a></li>
 <li><a href="#isInitialized()" tabindex="0">isInitialized()</a></li>
 <li><a href="#writeTo(com.google.protobuf.CodedOutputStream)" tabindex="0">writeTo(CodedOutputStream)</a></li>
 <li><a href="#getSerializedSize()" tabindex="0">getSerializedSize()</a></li>
@@ -169,8 +176,17 @@ implements <a href="ScalarResponseOrBuilder.html" title="interface in org.episte
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final int</code></div>
-<div class="col-second even-row-color"><code><a href="#VALUE_FIELD_NUMBER" class="member-name-link">VALUE_FIELD_NUMBER</a></code></div>
+<div class="col-second even-row-color"><code><a href="#HP_VALUE_FIELD_NUMBER" class="member-name-link">HP_VALUE_FIELD_NUMBER</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final int</code></div>
+<div class="col-second odd-row-color"><code><a href="#IMAGINARY_FIELD_NUMBER" class="member-name-link">IMAGINARY_FIELD_NUMBER</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final int</code></div>
+<div class="col-second even-row-color"><code><a href="#IS_COMPLEX_FIELD_NUMBER" class="member-name-link">IS_COMPLEX_FIELD_NUMBER</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final int</code></div>
+<div class="col-second odd-row-color"><code><a href="#VALUE_FIELD_NUMBER" class="member-name-link">VALUE_FIELD_NUMBER</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-com.google.protobuf.GeneratedMessageV3">Fields inherited from class&nbsp;com.google.protobuf.GeneratedMessageV3</h3>
@@ -206,6 +222,28 @@ implements <a href="ScalarResponseOrBuilder.html" title="interface in org.episte
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static final com.google.protobuf.Descriptors.Descriptor</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDescriptor()" class="member-name-link">getDescriptor</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpValue()" class="member-name-link">getHpValue</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">
+For high-precision result</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getHpValueBytes()" class="member-name-link">getHpValueBytes</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">
+For high-precision result</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getImaginary()" class="member-name-link">getImaginary</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block"><code>double imaginary = 2;</code></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getIsComplex()" class="member-name-link">getIsComplex</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block"><code>bool is_complex = 3;</code></div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.google.protobuf.Parser<wbr>&lt;<a href="ScalarResponse.html" title="class in org.episteme.server.server.proto">ScalarResponse</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getParserForType()" class="member-name-link">getParserForType</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -340,6 +378,54 @@ implements <a href="ScalarResponseOrBuilder.html" title="interface in org.episte
 </div>
 </section>
 </li>
+<li>
+<section class="detail" id="IMAGINARY_FIELD_NUMBER">
+<h3>IMAGINARY_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">IMAGINARY_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.ScalarResponse.IMAGINARY_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="IS_COMPLEX_FIELD_NUMBER">
+<h3>IS_COMPLEX_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">IS_COMPLEX_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.ScalarResponse.IS_COMPLEX_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="HP_VALUE_FIELD_NUMBER">
+<h3>HP_VALUE_FIELD_NUMBER</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">HP_VALUE_FIELD_NUMBER</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.server.server.proto.ScalarResponse.HP_VALUE_FIELD_NUMBER">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -391,6 +477,74 @@ implements <a href="ScalarResponseOrBuilder.html" title="interface in org.episte
 <dd><code><a href="ScalarResponseOrBuilder.html#getValue()">getValue</a></code>&nbsp;in interface&nbsp;<code><a href="ScalarResponseOrBuilder.html" title="interface in org.episteme.server.server.proto">ScalarResponseOrBuilder</a></code></dd>
 <dt>Returns:</dt>
 <dd>The value.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getImaginary()">
+<h3>getImaginary</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getImaginary</span>()</div>
+<div class="block"><code>double imaginary = 2;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScalarResponseOrBuilder.html#getImaginary()">getImaginary</a></code>&nbsp;in interface&nbsp;<code><a href="ScalarResponseOrBuilder.html" title="interface in org.episteme.server.server.proto">ScalarResponseOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The imaginary.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getIsComplex()">
+<h3>getIsComplex</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">getIsComplex</span>()</div>
+<div class="block"><code>bool is_complex = 3;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScalarResponseOrBuilder.html#getIsComplex()">getIsComplex</a></code>&nbsp;in interface&nbsp;<code><a href="ScalarResponseOrBuilder.html" title="interface in org.episteme.server.server.proto">ScalarResponseOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The isComplex.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpValue()">
+<h3>getHpValue</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHpValue</span>()</div>
+<div class="block"><pre>
+For high-precision result
+</pre>
+
+<code>string hp_value = 4;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScalarResponseOrBuilder.html#getHpValue()">getHpValue</a></code>&nbsp;in interface&nbsp;<code><a href="ScalarResponseOrBuilder.html" title="interface in org.episteme.server.server.proto">ScalarResponseOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The hpValue.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpValueBytes()">
+<h3>getHpValueBytes</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getHpValueBytes</span>()</div>
+<div class="block"><pre>
+For high-precision result
+</pre>
+
+<code>string hp_value = 4;</code></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ScalarResponseOrBuilder.html#getHpValueBytes()">getHpValueBytes</a></code>&nbsp;in interface&nbsp;<code><a href="ScalarResponseOrBuilder.html" title="interface in org.episteme.server.server.proto">ScalarResponseOrBuilder</a></code></dd>
+<dt>Returns:</dt>
+<dd>The bytes for hpValue.</dd>
 </dl>
 </div>
 </section>

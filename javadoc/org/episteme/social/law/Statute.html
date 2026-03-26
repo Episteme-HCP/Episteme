@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -55,13 +55,11 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
-<li><a href="#nested-class-summary" tabindex="0">Nested Class Summary</a></li>
 <li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(java.lang.String,java.lang.String,org.episteme.social.law.StatuteType,java.lang.String,int,org.episteme.social.law.StatuteStatus)" tabindex="0">Statute(String, String, StatuteType, String, int, StatuteStatus)</a></li>
-<li><a href="#%3Cinit%3E(java.lang.String,java.lang.String,org.episteme.social.law.Statute.Type,java.lang.String,int,org.episteme.social.law.Statute.Status)" tabindex="0">Statute(String, String, Statute.Type, String, int, Statute.Status)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -128,32 +126,6 @@ Modernized to implement ComprehensiveIdentification and use extensible StatuteTy
 </section>
 <section class="summary">
 <ul class="summary-list">
-<!-- ======== NESTED CLASS SUMMARY ======== -->
-<li>
-<section class="nested-class-summary" id="nested-class-summary">
-<h2>Nested Class Summary</h2>
-<div class="caption"><span>Nested Classes</span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Class</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static enum&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="Statute.Status.html" class="type-name-link" title="enum class in org.episteme.social.law">Statute.Status</a></code></div>
-<div class="col-last even-row-color">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use <a href="StatuteStatus.html" title="class in org.episteme.social.law"><code>StatuteStatus</code></a> instead.</div>
-</div>
-</div>
-<div class="col-first odd-row-color"><code>static enum&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="Statute.Type.html" class="type-name-link" title="enum class in org.episteme.social.law">Statute.Type</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use <a href="StatuteType.html" title="class in org.episteme.social.law"><code>StatuteType</code></a> instead.</div>
-</div>
-</div>
-</div>
-</section>
-</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -162,22 +134,13 @@ Modernized to implement ComprehensiveIdentification and use extensible StatuteTy
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,java.lang.String,org.episteme.social.law.Statute.Type,java.lang.String,int,org.episteme.social.law.Statute.Status)" class="member-name-link">Statute</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;code,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title,
- <a href="Statute.Type.html" title="enum class in org.episteme.social.law">Statute.Type</a>&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;jurisdiction,
- int&nbsp;yearEnacted,
- <a href="Statute.Status.html" title="enum class in org.episteme.social.law">Statute.Status</a>&nbsp;status)</code></div>
-<div class="col-last even-row-color">
-<div class="block"><span class="deprecated-label">Deprecated.</span></div>
-</div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.lang.String,java.lang.String,org.episteme.social.law.StatuteType,java.lang.String,int,org.episteme.social.law.StatuteStatus)" class="member-name-link">Statute</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;code,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,java.lang.String,org.episteme.social.law.StatuteType,java.lang.String,int,org.episteme.social.law.StatuteStatus)" class="member-name-link">Statute</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;code,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title,
  <a href="StatuteType.html" title="class in org.episteme.social.law">StatuteType</a>&nbsp;type,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;jurisdiction,
  int&nbsp;yearEnacted,
  <a href="StatuteStatus.html" title="class in org.episteme.social.law">StatuteStatus</a>&nbsp;status)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -283,21 +246,6 @@ Modernized to implement ComprehensiveIdentification and use extensible StatuteTy
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;jurisdiction,
  int&nbsp;yearEnacted,
  <a href="StatuteStatus.html" title="class in org.episteme.social.law">StatuteStatus</a>&nbsp;status)</span></div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="&lt;init&gt;(java.lang.String,java.lang.String,org.episteme.social.law.Statute.Type,java.lang.String,int,org.episteme.social.law.Statute.Status)">
-<h3>Statute</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>
-</span><span class="modifiers">public</span>&nbsp;<span class="element-name">Statute</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;code,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title,
- <a href="Statute.Type.html" title="enum class in org.episteme.social.law">Statute.Type</a>&nbsp;type,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;jurisdiction,
- int&nbsp;yearEnacted,
- <a href="Statute.Status.html" title="enum class in org.episteme.social.law">Statute.Status</a>&nbsp;status)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
 </div>
 </section>
 </li>

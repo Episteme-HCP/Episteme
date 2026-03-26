@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -65,7 +65,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.matrices.storage">org.episteme.core.mathematics.linearalgebra.matrices.storage</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.nativ.mathematics.linearalgebra.matrices">org.episteme.nativ.mathematics.linearalgebra.matrices</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.nativ.mathematics.linearalgebra.matrices.storage">org.episteme.nativ.mathematics.linearalgebra.matrices.storage</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -105,37 +105,6 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static &lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MatrixFactory.</span><code><a href="../../MatrixFactory.html#createAutomaticStorage(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createAutomaticStorage</a><wbr>(E[][]&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Determines and creates the optimal storage (Dense or Sparse) based on data
-density.</div>
-</div>
-<div class="col-first odd-row-color"><code>static &lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixFactory.</span><code><a href="../../MatrixFactory.html#createAutomaticStorage(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createAutomaticStorage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&gt;&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static &lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MatrixFactory.</span><code><a href="../../MatrixFactory.html#createDenseStorage(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDenseStorage</a><wbr>(E[][]&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Determines and creates the optimal Dense storage for the given data.</div>
-</div>
-<div class="col-first odd-row-color"><code>static &lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixFactory.</span><code><a href="../../MatrixFactory.html#createDenseStorage(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDenseStorage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&gt;&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static &lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MatrixFactory.</span><code><a href="../../MatrixFactory.html#createSparseStorage(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createSparseStorage</a><wbr>(E[][]&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Determines and creates the optimal Sparse storage for the given data.</div>
-</div>
-<div class="col-first odd-row-color"><code>static &lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixFactory.</span><code><a href="../../MatrixFactory.html#createSparseStorage(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createSparseStorage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&gt;&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;<a href="../../GenericMatrix.html#type-param-E" title="type parameter in GenericMatrix">E</a>&gt;</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">GenericMatrix.</span><code><a href="../../GenericMatrix.html#getStorage()" class="member-name-link">getStorage</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -222,7 +191,7 @@ density.</div>
 <div class="block">Symmetric matrix storage - stores only upper triangle.</div>
 </div>
 <div class="col-first odd-row-color"><code>class&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../TiledMatrixStorage.html" class="type-name-link" title="class in org.episteme.core.mathematics.linearalgebra.matrices.storage">TiledMatrixStorage</a></code></div>
+<div class="col-second odd-row-color"><code><a href="../TiledMatrixStorage.html" class="type-name-link" title="class in org.episteme.core.mathematics.linearalgebra.matrices.storage">TiledMatrixStorage</a>&lt;E&gt;</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Storage implementation for tiled matrices.</div>
 </div>
@@ -268,7 +237,7 @@ density.</div>
 <div class="col-first odd-row-color"><code><a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;<a href="../SymmetricMatrixStorage.html#type-param-E" title="type parameter in SymmetricMatrixStorage">E</a>&gt;</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">SymmetricMatrixStorage.</span><code><a href="../SymmetricMatrixStorage.html#clone()" class="member-name-link">clone</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;<a href="../../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-first even-row-color"><code><a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;<a href="../TiledMatrixStorage.html#type-param-E" title="type parameter in TiledMatrixStorage">E</a>&gt;</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">TiledMatrixStorage.</span><code><a href="../TiledMatrixStorage.html#clone()" class="member-name-link">clone</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;<a href="../TriangularMatrixStorage.html#type-param-E" title="type parameter in TriangularMatrixStorage">E</a>&gt;</code></div>
@@ -288,29 +257,21 @@ density.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.nativ.mathematics.linearalgebra.matrices">
-<h2>Uses of <a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a> in <a href="../../../../../../nativ/mathematics/linearalgebra/matrices/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices</a></h2>
-<div class="caption"><span>Classes in <a href="../../../../../../nativ/mathematics/linearalgebra/matrices/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices</a> that implement <a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Class</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../../../../nativ/mathematics/linearalgebra/matrices/NativeMatrix.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">A dense matrix backed by off-heap native memory.</div>
-</div>
-</div>
-<div class="caption"><span>Methods in <a href="../../../../../../nativ/mathematics/linearalgebra/matrices/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices</a> that return <a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a></span></div>
+<section class="detail" id="org.episteme.core.technical.algorithm">
+<h2>Uses of <a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a> in <a href="../../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a> that return <a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>&lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">NativeMatrixStorageFactory.</span><code><a href="../../../../../../nativ/mathematics/linearalgebra/matrices/NativeMatrixStorageFactory.html#createDense(int,int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDense</a><wbr>(int&nbsp;rows,
+<div class="col-second even-row-color"><span class="type-name-label">ProviderRegistry.</span><code><a href="../../../../../technical/algorithm/ProviderRegistry.html#createStorage(int,int,org.episteme.core.mathematics.structures.rings.Ring,double)" class="member-name-link">createStorage</a><wbr>(int&nbsp;rows,
  int&nbsp;cols,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+ <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring,
+ double&nbsp;density)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Creates optimal storage based on data and density context.</div>
+</div>
 </div>
 </section>
 </li>
@@ -323,10 +284,26 @@ density.</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../../../../nativ/mathematics/linearalgebra/matrices/storage/NativeHDF5MatrixStorage.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeHDF5MatrixStorage</a></code></div>
+<div class="col-second even-row-color"><code><a href="../../../../../../nativ/mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a></code></div>
 <div class="col-last even-row-color">
+<div class="block">A dense matrix backed by off-heap native memory.</div>
+</div>
+<div class="col-first odd-row-color"><code>class&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../../../../../../nativ/mathematics/linearalgebra/matrices/storage/NativeHDF5MatrixStorage.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeHDF5MatrixStorage</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Matrix storage backed by HDF5 with hyperslab support for partial loading.</div>
 </div>
+</div>
+<div class="caption"><span>Methods in <a href="../../../../../../nativ/mathematics/linearalgebra/matrices/storage/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices.storage</a> that return <a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>&lt;E&gt;&nbsp;<a href="../MatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">MatrixStorage</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeMatrixStorageFactory.</span><code><a href="../../../../../../nativ/mathematics/linearalgebra/matrices/storage/NativeMatrixStorageFactory.html#createDense(int,int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDense</a><wbr>(int&nbsp;rows,
+ int&nbsp;cols,
+ <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>

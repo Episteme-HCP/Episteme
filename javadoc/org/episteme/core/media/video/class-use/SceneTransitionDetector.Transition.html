@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -64,12 +64,36 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Core functionality for the org.episteme.core.media.video package in the Episteme library.</div>
 </div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.media.video.backends">org.episteme.core.media.video.backends</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.media.backends">org.episteme.nativ.media.backends</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.nativ.media.vision.backends">org.episteme.nativ.media.vision.backends</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
 <li>
 <section class="detail" id="org.episteme.core.media.video">
 <h2>Uses of <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a> in <a href="../package-summary.html">org.episteme.core.media.video</a></h2>
+<div class="caption"><span>Methods in <a href="../package-summary.html">org.episteme.core.media.video</a> that return <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>default <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VideoAlgorithmProvider.</span><code><a href="../VideoAlgorithmProvider.html#detectMotion(float%5B%5D%5B%5D,float%5B%5D%5B%5D,float)" class="member-name-link">detectMotion</a><wbr>(float[][]&nbsp;prev,
+ float[][]&nbsp;curr,
+ float&nbsp;threshold)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Detects motion between two frames.</div>
+</div>
+<div class="col-first odd-row-color"><code>static <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VideoAnalyzer.</span><code><a href="../VideoAnalyzer.html#detectMotion(float%5B%5D%5B%5D,float%5B%5D%5B%5D,float)" class="member-name-link">detectMotion</a><wbr>(float[][]&nbsp;prev,
+ float[][]&nbsp;curr,
+ float&nbsp;threshold)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
 <div class="caption"><span>Methods in <a href="../package-summary.html">org.episteme.core.media.video</a> that return types with arguments of type <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -81,6 +105,75 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Detects hard cuts using histogram differences.</div>
 </div>
+<div class="col-first odd-row-color"><code>default <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VideoAlgorithmProvider.</span><code><a href="../VideoAlgorithmProvider.html#detectTransitions(java.util.List,double)" class="member-name-link">detectTransitions</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;float[][]&gt;&nbsp;frames,
+ double&nbsp;threshold)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Detects scene transitions in a list of frames.</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.media.video.backends">
+<h2>Uses of <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a> in <a href="../backends/package-summary.html">org.episteme.core.media.video.backends</a></h2>
+<div class="caption"><span>Methods in <a href="../backends/package-summary.html">org.episteme.core.media.video.backends</a> that return <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MulticoreVideoBackend.</span><code><a href="../backends/MulticoreVideoBackend.html#detectMotion(float%5B%5D%5B%5D,float%5B%5D%5B%5D,float)" class="member-name-link">detectMotion</a><wbr>(float[][]&nbsp;prev,
+ float[][]&nbsp;curr,
+ float&nbsp;threshold)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+<div class="caption"><span>Methods in <a href="../backends/package-summary.html">org.episteme.core.media.video.backends</a> that return types with arguments of type <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MulticoreVideoBackend.</span><code><a href="../backends/MulticoreVideoBackend.html#detectTransitions(java.util.List,double)" class="member-name-link">detectTransitions</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;float[][]&gt;&nbsp;frames,
+ double&nbsp;threshold)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.nativ.media.backends">
+<h2>Uses of <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a> in <a href="../../../../nativ/media/backends/package-summary.html">org.episteme.nativ.media.backends</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../nativ/media/backends/package-summary.html">org.episteme.nativ.media.backends</a> that return <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeJavaCVMediaBackend.</span><code><a href="../../../../nativ/media/backends/NativeJavaCVMediaBackend.html#detectMotion(float%5B%5D%5B%5D,float%5B%5D%5B%5D,float)" class="member-name-link">detectMotion</a><wbr>(float[][]&nbsp;prev,
+ float[][]&nbsp;curr,
+ float&nbsp;threshold)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.nativ.media.vision.backends">
+<h2>Uses of <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a> in <a href="../../../../nativ/media/vision/backends/package-summary.html">org.episteme.nativ.media.vision.backends</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../nativ/media/vision/backends/package-summary.html">org.episteme.nativ.media.vision.backends</a> that return <a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeCUDAVisionBackend.</span><code><a href="../../../../nativ/media/vision/backends/NativeCUDAVisionBackend.html#detectMotion(float%5B%5D%5B%5D,float%5B%5D%5B%5D,float)" class="member-name-link">detectMotion</a><wbr>(float[][]&nbsp;prev,
+ float[][]&nbsp;curr,
+ float&nbsp;threshold)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../SceneTransitionDetector.Transition.html" title="class in org.episteme.core.media.video">SceneTransitionDetector.Transition</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">NativeOpenCLVisionBackend.</span><code><a href="../../../../nativ/media/vision/backends/NativeOpenCLVisionBackend.html#detectMotion(float%5B%5D%5B%5D,float%5B%5D%5B%5D,float)" class="member-name-link">detectMotion</a><wbr>(float[][]&nbsp;prev,
+ float[][]&nbsp;curr,
+ float&nbsp;threshold)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>

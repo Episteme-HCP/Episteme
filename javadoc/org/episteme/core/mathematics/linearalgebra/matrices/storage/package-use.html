@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -64,7 +64,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.matrices.storage">org.episteme.core.mathematics.linearalgebra.matrices.storage</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.nativ.mathematics.linearalgebra.matrices">org.episteme.nativ.mathematics.linearalgebra.matrices</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.nativ.mathematics.linearalgebra.matrices.storage">org.episteme.nativ.mathematics.linearalgebra.matrices.storage</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -90,20 +90,16 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/DiagonalMatrixStorage.html#org.episteme.core.mathematics.linearalgebra.matrices">DiagonalMatrixStorage</a></div>
+<div class="col-first even-row-color"><a href="class-use/MatrixStorage.html#org.episteme.core.mathematics.linearalgebra.matrices">MatrixStorage</a></div>
 <div class="col-last even-row-color">
-<div class="block">Diagonal matrix storage - only stores diagonal elements.</div>
-</div>
-<div class="col-first odd-row-color"><a href="class-use/MatrixStorage.html#org.episteme.core.mathematics.linearalgebra.matrices">MatrixStorage</a></div>
-<div class="col-last odd-row-color">
 <div class="block">Internal storage abstraction for matrices.</div>
 </div>
-<div class="col-first even-row-color"><a href="class-use/RealDoubleMatrixStorage.html#org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrixStorage</a></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><a href="class-use/RealDoubleMatrixStorage.html#org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrixStorage</a></div>
+<div class="col-last odd-row-color">
 <div class="block">Optimized storage for double-precision real matrices.</div>
 </div>
-<div class="col-first odd-row-color"><a href="class-use/SparseMatrixStorage.html#org.episteme.core.mathematics.linearalgebra.matrices">SparseMatrixStorage</a></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><a href="class-use/SparseMatrixStorage.html#org.episteme.core.mathematics.linearalgebra.matrices">SparseMatrixStorage</a></div>
+<div class="col-last even-row-color">
 <div class="block">Sparse matrix storage using a Map.</div>
 </div>
 </div>
@@ -127,22 +123,14 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.nativ.mathematics.linearalgebra.matrices">
-<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.linearalgebra.matrices.storage</a> used by <a href="../../../../../nativ/mathematics/linearalgebra/matrices/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices</a></span></div>
+<section class="detail" id="org.episteme.core.technical.algorithm">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.linearalgebra.matrices.storage</a> used by <a href="../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></span></div>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/MatrixStorage.html#org.episteme.nativ.mathematics.linearalgebra.matrices">MatrixStorage</a></div>
+<div class="col-first even-row-color"><a href="class-use/MatrixStorage.html#org.episteme.core.technical.algorithm">MatrixStorage</a></div>
 <div class="col-last even-row-color">
 <div class="block">Internal storage abstraction for matrices.</div>
-</div>
-<div class="col-first odd-row-color"><a href="class-use/MatrixStorageFactory.html#org.episteme.nativ.mathematics.linearalgebra.matrices">MatrixStorageFactory</a></div>
-<div class="col-last odd-row-color">
-<div class="block">Service Provider Interface (SPI) for creating matrix storage.</div>
-</div>
-<div class="col-first even-row-color"><a href="class-use/RealDoubleMatrixStorage.html#org.episteme.nativ.mathematics.linearalgebra.matrices">RealDoubleMatrixStorage</a></div>
-<div class="col-last even-row-color">
-<div class="block">Optimized storage for double-precision real matrices.</div>
 </div>
 </div>
 </section>
@@ -156,6 +144,14 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><a href="class-use/MatrixStorage.html#org.episteme.nativ.mathematics.linearalgebra.matrices.storage">MatrixStorage</a></div>
 <div class="col-last even-row-color">
 <div class="block">Internal storage abstraction for matrices.</div>
+</div>
+<div class="col-first odd-row-color"><a href="class-use/MatrixStorageFactory.html#org.episteme.nativ.mathematics.linearalgebra.matrices.storage">MatrixStorageFactory</a></div>
+<div class="col-last odd-row-color">
+<div class="block">Service Provider Interface (SPI) for creating matrix storage.</div>
+</div>
+<div class="col-first even-row-color"><a href="class-use/RealDoubleMatrixStorage.html#org.episteme.nativ.mathematics.linearalgebra.matrices.storage">RealDoubleMatrixStorage</a></div>
+<div class="col-last even-row-color">
+<div class="block">Optimized storage for double-precision real matrices.</div>
 </div>
 </div>
 </section>

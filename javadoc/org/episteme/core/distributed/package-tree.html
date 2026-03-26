@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -64,10 +64,11 @@ loadScripts(document, 'script');</script>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
 <ul>
 <li class="circle">org.episteme.core.distributed.<a href="DistributedCompute.html" class="type-name-link" title="class in org.episteme.core.distributed">DistributedCompute</a></li>
-<li class="circle">org.episteme.core.distributed.<a href="LocalDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">LocalDistributedContext</a> (implements org.episteme.core.distributed.<a href="DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a>)</li>
-<li class="circle">org.episteme.core.distributed.<a href="MPIDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">MPIDistributedContext</a> (implements org.episteme.core.distributed.<a href="DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a>)</li>
-<li class="circle">org.episteme.core.distributed.<a href="RemoteDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">RemoteDistributedContext</a> (implements org.episteme.core.distributed.<a href="DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a>)</li>
-<li class="circle">org.episteme.core.distributed.<a href="SparkDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">SparkDistributedContext</a> (implements org.episteme.core.distributed.<a href="DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a>)</li>
+<li class="circle">org.episteme.core.distributed.<a href="DistributedExecutionContext.html" class="type-name-link" title="class in org.episteme.core.distributed">DistributedExecutionContext</a> (implements org.episteme.core.technical.backend.<a href="../technical/backend/ExecutionContext.html" title="interface in org.episteme.core.technical.backend">ExecutionContext</a>)</li>
+<li class="circle">org.episteme.core.distributed.<a href="LocalDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">LocalDistributedContext</a> (implements org.episteme.core.technical.backend.distributed.<a href="../technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a>)</li>
+<li class="circle">org.episteme.core.distributed.<a href="MPIDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">MPIDistributedContext</a> (implements org.episteme.core.technical.backend.distributed.<a href="../technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a>)</li>
+<li class="circle">org.episteme.core.distributed.<a href="RemoteDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">RemoteDistributedContext</a> (implements org.episteme.core.technical.backend.distributed.<a href="../technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a>)</li>
+<li class="circle">org.episteme.core.distributed.<a href="SparkDistributedContext.html" class="type-name-link" title="class in org.episteme.core.distributed">SparkDistributedContext</a> (implements org.episteme.core.technical.backend.distributed.<a href="../technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a>)</li>
 <li class="circle">org.episteme.core.distributed.<a href="TaskRegistry.html" class="type-name-link" title="class in org.episteme.core.distributed">TaskRegistry</a></li>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Throwable.html" class="type-name-link external-link" title="class or interface in java.lang">Throwable</a> (implements java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
 <ul>
@@ -90,7 +91,6 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.episteme.core.distributed.<a href="DistributedComputingProvider.html" class="type-name-link" title="interface in org.episteme.core.distributed">DistributedComputingProvider</a></li>
 </ul>
 </li>
-<li class="circle">org.episteme.core.distributed.<a href="DistributedContext.html" class="type-name-link" title="interface in org.episteme.core.distributed">DistributedContext</a></li>
 <li class="circle">java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" class="type-name-link external-link" title="class or interface in java.io">Serializable</a>
 <ul>
 <li class="circle">org.episteme.core.distributed.<a href="DistributedTask.html" class="type-name-link" title="interface in org.episteme.core.distributed">DistributedTask</a>&lt;I,<wbr>O&gt;</li>
@@ -106,7 +106,6 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Enum.html" class="type-name-link external-link" title="class or interface in java.lang">Enum</a>&lt;E&gt; (implements java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Comparable.html" title="class or interface in java.lang" class="external-link">Comparable</a>&lt;T&gt;, java.lang.constant.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/constant/Constable.html" title="class or interface in java.lang.constant" class="external-link">Constable</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
 <ul>
-<li class="circle">org.episteme.core.distributed.<a href="DistributedContext.Priority.html" class="type-name-link" title="enum class in org.episteme.core.distributed">DistributedContext.Priority</a></li>
 <li class="circle">org.episteme.core.distributed.<a href="TaskRegistry.PrecisionMode.html" class="type-name-link" title="enum class in org.episteme.core.distributed">TaskRegistry.PrecisionMode</a></li>
 </ul>
 </li>

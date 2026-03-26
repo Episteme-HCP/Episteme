@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -79,8 +79,17 @@ loadScripts(document, 'script');</script>
 <li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">multiply(Matrix)</a></li>
 <li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix)" tabindex="0">multiply(RealDoubleMatrix)</a></li>
 <li><a href="#add(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">add(Matrix)</a></li>
+<li><a href="#subtract(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix)" tabindex="0">subtract(RealDoubleMatrix)</a></li>
+<li><a href="#scale(org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">scale(Real)</a></li>
+<li><a href="#solve(org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">solve(Vector)</a></li>
+<li><a href="#transpose()" tabindex="0">transpose()</a></li>
 <li><a href="#inverse()" tabindex="0">inverse()</a></li>
 <li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">multiply(Vector)</a></li>
+<li><a href="#lu()" tabindex="0">lu()</a></li>
+<li><a href="#qr()" tabindex="0">qr()</a></li>
+<li><a href="#svd()" tabindex="0">svd()</a></li>
+<li><a href="#cholesky()" tabindex="0">cholesky()</a></li>
+<li><a href="#eigen()" tabindex="0">eigen()</a></li>
 <li><a href="#close()" tabindex="0">close()</a></li>
 </ol>
 </li>
@@ -161,14 +170,24 @@ optimization.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the sum of this matrix and another.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#direct(int,int)" class="member-name-link">direct</a><wbr>(int&nbsp;rows,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="solvers/CholeskyResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">CholeskyResult</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cholesky()" class="member-name-link">cholesky</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the Cholesky decomposition of this matrix.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#direct(int,int)" class="member-name-link">direct</a><wbr>(int&nbsp;rows,
  int&nbsp;cols)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a RealDoubleMatrix intended for direct/native usage.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="solvers/EigenResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenResult</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#eigen()" class="member-name-link">eigen</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the eigenvalue decomposition of this matrix.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/DoubleBuffer.html" title="class or interface in java.nio" class="external-link">DoubleBuffer</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBuffer()" class="member-name-link">getBuffer</a>()</code></div>
@@ -179,7 +198,7 @@ optimization.
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../structures/rings/Field.html" title="interface in org.episteme.core.mathematics.structures.rings">Field</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getField()" class="member-name-link">getField</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse()" class="member-name-link">inverse</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the multiplicative inverse of this matrix.</div>
@@ -187,43 +206,69 @@ optimization.
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isDirect()" class="member-name-link">isDirect</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix)" class="member-name-link">multiply</a><wbr>(<a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a>&nbsp;other)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="solvers/LUResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUResult</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lu()" class="member-name-link">lu</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the LU decomposition of this matrix.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix)" class="member-name-link">multiply</a><wbr>(<a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a>&nbsp;other)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Optimized matrix multiplication (GEMM).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">multiply</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;other)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">multiply</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;other)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the product of this matrix and another.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">multiply</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;vector)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../vectors/RealDoubleVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">RealDoubleVector</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">multiply</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;vector)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Multiplies this matrix by a vector.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(double%5B%5D%5B%5D)" class="member-name-link">of</a><wbr>(double[][]&nbsp;values)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(double%5B%5D%5B%5D)" class="member-name-link">of</a><wbr>(double[][]&nbsp;values)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a RealDoubleMatrix from a 2D double array (Heap Storage).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(double%5B%5D,int,int)" class="member-name-link">of</a><wbr>(double[]&nbsp;data,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(double%5B%5D,int,int)" class="member-name-link">of</a><wbr>(double[]&nbsp;data,
  int&nbsp;rows,
  int&nbsp;cols)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a RealDoubleMatrix from a flattened double array.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage)" class="member-name-link">of</a><wbr>(<a href="storage/RealDoubleMatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">RealDoubleMatrixStorage</a>&nbsp;storage)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage)" class="member-name-link">of</a><wbr>(<a href="storage/RealDoubleMatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">RealDoubleMatrixStorage</a>&nbsp;storage)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a RealDoubleMatrix from a specialized storage.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,int,double)" class="member-name-link">set</a><wbr>(int&nbsp;row,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="solvers/QRResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">QRResult</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#qr()" class="member-name-link">qr</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the QR decomposition of this matrix.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scale(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">scale</a><wbr>(<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;scalar)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Convenience scalar multiplication (scalar Ã— this).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,int,double)" class="member-name-link">set</a><wbr>(int&nbsp;row,
  int&nbsp;col,
  double&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../vectors/RealDoubleVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">RealDoubleVector</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#solve(org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">solve</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;b)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#subtract(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix)" class="member-name-link">subtract</a><wbr>(<a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a>&nbsp;other)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="solvers/SVDResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">SVDResult</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#svd()" class="member-name-link">svd</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the Singular Value Decomposition (SVD) of this matrix.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[][]</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#to2DDoubleArray()" class="member-name-link">to2DDoubleArray</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -234,12 +279,17 @@ optimization.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the elements of this matrix as a flattened double array.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#transpose()" class="member-name-link">transpose</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the transpose of this matrix.</div>
+</div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix">Methods inherited from class&nbsp;<a href="GenericMatrix.html#method-summary" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a></h3>
-<code><a href="GenericMatrix.html#cols()" title="cols()">cols</a>, <a href="GenericMatrix.html#contains(org.episteme.core.mathematics.linearalgebra.Matrix)" title="contains(Matrix)">contains</a>, <a href="GenericMatrix.html#description()" title="description()">description</a>, <a href="GenericMatrix.html#determinant()" title="determinant()">determinant</a>, <a href="GenericMatrix.html#get(int,int)" title="get(int, int)">get</a>, <a href="GenericMatrix.html#getColumn(int)" title="getColumn(int)">getColumn</a>, <a href="GenericMatrix.html#getRow(int)" title="getRow(int)">getRow</a>, <a href="GenericMatrix.html#getScalarRing()" title="getScalarRing()">getScalarRing</a>, <a href="GenericMatrix.html#getStorage()" title="getStorage()">getStorage</a>, <a href="GenericMatrix.html#getSubMatrix(int,int,int,int)" title="getSubMatrix(int, int, int, int)">getSubMatrix</a>, <a href="GenericMatrix.html#negate()" title="negate()">negate</a>, <a href="GenericMatrix.html#of(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" title="of(E[][], Ring)">of</a>, <a href="GenericMatrix.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" title="of(List, Ring)">of</a>, <a href="GenericMatrix.html#one()" title="one()">one</a>, <a href="GenericMatrix.html#rows()" title="rows()">rows</a>, <a href="GenericMatrix.html#scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)" title="scale(Real, Matrix)">scale</a>, <a href="GenericMatrix.html#set(int,int,E)" title="set(int, int, Real)">set</a>, <a href="GenericMatrix.html#trace()" title="trace()">trace</a>, <a href="GenericMatrix.html#transpose()" title="transpose()">transpose</a>, <a href="GenericMatrix.html#zero()" title="zero()">zero</a></code></div>
+<code><a href="GenericMatrix.html#cols()" title="cols()">cols</a>, <a href="GenericMatrix.html#contains(org.episteme.core.mathematics.linearalgebra.Matrix)" title="contains(Matrix)">contains</a>, <a href="GenericMatrix.html#description()" title="description()">description</a>, <a href="GenericMatrix.html#determinant()" title="determinant()">determinant</a>, <a href="GenericMatrix.html#get(int,int)" title="get(int, int)">get</a>, <a href="GenericMatrix.html#getColumn(int)" title="getColumn(int)">getColumn</a>, <a href="GenericMatrix.html#getProvider()" title="getProvider()">getProvider</a>, <a href="GenericMatrix.html#getRow(int)" title="getRow(int)">getRow</a>, <a href="GenericMatrix.html#getScalarRing()" title="getScalarRing()">getScalarRing</a>, <a href="GenericMatrix.html#getStorage()" title="getStorage()">getStorage</a>, <a href="GenericMatrix.html#getSubMatrix(int,int,int,int)" title="getSubMatrix(int, int, int, int)">getSubMatrix</a>, <a href="GenericMatrix.html#negate()" title="negate()">negate</a>, <a href="GenericMatrix.html#one()" title="one()">one</a>, <a href="GenericMatrix.html#rows()" title="rows()">rows</a>, <a href="GenericMatrix.html#scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)" title="scale(Real, Matrix)">scale</a>, <a href="GenericMatrix.html#set(int,int,E)" title="set(int, int, Real)">set</a>, <a href="GenericMatrix.html#trace()" title="trace()">trace</a>, <a href="GenericMatrix.html#withProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" title="withProvider(LinearAlgebraProvider)">withProvider</a>, <a href="GenericMatrix.html#zero()" title="zero()">zero</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
@@ -248,7 +298,7 @@ optimization.
 <code><a href="../../structures/groups/AbelianGroup.html#negate(E)" title="negate(Matrix)">negate</a>, <a href="../../structures/groups/AbelianGroup.html#subtract(E,E)" title="subtract(Matrix, Matrix)">subtract</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.linearalgebra.Matrix">Methods inherited from interface&nbsp;<a href="../Matrix.html#method-summary" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a></h3>
-<code><a href="../Matrix.html#add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="add(Matrix, Matrix)">add</a>, <a href="../Matrix.html#identity()" title="identity()">identity</a>, <a href="../Matrix.html#inverse(org.episteme.core.mathematics.linearalgebra.Matrix)" title="inverse(Matrix)">inverse</a>, <a href="../Matrix.html#isCommutative()" title="isCommutative()">isCommutative</a>, <a href="../Matrix.html#isEmpty()" title="isEmpty()">isEmpty</a>, <a href="../Matrix.html#isMultiplicationCommutative()" title="isMultiplicationCommutative()">isMultiplicationCommutative</a>, <a href="../Matrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="multiply(Matrix, Matrix)">multiply</a>, <a href="../Matrix.html#operate(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="operate(Matrix, Matrix)">operate</a>, <a href="../Matrix.html#subtract(org.episteme.core.mathematics.linearalgebra.Matrix)" title="subtract(Matrix)">subtract</a>, <a href="../Matrix.html#toTensor()" title="toTensor()">toTensor</a></code></div>
+<code><a href="../Matrix.html#add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="add(Matrix, Matrix)">add</a>, <a href="../Matrix.html#identity()" title="identity()">identity</a>, <a href="../Matrix.html#inverse(org.episteme.core.mathematics.linearalgebra.Matrix)" title="inverse(Matrix)">inverse</a>, <a href="../Matrix.html#isCommutative()" title="isCommutative()">isCommutative</a>, <a href="../Matrix.html#isEmpty()" title="isEmpty()">isEmpty</a>, <a href="../Matrix.html#isMultiplicationCommutative()" title="isMultiplicationCommutative()">isMultiplicationCommutative</a>, <a href="../Matrix.html#map(java.util.function.Function)" title="map(Function)">map</a>, <a href="../Matrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="multiply(Matrix, Matrix)">multiply</a>, <a href="../Matrix.html#operate(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="operate(Matrix, Matrix)">operate</a>, <a href="../Matrix.html#subtract(org.episteme.core.mathematics.linearalgebra.Matrix)" title="subtract(Matrix)">subtract</a>, <a href="../Matrix.html#toTensor()" title="toTensor()">toTensor</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.structures.groups.Monoid">Methods inherited from interface&nbsp;<a href="../../structures/groups/Monoid.html#method-summary" title="interface in org.episteme.core.mathematics.structures.groups">Monoid</a></h3>
 <code><a href="../../structures/groups/Monoid.html#isAssociative()" title="isAssociative()">isAssociative</a></code></div>
@@ -274,7 +324,11 @@ optimization.
 <h3>RealDoubleMatrix</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="element-name">RealDoubleMatrix</span><wbr><span class="parameters">(<a href="storage/RealDoubleMatrixStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.matrices.storage">RealDoubleMatrixStorage</a>&nbsp;storage)</span></div>
-<div class="block">Internal constructor.</div>
+<div class="block">Internal constructor.
+<p>
+NOTE: This constructor eagerly looks up the "best system provider" for internal 
+element-wise and BLAS operations (like add, subtract). This is separate from 
+the provider selected by higher-level algorithms like Benchmarks.</div>
 </div>
 </section>
 </li>
@@ -308,7 +362,8 @@ optimization.
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(double[]&nbsp;data,
  int&nbsp;rows,
  int&nbsp;cols)</span></div>
-<div class="block">Creates a RealDoubleMatrix from a flattened double array.</div>
+<div class="block">Creates a RealDoubleMatrix from a flattened double array.
+NOTE: Assumes data is already row-major.</div>
 </div>
 </section>
 </li>
@@ -437,10 +492,62 @@ optimization.
 </section>
 </li>
 <li>
+<section class="detail" id="subtract(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix)">
+<h3>subtract</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></span>&nbsp;<span class="element-name">subtract</span><wbr><span class="parameters">(<a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a>&nbsp;other)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="scale(org.episteme.core.mathematics.numbers.real.Real)">
+<h3>scale</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></span>&nbsp;<span class="element-name">scale</span><wbr><span class="parameters">(<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;scalar)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#scale(E)">Matrix</a></code></span></div>
+<div class="block">Convenience scalar multiplication (scalar Ã— this).</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../Matrix.html#scale(E)">scale</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../structures/spaces/Module.html#scale(R)">scale</a></code>&nbsp;in interface&nbsp;<code><a href="../../structures/spaces/Module.html" title="interface in org.episteme.core.mathematics.structures.spaces">Module</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Parameters:</dt>
+<dd><code>scalar</code> - the scalar</dd>
+<dt>Returns:</dt>
+<dd>scalar Ã— this</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="solve(org.episteme.core.mathematics.linearalgebra.Vector)">
+<h3>solve</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../vectors/RealDoubleVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">RealDoubleVector</a></span>&nbsp;<span class="element-name">solve</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;b)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="transpose()">
+<h3>transpose</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></span>&nbsp;<span class="element-name">transpose</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#transpose()">Matrix</a></code></span></div>
+<div class="block">Returns the transpose of this matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../Matrix.html#transpose()">transpose</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="GenericMatrix.html#transpose()">transpose</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="inverse()">
 <h3>inverse</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">inverse</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="RealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">RealDoubleMatrix</a></span>&nbsp;<span class="element-name">inverse</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#inverse()">Matrix</a></code></span></div>
 <div class="block">Returns the multiplicative inverse of this matrix.</div>
 <dl class="notes">
@@ -456,7 +563,7 @@ optimization.
 <section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.Vector)">
 <h3>multiply</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;vector)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../vectors/RealDoubleVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">RealDoubleVector</a></span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;vector)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Vector)">Matrix</a></code></span></div>
 <div class="block">Multiplies this matrix by a vector.</div>
 <dl class="notes">
@@ -464,6 +571,86 @@ optimization.
 <dd><code><a href="../Matrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Vector)">multiply</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
 <dt>Overrides:</dt>
 <dd><code><a href="GenericMatrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Vector)">multiply</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="lu()">
+<h3>lu</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="solvers/LUResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUResult</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">lu</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#lu()">Matrix</a></code></span></div>
+<div class="block">Computes the LU decomposition of this matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../Matrix.html#lu()">lu</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="GenericMatrix.html#lu()">lu</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="qr()">
+<h3>qr</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="solvers/QRResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">QRResult</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">qr</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#qr()">Matrix</a></code></span></div>
+<div class="block">Computes the QR decomposition of this matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../Matrix.html#qr()">qr</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="GenericMatrix.html#qr()">qr</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="svd()">
+<h3>svd</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="solvers/SVDResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">SVDResult</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">svd</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#svd()">Matrix</a></code></span></div>
+<div class="block">Computes the Singular Value Decomposition (SVD) of this matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../Matrix.html#svd()">svd</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="GenericMatrix.html#svd()">svd</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="cholesky()">
+<h3>cholesky</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="solvers/CholeskyResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">CholeskyResult</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">cholesky</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#cholesky()">Matrix</a></code></span></div>
+<div class="block">Computes the Cholesky decomposition of this matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../Matrix.html#cholesky()">cholesky</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="GenericMatrix.html#cholesky()">cholesky</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="eigen()">
+<h3>eigen</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="solvers/EigenResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenResult</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">eigen</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#eigen()">Matrix</a></code></span></div>
+<div class="block">Computes the eigenvalue decomposition of this matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../Matrix.html#eigen()">eigen</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="GenericMatrix.html#eigen()">eigen</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
 </dl>
 </div>
 </section>

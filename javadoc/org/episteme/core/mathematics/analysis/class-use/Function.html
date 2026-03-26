@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -83,15 +83,15 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.geometry.surfaces">org.episteme.core.mathematics.geometry.surfaces</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.numerical.fem">org.episteme.core.mathematics.numerical.fem</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.numerical.fem.providers">org.episteme.core.mathematics.numerical.fem.providers</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.optimization">org.episteme.core.mathematics.optimization</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.statistics">org.episteme.core.mathematics.statistics</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.statistics.distributions">org.episteme.core.mathematics.statistics.distributions</a></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm</a></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.technical.algorithm.numerical">org.episteme.core.technical.algorithm.numerical</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.ui.viewers.mathematics.analysis.plotting">org.episteme.core.ui.viewers.mathematics.analysis.plotting</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -99,8 +99,6 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.natural.computing.ai.evolutionary">org.episteme.natural.computing.ai.evolutionary</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.natural.computing.ai.swarm">org.episteme.natural.computing.ai.swarm</a></div>
-<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
@@ -689,6 +687,36 @@ algorithm.</div>
 </section>
 </li>
 <li>
+<section class="detail" id="org.episteme.core.mathematics.numerical.fem">
+<h2>Uses of <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a> in <a href="../../numerical/fem/package-summary.html">org.episteme.core.mathematics.numerical.fem</a></h2>
+<div class="caption"><span>Methods in <a href="../../numerical/fem/package-summary.html">org.episteme.core.mathematics.numerical.fem</a> with parameters of type <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">FEMProvider.</span><code><a href="../../numerical/fem/FEMProvider.html#solvePoisson(org.episteme.core.mathematics.analysis.fem.Mesh,org.episteme.core.mathematics.analysis.Function)" class="member-name-link">solvePoisson</a><wbr>(<a href="../fem/Mesh.html" title="class in org.episteme.core.mathematics.analysis.fem">Mesh</a>&nbsp;mesh,
+ <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a>&lt;<a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;sourceTerm)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.mathematics.numerical.fem.providers">
+<h2>Uses of <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a> in <a href="../../numerical/fem/providers/package-summary.html">org.episteme.core.mathematics.numerical.fem.providers</a></h2>
+<div class="caption"><span>Methods in <a href="../../numerical/fem/providers/package-summary.html">org.episteme.core.mathematics.numerical.fem.providers</a> with parameters of type <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MulticoreFEMProvider.</span><code><a href="../../numerical/fem/providers/MulticoreFEMProvider.html#solvePoisson(org.episteme.core.mathematics.analysis.fem.Mesh,org.episteme.core.mathematics.analysis.Function)" class="member-name-link">solvePoisson</a><wbr>(<a href="../fem/Mesh.html" title="class in org.episteme.core.mathematics.analysis.fem">Mesh</a>&nbsp;mesh,
+ <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a>&lt;<a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;sourceTerm)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="org.episteme.core.mathematics.optimization">
 <h2>Uses of <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a> in <a href="../../optimization/package-summary.html">org.episteme.core.mathematics.optimization</a></h2>
 <div class="caption"><span>Methods in <a href="../../optimization/package-summary.html">org.episteme.core.mathematics.optimization</a> with parameters of type <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a></span></div>
@@ -846,38 +874,6 @@ algorithm.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.technical.algorithm">
-<h2>Uses of <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a> in <a href="../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></h2>
-<div class="caption"><span>Methods in <a href="../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a> with parameters of type <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">FEMProvider.</span><code><a href="../../../technical/algorithm/FEMProvider.html#solvePoisson(org.episteme.core.mathematics.analysis.fem.Mesh,org.episteme.core.mathematics.analysis.Function)" class="member-name-link">solvePoisson</a><wbr>(<a href="../fem/Mesh.html" title="class in org.episteme.core.mathematics.analysis.fem">Mesh</a>&nbsp;mesh,
- <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a>&lt;<a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;sourceTerm)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Solves the Poisson equation on the given mesh.</div>
-</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.core.technical.algorithm.numerical">
-<h2>Uses of <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a> in <a href="../../../technical/algorithm/numerical/package-summary.html">org.episteme.core.technical.algorithm.numerical</a></h2>
-<div class="caption"><span>Methods in <a href="../../../technical/algorithm/numerical/package-summary.html">org.episteme.core.technical.algorithm.numerical</a> with parameters of type <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MulticoreFEMProvider.</span><code><a href="../../../technical/algorithm/numerical/MulticoreFEMProvider.html#solvePoisson(org.episteme.core.mathematics.analysis.fem.Mesh,org.episteme.core.mathematics.analysis.Function)" class="member-name-link">solvePoisson</a><wbr>(<a href="../fem/Mesh.html" title="class in org.episteme.core.mathematics.analysis.fem">Mesh</a>&nbsp;mesh,
- <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a>&lt;<a href="../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;sourceTerm)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="org.episteme.core.ui.viewers.mathematics.analysis.plotting">
 <h2>Uses of <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a> in <a href="../../../ui/viewers/mathematics/analysis/plotting/package-summary.html">org.episteme.core.ui.viewers.mathematics.analysis.plotting</a></h2>
 <div class="caption"><span>Methods in <a href="../../../ui/viewers/mathematics/analysis/plotting/package-summary.html">org.episteme.core.ui.viewers.mathematics.analysis.plotting</a> with parameters of type <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a></span></div>
@@ -998,26 +994,6 @@ algorithm.</div>
  <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;lowerBounds,
  <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;upperBounds)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.natural.computing.ai.swarm">
-<h2>Uses of <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a> in <a href="../../../../natural/computing/ai/swarm/package-summary.html">org.episteme.natural.computing.ai.swarm</a></h2>
-<div class="caption"><span>Constructors in <a href="../../../../natural/computing/ai/swarm/package-summary.html">org.episteme.natural.computing.ai.swarm</a> with parameters of type <a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier</div>
-<div class="table-header col-second">Constructor</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../../natural/computing/ai/swarm/ParticleSwarmOptimization.html#%3Cinit%3E(org.episteme.core.mathematics.analysis.Function,int,org.episteme.core.mathematics.numbers.real.Real%5B%5D,org.episteme.core.mathematics.numbers.real.Real%5B%5D,int)" class="member-name-link">ParticleSwarmOptimization</a><wbr>(<a href="../Function.html" title="interface in org.episteme.core.mathematics.analysis">Function</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[],<wbr><a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;objective,
- int&nbsp;dimensions,
- <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;lowerBounds,
- <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;upperBounds,
- int&nbsp;swarmSize)</code></div>
-<div class="col-last even-row-color">
-<div class="block"><span class="deprecated-label">Deprecated.</span></div>
-</div>
 </div>
 </section>
 </li>

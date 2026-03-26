@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -65,6 +65,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,int)" tabindex="0">multiply(TiledMatrix, TiledMatrix, int)</a></li>
+<li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,int,org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" tabindex="0">multiply(TiledMatrix, TiledMatrix, int, LinearAlgebraProvider)</a></li>
 </ol>
 </li>
 </ol>
@@ -122,12 +123,20 @@ It is optimal for clusters with abundant memory but limited bandwidth.
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,int)" class="member-name-link">multiply</a><wbr>(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;A,
- <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;B,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;E&gt;&nbsp;<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,int)" class="member-name-link">multiply</a><wbr>(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B,
  int&nbsp;replicationFactor)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Performs distributed matrix multiplication C = A x B using 2.5D algorithm.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;E&gt;&nbsp;<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,int,org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" class="member-name-link">multiply</a><wbr>(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B,
+ int&nbsp;replicationFactor,
+ <a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;E&gt;&nbsp;leafProvider)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Performs distributed matrix multiplication C = A x B using 2.5D algorithm with a leaf provider.</div>
 </div>
 </div>
 </div>
@@ -166,8 +175,8 @@ It is optimal for clusters with abundant memory but limited bandwidth.
 <section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,int)">
 <h3>multiply</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a></span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;A,
- <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;B,
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B,
  int&nbsp;replicationFactor)</span></div>
 <div class="block">Performs distributed matrix multiplication C = A x B using 2.5D algorithm.</div>
 <dl class="notes">
@@ -175,6 +184,27 @@ It is optimal for clusters with abundant memory but limited bandwidth.
 <dd><code>A</code> - Left matrix</dd>
 <dd><code>B</code> - Right matrix</dd>
 <dd><code>replicationFactor</code> - Number of layers (c) to replicate data across</dd>
+<dt>Returns:</dt>
+<dd>Result matrix C</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,int,org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)">
+<h3>multiply</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B,
+ int&nbsp;replicationFactor,
+ <a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;E&gt;&nbsp;leafProvider)</span></div>
+<div class="block">Performs distributed matrix multiplication C = A x B using 2.5D algorithm with a leaf provider.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>A</code> - Left matrix</dd>
+<dd><code>B</code> - Right matrix</dd>
+<dd><code>replicationFactor</code> - Number of layers (c) to replicate data across</dd>
+<dd><code>leafProvider</code> - Provider for tile-level multiplication</dd>
 <dt>Returns:</dt>
 <dd>Result matrix C</dd>
 </dl>

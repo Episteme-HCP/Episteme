@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -63,8 +63,14 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
 <ul>
+<li class="circle">org.episteme.core.device.<a href="AbstractDevice.html" class="type-name-link" title="class in org.episteme.core.device">AbstractDevice</a> (implements org.episteme.core.device.<a href="Device.html" title="interface in org.episteme.core.device">Device</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="AbstractActuator.html" class="type-name-link" title="class in org.episteme.core.device">AbstractActuator</a>&lt;C&gt; (implements org.episteme.core.device.<a href="Actuator.html" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;)</li>
+<li class="circle">org.episteme.core.device.<a href="AbstractSensor.html" class="type-name-link" title="class in org.episteme.core.device">AbstractSensor</a>&lt;Q&gt; (implements org.episteme.core.device.<a href="Sensor.html" title="interface in org.episteme.core.device">Sensor</a>&lt;Q&gt;)</li>
+<li class="circle">org.episteme.core.device.<a href="USBDevice.html" class="type-name-link" title="class in org.episteme.core.device">USBDevice</a></li>
+</ul>
+</li>
 <li class="circle">org.episteme.core.device.<a href="GPIBDevice.html" class="type-name-link" title="class in org.episteme.core.device">GPIBDevice</a> (implements org.episteme.core.device.<a href="Device.html" title="interface in org.episteme.core.device">Device</a>)</li>
-<li class="circle">org.episteme.core.device.<a href="USBDevice.html" class="type-name-link" title="class in org.episteme.core.device">USBDevice</a> (implements org.episteme.core.device.<a href="Device.html" title="interface in org.episteme.core.device">Device</a>)</li>
 </ul>
 </li>
 </ul>
@@ -74,11 +80,100 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" class="type-name-link external-link" title="class or interface in java.lang">AutoCloseable</a>
 <ul>
-<li class="circle">org.episteme.core.device.<a href="Device.html" class="type-name-link" title="interface in org.episteme.core.device">Device</a>
+<li class="circle">org.episteme.core.device.<a href="Device.html" class="type-name-link" title="interface in org.episteme.core.device">Device</a> (also extends org.episteme.core.util.identity.<a href="../util/identity/ComprehensiveIdentification.html" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a>)
 <ul>
 <li class="circle">org.episteme.core.device.<a href="Actuator.html" class="type-name-link" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;</li>
-<li class="circle">org.episteme.core.device.<a href="Instrument.html" class="type-name-link" title="interface in org.episteme.core.device">Instrument</a></li>
-<li class="circle">org.episteme.core.device.<a href="Sensor.html" class="type-name-link" title="interface in org.episteme.core.device">Sensor</a>&lt;D&gt;</li>
+<li class="circle">org.episteme.core.device.<a href="ComplexInstrument.html" class="type-name-link" title="interface in org.episteme.core.device">ComplexInstrument</a></li>
+<li class="circle">org.episteme.core.device.<a href="Sensor.html" class="type-name-link" title="interface in org.episteme.core.device">Sensor</a>&lt;Q&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="circle">org.episteme.core.util.<a href="../util/Commented.html" class="type-name-link" title="interface in org.episteme.core.util">Commented</a>
+<ul>
+<li class="circle">org.episteme.core.util.identity.<a href="../util/identity/ComprehensiveIdentification.html" class="type-name-link" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a> (also extends org.episteme.core.util.identity.<a href="../util/identity/Identified.html" title="interface in org.episteme.core.util.identity">Identified</a>&lt;T&gt;, org.episteme.core.util.<a href="../util/Named.html" title="interface in org.episteme.core.util">Named</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Device.html" class="type-name-link" title="interface in org.episteme.core.device">Device</a> (also extends java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Actuator.html" class="type-name-link" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;</li>
+<li class="circle">org.episteme.core.device.<a href="ComplexInstrument.html" class="type-name-link" title="interface in org.episteme.core.device">ComplexInstrument</a></li>
+<li class="circle">org.episteme.core.device.<a href="Sensor.html" class="type-name-link" title="interface in org.episteme.core.device">Sensor</a>&lt;Q&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="circle">org.episteme.core.device.<a href="Device.Record.html" class="type-name-link" title="interface in org.episteme.core.device">Device.Record</a></li>
+<li class="circle">org.episteme.core.util.identity.<a href="../util/identity/Identified.html" class="type-name-link" title="interface in org.episteme.core.util.identity">Identified</a>&lt;T&gt;
+<ul>
+<li class="circle">org.episteme.core.util.identity.<a href="../util/identity/ComprehensiveIdentification.html" class="type-name-link" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a> (also extends org.episteme.core.util.<a href="../util/Commented.html" title="interface in org.episteme.core.util">Commented</a>, org.episteme.core.util.<a href="../util/Named.html" title="interface in org.episteme.core.util">Named</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Device.html" class="type-name-link" title="interface in org.episteme.core.device">Device</a> (also extends java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Actuator.html" class="type-name-link" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;</li>
+<li class="circle">org.episteme.core.device.<a href="ComplexInstrument.html" class="type-name-link" title="interface in org.episteme.core.device">ComplexInstrument</a></li>
+<li class="circle">org.episteme.core.device.<a href="Sensor.html" class="type-name-link" title="interface in org.episteme.core.device">Sensor</a>&lt;Q&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="circle">org.episteme.core.util.<a href="../util/Named.html" class="type-name-link" title="interface in org.episteme.core.util">Named</a>
+<ul>
+<li class="circle">org.episteme.core.util.identity.<a href="../util/identity/ComprehensiveIdentification.html" class="type-name-link" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a> (also extends org.episteme.core.util.<a href="../util/Commented.html" title="interface in org.episteme.core.util">Commented</a>, org.episteme.core.util.identity.<a href="../util/identity/Identified.html" title="interface in org.episteme.core.util.identity">Identified</a>&lt;T&gt;, java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Device.html" class="type-name-link" title="interface in org.episteme.core.device">Device</a> (also extends java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Actuator.html" class="type-name-link" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;</li>
+<li class="circle">org.episteme.core.device.<a href="ComplexInstrument.html" class="type-name-link" title="interface in org.episteme.core.device">ComplexInstrument</a></li>
+<li class="circle">org.episteme.core.device.<a href="Sensor.html" class="type-name-link" title="interface in org.episteme.core.device">Sensor</a>&lt;Q&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="circle">java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" class="type-name-link external-link" title="class or interface in java.io">Serializable</a>
+<ul>
+<li class="circle">org.episteme.core.util.identity.<a href="../util/identity/ComprehensiveIdentification.html" class="type-name-link" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a> (also extends org.episteme.core.util.<a href="../util/Commented.html" title="interface in org.episteme.core.util">Commented</a>, org.episteme.core.util.identity.<a href="../util/identity/Identified.html" title="interface in org.episteme.core.util.identity">Identified</a>&lt;T&gt;, org.episteme.core.util.<a href="../util/Named.html" title="interface in org.episteme.core.util">Named</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Device.html" class="type-name-link" title="interface in org.episteme.core.device">Device</a> (also extends java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Actuator.html" class="type-name-link" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;</li>
+<li class="circle">org.episteme.core.device.<a href="ComplexInstrument.html" class="type-name-link" title="interface in org.episteme.core.device">ComplexInstrument</a></li>
+<li class="circle">org.episteme.core.device.<a href="Sensor.html" class="type-name-link" title="interface in org.episteme.core.device">Sensor</a>&lt;Q&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Enum Class Hierarchy">Enum Class Hierarchy</h2>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Enum.html" class="type-name-link external-link" title="class or interface in java.lang">Enum</a>&lt;E&gt; (implements java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Comparable.html" title="class or interface in java.lang" class="external-link">Comparable</a>&lt;T&gt;, java.lang.constant.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/constant/Constable.html" title="class or interface in java.lang.constant" class="external-link">Constable</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="Device.Status.html" class="type-name-link" title="enum class in org.episteme.core.device">Device.Status</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Record Class Hierarchy">Record Class Hierarchy</h2>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Record.html" class="type-name-link external-link" title="class or interface in java.lang">Record</a>
+<ul>
+<li class="circle">org.episteme.core.device.<a href="AbstractDevice.Record.html" class="type-name-link" title="class in org.episteme.core.device">AbstractDevice.Record</a> (implements org.episteme.core.device.<a href="Device.Record.html" title="interface in org.episteme.core.device">Device.Record</a>)</li>
 </ul>
 </li>
 </ul>

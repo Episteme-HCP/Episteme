@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -1213,7 +1213,7 @@ and competition modeling.</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../../../social/politics/Conflict.html#%3Cinit%3E(java.lang.String,java.util.Set,org.episteme.natural.earth.Place,org.episteme.social.history.time.TimeCoordinate)" class="member-name-link">Conflict</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../social/sociology/Group.html" title="class in org.episteme.social.sociology">Group</a>&gt;&nbsp;involvedGroups,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../social/psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a>&gt;&nbsp;involvedGroups,
  <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;place,
  <a href="../../../social/history/time/TimeCoordinate.html" title="interface in org.episteme.social.history.time">TimeCoordinate</a>&nbsp;startingDate)</code></div>
 <div class="col-last even-row-color">
@@ -1276,7 +1276,7 @@ and competition modeling.</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code><a href="../Place.html" title="class in org.episteme.natural.earth">Place</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">Group.</span><code><a href="../../../social/psychology/social/Group.html#getFormalTerritory()" class="member-name-link">getFormalTerritory</a>()</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">PsychologicalGroup.</span><code><a href="../../../social/psychology/social/PsychologicalGroup.html#getFormalTerritory()" class="member-name-link">getFormalTerritory</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="caption"><span>Methods in <a href="../../../social/psychology/social/package-summary.html">org.episteme.social.psychology.social</a> with parameters of type <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a></span></div>
@@ -1285,7 +1285,7 @@ and competition modeling.</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>void</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">Group.</span><code><a href="../../../social/psychology/social/Group.html#setFormalTerritory(org.episteme.natural.earth.Place)" class="member-name-link">setFormalTerritory</a><wbr>(<a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">PsychologicalGroup.</span><code><a href="../../../social/psychology/social/PsychologicalGroup.html#setFormalTerritory(org.episteme.natural.earth.Place)" class="member-name-link">setFormalTerritory</a><wbr>(<a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="caption"><span>Constructors in <a href="../../../social/psychology/social/package-summary.html">org.episteme.social.psychology.social</a> with parameters of type <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a></span></div>
@@ -1293,46 +1293,6 @@ and competition modeling.</div>
 <div class="table-header col-first">Modifier</div>
 <div class="table-header col-second">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../social/psychology/social/Family.html#%3Cinit%3E(org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">Family</a><wbr>(<a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
- <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;formalTerritory)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Creates a new Family with a designated home territory.</div>
-</div>
-<div class="col-first odd-row-color"><code>&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../../../social/psychology/social/Group.html#%3Cinit%3E(java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">Group</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
- <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Default Constructor with ID generation.</div>
-</div>
-<div class="col-first even-row-color"><code>&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../social/psychology/social/Group.html#%3Cinit%3E(java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place,org.episteme.natural.engineering.eventdriven.EventDrivenEngine)" class="member-name-link">Group</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
- <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory,
- <a href="../../engineering/eventdriven/EventDrivenEngine.html" title="class in org.episteme.natural.engineering.eventdriven">EventDrivenEngine</a>&nbsp;engine)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../../../social/psychology/social/Group.html#%3Cinit%3E(org.episteme.core.util.identity.Identification,java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">Group</a><wbr>(<a href="../../../core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a>&nbsp;id,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
- <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Constructor used by subclasses or for explicit ID.</div>
-</div>
-<div class="col-first even-row-color"><code>&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../social/psychology/social/Group.html#%3Cinit%3E(org.episteme.core.util.identity.Identification,java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place,org.episteme.natural.engineering.eventdriven.EventDrivenEngine)" class="member-name-link">Group</a><wbr>(<a href="../../../core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a>&nbsp;id,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
- <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory,
- <a href="../../engineering/eventdriven/EventDrivenEngine.html" title="class in org.episteme.natural.engineering.eventdriven">EventDrivenEngine</a>&nbsp;engine)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../../../social/psychology/social/Group.html#%3Cinit%3E(org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">Group</a><wbr>(<a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
- <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;formalTerritory)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Legacy/Convenience constructor.</div>
-</div>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../../../social/psychology/social/HumanGroup.html#%3Cinit%3E(java.lang.String,org.episteme.natural.earth.Place,org.episteme.natural.engineering.eventdriven.EventDrivenEngine)" class="member-name-link">HumanGroup</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory,
@@ -1344,6 +1304,46 @@ and competition modeling.</div>
 <div class="col-second odd-row-color"><code><a href="../../../social/psychology/social/HumanGroup.html#%3Cinit%3E(org.episteme.natural.earth.Place)" class="member-name-link">HumanGroup</a><wbr>(<a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;formalTerritory)</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Initializes a new HumanGroup instance with a physical location.</div>
+</div>
+<div class="col-first even-row-color"><code>&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../../../social/psychology/social/PsychologicalFamily.html#%3Cinit%3E(org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">PsychologicalFamily</a><wbr>(<a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
+ <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;formalTerritory)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Creates a new PsychologicalFamily with a designated home territory.</div>
+</div>
+<div class="col-first odd-row-color"><code>&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../../../social/psychology/social/PsychologicalGroup.html#%3Cinit%3E(java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">PsychologicalGroup</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
+ <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Default Constructor with ID generation.</div>
+</div>
+<div class="col-first even-row-color"><code>&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../../../social/psychology/social/PsychologicalGroup.html#%3Cinit%3E(java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place,org.episteme.natural.engineering.eventdriven.EventDrivenEngine)" class="member-name-link">PsychologicalGroup</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
+ <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory,
+ <a href="../../engineering/eventdriven/EventDrivenEngine.html" title="class in org.episteme.natural.engineering.eventdriven">EventDrivenEngine</a>&nbsp;engine)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../../../social/psychology/social/PsychologicalGroup.html#%3Cinit%3E(org.episteme.core.util.identity.Identification,java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">PsychologicalGroup</a><wbr>(<a href="../../../core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a>&nbsp;id,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
+ <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Constructor used by subclasses or for explicit ID.</div>
+</div>
+<div class="col-first even-row-color"><code>&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../../../social/psychology/social/PsychologicalGroup.html#%3Cinit%3E(org.episteme.core.util.identity.Identification,java.lang.String,org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place,org.episteme.natural.engineering.eventdriven.EventDrivenEngine)" class="member-name-link">PsychologicalGroup</a><wbr>(<a href="../../../core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a>&nbsp;id,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
+ <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;territory,
+ <a href="../../engineering/eventdriven/EventDrivenEngine.html" title="class in org.episteme.natural.engineering.eventdriven">EventDrivenEngine</a>&nbsp;engine)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../../../social/psychology/social/PsychologicalGroup.html#%3Cinit%3E(org.episteme.natural.biology.taxonomy.Species,org.episteme.natural.earth.Place)" class="member-name-link">PsychologicalGroup</a><wbr>(<a href="../../biology/taxonomy/Species.html" title="class in org.episteme.natural.biology.taxonomy">Species</a>&nbsp;species,
+ <a href="../Place.html" title="class in org.episteme.natural.earth">Place</a>&nbsp;formalTerritory)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Legacy/Convenience constructor.</div>
 </div>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../../../social/psychology/social/Tribe.html#%3Cinit%3E(java.lang.String,org.episteme.natural.earth.Place,org.episteme.social.sociology.Culture)" class="member-name-link">Tribe</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,

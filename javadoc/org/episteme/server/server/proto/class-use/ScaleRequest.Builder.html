@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -95,81 +95,119 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearField(com.google.protobuf.Descriptors.FieldDescriptor)" class="member-name-link">clearField</a><wbr>(com.google.protobuf.Descriptors.FieldDescriptor&nbsp;field)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearMatrix()" class="member-name-link">clearMatrix</a>()</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearHpScalar()" class="member-name-link">clearHpScalar</a>()</code></div>
 <div class="col-last odd-row-color">
-<div class="block"><code>.org.episteme.computing.remote.MatrixData matrix = 2;</code></div>
+<div class="block">
+For high-precision scalars (RealBig)</div>
 </div>
 <div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearOneof(com.google.protobuf.Descriptors.OneofDescriptor)" class="member-name-link">clearOneof</a><wbr>(com.google.protobuf.Descriptors.OneofDescriptor&nbsp;oneof)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearImaginary()" class="member-name-link">clearImaginary</a>()</code></div>
+<div class="col-last even-row-color">
+<div class="block"><code>double imaginary = 3;</code></div>
+</div>
 <div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearScalar()" class="member-name-link">clearScalar</a>()</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearIsComplex()" class="member-name-link">clearIsComplex</a>()</code></div>
 <div class="col-last odd-row-color">
-<div class="block"><code>double scalar = 1;</code></div>
+<div class="block"><code>bool is_complex = 4;</code></div>
 </div>
 <div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clone()" class="member-name-link">clone</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeFrom(com.google.protobuf.CodedInputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">mergeFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeFrom(com.google.protobuf.Message)" class="member-name-link">mergeFrom</a><wbr>(com.google.protobuf.Message&nbsp;other)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeFrom(org.episteme.server.server.proto.ScaleRequest)" class="member-name-link">mergeFrom</a><wbr>(<a href="../ScaleRequest.html" title="class in org.episteme.server.server.proto">ScaleRequest</a>&nbsp;other)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeMatrix(org.episteme.server.server.proto.MatrixData)" class="member-name-link">mergeMatrix</a><wbr>(<a href="../MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&nbsp;value)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearMatrix()" class="member-name-link">clearMatrix</a>()</code></div>
 <div class="col-last even-row-color">
 <div class="block"><code>.org.episteme.computing.remote.MatrixData matrix = 2;</code></div>
 </div>
-<div class="col-first odd-row-color"><code>final <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeUnknownFields(com.google.protobuf.UnknownFieldSet)" class="member-name-link">mergeUnknownFields</a><wbr>(com.google.protobuf.UnknownFieldSet&nbsp;unknownFields)</code></div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearOneof(com.google.protobuf.Descriptors.OneofDescriptor)" class="member-name-link">clearOneof</a><wbr>(com.google.protobuf.Descriptors.OneofDescriptor&nbsp;oneof)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilder()" class="member-name-link">newBuilder</a>()</code></div>
+<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clearScalar()" class="member-name-link">clearScalar</a>()</code></div>
+<div class="col-last even-row-color">
+<div class="block"><code>double scalar = 1;</code></div>
+</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#clone()" class="member-name-link">clone</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeFrom(com.google.protobuf.CodedInputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">mergeFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeFrom(com.google.protobuf.Message)" class="member-name-link">mergeFrom</a><wbr>(com.google.protobuf.Message&nbsp;other)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeFrom(org.episteme.server.server.proto.ScaleRequest)" class="member-name-link">mergeFrom</a><wbr>(<a href="../ScaleRequest.html" title="class in org.episteme.server.server.proto">ScaleRequest</a>&nbsp;other)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeMatrix(org.episteme.server.server.proto.MatrixData)" class="member-name-link">mergeMatrix</a><wbr>(<a href="../MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&nbsp;value)</code></div>
+<div class="col-last odd-row-color">
+<div class="block"><code>.org.episteme.computing.remote.MatrixData matrix = 2;</code></div>
+</div>
+<div class="col-first even-row-color"><code>final <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#mergeUnknownFields(com.google.protobuf.UnknownFieldSet)" class="member-name-link">mergeUnknownFields</a><wbr>(com.google.protobuf.UnknownFieldSet&nbsp;unknownFields)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilder(org.episteme.server.server.proto.ScaleRequest)" class="member-name-link">newBuilder</a><wbr>(<a href="../ScaleRequest.html" title="class in org.episteme.server.server.proto">ScaleRequest</a>&nbsp;prototype)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilder()" class="member-name-link">newBuilder</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilderForType()" class="member-name-link">newBuilderForType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilderForType(com.google.protobuf.GeneratedMessageV3.BuilderParent)" class="member-name-link">newBuilderForType</a><wbr>(com.google.protobuf.GeneratedMessageV3.BuilderParent&nbsp;parent)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setField(com.google.protobuf.Descriptors.FieldDescriptor,java.lang.Object)" class="member-name-link">setField</a><wbr>(com.google.protobuf.Descriptors.FieldDescriptor&nbsp;field,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
+<div class="col-first even-row-color"><code>static <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilder(org.episteme.server.server.proto.ScaleRequest)" class="member-name-link">newBuilder</a><wbr>(<a href="../ScaleRequest.html" title="class in org.episteme.server.server.proto">ScaleRequest</a>&nbsp;prototype)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setMatrix(org.episteme.server.server.proto.MatrixData)" class="member-name-link">setMatrix</a><wbr>(<a href="../MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&nbsp;value)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilderForType()" class="member-name-link">newBuilderForType</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>protected <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#newBuilderForType(com.google.protobuf.GeneratedMessageV3.BuilderParent)" class="member-name-link">newBuilderForType</a><wbr>(com.google.protobuf.GeneratedMessageV3.BuilderParent&nbsp;parent)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setField(com.google.protobuf.Descriptors.FieldDescriptor,java.lang.Object)" class="member-name-link">setField</a><wbr>(com.google.protobuf.Descriptors.FieldDescriptor&nbsp;field,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setHpScalar(java.lang.String)" class="member-name-link">setHpScalar</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color">
+<div class="block">
+For high-precision scalars (RealBig)</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setHpScalarBytes(com.google.protobuf.ByteString)" class="member-name-link">setHpScalarBytes</a><wbr>(com.google.protobuf.ByteString&nbsp;value)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">
+For high-precision scalars (RealBig)</div>
+</div>
+<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setImaginary(double)" class="member-name-link">setImaginary</a><wbr>(double&nbsp;value)</code></div>
+<div class="col-last even-row-color">
+<div class="block"><code>double imaginary = 3;</code></div>
+</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setIsComplex(boolean)" class="member-name-link">setIsComplex</a><wbr>(boolean&nbsp;value)</code></div>
+<div class="col-last odd-row-color">
+<div class="block"><code>bool is_complex = 4;</code></div>
+</div>
+<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setMatrix(org.episteme.server.server.proto.MatrixData)" class="member-name-link">setMatrix</a><wbr>(<a href="../MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color">
+<div class="block"><code>.org.episteme.computing.remote.MatrixData matrix = 2;</code></div>
+</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setMatrix(org.episteme.server.server.proto.MatrixData.Builder)" class="member-name-link">setMatrix</a><wbr>(<a href="../MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a>&nbsp;builderForValue)</code></div>
 <div class="col-last odd-row-color">
 <div class="block"><code>.org.episteme.computing.remote.MatrixData matrix = 2;</code></div>
 </div>
 <div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setMatrix(org.episteme.server.server.proto.MatrixData.Builder)" class="member-name-link">setMatrix</a><wbr>(<a href="../MatrixData.Builder.html" title="class in org.episteme.server.server.proto">MatrixData.Builder</a>&nbsp;builderForValue)</code></div>
-<div class="col-last even-row-color">
-<div class="block"><code>.org.episteme.computing.remote.MatrixData matrix = 2;</code></div>
-</div>
-<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setRepeatedField(com.google.protobuf.Descriptors.FieldDescriptor,int,java.lang.Object)" class="member-name-link">setRepeatedField</a><wbr>(com.google.protobuf.Descriptors.FieldDescriptor&nbsp;field,
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setRepeatedField(com.google.protobuf.Descriptors.FieldDescriptor,int,java.lang.Object)" class="member-name-link">setRepeatedField</a><wbr>(com.google.protobuf.Descriptors.FieldDescriptor&nbsp;field,
  int&nbsp;index,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setScalar(double)" class="member-name-link">setScalar</a><wbr>(double&nbsp;value)</code></div>
-<div class="col-last even-row-color">
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setScalar(double)" class="member-name-link">setScalar</a><wbr>(double&nbsp;value)</code></div>
+<div class="col-last odd-row-color">
 <div class="block"><code>double scalar = 1;</code></div>
 </div>
-<div class="col-first odd-row-color"><code>final <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setUnknownFields(com.google.protobuf.UnknownFieldSet)" class="member-name-link">setUnknownFields</a><wbr>(com.google.protobuf.UnknownFieldSet&nbsp;unknownFields)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#toBuilder()" class="member-name-link">toBuilder</a>()</code></div>
+<div class="col-first even-row-color"><code>final <a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ScaleRequest.Builder.</span><code><a href="../ScaleRequest.Builder.html#setUnknownFields(com.google.protobuf.UnknownFieldSet)" class="member-name-link">setUnknownFields</a><wbr>(com.google.protobuf.UnknownFieldSet&nbsp;unknownFields)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../ScaleRequest.Builder.html" title="class in org.episteme.server.server.proto">ScaleRequest.Builder</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">ScaleRequest.</span><code><a href="../ScaleRequest.html#toBuilder()" class="member-name-link">toBuilder</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>

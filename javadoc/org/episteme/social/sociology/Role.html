@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -70,7 +70,6 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,org.episteme.social.sociology.RoleKind)" tabindex="0">Role(Individual, String, Situation, RoleKind)</a></li>
 <li><a href="#%3Cinit%3E(java.lang.String,org.episteme.social.sociology.RoleKind)" tabindex="0">Role(String, RoleKind)</a></li>
-<li><a href="#%3Cinit%3E(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,int)" tabindex="0">Role(Individual, String, Situation, int)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -170,20 +169,11 @@ Roles define expected behaviors and relations (e.g., Client/Server, Supervisor, 
 <div class="col-last even-row-color">
 <div class="block">Creates a standalone Role template.</div>
 </div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,int)" class="member-name-link">Role</a><wbr>(<a href="../../natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&nbsp;individual,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="Situation.html" title="class in org.episteme.social.sociology">Situation</a>&nbsp;situation,
- int&nbsp;kind)</code></div>
-<div class="col-last odd-row-color">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use <a href="#%3Cinit%3E(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,org.episteme.social.sociology.RoleKind)"><code>Role(Individual, String, Situation, RoleKind)</code></a> instead</div>
-</div>
-</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,org.episteme.social.sociology.RoleKind)" class="member-name-link">Role</a><wbr>(<a href="../../natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&nbsp;individual,
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,org.episteme.social.sociology.RoleKind)" class="member-name-link">Role</a><wbr>(<a href="../../natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&nbsp;individual,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  <a href="Situation.html" title="class in org.episteme.social.sociology">Situation</a>&nbsp;situation,
  <a href="RoleKind.html" title="class in org.episteme.social.sociology">RoleKind</a>&nbsp;kind)</code></div>
-<div class="col-last even-row-color">
+<div class="col-last odd-row-color">
 <div class="block">Creates a new Role for an individual within a specific situation.</div>
 </div>
 </div>
@@ -346,22 +336,6 @@ Roles define expected behaviors and relations (e.g., Client/Server, Supervisor, 
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/NullPointerException.html" title="class or interface in java.lang" class="external-link">NullPointerException</a></code> - if name is null</dd>
 </dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="&lt;init&gt;(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,int)">
-<h3>Role</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>
-</span><span class="modifiers">public</span>&nbsp;<span class="element-name">Role</span><wbr><span class="parameters">(<a href="../../natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&nbsp;individual,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="Situation.html" title="class in org.episteme.social.sociology">Situation</a>&nbsp;situation,
- int&nbsp;kind)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use <a href="#%3Cinit%3E(org.episteme.natural.biology.Individual,java.lang.String,org.episteme.social.sociology.Situation,org.episteme.social.sociology.RoleKind)"><code>Role(Individual, String, Situation, RoleKind)</code></a> instead</div>
-</div>
-<div class="block">Deprecated constructor for backward compatibility with integer-based role kinds.</div>
 </div>
 </section>
 </li>

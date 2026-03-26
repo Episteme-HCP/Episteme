@@ -33,7 +33,7 @@ loadScripts(document, 'script');</script>
 <li class="nav-bar-cell1-rev">Index</li>
 <li><a href="../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -191,21 +191,33 @@ o = e0 + e1*i + e2*j + e3*k + e4*l + e5*il + e6*jl + e7*kl</div>
 <dd>
 <div class="block">Creates an instance of a <code>OddsResult</code> record class.</div>
 </dd>
-<dt><a href="../org/episteme/natural/physics/classical/mechanics/backends/ODEBackend.html" class="type-name-link" title="class in org.episteme.natural.physics.classical.mechanics.backends">ODEBackend</a> - Class in <a href="../org/episteme/natural/physics/classical/mechanics/backends/package-summary.html">org.episteme.natural.physics.classical.mechanics.backends</a></dt>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ODEBackend.html" class="type-name-link" title="class in org.episteme.nativ.physics.classical.mechanics.collision.backends">ODEBackend</a> - Class in <a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision.backends</a></dt>
 <dd>
-<div class="block">ODE (Open Dynamics Engine) physics backend provider.</div>
+<div class="block">Implementation of <a href="../org/episteme/natural/physics/classical/mechanics/collision/MechanicsBackend.html" title="interface in org.episteme.natural.physics.classical.mechanics.collision"><code>MechanicsBackend</code></a> for ODE (Open Dynamics Engine).</div>
 </dd>
-<dt><a href="../org/episteme/natural/physics/classical/mechanics/backends/ODEBackend.html#%3Cinit%3E()" class="member-name-link">ODEBackend()</a> - Constructor for class org.episteme.natural.physics.classical.mechanics.backends.<a href="../org/episteme/natural/physics/classical/mechanics/backends/ODEBackend.html" title="class in org.episteme.natural.physics.classical.mechanics.backends">ODEBackend</a></dt>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ODEBackend.html#%3Cinit%3E()" class="member-name-link">ODEBackend()</a> - Constructor for class org.episteme.nativ.physics.classical.mechanics.collision.backends.<a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ODEBackend.html" title="class in org.episteme.nativ.physics.classical.mechanics.collision.backends">ODEBackend</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/ODEProvider.html" class="type-name-link" title="interface in org.episteme.core.technical.algorithm">ODEProvider</a> - Interface in <a href="../org/episteme/core/technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></dt>
+<dt><a href="../org/episteme/core/mathematics/numerical/ode/ODEProvider.html" class="type-name-link" title="interface in org.episteme.core.mathematics.numerical.ode">ODEProvider</a> - Interface in <a href="../org/episteme/core/mathematics/numerical/ode/package-summary.html">org.episteme.core.mathematics.numerical.ode</a></dt>
 <dd>
 <div class="block">Interface for Ordinary Differential Equation (ODE) solvers.</div>
 </dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/ODERigidBody.html" class="type-name-link" title="class in org.episteme.nativ.physics.classical.mechanics.collision.backends.ode">ODERigidBody</a> - Class in <a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision.backends.ode</a></dt>
+<dd>
+<div class="block">ODE implementation of RigidBodyBackend.</div>
+</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/ODERigidBody.html#%3Cinit%3E(org.ode4j.ode.DWorld,org.episteme.natural.physics.classical.mechanics.collision.RigidBody)" class="member-name-link">ODERigidBody(DWorld, RigidBody)</a> - Constructor for class org.episteme.nativ.physics.classical.mechanics.collision.backends.ode.<a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/ODERigidBody.html" title="class in org.episteme.nativ.physics.classical.mechanics.collision.backends.ode">ODERigidBody</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/ode/ODESolver.html" class="type-name-link" title="class in org.episteme.core.mathematics.analysis.ode">ODESolver</a> - Class in <a href="../org/episteme/core/mathematics/analysis/ode/package-summary.html">org.episteme.core.mathematics.analysis.ode</a></dt>
 <dd>
 <div class="block">Ordinary Differential Equation (ODE) solvers.</div>
 </dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/ode/ODESolver.html#%3Cinit%3E()" class="member-name-link">ODESolver()</a> - Constructor for class org.episteme.core.mathematics.analysis.ode.<a href="../org/episteme/core/mathematics/analysis/ode/ODESolver.html" title="class in org.episteme.core.mathematics.analysis.ode">ODESolver</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/ODEWorld.html" class="type-name-link" title="class in org.episteme.nativ.physics.classical.mechanics.collision.backends.ode">ODEWorld</a> - Class in <a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision.backends.ode</a></dt>
+<dd>
+<div class="block">ODE implementation of PhysicsWorldBackend.</div>
+</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/ODEWorld.html#%3Cinit%3E()" class="member-name-link">ODEWorld()</a> - Constructor for class org.episteme.nativ.physics.classical.mechanics.collision.backends.ode.<a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/ODEWorld.html" title="class in org.episteme.nativ.physics.classical.mechanics.collision.backends.ode">ODEWorld</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/series/BellSequence.html#oeis-reference-heading" class="search-tag-link">OEIS Reference</a> - Section in class org.episteme.core.mathematics.analysis.series.BellSequence</dt>
 <dd>&nbsp;</dd>
@@ -281,6 +293,12 @@ o = e0 + e1*i + e2*j + e3*k + e4*l + e5*il + e6*jl + e7*kl</div>
 <dd>
 <div class="block">Creates a dimension with the specified exponents.</div>
 </dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/SparseMatrix.html#of(int,int,E,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(int, int, E, Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/SparseMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">SparseMatrix</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/SparseMatrix.html#of(int,int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(int, int, Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/SparseMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">SparseMatrix</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/vectors/SparseVector.html#of(int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(int, Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.vectors.<a href="../org/episteme/core/mathematics/linearalgebra/vectors/SparseVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">SparseVector</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/numbers/integers/Integer.html#of(long)" class="member-name-link">of(long)</a> - Static method in class org.episteme.core.mathematics.numbers.integers.<a href="../org/episteme/core/mathematics/numbers/integers/Integer.html" title="class in org.episteme.core.mathematics.numbers.integers">Integer</a></dt>
 <dd>
 <div class="block">Creates an integer from a long value.</div>
@@ -299,14 +317,17 @@ o = e0 + e1*i + e2*j + e3*k + e4*l + e5*il + e6*jl + e7*kl</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/numbers/rationals/Rational.html#of(long,long)" class="member-name-link">of(long, long)</a> - Static method in class org.episteme.core.mathematics.numbers.rationals.<a href="../org/episteme/core/mathematics/numbers/rationals/Rational.html" title="class in org.episteme.core.mathematics.numbers.rationals">Rational</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/GenericMatrix.html#of(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(E[][], Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a></dt>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/DenseMatrix.html#of(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(E[][], Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/DenseMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">DenseMatrix</a></dt>
 <dd>
-<div class="block">Creates a matrix from a 2D array, automatically selecting storage and
-provider.</div>
+<div class="block">Creates a DenseMatrix with automatic storage optimization.</div>
 </dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/vectors/VectorFactory.html#of(java.lang.Class,E...)" class="member-name-link">of(Class, E...)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.vectors.<a href="../org/episteme/core/mathematics/linearalgebra/vectors/VectorFactory.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">VectorFactory</a></dt>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/Matrix.html#of(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(E[][], Ring)</a> - Static method in interface org.episteme.core.mathematics.linearalgebra.<a href="../org/episteme/core/mathematics/linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a></dt>
 <dd>
-<div class="block">Creates a vector from varargs elements.</div>
+<div class="block">Creates a matrix from a 2D array.</div>
+</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/Vector.html#of(E%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(E[], Ring)</a> - Static method in interface org.episteme.core.mathematics.linearalgebra.<a href="../org/episteme/core/mathematics/linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a></dt>
+<dd>
+<div class="block">Creates a vector from an array of elements.</div>
 </dd>
 <dt><a href="../org/episteme/core/mathematics/ml/generative/PromptTemplate.html#of(java.lang.String)" class="member-name-link">of(String)</a> - Static method in class org.episteme.core.mathematics.ml.generative.<a href="../org/episteme/core/mathematics/ml/generative/PromptTemplate.html" title="class in org.episteme.core.mathematics.ml.generative">PromptTemplate</a></dt>
 <dd>&nbsp;</dd>
@@ -360,14 +381,21 @@ provider.</div>
 <dd>
 <div class="block">Creates a scalar field with known dimension.</div>
 </dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/Vector.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(List, Ring)</a> - Static method in interface org.episteme.core.mathematics.linearalgebra.<a href="../org/episteme/core/mathematics/linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a></dt>
+<dd>
+<div class="block">Creates a vector from a list of elements.</div>
+</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/vectors/DenseVector.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(List, Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.vectors.<a href="../org/episteme/core/mathematics/linearalgebra/vectors/DenseVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">DenseVector</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/vectors/SparseVector.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(List, Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.vectors.<a href="../org/episteme/core/mathematics/linearalgebra/vectors/SparseVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">SparseVector</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/GenericMatrix.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(List, Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a></dt>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/DenseMatrix.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(List, Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/DenseMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">DenseMatrix</a></dt>
 <dd>
-<div class="block">Creates a matrix from a List of Lists, automatically selecting storage and
-provider.</div>
+<div class="block">Creates a DenseMatrix with automatic storage optimization.</div>
+</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/Matrix.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(List, Ring)</a> - Static method in interface org.episteme.core.mathematics.linearalgebra.<a href="../org/episteme/core/mathematics/linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a></dt>
+<dd>
+<div class="block">Creates a matrix from a 2D list.</div>
 </dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/Differentiation.html#of(org.episteme.core.mathematics.analysis.RealFunction)" class="member-name-link">of(RealFunction)</a> - Static method in class org.episteme.core.mathematics.analysis.<a href="../org/episteme/core/mathematics/analysis/Differentiation.html" title="class in org.episteme.core.mathematics.analysis">Differentiation</a></dt>
 <dd>
@@ -409,6 +437,10 @@ provider.</div>
 <dd>
 <div class="block">Returns the SquareMatrices structure for nÃƒâ€”n matrices over a field.</div>
 </dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/Vector.html#of(org.episteme.core.mathematics.structures.rings.Ring,E...)" class="member-name-link">of(Ring, E...)</a> - Static method in interface org.episteme.core.mathematics.linearalgebra.<a href="../org/episteme/core/mathematics/linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a></dt>
+<dd>
+<div class="block">Creates a vector from a variable number of elements.</div>
+</dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/functions/Polynomial.html#of(org.episteme.core.mathematics.structures.rings.Ring,R...)" class="member-name-link">of(Ring, R...)</a> - Static method in class org.episteme.core.mathematics.analysis.functions.<a href="../org/episteme/core/mathematics/analysis/functions/Polynomial.html" title="class in org.episteme.core.mathematics.analysis.functions">Polynomial</a></dt>
 <dd>
 <div class="block">Creates a polynomial from coefficients.</div>
@@ -419,16 +451,10 @@ provider.</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/methodology/Observation.html#of(T)" class="member-name-link">of(T)</a> - Static method in class org.episteme.core.methodology.<a href="../org/episteme/core/methodology/Observation.html" title="class in org.episteme.core.methodology">Observation</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html#of(T%5B%5D,int...)" class="member-name-link">of(T[], int...)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.tensors.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorFactory</a></dt>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/Tensor.html#of(T%5B%5D,int...)" class="member-name-link">of(T[], int...)</a> - Static method in interface org.episteme.core.mathematics.linearalgebra.<a href="../org/episteme/core/mathematics/linearalgebra/Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a></dt>
 <dd>
-<div class="block">Creates a tensor from data with automatic storage selection.</div>
+<div class="block">Creates a tensor from data.</div>
 </dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html#of(T%5B%5D,org.episteme.core.mathematics.linearalgebra.tensors.TensorFactory.Storage,int...)" class="member-name-link">of(T[], TensorFactory.Storage, int...)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.tensors.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorFactory</a></dt>
-<dd>
-<div class="block">Creates a tensor from data with explicit storage selection.</div>
-</dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/vectors/GenericVector.html#of(T%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of(T[], Ring)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.vectors.<a href="../org/episteme/core/mathematics/linearalgebra/vectors/GenericVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">GenericVector</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/geometry/boundaries/PointBoundary.html#of2D(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">of2D(Real, Real)</a> - Static method in class org.episteme.core.mathematics.geometry.boundaries.<a href="../org/episteme/core/mathematics/geometry/boundaries/PointBoundary.html" title="class in org.episteme.core.mathematics.geometry.boundaries">PointBoundary</a></dt>
 <dd>
 <div class="block">Creates a 2D point boundary.</div>
@@ -469,9 +495,11 @@ provider.</div>
 <dd>
 <div class="block">Creates a new Dijkstra algorithm instance for Double weights.</div>
 </dd>
+<dt><a href="../org/episteme/core/technical/algorithm/AutoTuningManager.Mode.html#OFF" class="member-name-link">OFF</a> - Enum constant in enum class org.episteme.core.technical.algorithm.<a href="../org/episteme/core/technical/algorithm/AutoTuningManager.Mode.html" title="enum class in org.episteme.core.technical.algorithm">AutoTuningManager.Mode</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/social/sports/NutritionPlanner.TrainingPhase.html#OFF_SEASON" class="member-name-link">OFF_SEASON</a> - Enum constant in enum class org.episteme.social.sports.<a href="../org/episteme/social/sports/NutritionPlanner.TrainingPhase.html" title="enum class in org.episteme.social.sports">NutritionPlanner.TrainingPhase</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/measure/MeasureInstrument.Status.html#OFFLINE" class="member-name-link">OFFLINE</a> - Enum constant in enum class org.episteme.core.measure.<a href="../org/episteme/core/measure/MeasureInstrument.Status.html" title="enum class in org.episteme.core.measure">MeasureInstrument.Status</a></dt>
+<dt><a href="../org/episteme/core/device/Device.Status.html#OFFLINE" class="member-name-link">OFFLINE</a> - Enum constant in enum class org.episteme.core.device.<a href="../org/episteme/core/device/Device.Status.html" title="enum class in org.episteme.core.device">Device.Status</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/DenseTensor.html#offset" class="member-name-link">offset</a> - Variable in class org.episteme.core.mathematics.linearalgebra.tensors.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/DenseTensor.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">DenseTensor</a></dt>
 <dd>&nbsp;</dd>
@@ -920,6 +948,8 @@ if we want to keep the outer OMOBJ.</div>
 <dd>
 <div class="block">Constructor.</div>
 </dd>
+<dt><a href="../org/episteme/core/technical/algorithm/AutoTuningManager.Mode.html#ON" class="member-name-link">ON</a> - Enum constant in enum class org.episteme.core.technical.algorithm.<a href="../org/episteme/core/technical/algorithm/AutoTuningManager.Mode.html" title="enum class in org.episteme.core.technical.algorithm">AutoTuningManager.Mode</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/apps/apps/biology/LifeScienceStudio.html#onAppReady()" class="member-name-link">onAppReady()</a> - Method in class org.episteme.apps.apps.biology.<a href="../org/episteme/apps/apps/biology/LifeScienceStudio.html" title="class in org.episteme.apps.apps.biology">LifeScienceStudio</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/apps/apps/chemistry/ChemicalStudio.html#onAppReady()" class="member-name-link">onAppReady()</a> - Method in class org.episteme.apps.apps.chemistry.<a href="../org/episteme/apps/apps/chemistry/ChemicalStudio.html" title="class in org.episteme.apps.apps.chemistry">ChemicalStudio</a></dt>
@@ -960,10 +990,6 @@ if we want to keep the outer OMOBJ.</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/SIMDRealDoubleMatrix.html#one()" class="member-name-link">one()</a> - Method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/SIMDRealDoubleMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">SIMDRealDoubleMatrix</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/Matrix.html#one()" class="member-name-link">one()</a> - Method in interface org.episteme.core.mathematics.linearalgebra.<a href="../org/episteme/core/mathematics/linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a></dt>
-<dd>
-<div class="block">Returns the identity matrix (for square matrices).</div>
-</dd>
 <dt><a href="../org/episteme/core/mathematics/numbers/complex/Complex.html#one()" class="member-name-link">one()</a> - Method in class org.episteme.core.mathematics.numbers.complex.<a href="../org/episteme/core/mathematics/numbers/complex/Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/numbers/complex/Octonion.html#one()" class="member-name-link">one()</a> - Method in class org.episteme.core.mathematics.numbers.complex.<a href="../org/episteme/core/mathematics/numbers/complex/Octonion.html" title="class in org.episteme.core.mathematics.numbers.complex">Octonion</a></dt>
@@ -975,6 +1001,8 @@ if we want to keep the outer OMOBJ.</div>
 <dt><a href="../org/episteme/core/mathematics/numbers/integers/Integer.html#one()" class="member-name-link">one()</a> - Method in class org.episteme.core.mathematics.numbers.integers.<a href="../org/episteme/core/mathematics/numbers/integers/Integer.html" title="class in org.episteme.core.mathematics.numbers.integers">Integer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/numbers/rationals/Rational.html#one()" class="member-name-link">one()</a> - Method in class org.episteme.core.mathematics.numbers.rationals.<a href="../org/episteme/core/mathematics/numbers/rationals/Rational.html" title="class in org.episteme.core.mathematics.numbers.rationals">Rational</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/numbers/real/DoubleField.html#one()" class="member-name-link">one()</a> - Method in class org.episteme.core.mathematics.numbers.real.<a href="../org/episteme/core/mathematics/numbers/real/DoubleField.html" title="class in org.episteme.core.mathematics.numbers.real">DoubleField</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/numbers/real/Real.html#one()" class="member-name-link">one()</a> - Method in class org.episteme.core.mathematics.numbers.real.<a href="../org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></dt>
 <dd>&nbsp;</dd>
@@ -1025,9 +1053,7 @@ if we want to keep the outer OMOBJ.</div>
 <dt><a href="../org/episteme/core/mathematics/numbers/rationals/Rational.html#ONE" class="member-name-link">ONE</a> - Static variable in class org.episteme.core.mathematics.numbers.rationals.<a href="../org/episteme/core/mathematics/numbers/rationals/Rational.html" title="class in org.episteme.core.mathematics.numbers.rationals">Rational</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/numbers/real/Real.html#ONE" class="member-name-link">ONE</a> - Static variable in class org.episteme.core.mathematics.numbers.real.<a href="../org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></dt>
-<dd>
-<div class="block">The real number 1</div>
-</dd>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/measure/Units.html#ONE" class="member-name-link">ONE</a> - Static variable in class org.episteme.core.measure.<a href="../org/episteme/core/measure/Units.html" title="class in org.episteme.core.measure">Units</a></dt>
 <dd>
 <div class="block">Dimensionless unit: 1 (for ratios).</div>
@@ -1039,6 +1065,10 @@ if we want to keep the outer OMOBJ.</div>
 <dt><a href="../org/episteme/social/linguistics/loaders/tigerxml/Path.html#oneArgumentDomain()" class="member-name-link">oneArgumentDomain()</a> - Method in class org.episteme.social.linguistics.loaders.tigerxml.<a href="../org/episteme/social/linguistics/loaders/tigerxml/Path.html" title="class in org.episteme.social.linguistics.loaders.tigerxml">Path</a></dt>
 <dd>
 <div class="block">Determines if the path stays within a single argument domain.</div>
+</dd>
+<dt><a href="../org/episteme/core/mathematics/numbers/real/Real.html#oneE()" class="member-name-link">oneE()</a> - Static method in class org.episteme.core.mathematics.numbers.real.<a href="../org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></dt>
+<dd>
+<div class="block">The real number 1</div>
 </dd>
 <dt><a href="../org/episteme/natural/chemistry/computational/quantum/SCFMethod.html#oneEI" class="member-name-link">oneEI</a> - Variable in class org.episteme.natural.chemistry.computational.quantum.<a href="../org/episteme/natural/chemistry/computational/quantum/SCFMethod.html" title="class in org.episteme.natural.chemistry.computational.quantum">SCFMethod</a></dt>
 <dd>&nbsp;</dd>
@@ -1060,30 +1090,22 @@ if we want to keep the outer OMOBJ.</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/backends/CPUSparseTensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.core.mathematics.linearalgebra.tensors.backends.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/backends/CPUSparseTensorBackend.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors.backends">CPUSparseTensorBackend</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/providers/DenseNeuralProvider.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.core.mathematics.linearalgebra.tensors.providers.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/providers/DenseNeuralProvider.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors.providers">DenseNeuralProvider</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in interface org.episteme.core.mathematics.linearalgebra.tensors.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></dt>
 <dd>
 <div class="block">Creates a tensor with the given shape, filled with ones.</div>
 </dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.tensors.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorFactory</a></dt>
-<dd>
-<div class="block">Creates a one-filled tensor with automatic storage selection.</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/inference/CUDATensorProvider.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.core.technical.algorithm.inference.<a href="../org/episteme/core/technical/algorithm/inference/CUDATensorProvider.html" title="class in org.episteme.core.technical.algorithm.inference">CUDATensorProvider</a></dt>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorProvider.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in interface org.episteme.core.mathematics.linearalgebra.tensors.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorProvider</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/inference/DenseNeuralProvider.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.core.technical.algorithm.inference.<a href="../org/episteme/core/technical/algorithm/inference/DenseNeuralProvider.html" title="class in org.episteme.core.technical.algorithm.inference">DenseNeuralProvider</a></dt>
+<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/backends/NativeND4JCUDASparseTensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.nativ.mathematics.linearalgebra.tensors.backends.<a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/backends/NativeND4JCUDASparseTensorBackend.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors.backends">NativeND4JCUDASparseTensorBackend</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/TensorProvider.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in interface org.episteme.core.technical.algorithm.<a href="../org/episteme/core/technical/algorithm/TensorProvider.html" title="interface in org.episteme.core.technical.algorithm">TensorProvider</a></dt>
+<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.nativ.mathematics.linearalgebra.tensors.backends.<a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors.backends">ND4JBaseTensorBackend</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/nd4j/ND4JBaseTensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.core.technical.backend.nd4j.<a href="../org/episteme/core/technical/backend/nd4j/ND4JBaseTensorBackend.html" title="class in org.episteme.core.technical.backend.nd4j">ND4JBaseTensorBackend</a></dt>
+<dt><a href="../org/episteme/nativ/mathematics/tensors/backends/NativeCPUTensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.nativ.mathematics.tensors.backends.<a href="../org/episteme/nativ/mathematics/tensors/backends/NativeCPUTensorBackend.html" title="class in org.episteme.nativ.mathematics.tensors.backends">NativeCPUTensorBackend</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/nd4j/ND4JSparseTensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.core.technical.backend.nd4j.<a href="../org/episteme/core/technical/backend/nd4j/ND4JSparseTensorBackend.html" title="class in org.episteme.core.technical.backend.nd4j">ND4JSparseTensorBackend</a></dt>
+<dt><a href="../org/episteme/nativ/mathematics/tensors/backends/NativeCUDATensorBackend.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.nativ.mathematics.tensors.backends.<a href="../org/episteme/nativ/mathematics/tensors/backends/NativeCUDATensorBackend.html" title="class in org.episteme.nativ.mathematics.tensors.backends">NativeCUDATensorBackend</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/providers/NativeTensorProvider.html#ones(java.lang.Class,int...)" class="member-name-link">ones(Class, int...)</a> - Method in class org.episteme.nativ.mathematics.linearalgebra.tensors.providers.<a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/providers/NativeTensorProvider.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors.providers">NativeTensorProvider</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html#ones(java.lang.Class,org.episteme.core.mathematics.linearalgebra.tensors.TensorFactory.Storage,int...)" class="member-name-link">ones(Class, TensorFactory.Storage, int...)</a> - Static method in class org.episteme.core.mathematics.linearalgebra.tensors.<a href="../org/episteme/core/mathematics/linearalgebra/tensors/TensorFactory.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorFactory</a></dt>
-<dd>
-<div class="block">Creates a one-filled tensor with explicit storage selection.</div>
-</dd>
 <dt><a href="../org/episteme/core/mathematics/statistics/anova/ANOVA.html#oneWay(java.util.List)" class="member-name-link">oneWay(List)</a> - Static method in class org.episteme.core.mathematics.statistics.anova.<a href="../org/episteme/core/mathematics/statistics/anova/ANOVA.html" title="class in org.episteme.core.mathematics.statistics.anova">ANOVA</a></dt>
 <dd>
 <div class="block">One-way ANOVA.</div>
@@ -1110,17 +1132,17 @@ if we want to keep the outer OMOBJ.</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/apps/apps/framework/FeaturedAppBase.html#onNew()" class="member-name-link">onNew()</a> - Method in class org.episteme.apps.apps.framework.<a href="../org/episteme/apps/apps/framework/FeaturedAppBase.html" title="class in org.episteme.apps.apps.framework">FeaturedAppBase</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/ml/backends/ONNXBackend.html" class="type-name-link" title="class in org.episteme.core.mathematics.ml.backends">ONNXBackend</a> - Class in <a href="../org/episteme/core/mathematics/ml/backends/package-summary.html">org.episteme.core.mathematics.ml.backends</a></dt>
+<dd>
+<div class="block">ONNX Runtime inference backend.</div>
+</dd>
+<dt><a href="../org/episteme/core/mathematics/ml/backends/ONNXBackend.html#%3Cinit%3E()" class="member-name-link">ONNXBackend()</a> - Constructor for class org.episteme.core.mathematics.ml.backends.<a href="../org/episteme/core/mathematics/ml/backends/ONNXBackend.html" title="class in org.episteme.core.mathematics.ml.backends">ONNXBackend</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/loaders/ONNXModelReader.html" class="type-name-link" title="class in org.episteme.core.mathematics.loaders">ONNXModelReader</a> - Class in <a href="../org/episteme/core/mathematics/loaders/package-summary.html">org.episteme.core.mathematics.loaders</a></dt>
 <dd>
 <div class="block">Standardized Loader for ONNX (Open Neural Network Exchange) models.</div>
 </dd>
 <dt><a href="../org/episteme/core/mathematics/loaders/ONNXModelReader.html#%3Cinit%3E()" class="member-name-link">ONNXModelReader()</a> - Constructor for class org.episteme.core.mathematics.loaders.<a href="../org/episteme/core/mathematics/loaders/ONNXModelReader.html" title="class in org.episteme.core.mathematics.loaders">ONNXModelReader</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/mathematics/ml/providers/ONNXProvider.html" class="type-name-link" title="class in org.episteme.core.mathematics.ml.providers">ONNXProvider</a> - Class in <a href="../org/episteme/core/mathematics/ml/providers/package-summary.html">org.episteme.core.mathematics.ml.providers</a></dt>
-<dd>
-<div class="block">ONNX Inference Provider.</div>
-</dd>
-<dt><a href="../org/episteme/core/mathematics/ml/providers/ONNXProvider.html#%3Cinit%3E()" class="member-name-link">ONNXProvider()</a> - Constructor for class org.episteme.core.mathematics.ml.providers.<a href="../org/episteme/core/mathematics/ml/providers/ONNXProvider.html" title="class in org.episteme.core.mathematics.ml.providers">ONNXProvider</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/ml/neural/backends/ONNXRuntimeBackend.html" class="type-name-link" title="class in org.episteme.core.mathematics.ml.neural.backends">ONNXRuntimeBackend</a> - Class in <a href="../org/episteme/core/mathematics/ml/neural/backends/package-summary.html">org.episteme.core.mathematics.ml.neural.backends</a></dt>
 <dd>
@@ -1226,10 +1248,6 @@ if we want to keep the outer OMOBJ.</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/apps/apps/framework/FeaturedAppBase.html#onUndo()" class="member-name-link">onUndo()</a> - Method in class org.episteme.apps.apps.framework.<a href="../org/episteme/apps/apps/framework/FeaturedAppBase.html" title="class in org.episteme.apps.apps.framework">FeaturedAppBase</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/natural/ui/viewers/devices/PhysicalMeasureInstrument.html#onValueChanged(org.episteme.core.measure.Quantity)" class="member-name-link">onValueChanged(Quantity)</a> - Method in class org.episteme.natural.ui.viewers.devices.<a href="../org/episteme/natural/ui/viewers/devices/PhysicalMeasureInstrument.html" title="class in org.episteme.natural.ui.viewers.devices">PhysicalMeasureInstrument</a></dt>
-<dd>
-<div class="block">Called when the value changes.</div>
-</dd>
 <dt><a href="../org/episteme/server/server/resilience/HeartbeatMonitor.html#onWorkerDead(java.util.function.Consumer)" class="member-name-link">onWorkerDead(Consumer)</a> - Method in class org.episteme.server.server.resilience.<a href="../org/episteme/server/server/resilience/HeartbeatMonitor.html" title="class in org.episteme.server.server.resilience">HeartbeatMonitor</a></dt>
 <dd>
 <div class="block">Set callback for when a worker is detected as dead.</div>
@@ -1316,55 +1334,17 @@ if we want to keep the outer OMOBJ.</div>
 <dd>
 <div class="block">Force execution using OpenCL (Cross-platform).</div>
 </dd>
-<dt><a href="../org/episteme/core/ComputeContext.Backend.html#OPENCL_GPU" class="member-name-link">OPENCL_GPU</a> - Enum constant in enum class org.episteme.core.<a href="../org/episteme/core/ComputeContext.Backend.html" title="enum class in org.episteme.core">ComputeContext.Backend</a></dt>
+<dt><a href="../org/episteme/nativ/technical/backend/gpu/opencl/OpenCLExecutionContext.html" class="type-name-link" title="class in org.episteme.nativ.technical.backend.gpu.opencl">OpenCLExecutionContext</a> - Class in <a href="../org/episteme/nativ/technical/backend/gpu/opencl/package-summary.html">org.episteme.nativ.technical.backend.gpu.opencl</a></dt>
 <dd>
-<div class="block">OpenCL GPU implementation</div>
+<div class="block">Execution context for OpenCL operations.</div>
 </dd>
-<dt><a href="../org/episteme/core/media/vision/VisionContext.Backend.html#OPENCL_GPU" class="member-name-link">OPENCL_GPU</a> - Enum constant in enum class org.episteme.core.media.vision.<a href="../org/episteme/core/media/vision/VisionContext.Backend.html" title="enum class in org.episteme.core.media.vision">VisionContext.Backend</a></dt>
-<dd>
-<div class="block">OpenCL GPU acceleration</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLBackend.html" class="type-name-link" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLBackend</a> - Class in <a href="../org/episteme/core/technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></dt>
-<dd>
-<div class="block">OpenCL implementation of GPUBackend for cross-platform hardware acceleration.</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLBackend.html#%3Cinit%3E()" class="member-name-link">OpenCLBackend()</a> - Constructor for class org.episteme.core.technical.backend.gpu.opencl.<a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLBackend.html" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLBackend</a></dt>
+<dt><a href="../org/episteme/nativ/technical/backend/gpu/opencl/OpenCLExecutionContext.html#%3Cinit%3E(org.jocl.cl_context,org.jocl.cl_command_queue)" class="member-name-link">OpenCLExecutionContext(cl_context, cl_command_queue)</a> - Constructor for class org.episteme.nativ.technical.backend.gpu.opencl.<a href="../org/episteme/nativ/technical/backend/gpu/opencl/OpenCLExecutionContext.html" title="class in org.episteme.nativ.technical.backend.gpu.opencl">OpenCLExecutionContext</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLExecutionContext.html" class="type-name-link" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLExecutionContext</a> - Class in <a href="../org/episteme/core/technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></dt>
-<dd>
-<div class="block">OpenCL Execution Context.</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLExecutionContext.html#%3Cinit%3E(org.jocl.cl_context,org.jocl.cl_command_queue)" class="member-name-link">OpenCLExecutionContext(cl_context, cl_command_queue)</a> - Constructor for class org.episteme.core.technical.backend.gpu.opencl.<a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLExecutionContext.html" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLExecutionContext</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLFFTProvider.html" class="type-name-link" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLFFTProvider</a> - Class in <a href="../org/episteme/core/technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></dt>
-<dd>
-<div class="block">OpenCL implementation of FFTProvider using a Direct Fourier Transform (DFT) kernel.</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLFFTProvider.html#%3Cinit%3E()" class="member-name-link">OpenCLFFTProvider()</a> - Constructor for class org.episteme.core.technical.backend.gpu.opencl.<a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLFFTProvider.html" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLFFTProvider</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLKernelLoader.html" class="type-name-link" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLKernelLoader</a> - Class in <a href="../org/episteme/core/technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></dt>
+<dt><a href="../org/episteme/nativ/technical/backend/gpu/opencl/OpenCLKernelLoader.html" class="type-name-link" title="class in org.episteme.nativ.technical.backend.gpu.opencl">OpenCLKernelLoader</a> - Class in <a href="../org/episteme/nativ/technical/backend/gpu/opencl/package-summary.html">org.episteme.nativ.technical.backend.gpu.opencl</a></dt>
 <dd>
 <div class="block">Utility to load OpenCL kernel source code from resources.</div>
 </dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLKernelLoader.html#%3Cinit%3E()" class="member-name-link">OpenCLKernelLoader()</a> - Constructor for class org.episteme.core.technical.backend.gpu.opencl.<a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLKernelLoader.html" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLKernelLoader</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/physics/fluid/OpenCLLatticeBoltzmannProvider.html" class="type-name-link" title="class in org.episteme.core.technical.algorithm.physics.fluid">OpenCLLatticeBoltzmannProvider</a> - Class in <a href="../org/episteme/core/technical/algorithm/physics/fluid/package-summary.html">org.episteme.core.technical.algorithm.physics.fluid</a></dt>
-<dd>
-<div class="block">GPU-accelerated Lattice Boltzmann Method (LBM) provider using OpenCL.</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/physics/fluid/OpenCLLatticeBoltzmannProvider.html#%3Cinit%3E()" class="member-name-link">OpenCLLatticeBoltzmannProvider()</a> - Constructor for class org.episteme.core.technical.algorithm.physics.fluid.<a href="../org/episteme/core/technical/algorithm/physics/fluid/OpenCLLatticeBoltzmannProvider.html" title="class in org.episteme.core.technical.algorithm.physics.fluid">OpenCLLatticeBoltzmannProvider</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLLinearAlgebraBackend.html" class="type-name-link" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLLinearAlgebraBackend</a> - Class in <a href="../org/episteme/core/technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></dt>
-<dd>
-<div class="block">Native OpenCL Linear Algebra Backend using JOCL.</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLLinearAlgebraBackend.html#%3Cinit%3E()" class="member-name-link">OpenCLLinearAlgebraBackend()</a> - Constructor for class org.episteme.core.technical.backend.gpu.opencl.<a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLLinearAlgebraBackend.html" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLLinearAlgebraBackend</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLNBodyProvider.html" class="type-name-link" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLNBodyProvider</a> - Class in <a href="../org/episteme/core/technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></dt>
-<dd>
-<div class="block">GPU-accelerated N-Body simulation provider using OpenCL.</div>
-</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLNBodyProvider.html#%3Cinit%3E()" class="member-name-link">OpenCLNBodyProvider()</a> - Constructor for class org.episteme.core.technical.backend.gpu.opencl.<a href="../org/episteme/core/technical/backend/gpu/opencl/OpenCLNBodyProvider.html" title="class in org.episteme.core.technical.backend.gpu.opencl">OpenCLNBodyProvider</a></dt>
+<dt><a href="../org/episteme/nativ/technical/backend/gpu/opencl/OpenCLKernelLoader.html#%3Cinit%3E()" class="member-name-link">OpenCLKernelLoader()</a> - Constructor for class org.episteme.nativ.technical.backend.gpu.opencl.<a href="../org/episteme/nativ/technical/backend/gpu/opencl/OpenCLKernelLoader.html" title="class in org.episteme.nativ.technical.backend.gpu.opencl">OpenCLKernelLoader</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/algebra/intervals/RealInterval.html#openClosed(double,double)" class="member-name-link">openClosed(double, double)</a> - Static method in class org.episteme.core.mathematics.algebra.intervals.<a href="../org/episteme/core/mathematics/algebra/intervals/RealInterval.html" title="class in org.episteme.core.mathematics.algebra.intervals">RealInterval</a></dt>
 <dd>
@@ -1373,16 +1353,6 @@ if we want to keep the outer OMOBJ.</div>
 <dt><a href="../org/episteme/core/mathematics/algebra/intervals/RealInterval.html#openClosed(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">openClosed(Real, Real)</a> - Static method in class org.episteme.core.mathematics.algebra.intervals.<a href="../org/episteme/core/mathematics/algebra/intervals/RealInterval.html" title="class in org.episteme.core.mathematics.algebra.intervals">RealInterval</a></dt>
 <dd>
 <div class="block">Creates a half-open 1D interval (min, max] over Real numbers.</div>
-</dd>
-<dt><a href="../org/episteme/core/media/vision/providers/OpenCLVisionProvider.html" class="type-name-link" title="class in org.episteme.core.media.vision.providers">OpenCLVisionProvider</a> - Class in <a href="../org/episteme/core/media/vision/providers/package-summary.html">org.episteme.core.media.vision.providers</a></dt>
-<dd>
-<div class="block">OpenCL-accelerated vision provider.</div>
-</dd>
-<dt><a href="../org/episteme/core/media/vision/providers/OpenCLVisionProvider.html#%3Cinit%3E()" class="member-name-link">OpenCLVisionProvider()</a> - Constructor for class org.episteme.core.media.vision.providers.<a href="../org/episteme/core/media/vision/providers/OpenCLVisionProvider.html" title="class in org.episteme.core.media.vision.providers">OpenCLVisionProvider</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/media/vision/VisionContext.Backend.html#OPENCV_NATIVE" class="member-name-link">OPENCV_NATIVE</a> - Enum constant in enum class org.episteme.core.media.vision.<a href="../org/episteme/core/media/vision/VisionContext.Backend.html" title="enum class in org.episteme.core.media.vision">VisionContext.Backend</a></dt>
-<dd>
-<div class="block">Native OpenCV implementation</div>
 </dd>
 <dt><a href="../org/episteme/social/architecture/lift/Elevator.State.html#OPENING" class="member-name-link">OPENING</a> - Enum constant in enum class org.episteme.social.architecture.lift.<a href="../org/episteme/social/architecture/lift/Elevator.State.html" title="enum class in org.episteme.social.architecture.lift">Elevator.State</a></dt>
 <dd>
@@ -1486,6 +1456,8 @@ if we want to keep the outer OMOBJ.</div>
 </dd>
 <dt><a href="../org/episteme/core/mathematics/algebra/algebras/BooleanAlgebra.html#operate(java.lang.Boolean,java.lang.Boolean)" class="member-name-link">operate(Boolean, Boolean)</a> - Method in class org.episteme.core.mathematics.algebra.algebras.<a href="../org/episteme/core/mathematics/algebra/algebras/BooleanAlgebra.html" title="class in org.episteme.core.mathematics.algebra.algebras">BooleanAlgebra</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/numbers/real/DoubleField.html#operate(java.lang.Double,java.lang.Double)" class="member-name-link">operate(Double, Double)</a> - Method in class org.episteme.core.mathematics.numbers.real.<a href="../org/episteme/core/mathematics/numbers/real/DoubleField.html" title="class in org.episteme.core.mathematics.numbers.real">DoubleField</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/algebra/algebras/CliffordAlgebra.html#operate(org.episteme.core.mathematics.algebra.algebras.CliffordAlgebra.Multivector,org.episteme.core.mathematics.algebra.algebras.CliffordAlgebra.Multivector)" class="member-name-link">operate(CliffordAlgebra.Multivector, CliffordAlgebra.Multivector)</a> - Method in class org.episteme.core.mathematics.algebra.algebras.<a href="../org/episteme/core/mathematics/algebra/algebras/CliffordAlgebra.html" title="class in org.episteme.core.mathematics.algebra.algebras">CliffordAlgebra</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/algebra/groups/DihedralGroup.html#operate(org.episteme.core.mathematics.algebra.groups.DihedralGroup.Element,org.episteme.core.mathematics.algebra.groups.DihedralGroup.Element)" class="member-name-link">operate(DihedralGroup.Element, DihedralGroup.Element)</a> - Method in class org.episteme.core.mathematics.algebra.groups.<a href="../org/episteme/core/mathematics/algebra/groups/DihedralGroup.html" title="class in org.episteme.core.mathematics.algebra.groups">DihedralGroup</a></dt>
@@ -1554,9 +1526,18 @@ if we want to keep the outer OMOBJ.</div>
 <dd>
 <div class="block">Represents a computation that can be executed on a backend.</div>
 </dd>
-<dt><a href="../org/episteme/core/measure/MeasureInstrument.Status.html#OPERATIONAL" class="member-name-link">OPERATIONAL</a> - Enum constant in enum class org.episteme.core.measure.<a href="../org/episteme/core/measure/MeasureInstrument.Status.html" title="enum class in org.episteme.core.measure">MeasureInstrument.Status</a></dt>
+<dt><a href="../org/episteme/core/device/Device.Status.html#OPERATIONAL" class="member-name-link">OPERATIONAL</a> - Enum constant in enum class org.episteme.core.device.<a href="../org/episteme/core/device/Device.Status.html" title="enum class in org.episteme.core.device">Device.Status</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/social/economics/ManagementLevel.html#OPERATIONAL" class="member-name-link">OPERATIONAL</a> - Static variable in class org.episteme.social.economics.<a href="../org/episteme/social/economics/ManagementLevel.html" title="class in org.episteme.social.economics">ManagementLevel</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/technical/algorithm/OperationCancelledException.html" class="type-name-link" title="class in org.episteme.core.technical.algorithm">OperationCancelledException</a> - Exception Class in <a href="../org/episteme/core/technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></dt>
+<dd>
+<div class="block">Thrown when a mathematical operation is cancelled by the user or system via <a href="../org/episteme/core/technical/algorithm/OperationContext.html" title="class in org.episteme.core.technical.algorithm"><code>OperationContext</code></a> 
+or <a href="../org/episteme/core/mathematics/context/MathContext.html" title="class in org.episteme.core.mathematics.context"><code>MathContext</code></a>.</div>
+</dd>
+<dt><a href="../org/episteme/core/technical/algorithm/OperationCancelledException.html#%3Cinit%3E()" class="member-name-link">OperationCancelledException()</a> - Constructor for exception class org.episteme.core.technical.algorithm.<a href="../org/episteme/core/technical/algorithm/OperationCancelledException.html" title="class in org.episteme.core.technical.algorithm">OperationCancelledException</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/technical/algorithm/OperationCancelledException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">OperationCancelledException(String)</a> - Constructor for exception class org.episteme.core.technical.algorithm.<a href="../org/episteme/core/technical/algorithm/OperationCancelledException.html" title="class in org.episteme.core.technical.algorithm">OperationCancelledException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/technical/algorithm/OperationContext.html" class="type-name-link" title="class in org.episteme.core.technical.algorithm">OperationContext</a> - Class in <a href="../org/episteme/core/technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></dt>
 <dd>
@@ -1683,10 +1664,6 @@ r ÃƒÂ¢Ã¢â‚¬Â°Ã‹â€  (ÃƒÂÃ¢â€šÂ¬/4) * sqrt(N)</div
 <dd>
 <div class="block">Runs genetic algorithm.</div>
 </dd>
-<dt><a href="../org/episteme/natural/computing/ai/swarm/ParticleSwarmOptimization.html#optimize(int)" class="member-name-link">optimize(int)</a> - Method in class org.episteme.natural.computing.ai.swarm.<a href="../org/episteme/natural/computing/ai/swarm/ParticleSwarmOptimization.html" title="class in org.episteme.natural.computing.ai.swarm">ParticleSwarmOptimization</a></dt>
-<dd>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
-</dd>
 <dt><a href="../org/episteme/core/mathematics/optimization/GeneticOptimizer.html#optimize(java.util.function.Function,int,int,int,double)" class="member-name-link">optimize(Function, int, int, int, double)</a> - Static method in class org.episteme.core.mathematics.optimization.<a href="../org/episteme/core/mathematics/optimization/GeneticOptimizer.html" title="class in org.episteme.core.mathematics.optimization">GeneticOptimizer</a></dt>
 <dd>
 <div class="block">Optimizes a function using a genetic algorithm.</div>
@@ -1763,6 +1740,10 @@ and binomial tree implementations.</div>
 <dd>
 <div class="block">Logical OR (disjunction, join, Ã¢Ë†Â¨).</div>
 </dd>
+<dt><a href="../org/episteme/core/mathematics/algebra/algebras/BooleanAlgebraProvider.html#or(java.lang.Boolean,java.lang.Boolean)" class="member-name-link">or(Boolean, Boolean)</a> - Method in interface org.episteme.core.mathematics.algebra.algebras.<a href="../org/episteme/core/mathematics/algebra/algebras/BooleanAlgebraProvider.html" title="interface in org.episteme.core.mathematics.algebra.algebras">BooleanAlgebraProvider</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/algebra/algebras/providers/StandardBooleanAlgebraProvider.html#or(java.lang.Boolean,java.lang.Boolean)" class="member-name-link">or(Boolean, Boolean)</a> - Method in class org.episteme.core.mathematics.algebra.algebras.providers.<a href="../org/episteme/core/mathematics/algebra/algebras/providers/StandardBooleanAlgebraProvider.html" title="class in org.episteme.core.mathematics.algebra.algebras.providers">StandardBooleanAlgebraProvider</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/logic/multivalued/IntuitionisticLogic.html#or(java.lang.Boolean,java.lang.Boolean)" class="member-name-link">or(Boolean, Boolean)</a> - Method in class org.episteme.core.mathematics.logic.multivalued.<a href="../org/episteme/core/mathematics/logic/multivalued/IntuitionisticLogic.html" title="class in org.episteme.core.mathematics.logic.multivalued">IntuitionisticLogic</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/logic/propositional/BooleanLogic.html#or(java.lang.Boolean,java.lang.Boolean)" class="member-name-link">or(Boolean, Boolean)</a> - Method in class org.episteme.core.mathematics.logic.propositional.<a href="../org/episteme/core/mathematics/logic/propositional/BooleanLogic.html" title="class in org.episteme.core.mathematics.logic.propositional">BooleanLogic</a></dt>
@@ -1916,10 +1897,6 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>
 <div class="block">Returns the ordinal of this enum constant.</div>
 </dd>
-<dt><a href="../org/episteme/social/law/Statute.Type.html#ORDINANCE" class="member-name-link">ORDINANCE</a> - Enum constant in enum class org.episteme.social.law.<a href="../org/episteme/social/law/Statute.Type.html" title="enum class in org.episteme.social.law">Statute.Type</a></dt>
-<dd>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span></div>
-</dd>
 <dt><a href="../org/episteme/social/law/StatuteType.html#ORDINANCE" class="member-name-link">ORDINANCE</a> - Static variable in class org.episteme.social.law.<a href="../org/episteme/social/law/StatuteType.html" title="class in org.episteme.social.law">StatuteType</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/social/history/archeology/ArcheologyConstants.html#ORDOVICIAN" class="member-name-link">ORDOVICIAN</a> - Static variable in class org.episteme.social.history.archeology.<a href="../org/episteme/social/history/archeology/ArcheologyConstants.html" title="class in org.episteme.social.history.archeology">ArcheologyConstants</a></dt>
@@ -1954,6 +1931,16 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 </dd>
 <dt><a href="../org/episteme/apps/apps/sociology/package-summary.html">org.episteme.apps.apps.sociology</a> - package org.episteme.apps.apps.sociology</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/apps/apps/util/package-summary.html">org.episteme.apps.apps.util</a> - package org.episteme.apps.apps.util</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/apps/examples/audio/package-summary.html">org.episteme.apps.examples.audio</a> - package org.episteme.apps.examples.audio</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/apps/examples/linearalgebra/package-summary.html">org.episteme.apps.examples.linearalgebra</a> - package org.episteme.apps.examples.linearalgebra</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/apps/examples/physics/package-summary.html">org.episteme.apps.examples.physics</a> - package org.episteme.apps.examples.physics</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/benchmarks/package-summary.html">org.episteme.benchmarks</a> - package org.episteme.benchmarks</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/benchmarks/benchmark/package-summary.html">org.episteme.benchmarks.benchmark</a> - package org.episteme.benchmarks.benchmark</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/benchmarks/benchmark/benchmarks/package-summary.html">org.episteme.benchmarks.benchmark.benchmarks</a> - package org.episteme.benchmarks.benchmark.benchmarks</dt>
@@ -1964,9 +1951,13 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/benchmarks/persistence/package-summary.html">org.episteme.benchmarks.persistence</a> - package org.episteme.benchmarks.persistence</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/benchmarks/reporting/package-summary.html">org.episteme.benchmarks.reporting</a> - package org.episteme.benchmarks.reporting</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/benchmarks/testing/package-summary.html">org.episteme.benchmarks.testing</a> - package org.episteme.benchmarks.testing</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/benchmarks/ui/package-summary.html">org.episteme.benchmarks.ui</a> - package org.episteme.benchmarks.ui</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/benchmarks/util/package-summary.html">org.episteme.benchmarks.util</a> - package org.episteme.benchmarks.util</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/benchmarks/verification/package-summary.html">org.episteme.benchmarks.verification</a> - package org.episteme.benchmarks.verification</dt>
 <dd>&nbsp;</dd>
@@ -1986,6 +1977,8 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/client/client/earth/climatesim/package-summary.html">org.episteme.client.client.earth.climatesim</a> - package org.episteme.client.client.earth.climatesim</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/client/client/mathematics/linearalgebra/backends/package-summary.html">org.episteme.client.client.mathematics.linearalgebra.backends</a> - package org.episteme.client.client.mathematics.linearalgebra.backends</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/client/client/mathematics/mandelbrot/package-summary.html">org.episteme.client.client.mathematics.mandelbrot</a> - package org.episteme.client.client.mathematics.mandelbrot</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/client/client/mathematics/montecarlopi/package-summary.html">org.episteme.client.client.mathematics.montecarlopi</a> - package org.episteme.client.client.mathematics.montecarlopi</dt>
@@ -2003,8 +1996,6 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dt><a href="../org/episteme/client/client/shared/gridmonitor/package-summary.html">org.episteme.client.client.shared.gridmonitor</a> - package org.episteme.client.client.shared.gridmonitor</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/client/client/shared/whiteboard/package-summary.html">org.episteme.client.client.shared.whiteboard</a> - package org.episteme.client.client.shared.whiteboard</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/client/client/technical/backend/math/package-summary.html">org.episteme.client.client.technical.backend.math</a> - package org.episteme.client.client.technical.backend.math</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/client/client/util/package-summary.html">org.episteme.client.client.util</a> - package org.episteme.client.client.util</dt>
 <dd>&nbsp;</dd>
@@ -2026,9 +2017,11 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>
 <div class="block">Distributed computing infrastructure for Episteme.</div>
 </dd>
-<dt><a href="../org/episteme/core/distributed/providers/package-summary.html">org.episteme.core.distributed.providers</a> - package org.episteme.core.distributed.providers</dt>
+<dt><a href="../org/episteme/core/distributed/backends/package-summary.html">org.episteme.core.distributed.backends</a> - package org.episteme.core.distributed.backends</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/io/package-summary.html">org.episteme.core.io</a> - package org.episteme.core.io</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/io/backends/package-summary.html">org.episteme.core.io.backends</a> - package org.episteme.core.io.backends</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/io/cache/package-summary.html">org.episteme.core.io.cache</a> - package org.episteme.core.io.cache</dt>
 <dd>&nbsp;</dd>
@@ -2047,6 +2040,8 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <div class="block">Defines fundamental algebraic concepts:</div>
 </dd>
 <dt><a href="../org/episteme/core/mathematics/algebra/algebras/package-summary.html">org.episteme.core.mathematics.algebra.algebras</a> - package org.episteme.core.mathematics.algebra.algebras</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/algebra/algebras/providers/package-summary.html">org.episteme.core.mathematics.algebra.algebras.providers</a> - package org.episteme.core.mathematics.algebra.algebras.providers</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/algebra/categories/package-summary.html">org.episteme.core.mathematics.algebra.categories</a> - package org.episteme.core.mathematics.algebra.categories</dt>
 <dd>&nbsp;</dd>
@@ -2068,7 +2063,17 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/fem/package-summary.html">org.episteme.core.mathematics.analysis.fem</a> - package org.episteme.core.mathematics.analysis.fem</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/analysis/fft/package-summary.html">org.episteme.core.mathematics.analysis.fft</a> - package org.episteme.core.mathematics.analysis.fft</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/analysis/fft/providers/package-summary.html">org.episteme.core.mathematics.analysis.fft.providers</a> - package org.episteme.core.mathematics.analysis.fft.providers</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/analysis/fractals/package-summary.html">org.episteme.core.mathematics.analysis.fractals</a> - package org.episteme.core.mathematics.analysis.fractals</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/analysis/fractals/providers/package-summary.html">org.episteme.core.mathematics.analysis.fractals.providers</a> - package org.episteme.core.mathematics.analysis.fractals.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/functions/package-summary.html">org.episteme.core.mathematics.analysis.functions</a> - package org.episteme.core.mathematics.analysis.functions</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/analysis/functions/algorithms/package-summary.html">org.episteme.core.mathematics.analysis.functions.algorithms</a> - package org.episteme.core.mathematics.analysis.functions.algorithms</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/analysis/integration/package-summary.html">org.episteme.core.mathematics.analysis.integration</a> - package org.episteme.core.mathematics.analysis.integration</dt>
 <dd>&nbsp;</dd>
@@ -2113,6 +2118,8 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dt><a href="../org/episteme/core/mathematics/discrete/graph/flow/package-summary.html">org.episteme.core.mathematics.discrete.graph.flow</a> - package org.episteme.core.mathematics.discrete.graph.flow</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/discrete/graph/matching/package-summary.html">org.episteme.core.mathematics.discrete.graph.matching</a> - package org.episteme.core.mathematics.discrete.graph.matching</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/discrete/graph/providers/package-summary.html">org.episteme.core.mathematics.discrete.graph.providers</a> - package org.episteme.core.mathematics.discrete.graph.providers</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/dynamical/package-summary.html">org.episteme.core.mathematics.dynamical</a> - package org.episteme.core.mathematics.dynamical</dt>
 <dd>&nbsp;</dd>
@@ -2161,6 +2168,8 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/package-summary.html">org.episteme.core.mathematics.linearalgebra.tensors</a> - package org.episteme.core.mathematics.linearalgebra.tensors</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/backends/package-summary.html">org.episteme.core.mathematics.linearalgebra.tensors.backends</a> - package org.episteme.core.mathematics.linearalgebra.tensors.backends</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/tensors/providers/package-summary.html">org.episteme.core.mathematics.linearalgebra.tensors.providers</a> - package org.episteme.core.mathematics.linearalgebra.tensors.providers</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/linearalgebra/vectors/package-summary.html">org.episteme.core.mathematics.linearalgebra.vectors</a> - package org.episteme.core.mathematics.linearalgebra.vectors</dt>
 <dd>&nbsp;</dd>
@@ -2259,6 +2268,8 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/ml/package-summary.html">org.episteme.core.mathematics.ml</a> - package org.episteme.core.mathematics.ml</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/ml/backends/package-summary.html">org.episteme.core.mathematics.ml.backends</a> - package org.episteme.core.mathematics.ml.backends</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/ml/generative/package-summary.html">org.episteme.core.mathematics.ml.generative</a> - package org.episteme.core.mathematics.ml.generative</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/ml/neural/package-summary.html">org.episteme.core.mathematics.ml.neural</a> - package org.episteme.core.mathematics.ml.neural</dt>
@@ -2283,6 +2294,16 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/numbertheory/package-summary.html">org.episteme.core.mathematics.numbertheory</a> - package org.episteme.core.mathematics.numbertheory</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/numerical/package-summary.html">org.episteme.core.mathematics.numerical</a> - package org.episteme.core.mathematics.numerical</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/numerical/fem/package-summary.html">org.episteme.core.mathematics.numerical.fem</a> - package org.episteme.core.mathematics.numerical.fem</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/numerical/fem/providers/package-summary.html">org.episteme.core.mathematics.numerical.fem.providers</a> - package org.episteme.core.mathematics.numerical.fem.providers</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/numerical/ode/package-summary.html">org.episteme.core.mathematics.numerical.ode</a> - package org.episteme.core.mathematics.numerical.ode</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/numerical/ode/providers/package-summary.html">org.episteme.core.mathematics.numerical.ode.providers</a> - package org.episteme.core.mathematics.numerical.ode.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/optimization/package-summary.html">org.episteme.core.mathematics.optimization</a> - package org.episteme.core.mathematics.optimization</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/optimization/evolutionary/package-summary.html">org.episteme.core.mathematics.optimization.evolutionary</a> - package org.episteme.core.mathematics.optimization.evolutionary</dt>
@@ -2297,6 +2318,10 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>
 <div class="block">Provides the <a href="../org/episteme/core/mathematics/optimization/evolutionary/geneticprogramming/package-summary.html"><code>org.episteme.core.mathematics.optimization.evolutionary.geneticprogramming</code></a> module.</div>
 </dd>
+<dt><a href="../org/episteme/core/mathematics/optimization/genetic/package-summary.html">org.episteme.core.mathematics.optimization.genetic</a> - package org.episteme.core.mathematics.optimization.genetic</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/optimization/genetic/providers/package-summary.html">org.episteme.core.mathematics.optimization.genetic.providers</a> - package org.episteme.core.mathematics.optimization.genetic.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/optimization/swarm/package-summary.html">org.episteme.core.mathematics.optimization.swarm</a> - package org.episteme.core.mathematics.optimization.swarm</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/random/package-summary.html">org.episteme.core.mathematics.random</a> - package org.episteme.core.mathematics.random</dt>
@@ -2309,11 +2334,17 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/statistics/anova/package-summary.html">org.episteme.core.mathematics.statistics.anova</a> - package org.episteme.core.mathematics.statistics.anova</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/statistics/bayesian/package-summary.html">org.episteme.core.mathematics.statistics.bayesian</a> - package org.episteme.core.mathematics.statistics.bayesian</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/statistics/bayesian/providers/package-summary.html">org.episteme.core.mathematics.statistics.bayesian.providers</a> - package org.episteme.core.mathematics.statistics.bayesian.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/statistics/distributions/package-summary.html">org.episteme.core.mathematics.statistics.distributions</a> - package org.episteme.core.mathematics.statistics.distributions</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/statistics/fitting/package-summary.html">org.episteme.core.mathematics.statistics.fitting</a> - package org.episteme.core.mathematics.statistics.fitting</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/statistics/montecarlo/package-summary.html">org.episteme.core.mathematics.statistics.montecarlo</a> - package org.episteme.core.mathematics.statistics.montecarlo</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/mathematics/statistics/montecarlo/providers/package-summary.html">org.episteme.core.mathematics.statistics.montecarlo.providers</a> - package org.episteme.core.mathematics.statistics.montecarlo.providers</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/statistics/timeseries/package-summary.html">org.episteme.core.mathematics.statistics.timeseries</a> - package org.episteme.core.mathematics.statistics.timeseries</dt>
 <dd>&nbsp;</dd>
@@ -2375,10 +2406,10 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/media/audio/ops/package-summary.html">org.episteme.core.media.audio.ops</a> - package org.episteme.core.media.audio.ops</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/core/media/audio/providers/package-summary.html">org.episteme.core.media.audio.providers</a> - package org.episteme.core.media.audio.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/media/backends/package-summary.html">org.episteme.core.media.backends</a> - package org.episteme.core.media.backends</dt>
-<dd>
-<div class="block">Core functionality for the org.episteme.core.media.backends package in the Episteme library.</div>
-</dd>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/media/pictures/package-summary.html">org.episteme.core.media.pictures</a> - package org.episteme.core.media.pictures</dt>
 <dd>
 <div class="block">Core functionality for the org.episteme.core.media.pictures package in the Episteme library.</div>
@@ -2387,6 +2418,8 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>
 <div class="block">Core functionality for the org.episteme.core.media.video package in the Episteme library.</div>
 </dd>
+<dt><a href="../org/episteme/core/media/video/backends/package-summary.html">org.episteme.core.media.video.backends</a> - package org.episteme.core.media.video.backends</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/media/vision/package-summary.html">org.episteme.core.media.vision</a> - package org.episteme.core.media.vision</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/media/vision/backends/package-summary.html">org.episteme.core.media.vision.backends</a> - package org.episteme.core.media.vision.backends</dt>
@@ -2394,8 +2427,6 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dt><a href="../org/episteme/core/media/vision/detection/package-summary.html">org.episteme.core.media.vision.detection</a> - package org.episteme.core.media.vision.detection</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/media/vision/ops/package-summary.html">org.episteme.core.media.vision.ops</a> - package org.episteme.core.media.vision.ops</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/media/vision/providers/package-summary.html">org.episteme.core.media.vision.providers</a> - package org.episteme.core.media.vision.providers</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/methodology/package-summary.html">org.episteme.core.methodology</a> - package org.episteme.core.methodology</dt>
 <dd>
@@ -2405,32 +2436,6 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a> - package org.episteme.core.technical.algorithm</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/fft/package-summary.html">org.episteme.core.technical.algorithm.fft</a> - package org.episteme.core.technical.algorithm.fft</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/fractals/package-summary.html">org.episteme.core.technical.algorithm.fractals</a> - package org.episteme.core.technical.algorithm.fractals</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/genetic/package-summary.html">org.episteme.core.technical.algorithm.genetic</a> - package org.episteme.core.technical.algorithm.genetic</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/graph/package-summary.html">org.episteme.core.technical.algorithm.graph</a> - package org.episteme.core.technical.algorithm.graph</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/inference/package-summary.html">org.episteme.core.technical.algorithm.inference</a> - package org.episteme.core.technical.algorithm.inference</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/io/package-summary.html">org.episteme.core.technical.algorithm.io</a> - package org.episteme.core.technical.algorithm.io</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/ml/package-summary.html">org.episteme.core.technical.algorithm.ml</a> - package org.episteme.core.technical.algorithm.ml</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/montecarlo/package-summary.html">org.episteme.core.technical.algorithm.montecarlo</a> - package org.episteme.core.technical.algorithm.montecarlo</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/nbody/package-summary.html">org.episteme.core.technical.algorithm.nbody</a> - package org.episteme.core.technical.algorithm.nbody</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/numerical/package-summary.html">org.episteme.core.technical.algorithm.numerical</a> - package org.episteme.core.technical.algorithm.numerical</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/physics/package-summary.html">org.episteme.core.technical.algorithm.physics</a> - package org.episteme.core.technical.algorithm.physics</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/physics/fluid/package-summary.html">org.episteme.core.technical.algorithm.physics.fluid</a> - package org.episteme.core.technical.algorithm.physics.fluid</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/algorithm/simulation/package-summary.html">org.episteme.core.technical.algorithm.simulation</a> - package org.episteme.core.technical.algorithm.simulation</dt>
-<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/technical/backend/package-summary.html">org.episteme.core.technical.backend</a> - package org.episteme.core.technical.backend</dt>
 <dd>
 <div class="block">Provides a Service Provider Interface (SPI) for implementing</div>
@@ -2439,17 +2444,11 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>
 <div class="block">Provides the default CPU backend using pure Java.</div>
 </dd>
+<dt><a href="../org/episteme/core/technical/backend/distributed/package-summary.html">org.episteme.core.technical.backend.distributed</a> - package org.episteme.core.technical.backend.distributed</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/technical/backend/gpu/package-summary.html">org.episteme.core.technical.backend.gpu</a> - package org.episteme.core.technical.backend.gpu</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/cuda/package-summary.html">org.episteme.core.technical.backend.gpu.cuda</a> - package org.episteme.core.technical.backend.gpu.cuda</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a> - package org.episteme.core.technical.backend.gpu.opencl</dt>
-<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/technical/backend/nativ/package-summary.html">org.episteme.core.technical.backend.nativ</a> - package org.episteme.core.technical.backend.nativ</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/nd4j/package-summary.html">org.episteme.core.technical.backend.nd4j</a> - package org.episteme.core.technical.backend.nd4j</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/core/technical/backend/quantum/package-summary.html">org.episteme.core.technical.backend.quantum</a> - package org.episteme.core.technical.backend.quantum</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/technical/backend/simd/package-summary.html">org.episteme.core.technical.backend.simd</a> - package org.episteme.core.technical.backend.simd</dt>
 <dd>&nbsp;</dd>
@@ -2517,55 +2516,65 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>
 <div class="block">Core functionality for the org.episteme.database package in the Episteme library.</div>
 </dd>
-<dt><a href="../org/episteme/examples/audio/package-summary.html">org.episteme.examples.audio</a> - package org.episteme.examples.audio</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/examples/linearalgebra/package-summary.html">org.episteme.examples.linearalgebra</a> - package org.episteme.examples.linearalgebra</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/examples/physics/package-summary.html">org.episteme.examples.physics</a> - package org.episteme.examples.physics</dt>
-<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/jni/jni/package-summary.html">org.episteme.jni.jni</a> - package org.episteme.jni.jni</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/jni/jni/devices/package-summary.html">org.episteme.jni.jni.devices</a> - package org.episteme.jni.jni.devices</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/io/package-summary.html">org.episteme.nativ.io</a> - package org.episteme.nativ.io</dt>
+<dt><a href="../org/episteme/nativ/io/backends/package-summary.html">org.episteme.nativ.io.backends</a> - package org.episteme.nativ.io.backends</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/blas/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.blas</a> - package org.episteme.nativ.mathematics.linearalgebra.blas</dt>
+<dt><a href="../org/episteme/nativ/mathematics/analysis/package-summary.html">org.episteme.nativ.mathematics.analysis</a> - package org.episteme.nativ.mathematics.analysis</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/matrices/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices</a> - package org.episteme.nativ.mathematics.linearalgebra.matrices</dt>
+<dt><a href="../org/episteme/nativ/mathematics/analysis/fft/backends/package-summary.html">org.episteme.nativ.mathematics.analysis.fft.backends</a> - package org.episteme.nativ.mathematics.analysis.fft.backends</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/matrices/backends/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices.backends</a> - package org.episteme.nativ.mathematics.linearalgebra.matrices.backends</dt>
+<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/backends/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.backends</a> - package org.episteme.nativ.mathematics.linearalgebra.backends</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/mathematics/linearalgebra/matrices/storage/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.matrices.storage</a> - package org.episteme.nativ.mathematics.linearalgebra.matrices.storage</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.tensors</a> - package org.episteme.nativ.mathematics.linearalgebra.tensors</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/providers/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.tensors.providers</a> - package org.episteme.nativ.mathematics.linearalgebra.tensors.providers</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/vectors/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors</a> - package org.episteme.nativ.mathematics.linearalgebra.vectors</dt>
+<dt><a href="../org/episteme/nativ/mathematics/linearalgebra/tensors/backends/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.tensors.backends</a> - package org.episteme.nativ.mathematics.linearalgebra.tensors.backends</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/mathematics/linearalgebra/vectors/storage/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors.storage</a> - package org.episteme.nativ.mathematics.linearalgebra.vectors.storage</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/mathematics/tensors/backends/package-summary.html">org.episteme.nativ.mathematics.tensors.backends</a> - package org.episteme.nativ.mathematics.tensors.backends</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/media/audio/backends/package-summary.html">org.episteme.nativ.media.audio.backends</a> - package org.episteme.nativ.media.audio.backends</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/media/vision/providers/package-summary.html">org.episteme.nativ.media.vision.providers</a> - package org.episteme.nativ.media.vision.providers</dt>
+<dt><a href="../org/episteme/nativ/media/backends/package-summary.html">org.episteme.nativ.media.backends</a> - package org.episteme.nativ.media.backends</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/physics/package-summary.html">org.episteme.nativ.physics</a> - package org.episteme.nativ.physics</dt>
+<dt><a href="../org/episteme/nativ/media/video/backends/package-summary.html">org.episteme.nativ.media.video.backends</a> - package org.episteme.nativ.media.video.backends</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/physics/classical/mechanics/backends/package-summary.html">org.episteme.nativ.physics.classical.mechanics.backends</a> - package org.episteme.nativ.physics.classical.mechanics.backends</dt>
+<dt><a href="../org/episteme/nativ/media/vision/backends/package-summary.html">org.episteme.nativ.media.vision.backends</a> - package org.episteme.nativ.media.vision.backends</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/matter/fluids/backends/package-summary.html">org.episteme.nativ.physics.classical.matter.fluids.backends</a> - package org.episteme.nativ.physics.classical.matter.fluids.backends</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision</a> - package org.episteme.nativ.physics.classical.mechanics.collision</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision.backends</a> - package org.episteme.nativ.physics.classical.mechanics.collision.backends</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/genesis/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision.backends.genesis</a> - package org.episteme.nativ.physics.classical.mechanics.collision.backends.genesis</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/jbullet/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision.backends.jbullet</a> - package org.episteme.nativ.physics.classical.mechanics.collision.backends.jbullet</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/collision/backends/ode/package-summary.html">org.episteme.nativ.physics.classical.mechanics.collision.backends.ode</a> - package org.episteme.nativ.physics.classical.mechanics.collision.backends.ode</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/nbody/backends/package-summary.html">org.episteme.nativ.physics.classical.mechanics.nbody.backends</a> - package org.episteme.nativ.physics.classical.mechanics.nbody.backends</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/physics/classical/mechanics/simulation/backends/package-summary.html">org.episteme.nativ.physics.classical.mechanics.simulation.backends</a> - package org.episteme.nativ.physics.classical.mechanics.simulation.backends</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/physics/loaders/fits/package-summary.html">org.episteme.nativ.physics.loaders.fits</a> - package org.episteme.nativ.physics.loaders.fits</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/physics/loaders/hdf5/package-summary.html">org.episteme.nativ.physics.loaders.hdf5</a> - package org.episteme.nativ.physics.loaders.hdf5</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/technical/algorithm/fft/package-summary.html">org.episteme.nativ.technical.algorithm.fft</a> - package org.episteme.nativ.technical.algorithm.fft</dt>
+<dt><a href="../org/episteme/nativ/physics/quantum/backends/package-summary.html">org.episteme.nativ.physics.quantum.backends</a> - package org.episteme.nativ.physics.quantum.backends</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/technical/algorithm/linearalgebra/package-summary.html">org.episteme.nativ.technical.algorithm.linearalgebra</a> - package org.episteme.nativ.technical.algorithm.linearalgebra</dt>
+<dt><a href="../org/episteme/nativ/technical/backend/gpu/cuda/package-summary.html">org.episteme.nativ.technical.backend.gpu.cuda</a> - package org.episteme.nativ.technical.backend.gpu.cuda</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/nativ/technical/backend/gpu/opencl/package-summary.html">org.episteme.nativ.technical.backend.gpu.opencl</a> - package org.episteme.nativ.technical.backend.gpu.opencl</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/technical/backend/nativ/package-summary.html">org.episteme.nativ.technical.backend.nativ</a> - package org.episteme.nativ.technical.backend.nativ</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/technical/backend/quantum/package-summary.html">org.episteme.nativ.technical.backend.quantum</a> - package org.episteme.nativ.technical.backend.quantum</dt>
-<dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/technical/backend/simd/package-summary.html">org.episteme.nativ.technical.backend.simd</a> - package org.episteme.nativ.technical.backend.simd</dt>
+<dt><a href="../org/episteme/nativ/ui/viewers/mathematics/analysis/plotting/backends/package-summary.html">org.episteme.nativ.ui.viewers.mathematics.analysis.plotting.backends</a> - package org.episteme.nativ.ui.viewers.mathematics.analysis.plotting.backends</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/nativ/util/package-summary.html">org.episteme.nativ.util</a> - package org.episteme.nativ.util</dt>
 <dd>&nbsp;</dd>
@@ -2852,13 +2861,29 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/matter/fluids/package-summary.html">org.episteme.natural.physics.classical.matter.fluids</a> - package org.episteme.natural.physics.classical.matter.fluids</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/matter/fluids/providers/package-summary.html">org.episteme.natural.physics.classical.matter.fluids.providers</a> - package org.episteme.natural.physics.classical.matter.fluids.providers</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/matter/molecular/package-summary.html">org.episteme.natural.physics.classical.matter.molecular</a> - package org.episteme.natural.physics.classical.matter.molecular</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/matter/molecular/providers/package-summary.html">org.episteme.natural.physics.classical.matter.molecular.providers</a> - package org.episteme.natural.physics.classical.matter.molecular.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/matter/plasma/package-summary.html">org.episteme.natural.physics.classical.matter.plasma</a> - package org.episteme.natural.physics.classical.matter.plasma</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/matter/solidstate/package-summary.html">org.episteme.natural.physics.classical.matter.solidstate</a> - package org.episteme.natural.physics.classical.matter.solidstate</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/mechanics/package-summary.html">org.episteme.natural.physics.classical.mechanics</a> - package org.episteme.natural.physics.classical.mechanics</dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/natural/physics/classical/mechanics/backends/package-summary.html">org.episteme.natural.physics.classical.mechanics.backends</a> - package org.episteme.natural.physics.classical.mechanics.backends</dt>
+<dt><a href="../org/episteme/natural/physics/classical/mechanics/collision/package-summary.html">org.episteme.natural.physics.classical.mechanics.collision</a> - package org.episteme.natural.physics.classical.mechanics.collision</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/mechanics/collision/providers/package-summary.html">org.episteme.natural.physics.classical.mechanics.collision.providers</a> - package org.episteme.natural.physics.classical.mechanics.collision.providers</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/mechanics/nbody/package-summary.html">org.episteme.natural.physics.classical.mechanics.nbody</a> - package org.episteme.natural.physics.classical.mechanics.nbody</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/mechanics/nbody/providers/package-summary.html">org.episteme.natural.physics.classical.mechanics.nbody.providers</a> - package org.episteme.natural.physics.classical.mechanics.nbody.providers</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/mechanics/simulation/package-summary.html">org.episteme.natural.physics.classical.mechanics.simulation</a> - package org.episteme.natural.physics.classical.mechanics.simulation</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/mechanics/simulation/providers/package-summary.html">org.episteme.natural.physics.classical.mechanics.simulation.providers</a> - package org.episteme.natural.physics.classical.mechanics.simulation.providers</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/oscillations/package-summary.html">org.episteme.natural.physics.classical.oscillations</a> - package org.episteme.natural.physics.classical.oscillations</dt>
 <dd>&nbsp;</dd>
@@ -2870,13 +2895,19 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/waves/acoustics/package-summary.html">org.episteme.natural.physics.classical.waves.acoustics</a> - package org.episteme.natural.physics.classical.waves.acoustics</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/waves/electromagnetism/package-summary.html">org.episteme.natural.physics.classical.waves.electromagnetism</a> - package org.episteme.natural.physics.classical.waves.electromagnetism</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/waves/electromagnetism/circuit/package-summary.html">org.episteme.natural.physics.classical.waves.electromagnetism.circuit</a> - package org.episteme.natural.physics.classical.waves.electromagnetism.circuit</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/waves/electromagnetism/components/package-summary.html">org.episteme.natural.physics.classical.waves.electromagnetism.components</a> - package org.episteme.natural.physics.classical.waves.electromagnetism.components</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/waves/electromagnetism/field/package-summary.html">org.episteme.natural.physics.classical.waves.electromagnetism.field</a> - package org.episteme.natural.physics.classical.waves.electromagnetism.field</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/waves/electromagnetism/providers/package-summary.html">org.episteme.natural.physics.classical.waves.electromagnetism.providers</a> - package org.episteme.natural.physics.classical.waves.electromagnetism.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/classical/waves/optics/package-summary.html">org.episteme.natural.physics.classical.waves.optics</a> - package org.episteme.natural.physics.classical.waves.optics</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/classical/waves/providers/package-summary.html">org.episteme.natural.physics.classical.waves.providers</a> - package org.episteme.natural.physics.classical.waves.providers</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/loaders/package-summary.html">org.episteme.natural.physics.loaders</a> - package org.episteme.natural.physics.loaders</dt>
 <dd>&nbsp;</dd>
@@ -2894,9 +2925,15 @@ v = Ã¢Ë†Å¡[ÃŽÂ¼(2/r - 1/a)]</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/quantum/errorcorrection/package-summary.html">org.episteme.natural.physics.quantum.errorcorrection</a> - package org.episteme.natural.physics.quantum.errorcorrection</dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/quantum/scf/package-summary.html">org.episteme.natural.physics.quantum.scf</a> - package org.episteme.natural.physics.quantum.scf</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/physics/quantum/scf/providers/package-summary.html">org.episteme.natural.physics.quantum.scf.providers</a> - package org.episteme.natural.physics.quantum.scf.providers</dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/relativity/package-summary.html">org.episteme.natural.physics.relativity</a> - package org.episteme.natural.physics.relativity</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/physics/statistical/package-summary.html">org.episteme.natural.physics.statistical</a> - package org.episteme.natural.physics.statistical</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/natural/technical/backend/quantum/package-summary.html">org.episteme.natural.technical.backend.quantum</a> - package org.episteme.natural.technical.backend.quantum</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/natural/ui/package-summary.html">org.episteme.natural.ui</a> - package org.episteme.natural.ui</dt>
 <dd>&nbsp;</dd>
@@ -3108,6 +3145,8 @@ analysis, and urban climatology.</div>
 <div class="block">- plays, performances, dramatic arts.</div>
 </dd>
 <dt><a href="../org/episteme/social/device/actuators/package-summary.html">org.episteme.social.device.actuators</a> - package org.episteme.social.device.actuators</dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/social/device/sensors/package-summary.html">org.episteme.social.device.sensors</a> - package org.episteme.social.device.sensors</dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/social/device/sim/package-summary.html">org.episteme.social.device.sim</a> - package org.episteme.social.device.sim</dt>
 <dd>
@@ -3453,6 +3492,10 @@ ressources into a finished something that can be sold.</div>
 <dt><a href="../org/episteme/core/mathematics/geometry/ComputationalGeometry2D.html#orientation(org.episteme.core.mathematics.geometry.Point2D,org.episteme.core.mathematics.geometry.Point2D,org.episteme.core.mathematics.geometry.Point2D)" class="member-name-link">orientation(Point2D, Point2D, Point2D)</a> - Static method in class org.episteme.core.mathematics.geometry.<a href="../org/episteme/core/mathematics/geometry/ComputationalGeometry2D.html" title="class in org.episteme.core.mathematics.geometry">ComputationalGeometry2D</a></dt>
 <dd>
 <div class="block">Computes the orientation of triplet (p, q, r).</div>
+</dd>
+<dt><a href="../org/episteme/nativ/technical/backend/nativ/ScavengeProtectedSegment.html#origin()" class="member-name-link">origin()</a> - Method in record class org.episteme.nativ.technical.backend.nativ.<a href="../org/episteme/nativ/technical/backend/nativ/ScavengeProtectedSegment.html" title="class in org.episteme.nativ.technical.backend.nativ">ScavengeProtectedSegment</a></dt>
+<dd>
+<div class="block">Returns the value of the <code>origin</code> record component.</div>
 </dd>
 <dt><a href="../org/episteme/social/architecture/AcousticRayTracer.Ray.html#origin()" class="member-name-link">origin()</a> - Method in record class org.episteme.social.architecture.<a href="../org/episteme/social/architecture/AcousticRayTracer.Ray.html" title="class in org.episteme.social.architecture">AcousticRayTracer.Ray</a></dt>
 <dd>

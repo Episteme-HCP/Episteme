@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -58,9 +58,17 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#setService(org.episteme.core.technical.algorithm.AlgorithmService)" tabindex="0">setService(AlgorithmService)</a></li>
+<li><a href="#getService()" tabindex="0">getService()</a></li>
 <li><a href="#getProvider(java.lang.Class)" tabindex="0">getProvider(Class)</a></li>
 <li><a href="#getProviders(java.lang.Class)" tabindex="0">getProviders(Class)</a></li>
+<li><a href="#getReferenceProvider(java.lang.Class)" tabindex="0">getReferenceProvider(Class)</a></li>
+<li><a href="#getNextProvider(java.lang.Class,org.episteme.core.technical.algorithm.AlgorithmProvider)" tabindex="0">getNextProvider(Class, AlgorithmProvider)</a></li>
+<li><a href="#executeWithFallback(java.lang.Class,java.util.function.Function)" tabindex="0">executeWithFallback(Class, Function)</a></li>
+<li><a href="#getRegistry()" tabindex="0">getRegistry()</a></li>
+<li><a href="#isFiltered(java.lang.String)" tabindex="0">isFiltered(String)</a></li>
 <li><a href="#refresh()" tabindex="0">refresh()</a></li>
+<li><a href="#shutdown()" tabindex="0">shutdown()</a></li>
 </ol>
 </li>
 </ol>
@@ -108,6 +116,19 @@ Results from both paths are merged, deduplicated, and sorted by priority.
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, R&gt;<br>R</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#executeWithFallback(java.lang.Class,java.util.function.Function)" class="member-name-link">executeWithFallback</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;P,<wbr>R&gt;&nbsp;operation)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Executes an operation using the best available provider, automatically falling back
+to the next provider if the current one throws <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link"><code>UnsupportedOperationException</code></a>.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;<br>P</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getNextProvider(java.lang.Class,org.episteme.core.technical.algorithm.AlgorithmProvider)" class="member-name-link">getNextProvider</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&nbsp;current)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Finds and returns the next-best available provider after the given one.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;<br>P</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getProvider(java.lang.Class)" class="member-name-link">getProvider</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
@@ -118,10 +139,40 @@ Results from both paths are merged, deduplicated, and sorted by priority.
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Finds and returns all available providers for the given interface, sorted by priority.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;<br>P</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getReferenceProvider(java.lang.Class)" class="member-name-link">getReferenceProvider</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Finds and returns the reference (baseline) provider for the given interface.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="ProviderRegistry.html" title="class in org.episteme.core.technical.algorithm">ProviderRegistry</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getRegistry()" class="member-name-link">getRegistry</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns the provider registry for operational selection.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="AlgorithmService.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmService</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getService()" class="member-name-link">getService</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Gets the current AlgorithmService.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isFiltered(java.lang.String)" class="member-name-link">isFiltered</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Checks if a provider with the given name is filtered out by global configuration.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#refresh()" class="member-name-link">refresh</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Forces a refresh of the discovered providers.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setService(org.episteme.core.technical.algorithm.AlgorithmService)" class="member-name-link">setService</a><wbr>(<a href="AlgorithmService.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmService</a>&nbsp;newService)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Sets the AlgorithmService to use.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#shutdown()" class="member-name-link">shutdown</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Shuts down all discovered backends and providers.</div>
 </div>
 </div>
 </div>
@@ -141,21 +192,29 @@ Results from both paths are merged, deduplicated, and sorted by priority.
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="setService(org.episteme.core.technical.algorithm.AlgorithmService)">
+<h3>setService</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setService</span><wbr><span class="parameters">(<a href="AlgorithmService.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmService</a>&nbsp;newService)</span></div>
+<div class="block">Sets the AlgorithmService to use.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getService()">
+<h3>getService</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="AlgorithmService.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmService</a></span>&nbsp;<span class="element-name">getService</span>()</div>
+<div class="block">Gets the current AlgorithmService.</div>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="getProvider(java.lang.Class)">
 <h3>getProvider</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;</span>&nbsp;<span class="return-type">P</span>&nbsp;<span class="element-name">getProvider</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass)</span></div>
 <div class="block">Finds and returns the best available provider for the given interface.</div>
-<dl class="notes">
-<dt>Type Parameters:</dt>
-<dd><span id="getProvider(java.lang.Class)-type-param-P"><code>P</code> - the provider type</span></dd>
-<dt>Parameters:</dt>
-<dd><code>providerClass</code> - the interface class of the provider</dd>
-<dt>Returns:</dt>
-<dd>the best available provider</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/NoSuchElementException.html" title="class or interface in java.util" class="external-link">NoSuchElementException</a></code> - if no provider is found</dd>
-</dl>
 </div>
 </section>
 </li>
@@ -164,19 +223,55 @@ Results from both paths are merged, deduplicated, and sorted by priority.
 <h3>getProviders</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;P&gt;</span>&nbsp;<span class="element-name">getProviders</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass)</span></div>
-<div class="block">Finds and returns all available providers for the given interface, sorted by priority.
-<p>
-Merges providers from both the AlgorithmProvider SPI and the Backend SPI
-(via <a href="../backend/Backend.html#getAlgorithmProviders()"><code>Backend.getAlgorithmProviders()</code></a>).
-</p></div>
-<dl class="notes">
-<dt>Type Parameters:</dt>
-<dd><span id="getProviders(java.lang.Class)-type-param-P"><code>P</code> - the provider type</span></dd>
-<dt>Parameters:</dt>
-<dd><code>providerClass</code> - the interface class of the provider</dd>
-<dt>Returns:</dt>
-<dd>list of available providers sorted by priority (descending)</dd>
-</dl>
+<div class="block">Finds and returns all available providers for the given interface, sorted by priority.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getReferenceProvider(java.lang.Class)">
+<h3>getReferenceProvider</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;</span>&nbsp;<span class="return-type">P</span>&nbsp;<span class="element-name">getReferenceProvider</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass)</span></div>
+<div class="block">Finds and returns the reference (baseline) provider for the given interface.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getNextProvider(java.lang.Class,org.episteme.core.technical.algorithm.AlgorithmProvider)">
+<h3>getNextProvider</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&gt;</span>&nbsp;<span class="return-type">P</span>&nbsp;<span class="element-name">getNextProvider</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>&nbsp;current)</span></div>
+<div class="block">Finds and returns the next-best available provider after the given one.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="executeWithFallback(java.lang.Class,java.util.function.Function)">
+<h3>executeWithFallback</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;P extends <a href="AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, R&gt;</span>&nbsp;<span class="return-type">R</span>&nbsp;<span class="element-name">executeWithFallback</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;providerClass,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;P,<wbr>R&gt;&nbsp;operation)</span></div>
+<div class="block">Executes an operation using the best available provider, automatically falling back
+to the next provider if the current one throws <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link"><code>UnsupportedOperationException</code></a>.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getRegistry()">
+<h3>getRegistry</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="ProviderRegistry.html" title="class in org.episteme.core.technical.algorithm">ProviderRegistry</a></span>&nbsp;<span class="element-name">getRegistry</span>()</div>
+<div class="block">Returns the provider registry for operational selection.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isFiltered(java.lang.String)">
+<h3>isFiltered</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isFiltered</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="block">Checks if a provider with the given name is filtered out by global configuration.</div>
 </div>
 </section>
 </li>
@@ -186,6 +281,15 @@ Merges providers from both the AlgorithmProvider SPI and the Backend SPI
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">refresh</span>()</div>
 <div class="block">Forces a refresh of the discovered providers.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="shutdown()">
+<h3>shutdown</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">shutdown</span>()</div>
+<div class="block">Shuts down all discovered backends and providers.</div>
 </div>
 </section>
 </li>

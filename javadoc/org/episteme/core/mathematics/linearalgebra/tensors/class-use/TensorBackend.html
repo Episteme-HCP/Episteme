@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -59,33 +59,15 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Package</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core">org.episteme.core</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.tensors">org.episteme.core.mathematics.linearalgebra.tensors</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.tensors">org.episteme.core.mathematics.linearalgebra.tensors</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.tensors.backends">org.episteme.core.mathematics.linearalgebra.tensors.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.tensors.backends">org.episteme.core.mathematics.linearalgebra.tensors.backends</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.mathematics.linearalgebra.tensors.backends">org.episteme.nativ.mathematics.linearalgebra.tensors.backends</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.backend.nd4j">org.episteme.core.technical.backend.nd4j</a></div>
-<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
-<li>
-<section class="detail" id="org.episteme.core">
-<h2>Uses of <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a> in <a href="../../../../package-summary.html">org.episteme.core</a></h2>
-<div class="caption"><span>Methods in <a href="../../../../package-summary.html">org.episteme.core</a> that return <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ComputeContext.</span><code><a href="../../../../ComputeContext.html#getTensorBackend()" class="member-name-link">getTensorBackend</a>()</code></div>
-<div class="col-last even-row-color">
-<div class="block">Gets the appropriate tensor backend for the current context.</div>
-</div>
-</div>
-</section>
-</li>
 <li>
 <section class="detail" id="org.episteme.core.mathematics.linearalgebra.tensors">
 <h2>Uses of <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a> in <a href="../package-summary.html">org.episteme.core.mathematics.linearalgebra.tensors</a></h2>
@@ -106,9 +88,25 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">TensorBackendManager.</span><code><a href="../TensorBackendManager.html#getDefaultBackend()" class="member-name-link">getDefaultBackend</a>()</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">TensorBackendManager.</span><code><a href="../TensorBackendManager.html#staticDefault()" class="member-name-link">staticDefault</a>()</code></div>
 <div class="col-last even-row-color">
 <div class="block">Returns the default backend.</div>
+</div>
+<div class="col-first odd-row-color"><code>static <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">TensorBackendManager.</span><code><a href="../TensorBackendManager.html#staticSelect(java.lang.String)" class="member-name-link">staticSelect</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nameOrId)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Selects a backend by name or id.</div>
+</div>
+</div>
+<div class="caption"><span>Methods in <a href="../package-summary.html">org.episteme.core.mathematics.linearalgebra.tensors</a> that return types with arguments of type <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a><wbr>&lt;<a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">TensorBackendManager.</span><code><a href="../TensorBackendManager.html#staticAll()" class="member-name-link">staticAll</a>()</code></div>
+<div class="col-last even-row-color">
+<div class="block">Returns all registered backends.</div>
 </div>
 </div>
 </section>
@@ -133,32 +131,32 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.technical.backend.nd4j">
-<h2>Uses of <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a> in <a href="../../../../technical/backend/nd4j/package-summary.html">org.episteme.core.technical.backend.nd4j</a></h2>
-<div class="caption"><span>Classes in <a href="../../../../technical/backend/nd4j/package-summary.html">org.episteme.core.technical.backend.nd4j</a> that implement <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span></div>
+<section class="detail" id="org.episteme.nativ.mathematics.linearalgebra.tensors.backends">
+<h2>Uses of <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a> in <a href="../../../../../nativ/mathematics/linearalgebra/tensors/backends/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.tensors.backends</a></h2>
+<div class="caption"><span>Classes in <a href="../../../../../nativ/mathematics/linearalgebra/tensors/backends/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.tensors.backends</a> that implement <a href="../TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../../technical/backend/nd4j/ND4JBaseTensorBackend.html" class="type-name-link" title="class in org.episteme.core.technical.backend.nd4j">ND4JBaseTensorBackend</a></code></div>
+<div class="col-second even-row-color"><code><a href="../../../../../nativ/mathematics/linearalgebra/tensors/backends/NativeND4JCUDASparseTensorBackend.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors.backends">NativeND4JCUDASparseTensorBackend</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">Abstract Base for ND4J-backed Tensor Providers.</div>
+<div class="block">NativeND4J Sparse Tensor backend.</div>
 </div>
 <div class="col-first odd-row-color"><code>class&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../../../../technical/backend/nd4j/ND4JCUDATensorBackend.html" class="type-name-link" title="class in org.episteme.core.technical.backend.nd4j">ND4JCUDATensorBackend</a></code></div>
+<div class="col-second odd-row-color"><code><a href="../../../../../nativ/mathematics/linearalgebra/tensors/backends/NativeND4JCUDATensorBackend.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors.backends">NativeND4JCUDATensorBackend</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">ND4J CUDA (GPU) Tensor Provider.</div>
+<div class="block">NativeND4J CUDA (GPU) Tensor backend.</div>
 </div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../../technical/backend/nd4j/ND4JNativeTensorBackend.html" class="type-name-link" title="class in org.episteme.core.technical.backend.nd4j">ND4JNativeTensorBackend</a></code></div>
+<div class="col-second even-row-color"><code><a href="../../../../../nativ/mathematics/linearalgebra/tensors/backends/NativeND4JTensorBackend.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors.backends">NativeND4JTensorBackend</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">ND4J Native (CPU) Tensor Provider.</div>
+<div class="block">NativeND4J Tensor backend, using AVX/AVX2/AVX512 instructions when available.</div>
 </div>
 <div class="col-first odd-row-color"><code>class&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../../../../technical/backend/nd4j/ND4JSparseTensorBackend.html" class="type-name-link" title="class in org.episteme.core.technical.backend.nd4j">ND4JSparseTensorBackend</a></code></div>
+<div class="col-second odd-row-color"><code><a href="../../../../../nativ/mathematics/linearalgebra/tensors/backends/ND4JBaseTensorBackend.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors.backends">ND4JBaseTensorBackend</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">ND4J Sparse Tensor Provider.</div>
+<div class="block">Abstract base for ND4J-backed Tensor backends.</div>
 </div>
 </div>
 </section>

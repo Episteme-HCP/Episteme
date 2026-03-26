@@ -33,7 +33,7 @@ loadScripts(document, 'script');</script>
 <li><a href="index-files/index-1.html">Index</a></li>
 <li><a href="search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -178,6 +178,336 @@ loadScripts(document, 'script');</script>
 <li class="block-list">
 <h5>year</h5>
 <pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> year</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/core/device/package-summary.html">org.episteme.core.device</a></h2>
+<ul class="block-list">
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.AbstractActuator">
+<h3>Class&nbsp;<a href="org/episteme/core/device/AbstractActuator.html" title="class in org.episteme.core.device">org.episteme.core.device.AbstractActuator</a></h3>
+<div class="type-signature">class AbstractActuator extends <a href="org/episteme/core/device/AbstractDevice.html" title="class in org.episteme.core.device">AbstractDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.AbstractDevice">
+<h3>Class&nbsp;<a href="org/episteme/core/device/AbstractDevice.html" title="class in org.episteme.core.device">org.episteme.core.device.AbstractDevice</a></h3>
+<div class="type-signature">class AbstractDevice extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>accuracy</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;?&gt; accuracy</pre>
+</li>
+<li class="block-list">
+<h5>calibrationHistory</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/core/measure/Calibration.html" title="class in org.episteme.core.measure">Calibration</a>&gt; calibrationHistory</pre>
+</li>
+<li class="block-list">
+<h5>currentValue</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;?&gt; currentValue</pre>
+</li>
+<li class="block-list">
+<h5>displayUnit</h5>
+<pre><a href="org/episteme/core/measure/Unit.html" title="interface in org.episteme.core.measure">Unit</a>&lt;?&gt; displayUnit</pre>
+</li>
+<li class="block-list">
+<h5>enabled</h5>
+<pre>boolean enabled</pre>
+</li>
+<li class="block-list">
+<h5>firmware</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> firmware</pre>
+</li>
+<li class="block-list">
+<h5>history</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/core/device/AbstractDevice.Record.html" title="class in org.episteme.core.device">AbstractDevice.Record</a>&gt; history</pre>
+</li>
+<li class="block-list">
+<h5>identification</h5>
+<pre><a href="org/episteme/core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a> identification</pre>
+</li>
+<li class="block-list">
+<h5>lastCalibration</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Instant.html" title="class or interface in java.time" class="external-link">Instant</a> lastCalibration</pre>
+</li>
+<li class="block-list">
+<h5>locationDescription</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> locationDescription</pre>
+</li>
+<li class="block-list">
+<h5>manufacturer</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> manufacturer</pre>
+</li>
+<li class="block-list">
+<h5>maxRange</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;?&gt; maxRange</pre>
+</li>
+<li class="block-list">
+<h5>minRange</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;?&gt; minRange</pre>
+</li>
+<li class="block-list">
+<h5>model</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> model</pre>
+</li>
+<li class="block-list">
+<h5>precisionDescription</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> precisionDescription</pre>
+</li>
+<li class="block-list">
+<h5>resolution</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;?&gt; resolution</pre>
+</li>
+<li class="block-list">
+<h5>sensitivity</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;?&gt; sensitivity</pre>
+</li>
+<li class="block-list">
+<h5>status</h5>
+<pre><a href="org/episteme/core/device/Device.Status.html" title="enum class in org.episteme.core.device">Device.Status</a> status</pre>
+</li>
+<li class="block-list">
+<h5>traits</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt; traits</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.AbstractSensor">
+<h3>Class&nbsp;<a href="org/episteme/core/device/AbstractSensor.html" title="class in org.episteme.core.device">org.episteme.core.device.AbstractSensor</a></h3>
+<div class="type-signature">class AbstractSensor extends <a href="org/episteme/core/device/AbstractDevice.html" title="class in org.episteme.core.device">AbstractDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.GPIBDevice">
+<h3>Class&nbsp;<a href="org/episteme/core/device/GPIBDevice.html" title="class in org.episteme.core.device">org.episteme.core.device.GPIBDevice</a></h3>
+<div class="type-signature">class GPIBDevice extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>boardIndex</h5>
+<pre>int boardIndex</pre>
+</li>
+<li class="block-list">
+<h5>connected</h5>
+<pre>boolean connected</pre>
+</li>
+<li class="block-list">
+<h5>firmware</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> firmware</pre>
+</li>
+<li class="block-list">
+<h5>gpibAddress</h5>
+<pre>int gpibAddress</pre>
+</li>
+<li class="block-list">
+<h5>manufacturer</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> manufacturer</pre>
+</li>
+<li class="block-list">
+<h5>name</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> name</pre>
+</li>
+<li class="block-list">
+<h5>traits</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt; traits</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.USBDevice">
+<h3>Class&nbsp;<a href="org/episteme/core/device/USBDevice.html" title="class in org.episteme.core.device">org.episteme.core.device.USBDevice</a></h3>
+<div class="type-signature">class USBDevice extends <a href="org/episteme/core/device/AbstractDevice.html" title="class in org.episteme.core.device">AbstractDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>productId</h5>
+<pre>int productId</pre>
+</li>
+<li class="block-list">
+<h5>serialNumber</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> serialNumber</pre>
+</li>
+<li class="block-list">
+<h5>vendorId</h5>
+<pre>int vendorId</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/core/device/sim/package-summary.html">org.episteme.core.device.sim</a></h2>
+<ul class="block-list">
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.sim.AbstractSimulatedActuator">
+<h3>Class&nbsp;<a href="org/episteme/core/device/sim/AbstractSimulatedActuator.html" title="class in org.episteme.core.device.sim">org.episteme.core.device.sim.AbstractSimulatedActuator</a></h3>
+<div class="type-signature">class AbstractSimulatedActuator extends <a href="org/episteme/core/device/AbstractActuator.html" title="class in org.episteme.core.device">AbstractActuator</a>&lt;<a href="org/episteme/core/device/sim/AbstractSimulatedActuator.html#type-param-C" title="type parameter in AbstractSimulatedActuator">C</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>support</h5>
+<pre><a href="org/episteme/core/device/sim/SimulatedDeviceSupport.html" title="class in org.episteme.core.device.sim">SimulatedDeviceSupport</a> support</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.sim.AbstractSimulatedDevice">
+<h3>Class&nbsp;<a href="org/episteme/core/device/sim/AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">org.episteme.core.device.sim.AbstractSimulatedDevice</a></h3>
+<div class="type-signature">class AbstractSimulatedDevice extends <a href="org/episteme/core/device/AbstractDevice.html" title="class in org.episteme.core.device">AbstractDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>support</h5>
+<pre><a href="org/episteme/core/device/sim/SimulatedDeviceSupport.html" title="class in org.episteme.core.device.sim">SimulatedDeviceSupport</a> support</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.sim.AbstractSimulatedSensor">
+<h3>Class&nbsp;<a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">org.episteme.core.device.sim.AbstractSimulatedSensor</a></h3>
+<div class="type-signature">class AbstractSimulatedSensor extends <a href="org/episteme/core/device/AbstractSensor.html" title="class in org.episteme.core.device">AbstractSensor</a>&lt;<a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html#type-param-Q" title="type parameter in AbstractSimulatedSensor">Q</a> extends <a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html#type-param-Q" title="type parameter in AbstractSimulatedSensor">Q</a>&gt;&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>support</h5>
+<pre><a href="org/episteme/core/device/sim/SimulatedDeviceSupport.html" title="class in org.episteme.core.device.sim">SimulatedDeviceSupport</a> support</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.sim.SimulatedGPIBDevice">
+<h3>Class&nbsp;<a href="org/episteme/core/device/sim/SimulatedGPIBDevice.html" title="class in org.episteme.core.device.sim">org.episteme.core.device.sim.SimulatedGPIBDevice</a></h3>
+<div class="type-signature">class SimulatedGPIBDevice extends <a href="org/episteme/core/device/sim/AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>boardIndex</h5>
+<pre>int boardIndex</pre>
+</li>
+<li class="block-list">
+<h5>gpibAddress</h5>
+<pre>int gpibAddress</pre>
+</li>
+<li class="block-list">
+<h5>lastCommand</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> lastCommand</pre>
+</li>
+<li class="block-list">
+<h5>simulatedResponse</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> simulatedResponse</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.device.sim.SimulatedUSBDevice">
+<h3>Class&nbsp;<a href="org/episteme/core/device/sim/SimulatedUSBDevice.html" title="class in org.episteme.core.device.sim">org.episteme.core.device.sim.SimulatedUSBDevice</a></h3>
+<div class="type-signature">class SimulatedUSBDevice extends <a href="org/episteme/core/device/sim/AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>actuatorValue</h5>
+<pre>double actuatorValue</pre>
+</li>
+<li class="block-list">
+<h5>baseValue</h5>
+<pre>double baseValue</pre>
+</li>
+<li class="block-list">
+<h5>calibrated</h5>
+<pre>boolean calibrated</pre>
+</li>
+<li class="block-list">
+<h5>deviceType</h5>
+<pre><a href="org/episteme/core/device/sim/SimulatedUSBDevice.DeviceType.html" title="enum class in org.episteme.core.device.sim">SimulatedUSBDevice.DeviceType</a> deviceType</pre>
+</li>
+<li class="block-list">
+<h5>noiseLevel</h5>
+<pre>double noiseLevel</pre>
+</li>
+<li class="block-list">
+<h5>productId</h5>
+<pre>int productId</pre>
+</li>
+<li class="block-list">
+<h5>random</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Random.html" title="class or interface in java.util" class="external-link">Random</a> random</pre>
+</li>
+<li class="block-list">
+<h5>samplingRateHz</h5>
+<pre>int samplingRateHz</pre>
+</li>
+<li class="block-list">
+<h5>unit</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> unit</pre>
+</li>
+<li class="block-list">
+<h5>vendorId</h5>
+<pre>int vendorId</pre>
 </li>
 </ul>
 </section>
@@ -797,15 +1127,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="serialized-class-details" id="org.episteme.core.mathematics.loaders.mathml.MathMLDocumentImpl">
-<h3>Class&nbsp;<a href="org/episteme/core/mathematics/loaders/mathml/MathMLDocumentImpl.html" title="class in org.episteme.core.mathematics.loaders.mathml">org.episteme.core.mathematics.loaders.mathml.MathMLDocumentImpl</a></h3>
-<div class="type-signature">class MathMLDocumentImpl extends org.apache.xerces.dom.DocumentImpl implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
-</section>
-</li>
-<li>
 <section class="serialized-class-details" id="org.episteme.core.mathematics.loaders.mathml.MathMLDocumentEpistemeImpl">
 <h3>Class&nbsp;<a href="org/episteme/core/mathematics/loaders/mathml/MathMLDocumentEpistemeImpl.html" title="class in org.episteme.core.mathematics.loaders.mathml">org.episteme.core.mathematics.loaders.mathml.MathMLDocumentEpistemeImpl</a></h3>
 <div class="type-signature">class MathMLDocumentEpistemeImpl extends <a href="org/episteme/core/mathematics/loaders/mathml/MathMLDocumentImpl.html" title="class in org.episteme.core.mathematics.loaders.mathml">MathMLDocumentImpl</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.mathematics.loaders.mathml.MathMLDocumentImpl">
+<h3>Class&nbsp;<a href="org/episteme/core/mathematics/loaders/mathml/MathMLDocumentImpl.html" title="class in org.episteme.core.mathematics.loaders.mathml">org.episteme.core.mathematics.loaders.mathml.MathMLDocumentImpl</a></h3>
+<div class="type-signature">class MathMLDocumentImpl extends org.apache.xerces.dom.DocumentImpl implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
 </section>
 </li>
 <li>
@@ -1619,6 +1949,25 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="serialized-class-details" id="org.episteme.core.mathematics.numbers.real.RealBig">
+<h3>Class&nbsp;<a href="org/episteme/core/mathematics/numbers/real/RealBig.html" title="class in org.episteme.core.mathematics.numbers.real">org.episteme.core.mathematics.numbers.real.RealBig</a></h3>
+<div class="type-signature">class RealBig extends <a href="org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>value</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a> value</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
 <section class="serialized-class-details" id="org.episteme.core.mathematics.numbers.real.RealDouble">
 <h3>Class&nbsp;<a href="org/episteme/core/mathematics/numbers/real/RealDouble.html" title="class in org.episteme.core.mathematics.numbers.real">org.episteme.core.mathematics.numbers.real.RealDouble</a></h3>
 <div class="type-signature">class RealDouble extends <a href="org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -1663,53 +2012,6 @@ loadScripts(document, 'script');</script>
 <section class="serialized-package-container">
 <h2 title="Package">Package&nbsp;<a href="org/episteme/core/methodology/package-summary.html">org.episteme.core.methodology</a></h2>
 <ul class="block-list">
-<li>
-<section class="serialized-class-details" id="org.episteme.core.methodology.Instrument">
-<h3>Class&nbsp;<a href="org/episteme/core/methodology/Instrument.html" title="class in org.episteme.core.methodology">org.episteme.core.methodology.Instrument</a></h3>
-<div class="type-signature">class Instrument extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
-<dl class="name-value">
-<dt>serialVersionUID:</dt>
-<dd>1L</dd>
-</dl>
-<ul class="block-list">
-<li>
-<section class="detail">
-<h4>Serialized Fields</h4>
-<ul class="block-list">
-<li class="block-list">
-<h5>id</h5>
-<pre><a href="org/episteme/core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a> id</pre>
-</li>
-<li class="block-list">
-<h5>manufacturer</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> manufacturer</pre>
-</li>
-<li class="block-list">
-<h5>model</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> model</pre>
-</li>
-<li class="block-list">
-<h5>name</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> name</pre>
-</li>
-<li class="block-list">
-<h5>precisionDescription</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> precisionDescription</pre>
-</li>
-<li class="block-list">
-<h5>sensitivity</h5>
-<pre><a href="org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a> sensitivity</pre>
-</li>
-<li class="block-list">
-<h5>traits</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt; traits</pre>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</section>
-</li>
 <li>
 <section class="serialized-class-details" id="org.episteme.core.methodology.Observation">
 <h3>Class&nbsp;<a href="org/episteme/core/methodology/Observation.html" title="class in org.episteme.core.methodology">org.episteme.core.methodology.Observation</a></h3>
@@ -2079,41 +2381,18 @@ loadScripts(document, 'script');</script>
 </li>
 <li>
 <section class="serialized-package-container">
-<h2 title="Package">Package&nbsp;<a href="org/episteme/core/technical/algorithm/inference/package-summary.html">org.episteme.core.technical.algorithm.inference</a></h2>
+<h2 title="Package">Package&nbsp;<a href="org/episteme/core/technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></h2>
 <ul class="block-list">
 <li>
-<section class="serialized-class-details" id="org.episteme.core.technical.algorithm.inference.CUDATensor">
-<h3>Class&nbsp;<a href="org/episteme/core/technical/algorithm/inference/CUDATensor.html" title="class in org.episteme.core.technical.algorithm.inference">org.episteme.core.technical.algorithm.inference.CUDATensor</a></h3>
-<div class="type-signature">class CUDATensor extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
-<dl class="name-value">
-<dt>serialVersionUID:</dt>
-<dd>1L</dd>
-</dl>
-<ul class="block-list">
-<li>
-<section class="detail">
-<h4>Serialized Fields</h4>
-<ul class="block-list">
-<li class="block-list">
-<h5>devicePointer</h5>
-<pre>jcuda.Pointer devicePointer</pre>
-</li>
-<li class="block-list">
-<h5>explicitType</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;<a href="org/episteme/core/technical/algorithm/inference/CUDATensor.html#type-param-T" title="type parameter in CUDATensor">T</a>&gt; explicitType</pre>
-</li>
-<li class="block-list">
-<h5>shape</h5>
-<pre>int[] shape</pre>
-</li>
-<li class="block-list">
-<h5>size</h5>
-<pre>int size</pre>
-</li>
-</ul>
+<section class="serialized-class-details" id="org.episteme.core.technical.algorithm.FallbackDisabledException">
+<h3>Exception Class&nbsp;<a href="org/episteme/core/technical/algorithm/FallbackDisabledException.html" title="class in org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm.FallbackDisabledException</a></h3>
+<div class="type-signature">class FallbackDisabledException extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/RuntimeException.html" title="class or interface in java.lang" class="external-link">RuntimeException</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
 </section>
 </li>
-</ul>
+<li>
+<section class="serialized-class-details" id="org.episteme.core.technical.algorithm.OperationCancelledException">
+<h3>Exception Class&nbsp;<a href="org/episteme/core/technical/algorithm/OperationCancelledException.html" title="class in org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm.OperationCancelledException</a></h3>
+<div class="type-signature">class OperationCancelledException extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/RuntimeException.html" title="class or interface in java.lang" class="external-link">RuntimeException</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
 </section>
 </li>
 </ul>
@@ -2212,10 +2491,6 @@ loadScripts(document, 'script');</script>
 <h4>Serialized Fields</h4>
 <ul class="block-list">
 <li class="block-list">
-<h5>traits</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt; traits</pre>
-</li>
-<li class="block-list">
 <h5>value</h5>
 <pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> value</pre>
 </li>
@@ -2267,8 +2542,77 @@ loadScripts(document, 'script');</script>
 </li>
 <li>
 <section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/jni/jni/devices/package-summary.html">org.episteme.jni.jni.devices</a></h2>
+<ul class="block-list">
+<li>
+<section class="serialized-class-details" id="org.episteme.jni.jni.devices.MassSpectra">
+<h3>Class&nbsp;<a href="org/episteme/jni/jni/devices/MassSpectra.html" title="class in org.episteme.jni.jni.devices">org.episteme.jni.jni.devices.MassSpectra</a></h3>
+<div class="type-signature">class MassSpectra extends <a href="org/episteme/core/device/AbstractDevice.html" title="class in org.episteme.core.device">AbstractDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>bridge</h5>
+<pre><a href="org/episteme/jni/jni/NativeDeviceBridge.html" title="class in org.episteme.jni.jni">NativeDeviceBridge</a> bridge</pre>
+</li>
+<li class="block-list">
+<h5>deviceId</h5>
+<pre>int deviceId</pre>
+</li>
+<li class="block-list">
+<h5>integrationTime</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Time.html" title="interface in org.episteme.core.measure.quantity">Time</a>&gt; integrationTime</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
 <h2 title="Package">Package&nbsp;<a href="org/episteme/nativ/mathematics/linearalgebra/tensors/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.tensors</a></h2>
 <ul class="block-list">
+<li>
+<section class="serialized-class-details" id="org.episteme.nativ.mathematics.linearalgebra.tensors.CUDATensor">
+<h3>Class&nbsp;<a href="org/episteme/nativ/mathematics/linearalgebra/tensors/CUDATensor.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors">org.episteme.nativ.mathematics.linearalgebra.tensors.CUDATensor</a></h3>
+<div class="type-signature">class CUDATensor extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>1L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>devicePointer</h5>
+<pre>jcuda.Pointer devicePointer</pre>
+</li>
+<li class="block-list">
+<h5>explicitType</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;<a href="org/episteme/nativ/mathematics/linearalgebra/tensors/CUDATensor.html#type-param-T" title="type parameter in CUDATensor">T</a>&gt; explicitType</pre>
+</li>
+<li class="block-list">
+<h5>shape</h5>
+<pre>int[] shape</pre>
+</li>
+<li class="block-list">
+<h5>size</h5>
+<pre>int size</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
 <li>
 <section class="serialized-class-details" id="org.episteme.nativ.mathematics.linearalgebra.tensors.NativeTensor">
 <h3>Class&nbsp;<a href="org/episteme/nativ/mathematics/linearalgebra/tensors/NativeTensor.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors">org.episteme.nativ.mathematics.linearalgebra.tensors.NativeTensor</a></h3>
@@ -2317,12 +2661,12 @@ loadScripts(document, 'script');</script>
 </li>
 <li>
 <section class="serialized-package-container">
-<h2 title="Package">Package&nbsp;<a href="org/episteme/nativ/mathematics/linearalgebra/vectors/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors</a></h2>
+<h2 title="Package">Package&nbsp;<a href="org/episteme/nativ/mathematics/linearalgebra/vectors/storage/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors.storage</a></h2>
 <ul class="block-list">
 <li>
-<section class="serialized-class-details" id="org.episteme.nativ.mathematics.linearalgebra.vectors.NativeVector">
-<h3>Class&nbsp;<a href="org/episteme/nativ/mathematics/linearalgebra/vectors/NativeVector.html" title="class in org.episteme.nativ.mathematics.linearalgebra.vectors">org.episteme.nativ.mathematics.linearalgebra.vectors.NativeVector</a></h3>
-<div class="type-signature">class NativeVector extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<section class="serialized-class-details" id="org.episteme.nativ.mathematics.linearalgebra.vectors.storage.NativeDoubleVectorStorage">
+<h3>Class&nbsp;<a href="org/episteme/nativ/mathematics/linearalgebra/vectors/storage/NativeDoubleVectorStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.vectors.storage">org.episteme.nativ.mathematics.linearalgebra.vectors.storage.NativeDoubleVectorStorage</a></h3>
+<div class="type-signature">class NativeDoubleVectorStorage extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
 <ul class="block-list">
 <li>
 <section class="detail">
@@ -4706,6 +5050,424 @@ loadScripts(document, 'script');</script>
 </li>
 <li>
 <section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/natural/device/actuators/package-summary.html">org.episteme.natural.device.actuators</a></h2>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/natural/device/instruments/package-summary.html">org.episteme.natural.device.instruments</a></h2>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/natural/device/sensors/package-summary.html">org.episteme.natural.device.sensors</a></h2>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/natural/device/sim/package-summary.html">org.episteme.natural.device.sim</a></h2>
+<ul class="block-list">
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedCentrifuge">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedCentrifuge.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedCentrifuge</a></h3>
+<div class="type-signature">class SimulatedCentrifuge extends <a href="org/episteme/core/device/sim/AbstractSimulatedActuator.html" title="class in org.episteme.core.device.sim">AbstractSimulatedActuator</a>&lt;<a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>currentRPM</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt; currentRPM</pre>
+</li>
+<li class="block-list">
+<h5>maxRCF</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; maxRCF</pre>
+</li>
+<li class="block-list">
+<h5>maxRPM</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt; maxRPM</pre>
+</li>
+<li class="block-list">
+<h5>rotorType</h5>
+<pre><a href="org/episteme/natural/device/actuators/Centrifuge.RotorType.html" title="enum class in org.episteme.natural.device.actuators">Centrifuge.RotorType</a> rotorType</pre>
+</li>
+<li class="block-list">
+<h5>running</h5>
+<pre>boolean running</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedHumidityProbe">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedHumidityProbe.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedHumidityProbe</a></h3>
+<div class="type-signature">class SimulatedHumidityProbe extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>random</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Random.html" title="class or interface in java.util" class="external-link">Random</a> random</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedMicroscope">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedMicroscope.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedMicroscope</a></h3>
+<div class="type-signature">class SimulatedMicroscope extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>currentMagnification</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; currentMagnification</pre>
+</li>
+<li class="block-list">
+<h5>maxMagnification</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; maxMagnification</pre>
+</li>
+<li class="block-list">
+<h5>opticalResolution</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Length.html" title="interface in org.episteme.core.measure.quantity">Length</a>&gt; opticalResolution</pre>
+</li>
+<li class="block-list">
+<h5>type</h5>
+<pre><a href="org/episteme/natural/device/sensors/Microscope.Type.html" title="enum class in org.episteme.natural.device.sensors">Microscope.Type</a> type</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedMultimeter">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedMultimeter.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedMultimeter</a></h3>
+<div class="type-signature">class SimulatedMultimeter extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>function</h5>
+<pre><a href="org/episteme/natural/device/sensors/Multimeter.Function.html" title="enum class in org.episteme.natural.device.sensors">Multimeter.Function</a> function</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedOscilloscope">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedOscilloscope.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedOscilloscope</a></h3>
+<div class="type-signature">class SimulatedOscilloscope extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/ElectricPotential.html" title="interface in org.episteme.core.measure.quantity">ElectricPotential</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>channels</h5>
+<pre>int channels</pre>
+</li>
+<li class="block-list">
+<h5>sampleRate</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt; sampleRate</pre>
+</li>
+<li class="block-list">
+<h5>timeBase</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Time.html" title="interface in org.episteme.core.measure.quantity">Time</a>&gt; timeBase</pre>
+</li>
+<li class="block-list">
+<h5>triggerLevel</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/ElectricPotential.html" title="interface in org.episteme.core.measure.quantity">ElectricPotential</a>&gt; triggerLevel</pre>
+</li>
+<li class="block-list">
+<h5>triggerMode</h5>
+<pre><a href="org/episteme/natural/device/sensors/Oscilloscope.TriggerMode.html" title="enum class in org.episteme.natural.device.sensors">Oscilloscope.TriggerMode</a> triggerMode</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedPHMeter">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedPHMeter.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedPHMeter</a></h3>
+<div class="type-signature">class SimulatedPHMeter extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>random</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Random.html" title="class or interface in java.util" class="external-link">Random</a> random</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedPressureGauge">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedPressureGauge.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedPressureGauge</a></h3>
+<div class="type-signature">class SimulatedPressureGauge extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Pressure.html" title="interface in org.episteme.core.measure.quantity">Pressure</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>maxPressure</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Pressure.html" title="interface in org.episteme.core.measure.quantity">Pressure</a>&gt; maxPressure</pre>
+</li>
+<li class="block-list">
+<h5>minPressure</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Pressure.html" title="interface in org.episteme.core.measure.quantity">Pressure</a>&gt; minPressure</pre>
+</li>
+<li class="block-list">
+<h5>random</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Random.html" title="class or interface in java.util" class="external-link">Random</a> random</pre>
+</li>
+<li class="block-list">
+<h5>type</h5>
+<pre><a href="org/episteme/natural/device/sensors/PressureGauge.GaugeType.html" title="enum class in org.episteme.natural.device.sensors">PressureGauge.GaugeType</a> type</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedSeismograph">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedSeismograph.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedSeismograph</a></h3>
+<div class="type-signature">class SimulatedSeismograph extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>random</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Random.html" title="class or interface in java.util" class="external-link">Random</a> random</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedSpectrometer">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedSpectrometer.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedSpectrometer</a></h3>
+<div class="type-signature">class SimulatedSpectrometer extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>integrationTime</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Time.html" title="interface in org.episteme.core.measure.quantity">Time</a>&gt; integrationTime</pre>
+</li>
+<li class="block-list">
+<h5>maxWavelength</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Length.html" title="interface in org.episteme.core.measure.quantity">Length</a>&gt; maxWavelength</pre>
+</li>
+<li class="block-list">
+<h5>minWavelength</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Length.html" title="interface in org.episteme.core.measure.quantity">Length</a>&gt; minWavelength</pre>
+</li>
+<li class="block-list">
+<h5>spectralResolution</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Length.html" title="interface in org.episteme.core.measure.quantity">Length</a>&gt; spectralResolution</pre>
+</li>
+<li class="block-list">
+<h5>type</h5>
+<pre><a href="org/episteme/natural/device/sensors/Spectrometer.SpectroscopyType.html" title="enum class in org.episteme.natural.device.sensors">Spectrometer.SpectroscopyType</a> type</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedTelescope">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedTelescope.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedTelescope</a></h3>
+<div class="type-signature">class SimulatedTelescope extends <a href="org/episteme/core/device/sim/AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>dec</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Angle.html" title="interface in org.episteme.core.measure.quantity">Angle</a>&gt; dec</pre>
+</li>
+<li class="block-list">
+<h5>ra</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Angle.html" title="interface in org.episteme.core.measure.quantity">Angle</a>&gt; ra</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedTemperatureProbe">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedTemperatureProbe.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedTemperatureProbe</a></h3>
+<div class="type-signature">class SimulatedTemperatureProbe extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Temperature.html" title="interface in org.episteme.core.measure.quantity">Temperature</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>maxTemp</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Temperature.html" title="interface in org.episteme.core.measure.quantity">Temperature</a>&gt; maxTemp</pre>
+</li>
+<li class="block-list">
+<h5>minTemp</h5>
+<pre><a href="org/episteme/core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="org/episteme/core/measure/quantity/Temperature.html" title="interface in org.episteme.core.measure.quantity">Temperature</a>&gt; minTemp</pre>
+</li>
+<li class="block-list">
+<h5>random</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Random.html" title="class or interface in java.util" class="external-link">Random</a> random</pre>
+</li>
+<li class="block-list">
+<h5>type</h5>
+<pre><a href="org/episteme/natural/device/sensors/TemperatureProbe.ProbeType.html" title="enum class in org.episteme.natural.device.sensors">TemperatureProbe.ProbeType</a> type</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedVitalSignsMonitor">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedVitalSignsMonitor.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedVitalSignsMonitor</a></h3>
+<div class="type-signature">class SimulatedVitalSignsMonitor extends <a href="org/episteme/core/device/sim/AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>baseDiastolic</h5>
+<pre>int baseDiastolic</pre>
+</li>
+<li class="block-list">
+<h5>baseHeartRate</h5>
+<pre>int baseHeartRate</pre>
+</li>
+<li class="block-list">
+<h5>baseRespRate</h5>
+<pre>int baseRespRate</pre>
+</li>
+<li class="block-list">
+<h5>baseSpO2</h5>
+<pre>int baseSpO2</pre>
+</li>
+<li class="block-list">
+<h5>baseSystolic</h5>
+<pre>int baseSystolic</pre>
+</li>
+<li class="block-list">
+<h5>baseTemp</h5>
+<pre>double baseTemp</pre>
+</li>
+<li class="block-list">
+<h5>bufferIndex</h5>
+<pre>int bufferIndex</pre>
+</li>
+<li class="block-list">
+<h5>ecgBuffer</h5>
+<pre>double[] ecgBuffer</pre>
+</li>
+<li class="block-list">
+<h5>plethBuffer</h5>
+<pre>double[] plethBuffer</pre>
+</li>
+<li class="block-list">
+<h5>random</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Random.html" title="class or interface in java.util" class="external-link">Random</a> random</pre>
+</li>
+<li class="block-list">
+<h5>sampleRate</h5>
+<pre>double sampleRate</pre>
+</li>
+<li class="block-list">
+<h5>time</h5>
+<pre>double time</pre>
+</li>
+<li class="block-list">
+<h5>waveformSize</h5>
+<pre>int waveformSize</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.natural.device.sim.SimulatedWeatherStation">
+<h3>Class&nbsp;<a href="org/episteme/natural/device/sim/SimulatedWeatherStation.html" title="class in org.episteme.natural.device.sim">org.episteme.natural.device.sim.SimulatedWeatherStation</a></h3>
+<div class="type-signature">class SimulatedWeatherStation extends <a href="org/episteme/core/device/sim/AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>humidityProbe</h5>
+<pre><a href="org/episteme/natural/device/sensors/HumidityProbe.html" title="interface in org.episteme.natural.device.sensors">HumidityProbe</a> humidityProbe</pre>
+</li>
+<li class="block-list">
+<h5>pressureGauge</h5>
+<pre><a href="org/episteme/natural/device/sensors/PressureGauge.html" title="interface in org.episteme.natural.device.sensors">PressureGauge</a> pressureGauge</pre>
+</li>
+<li class="block-list">
+<h5>temperatureProbe</h5>
+<pre><a href="org/episteme/natural/device/sensors/TemperatureProbe.html" title="interface in org.episteme.natural.device.sensors">TemperatureProbe</a> temperatureProbe</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/natural/device/transducers/package-summary.html">org.episteme.natural.device.transducers</a></h2>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
 <h2 title="Package">Package&nbsp;<a href="org/episteme/natural/earth/package-summary.html">org.episteme.natural.earth</a></h2>
 <ul class="block-list">
 <li>
@@ -6830,6 +7592,37 @@ loadScripts(document, 'script');</script>
 <h2 title="Package">Package&nbsp;<a href="org/episteme/server/server/model/package-summary.html">org.episteme.server.server.model</a></h2>
 <ul class="block-list">
 <li>
+<section class="serialized-class-details" id="org.episteme.server.server.model.ConfigProperty">
+<h3>Class&nbsp;<a href="org/episteme/server/server/model/ConfigProperty.html" title="class in org.episteme.server.server.model">org.episteme.server.server.model.ConfigProperty</a></h3>
+<div class="type-signature">class ConfigProperty extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>description</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> description</pre>
+</li>
+<li class="block-list">
+<h5>propertyKey</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> propertyKey</pre>
+</li>
+<li class="block-list">
+<h5>updatedAt</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/LocalDateTime.html" title="class or interface in java.time" class="external-link">LocalDateTime</a> updatedAt</pre>
+</li>
+<li class="block-list">
+<h5>value</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> value</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
 <section class="serialized-class-details" id="org.episteme.server.server.model.Job">
 <h3>Class&nbsp;<a href="org/episteme/server/server/model/Job.html" title="class in org.episteme.server.server.model">org.episteme.server.server.model.Job</a></h3>
 <div class="type-signature">class Job extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -6892,6 +7685,49 @@ loadScripts(document, 'script');</script>
 <li class="block-list">
 <h5>username</h5>
 <pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> username</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.server.server.model.WorkerEntity">
+<h3>Class&nbsp;<a href="org/episteme/server/server/model/WorkerEntity.html" title="class in org.episteme.server.server.model">org.episteme.server.server.model.WorkerEntity</a></h3>
+<div class="type-signature">class WorkerEntity extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>activeTasks</h5>
+<pre>int activeTasks</pre>
+</li>
+<li class="block-list">
+<h5>alive</h5>
+<pre>boolean alive</pre>
+</li>
+<li class="block-list">
+<h5>cores</h5>
+<pre>int cores</pre>
+</li>
+<li class="block-list">
+<h5>hostname</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> hostname</pre>
+</li>
+<li class="block-list">
+<h5>lastHeartbeat</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/LocalDateTime.html" title="class or interface in java.time" class="external-link">LocalDateTime</a> lastHeartbeat</pre>
+</li>
+<li class="block-list">
+<h5>load</h5>
+<pre>double load</pre>
+</li>
+<li class="block-list">
+<h5>workerId</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> workerId</pre>
 </li>
 </ul>
 </section>
@@ -6996,7 +7832,7 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="block-list">
 <h5>provider</h5>
-<pre><a href="org/episteme/core/technical/algorithm/LatticeBoltzmannProvider.html" title="interface in org.episteme.core.technical.algorithm">LatticeBoltzmannProvider</a> provider</pre>
+<pre><a href="org/episteme/natural/physics/classical/matter/fluids/LatticeBoltzmannProvider.html" title="interface in org.episteme.natural.physics.classical.matter.fluids">LatticeBoltzmannProvider</a> provider</pre>
 </li>
 <li class="block-list">
 <h5>tau</h5>
@@ -7255,6 +8091,37 @@ loadScripts(document, 'script');</script>
 <li class="block-list">
 <h5>token_</h5>
 <pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> token_</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.server.server.proto.CholeskyResponse">
+<h3>Class&nbsp;<a href="org/episteme/server/server/proto/CholeskyResponse.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.CholeskyResponse</a></h3>
+<div class="type-signature">class CholeskyResponse extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>0L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>bitField0_</h5>
+<pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>l_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> l_</pre>
+</li>
+<li class="block-list">
+<h5>memoizedIsInitialized</h5>
+<pre>byte memoizedIsInitialized</pre>
 </li>
 </ul>
 </section>
@@ -7531,6 +8398,41 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="serialized-class-details" id="org.episteme.server.server.proto.EigenResponse">
+<h3>Class&nbsp;<a href="org/episteme/server/server/proto/EigenResponse.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.EigenResponse</a></h3>
+<div class="type-signature">class EigenResponse extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>0L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>bitField0_</h5>
+<pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>d_</h5>
+<pre><a href="org/episteme/server/server/proto/VectorData.html" title="class in org.episteme.server.server.proto">VectorData</a> d_</pre>
+</li>
+<li class="block-list">
+<h5>memoizedIsInitialized</h5>
+<pre>byte memoizedIsInitialized</pre>
+</li>
+<li class="block-list">
+<h5>v_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> v_</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
 <section class="serialized-class-details" id="org.episteme.server.server.proto.Empty">
 <h3>Class&nbsp;<a href="org/episteme/server/server/proto/Empty.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.Empty</a></h3>
 <div class="type-signature">class Empty extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -7620,6 +8522,104 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="serialized-class-details" id="org.episteme.server.server.proto.GMRESRequest">
+<h3>Class&nbsp;<a href="org/episteme/server/server/proto/GMRESRequest.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.GMRESRequest</a></h3>
+<div class="type-signature">class GMRESRequest extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>0L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>b_</h5>
+<pre><a href="org/episteme/server/server/proto/VectorData.html" title="class in org.episteme.server.server.proto">VectorData</a> b_</pre>
+</li>
+<li class="block-list">
+<h5>bitField0_</h5>
+<pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>matrix_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> matrix_</pre>
+</li>
+<li class="block-list">
+<h5>maxIterations_</h5>
+<pre>int maxIterations_</pre>
+</li>
+<li class="block-list">
+<h5>memoizedIsInitialized</h5>
+<pre>byte memoizedIsInitialized</pre>
+</li>
+<li class="block-list">
+<h5>restart_</h5>
+<pre>int restart_</pre>
+</li>
+<li class="block-list">
+<h5>tolerance_</h5>
+<pre><a href="org/episteme/server/server/proto/ScalarResponse.html" title="class in org.episteme.server.server.proto">ScalarResponse</a> tolerance_</pre>
+</li>
+<li class="block-list">
+<h5>x0_</h5>
+<pre><a href="org/episteme/server/server/proto/VectorData.html" title="class in org.episteme.server.server.proto">VectorData</a> x0_</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.server.server.proto.IterativeSolverRequest">
+<h3>Class&nbsp;<a href="org/episteme/server/server/proto/IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.IterativeSolverRequest</a></h3>
+<div class="type-signature">class IterativeSolverRequest extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>0L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>b_</h5>
+<pre><a href="org/episteme/server/server/proto/VectorData.html" title="class in org.episteme.server.server.proto">VectorData</a> b_</pre>
+</li>
+<li class="block-list">
+<h5>bitField0_</h5>
+<pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>matrix_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> matrix_</pre>
+</li>
+<li class="block-list">
+<h5>maxIterations_</h5>
+<pre>int maxIterations_</pre>
+</li>
+<li class="block-list">
+<h5>memoizedIsInitialized</h5>
+<pre>byte memoizedIsInitialized</pre>
+</li>
+<li class="block-list">
+<h5>tolerance_</h5>
+<pre><a href="org/episteme/server/server/proto/ScalarResponse.html" title="class in org.episteme.server.server.proto">ScalarResponse</a> tolerance_</pre>
+</li>
+<li class="block-list">
+<h5>x0_</h5>
+<pre><a href="org/episteme/server/server/proto/VectorData.html" title="class in org.episteme.server.server.proto">VectorData</a> x0_</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
 <section class="serialized-class-details" id="org.episteme.server.server.proto.LoginRequest">
 <h3>Class&nbsp;<a href="org/episteme/server/server/proto/LoginRequest.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.LoginRequest</a></h3>
 <div class="type-signature">class LoginRequest extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -7651,6 +8651,45 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="serialized-class-details" id="org.episteme.server.server.proto.LUResponse">
+<h3>Class&nbsp;<a href="org/episteme/server/server/proto/LUResponse.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.LUResponse</a></h3>
+<div class="type-signature">class LUResponse extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>0L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>bitField0_</h5>
+<pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>l_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> l_</pre>
+</li>
+<li class="block-list">
+<h5>memoizedIsInitialized</h5>
+<pre>byte memoizedIsInitialized</pre>
+</li>
+<li class="block-list">
+<h5>p_</h5>
+<pre><a href="org/episteme/server/server/proto/VectorData.html" title="class in org.episteme.server.server.proto">VectorData</a> p_</pre>
+</li>
+<li class="block-list">
+<h5>u_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> u_</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
 <section class="serialized-class-details" id="org.episteme.server.server.proto.MatrixData">
 <h3>Class&nbsp;<a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.MatrixData</a></h3>
 <div class="type-signature">class MatrixData extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -7669,11 +8708,15 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="block-list">
 <h5>data_</h5>
-<pre>com.google.protobuf.Internal.DoubleList data_</pre>
+<pre>com.google.protobuf.ByteString data_</pre>
 </li>
 <li class="block-list">
-<h5>dataMemoizedSerializedSize</h5>
-<pre>int dataMemoizedSerializedSize</pre>
+<h5>hpData_</h5>
+<pre>com.google.protobuf.LazyStringArrayList hpData_</pre>
+</li>
+<li class="block-list">
+<h5>isComplex_</h5>
+<pre>boolean isComplex_</pre>
 </li>
 <li class="block-list">
 <h5>memoizedIsInitialized</h5>
@@ -7818,6 +8861,41 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="serialized-class-details" id="org.episteme.server.server.proto.QRResponse">
+<h3>Class&nbsp;<a href="org/episteme/server/server/proto/QRResponse.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.QRResponse</a></h3>
+<div class="type-signature">class QRResponse extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>0L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>bitField0_</h5>
+<pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>memoizedIsInitialized</h5>
+<pre>byte memoizedIsInitialized</pre>
+</li>
+<li class="block-list">
+<h5>q_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> q_</pre>
+</li>
+<li class="block-list">
+<h5>r_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> r_</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
 <section class="serialized-class-details" id="org.episteme.server.server.proto.RegisterRequest">
 <h3>Class&nbsp;<a href="org/episteme/server/server/proto/RegisterRequest.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.RegisterRequest</a></h3>
 <div class="type-signature">class RegisterRequest extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -7866,6 +8944,18 @@ loadScripts(document, 'script');</script>
 <h4>Serialized Fields</h4>
 <ul class="block-list">
 <li class="block-list">
+<h5>hpValue_</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> hpValue_</pre>
+</li>
+<li class="block-list">
+<h5>imaginary_</h5>
+<pre>double imaginary_</pre>
+</li>
+<li class="block-list">
+<h5>isComplex_</h5>
+<pre>boolean isComplex_</pre>
+</li>
+<li class="block-list">
 <h5>memoizedIsInitialized</h5>
 <pre>byte memoizedIsInitialized</pre>
 </li>
@@ -7895,6 +8985,18 @@ loadScripts(document, 'script');</script>
 <li class="block-list">
 <h5>bitField0_</h5>
 <pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>hpScalar_</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> hpScalar_</pre>
+</li>
+<li class="block-list">
+<h5>imaginary_</h5>
+<pre>double imaginary_</pre>
+</li>
+<li class="block-list">
+<h5>isComplex_</h5>
+<pre>boolean isComplex_</pre>
 </li>
 <li class="block-list">
 <h5>matrix_</h5>
@@ -8199,6 +9301,45 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="serialized-class-details" id="org.episteme.server.server.proto.SVDResponse">
+<h3>Class&nbsp;<a href="org/episteme/server/server/proto/SVDResponse.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.SVDResponse</a></h3>
+<div class="type-signature">class SVDResponse extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>0L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>bitField0_</h5>
+<pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>memoizedIsInitialized</h5>
+<pre>byte memoizedIsInitialized</pre>
+</li>
+<li class="block-list">
+<h5>s_</h5>
+<pre><a href="org/episteme/server/server/proto/VectorData.html" title="class in org.episteme.server.server.proto">VectorData</a> s_</pre>
+</li>
+<li class="block-list">
+<h5>u_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> u_</pre>
+</li>
+<li class="block-list">
+<h5>v_</h5>
+<pre><a href="org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a> v_</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
 <section class="serialized-class-details" id="org.episteme.server.server.proto.TaskIdentifier">
 <h3>Class&nbsp;<a href="org/episteme/server/server/proto/TaskIdentifier.html" title="class in org.episteme.server.server.proto">org.episteme.server.server.proto.TaskIdentifier</a></h3>
 <div class="type-signature">class TaskIdentifier extends com.google.protobuf.GeneratedMessageV3 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -8423,11 +9564,15 @@ loadScripts(document, 'script');</script>
 <ul class="block-list">
 <li class="block-list">
 <h5>data_</h5>
-<pre>com.google.protobuf.Internal.DoubleList data_</pre>
+<pre>com.google.protobuf.ByteString data_</pre>
 </li>
 <li class="block-list">
-<h5>dataMemoizedSerializedSize</h5>
-<pre>int dataMemoizedSerializedSize</pre>
+<h5>hpData_</h5>
+<pre>com.google.protobuf.LazyStringArrayList hpData_</pre>
+</li>
+<li class="block-list">
+<h5>isComplex_</h5>
+<pre>boolean isComplex_</pre>
 </li>
 <li class="block-list">
 <h5>memoizedIsInitialized</h5>
@@ -8525,6 +9670,18 @@ loadScripts(document, 'script');</script>
 <li class="block-list">
 <h5>bitField0_</h5>
 <pre>int bitField0_</pre>
+</li>
+<li class="block-list">
+<h5>hpScalar_</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a> hpScalar_</pre>
+</li>
+<li class="block-list">
+<h5>imaginary_</h5>
+<pre>double imaginary_</pre>
+</li>
+<li class="block-list">
+<h5>isComplex_</h5>
+<pre>boolean isComplex_</pre>
 </li>
 <li class="block-list">
 <h5>memoizedIsInitialized</h5>
@@ -11489,6 +12646,84 @@ loadScripts(document, 'script');</script>
 </li>
 <li>
 <section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/social/device/actuators/package-summary.html">org.episteme.social.device.actuators</a></h2>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/social/device/sensors/package-summary.html">org.episteme.social.device.sensors</a></h2>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
+<h2 title="Package">Package&nbsp;<a href="org/episteme/social/device/sim/package-summary.html">org.episteme.social.device.sim</a></h2>
+<ul class="block-list">
+<li>
+<section class="serialized-class-details" id="org.episteme.social.device.sim.SimulatedBallotCaster">
+<h3>Class&nbsp;<a href="org/episteme/social/device/sim/SimulatedBallotCaster.html" title="class in org.episteme.social.device.sim">org.episteme.social.device.sim.SimulatedBallotCaster</a></h3>
+<div class="type-signature">class SimulatedBallotCaster extends <a href="org/episteme/core/device/sim/AbstractSimulatedActuator.html" title="class in org.episteme.core.device.sim">AbstractSimulatedActuator</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>ballotCount</h5>
+<pre>int ballotCount</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.social.device.sim.SimulatedVoterScanner">
+<h3>Class&nbsp;<a href="org/episteme/social/device/sim/SimulatedVoterScanner.html" title="class in org.episteme.social.device.sim">org.episteme.social.device.sim.SimulatedVoterScanner</a></h3>
+<div class="type-signature">class SimulatedVoterScanner extends <a href="org/episteme/core/device/sim/AbstractSimulatedSensor.html" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;<a href="org/episteme/core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>currentVoter</h5>
+<pre><a href="org/episteme/core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a> currentVoter</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.social.device.sim.SimulatedVotingMachine">
+<h3>Class&nbsp;<a href="org/episteme/social/device/sim/SimulatedVotingMachine.html" title="class in org.episteme.social.device.sim">org.episteme.social.device.sim.SimulatedVotingMachine</a></h3>
+<div class="type-signature">class SimulatedVotingMachine extends <a href="org/episteme/core/device/sim/AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>caster</h5>
+<pre><a href="org/episteme/social/device/sim/SimulatedBallotCaster.html" title="class in org.episteme.social.device.sim">SimulatedBallotCaster</a> caster</pre>
+</li>
+<li class="block-list">
+<h5>scanner</h5>
+<pre><a href="org/episteme/social/device/sim/SimulatedVoterScanner.html" title="class in org.episteme.social.device.sim">SimulatedVoterScanner</a> scanner</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-package-container">
 <h2 title="Package">Package&nbsp;<a href="org/episteme/social/economics/package-summary.html">org.episteme.social.economics</a></h2>
 <ul class="block-list">
 <li>
@@ -11652,7 +12887,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="serialized-class-details" id="org.episteme.social.economics.Community">
 <h3>Class&nbsp;<a href="org/episteme/social/economics/Community.html" title="class in org.episteme.social.economics">org.episteme.social.economics.Community</a></h3>
-<div class="type-signature">class Community extends <a href="org/episteme/social/psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<div class="type-signature">class Community extends <a href="org/episteme/social/psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
 <dl class="name-value">
 <dt>serialVersionUID:</dt>
 <dd>1L</dd>
@@ -18720,7 +19955,7 @@ holds all other nodes.</div>
 </li>
 <li class="block-list">
 <h5>groups</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="org/episteme/social/sociology/Group.html" title="class in org.episteme.social.sociology">Group</a>&gt; groups</pre>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="org/episteme/social/psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a>&gt; groups</pre>
 </li>
 <li class="block-list">
 <h5>name</h5>
@@ -19381,12 +20616,12 @@ holds all other nodes.</div>
 <h4>Serialized Fields</h4>
 <ul class="block-list">
 <li class="block-list">
-<h5>group</h5>
-<pre><a href="org/episteme/social/psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a> group</pre>
-</li>
-<li class="block-list">
 <h5>leaders</h5>
 <pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&gt; leaders</pre>
+</li>
+<li class="block-list">
+<h5>PsychologicalGroup</h5>
+<pre><a href="org/episteme/social/psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a> PsychologicalGroup</pre>
 </li>
 </ul>
 </section>
@@ -19820,50 +21055,9 @@ holds all other nodes.</div>
 </section>
 </li>
 <li>
-<section class="serialized-class-details" id="org.episteme.social.psychology.social.Family">
-<h3>Class&nbsp;<a href="org/episteme/social/psychology/social/Family.html" title="class in org.episteme.social.psychology.social">org.episteme.social.psychology.social.Family</a></h3>
-<div class="type-signature">class Family extends <a href="org/episteme/social/psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
-<dl class="name-value">
-<dt>serialVersionUID:</dt>
-<dd>1L</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="serialized-class-details" id="org.episteme.social.psychology.social.Group">
-<h3>Class&nbsp;<a href="org/episteme/social/psychology/social/Group.html" title="class in org.episteme.social.psychology.social">org.episteme.social.psychology.social.Group</a></h3>
-<div class="type-signature">class Group extends <a href="org/episteme/natural/biology/ecology/Population.html" title="class in org.episteme.natural.biology.ecology">Population</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
-<dl class="name-value">
-<dt>serialVersionUID:</dt>
-<dd>2L</dd>
-</dl>
-<ul class="block-list">
-<li>
-<section class="detail">
-<h4>Serialized Fields</h4>
-<ul class="block-list">
-<li class="block-list">
-<h5>leaders</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&gt; leaders</pre>
-<div class="block">Individuals designated as leaders or rulers within the group.</div>
-</li>
-<li class="block-list">
-<h5>relations</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>, <a href="org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt; relations</pre>
-<div class="block">Complex mapping of interpersonal relations.
-Maps an individual to their perceived relations with other members.
-The double value typically represents attraction/repulsion or dominance.</div>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</section>
-</li>
-<li>
 <section class="serialized-class-details" id="org.episteme.social.psychology.social.HumanGroup">
 <h3>Class&nbsp;<a href="org/episteme/social/psychology/social/HumanGroup.html" title="class in org.episteme.social.psychology.social">org.episteme.social.psychology.social.HumanGroup</a></h3>
-<div class="type-signature">class HumanGroup extends <a href="org/episteme/social/psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<div class="type-signature">class HumanGroup extends <a href="org/episteme/social/psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
 </section>
 </li>
 <li>
@@ -19882,6 +21076,47 @@ The double value typically represents attraction/repulsion or dominance.</div>
 <li class="block-list">
 <h5>category</h5>
 <pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a> category</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.social.psychology.social.PsychologicalFamily">
+<h3>Class&nbsp;<a href="org/episteme/social/psychology/social/PsychologicalFamily.html" title="class in org.episteme.social.psychology.social">org.episteme.social.psychology.social.PsychologicalFamily</a></h3>
+<div class="type-signature">class PsychologicalFamily extends <a href="org/episteme/social/psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>1L</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.social.psychology.social.PsychologicalGroup">
+<h3>Class&nbsp;<a href="org/episteme/social/psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">org.episteme.social.psychology.social.PsychologicalGroup</a></h3>
+<div class="type-signature">class PsychologicalGroup extends <a href="org/episteme/natural/biology/ecology/Population.html" title="class in org.episteme.natural.biology.ecology">Population</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>2L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>leaders</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&gt; leaders</pre>
+<div class="block">Individuals designated as leaders or rulers within the PsychologicalGroup.</div>
+</li>
+<li class="block-list">
+<h5>relations</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>, <a href="org/episteme/core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt; relations</pre>
+<div class="block">Complex mapping of interpersonal relations.
+Maps an individual to their perceived relations with other members.
+The double value typically represents attraction/repulsion or dominance.</div>
 </li>
 </ul>
 </section>
@@ -20087,7 +21322,7 @@ The double value typically represents attraction/repulsion or dominance.</div>
 <ul class="block-list">
 <li class="block-list">
 <h5>individuals</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/social/sociology/Group.html" title="class in org.episteme.social.sociology">Group</a>&gt; individuals</pre>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/social/sociology/SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&gt; individuals</pre>
 </li>
 <li class="block-list">
 <h5>manualGroups</h5>
@@ -20209,37 +21444,6 @@ The double value typically represents attraction/repulsion or dominance.</div>
 </section>
 </li>
 <li>
-<section class="serialized-class-details" id="org.episteme.social.sociology.Family">
-<h3>Class&nbsp;<a href="org/episteme/social/sociology/Family.html" title="class in org.episteme.social.sociology">org.episteme.social.sociology.Family</a></h3>
-<div class="type-signature">class Family extends <a href="org/episteme/social/sociology/Group.html" title="class in org.episteme.social.sociology">Group</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
-<dl class="name-value">
-<dt>serialVersionUID:</dt>
-<dd>2L</dd>
-</dl>
-<ul class="block-list">
-<li>
-<section class="detail">
-<h4>Serialized Fields</h4>
-<ul class="block-list">
-<li class="block-list">
-<h5>children</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a>&gt; children</pre>
-</li>
-<li class="block-list">
-<h5>parent1</h5>
-<pre><a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a> parent1</pre>
-</li>
-<li class="block-list">
-<h5>parent2</h5>
-<pre><a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a> parent2</pre>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</section>
-</li>
-<li>
 <section class="serialized-class-details" id="org.episteme.social.sociology.Gender">
 <h3>Class&nbsp;<a href="org/episteme/social/sociology/Gender.html" title="class in org.episteme.social.sociology">org.episteme.social.sociology.Gender</a></h3>
 <div class="type-signature">class Gender extends <a href="org/episteme/core/util/ExtensibleEnum.html" title="class in org.episteme.core.util">ExtensibleEnum</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
@@ -20255,33 +21459,6 @@ The double value typically represents attraction/repulsion or dominance.</div>
 <li class="block-list">
 <h5>builtIn</h5>
 <pre>boolean builtIn</pre>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</section>
-</li>
-<li>
-<section class="serialized-class-details" id="org.episteme.social.sociology.Group">
-<h3>Class&nbsp;<a href="org/episteme/social/sociology/Group.html" title="class in org.episteme.social.sociology">org.episteme.social.sociology.Group</a></h3>
-<div class="type-signature">class Group extends <a href="org/episteme/natural/biology/ecology/Population.html" title="class in org.episteme.natural.biology.ecology">Population</a>&lt;<a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
-<dl class="name-value">
-<dt>serialVersionUID:</dt>
-<dd>2L</dd>
-</dl>
-<ul class="block-list">
-<li>
-<section class="detail">
-<h4>Serialized Fields</h4>
-<ul class="block-list">
-<li class="block-list">
-<h5>internalRoles</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt; internalRoles</pre>
-</li>
-<li class="block-list">
-<h5>kind</h5>
-<pre><a href="org/episteme/social/sociology/GroupKind.html" title="class in org.episteme.social.sociology">GroupKind</a> kind</pre>
 </li>
 </ul>
 </section>
@@ -21085,7 +22262,7 @@ The double value typically represents attraction/repulsion or dominance.</div>
 </li>
 <li class="block-list">
 <h5>institutions</h5>
-<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/social/sociology/Group.html" title="class in org.episteme.social.sociology">Group</a>&gt; institutions</pre>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/social/sociology/SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&gt; institutions</pre>
 </li>
 <li class="block-list">
 <h5>languages</h5>
@@ -21207,6 +22384,64 @@ The double value typically represents attraction/repulsion or dominance.</div>
 <li class="block-list">
 <h5>builtIn</h5>
 <pre>boolean builtIn</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.social.sociology.SociologicalFamily">
+<h3>Class&nbsp;<a href="org/episteme/social/sociology/SociologicalFamily.html" title="class in org.episteme.social.sociology">org.episteme.social.sociology.SociologicalFamily</a></h3>
+<div class="type-signature">class SociologicalFamily extends <a href="org/episteme/social/sociology/SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a> implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>2L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>children</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a>&gt; children</pre>
+</li>
+<li class="block-list">
+<h5>parent1</h5>
+<pre><a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a> parent1</pre>
+</li>
+<li class="block-list">
+<h5>parent2</h5>
+<pre><a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a> parent2</pre>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<li>
+<section class="serialized-class-details" id="org.episteme.social.sociology.SociologicalGroup">
+<h3>Class&nbsp;<a href="org/episteme/social/sociology/SociologicalGroup.html" title="class in org.episteme.social.sociology">org.episteme.social.sociology.SociologicalGroup</a></h3>
+<div class="type-signature">class SociologicalGroup extends <a href="org/episteme/natural/biology/ecology/Population.html" title="class in org.episteme.natural.biology.ecology">Population</a>&lt;<a href="org/episteme/social/sociology/Person.html" title="class in org.episteme.social.sociology">Person</a>&gt; implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></div>
+<dl class="name-value">
+<dt>serialVersionUID:</dt>
+<dd>2L</dd>
+</dl>
+<ul class="block-list">
+<li>
+<section class="detail">
+<h4>Serialized Fields</h4>
+<ul class="block-list">
+<li class="block-list">
+<h5>internalRoles</h5>
+<pre><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="org/episteme/natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt; internalRoles</pre>
+</li>
+<li class="block-list">
+<h5>kind</h5>
+<pre><a href="org/episteme/social/sociology/GroupKind.html" title="class in org.episteme.social.sociology">GroupKind</a> kind</pre>
 </li>
 </ul>
 </section>

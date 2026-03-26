@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,9 +60,9 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#calculateDensity(int,int,boolean)" tabindex="0">calculateDensity(int, int, boolean)</a></li>
 <li><a href="#reciprocityIndex(int,int)" tabindex="0">reciprocityIndex(int, int)</a></li>
-<li><a href="#calculateBondingCapital(org.episteme.social.sociology.Person,org.episteme.social.sociology.Group,org.episteme.social.sociology.SocialNetwork)" tabindex="0">calculateBondingCapital(Person, Group, SocialNetwork)</a></li>
+<li><a href="#calculateBondingCapital(org.episteme.social.sociology.Person,org.episteme.social.sociology.SociologicalGroup,org.episteme.social.sociology.SocialNetwork)" tabindex="0">calculateBondingCapital(Person, SociologicalGroup, SocialNetwork)</a></li>
 <li><a href="#calculateBridgingCapital(org.episteme.social.sociology.Person,java.util.Set,org.episteme.social.sociology.SocialNetwork)" tabindex="0">calculateBridgingCapital(Person, Set, SocialNetwork)</a></li>
-<li><a href="#calculateSocialCohesion(org.episteme.social.sociology.Group,org.episteme.social.sociology.SocialNetwork)" tabindex="0">calculateSocialCohesion(Group, SocialNetwork)</a></li>
+<li><a href="#calculateSocialCohesion(org.episteme.social.sociology.SociologicalGroup,org.episteme.social.sociology.SocialNetwork)" tabindex="0">calculateSocialCohesion(SociologicalGroup, SocialNetwork)</a></li>
 </ol>
 </li>
 </ol>
@@ -106,15 +106,15 @@ Provides metrics for network density, trust, and capital types (Bonding vs Bridg
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#calculateBondingCapital(org.episteme.social.sociology.Person,org.episteme.social.sociology.Group,org.episteme.social.sociology.SocialNetwork)" class="member-name-link">calculateBondingCapital</a><wbr>(<a href="Person.html" title="class in org.episteme.social.sociology">Person</a>&nbsp;person,
- <a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&nbsp;group,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#calculateBondingCapital(org.episteme.social.sociology.Person,org.episteme.social.sociology.SociologicalGroup,org.episteme.social.sociology.SocialNetwork)" class="member-name-link">calculateBondingCapital</a><wbr>(<a href="Person.html" title="class in org.episteme.social.sociology">Person</a>&nbsp;person,
+ <a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&nbsp;SociologicalGroup,
  <a href="SocialNetwork.html" title="class in org.episteme.social.sociology">SocialNetwork</a>&nbsp;network)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Calculates the "Bonding Social Capital" of a person within a specific group.</div>
+<div class="block">Calculates the "Bonding Social Capital" of a person within a specific SociologicalGroup.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#calculateBridgingCapital(org.episteme.social.sociology.Person,java.util.Set,org.episteme.social.sociology.SocialNetwork)" class="member-name-link">calculateBridgingCapital</a><wbr>(<a href="Person.html" title="class in org.episteme.social.sociology">Person</a>&nbsp;person,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&gt;&nbsp;primaryGroups,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&gt;&nbsp;primaryGroups,
  <a href="SocialNetwork.html" title="class in org.episteme.social.sociology">SocialNetwork</a>&nbsp;network)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Calculates the "Bridging Social Capital" of a person.</div>
@@ -127,10 +127,10 @@ Provides metrics for network density, trust, and capital types (Bonding vs Bridg
 <div class="block">Calculates the Network Density.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#calculateSocialCohesion(org.episteme.social.sociology.Group,org.episteme.social.sociology.SocialNetwork)" class="member-name-link">calculateSocialCohesion</a><wbr>(<a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&nbsp;group,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#calculateSocialCohesion(org.episteme.social.sociology.SociologicalGroup,org.episteme.social.sociology.SocialNetwork)" class="member-name-link">calculateSocialCohesion</a><wbr>(<a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&nbsp;SociologicalGroup,
  <a href="SocialNetwork.html" title="class in org.episteme.social.sociology">SocialNetwork</a>&nbsp;network)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Estimates "Social Cohesion" of a group.</div>
+<div class="block">Estimates "Social Cohesion" of a SociologicalGroup.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#reciprocityIndex(int,int)" class="member-name-link">reciprocityIndex</a><wbr>(int&nbsp;mutualLinks,
@@ -193,18 +193,18 @@ Defined as the ratio of actual connections to the total number of possible conne
 </section>
 </li>
 <li>
-<section class="detail" id="calculateBondingCapital(org.episteme.social.sociology.Person,org.episteme.social.sociology.Group,org.episteme.social.sociology.SocialNetwork)">
+<section class="detail" id="calculateBondingCapital(org.episteme.social.sociology.Person,org.episteme.social.sociology.SociologicalGroup,org.episteme.social.sociology.SocialNetwork)">
 <h3>calculateBondingCapital</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">calculateBondingCapital</span><wbr><span class="parameters">(<a href="Person.html" title="class in org.episteme.social.sociology">Person</a>&nbsp;person,
- <a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&nbsp;group,
+ <a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&nbsp;SociologicalGroup,
  <a href="SocialNetwork.html" title="class in org.episteme.social.sociology">SocialNetwork</a>&nbsp;network)</span></div>
-<div class="block">Calculates the "Bonding Social Capital" of a person within a specific group.
-This is measured as the ratio of ties within the group to the group size.</div>
+<div class="block">Calculates the "Bonding Social Capital" of a person within a specific SociologicalGroup.
+This is measured as the ratio of ties within the SociologicalGroup to the SociologicalGroup size.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>person</code> - the person to analyze</dd>
-<dd><code>group</code> - the group they belong to</dd>
+<dd><code>SociologicalGroup</code> - the SociologicalGroup they belong to</dd>
 <dd><code>network</code> - the social network</dd>
 <dt>Returns:</dt>
 <dd>internal tie ratio</dd>
@@ -217,7 +217,7 @@ This is measured as the ratio of ties within the group to the group size.</div>
 <h3>calculateBridgingCapital</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">calculateBridgingCapital</span><wbr><span class="parameters">(<a href="Person.html" title="class in org.episteme.social.sociology">Person</a>&nbsp;person,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&gt;&nbsp;primaryGroups,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&gt;&nbsp;primaryGroups,
  <a href="SocialNetwork.html" title="class in org.episteme.social.sociology">SocialNetwork</a>&nbsp;network)</span></div>
 <div class="block">Calculates the "Bridging Social Capital" of a person.
 Measured as the number of ties to people outside their primary groups.</div>
@@ -233,16 +233,16 @@ Measured as the number of ties to people outside their primary groups.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="calculateSocialCohesion(org.episteme.social.sociology.Group,org.episteme.social.sociology.SocialNetwork)">
+<section class="detail" id="calculateSocialCohesion(org.episteme.social.sociology.SociologicalGroup,org.episteme.social.sociology.SocialNetwork)">
 <h3>calculateSocialCohesion</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">calculateSocialCohesion</span><wbr><span class="parameters">(<a href="Group.html" title="class in org.episteme.social.sociology">Group</a>&nbsp;group,
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">calculateSocialCohesion</span><wbr><span class="parameters">(<a href="SociologicalGroup.html" title="class in org.episteme.social.sociology">SociologicalGroup</a>&nbsp;SociologicalGroup,
  <a href="SocialNetwork.html" title="class in org.episteme.social.sociology">SocialNetwork</a>&nbsp;network)</span></div>
-<div class="block">Estimates "Social Cohesion" of a group.
+<div class="block">Estimates "Social Cohesion" of a SociologicalGroup.
 Average of all internal bonding capital scores.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>group</code> - the group</dd>
+<dd><code>SociologicalGroup</code> - the SociologicalGroup</dd>
 <dd><code>network</code> - the network</dd>
 <dt>Returns:</dt>
 <dd>cohesion index</dd>

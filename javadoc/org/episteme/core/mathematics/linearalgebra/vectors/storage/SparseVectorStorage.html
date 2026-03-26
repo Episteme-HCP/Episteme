@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -68,6 +68,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#get(int)" tabindex="0">get(int)</a></li>
 <li><a href="#set(int,E)" tabindex="0">set(int, E)</a></li>
 <li><a href="#copy()" tabindex="0">copy()</a></li>
+<li><a href="#getNonZeros()" tabindex="0">getNonZeros()</a></li>
 </ol>
 </li>
 </ol>
@@ -147,10 +148,15 @@ implements <a href="VectorStorage.html" title="interface in org.episteme.core.ma
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the element at the specified index.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,E)" class="member-name-link">set</a><wbr>(int&nbsp;index,
- <a href="#type-param-E" title="type parameter in SparseVectorStorage">E</a>&nbsp;value)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr><a href="#type-param-E" title="type parameter in SparseVectorStorage">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNonZeros()" class="member-name-link">getNonZeros</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the non-zero entries in this storage.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,E)" class="member-name-link">set</a><wbr>(int&nbsp;index,
+ <a href="#type-param-E" title="type parameter in SparseVectorStorage">E</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the element at the specified index.</div>
 </div>
 </div>
@@ -247,6 +253,19 @@ implements <a href="VectorStorage.html" title="interface in org.episteme.core.ma
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="VectorStorage.html#copy()">copy</a></code>&nbsp;in interface&nbsp;<code><a href="VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a>&lt;<a href="#type-param-E" title="type parameter in SparseVectorStorage">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getNonZeros()">
+<h3>getNonZeros</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>,<wbr><a href="#type-param-E" title="type parameter in SparseVectorStorage">E</a>&gt;</span>&nbsp;<span class="element-name">getNonZeros</span>()</div>
+<div class="block">Returns the non-zero entries in this storage.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>a map of index to value for non-zero entries</dd>
 </dl>
 </div>
 </section>

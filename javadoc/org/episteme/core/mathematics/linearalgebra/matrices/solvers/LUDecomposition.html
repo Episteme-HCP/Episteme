@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -55,14 +55,16 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
+<li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
+<li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
+<ol class="toc-list">
+<li><a href="#%3Cinit%3E()" tabindex="0">LUDecomposition()</a></li>
+</ol>
+</li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#decompose(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">decompose(Matrix)</a></li>
-<li><a href="#getL()" tabindex="0">getL()</a></li>
-<li><a href="#getU()" tabindex="0">getU()</a></li>
-<li><a href="#determinant()" tabindex="0">determinant()</a></li>
-<li><a href="#solve(org.episteme.core.mathematics.numbers.real.Real%5B%5D)" tabindex="0">solve(Real[])</a></li>
 </ol>
 </li>
 </ol>
@@ -80,10 +82,9 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">LUDecomposition</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">LU Decomposition: A = LU where L is lower triangular, U is upper triangular.
+<div class="block">LU Decomposition: A = PLU where P is permutation, L is lower triangular, U is upper triangular.
 <p>
-Used for solving linear systems, computing determinants, and matrix
-inversion.
+This class delegates to the active <a href="../../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra"><code>LinearAlgebraProvider</code></a> via <a href="../../../../technical/algorithm/AlgorithmManager.html" title="class in org.episteme.core.technical.algorithm"><code>AlgorithmManager</code></a>.
 </p></div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -95,37 +96,34 @@ inversion.
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<li>
+<section class="constructor-summary" id="constructor-summary">
+<h2>Constructor Summary</h2>
+<div class="caption"><span>Constructors</span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Constructor</div>
+<div class="table-header col-last">Description</div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">LUDecomposition</a>()</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
 <!-- ========== METHOD SUMMARY =========== -->
 <li>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="LUDecomposition.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUDecomposition</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="LUResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUResult</a><wbr>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#decompose(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">decompose</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Computes LU decomposition with partial pivoting.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#determinant()" class="member-name-link">determinant</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Computes determinant using LU decomposition.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getL()" class="member-name-link">getL</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getU()" class="member-name-link">getU</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#solve(org.episteme.core.mathematics.numbers.real.Real%5B%5D)" class="member-name-link">solve</a><wbr>(<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;b)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Solves Ax = b using LU decomposition.</div>
+<div class="block">Computes LU decomposition using the best available LinearAlgebraProvider.</div>
 </div>
 </div>
 </div>
@@ -139,6 +137,22 @@ inversion.
 </section>
 <section class="details">
 <ul class="details-list">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<li>
+<section class="constructor-details" id="constructor-detail">
+<h2>Constructor Details</h2>
+<ul class="member-list">
+<li>
+<section class="detail" id="&lt;init&gt;()">
+<h3>LUDecomposition</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">LUDecomposition</span>()</div>
+</div>
+</section>
+</li>
+</ul>
+</section>
+</li>
 <!-- ============ METHOD DETAIL ========== -->
 <li>
 <section class="method-details" id="method-detail">
@@ -148,42 +162,14 @@ inversion.
 <section class="detail" id="decompose(org.episteme.core.mathematics.linearalgebra.Matrix)">
 <h3>decompose</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="LUDecomposition.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUDecomposition</a></span>&nbsp;<span class="element-name">decompose</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix)</span></div>
-<div class="block">Computes LU decomposition with partial pivoting.</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getL()">
-<h3>getL</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">getL</span>()</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getU()">
-<h3>getU</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">getU</span>()</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="determinant()">
-<h3>determinant</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">determinant</span>()</div>
-<div class="block">Computes determinant using LU decomposition.</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="solve(org.episteme.core.mathematics.numbers.real.Real[])">
-<h3>solve</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</span>&nbsp;<span class="element-name">solve</span><wbr><span class="parameters">(<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;b)</span></div>
-<div class="block">Solves Ax = b using LU decomposition.</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="LUResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUResult</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">decompose</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix)</span></div>
+<div class="block">Computes LU decomposition using the best available LinearAlgebraProvider.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>matrix</code> - the square matrix to decompose</dd>
+<dt>Returns:</dt>
+<dd>the result containing L, U, and P</dd>
+</dl>
 </div>
 </section>
 </li>

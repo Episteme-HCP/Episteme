@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -62,6 +62,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#zeros(java.lang.Class,int...)" tabindex="0">zeros(Class, int...)</a></li>
+<li><a href="#of(T%5B%5D,int...)" tabindex="0">of(T[], int...)</a></li>
 <li><a href="#shape()" tabindex="0">shape()</a></li>
 <li><a href="#rank()" tabindex="0">rank()</a></li>
 <li><a href="#size()" tabindex="0">size()</a></li>
@@ -98,7 +100,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <dl class="notes">
 <dt>All Known Implementing Classes:</dt>
-<dd><code><a href="../../technical/algorithm/inference/CUDATensor.html" title="class in org.episteme.core.technical.algorithm.inference">CUDATensor</a>, <a href="tensors/DenseTensor.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">DenseTensor</a>, <a href="../../../nativ/mathematics/linearalgebra/tensors/NativeTensor.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors">NativeTensor</a>, <a href="tensors/SparseTensor.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">SparseTensor</a></code></dd>
+<dd><code><a href="../../../nativ/mathematics/linearalgebra/tensors/CUDATensor.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors">CUDATensor</a>, <a href="tensors/DenseTensor.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">DenseTensor</a>, <a href="../../../nativ/mathematics/linearalgebra/tensors/NativeTensor.html" title="class in org.episteme.nativ.mathematics.linearalgebra.tensors">NativeTensor</a>, <a href="tensors/SparseTensor.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">SparseTensor</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
@@ -132,7 +134,7 @@ and numerical computing.
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -174,72 +176,84 @@ and numerical computing.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Element-wise multiplication (Hadamard product).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#rank()" class="member-name-link">rank</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns the rank (number of dimensions) of this tensor.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#reshape(int...)" class="member-name-link">reshape</a><wbr>(int...&nbsp;newShape)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Reshapes this tensor to a new shape.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#scale(T)" class="member-name-link">scale</a><wbr>(<a href="#type-param-T" title="type parameter in Tensor">T</a>&nbsp;scalar)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Scalar multiplication.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#set(T,int...)" class="member-name-link">set</a><wbr>(<a href="#type-param-T" title="type parameter in Tensor">T</a>&nbsp;value,
- int...&nbsp;indices)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Sets the element at the specified indices.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int[]</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#shape()" class="member-name-link">shape</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns the shape of this tensor.</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static &lt;T&gt;&nbsp;<a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;T&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(T%5B%5D,int...)" class="member-name-link">of</a><wbr>(T[]&nbsp;data,
+ int...&nbsp;shape)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1">
+<div class="block">Creates a tensor from data.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#size()" class="member-name-link">size</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#rank()" class="member-name-link">rank</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Returns the rank (number of dimensions) of this tensor.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#reshape(int...)" class="member-name-link">reshape</a><wbr>(int...&nbsp;newShape)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Reshapes this tensor to a new shape.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#scale(T)" class="member-name-link">scale</a><wbr>(<a href="#type-param-T" title="type parameter in Tensor">T</a>&nbsp;scalar)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Scalar multiplication.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#set(T,int...)" class="member-name-link">set</a><wbr>(<a href="#type-param-T" title="type parameter in Tensor">T</a>&nbsp;value,
+ int...&nbsp;indices)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Sets the element at the specified indices.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#shape()" class="member-name-link">shape</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Returns the shape of this tensor.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#size()" class="member-name-link">size</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the total number of elements.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#slice(int%5B%5D,int%5B%5D)" class="member-name-link">slice</a><wbr>(int[]&nbsp;starts,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#slice(int%5B%5D,int%5B%5D)" class="member-name-link">slice</a><wbr>(int[]&nbsp;starts,
  int[]&nbsp;sizes)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns a slice (sub-tensor) of this tensor.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#subtract(org.episteme.core.mathematics.linearalgebra.Tensor)" class="member-name-link">subtract</a><wbr>(<a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;&nbsp;other)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#subtract(org.episteme.core.mathematics.linearalgebra.Tensor)" class="member-name-link">subtract</a><wbr>(<a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;&nbsp;other)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Element-wise subtraction.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#type-param-T" title="type parameter in Tensor">T</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sum()" class="member-name-link">sum</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#type-param-T" title="type parameter in Tensor">T</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sum()" class="member-name-link">sum</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sums all elements.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sum(int)" class="member-name-link">sum</a><wbr>(int&nbsp;axis)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sum(int)" class="member-name-link">sum</a><wbr>(int&nbsp;axis)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sums along the specified axis.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#toArray()" class="member-name-link">toArray</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#toArray()" class="member-name-link">toArray</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Converts this tensor to a multidimensional array.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#transpose()" class="member-name-link">transpose</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#transpose()" class="member-name-link">transpose</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Transposes a rank-2 tensor (matrix).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#transpose(int...)" class="member-name-link">transpose</a><wbr>(int...&nbsp;permutation)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;<a href="#type-param-T" title="type parameter in Tensor">T</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#transpose(int...)" class="member-name-link">transpose</a><wbr>(int...&nbsp;permutation)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Transposes dimensions according to the given permutation.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static &lt;T&gt;&nbsp;<a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a><wbr>&lt;T&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#zeros(java.lang.Class,int...)" class="member-name-link">zeros</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;elementType,
+ int...&nbsp;shape)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1">
+<div class="block">Creates a tensor of zeros with the specified shape.</div>
 </div>
 </div>
 </div>
@@ -255,6 +269,26 @@ and numerical computing.
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="zeros(java.lang.Class,int...)">
+<h3>zeros</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">static</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;T&gt;</span>&nbsp;<span class="element-name">zeros</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;elementType,
+ int...&nbsp;shape)</span></div>
+<div class="block">Creates a tensor of zeros with the specified shape.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="of(T[],int...)">
+<h3 id="of(java.lang.Object[],int[])">of</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">static</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="Tensor.html" title="interface in org.episteme.core.mathematics.linearalgebra">Tensor</a>&lt;T&gt;</span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(T[]&nbsp;data,
+ int...&nbsp;shape)</span></div>
+<div class="block">Creates a tensor from data.</div>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="shape()">
 <h3>shape</h3>

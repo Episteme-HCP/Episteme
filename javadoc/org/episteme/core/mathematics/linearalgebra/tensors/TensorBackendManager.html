@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,7 +60,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#getInstance()" tabindex="0">getInstance()</a></li>
-<li><a href="#getDefaultBackend()" tabindex="0">getDefaultBackend()</a></li>
+<li><a href="#staticDefault()" tabindex="0">staticDefault()</a></li>
+<li><a href="#staticAll()" tabindex="0">staticAll()</a></li>
+<li><a href="#staticSelect(java.lang.String)" tabindex="0">staticSelect(String)</a></li>
 </ol>
 </li>
 </ol>
@@ -97,7 +99,7 @@ loadScripts(document, 'script');</script>
 <h2>Field Summary</h2>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.episteme.core.technical.backend.AbstractBackendManager">Fields inherited from class&nbsp;<a href="../../../technical/backend/AbstractBackendManager.html#field-summary" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a></h3>
-<code><a href="../../../technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../../../technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../../../technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a></code></div>
+<code><a href="../../../technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../../../technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../../../technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a>, <a href="../../../technical/backend/AbstractBackendManager.html#logger">logger</a></code></div>
 </section>
 </li>
 <!-- ========== METHOD SUMMARY =========== -->
@@ -111,15 +113,25 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="TensorBackendManager.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackendManager</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns the global singleton instance.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a><wbr>&lt;<a href="TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticAll()" class="member-name-link">staticAll</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns all registered backends.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDefaultBackend()" class="member-name-link">getDefaultBackend</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticDefault()" class="member-name-link">staticDefault</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Returns the default backend.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="TensorBackendManager.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackendManager</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticSelect(java.lang.String)" class="member-name-link">staticSelect</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nameOrId)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the global singleton instance.</div>
+<div class="block">Selects a backend by name or id.</div>
 </div>
 </div>
 </div>
@@ -151,11 +163,29 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getDefaultBackend()">
-<h3>getDefaultBackend</h3>
+<section class="detail" id="staticDefault()">
+<h3>staticDefault</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span>&nbsp;<span class="element-name">getDefaultBackend</span>()</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span>&nbsp;<span class="element-name">staticDefault</span>()</div>
 <div class="block">Returns the default backend.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="staticAll()">
+<h3>staticAll</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a>&gt;</span>&nbsp;<span class="element-name">staticAll</span>()</div>
+<div class="block">Returns all registered backends.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="staticSelect(java.lang.String)">
+<h3>staticSelect</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="TensorBackend.html" title="interface in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackend</a></span>&nbsp;<span class="element-name">staticSelect</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nameOrId)</span></div>
+<div class="block">Selects a backend by name or id.</div>
 </div>
 </section>
 </li>

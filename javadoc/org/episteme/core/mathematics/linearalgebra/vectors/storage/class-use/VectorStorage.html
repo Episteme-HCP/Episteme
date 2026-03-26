@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -59,30 +59,31 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Package</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core">org.episteme.core</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.linearalgebra">org.episteme.core.mathematics.linearalgebra</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.vectors">org.episteme.core.mathematics.linearalgebra.vectors</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.vectors.storage">org.episteme.core.mathematics.linearalgebra.vectors.storage</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.nativ.mathematics.linearalgebra.vectors">org.episteme.nativ.mathematics.linearalgebra.vectors</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.mathematics.linearalgebra.vectors.storage">org.episteme.nativ.mathematics.linearalgebra.vectors.storage</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
 <li>
-<section class="detail" id="org.episteme.core">
-<h2>Uses of <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a> in <a href="../../../../../package-summary.html">org.episteme.core</a></h2>
-<div class="caption"><span>Methods in <a href="../../../../../package-summary.html">org.episteme.core</a> that return <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
+<section class="detail" id="org.episteme.core.mathematics.linearalgebra">
+<h2>Uses of <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a> in <a href="../../../package-summary.html">org.episteme.core.mathematics.linearalgebra</a></h2>
+<div class="caption"><span>Methods in <a href="../../../package-summary.html">org.episteme.core.mathematics.linearalgebra</a> that return <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static &lt;E&gt;&nbsp;<a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ComputeContext.</span><code><a href="../../../../../ComputeContext.html#createDenseStorage(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDenseStorage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
+<div class="col-first even-row-color"><code><a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;<a href="../../../Vector.html#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">Vector.</span><code><a href="../../../Vector.html#getStorage()" class="member-name-link">getStorage</a>()</code></div>
 <div class="col-last even-row-color">
-<div class="block">Creates a dense vector storage from a list of data.</div>
+<div class="block">Returns the underlying storage of this vector.</div>
 </div>
 </div>
 </section>
@@ -104,23 +105,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static &lt;E&gt;&nbsp;<a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorFactory.</span><code><a href="../../VectorFactory.html#createAutomaticStorage(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createAutomaticStorage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Automatic storage selection based on density.</div>
-</div>
-<div class="col-first odd-row-color"><code>static &lt;E&gt;&nbsp;<a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorFactory.</span><code><a href="../../VectorFactory.html#createDenseStorage(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDenseStorage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static &lt;E&gt;&nbsp;<a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorFactory.</span><code><a href="../../VectorFactory.html#createSparseStorage(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createSparseStorage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&nbsp;data,
- <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
+<div class="col-first even-row-color"><code><a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;<a href="../../GenericVector.html#type-param-E" title="type parameter in GenericVector">E</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">GenericVector.</span><code><a href="../../GenericVector.html#getStorage()" class="member-name-link">getStorage</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;<a href="../../GenericVector.html#type-param-E" title="type parameter in GenericVector">E</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">GenericVector.</span><code><a href="../../GenericVector.html#getStorage()" class="member-name-link">getStorage</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="caption"><span>Constructors in <a href="../../package-summary.html">org.episteme.core.mathematics.linearalgebra.vectors</a> with parameters of type <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
 <div class="summary-table three-column-summary">
@@ -211,29 +198,47 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.nativ.mathematics.linearalgebra.vectors">
-<h2>Uses of <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a> in <a href="../../../../../../nativ/mathematics/linearalgebra/vectors/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors</a></h2>
-<div class="caption"><span>Classes in <a href="../../../../../../nativ/mathematics/linearalgebra/vectors/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors</a> that implement <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
+<section class="detail" id="org.episteme.core.technical.algorithm">
+<h2>Uses of <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a> in <a href="../../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a> that return <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>&lt;E&gt;&nbsp;<a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ProviderRegistry.</span><code><a href="../../../../../technical/algorithm/ProviderRegistry.html#createVectorStorage(int,org.episteme.core.mathematics.structures.rings.Ring,double)" class="member-name-link">createVectorStorage</a><wbr>(int&nbsp;dim,
+ <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring,
+ double&nbsp;density)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Creates optimal vector storage.</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.nativ.mathematics.linearalgebra.vectors.storage">
+<h2>Uses of <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a> in <a href="../../../../../../nativ/mathematics/linearalgebra/vectors/storage/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors.storage</a></h2>
+<div class="caption"><span>Classes in <a href="../../../../../../nativ/mathematics/linearalgebra/vectors/storage/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors.storage</a> that implement <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../../../../nativ/mathematics/linearalgebra/vectors/NativeVector.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.vectors">NativeVector</a></code></div>
+<div class="col-second even-row-color"><code><a href="../../../../../../nativ/mathematics/linearalgebra/vectors/storage/NativeDoubleVectorStorage.html" class="type-name-link" title="class in org.episteme.nativ.mathematics.linearalgebra.vectors.storage">NativeDoubleVectorStorage</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">A dense vector backed by off-heap native memory.</div>
 </div>
 </div>
-<div class="caption"><span>Methods in <a href="../../../../../../nativ/mathematics/linearalgebra/vectors/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors</a> that return <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
+<div class="caption"><span>Methods in <a href="../../../../../../nativ/mathematics/linearalgebra/vectors/storage/package-summary.html">org.episteme.nativ.mathematics.linearalgebra.vectors.storage</a> that return <a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code><a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;<a href="../../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">NativeVector.</span><code><a href="../../../../../../nativ/mathematics/linearalgebra/vectors/NativeVector.html#copy()" class="member-name-link">copy</a>()</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeDoubleVectorStorage.</span><code><a href="../../../../../../nativ/mathematics/linearalgebra/vectors/storage/NativeDoubleVectorStorage.html#copy()" class="member-name-link">copy</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>&lt;E&gt;&nbsp;<a href="../VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;E&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">NativeVectorStorageFactory.</span><code><a href="../../../../../../nativ/mathematics/linearalgebra/vectors/NativeVectorStorageFactory.html#createDense(int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDense</a><wbr>(int&nbsp;dimension,
+<div class="col-second odd-row-color"><span class="type-name-label">NativeVectorStorageFactory.</span><code><a href="../../../../../../nativ/mathematics/linearalgebra/vectors/storage/NativeVectorStorageFactory.html#createDense(int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">createDense</a><wbr>(int&nbsp;dim,
  <a href="../../../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -56,13 +56,21 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
 <li><a href="#nested-class-summary" tabindex="0">Nested Class Summary</a></li>
+<li><a href="#field-summary" tabindex="0">Field Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
+<li><a href="#field-detail" tabindex="0">Field Details</a>
+<ol class="toc-list">
+<li><a href="#DEFAULT" tabindex="0">DEFAULT</a></li>
+</ol>
+</li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#getDataSize()" tabindex="0">getDataSize()</a></li>
 <li><a href="#getHints()" tabindex="0">getHints()</a></li>
 <li><a href="#hasHint(org.episteme.core.technical.algorithm.OperationContext.Hint)" tabindex="0">hasHint(OperationContext.Hint)</a></li>
 <li><a href="#getDimensionality()" tabindex="0">getDimensionality()</a></li>
+<li><a href="#isCancelled()" tabindex="0">isCancelled()</a></li>
+<li><a href="#setCancelled(boolean)" tabindex="0">setCancelled(boolean)</a></li>
 </ol>
 </li>
 </ol>
@@ -126,6 +134,21 @@ LinearAlgebraProvider best = ProviderSelector.select(
 </div>
 </section>
 </li>
+<!-- =========== FIELD SUMMARY =========== -->
+<li>
+<section class="field-summary" id="field-summary">
+<h2>Field Summary</h2>
+<div class="caption"><span>Fields</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Field</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static final <a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a></code></div>
+<div class="col-second even-row-color"><code><a href="#DEFAULT" class="member-name-link">DEFAULT</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
 <!-- ========== METHOD SUMMARY =========== -->
 <li>
 <section class="method-summary" id="method-summary">
@@ -157,6 +180,16 @@ LinearAlgebraProvider best = ProviderSelector.select(
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Whether a specific hint is present.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCancelled()" class="member-name-link">isCancelled</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if this operation has been cancelled.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setCancelled(boolean)" class="member-name-link">setCancelled</a><wbr>(boolean&nbsp;cancelled)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the cancellation state of this operation.</div>
+</div>
 </div>
 </div>
 </div>
@@ -169,6 +202,22 @@ LinearAlgebraProvider best = ProviderSelector.select(
 </section>
 <section class="details">
 <ul class="details-list">
+<!-- ============ FIELD DETAIL =========== -->
+<li>
+<section class="field-details" id="field-detail">
+<h2>Field Details</h2>
+<ul class="member-list">
+<li>
+<section class="detail" id="DEFAULT">
+<h3>DEFAULT</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a></span>&nbsp;<span class="element-name">DEFAULT</span></div>
+</div>
+</section>
+</li>
+</ul>
+</section>
+</li>
 <!-- ============ METHOD DETAIL ========== -->
 <li>
 <section class="method-details" id="method-detail">
@@ -207,6 +256,24 @@ LinearAlgebraProvider best = ProviderSelector.select(
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getDimensionality</span>()</div>
 <div class="block">Dimensionality of the data (e.g., rows for matrix).</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isCancelled()">
+<h3>isCancelled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCancelled</span>()</div>
+<div class="block">Returns true if this operation has been cancelled.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setCancelled(boolean)">
+<h3>setCancelled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCancelled</span><wbr><span class="parameters">(boolean&nbsp;cancelled)</span></div>
+<div class="block">Sets the cancellation state of this operation.</div>
 </div>
 </section>
 </li>

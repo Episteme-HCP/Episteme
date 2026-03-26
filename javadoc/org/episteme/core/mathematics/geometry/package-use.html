@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -80,22 +80,24 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.geometry.triangulation">org.episteme.core.mathematics.geometry.triangulation</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm</a></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.algorithm.physics">org.episteme.core.technical.algorithm.physics</a></div>
-<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.natural.earth.coordinates">org.episteme.natural.earth.coordinates</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.natural.physics.classical.mechanics">org.episteme.natural.physics.classical.mechanics</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.natural.physics.classical.mechanics.collision">org.episteme.natural.physics.classical.mechanics.collision</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.natural.physics.classical.waves.electromagnetism">org.episteme.natural.physics.classical.waves.electromagnetism</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.natural.physics.classical.waves.electromagnetism.field">org.episteme.natural.physics.classical.waves.electromagnetism.field</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.natural.physics.classical.waves.optics">org.episteme.natural.physics.classical.waves.optics</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.natural.physics.classical.waves.electromagnetism.providers">org.episteme.natural.physics.classical.waves.electromagnetism.providers</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.natural.physics.relativity">org.episteme.natural.physics.relativity</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.natural.physics.classical.waves.optics">org.episteme.natural.physics.classical.waves.optics</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.social.geography">org.episteme.social.geography</a></div>
-<div class="col-last odd-row-color">
+<div class="col-first odd-row-color"><a href="#org.episteme.natural.physics.relativity">org.episteme.natural.physics.relativity</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.social.geography">org.episteme.social.geography</a></div>
+<div class="col-last even-row-color">
 <div class="block">Provides classes for social geography, human settlements, and mapping.</div>
 </div>
 </div>
@@ -365,34 +367,6 @@ z).</div>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.technical.algorithm">
-<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.geometry</a> used by <a href="../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></span></div>
-<div class="summary-table two-column-summary">
-<div class="table-header col-first">Class</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/Vector4D.html#org.episteme.core.technical.algorithm">Vector4D</a></div>
-<div class="col-last even-row-color">
-<div class="block">Represents a 4D vector, typically used for spacetime coordinates (ct, x, y,
-z).</div>
-</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.core.technical.algorithm.physics">
-<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.geometry</a> used by <a href="../../technical/algorithm/physics/package-summary.html">org.episteme.core.technical.algorithm.physics</a></span></div>
-<div class="summary-table two-column-summary">
-<div class="table-header col-first">Class</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/Vector4D.html#org.episteme.core.technical.algorithm.physics">Vector4D</a></div>
-<div class="col-last even-row-color">
-<div class="block">Represents a 4D vector, typically used for spacetime coordinates (ct, x, y,
-z).</div>
-</div>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="org.episteme.natural.earth.coordinates">
 <div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.geometry</a> used by <a href="../../../natural/earth/coordinates/package-summary.html">org.episteme.natural.earth.coordinates</a></span></div>
 <div class="summary-table two-column-summary">
@@ -416,19 +390,42 @@ z).</div>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="class-use/Point3D.html#org.episteme.natural.physics.classical.mechanics">Point3D</a></div>
+<div class="col-first even-row-color"><a href="class-use/Vector2D.html#org.episteme.natural.physics.classical.mechanics">Vector2D</a></div>
+<div class="col-last even-row-color">
+<div class="block">A 2D vector in Euclidean space.
+* @author Silvere Martin-Michiellot</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.natural.physics.classical.mechanics.collision">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.geometry</a> used by <a href="../../../natural/physics/classical/mechanics/collision/package-summary.html">org.episteme.natural.physics.classical.mechanics.collision</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/Point3D.html#org.episteme.natural.physics.classical.mechanics.collision">Point3D</a></div>
 <div class="col-last even-row-color">
 <div class="block">A point in 3D Euclidean space.
 * @author Silvere Martin-Michiellot</div>
 </div>
-<div class="col-first odd-row-color"><a href="class-use/Vector2D.html#org.episteme.natural.physics.classical.mechanics">Vector2D</a></div>
+<div class="col-first odd-row-color"><a href="class-use/Vector3D.html#org.episteme.natural.physics.classical.mechanics.collision">Vector3D</a></div>
 <div class="col-last odd-row-color">
-<div class="block">A 2D vector in Euclidean space.
-* @author Silvere Martin-Michiellot</div>
-</div>
-<div class="col-first even-row-color"><a href="class-use/Vector3D.html#org.episteme.natural.physics.classical.mechanics">Vector3D</a></div>
-<div class="col-last even-row-color">
 <div class="block">Represents a 3D vector.</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.natural.physics.classical.waves.electromagnetism">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.geometry</a> used by <a href="../../../natural/physics/classical/waves/electromagnetism/package-summary.html">org.episteme.natural.physics.classical.waves.electromagnetism</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/Vector4D.html#org.episteme.natural.physics.classical.waves.electromagnetism">Vector4D</a></div>
+<div class="col-last even-row-color">
+<div class="block">Represents a 4D vector, typically used for spacetime coordinates (ct, x, y,
+z).</div>
 </div>
 </div>
 </section>
@@ -445,6 +442,20 @@ z).</div>
 </div>
 <div class="col-first odd-row-color"><a href="class-use/Vector4D.html#org.episteme.natural.physics.classical.waves.electromagnetism.field">Vector4D</a></div>
 <div class="col-last odd-row-color">
+<div class="block">Represents a 4D vector, typically used for spacetime coordinates (ct, x, y,
+z).</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.natural.physics.classical.waves.electromagnetism.providers">
+<div class="caption"><span>Classes in <a href="package-summary.html">org.episteme.core.mathematics.geometry</a> used by <a href="../../../natural/physics/classical/waves/electromagnetism/providers/package-summary.html">org.episteme.natural.physics.classical.waves.electromagnetism.providers</a></span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><a href="class-use/Vector4D.html#org.episteme.natural.physics.classical.waves.electromagnetism.providers">Vector4D</a></div>
+<div class="col-last even-row-color">
 <div class="block">Represents a 4D vector, typically used for spacetime coordinates (ct, x, y,
 z).</div>
 </div>

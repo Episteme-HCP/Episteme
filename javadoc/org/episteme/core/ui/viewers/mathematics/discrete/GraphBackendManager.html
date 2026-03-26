@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,11 +60,12 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#getInstance()" tabindex="0">getInstance()</a></li>
+<li><a href="#staticDefault()" tabindex="0">staticDefault()</a></li>
 <li><a href="#getPreferredId()" tabindex="0">getPreferredId()</a></li>
 <li><a href="#setPreferredId(java.lang.String)" tabindex="0">setPreferredId(String)</a></li>
 <li><a href="#getActiveBackend()" tabindex="0">getActiveBackend()</a></li>
 <li><a href="#staticSelect(java.lang.String)" tabindex="0">staticSelect(String)</a></li>
-<li><a href="#staticAllBackends()" tabindex="0">staticAllBackends()</a></li>
+<li><a href="#staticAll()" tabindex="0">staticAll()</a></li>
 <li><a href="#selectBestBackend()" tabindex="0">selectBestBackend()</a></li>
 </ol>
 </li>
@@ -102,7 +103,7 @@ loadScripts(document, 'script');</script>
 <h2>Field Summary</h2>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.episteme.core.technical.backend.AbstractBackendManager">Fields inherited from class&nbsp;<a href="../../../../technical/backend/AbstractBackendManager.html#field-summary" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a></h3>
-<code><a href="../../../../technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../../../../technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../../../../technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a></code></div>
+<code><a href="../../../../technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../../../../technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../../../../technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a>, <a href="../../../../technical/backend/AbstractBackendManager.html#logger">logger</a></code></div>
 </section>
 </li>
 <!-- ========== METHOD SUMMARY =========== -->
@@ -140,11 +141,14 @@ loadScripts(document, 'script');</script>
 <div class="block">Sets the preferred graph backend ID.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a><wbr>&lt;<a href="GraphBackend.html" title="interface in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackend</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticAllBackends()" class="member-name-link">staticAllBackends</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticAll()" class="member-name-link">staticAll</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="GraphBackend.html" title="interface in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackend</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticSelect(java.lang.String)" class="member-name-link">staticSelect</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticDefault()" class="member-name-link">staticDefault</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="GraphBackend.html" title="interface in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackend</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticSelect(java.lang.String)" class="member-name-link">staticSelect</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -170,6 +174,14 @@ loadScripts(document, 'script');</script>
 <h3>getInstance</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="GraphBackendManager.html" title="class in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackendManager</a></span>&nbsp;<span class="element-name">getInstance</span>()</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="staticDefault()">
+<h3>staticDefault</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="GraphBackend.html" title="interface in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackend</a></span>&nbsp;<span class="element-name">staticDefault</span>()</div>
 </div>
 </section>
 </li>
@@ -209,10 +221,10 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="staticAllBackends()">
-<h3>staticAllBackends</h3>
+<section class="detail" id="staticAll()">
+<h3>staticAll</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="GraphBackend.html" title="interface in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackend</a>&gt;</span>&nbsp;<span class="element-name">staticAllBackends</span>()</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="GraphBackend.html" title="interface in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackend</a>&gt;</span>&nbsp;<span class="element-name">staticAll</span>()</div>
 </div>
 </section>
 </li>

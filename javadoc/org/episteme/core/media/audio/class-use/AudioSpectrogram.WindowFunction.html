@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -64,6 +64,8 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">Core functionality for the org.episteme.core.media.audio package in the Episteme library.</div>
 </div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.media.audio.providers">org.episteme.core.media.audio.providers</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
@@ -107,14 +109,49 @@ the order they are declared.</div>
 <div class="col-last even-row-color">
 <div class="block">Calculates the magnitude spectrum of a buffer.</div>
 </div>
-<div class="col-first odd-row-color"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;double[]&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">AudioSpectrogram.</span><code><a href="../AudioSpectrogram.html#computeSpectrogram(double%5B%5D,int,int,org.episteme.core.media.audio.AudioSpectrogram.WindowFunction)" class="member-name-link">computeSpectrogram</a><wbr>(double[]&nbsp;audioData,
+<div class="col-first odd-row-color"><code>double[]</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">AudioSpectrogramProvider.</span><code><a href="../AudioSpectrogramProvider.html#calculateSpectrum(double%5B%5D,org.episteme.core.media.audio.AudioSpectrogram.WindowFunction)" class="member-name-link">calculateSpectrum</a><wbr>(double[]&nbsp;buffer,
+ <a href="../AudioSpectrogram.WindowFunction.html" title="enum class in org.episteme.core.media.audio">AudioSpectrogram.WindowFunction</a>&nbsp;window)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Calculates the magnitude spectrum of a buffer.</div>
+</div>
+<div class="col-first even-row-color"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;double[]&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">AudioSpectrogram.</span><code><a href="../AudioSpectrogram.html#computeSpectrogram(double%5B%5D,int,int,org.episteme.core.media.audio.AudioSpectrogram.WindowFunction)" class="member-name-link">computeSpectrogram</a><wbr>(double[]&nbsp;audioData,
+ int&nbsp;windowSize,
+ int&nbsp;overlap,
+ <a href="../AudioSpectrogram.WindowFunction.html" title="enum class in org.episteme.core.media.audio">AudioSpectrogram.WindowFunction</a>&nbsp;window)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Computes a full spectrogram (list of spectrums) for a long buffer.</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;double[]&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">AudioSpectrogramProvider.</span><code><a href="../AudioSpectrogramProvider.html#computeSpectrogram(double%5B%5D,int,int,org.episteme.core.media.audio.AudioSpectrogram.WindowFunction)" class="member-name-link">computeSpectrogram</a><wbr>(double[]&nbsp;audioData,
  int&nbsp;windowSize,
  int&nbsp;overlap,
  <a href="../AudioSpectrogram.WindowFunction.html" title="enum class in org.episteme.core.media.audio">AudioSpectrogram.WindowFunction</a>&nbsp;window)</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Computes a full spectrogram (list of spectrums) for a long buffer.</div>
 </div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.media.audio.providers">
+<h2>Uses of <a href="../AudioSpectrogram.WindowFunction.html" title="enum class in org.episteme.core.media.audio">AudioSpectrogram.WindowFunction</a> in <a href="../providers/package-summary.html">org.episteme.core.media.audio.providers</a></h2>
+<div class="caption"><span>Methods in <a href="../providers/package-summary.html">org.episteme.core.media.audio.providers</a> with parameters of type <a href="../AudioSpectrogram.WindowFunction.html" title="enum class in org.episteme.core.media.audio">AudioSpectrogram.WindowFunction</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>double[]</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">DefaultAudioSpectrogramProvider.</span><code><a href="../providers/DefaultAudioSpectrogramProvider.html#calculateSpectrum(double%5B%5D,org.episteme.core.media.audio.AudioSpectrogram.WindowFunction)" class="member-name-link">calculateSpectrum</a><wbr>(double[]&nbsp;buffer,
+ <a href="../AudioSpectrogram.WindowFunction.html" title="enum class in org.episteme.core.media.audio">AudioSpectrogram.WindowFunction</a>&nbsp;window)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;double[]&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">DefaultAudioSpectrogramProvider.</span><code><a href="../providers/DefaultAudioSpectrogramProvider.html#computeSpectrogram(double%5B%5D,int,int,org.episteme.core.media.audio.AudioSpectrogram.WindowFunction)" class="member-name-link">computeSpectrogram</a><wbr>(double[]&nbsp;audioData,
+ int&nbsp;windowSize,
+ int&nbsp;overlap,
+ <a href="../AudioSpectrogram.WindowFunction.html" title="enum class in org.episteme.core.media.audio">AudioSpectrogram.WindowFunction</a>&nbsp;window)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>

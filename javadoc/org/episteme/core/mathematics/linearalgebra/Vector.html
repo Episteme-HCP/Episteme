@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -58,8 +58,15 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" tabindex="0">of(List, Ring)</a></li>
+<li><a href="#of(E%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" tabindex="0">of(E[], Ring)</a></li>
+<li><a href="#of(org.episteme.core.mathematics.structures.rings.Ring,E...)" tabindex="0">of(Ring, E...)</a></li>
+<li><a href="#zeros(int,org.episteme.core.mathematics.structures.rings.Ring)" tabindex="0">zeros(int, Ring)</a></li>
 <li><a href="#dimension()" tabindex="0">dimension()</a></li>
 <li><a href="#get(int)" tabindex="0">get(int)</a></li>
+<li><a href="#getStorage()" tabindex="0">getStorage()</a></li>
+<li><a href="#getProvider()" tabindex="0">getProvider()</a></li>
+<li><a href="#map(java.util.function.Function)" tabindex="0">map(Function)</a></li>
 <li><a href="#add(org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">add(Vector)</a></li>
 <li><a href="#subtract(org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">subtract(Vector)</a></li>
 <li><a href="#multiply(E)" tabindex="0">multiply(E)</a></li>
@@ -116,7 +123,7 @@ and dot product.
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -152,25 +159,58 @@ and dot product.
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the element at the specified index.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#multiply(E)" class="member-name-link">multiply</a><wbr>(<a href="#type-param-E" title="type parameter in Vector">E</a>&nbsp;scalar)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Returns the scalar product of this vector.</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getProvider()" class="member-name-link">getProvider</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Returns the provider that created or manages this vector.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="vectors/storage/VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getStorage()" class="member-name-link">getStorage</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Returns the underlying storage of this vector.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#map(java.util.function.Function)" class="member-name-link">map</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>,<wbr><a href="#type-param-E" title="type parameter in Vector">E</a>&gt;&nbsp;mapper)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Applies a mapping function to each element of this vector.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#negate()" class="member-name-link">negate</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#multiply(E)" class="member-name-link">multiply</a><wbr>(<a href="#type-param-E" title="type parameter in Vector">E</a>&nbsp;scalar)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Returns the scalar product of this vector.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#negate()" class="member-name-link">negate</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the negation of this vector (-this).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#type-param-E" title="type parameter in Vector">E</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#norm()" class="member-name-link">norm</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#type-param-E" title="type parameter in Vector">E</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#norm()" class="member-name-link">norm</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the norm (length) of this vector.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#normalize()" class="member-name-link">normalize</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#normalize()" class="member-name-link">normalize</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Returns the normalized vector (unit vector).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static &lt;E&gt;&nbsp;<a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(E%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of</a><wbr>(E[]&nbsp;data,
+ <a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1">
+<div class="block">Creates a vector from an array of elements.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1"><code>static &lt;E&gt;&nbsp;<a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&nbsp;data,
+ <a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1">
+<div class="block">Creates a vector from a list of elements.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static &lt;E&gt;&nbsp;<a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(org.episteme.core.mathematics.structures.rings.Ring,E...)" class="member-name-link">of</a><wbr>(<a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring,
+ E...&nbsp;elements)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1">
+<div class="block">Creates a vector from a variable number of elements.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#projection(org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">projection</a><wbr>(<a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;&nbsp;other)</code></div>
@@ -192,6 +232,12 @@ and dot product.
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Converts this vector to a rank-1 tensor.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1"><code>static &lt;E&gt;&nbsp;<a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1"><code><a href="#zeros(int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">zeros</a><wbr>(int&nbsp;dimension,
+ <a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1">
+<div class="block">Creates a vector of zeros.</div>
+</div>
 </div>
 </div>
 </div>
@@ -209,7 +255,7 @@ and dot product.
 <code><a href="../structures/groups/Magma.html#operate(E,E)" title="operate(Vector, Vector)">operate</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.structures.spaces.Module">Methods inherited from interface&nbsp;<a href="../structures/spaces/Module.html#method-summary" title="interface in org.episteme.core.mathematics.structures.spaces">Module</a></h3>
-<code><a href="../structures/spaces/Module.html#getScalarRing()" title="getScalarRing()">getScalarRing</a>, <a href="../structures/spaces/Module.html#scale(R,M)" title="scale(E, Vector)">scale</a></code></div>
+<code><a href="../structures/spaces/Module.html#getScalarRing()" title="getScalarRing()">getScalarRing</a>, <a href="../structures/spaces/Module.html#scale(R)" title="scale(E)">scale</a>, <a href="../structures/spaces/Module.html#scale(R,M)" title="scale(E, Vector)">scale</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.structures.groups.Monoid">Methods inherited from interface&nbsp;<a href="../structures/groups/Monoid.html#method-summary" title="interface in org.episteme.core.mathematics.structures.groups">Monoid</a></h3>
 <code><a href="../structures/groups/Monoid.html#isAssociative()" title="isAssociative()">isAssociative</a></code></div>
@@ -227,6 +273,47 @@ and dot product.
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)">
+<h3>of</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;E&gt;</span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;&nbsp;data,
+ <a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</span></div>
+<div class="block">Creates a vector from a list of elements.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="of(E[],org.episteme.core.mathematics.structures.rings.Ring)">
+<h3 id="of(java.lang.Object[],org.episteme.core.mathematics.structures.rings.Ring)">of</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;E&gt;</span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(E[]&nbsp;data,
+ <a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</span></div>
+<div class="block">Creates a vector from an array of elements.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="of(org.episteme.core.mathematics.structures.rings.Ring,E...)">
+<h3 id="of(org.episteme.core.mathematics.structures.rings.Ring,java.lang.Object[])">of</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/SafeVarargs.html" title="class or interface in java.lang" class="external-link">@SafeVarargs</a>
+</span><span class="modifiers">static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;E&gt;</span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(<a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring,
+ E...&nbsp;elements)</span></div>
+<div class="block">Creates a vector from a variable number of elements.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="zeros(int,org.episteme.core.mathematics.structures.rings.Ring)">
+<h3>zeros</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;E&gt;</span>&nbsp;<span class="element-name">zeros</span><wbr><span class="parameters">(int&nbsp;dimension,
+ <a href="../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;E&gt;&nbsp;ring)</span></div>
+<div class="block">Creates a vector of zeros.</div>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="dimension()">
 <h3>dimension</h3>
@@ -253,6 +340,47 @@ and dot product.
 <dd>the element at the specified index</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/IndexOutOfBoundsException.html" title="class or interface in java.lang" class="external-link">IndexOutOfBoundsException</a></code> - if the index is out of range</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getStorage()">
+<h3>getStorage</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type"><a href="vectors/storage/VectorStorage.html" title="interface in org.episteme.core.mathematics.linearalgebra.vectors.storage">VectorStorage</a>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</span>&nbsp;<span class="element-name">getStorage</span>()</div>
+<div class="block">Returns the underlying storage of this vector.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the vector storage</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getProvider()">
+<h3>getProvider</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</span>&nbsp;<span class="element-name">getProvider</span>()</div>
+<div class="block">Returns the provider that created or manages this vector.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the linear algebra provider</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="map(java.util.function.Function)">
+<h3>map</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>&gt;</span>&nbsp;<span class="element-name">map</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="#type-param-E" title="type parameter in Vector">E</a>,<wbr><a href="#type-param-E" title="type parameter in Vector">E</a>&gt;&nbsp;mapper)</span></div>
+<div class="block">Applies a mapping function to each element of this vector.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>mapper</code> - the function to apply</dd>
+<dt>Returns:</dt>
+<dd>a new vector with mapped elements</dd>
 </dl>
 </div>
 </section>

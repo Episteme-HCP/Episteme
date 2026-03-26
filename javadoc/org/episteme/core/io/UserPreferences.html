@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -64,7 +64,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#KEY_PLOTTING_BACKEND" tabindex="0">KEY_PLOTTING_BACKEND</a></li>
 <li><a href="#KEY_MOLECULAR_BACKEND" tabindex="0">KEY_MOLECULAR_BACKEND</a></li>
 <li><a href="#KEY_QUANTUM_BACKEND" tabindex="0">KEY_QUANTUM_BACKEND</a></li>
-<li><a href="#KEY_MATH_BACKEND" tabindex="0">KEY_MATH_BACKEND</a></li>
+<li><a href="#KEY_BACKEND_DEACTIVATED" tabindex="0">KEY_BACKEND_DEACTIVATED</a></li>
+<li><a href="#KEY_AUTO_TUNING_MODE" tabindex="0">KEY_AUTO_TUNING_MODE</a></li>
+<li><a href="#KEY_AUTO_TUNING_ENABLED" tabindex="0">KEY_AUTO_TUNING_ENABLED</a></li>
 <li><a href="#KEY_LANGUAGE" tabindex="0">KEY_LANGUAGE</a></li>
 <li><a href="#KEY_THEME" tabindex="0">KEY_THEME</a></li>
 <li><a href="#KEY_COMPUTE_BACKEND" tabindex="0">KEY_COMPUTE_BACKEND</a></li>
@@ -97,6 +99,12 @@ loadScripts(document, 'script');</script>
 <li><a href="#isGpuEnabled()" tabindex="0">isGpuEnabled()</a></li>
 <li><a href="#setGpuEnabled(boolean)" tabindex="0">setGpuEnabled(boolean)</a></li>
 <li><a href="#getPreferencesMap()" tabindex="0">getPreferencesMap()</a></li>
+<li><a href="#getAutoTuningMode()" tabindex="0">getAutoTuningMode()</a></li>
+<li><a href="#setAutoTuningMode(java.lang.String)" tabindex="0">setAutoTuningMode(String)</a></li>
+<li><a href="#isBackendDeactivated(java.lang.String)" tabindex="0">isBackendDeactivated(String)</a></li>
+<li><a href="#setBackendDeactivated(java.lang.String,boolean)" tabindex="0">setBackendDeactivated(String, boolean)</a></li>
+<li><a href="#isAutoTuningEnabled()" tabindex="0">isAutoTuningEnabled()</a></li>
+<li><a href="#setAutoTuningEnabled(boolean)" tabindex="0">setAutoTuningEnabled(boolean)</a></li>
 </ol>
 </li>
 </ol>
@@ -136,28 +144,34 @@ Stores user preferences in the user's home directory.</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#KEY_COMPUTE_BACKEND" class="member-name-link">KEY_COMPUTE_BACKEND</a></code></div>
+<div class="col-second even-row-color"><code><a href="#KEY_AUTO_TUNING_ENABLED" class="member-name-link">KEY_AUTO_TUNING_ENABLED</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#KEY_COMPUTE_CUDA_DEVICE" class="member-name-link">KEY_COMPUTE_CUDA_DEVICE</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#KEY_AUTO_TUNING_MODE" class="member-name-link">KEY_AUTO_TUNING_MODE</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#KEY_COMPUTE_GPU_ENABLED" class="member-name-link">KEY_COMPUTE_GPU_ENABLED</a></code></div>
+<div class="col-second even-row-color"><code><a href="#KEY_BACKEND_DEACTIVATED" class="member-name-link">KEY_BACKEND_DEACTIVATED</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#KEY_COMPUTE_OPENCL_DEVICE" class="member-name-link">KEY_COMPUTE_OPENCL_DEVICE</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#KEY_COMPUTE_BACKEND" class="member-name-link">KEY_COMPUTE_BACKEND</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#KEY_COMPUTE_THREADS" class="member-name-link">KEY_COMPUTE_THREADS</a></code></div>
+<div class="col-second even-row-color"><code><a href="#KEY_COMPUTE_CUDA_DEVICE" class="member-name-link">KEY_COMPUTE_CUDA_DEVICE</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#KEY_LANGUAGE" class="member-name-link">KEY_LANGUAGE</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#KEY_COMPUTE_GPU_ENABLED" class="member-name-link">KEY_COMPUTE_GPU_ENABLED</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#KEY_MAP_BACKEND" class="member-name-link">KEY_MAP_BACKEND</a></code></div>
+<div class="col-second even-row-color"><code><a href="#KEY_COMPUTE_OPENCL_DEVICE" class="member-name-link">KEY_COMPUTE_OPENCL_DEVICE</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#KEY_MATH_BACKEND" class="member-name-link">KEY_MATH_BACKEND</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#KEY_COMPUTE_THREADS" class="member-name-link">KEY_COMPUTE_THREADS</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#KEY_LANGUAGE" class="member-name-link">KEY_LANGUAGE</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#KEY_MAP_BACKEND" class="member-name-link">KEY_MAP_BACKEND</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#KEY_MOLECULAR_BACKEND" class="member-name-link">KEY_MOLECULAR_BACKEND</a></code></div>
@@ -200,64 +214,95 @@ Stores user preferences in the user's home directory.</div>
 <div class="block">Gets a preference value with default.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getComputeBackend()" class="member-name-link">getComputeBackend</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAutoTuningMode()" class="member-name-link">getAutoTuningMode</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets the compute backend (cpu, opencl, cuda).</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getComputeThreads()" class="member-name-link">getComputeThreads</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets the number of compute threads.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="UserPreferences.html" title="class in org.episteme.core.io">UserPreferences</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInt(java.lang.String,int)" class="member-name-link">getInt</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
- int&nbsp;defaultValue)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets an integer preference value with default.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLanguage()" class="member-name-link">getLanguage</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets the UI language (default from episteme.properties).</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferencesMap()" class="member-name-link">getPreferencesMap</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets a read-only view of all persistent preferences.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferencesPath()" class="member-name-link">getPreferencesPath</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the path to the preferences file.</div>
+<div class="block">Gets the auto-tuning mode (ON, OFF, AUTO).</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferredBackend(java.lang.String)" class="member-name-link">getPreferredBackend</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;backendType)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getComputeBackend()" class="member-name-link">getComputeBackend</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets the preferred backend for a given type.</div>
+<div class="block">Gets the compute backend (cpu, opencl, cuda).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getComputeThreads()" class="member-name-link">getComputeThreads</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the number of compute threads.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="UserPreferences.html" title="class in org.episteme.core.io">UserPreferences</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInt(java.lang.String,int)" class="member-name-link">getInt</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ int&nbsp;defaultValue)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets an integer preference value with default.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLanguage()" class="member-name-link">getLanguage</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the UI language (default from episteme.properties).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferencesMap()" class="member-name-link">getPreferencesMap</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets a read-only view of all persistent preferences.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferencesPath()" class="member-name-link">getPreferencesPath</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the path to the preferences file.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTheme()" class="member-name-link">getTheme</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferredBackend(java.lang.String)" class="member-name-link">getPreferredBackend</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;backendType)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the preferred backend for a given type.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTheme()" class="member-name-link">getTheme</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the UI theme (default from episteme.properties).</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAutoTuningEnabled()" class="member-name-link">isAutoTuningEnabled</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets whether auto-tuning is enabled.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isGpuEnabled()" class="member-name-link">isGpuEnabled</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isBackendDeactivated(java.lang.String)" class="member-name-link">isBackendDeactivated</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Checks if a backend is manually deactivated.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isGpuEnabled()" class="member-name-link">isGpuEnabled</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets whether GPU compute is enabled.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#save()" class="member-name-link">save</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#save()" class="member-name-link">save</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Saves preferences to file.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(java.lang.String,java.lang.String)" class="member-name-link">set</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(java.lang.String,java.lang.String)" class="member-name-link">set</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets a preference value and saves immediately.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAutoTuningEnabled(boolean)" class="member-name-link">setAutoTuningEnabled</a><wbr>(boolean&nbsp;enabled)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets whether auto-tuning is enabled.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAutoTuningMode(java.lang.String)" class="member-name-link">setAutoTuningMode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;mode)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the auto-tuning mode.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBackendDeactivated(java.lang.String,boolean)" class="member-name-link">setBackendDeactivated</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
+ boolean&nbsp;deactivate)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets whether a backend is manually deactivated.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setComputeBackend(java.lang.String)" class="member-name-link">setComputeBackend</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;backend)</code></div>
@@ -394,15 +439,47 @@ Stores user preferences in the user's home directory.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="KEY_MATH_BACKEND">
-<h3>KEY_MATH_BACKEND</h3>
+<section class="detail" id="KEY_BACKEND_DEACTIVATED">
+<h3>KEY_BACKEND_DEACTIVATED</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">KEY_MATH_BACKEND</span></div>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">KEY_BACKEND_DEACTIVATED</span></div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../../../constant-values.html#org.episteme.core.io.UserPreferences.KEY_MATH_BACKEND">Constant Field Values</a></li>
+<li><a href="../../../../constant-values.html#org.episteme.core.io.UserPreferences.KEY_BACKEND_DEACTIVATED">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="KEY_AUTO_TUNING_MODE">
+<h3>KEY_AUTO_TUNING_MODE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">KEY_AUTO_TUNING_MODE</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../constant-values.html#org.episteme.core.io.UserPreferences.KEY_AUTO_TUNING_MODE">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="KEY_AUTO_TUNING_ENABLED">
+<h3>KEY_AUTO_TUNING_ENABLED</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">KEY_AUTO_TUNING_ENABLED</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../constant-values.html#org.episteme.core.io.UserPreferences.KEY_AUTO_TUNING_ENABLED">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -719,6 +796,61 @@ Stores user preferences in the user's home directory.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">getPreferencesMap</span>()</div>
 <div class="block">Gets a read-only view of all persistent preferences.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getAutoTuningMode()">
+<h3>getAutoTuningMode</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getAutoTuningMode</span>()</div>
+<div class="block">Gets the auto-tuning mode (ON, OFF, AUTO).</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setAutoTuningMode(java.lang.String)">
+<h3>setAutoTuningMode</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAutoTuningMode</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;mode)</span></div>
+<div class="block">Sets the auto-tuning mode.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isBackendDeactivated(java.lang.String)">
+<h3>isBackendDeactivated</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isBackendDeactivated</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</span></div>
+<div class="block">Checks if a backend is manually deactivated.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setBackendDeactivated(java.lang.String,boolean)">
+<h3>setBackendDeactivated</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setBackendDeactivated</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id,
+ boolean&nbsp;deactivate)</span></div>
+<div class="block">Sets whether a backend is manually deactivated.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isAutoTuningEnabled()">
+<h3>isAutoTuningEnabled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isAutoTuningEnabled</span>()</div>
+<div class="block">Gets whether auto-tuning is enabled.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setAutoTuningEnabled(boolean)">
+<h3>setAutoTuningEnabled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAutoTuningEnabled</span><wbr><span class="parameters">(boolean&nbsp;enabled)</span></div>
+<div class="block">Sets whether auto-tuning is enabled.</div>
 </div>
 </section>
 </li>

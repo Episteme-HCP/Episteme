@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,7 +60,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
-<li><a href="#%3Cinit%3E(java.lang.String,org.episteme.social.psychology.social.Group)" tabindex="0">Settlement(String, Group)</a></li>
+<li><a href="#%3Cinit%3E(java.lang.String,org.episteme.social.psychology.social.PsychologicalGroup)" tabindex="0">Settlement(String, PsychologicalGroup)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -130,8 +130,8 @@ that lack complex modern state infrastructure.
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,org.episteme.social.psychology.social.Group)" class="member-name-link">Settlement</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a>&nbsp;group)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,org.episteme.social.psychology.social.PsychologicalGroup)" class="member-name-link">Settlement</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="../psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a>&nbsp;PsychologicalGroup)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Initializes a new Settlement.</div>
 </div>
@@ -154,10 +154,10 @@ that lack complex modern state infrastructure.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Adds an individual to the leadership of the settlement.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getGroup()" class="member-name-link">getGroup</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the social group associated with this settlement.</div>
+<div class="block">Returns the social PsychologicalGroup associated with this settlement.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a><wbr>&lt;<a href="../../natural/biology/Individual.html" title="class in org.episteme.natural.biology">Individual</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLeaders()" class="member-name-link">getLeaders</a>()</code></div>
@@ -199,16 +199,16 @@ that lack complex modern state infrastructure.
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(java.lang.String,org.episteme.social.psychology.social.Group)">
+<section class="detail" id="&lt;init&gt;(java.lang.String,org.episteme.social.psychology.social.PsychologicalGroup)">
 <h3>Settlement</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Settlement</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a>&nbsp;group)</span></div>
+ <a href="../psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a>&nbsp;PsychologicalGroup)</span></div>
 <div class="block">Initializes a new Settlement.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>name</code> - the name of the settlement</dd>
-<dd><code>group</code> - the primary social group occupying the settlement</dd>
+<dd><code>PsychologicalGroup</code> - the primary social PsychologicalGroup occupying the settlement</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/NullPointerException.html" title="class or interface in java.lang" class="external-link">NullPointerException</a></code> - if any argument is null</dd>
 </dl>
@@ -227,11 +227,11 @@ that lack complex modern state infrastructure.
 <section class="detail" id="getGroup()">
 <h3>getGroup</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../psychology/social/Group.html" title="class in org.episteme.social.psychology.social">Group</a></span>&nbsp;<span class="element-name">getGroup</span>()</div>
-<div class="block">Returns the social group associated with this settlement.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../psychology/social/PsychologicalGroup.html" title="class in org.episteme.social.psychology.social">PsychologicalGroup</a></span>&nbsp;<span class="element-name">getGroup</span>()</div>
+<div class="block">Returns the social PsychologicalGroup associated with this settlement.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the group</dd>
+<dd>the PsychologicalGroup</dd>
 </dl>
 </div>
 </section>

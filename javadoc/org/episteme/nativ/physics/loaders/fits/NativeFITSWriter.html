@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -73,8 +73,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#getLongDescription()" tabindex="0">getLongDescription()</a></li>
 <li><a href="#getSupportedVersions()" tabindex="0">getSupportedVersions()</a></li>
 <li><a href="#getSupportedExtensions()" tabindex="0">getSupportedExtensions()</a></li>
-<li><a href="#save(org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix,java.lang.String)" tabindex="0">save(NativeMatrix, String)</a></li>
-<li><a href="#writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix)" tabindex="0">writeImage(NativeMatrix)</a></li>
+<li><a href="#save(org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage,java.lang.String)" tabindex="0">save(NativeDoubleMatrixStorage, String)</a></li>
+<li><a href="#writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage)" tabindex="0">writeImage(NativeDoubleMatrixStorage)</a></li>
 <li><a href="#close()" tabindex="0">close()</a></li>
 </ol>
 </li>
@@ -86,19 +86,19 @@ loadScripts(document, 'script');</script>
 <h1 title="Class NativeFITSWriter" class="title">Class NativeFITSWriter</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance"><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">org.episteme.core.io.AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;
+<div class="inheritance"><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">org.episteme.core.io.AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;
 <div class="inheritance">org.episteme.nativ.physics.loaders.fits.NativeFITSWriter</div>
 </div>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;, <a href="../../../../core/io/ResourceWriter.html" title="interface in org.episteme.core.io">ResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;, <a href="../../../../core/io/ResourceWriter.html" title="interface in org.episteme.core.io">ResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">NativeFITSWriter</span>
-<span class="extends-implements">extends <a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;
+<span class="extends-implements">extends <a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;
 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a></span></div>
 <div class="block">High-performance FITS writer using Panama.</div>
 </div>
@@ -159,7 +159,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the base path where this resource is located.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a><wbr>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a><wbr>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getResourceType()" class="member-name-link">getResourceType</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the type of resource.</div>
@@ -175,13 +175,13 @@ implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base
 <div class="block">Returns the supported versions of the format this reader/writer handles.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#save(org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix,java.lang.String)" class="member-name-link">save</a><wbr>(<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&nbsp;resource,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#save(org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage,java.lang.String)" class="member-name-link">save</a><wbr>(<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&nbsp;resource,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;destinationId)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Saves the resource to a destination.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix)" class="member-name-link">writeImage</a><wbr>(<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&nbsp;matrix)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage)" class="member-name-link">writeImage</a><wbr>(<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&nbsp;matrix)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
@@ -243,7 +243,9 @@ implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base
 MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getName()">getName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the display name</dd>
 </dl>
@@ -260,7 +262,9 @@ MUST be implemented with I18N support.</div>
 MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getDescription()">getDescription</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the description</dd>
 </dl>
@@ -277,7 +281,9 @@ MUST be implemented with I18N support.</div>
 MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getCategory()">getCategory</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getCategory()">getCategory</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getCategory()">getCategory</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the category name</dd>
 </dl>
@@ -288,12 +294,12 @@ MUST be implemented with I18N support.</div>
 <section class="detail" id="getResourceType()">
 <h3>getResourceType</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</span>&nbsp;<span class="element-name">getResourceType</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</span>&nbsp;<span class="element-name">getResourceType</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../core/io/ResourceIO.html#getResourceType()">ResourceIO</a></code></span></div>
 <div class="block">Returns the type of resource.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getResourceType()">getResourceType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getResourceType()">getResourceType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -307,7 +313,7 @@ MUST be implemented with I18N support.</div>
 <div class="block">Returns the base path where this resource is located.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getResourcePath()">getResourcePath</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getResourcePath()">getResourcePath</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -322,7 +328,9 @@ MUST be implemented with I18N support.</div>
 MUST be implemented with I18N support.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getLongDescription()">getLongDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getLongDescription()">getLongDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
+<dt>Overrides:</dt>
+<dd><code><a href="../../../../core/io/AbstractResourceWriter.html#getLongDescription()">getLongDescription</a></code>&nbsp;in class&nbsp;<code><a href="../../../../core/io/AbstractResourceWriter.html" title="class in org.episteme.core.io">AbstractResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>the long description</dd>
 </dl>
@@ -351,7 +359,7 @@ Examples:
 </p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getSupportedVersions()">getSupportedVersions</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getSupportedVersions()">getSupportedVersions</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>array of supported version strings, never null (empty array if version-agnostic)</dd>
 </dl>
@@ -367,23 +375,23 @@ Examples:
 <div class="block">Returns the supported file extensions (e.g., ".h5", ".fits").</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceIO.html#getSupportedExtensions()">getSupportedExtensions</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceIO.html#getSupportedExtensions()">getSupportedExtensions</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="save(org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix,java.lang.String)">
+<section class="detail" id="save(org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage,java.lang.String)">
 <h3>save</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">save</span><wbr><span class="parameters">(<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&nbsp;resource,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">save</span><wbr><span class="parameters">(<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&nbsp;resource,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;destinationId)</span>
           throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../../core/io/ResourceWriter.html#save(T,java.lang.String)">ResourceWriter</a></code></span></div>
 <div class="block">Saves the resource to a destination.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../../../core/io/ResourceWriter.html#save(T,java.lang.String)">save</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceWriter.html" title="interface in org.episteme.core.io">ResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&gt;</code></dd>
+<dd><code><a href="../../../../core/io/ResourceWriter.html#save(T,java.lang.String)">save</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../core/io/ResourceWriter.html" title="interface in org.episteme.core.io">ResourceWriter</a>&lt;<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&gt;</code></dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Exception.html" title="class or interface in java.lang" class="external-link">Exception</a></code></dd>
 </dl>
@@ -391,10 +399,10 @@ Examples:
 </section>
 </li>
 <li>
-<section class="detail" id="writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix)">
+<section class="detail" id="writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage)">
 <h3>writeImage</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeImage</span><wbr><span class="parameters">(<a href="../../../mathematics/linearalgebra/matrices/NativeMatrix.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices">NativeMatrix</a>&nbsp;matrix)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeImage</span><wbr><span class="parameters">(<a href="../../../mathematics/linearalgebra/matrices/storage/NativeDoubleMatrixStorage.html" title="class in org.episteme.nativ.mathematics.linearalgebra.matrices.storage">NativeDoubleMatrixStorage</a>&nbsp;matrix)</span></div>
 </div>
 </section>
 </li>

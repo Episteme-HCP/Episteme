@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,8 +60,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
-<li><a href="#%3Cinit%3E()" tabindex="0">HeartbeatMonitor()</a></li>
-<li><a href="#%3Cinit%3E(java.time.Duration,java.time.Duration)" tabindex="0">HeartbeatMonitor(Duration, Duration)</a></li>
+<li><a href="#%3Cinit%3E(org.episteme.server.server.repository.WorkerRepository)" tabindex="0">HeartbeatMonitor(WorkerRepository)</a></li>
+<li><a href="#%3Cinit%3E(org.episteme.server.server.repository.WorkerRepository,java.time.Duration,java.time.Duration)" tabindex="0">HeartbeatMonitor(WorkerRepository, Duration, Duration)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -134,13 +134,14 @@ within the timeout period, the worker is marked as dead and removed.</div>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">HeartbeatMonitor</a>()</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.episteme.server.server.repository.WorkerRepository)" class="member-name-link">HeartbeatMonitor</a><wbr>(<a href="../repository/WorkerRepository.html" title="interface in org.episteme.server.server.repository">WorkerRepository</a>&nbsp;workerRepository)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Create heartbeat monitor with default settings.
 - 30 second timeout
 - 10 second check interval</div>
 </div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.time.Duration,java.time.Duration)" class="member-name-link">HeartbeatMonitor</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;heartbeatTimeout,
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.episteme.server.server.repository.WorkerRepository,java.time.Duration,java.time.Duration)" class="member-name-link">HeartbeatMonitor</a><wbr>(<a href="../repository/WorkerRepository.html" title="interface in org.episteme.server.server.repository">WorkerRepository</a>&nbsp;workerRepository,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;heartbeatTimeout,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;checkInterval)</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Create heartbeat monitor with custom settings.</div>
@@ -239,10 +240,10 @@ within the timeout period, the worker is marked as dead and removed.</div>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;()">
+<section class="detail" id="&lt;init&gt;(org.episteme.server.server.repository.WorkerRepository)">
 <h3>HeartbeatMonitor</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">HeartbeatMonitor</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">HeartbeatMonitor</span><wbr><span class="parameters">(<a href="../repository/WorkerRepository.html" title="interface in org.episteme.server.server.repository">WorkerRepository</a>&nbsp;workerRepository)</span></div>
 <div class="block">Create heartbeat monitor with default settings.
 - 30 second timeout
 - 10 second check interval</div>
@@ -250,10 +251,11 @@ within the timeout period, the worker is marked as dead and removed.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="&lt;init&gt;(java.time.Duration,java.time.Duration)">
+<section class="detail" id="&lt;init&gt;(org.episteme.server.server.repository.WorkerRepository,java.time.Duration,java.time.Duration)">
 <h3>HeartbeatMonitor</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">HeartbeatMonitor</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;heartbeatTimeout,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">HeartbeatMonitor</span><wbr><span class="parameters">(<a href="../repository/WorkerRepository.html" title="interface in org.episteme.server.server.repository">WorkerRepository</a>&nbsp;workerRepository,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;heartbeatTimeout,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;checkInterval)</span></div>
 <div class="block">Create heartbeat monitor with custom settings.</div>
 </div>

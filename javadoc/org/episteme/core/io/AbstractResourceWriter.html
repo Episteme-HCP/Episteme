@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -64,6 +64,10 @@ loadScripts(document, 'script');</script>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#getName()" tabindex="0">getName()</a></li>
+<li><a href="#getDescription()" tabindex="0">getDescription()</a></li>
+<li><a href="#getCategory()" tabindex="0">getCategory()</a></li>
+<li><a href="#getLongDescription()" tabindex="0">getLongDescription()</a></li>
 <li><a href="#createBufferedStream(java.io.OutputStream)" tabindex="0">createBufferedStream(OutputStream)</a></li>
 </ol>
 </li>
@@ -84,7 +88,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <dl class="notes">
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="../../social/law/loaders/AbstractLegalDocumentWriter.html" title="class in org.episteme.social.law.loaders">AbstractLegalDocumentWriter</a>, <a href="../../natural/biology/loaders/FASTAWriter.html" title="class in org.episteme.natural.biology.loaders">FASTAWriter</a>, <a href="../../nativ/physics/loaders/fits/NativeFITSWriter.html" title="class in org.episteme.nativ.physics.loaders.fits">NativeFITSWriter</a>, <a href="../../nativ/physics/loaders/hdf5/NativeHDF5Writer.html" title="class in org.episteme.nativ.physics.loaders.hdf5">NativeHDF5Writer</a>, <a href="../mathematics/loaders/NeuralModelWriter.html" title="class in org.episteme.core.mathematics.loaders">NeuralModelWriter</a>, <a href="../mathematics/loaders/oeis/OEISWriter.html" title="class in org.episteme.core.mathematics.loaders.oeis">OEISWriter</a>, <a href="../../natural/biology/loaders/PDBWriter.html" title="class in org.episteme.natural.biology.loaders">PDBWriter</a>, <a href="../mathematics/loaders/VTKWriter.html" title="class in org.episteme.core.mathematics.loaders">VTKWriter</a></code></dd>
+<dd><code><a href="../../social/law/loaders/AbstractLegalDocumentWriter.html" title="class in org.episteme.social.law.loaders">AbstractLegalDocumentWriter</a>, <a href="../../natural/biology/loaders/FASTAWriter.html" title="class in org.episteme.natural.biology.loaders">FASTAWriter</a>, <a href="../../nativ/physics/loaders/fits/NativeFITSWriter.html" title="class in org.episteme.nativ.physics.loaders.fits">NativeFITSWriter</a>, <a href="../../nativ/physics/loaders/hdf5/NativeHDF5TensorWriter.html" title="class in org.episteme.nativ.physics.loaders.hdf5">NativeHDF5TensorWriter</a>, <a href="../../nativ/physics/loaders/hdf5/NativeHDF5Writer.html" title="class in org.episteme.nativ.physics.loaders.hdf5">NativeHDF5Writer</a>, <a href="../mathematics/loaders/NeuralModelWriter.html" title="class in org.episteme.core.mathematics.loaders">NeuralModelWriter</a>, <a href="../mathematics/loaders/oeis/OEISWriter.html" title="class in org.episteme.core.mathematics.loaders.oeis">OEISWriter</a>, <a href="../../natural/biology/loaders/PDBWriter.html" title="class in org.episteme.natural.biology.loaders">PDBWriter</a>, <a href="../mathematics/loaders/VTKWriter.html" title="class in org.episteme.core.mathematics.loaders">VTKWriter</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
@@ -92,7 +96,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="ResourceWriter.html" title="interface in org.episteme.core.io">ResourceWriter</a>&lt;T&gt;</span></div>
 <div class="block">Abstract base for resource writers.
-Provides basic buffering support but no caching/fallback logic (Output only).</div>
+Provides basic buffering support and I18N metadata.</div>
 </div>
 </section>
 <section class="summary">
@@ -126,6 +130,26 @@ Provides basic buffering support but no caching/fallback logic (Output only).</d
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Prepares an OutputStream with buffering.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCategory()" class="member-name-link">getCategory</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the category for grouping.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDescription()" class="member-name-link">getDescription</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a short description of this resource handler.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLongDescription()" class="member-name-link">getLongDescription</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a long description of this resource handler.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the display name of this resource handler.</div>
+</div>
 </div>
 </div>
 </div>
@@ -134,7 +158,7 @@ Provides basic buffering support but no caching/fallback logic (Output only).</d
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.io.ResourceIO">Methods inherited from interface&nbsp;<a href="ResourceIO.html#method-summary" title="interface in org.episteme.core.io">ResourceIO</a></h3>
-<code><a href="ResourceIO.html#getCategory()" title="getCategory()">getCategory</a>, <a href="ResourceIO.html#getDescription()" title="getDescription()">getDescription</a>, <a href="ResourceIO.html#getExpectedResourceFiles()" title="getExpectedResourceFiles()">getExpectedResourceFiles</a>, <a href="ResourceIO.html#getLongDescription()" title="getLongDescription()">getLongDescription</a>, <a href="ResourceIO.html#getName()" title="getName()">getName</a>, <a href="ResourceIO.html#getResourcePath()" title="getResourcePath()">getResourcePath</a>, <a href="ResourceIO.html#getResourceType()" title="getResourceType()">getResourceType</a>, <a href="ResourceIO.html#getSupportedExtensions()" title="getSupportedExtensions()">getSupportedExtensions</a>, <a href="ResourceIO.html#getSupportedVersions()" title="getSupportedVersions()">getSupportedVersions</a>, <a href="ResourceIO.html#isFileBased()" title="isFileBased()">isFileBased</a>, <a href="ResourceIO.html#isInput()" title="isInput()">isInput</a></code></div>
+<code><a href="ResourceIO.html#getExpectedResourceFiles()" title="getExpectedResourceFiles()">getExpectedResourceFiles</a>, <a href="ResourceIO.html#getResourcePath()" title="getResourcePath()">getResourcePath</a>, <a href="ResourceIO.html#getResourceType()" title="getResourceType()">getResourceType</a>, <a href="ResourceIO.html#getSupportedExtensions()" title="getSupportedExtensions()">getSupportedExtensions</a>, <a href="ResourceIO.html#getSupportedVersions()" title="getSupportedVersions()">getSupportedVersions</a>, <a href="ResourceIO.html#isFileBased()" title="isFileBased()">isFileBased</a>, <a href="ResourceIO.html#isInput()" title="isInput()">isInput</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.io.ResourceWriter">Methods inherited from interface&nbsp;<a href="ResourceWriter.html#method-summary" title="interface in org.episteme.core.io">ResourceWriter</a></h3>
 <code><a href="ResourceWriter.html#isOutput()" title="isOutput()">isOutput</a>, <a href="ResourceWriter.html#save(T,java.lang.String)" title="save(T, String)">save</a></code></div>
@@ -165,6 +189,74 @@ Provides basic buffering support but no caching/fallback logic (Output only).</d
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="getName()">
+<h3>getName</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getName</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ResourceIO.html#getName()">ResourceIO</a></code></span></div>
+<div class="block">Returns the display name of this resource handler.
+MUST be implemented with I18N support.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ResourceIO.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="#type-param-T" title="type parameter in AbstractResourceWriter">T</a>&gt;</code></dd>
+<dt>Returns:</dt>
+<dd>the display name</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getDescription()">
+<h3>getDescription</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getDescription</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ResourceIO.html#getDescription()">ResourceIO</a></code></span></div>
+<div class="block">Returns a short description of this resource handler.
+MUST be implemented with I18N support.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ResourceIO.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="#type-param-T" title="type parameter in AbstractResourceWriter">T</a>&gt;</code></dd>
+<dt>Returns:</dt>
+<dd>the description</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getCategory()">
+<h3>getCategory</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getCategory</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ResourceIO.html#getCategory()">ResourceIO</a></code></span></div>
+<div class="block">Returns the category for grouping.
+MUST be implemented with I18N support.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ResourceIO.html#getCategory()">getCategory</a></code>&nbsp;in interface&nbsp;<code><a href="ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="#type-param-T" title="type parameter in AbstractResourceWriter">T</a>&gt;</code></dd>
+<dt>Returns:</dt>
+<dd>the category name</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getLongDescription()">
+<h3>getLongDescription</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getLongDescription</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="ResourceIO.html#getLongDescription()">ResourceIO</a></code></span></div>
+<div class="block">Returns a long description of this resource handler.
+MUST be implemented with I18N support.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="ResourceIO.html#getLongDescription()">getLongDescription</a></code>&nbsp;in interface&nbsp;<code><a href="ResourceIO.html" title="interface in org.episteme.core.io">ResourceIO</a>&lt;<a href="#type-param-T" title="type parameter in AbstractResourceWriter">T</a>&gt;</code></dd>
+<dt>Returns:</dt>
+<dd>the long description</dd>
+</dl>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="createBufferedStream(java.io.OutputStream)">
 <h3>createBufferedStream</h3>

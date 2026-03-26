@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -66,9 +66,13 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.episteme.core.technical.backend.<a href="../technical/backend/AbstractBackendManager.html" class="type-name-link" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a>&lt;T&gt;
 <ul>
 <li class="circle">org.episteme.core.media.<a href="AudioBackendManager.html" class="type-name-link" title="class in org.episteme.core.media">AudioBackendManager</a></li>
+<li class="circle">org.episteme.core.media.<a href="VideoBackendManager.html" class="type-name-link" title="class in org.episteme.core.media">VideoBackendManager</a></li>
+<li class="circle">org.episteme.core.media.<a href="VisionBackendManager.html" class="type-name-link" title="class in org.episteme.core.media">VisionBackendManager</a></li>
 </ul>
 </li>
 <li class="circle">org.episteme.core.media.<a href="AudioBackendSystem.html" class="type-name-link" title="class in org.episteme.core.media">AudioBackendSystem</a></li>
+<li class="circle">org.episteme.core.media.<a href="VideoBackendSystem.html" class="type-name-link" title="class in org.episteme.core.media">VideoBackendSystem</a></li>
+<li class="circle">org.episteme.core.media.<a href="VisionBackendSystem.html" class="type-name-link" title="class in org.episteme.core.media">VisionBackendSystem</a></li>
 </ul>
 </li>
 </ul>
@@ -78,12 +82,32 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">org.episteme.core.technical.algorithm.<a href="../technical/algorithm/AlgorithmProvider.html" class="type-name-link" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>
 <ul>
-<li class="circle">org.episteme.core.media.<a href="AudioEngine.html" class="type-name-link" title="interface in org.episteme.core.media">AudioEngine</a></li>
+<li class="circle">org.episteme.core.media.audio.<a href="audio/AudioAlgorithmProvider.html" class="type-name-link" title="interface in org.episteme.core.media.audio">AudioAlgorithmProvider</a>&lt;T&gt;
+<ul>
+<li class="circle">org.episteme.core.media.<a href="AudioBackend.html" class="type-name-link" title="interface in org.episteme.core.media">AudioBackend</a> (also extends org.episteme.core.technical.backend.<a href="../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>)</li>
+</ul>
+</li>
+<li class="circle">org.episteme.core.media.video.<a href="video/VideoAlgorithmProvider.html" class="type-name-link" title="interface in org.episteme.core.media.video">VideoAlgorithmProvider</a>
+<ul>
+<li class="circle">org.episteme.core.media.<a href="VideoBackend.html" class="type-name-link" title="interface in org.episteme.core.media">VideoBackend</a> (also extends org.episteme.core.technical.backend.<a href="../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>)</li>
+</ul>
+</li>
+<li class="circle">org.episteme.core.media.vision.<a href="vision/VisionAlgorithmProvider.html" class="type-name-link" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;T&gt;
+<ul>
+<li class="circle">org.episteme.core.media.<a href="VisionBackend.html" class="type-name-link" title="interface in org.episteme.core.media">VisionBackend</a> (also extends org.episteme.core.technical.backend.<a href="../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>)</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="circle">org.episteme.core.technical.backend.<a href="../technical/backend/Backend.html" class="type-name-link" title="interface in org.episteme.core.technical.backend">Backend</a>
 <ul>
-<li class="circle">org.episteme.core.media.<a href="AudioBackend.html" class="type-name-link" title="interface in org.episteme.core.media">AudioBackend</a></li>
+<li class="circle">org.episteme.core.technical.backend.<a href="../technical/backend/ComputeBackend.html" class="type-name-link" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>
+<ul>
+<li class="circle">org.episteme.core.media.<a href="AudioBackend.html" class="type-name-link" title="interface in org.episteme.core.media">AudioBackend</a> (also extends org.episteme.core.media.audio.<a href="audio/AudioAlgorithmProvider.html" title="interface in org.episteme.core.media.audio">AudioAlgorithmProvider</a>&lt;T&gt;)</li>
+<li class="circle">org.episteme.core.media.<a href="VideoBackend.html" class="type-name-link" title="interface in org.episteme.core.media">VideoBackend</a> (also extends org.episteme.core.media.video.<a href="video/VideoAlgorithmProvider.html" title="interface in org.episteme.core.media.video">VideoAlgorithmProvider</a>)</li>
+<li class="circle">org.episteme.core.media.<a href="VisionBackend.html" class="type-name-link" title="interface in org.episteme.core.media">VisionBackend</a> (also extends org.episteme.core.media.vision.<a href="vision/VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;T&gt;)</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

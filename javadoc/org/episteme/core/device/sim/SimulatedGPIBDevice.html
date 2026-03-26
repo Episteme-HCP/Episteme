@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -55,6 +55,7 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
+<li><a href="#nested-class-summary" tabindex="0">Nested Class Summary</a></li>
 <li><a href="#field-summary" tabindex="0">Field Summary</a></li>
 <li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
@@ -73,7 +74,6 @@ loadScripts(document, 'script');</script>
 <li><a href="#write(java.lang.String)" tabindex="0">write(String)</a></li>
 <li><a href="#read()" tabindex="0">read()</a></li>
 <li><a href="#query(java.lang.String)" tabindex="0">query(String)</a></li>
-<li><a href="#getId()" tabindex="0">getId()</a></li>
 <li><a href="#addCustomReadings(java.util.Map)" tabindex="0">addCustomReadings(Map)</a></li>
 </ol>
 </li>
@@ -85,37 +85,60 @@ loadScripts(document, 'script');</script>
 <h1 title="Class SimulatedGPIBDevice" class="title">Class SimulatedGPIBDevice</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance"><a href="SimulatedDevice.html" title="class in org.episteme.core.device.sim">org.episteme.core.device.sim.SimulatedDevice</a>
+<div class="inheritance"><a href="../AbstractDevice.html" title="class in org.episteme.core.device">org.episteme.core.device.AbstractDevice</a>
+<div class="inheritance"><a href="AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">org.episteme.core.device.sim.AbstractSimulatedDevice</a>
 <div class="inheritance">org.episteme.core.device.sim.SimulatedGPIBDevice</div>
+</div>
 </div>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../Device.html" title="interface in org.episteme.core.device">Device</a></code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../Device.html" title="interface in org.episteme.core.device">Device</a>, <a href="../../util/Commented.html" title="interface in org.episteme.core.util">Commented</a>, <a href="../../util/identity/ComprehensiveIdentification.html" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a>, <a href="../../util/identity/Identified.html" title="interface in org.episteme.core.util.identity">Identified</a>&lt;<a href="../../util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a>&gt;, <a href="../../util/Named.html" title="interface in org.episteme.core.util">Named</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">SimulatedGPIBDevice</span>
-<span class="extends-implements">extends <a href="SimulatedDevice.html" title="class in org.episteme.core.device.sim">SimulatedDevice</a></span></div>
+<span class="extends-implements">extends <a href="AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a></span></div>
 <div class="block">Simulated GPIB device for testing without physical hardware.</div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.0</dd>
 <dt>Author:</dt>
 <dd>Silvere Martin-Michiellot, Gemini AI (Google DeepMind)</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../serialized-form.html#org.episteme.core.device.sim.SimulatedGPIBDevice">Serialized Form</a></li>
+</ul>
+</dd>
 </dl>
 </div>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<li>
+<section class="nested-class-summary" id="nested-class-summary">
+<h2>Nested Class Summary</h2>
+<div class="inherited-list">
+<h3 id="nested-classes-inherited-from-class-org.episteme.core.device.AbstractDevice">Nested classes/interfaces inherited from class&nbsp;<a href="../AbstractDevice.html#nested-class-summary" title="class in org.episteme.core.device">AbstractDevice</a></h3>
+<code><a href="../AbstractDevice.Record.html" title="class in org.episteme.core.device">AbstractDevice.Record</a></code></div>
+<div class="inherited-list">
+<h3 id="nested-classes-inherited-from-class-org.episteme.core.device.Device">Nested classes/interfaces inherited from interface&nbsp;<a href="../Device.html#nested-class-summary" title="interface in org.episteme.core.device">Device</a></h3>
+<code><a href="../Device.Status.html" title="enum class in org.episteme.core.device">Device.Status</a></code></div>
+</section>
+</li>
 <!-- =========== FIELD SUMMARY =========== -->
 <li>
 <section class="field-summary" id="field-summary">
 <h2>Field Summary</h2>
 <div class="inherited-list">
-<h3 id="fields-inherited-from-class-org.episteme.core.device.sim.SimulatedDevice">Fields inherited from class&nbsp;<a href="SimulatedDevice.html#field-summary" title="class in org.episteme.core.device.sim">SimulatedDevice</a></h3>
-<code><a href="SimulatedDevice.html#capabilities">capabilities</a></code></div>
+<h3 id="fields-inherited-from-class-org.episteme.core.device.sim.AbstractSimulatedDevice">Fields inherited from class&nbsp;<a href="AbstractSimulatedDevice.html#field-summary" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a></h3>
+<code><a href="AbstractSimulatedDevice.html#support">support</a></code></div>
+<div class="inherited-list">
+<h3 id="fields-inherited-from-class-org.episteme.core.device.AbstractDevice">Fields inherited from class&nbsp;<a href="../AbstractDevice.html#field-summary" title="class in org.episteme.core.device">AbstractDevice</a></h3>
+<code><a href="../AbstractDevice.html#accuracy">accuracy</a>, <a href="../AbstractDevice.html#calibrationHistory">calibrationHistory</a>, <a href="../AbstractDevice.html#currentValue">currentValue</a>, <a href="../AbstractDevice.html#displayUnit">displayUnit</a>, <a href="../AbstractDevice.html#firmware">firmware</a>, <a href="../AbstractDevice.html#history">history</a>, <a href="../AbstractDevice.html#identification">identification</a>, <a href="../AbstractDevice.html#lastCalibration">lastCalibration</a>, <a href="../AbstractDevice.html#locationDescription">locationDescription</a>, <a href="../AbstractDevice.html#manufacturer">manufacturer</a>, <a href="../AbstractDevice.html#maxRange">maxRange</a>, <a href="../AbstractDevice.html#minRange">minRange</a>, <a href="../AbstractDevice.html#model">model</a>, <a href="../AbstractDevice.html#precisionDescription">precisionDescription</a>, <a href="../AbstractDevice.html#resolution">resolution</a>, <a href="../AbstractDevice.html#sensitivity">sensitivity</a>, <a href="../AbstractDevice.html#status">status</a></code></div>
 </section>
 </li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
@@ -157,43 +180,47 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getGpibAddress()" class="member-name-link">getGpibAddress</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getId()" class="member-name-link">getId</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#query(java.lang.String)" class="member-name-link">query</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;command)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the unique identifier for this device.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#query(java.lang.String)" class="member-name-link">query</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;command)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Writes a command and reads the response.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#read()" class="member-name-link">read</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#read()" class="member-name-link">read</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Simulates reading from the GPIB device.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBoardIndex(int)" class="member-name-link">setBoardIndex</a><wbr>(int&nbsp;boardIndex)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGpibAddress(int)" class="member-name-link">setGpibAddress</a><wbr>(int&nbsp;address)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBoardIndex(int)" class="member-name-link">setBoardIndex</a><wbr>(int&nbsp;boardIndex)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#write(java.lang.String)" class="member-name-link">write</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;command)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGpibAddress(int)" class="member-name-link">setGpibAddress</a><wbr>(int&nbsp;address)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#write(java.lang.String)" class="member-name-link">write</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;command)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Simulates sending a GPIB command.</div>
 </div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.episteme.core.device.sim.SimulatedDevice">Methods inherited from class&nbsp;<a href="SimulatedDevice.html#method-summary" title="class in org.episteme.core.device.sim">SimulatedDevice</a></h3>
-<code><a href="SimulatedDevice.html#close()" title="close()">close</a>, <a href="SimulatedDevice.html#connect()" title="connect()">connect</a>, <a href="SimulatedDevice.html#disconnect()" title="disconnect()">disconnect</a>, <a href="SimulatedDevice.html#getCapabilities()" title="getCapabilities()">getCapabilities</a>, <a href="SimulatedDevice.html#getDriverClass()" title="getDriverClass()">getDriverClass</a>, <a href="SimulatedDevice.html#getErrorCode()" title="getErrorCode()">getErrorCode</a>, <a href="SimulatedDevice.html#getFirmware()" title="getFirmware()">getFirmware</a>, <a href="SimulatedDevice.html#getFormattedInfo()" title="getFormattedInfo()">getFormattedInfo</a>, <a href="SimulatedDevice.html#getManufacturer()" title="getManufacturer()">getManufacturer</a>, <a href="SimulatedDevice.html#getName()" title="getName()">getName</a>, <a href="SimulatedDevice.html#getReadings()" title="getReadings()">getReadings</a>, <a href="SimulatedDevice.html#getStatus()" title="getStatus()">getStatus</a>, <a href="SimulatedDevice.html#getUptimeSeconds()" title="getUptimeSeconds()">getUptimeSeconds</a>, <a href="SimulatedDevice.html#isConnected()" title="isConnected()">isConnected</a>, <a href="SimulatedDevice.html#isPowerOn()" title="isPowerOn()">isPowerOn</a>, <a href="SimulatedDevice.html#setCapability(java.lang.String,boolean)" title="setCapability(String, boolean)">setCapability</a>, <a href="SimulatedDevice.html#setDriverClass(java.lang.String)" title="setDriverClass(String)">setDriverClass</a>, <a href="SimulatedDevice.html#setErrorCode(int)" title="setErrorCode(int)">setErrorCode</a>, <a href="SimulatedDevice.html#setFirmware(java.lang.String)" title="setFirmware(String)">setFirmware</a>, <a href="SimulatedDevice.html#setPowerOn(boolean)" title="setPowerOn(boolean)">setPowerOn</a></code></div>
+<h3 id="methods-inherited-from-class-org.episteme.core.device.sim.AbstractSimulatedDevice">Methods inherited from class&nbsp;<a href="AbstractSimulatedDevice.html#method-summary" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a></h3>
+<code><a href="AbstractSimulatedDevice.html#close()" title="close()">close</a>, <a href="AbstractSimulatedDevice.html#connect()" title="connect()">connect</a>, <a href="AbstractSimulatedDevice.html#disconnect()" title="disconnect()">disconnect</a>, <a href="AbstractSimulatedDevice.html#getCapabilities()" title="getCapabilities()">getCapabilities</a>, <a href="AbstractSimulatedDevice.html#getDriverClass()" title="getDriverClass()">getDriverClass</a>, <a href="AbstractSimulatedDevice.html#getErrorCode()" title="getErrorCode()">getErrorCode</a>, <a href="AbstractSimulatedDevice.html#getFormattedInfo()" title="getFormattedInfo()">getFormattedInfo</a>, <a href="AbstractSimulatedDevice.html#getReadings()" title="getReadings()">getReadings</a>, <a href="AbstractSimulatedDevice.html#getStatus()" title="getStatus()">getStatus</a>, <a href="AbstractSimulatedDevice.html#getUptimeSeconds()" title="getUptimeSeconds()">getUptimeSeconds</a>, <a href="AbstractSimulatedDevice.html#isConnected()" title="isConnected()">isConnected</a>, <a href="AbstractSimulatedDevice.html#isPowerOn()" title="isPowerOn()">isPowerOn</a>, <a href="AbstractSimulatedDevice.html#setCapability(java.lang.String,boolean)" title="setCapability(String, boolean)">setCapability</a>, <a href="AbstractSimulatedDevice.html#setDriverClass(java.lang.String)" title="setDriverClass(String)">setDriverClass</a>, <a href="AbstractSimulatedDevice.html#setErrorCode(int)" title="setErrorCode(int)">setErrorCode</a>, <a href="AbstractSimulatedDevice.html#setPowerOn(boolean)" title="setPowerOn(boolean)">setPowerOn</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.device.AbstractDevice">Methods inherited from class&nbsp;<a href="../AbstractDevice.html#method-summary" title="class in org.episteme.core.device">AbstractDevice</a></h3>
+<code><a href="../AbstractDevice.html#calibrate(org.episteme.core.measure.Quantity)" title="calibrate(Quantity)">calibrate</a>, <a href="../AbstractDevice.html#getAccuracy()" title="getAccuracy()">getAccuracy</a>, <a href="../AbstractDevice.html#getCalibrationHistory()" title="getCalibrationHistory()">getCalibrationHistory</a>, <a href="../AbstractDevice.html#getDeviceStatus()" title="getDeviceStatus()">getDeviceStatus</a>, <a href="../AbstractDevice.html#getDisplayUnit()" title="getDisplayUnit()">getDisplayUnit</a>, <a href="../AbstractDevice.html#getFirmware()" title="getFirmware()">getFirmware</a>, <a href="../AbstractDevice.html#getHistory()" title="getHistory()">getHistory</a>, <a href="../AbstractDevice.html#getId()" title="getId()">getId</a>, <a href="../AbstractDevice.html#getLastCalibration()" title="getLastCalibration()">getLastCalibration</a>, <a href="../AbstractDevice.html#getLocationDescription()" title="getLocationDescription()">getLocationDescription</a>, <a href="../AbstractDevice.html#getManufacturer()" title="getManufacturer()">getManufacturer</a>, <a href="../AbstractDevice.html#getMaxRange()" title="getMaxRange()">getMaxRange</a>, <a href="../AbstractDevice.html#getMeasurableQuantities()" title="getMeasurableQuantities()">getMeasurableQuantities</a>, <a href="../AbstractDevice.html#getMinRange()" title="getMinRange()">getMinRange</a>, <a href="../AbstractDevice.html#getModel()" title="getModel()">getModel</a>, <a href="../AbstractDevice.html#getPrecisionDescription()" title="getPrecisionDescription()">getPrecisionDescription</a>, <a href="../AbstractDevice.html#getResolution()" title="getResolution()">getResolution</a>, <a href="../AbstractDevice.html#getSensitivity()" title="getSensitivity()">getSensitivity</a>, <a href="../AbstractDevice.html#getTrait(java.lang.String)" title="getTrait(String)">getTrait</a>, <a href="../AbstractDevice.html#getTraits()" title="getTraits()">getTraits</a>, <a href="../AbstractDevice.html#getValue()" title="getValue()">getValue</a>, <a href="../AbstractDevice.html#isEnabled()" title="isEnabled()">isEnabled</a>, <a href="../AbstractDevice.html#measure()" title="measure()">measure</a>, <a href="../AbstractDevice.html#needsCalibration(int)" title="needsCalibration(int)">needsCalibration</a>, <a href="../AbstractDevice.html#performCalibration(org.episteme.core.measure.Quantity)" title="performCalibration(Quantity)">performCalibration</a>, <a href="../AbstractDevice.html#recordMeasurement(org.episteme.core.measure.Quantity)" title="recordMeasurement(Quantity)">recordMeasurement</a>, <a href="../AbstractDevice.html#setAccuracy(org.episteme.core.measure.Quantity)" title="setAccuracy(Quantity)">setAccuracy</a>, <a href="../AbstractDevice.html#setCurrentValue(org.episteme.core.measure.Quantity)" title="setCurrentValue(Quantity)">setCurrentValue</a>, <a href="../AbstractDevice.html#setDisplayUnit(org.episteme.core.measure.Unit)" title="setDisplayUnit(Unit)">setDisplayUnit</a>, <a href="../AbstractDevice.html#setEnabled(boolean)" title="setEnabled(boolean)">setEnabled</a>, <a href="../AbstractDevice.html#setFirmware(java.lang.String)" title="setFirmware(String)">setFirmware</a>, <a href="../AbstractDevice.html#setLastCalibration(java.time.Instant)" title="setLastCalibration(Instant)">setLastCalibration</a>, <a href="../AbstractDevice.html#setLocationDescription(java.lang.String)" title="setLocationDescription(String)">setLocationDescription</a>, <a href="../AbstractDevice.html#setManufacturer(java.lang.String)" title="setManufacturer(String)">setManufacturer</a>, <a href="../AbstractDevice.html#setMaxRange(org.episteme.core.measure.Quantity)" title="setMaxRange(Quantity)">setMaxRange</a>, <a href="../AbstractDevice.html#setMinRange(org.episteme.core.measure.Quantity)" title="setMinRange(Quantity)">setMinRange</a>, <a href="../AbstractDevice.html#setModel(java.lang.String)" title="setModel(String)">setModel</a>, <a href="../AbstractDevice.html#setPrecisionDescription(java.lang.String)" title="setPrecisionDescription(String)">setPrecisionDescription</a>, <a href="../AbstractDevice.html#setResolution(org.episteme.core.measure.Quantity)" title="setResolution(Quantity)">setResolution</a>, <a href="../AbstractDevice.html#setSensitivity(org.episteme.core.measure.Quantity)" title="setSensitivity(Quantity)">setSensitivity</a>, <a href="../AbstractDevice.html#setStatus(org.episteme.core.device.Device.Status)" title="setStatus(Device.Status)">setStatus</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.util.Commented">Methods inherited from interface&nbsp;<a href="../../util/Commented.html#method-summary" title="interface in org.episteme.core.util">Commented</a></h3>
+<code><a href="../../util/Commented.html#getComments()" title="getComments()">getComments</a>, <a href="../../util/Commented.html#getTrait(java.lang.String,java.lang.Class)" title="getTrait(String, Class)">getTrait</a>, <a href="../../util/Commented.html#setComments(java.lang.String)" title="setComments(String)">setComments</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.util.identity.ComprehensiveIdentification">Methods inherited from interface&nbsp;<a href="../../util/identity/ComprehensiveIdentification.html#method-summary" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a></h3>
+<code><a href="../../util/identity/ComprehensiveIdentification.html#getName()" title="getName()">getName</a>, <a href="../../util/identity/ComprehensiveIdentification.html#setName(java.lang.String)" title="setName(String)">setName</a>, <a href="../../util/identity/ComprehensiveIdentification.html#setTrait(java.lang.String,java.lang.Object)" title="setTrait(String, Object)">setTrait</a></code></div>
+<div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.device.Device">Methods inherited from interface&nbsp;<a href="../Device.html#method-summary" title="interface in org.episteme.core.device">Device</a></h3>
-<code><a href="../Device.html#getInstrumentMetadata()" title="getInstrumentMetadata()">getInstrumentMetadata</a></code></div>
+<code><a href="../Device.html#calibrate()" title="calibrate()">calibrate</a></code></div>
 </section>
 </li>
 </ul>
@@ -305,33 +332,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getId()">
-<h3>getId</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getId</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Device.html#getId()">Device</a></code></span></div>
-<div class="block">Returns the unique identifier for this device.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../Device.html#getId()">getId</a></code>&nbsp;in interface&nbsp;<code><a href="../Device.html" title="interface in org.episteme.core.device">Device</a></code></dd>
-<dt>Overrides:</dt>
-<dd><code><a href="SimulatedDevice.html#getId()">getId</a></code>&nbsp;in class&nbsp;<code><a href="SimulatedDevice.html" title="class in org.episteme.core.device.sim">SimulatedDevice</a></code></dd>
-<dt>Returns:</dt>
-<dd>the device ID</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="addCustomReadings(java.util.Map)">
 <h3>addCustomReadings</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addCustomReadings</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;readings)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from class:&nbsp;<code><a href="SimulatedDevice.html#addCustomReadings(java.util.Map)">SimulatedDevice</a></code></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from class:&nbsp;<code><a href="AbstractSimulatedDevice.html#addCustomReadings(java.util.Map)">AbstractSimulatedDevice</a></code></span></div>
 <div class="block">Subclasses can override to add custom readings.</div>
 <dl class="notes">
 <dt>Overrides:</dt>
-<dd><code><a href="SimulatedDevice.html#addCustomReadings(java.util.Map)">addCustomReadings</a></code>&nbsp;in class&nbsp;<code><a href="SimulatedDevice.html" title="class in org.episteme.core.device.sim">SimulatedDevice</a></code></dd>
+<dd><code><a href="AbstractSimulatedDevice.html#addCustomReadings(java.util.Map)">addCustomReadings</a></code>&nbsp;in class&nbsp;<code><a href="AbstractSimulatedDevice.html" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a></code></dd>
 </dl>
 </div>
 </section>

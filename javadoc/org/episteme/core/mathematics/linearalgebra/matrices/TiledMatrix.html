@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -61,7 +61,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(org.episteme.core.mathematics.linearalgebra.Matrix,int,int)" tabindex="0">TiledMatrix(Matrix, int, int)</a></li>
-<li><a href="#%3Cinit%3E(int,int,int)" tabindex="0">TiledMatrix(int, int, int)</a></li>
+<li><a href="#%3Cinit%3E(int,int,int,org.episteme.core.mathematics.structures.rings.Ring)" tabindex="0">TiledMatrix(int, int, int, Ring)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -69,12 +69,13 @@ loadScripts(document, 'script');</script>
 <li><a href="#rows()" tabindex="0">rows()</a></li>
 <li><a href="#cols()" tabindex="0">cols()</a></li>
 <li><a href="#get(int,int)" tabindex="0">get(int, int)</a></li>
-<li><a href="#set(int,int,org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">set(int, int, Real)</a></li>
+<li><a href="#set(int,int,E)" tabindex="0">set(int, int, E)</a></li>
 <li><a href="#getTile(int,int)" tabindex="0">getTile(int, int)</a></li>
 <li><a href="#getNumTileRows()" tabindex="0">getNumTileRows()</a></li>
 <li><a href="#getNumTileCols()" tabindex="0">getNumTileCols()</a></li>
 <li><a href="#getTileSize()" tabindex="0">getTileSize()</a></li>
 <li><a href="#setTile(int,int,org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">setTile(int, int, Matrix)</a></li>
+<li><a href="#updateTile(int,int,org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">updateTile(int, int, Matrix)</a></li>
 <li><a href="#getSubTiledMatrix(int,int,int,int)" tabindex="0">getSubTiledMatrix(int, int, int, int)</a></li>
 <li><a href="#close()" tabindex="0">close()</a></li>
 </ol>
@@ -84,22 +85,22 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<h1 title="Class TiledMatrix" class="title">Class TiledMatrix</h1>
+<h1 title="Class TiledMatrix" class="title">Class TiledMatrix&lt;<span id="type-param-E">E</span>&gt;</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance"><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;
-<div class="inheritance">org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix</div>
+<div class="inheritance"><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix</a>&lt;E&gt;
+<div class="inheritance">org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix&lt;E&gt;</div>
 </div>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="../../structures/groups/AbelianGroup.html" title="interface in org.episteme.core.mathematics.structures.groups">AbelianGroup</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/groups/AbelianMonoid.html" title="interface in org.episteme.core.mathematics.structures.groups">AbelianMonoid</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/groups/Group.html" title="interface in org.episteme.core.mathematics.structures.groups">Group</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/groups/Magma.html" title="interface in org.episteme.core.mathematics.structures.groups">Magma</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/groups/Monoid.html" title="interface in org.episteme.core.mathematics.structures.groups">Monoid</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/rings/Semiring.html" title="interface in org.episteme.core.mathematics.structures.rings">Semiring</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/sets/Set.html" title="interface in org.episteme.core.mathematics.structures.sets">Set</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&gt;, <a href="../../structures/spaces/Module.html" title="interface in org.episteme.core.mathematics.structures.spaces">Module</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;, <a href="../../structures/groups/AbelianGroup.html" title="interface in org.episteme.core.mathematics.structures.groups">AbelianGroup</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/groups/AbelianMonoid.html" title="interface in org.episteme.core.mathematics.structures.groups">AbelianMonoid</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/groups/Group.html" title="interface in org.episteme.core.mathematics.structures.groups">Group</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/groups/Magma.html" title="interface in org.episteme.core.mathematics.structures.groups">Magma</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/groups/Monoid.html" title="interface in org.episteme.core.mathematics.structures.groups">Monoid</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/rings/Semiring.html" title="interface in org.episteme.core.mathematics.structures.rings">Semiring</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/sets/Set.html" title="interface in org.episteme.core.mathematics.structures.sets">Set</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;&gt;, <a href="../../structures/spaces/Module.html" title="interface in org.episteme.core.mathematics.structures.spaces">Module</a>&lt;<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;E&gt;, E&gt;</code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
-<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">TiledMatrix</span>
-<span class="extends-implements">extends <a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;
+<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">TiledMatrix&lt;E&gt;</span>
+<span class="extends-implements">extends <a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;E&gt;
 implements <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a></span></div>
 <div class="block">A matrix decomposed into smaller tiles (blocks).
 This structure is optimized for cache-local computations and distributed processing.</div>
@@ -130,13 +131,14 @@ This structure is optimized for cache-local computations and distributed process
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(int,int,int)" class="member-name-link">TiledMatrix</a><wbr>(int&nbsp;rows,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(int,int,int,org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">TiledMatrix</a><wbr>(int&nbsp;rows,
  int&nbsp;cols,
- int&nbsp;tileSize)</code></div>
+ int&nbsp;tileSize,
+ <a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;ring)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Creates an empty TiledMatrix with specified dimensions.</div>
 </div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.linearalgebra.Matrix,int,int)" class="member-name-link">TiledMatrix</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;original,
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.linearalgebra.Matrix,int,int)" class="member-name-link">TiledMatrix</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;original,
  int&nbsp;tileRows,
  int&nbsp;tileCols)</code></div>
 <div class="col-last odd-row-color">
@@ -164,7 +166,7 @@ This structure is optimized for cache-local computations and distributed process
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the number of columns in this matrix.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-E" title="type parameter in TiledMatrix">E</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#get(int,int)" class="member-name-link">get</a><wbr>(int&nbsp;row,
  int&nbsp;col)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -176,7 +178,7 @@ This structure is optimized for cache-local computations and distributed process
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNumTileRows()" class="member-name-link">getNumTileRows</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSubTiledMatrix(int,int,int,int)" class="member-name-link">getSubTiledMatrix</a><wbr>(int&nbsp;startTileRow,
  int&nbsp;endTileRow,
  int&nbsp;startTileCol,
@@ -184,7 +186,7 @@ This structure is optimized for cache-local computations and distributed process
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a sub-tiled matrix representing a portion of this tiled matrix.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTile(int,int)" class="member-name-link">getTile</a><wbr>(int&nbsp;i,
  int&nbsp;j)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -197,21 +199,28 @@ This structure is optimized for cache-local computations and distributed process
 <div class="block">Returns the number of rows in this matrix.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,int,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">set</a><wbr>(int&nbsp;row,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#set(int,int,E)" class="member-name-link">set</a><wbr>(int&nbsp;row,
  int&nbsp;col,
- <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;value)</code></div>
+ <a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&nbsp;value)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTile(int,int,org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">setTile</a><wbr>(int&nbsp;i,
  int&nbsp;j,
- <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;tile)</code></div>
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;tile)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateTile(int,int,org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">updateTile</a><wbr>(int&nbsp;i,
+ int&nbsp;j,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;delta)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Thread-safe update of a tile (adds delta to current tile).</div>
+</div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix">Methods inherited from class&nbsp;<a href="GenericMatrix.html#method-summary" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a></h3>
-<code><a href="GenericMatrix.html#add(org.episteme.core.mathematics.linearalgebra.Matrix)" title="add(Matrix)">add</a>, <a href="GenericMatrix.html#contains(org.episteme.core.mathematics.linearalgebra.Matrix)" title="contains(Matrix)">contains</a>, <a href="GenericMatrix.html#description()" title="description()">description</a>, <a href="GenericMatrix.html#determinant()" title="determinant()">determinant</a>, <a href="GenericMatrix.html#getColumn(int)" title="getColumn(int)">getColumn</a>, <a href="GenericMatrix.html#getField()" title="getField()">getField</a>, <a href="GenericMatrix.html#getRow(int)" title="getRow(int)">getRow</a>, <a href="GenericMatrix.html#getScalarRing()" title="getScalarRing()">getScalarRing</a>, <a href="GenericMatrix.html#getStorage()" title="getStorage()">getStorage</a>, <a href="GenericMatrix.html#getSubMatrix(int,int,int,int)" title="getSubMatrix(int, int, int, int)">getSubMatrix</a>, <a href="GenericMatrix.html#inverse()" title="inverse()">inverse</a>, <a href="GenericMatrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix)" title="multiply(Matrix)">multiply</a>, <a href="GenericMatrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Vector)" title="multiply(Vector)">multiply</a>, <a href="GenericMatrix.html#negate()" title="negate()">negate</a>, <a href="GenericMatrix.html#of(E%5B%5D%5B%5D,org.episteme.core.mathematics.structures.rings.Ring)" title="of(E[][], Ring)">of</a>, <a href="GenericMatrix.html#of(java.util.List,org.episteme.core.mathematics.structures.rings.Ring)" title="of(List, Ring)">of</a>, <a href="GenericMatrix.html#one()" title="one()">one</a>, <a href="GenericMatrix.html#scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)" title="scale(Real, Matrix)">scale</a>, <a href="GenericMatrix.html#trace()" title="trace()">trace</a>, <a href="GenericMatrix.html#transpose()" title="transpose()">transpose</a>, <a href="GenericMatrix.html#zero()" title="zero()">zero</a></code></div>
+<code><a href="GenericMatrix.html#add(org.episteme.core.mathematics.linearalgebra.Matrix)" title="add(Matrix)">add</a>, <a href="GenericMatrix.html#cholesky()" title="cholesky()">cholesky</a>, <a href="GenericMatrix.html#contains(org.episteme.core.mathematics.linearalgebra.Matrix)" title="contains(Matrix)">contains</a>, <a href="GenericMatrix.html#description()" title="description()">description</a>, <a href="GenericMatrix.html#determinant()" title="determinant()">determinant</a>, <a href="GenericMatrix.html#eigen()" title="eigen()">eigen</a>, <a href="GenericMatrix.html#getColumn(int)" title="getColumn(int)">getColumn</a>, <a href="GenericMatrix.html#getField()" title="getField()">getField</a>, <a href="GenericMatrix.html#getProvider()" title="getProvider()">getProvider</a>, <a href="GenericMatrix.html#getRow(int)" title="getRow(int)">getRow</a>, <a href="GenericMatrix.html#getScalarRing()" title="getScalarRing()">getScalarRing</a>, <a href="GenericMatrix.html#getStorage()" title="getStorage()">getStorage</a>, <a href="GenericMatrix.html#getSubMatrix(int,int,int,int)" title="getSubMatrix(int, int, int, int)">getSubMatrix</a>, <a href="GenericMatrix.html#inverse()" title="inverse()">inverse</a>, <a href="GenericMatrix.html#lu()" title="lu()">lu</a>, <a href="GenericMatrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix)" title="multiply(Matrix)">multiply</a>, <a href="GenericMatrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Vector)" title="multiply(Vector)">multiply</a>, <a href="GenericMatrix.html#negate()" title="negate()">negate</a>, <a href="GenericMatrix.html#one()" title="one()">one</a>, <a href="GenericMatrix.html#qr()" title="qr()">qr</a>, <a href="GenericMatrix.html#scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)" title="scale(E, Matrix)">scale</a>, <a href="GenericMatrix.html#svd()" title="svd()">svd</a>, <a href="GenericMatrix.html#trace()" title="trace()">trace</a>, <a href="GenericMatrix.html#transpose()" title="transpose()">transpose</a>, <a href="GenericMatrix.html#withProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" title="withProvider(LinearAlgebraProvider)">withProvider</a>, <a href="GenericMatrix.html#zero()" title="zero()">zero</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
@@ -220,7 +229,7 @@ This structure is optimized for cache-local computations and distributed process
 <code><a href="../../structures/groups/AbelianGroup.html#negate(E)" title="negate(Matrix)">negate</a>, <a href="../../structures/groups/AbelianGroup.html#subtract(E,E)" title="subtract(Matrix, Matrix)">subtract</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.linearalgebra.Matrix">Methods inherited from interface&nbsp;<a href="../Matrix.html#method-summary" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a></h3>
-<code><a href="../Matrix.html#add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="add(Matrix, Matrix)">add</a>, <a href="../Matrix.html#identity()" title="identity()">identity</a>, <a href="../Matrix.html#inverse(org.episteme.core.mathematics.linearalgebra.Matrix)" title="inverse(Matrix)">inverse</a>, <a href="../Matrix.html#isCommutative()" title="isCommutative()">isCommutative</a>, <a href="../Matrix.html#isEmpty()" title="isEmpty()">isEmpty</a>, <a href="../Matrix.html#isMultiplicationCommutative()" title="isMultiplicationCommutative()">isMultiplicationCommutative</a>, <a href="../Matrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="multiply(Matrix, Matrix)">multiply</a>, <a href="../Matrix.html#operate(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="operate(Matrix, Matrix)">operate</a>, <a href="../Matrix.html#subtract(org.episteme.core.mathematics.linearalgebra.Matrix)" title="subtract(Matrix)">subtract</a>, <a href="../Matrix.html#toTensor()" title="toTensor()">toTensor</a></code></div>
+<code><a href="../Matrix.html#add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="add(Matrix, Matrix)">add</a>, <a href="../Matrix.html#identity()" title="identity()">identity</a>, <a href="../Matrix.html#inverse(org.episteme.core.mathematics.linearalgebra.Matrix)" title="inverse(Matrix)">inverse</a>, <a href="../Matrix.html#isCommutative()" title="isCommutative()">isCommutative</a>, <a href="../Matrix.html#isEmpty()" title="isEmpty()">isEmpty</a>, <a href="../Matrix.html#isMultiplicationCommutative()" title="isMultiplicationCommutative()">isMultiplicationCommutative</a>, <a href="../Matrix.html#map(java.util.function.Function)" title="map(Function)">map</a>, <a href="../Matrix.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="multiply(Matrix, Matrix)">multiply</a>, <a href="../Matrix.html#operate(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" title="operate(Matrix, Matrix)">operate</a>, <a href="../Matrix.html#scale(E)" title="scale(E)">scale</a>, <a href="../Matrix.html#subtract(org.episteme.core.mathematics.linearalgebra.Matrix)" title="subtract(Matrix)">subtract</a>, <a href="../Matrix.html#toTensor()" title="toTensor()">toTensor</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.structures.groups.Monoid">Methods inherited from interface&nbsp;<a href="../../structures/groups/Monoid.html#method-summary" title="interface in org.episteme.core.mathematics.structures.groups">Monoid</a></h3>
 <code><a href="../../structures/groups/Monoid.html#isAssociative()" title="isAssociative()">isAssociative</a></code></div>
@@ -245,7 +254,7 @@ This structure is optimized for cache-local computations and distributed process
 <section class="detail" id="&lt;init&gt;(org.episteme.core.mathematics.linearalgebra.Matrix,int,int)">
 <h3>TiledMatrix</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TiledMatrix</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;original,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TiledMatrix</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;original,
  int&nbsp;tileRows,
  int&nbsp;tileCols)</span></div>
 <div class="block">Creates a TiledMatrix from an existing matrix.</div>
@@ -253,12 +262,13 @@ This structure is optimized for cache-local computations and distributed process
 </section>
 </li>
 <li>
-<section class="detail" id="&lt;init&gt;(int,int,int)">
+<section class="detail" id="&lt;init&gt;(int,int,int,org.episteme.core.mathematics.structures.rings.Ring)">
 <h3>TiledMatrix</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TiledMatrix</span><wbr><span class="parameters">(int&nbsp;rows,
  int&nbsp;cols,
- int&nbsp;tileSize)</span></div>
+ int&nbsp;tileSize,
+ <a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;ring)</span></div>
 <div class="block">Creates an empty TiledMatrix with specified dimensions.</div>
 </div>
 </section>
@@ -280,9 +290,9 @@ This structure is optimized for cache-local computations and distributed process
 <div class="block">Returns the number of rows in this matrix.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../Matrix.html#rows()">rows</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="../Matrix.html#rows()">rows</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></dd>
 <dt>Overrides:</dt>
-<dd><code><a href="GenericMatrix.html#rows()">rows</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="GenericMatrix.html#rows()">rows</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -296,9 +306,9 @@ This structure is optimized for cache-local computations and distributed process
 <div class="block">Returns the number of columns in this matrix.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../Matrix.html#cols()">cols</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="../Matrix.html#cols()">cols</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></dd>
 <dt>Overrides:</dt>
-<dd><code><a href="GenericMatrix.html#cols()">cols</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="GenericMatrix.html#cols()">cols</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -307,29 +317,29 @@ This structure is optimized for cache-local computations and distributed process
 <section class="detail" id="get(int,int)">
 <h3>get</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(int&nbsp;row,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-E" title="type parameter in TiledMatrix">E</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(int&nbsp;row,
  int&nbsp;col)</span></div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../Matrix.html#get(int,int)">Matrix</a></code></span></div>
 <div class="block">Returns the element at the specified row and column.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../Matrix.html#get(int,int)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="../Matrix.html#get(int,int)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></dd>
 <dt>Overrides:</dt>
-<dd><code><a href="GenericMatrix.html#get(int,int)">get</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="GenericMatrix.html#get(int,int)">get</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="set(int,int,org.episteme.core.mathematics.numbers.real.Real)">
-<h3>set</h3>
+<section class="detail" id="set(int,int,E)">
+<h3 id="set(int,int,java.lang.Object)">set</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">set</span><wbr><span class="parameters">(int&nbsp;row,
  int&nbsp;col,
- <a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;value)</span></div>
+ <a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&nbsp;value)</span></div>
 <dl class="notes">
 <dt>Overrides:</dt>
-<dd><code><a href="GenericMatrix.html#set(int,int,E)">set</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dd><code><a href="GenericMatrix.html#set(int,int,E)">set</a></code>&nbsp;in class&nbsp;<code><a href="GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -338,7 +348,7 @@ This structure is optimized for cache-local computations and distributed process
 <section class="detail" id="getTile(int,int)">
 <h3>getTile</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">getTile</span><wbr><span class="parameters">(int&nbsp;i,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</span>&nbsp;<span class="element-name">getTile</span><wbr><span class="parameters">(int&nbsp;i,
  int&nbsp;j)</span></div>
 </div>
 </section>
@@ -373,7 +383,18 @@ This structure is optimized for cache-local computations and distributed process
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setTile</span><wbr><span class="parameters">(int&nbsp;i,
  int&nbsp;j,
- <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;tile)</span></div>
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;tile)</span></div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="updateTile(int,int,org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>updateTile</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateTile</span><wbr><span class="parameters">(int&nbsp;i,
+ int&nbsp;j,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;&nbsp;delta)</span></div>
+<div class="block">Thread-safe update of a tile (adds delta to current tile).</div>
 </div>
 </section>
 </li>
@@ -381,7 +402,7 @@ This structure is optimized for cache-local computations and distributed process
 <section class="detail" id="getSubTiledMatrix(int,int,int,int)">
 <h3>getSubTiledMatrix</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a></span>&nbsp;<span class="element-name">getSubTiledMatrix</span><wbr><span class="parameters">(int&nbsp;startTileRow,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;<a href="#type-param-E" title="type parameter in TiledMatrix">E</a>&gt;</span>&nbsp;<span class="element-name">getSubTiledMatrix</span><wbr><span class="parameters">(int&nbsp;startTileRow,
  int&nbsp;endTileRow,
  int&nbsp;startTileCol,
  int&nbsp;endTileCol)</span></div>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -97,12 +97,8 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Logging facade for Episteme.
 <p>
-Provides a simple, performance-optimized logging API built on
-java.util.logging.
-Users can bridge to SLF4J/Logback if needed.
-</p>
-<p>
-<b>Usage:</b></div>
+Provides a simple, performance-optimized logging API built on SLF4J.
+</p></div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.0</dd>
@@ -140,10 +136,10 @@ Users can bridge to SLF4J/Logback if needed.
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#error(java.util.function.Supplier)" class="member-name-link">error</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;messageSupplier)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.logging/java/util/logging/Logger.html" title="class or interface in java.util.logging" class="external-link">Logger</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.slf4j.Logger</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDelegate()" class="member-name-link">getDelegate</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets the underlying java.util.logging.Logger for advanced use cases.</div>
+<div class="block">Gets the underlying SLF4J Logger for advanced use cases.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Logger.html" title="class in org.episteme.core.util">Logger</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getLogger(java.lang.Class)" class="member-name-link">getLogger</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;clazz)</code></div>
@@ -163,19 +159,29 @@ Users can bridge to SLF4J/Logback if needed.
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isDebugEnabled()" class="member-name-link">isDebugEnabled</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Check if debug is enabled.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isErrorEnabled()" class="member-name-link">isErrorEnabled</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Check if error is enabled.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isInfoEnabled()" class="member-name-link">isInfoEnabled</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Check if info is enabled.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isTraceEnabled()" class="member-name-link">isTraceEnabled</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Check if trace is enabled.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isWarnEnabled()" class="member-name-link">isWarnEnabled</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Check if warn is enabled.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#trace(java.lang.String)" class="member-name-link">trace</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;message)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -342,6 +348,11 @@ Users can bridge to SLF4J/Logback if needed.
 <h3>isTraceEnabled</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isTraceEnabled</span>()</div>
+<div class="block">Check if trace is enabled.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if enabled</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -350,6 +361,11 @@ Users can bridge to SLF4J/Logback if needed.
 <h3>isDebugEnabled</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isDebugEnabled</span>()</div>
+<div class="block">Check if debug is enabled.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if enabled</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -358,6 +374,11 @@ Users can bridge to SLF4J/Logback if needed.
 <h3>isInfoEnabled</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isInfoEnabled</span>()</div>
+<div class="block">Check if info is enabled.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if enabled</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -366,6 +387,11 @@ Users can bridge to SLF4J/Logback if needed.
 <h3>isWarnEnabled</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isWarnEnabled</span>()</div>
+<div class="block">Check if warn is enabled.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if enabled</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -374,6 +400,11 @@ Users can bridge to SLF4J/Logback if needed.
 <h3>isErrorEnabled</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isErrorEnabled</span>()</div>
+<div class="block">Check if error is enabled.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if enabled</dd>
+</dl>
 </div>
 </section>
 </li>
@@ -381,8 +412,8 @@ Users can bridge to SLF4J/Logback if needed.
 <section class="detail" id="getDelegate()">
 <h3>getDelegate</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.logging/java/util/logging/Logger.html" title="class or interface in java.util.logging" class="external-link">Logger</a></span>&nbsp;<span class="element-name">getDelegate</span>()</div>
-<div class="block">Gets the underlying java.util.logging.Logger for advanced use cases.</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.slf4j.Logger</span>&nbsp;<span class="element-name">getDelegate</span>()</div>
+<div class="block">Gets the underlying SLF4J Logger for advanced use cases.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>the delegate logger</dd>

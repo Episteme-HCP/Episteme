@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -59,9 +59,9 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
-<li><a href="#start(org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">start(Real)</a></li>
+<li><a href="#start(org.episteme.core.measure.Quantity)" tabindex="0">start(Quantity)</a></li>
 <li><a href="#stop()" tabindex="0">stop()</a></li>
-<li><a href="#calculateRCF(org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">calculateRCF(Real)</a></li>
+<li><a href="#calculateRCF(org.episteme.core.measure.Quantity)" tabindex="0">calculateRCF(Quantity)</a></li>
 <li><a href="#getMaxRPM()" tabindex="0">getMaxRPM()</a></li>
 <li><a href="#getMaxRCF()" tabindex="0">getMaxRCF()</a></li>
 <li><a href="#getRotorType()" tabindex="0">getRotorType()</a></li>
@@ -79,7 +79,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Superinterfaces:</dt>
-<dd><code><a href="../../../core/device/Actuator.html" title="interface in org.episteme.core.device">Actuator</a>&lt;<a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../../../core/device/Device.html" title="interface in org.episteme.core.device">Device</a></code></dd>
+<dd><code><a href="../../../core/device/Actuator.html" title="interface in org.episteme.core.device">Actuator</a>&lt;<a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;&gt;, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>, <a href="../../../core/util/Commented.html" title="interface in org.episteme.core.util">Commented</a>, <a href="../../../core/util/identity/ComprehensiveIdentification.html" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a>, <a href="../../../core/device/Device.html" title="interface in org.episteme.core.device">Device</a>, <a href="../../../core/util/identity/Identified.html" title="interface in org.episteme.core.util.identity">Identified</a>&lt;<a href="../../../core/util/identity/Identification.html" title="class in org.episteme.core.util.identity">Identification</a>&gt;, <a href="../../../core/util/Named.html" title="interface in org.episteme.core.util">Named</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code></dd>
 </dl>
 <dl class="notes">
 <dt>All Known Implementing Classes:</dt>
@@ -88,7 +88,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">Centrifuge</span><span class="extends-implements">
-extends <a href="../../../core/device/Actuator.html" title="interface in org.episteme.core.device">Actuator</a>&lt;<a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span></div>
+extends <a href="../../../core/device/Actuator.html" title="interface in org.episteme.core.device">Actuator</a>&lt;<a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;&gt;</span></div>
 <div class="block">Interface for centrifuges.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -113,6 +113,9 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 <div class="col-second even-row-color"><code><a href="Centrifuge.RotorType.html" class="type-name-link" title="enum class in org.episteme.natural.device.actuators">Centrifuge.RotorType</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
+<div class="inherited-list">
+<h3 id="nested-classes-inherited-from-class-org.episteme.core.device.Device">Nested classes/interfaces inherited from interface&nbsp;<a href="../../../core/device/Device.html#nested-class-summary" title="interface in org.episteme.core.device">Device</a></h3>
+<code><a href="../../../core/device/Device.Record.html" title="interface in org.episteme.core.device">Device.Record</a>, <a href="../../../core/device/Device.Status.html" title="enum class in org.episteme.core.device">Device.Status</a></code></div>
 </section>
 </li>
 <!-- ========== METHOD SUMMARY =========== -->
@@ -126,16 +129,16 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#calculateRCF(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">calculateRCF</a><wbr>(<a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;radiusCm)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a><wbr>&lt;<a href="../../../core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#calculateRCF(org.episteme.core.measure.Quantity)" class="member-name-link">calculateRCF</a><wbr>(<a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Length.html" title="interface in org.episteme.core.measure.quantity">Length</a>&gt;&nbsp;radius)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a><wbr>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getCurrentRPM()" class="member-name-link">getCurrentRPM</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a><wbr>&lt;<a href="../../../core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getMaxRCF()" class="member-name-link">getMaxRCF</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a><wbr>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getMaxRPM()" class="member-name-link">getMaxRPM</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="Centrifuge.RotorType.html" title="enum class in org.episteme.natural.device.actuators">Centrifuge.RotorType</a></code></div>
@@ -145,7 +148,7 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isRunning()" class="member-name-link">isRunning</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#start(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">start</a><wbr>(<a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;rpm)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#start(org.episteme.core.measure.Quantity)" class="member-name-link">start</a><wbr>(<a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;&nbsp;rpm)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
@@ -155,13 +158,19 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.device.Actuator">Methods inherited from interface&nbsp;<a href="../../../core/device/Actuator.html#method-summary" title="interface in org.episteme.core.device">Actuator</a></h3>
-<code><a href="../../../core/device/Actuator.html#send(C)" title="send(Real)">send</a></code></div>
+<code><a href="../../../core/device/Actuator.html#send(C)" title="send(Quantity)">send</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.AutoCloseable">Methods inherited from interface&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html#method-summary" title="class or interface in java.lang" class="external-link">AutoCloseable</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/AutoCloseable.html#close()" title="class or interface in java.lang" class="external-link">close</a></code></div>
 <div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.util.Commented">Methods inherited from interface&nbsp;<a href="../../../core/util/Commented.html#method-summary" title="interface in org.episteme.core.util">Commented</a></h3>
+<code><a href="../../../core/util/Commented.html#getComments()" title="getComments()">getComments</a>, <a href="../../../core/util/Commented.html#getTrait(java.lang.String,java.lang.Class)" title="getTrait(String, Class)">getTrait</a>, <a href="../../../core/util/Commented.html#setComments(java.lang.String)" title="setComments(String)">setComments</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.util.identity.ComprehensiveIdentification">Methods inherited from interface&nbsp;<a href="../../../core/util/identity/ComprehensiveIdentification.html#method-summary" title="interface in org.episteme.core.util.identity">ComprehensiveIdentification</a></h3>
+<code><a href="../../../core/util/identity/ComprehensiveIdentification.html#getName()" title="getName()">getName</a>, <a href="../../../core/util/identity/ComprehensiveIdentification.html#getTrait(java.lang.String)" title="getTrait(String)">getTrait</a>, <a href="../../../core/util/identity/ComprehensiveIdentification.html#getTraits()" title="getTraits()">getTraits</a>, <a href="../../../core/util/identity/ComprehensiveIdentification.html#setName(java.lang.String)" title="setName(String)">setName</a>, <a href="../../../core/util/identity/ComprehensiveIdentification.html#setTrait(java.lang.String,java.lang.Object)" title="setTrait(String, Object)">setTrait</a></code></div>
+<div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.device.Device">Methods inherited from interface&nbsp;<a href="../../../core/device/Device.html#method-summary" title="interface in org.episteme.core.device">Device</a></h3>
-<code><a href="../../../core/device/Device.html#connect()" title="connect()">connect</a>, <a href="../../../core/device/Device.html#disconnect()" title="disconnect()">disconnect</a>, <a href="../../../core/device/Device.html#getCapabilities()" title="getCapabilities()">getCapabilities</a>, <a href="../../../core/device/Device.html#getFirmware()" title="getFirmware()">getFirmware</a>, <a href="../../../core/device/Device.html#getId()" title="getId()">getId</a>, <a href="../../../core/device/Device.html#getInstrumentMetadata()" title="getInstrumentMetadata()">getInstrumentMetadata</a>, <a href="../../../core/device/Device.html#getManufacturer()" title="getManufacturer()">getManufacturer</a>, <a href="../../../core/device/Device.html#getName()" title="getName()">getName</a>, <a href="../../../core/device/Device.html#getReadings()" title="getReadings()">getReadings</a>, <a href="../../../core/device/Device.html#getStatus()" title="getStatus()">getStatus</a>, <a href="../../../core/device/Device.html#isConnected()" title="isConnected()">isConnected</a></code></div>
+<code><a href="../../../core/device/Device.html#calibrate()" title="calibrate()">calibrate</a>, <a href="../../../core/device/Device.html#calibrate(org.episteme.core.measure.Quantity)" title="calibrate(Quantity)">calibrate</a>, <a href="../../../core/device/Device.html#connect()" title="connect()">connect</a>, <a href="../../../core/device/Device.html#disconnect()" title="disconnect()">disconnect</a>, <a href="../../../core/device/Device.html#getAccuracy()" title="getAccuracy()">getAccuracy</a>, <a href="../../../core/device/Device.html#getCalibrationHistory()" title="getCalibrationHistory()">getCalibrationHistory</a>, <a href="../../../core/device/Device.html#getCapabilities()" title="getCapabilities()">getCapabilities</a>, <a href="../../../core/device/Device.html#getDeviceStatus()" title="getDeviceStatus()">getDeviceStatus</a>, <a href="../../../core/device/Device.html#getDisplayUnit()" title="getDisplayUnit()">getDisplayUnit</a>, <a href="../../../core/device/Device.html#getFirmware()" title="getFirmware()">getFirmware</a>, <a href="../../../core/device/Device.html#getHistory()" title="getHistory()">getHistory</a>, <a href="../../../core/device/Device.html#getId()" title="getId()">getId</a>, <a href="../../../core/device/Device.html#getLastCalibration()" title="getLastCalibration()">getLastCalibration</a>, <a href="../../../core/device/Device.html#getLocationDescription()" title="getLocationDescription()">getLocationDescription</a>, <a href="../../../core/device/Device.html#getManufacturer()" title="getManufacturer()">getManufacturer</a>, <a href="../../../core/device/Device.html#getMaxRange()" title="getMaxRange()">getMaxRange</a>, <a href="../../../core/device/Device.html#getMeasurableQuantities()" title="getMeasurableQuantities()">getMeasurableQuantities</a>, <a href="../../../core/device/Device.html#getMinRange()" title="getMinRange()">getMinRange</a>, <a href="../../../core/device/Device.html#getModel()" title="getModel()">getModel</a>, <a href="../../../core/device/Device.html#getPrecisionDescription()" title="getPrecisionDescription()">getPrecisionDescription</a>, <a href="../../../core/device/Device.html#getReadings()" title="getReadings()">getReadings</a>, <a href="../../../core/device/Device.html#getResolution()" title="getResolution()">getResolution</a>, <a href="../../../core/device/Device.html#getSensitivity()" title="getSensitivity()">getSensitivity</a>, <a href="../../../core/device/Device.html#getStatus()" title="getStatus()">getStatus</a>, <a href="../../../core/device/Device.html#getValue()" title="getValue()">getValue</a>, <a href="../../../core/device/Device.html#isConnected()" title="isConnected()">isConnected</a>, <a href="../../../core/device/Device.html#isEnabled()" title="isEnabled()">isEnabled</a>, <a href="../../../core/device/Device.html#measure()" title="measure()">measure</a>, <a href="../../../core/device/Device.html#needsCalibration(int)" title="needsCalibration(int)">needsCalibration</a>, <a href="../../../core/device/Device.html#setDisplayUnit(org.episteme.core.measure.Unit)" title="setDisplayUnit(Unit)">setDisplayUnit</a>, <a href="../../../core/device/Device.html#setEnabled(boolean)" title="setEnabled(boolean)">setEnabled</a></code></div>
 </section>
 </li>
 </ul>
@@ -174,10 +183,10 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="start(org.episteme.core.mathematics.numbers.real.Real)">
+<section class="detail" id="start(org.episteme.core.measure.Quantity)">
 <h3>start</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">start</span><wbr><span class="parameters">(<a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;rpm)</span></div>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">start</span><wbr><span class="parameters">(<a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;&nbsp;rpm)</span></div>
 </div>
 </section>
 </li>
@@ -190,10 +199,10 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 </section>
 </li>
 <li>
-<section class="detail" id="calculateRCF(org.episteme.core.mathematics.numbers.real.Real)">
+<section class="detail" id="calculateRCF(org.episteme.core.measure.Quantity)">
 <h3>calculateRCF</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type"><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">calculateRCF</span><wbr><span class="parameters">(<a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;radiusCm)</span></div>
+<div class="member-signature"><span class="return-type"><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt;</span>&nbsp;<span class="element-name">calculateRCF</span><wbr><span class="parameters">(<a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Length.html" title="interface in org.episteme.core.measure.quantity">Length</a>&gt;&nbsp;radius)</span></div>
 </div>
 </section>
 </li>
@@ -201,7 +210,7 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 <section class="detail" id="getMaxRPM()">
 <h3>getMaxRPM</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type"><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">getMaxRPM</span>()</div>
+<div class="member-signature"><span class="return-type"><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;</span>&nbsp;<span class="element-name">getMaxRPM</span>()</div>
 </div>
 </section>
 </li>
@@ -209,7 +218,7 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 <section class="detail" id="getMaxRCF()">
 <h3>getMaxRCF</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type"><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">getMaxRCF</span>()</div>
+<div class="member-signature"><span class="return-type"><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Dimensionless.html" title="interface in org.episteme.core.measure.quantity">Dimensionless</a>&gt;</span>&nbsp;<span class="element-name">getMaxRCF</span>()</div>
 </div>
 </section>
 </li>
@@ -225,7 +234,7 @@ extends <a href="../../../core/device/Actuator.html" title="interface in org.epi
 <section class="detail" id="getCurrentRPM()">
 <h3>getCurrentRPM</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="return-type"><a href="../../../core/mathematics/numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">getCurrentRPM</span>()</div>
+<div class="member-signature"><span class="return-type"><a href="../../../core/measure/Quantity.html" title="interface in org.episteme.core.measure">Quantity</a>&lt;<a href="../../../core/measure/quantity/Frequency.html" title="interface in org.episteme.core.measure.quantity">Frequency</a>&gt;</span>&nbsp;<span class="element-name">getCurrentRPM</span>()</div>
 </div>
 </section>
 </li>

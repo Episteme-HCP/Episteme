@@ -33,7 +33,7 @@ loadScripts(document, 'script');</script>
 <li class="nav-bar-cell1-rev">Index</li>
 <li><a href="../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -203,7 +203,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Utilities for wave optics (diffraction, interference, polarization).</div>
 </dd>
-<dt><a href="../org/episteme/core/technical/algorithm/WaveProvider.html" class="type-name-link" title="interface in org.episteme.core.technical.algorithm">WaveProvider</a> - Interface in <a href="../org/episteme/core/technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></dt>
+<dt><a href="../org/episteme/natural/physics/classical/waves/WaveProvider.html" class="type-name-link" title="interface in org.episteme.natural.physics.classical.waves">WaveProvider</a> - Interface in <a href="../org/episteme/natural/physics/classical/waves/package-summary.html">org.episteme.natural.physics.classical.waves</a></dt>
 <dd>
 <div class="block">Interface for Wave Equation simulation providers.</div>
 </dd>
@@ -494,6 +494,18 @@ accordance with Eurocode 1 (EN 1991-1-4).</div>
 <dd>
 <div class="block">Creates a successful path result.</div>
 </dd>
+<dt><a href="../org/episteme/core/mathematics/context/MathContext.html#withPrecision(int)" class="member-name-link">withPrecision(int)</a> - Static method in class org.episteme.core.mathematics.context.<a href="../org/episteme/core/mathematics/context/MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></dt>
+<dd>
+<div class="block">Returns a new context with the specified precision (EXACT mode).</div>
+</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/matrices/GenericMatrix.html#withProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" class="member-name-link">withProvider(LinearAlgebraProvider)</a> - Method in class org.episteme.core.mathematics.linearalgebra.matrices.<a href="../org/episteme/core/mathematics/linearalgebra/matrices/GenericMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">GenericMatrix</a></dt>
+<dd>
+<div class="block">Returns a new view of this matrix with a different provider.</div>
+</dd>
+<dt><a href="../org/episteme/core/mathematics/linearalgebra/vectors/GenericVector.html#withProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" class="member-name-link">withProvider(LinearAlgebraProvider)</a> - Method in class org.episteme.core.mathematics.linearalgebra.vectors.<a href="../org/episteme/core/mathematics/linearalgebra/vectors/GenericVector.html" title="class in org.episteme.core.mathematics.linearalgebra.vectors">GenericVector</a></dt>
+<dd>
+<div class="block">Returns this vector with a different provider.</div>
+</dd>
 <dt><a href="../org/episteme/core/mathematics/context/MathContext.html#withRealPrecision(org.episteme.core.mathematics.context.MathContext.RealPrecision)" class="member-name-link">withRealPrecision(MathContext.RealPrecision)</a> - Method in class org.episteme.core.mathematics.context.<a href="../org/episteme/core/mathematics/context/MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></dt>
 <dd>
 <div class="block">Returns a new context with the specified real precision.</div>
@@ -619,6 +631,14 @@ Work done equals change in kinetic energy</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/security/AuditLogger.EventType.html#WORKER_REGISTERED" class="member-name-link">WORKER_REGISTERED</a> - Enum constant in enum class org.episteme.server.server.security.<a href="../org/episteme/server/server/security/AuditLogger.EventType.html" title="enum class in org.episteme.server.server.security">AuditLogger.EventType</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/model/WorkerEntity.html" class="type-name-link" title="class in org.episteme.server.server.model">WorkerEntity</a> - Class in <a href="../org/episteme/server/server/model/package-summary.html">org.episteme.server.server.model</a></dt>
+<dd>
+<div class="block">JPA Entity for persisting worker metadata and status.</div>
+</dd>
+<dt><a href="../org/episteme/server/server/model/WorkerEntity.html#%3Cinit%3E()" class="member-name-link">WorkerEntity()</a> - Constructor for class org.episteme.server.server.model.<a href="../org/episteme/server/server/model/WorkerEntity.html" title="class in org.episteme.server.server.model">WorkerEntity</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/model/WorkerEntity.html#%3Cinit%3E(java.lang.String,java.lang.String,int)" class="member-name-link">WorkerEntity(String, String, int)</a> - Constructor for class org.episteme.server.server.model.<a href="../org/episteme/server/server/model/WorkerEntity.html" title="class in org.episteme.server.server.model">WorkerEntity</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/scaling/AutoScaler.WorkerMetrics.html#workerId" class="member-name-link">workerId</a> - Variable in class org.episteme.server.server.scaling.<a href="../org/episteme/server/server/scaling/AutoScaler.WorkerMetrics.html" title="class in org.episteme.server.server.scaling">AutoScaler.WorkerMetrics</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/WorkerIdentifier.html#WORKERID_FIELD_NUMBER" class="member-name-link">WORKERID_FIELD_NUMBER</a> - Static variable in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/WorkerIdentifier.html" title="class in org.episteme.server.server.proto">WorkerIdentifier</a></dt>
@@ -644,6 +664,10 @@ Work done equals change in kinetic energy</div>
 <dt><a href="../org/episteme/worker/worker/WorkerNode.html" class="type-name-link" title="class in org.episteme.worker.worker">WorkerNode</a> - Class in <a href="../org/episteme/worker/worker/package-summary.html">org.episteme.worker.worker</a></dt>
 <dd>
 <div class="block">Episteme Worker Node.</div>
+</dd>
+<dt><a href="../org/episteme/worker/worker/WorkerNode.html#%3Cinit%3E(io.grpc.ManagedChannel)" class="member-name-link">WorkerNode(ManagedChannel)</a> - Constructor for class org.episteme.worker.worker.<a href="../org/episteme/worker/worker/WorkerNode.html" title="class in org.episteme.worker.worker">WorkerNode</a></dt>
+<dd>
+<div class="block">Creates a new WorkerNode with an existing channel (useful for testing).</div>
 </dd>
 <dt><a href="../org/episteme/worker/worker/WorkerNode.html#%3Cinit%3E(java.lang.String,int)" class="member-name-link">WorkerNode(String, int)</a> - Constructor for class org.episteme.worker.worker.<a href="../org/episteme/worker/worker/WorkerNode.html" title="class in org.episteme.worker.worker">WorkerNode</a></dt>
 <dd>
@@ -671,6 +695,10 @@ Work done equals change in kinetic energy</div>
 </dd>
 <dt><a href="../org/episteme/server/server/proto/WorkerRegistrationResponseOrBuilder.html" class="type-name-link" title="interface in org.episteme.server.server.proto">WorkerRegistrationResponseOrBuilder</a> - Interface in <a href="../org/episteme/server/server/proto/package-summary.html">org.episteme.server.server.proto</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/repository/WorkerRepository.html" class="type-name-link" title="interface in org.episteme.server.server.repository">WorkerRepository</a> - Interface in <a href="../org/episteme/server/server/repository/package-summary.html">org.episteme.server.server.repository</a></dt>
+<dd>
+<div class="block">Spring Data JPA Repository for Worker metadata.</div>
+</dd>
 <dt><a href="../org/episteme/natural/chemistry/loaders/cml/cmlimpl/BaseToolImpl.html#workflow" class="member-name-link">workflow</a> - Variable in class org.episteme.natural.chemistry.loaders.cml.cmlimpl.<a href="../org/episteme/natural/chemistry/loaders/cml/cmlimpl/BaseToolImpl.html" title="class in org.episteme.natural.chemistry.loaders.cml.cmlimpl">BaseToolImpl</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/workflow/WorkflowEngine.html#workflow(java.lang.String,java.lang.String)" class="member-name-link">workflow(String, String)</a> - Static method in class org.episteme.server.server.workflow.<a href="../org/episteme/server/server/workflow/WorkflowEngine.html" title="class in org.episteme.server.server.workflow">WorkflowEngine</a></dt>
@@ -810,11 +838,11 @@ economic activity, typically at dedicated workplaces.</div>
 <dd>
 <div class="block">Creates a WER Monte Carlo simulator.</div>
 </dd>
-<dt><a href="../org/episteme/nativ/physics/loaders/fits/NativeFITSWriter.html#writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix)" class="member-name-link">writeImage(NativeMatrix)</a> - Method in class org.episteme.nativ.physics.loaders.fits.<a href="../org/episteme/nativ/physics/loaders/fits/NativeFITSWriter.html" title="class in org.episteme.nativ.physics.loaders.fits">NativeFITSWriter</a></dt>
+<dt><a href="../org/episteme/nativ/physics/loaders/fits/NativeFITSWriter.html#writeImage(org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage)" class="member-name-link">writeImage(NativeDoubleMatrixStorage)</a> - Method in class org.episteme.nativ.physics.loaders.fits.<a href="../org/episteme/nativ/physics/loaders/fits/NativeFITSWriter.html" title="class in org.episteme.nativ.physics.loaders.fits">NativeFITSWriter</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html#writeMatrix(java.lang.String,org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix)" class="member-name-link">writeMatrix(String, NativeMatrix)</a> - Method in class org.episteme.nativ.physics.loaders.hdf5.<a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html" title="class in org.episteme.nativ.physics.loaders.hdf5">NativeHDF5Writer</a></dt>
+<dt><a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html#writeMatrix(java.lang.String,org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage)" class="member-name-link">writeMatrix(String, NativeDoubleMatrixStorage)</a> - Method in class org.episteme.nativ.physics.loaders.hdf5.<a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html" title="class in org.episteme.nativ.physics.loaders.hdf5">NativeHDF5Writer</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html#writeMatrix(java.lang.String,org.episteme.nativ.mathematics.linearalgebra.matrices.NativeMatrix,java.lang.String,int)" class="member-name-link">writeMatrix(String, NativeMatrix, String, int)</a> - Method in class org.episteme.nativ.physics.loaders.hdf5.<a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html" title="class in org.episteme.nativ.physics.loaders.hdf5">NativeHDF5Writer</a></dt>
+<dt><a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html#writeMatrix(java.lang.String,org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage,java.lang.String,int)" class="member-name-link">writeMatrix(String, NativeDoubleMatrixStorage, String, int)</a> - Method in class org.episteme.nativ.physics.loaders.hdf5.<a href="../org/episteme/nativ/physics/loaders/hdf5/NativeHDF5Writer.html" title="class in org.episteme.nativ.physics.loaders.hdf5">NativeHDF5Writer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/core/mathematics/loaders/openmath/io/OMDOMWriter.html#writeNode(org.episteme.core.mathematics.loaders.openmath.OMObject)" class="member-name-link">writeNode(OMObject)</a> - Method in class org.episteme.core.mathematics.loaders.openmath.io.<a href="../org/episteme/core/mathematics/loaders/openmath/io/OMDOMWriter.html" title="class in org.episteme.core.mathematics.loaders.openmath.io">OMDOMWriter</a></dt>
 <dd>
@@ -832,6 +860,8 @@ economic activity, typically at dedicated workplaces.</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/AuthResponse.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/AuthResponse.html" title="class in org.episteme.server.server.proto">AuthResponse</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/proto/CholeskyResponse.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/CholeskyResponse.html" title="class in org.episteme.server.server.proto">CholeskyResponse</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/CommandResponse.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/CommandResponse.html" title="class in org.episteme.server.server.proto">CommandResponse</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/CreateSessionRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/CreateSessionRequest.html" title="class in org.episteme.server.server.proto">CreateSessionRequest</a></dt>
@@ -848,13 +878,21 @@ economic activity, typically at dedicated workplaces.</div>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/DeviceList.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/DeviceList.html" title="class in org.episteme.server.server.proto">DeviceList</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/proto/EigenResponse.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/EigenResponse.html" title="class in org.episteme.server.server.proto">EigenResponse</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/Empty.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/Empty.html" title="class in org.episteme.server.server.proto">Empty</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/GenomeChunk.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/GenomeChunk.html" title="class in org.episteme.server.server.proto">GenomeChunk</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/GenomeRegionRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/GenomeRegionRequest.html" title="class in org.episteme.server.server.proto">GenomeRegionRequest</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/proto/GMRESRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/GMRESRequest.html" title="class in org.episteme.server.server.proto">GMRESRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/proto/IterativeSolverRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/LoginRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/LoginRequest.html" title="class in org.episteme.server.server.proto">LoginRequest</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/proto/LUResponse.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/LUResponse.html" title="class in org.episteme.server.server.proto">LUResponse</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/MatrixData.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/MatrixData.html" title="class in org.episteme.server.server.proto">MatrixData</a></dt>
 <dd>&nbsp;</dd>
@@ -865,6 +903,8 @@ economic activity, typically at dedicated workplaces.</div>
 <dt><a href="../org/episteme/server/server/proto/MatrixVectorRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/PublishAck.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/PublishAck.html" title="class in org.episteme.server.server.proto">PublishAck</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/proto/QRResponse.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/QRResponse.html" title="class in org.episteme.server.server.proto">QRResponse</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/RegisterRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/RegisterRequest.html" title="class in org.episteme.server.server.proto">RegisterRequest</a></dt>
 <dd>&nbsp;</dd>
@@ -887,6 +927,8 @@ economic activity, typically at dedicated workplaces.</div>
 <dt><a href="../org/episteme/server/server/proto/SkyRegionRequest.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/SkyRegionRequest.html" title="class in org.episteme.server.server.proto">SkyRegionRequest</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/StarObject.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/StarObject.html" title="class in org.episteme.server.server.proto">StarObject</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="../org/episteme/server/server/proto/SVDResponse.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/SVDResponse.html" title="class in org.episteme.server.server.proto">SVDResponse</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="../org/episteme/server/server/proto/TaskIdentifier.html#writeTo(com.google.protobuf.CodedOutputStream)" class="member-name-link">writeTo(CodedOutputStream)</a> - Method in class org.episteme.server.server.proto.<a href="../org/episteme/server/server/proto/TaskIdentifier.html" title="class in org.episteme.server.server.proto">TaskIdentifier</a></dt>
 <dd>&nbsp;</dd>

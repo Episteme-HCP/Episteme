@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -65,7 +65,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
 <li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix)" tabindex="0">multiply(TiledMatrix, TiledMatrix)</a></li>
-<li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.distributed.DistributedContext)" tabindex="0">multiply(Matrix, Matrix, Matrix, DistributedContext)</a></li>
+<li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" tabindex="0">multiply(TiledMatrix, TiledMatrix, LinearAlgebraProvider)</a></li>
+<li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.distributed.DistributedContext)" tabindex="0">multiply(Matrix, Matrix, Matrix, DistributedContext)</a></li>
 </ol>
 </li>
 </ol>
@@ -122,18 +123,25 @@ It uses cyclic shifts of matrix blocks for communication.
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix)" class="member-name-link">multiply</a><wbr>(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;A,
- <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;B)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;E&gt;&nbsp;<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix)" class="member-name-link">multiply</a><wbr>(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Performs distributed matrix multiplication C = A × B using Cannon's algorithm.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.distributed.DistributedContext)" class="member-name-link">multiply</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;E&gt;&nbsp;<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a><wbr>&lt;E&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" class="member-name-link">multiply</a><wbr>(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B,
+ <a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;E&gt;&nbsp;leafProvider)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Performs distributed matrix multiplication C = A × B using Cannon's algorithm with a leaf provider.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.distributed.DistributedContext)" class="member-name-link">multiply</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
  <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;B,
  <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;C,
- <a href="../../../distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a>&nbsp;ctx)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+ <a href="../../../technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a>&nbsp;ctx)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Multiplies two matrices distributed across a 2D processor grid.</div>
 </div>
 </div>
@@ -173,8 +181,8 @@ It uses cyclic shifts of matrix blocks for communication.
 <section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix)">
 <h3>multiply</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a></span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;A,
- <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&nbsp;B)</span></div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B)</span></div>
 <div class="block">Performs distributed matrix multiplication C = A × B using Cannon's algorithm.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -187,13 +195,32 @@ It uses cyclic shifts of matrix blocks for communication.
 </section>
 </li>
 <li>
-<section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.distributed.DistributedContext)">
+<section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.matrices.TiledMatrix,org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)">
+<h3>multiply</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;E&gt;</span>&nbsp;<span class="return-type"><a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;A,
+ <a href="../matrices/TiledMatrix.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices">TiledMatrix</a>&lt;E&gt;&nbsp;B,
+ <a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;E&gt;&nbsp;leafProvider)</span></div>
+<div class="block">Performs distributed matrix multiplication C = A × B using Cannon's algorithm with a leaf provider.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>A</code> - Left matrix (tiled)</dd>
+<dd><code>B</code> - Right matrix (tiled)</dd>
+<dd><code>leafProvider</code> - Provider for tile-level multiplication</dd>
+<dt>Returns:</dt>
+<dd>Result matrix C</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.distributed.DistributedContext)">
 <h3>multiply</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
  <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;B,
  <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;C,
- <a href="../../../distributed/DistributedContext.html" title="interface in org.episteme.core.distributed">DistributedContext</a>&nbsp;ctx)</span></div>
+ <a href="../../../technical/backend/distributed/DistributedContext.html" title="interface in org.episteme.core.technical.backend.distributed">DistributedContext</a>&nbsp;ctx)</span></div>
 <div class="block">Multiplies two matrices distributed across a 2D processor grid.</div>
 </div>
 </section>

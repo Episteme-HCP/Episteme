@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -75,6 +75,18 @@ loadScripts(document, 'script');</script>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
+<li><a href="#zeroE()" tabindex="0">zeroE()</a></li>
+<li><a href="#oneE()" tabindex="0">oneE()</a></li>
+<li><a href="#nanE()" tabindex="0">nanE()</a></li>
+<li><a href="#piE()" tabindex="0">piE()</a></li>
+<li><a href="#eE()" tabindex="0">eE()</a></li>
+<li><a href="#twoE()" tabindex="0">twoE()</a></li>
+<li><a href="#twoPiE()" tabindex="0">twoPiE()</a></li>
+<li><a href="#halfPiE()" tabindex="0">halfPiE()</a></li>
+<li><a href="#positiveInfinityE()" tabindex="0">positiveInfinityE()</a></li>
+<li><a href="#negativeInfinityE()" tabindex="0">negativeInfinityE()</a></li>
+<li><a href="#ln2E()" tabindex="0">ln2E()</a></li>
+<li><a href="#ln10E()" tabindex="0">ln10E()</a></li>
 <li><a href="#of(double)" tabindex="0">of(double)</a></li>
 <li><a href="#of(float)" tabindex="0">of(float)</a></li>
 <li><a href="#of(java.math.BigDecimal)" tabindex="0">of(BigDecimal)</a></li>
@@ -137,15 +149,15 @@ loadScripts(document, 'script');</script>
 <li><a href="#operate(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">operate(Real, Real)</a></li>
 <li><a href="#add(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">add(Real, Real)</a></li>
 <li><a href="#zero()" tabindex="0">zero()</a></li>
-<li><a href="#subtract(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">subtract(Real, Real)</a></li>
-<li><a href="#negate(org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">negate(Real)</a></li>
 <li><a href="#one()" tabindex="0">one()</a></li>
 <li><a href="#multiply(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">multiply(Real, Real)</a></li>
 <li><a href="#isMultiplicationCommutative()" tabindex="0">isMultiplicationCommutative()</a></li>
+<li><a href="#negate(org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">negate(Real)</a></li>
 <li><a href="#inverse(org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">inverse(Real)</a></li>
 <li><a href="#contains(org.episteme.core.mathematics.numbers.real.Real)" tabindex="0">contains(Real)</a></li>
 <li><a href="#description()" tabindex="0">description()</a></li>
 <li><a href="#isEmpty()" tabindex="0">isEmpty()</a></li>
+<li><a href="#getScalarRing()" tabindex="0">getScalarRing()</a></li>
 </ol>
 </li>
 </ol>
@@ -167,7 +179,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <dl class="notes">
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="RealDouble.html" title="class in org.episteme.core.mathematics.numbers.real">RealDouble</a></code></dd>
+<dd><code><a href="RealBig.html" title="class in org.episteme.core.mathematics.numbers.real">RealBig</a>, <a href="RealDouble.html" title="class in org.episteme.core.mathematics.numbers.real">RealDouble</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
@@ -205,64 +217,40 @@ This class provides a smart factory that chooses the backing implementation</div
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color"><code><a href="#E" class="member-name-link">E</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">The real number E</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#HALF_PI" class="member-name-link">HALF_PI</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">Ãâ‚¬/2 - quarter turn in radians</div>
-</div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color"><code><a href="#LN10" class="member-name-link">LN10</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">Natural logarithm of 10</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#LN2" class="member-name-link">LN2</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">Natural logarithm of 2</div>
-</div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color"><code><a href="#NaN" class="member-name-link">NaN</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">The real number NaN</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#NEGATIVE_INFINITY" class="member-name-link">NEGATIVE_INFINITY</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">Negative infinity</div>
-</div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color"><code><a href="#ONE" class="member-name-link">ONE</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">The real number 1</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#PI" class="member-name-link">PI</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The real number PI</div>
-</div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color"><code><a href="#POSITIVE_INFINITY" class="member-name-link">POSITIVE_INFINITY</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">Positive infinity</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#TWO" class="member-name-link">TWO</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The real number 2</div>
-</div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color"><code><a href="#TWO_PI" class="member-name-link">TWO_PI</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">2Ãâ‚¬ - commonly used in angular calculations</div>
-</div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#ZERO" class="member-name-link">ZERO</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The real number 0</div>
-</div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -280,14 +268,14 @@ This class provides a smart factory that chooses the backing implementation</div
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#abs()" class="member-name-link">abs</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#acos()" class="member-name-link">acos</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#acos()" class="member-name-link">acos</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the arccosine of this number.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#acosh()" class="member-name-link">acosh</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#acosh()" class="member-name-link">acosh</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the inverse hyperbolic cosine of this number.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
@@ -301,43 +289,43 @@ This class provides a smart factory that chooses the backing implementation</div
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the sum of two elements (additive notation).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#asin()" class="member-name-link">asin</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#asin()" class="member-name-link">asin</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the arcsine of this number.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#asinh()" class="member-name-link">asinh</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#asinh()" class="member-name-link">asinh</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the inverse hyperbolic sine of this number.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#atan()" class="member-name-link">atan</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#atan()" class="member-name-link">atan</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the arctangent of this number.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#atan2(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">atan2</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;x)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#atan2(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">atan2</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;x)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the angle theta from the conversion of rectangular coordinates (x, y)
 to polar coordinates (r, theta).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#atanh()" class="member-name-link">atanh</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#atanh()" class="member-name-link">atanh</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the inverse hyperbolic tangent of this number.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#bigDecimalValue()" class="member-name-link">bigDecimalValue</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cbrt()" class="member-name-link">cbrt</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#cbrt()" class="member-name-link">cbrt</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the cube root of this number.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ceil()" class="member-name-link">ceil</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#ceil()" class="member-name-link">ceil</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the smallest (closest to negative infinity) double value that is
 greater than or equal to the argument and is equal to a mathematical integer.</div>
 </div>
@@ -354,14 +342,14 @@ greater than or equal to the argument and is equal to a mathematical integer.</d
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Tests whether this set contains the specified element.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cos()" class="member-name-link">cos</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#cos()" class="member-name-link">cos</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the cosine of this number (in radians).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cosh()" class="member-name-link">cosh</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#cosh()" class="member-name-link">cosh</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the hyperbolic cosine of this number.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
@@ -377,114 +365,144 @@ greater than or equal to the argument and is equal to a mathematical integer.</d
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#doubleValue()" class="member-name-link">doubleValue</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;obj)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exp()" class="member-name-link">exp</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#eE()" class="member-name-link">eE</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">The real number E</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;obj)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#exp()" class="member-name-link">exp</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns e raised to this number.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>float</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#floatValue()" class="member-name-link">floatValue</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#floor()" class="member-name-link">floor</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>float</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#floatValue()" class="member-name-link">floatValue</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#floor()" class="member-name-link">floor</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the largest (closest to positive infinity) double value that is
 less than or equal to the argument and is equal to a mathematical integer.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hypot(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">hypot</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;y)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a><wbr>&lt;<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getScalarRing()" class="member-name-link">getScalarRing</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the ring structure for real numbers.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#halfPiE()" class="member-name-link">halfPiE</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Ãâ‚¬/2 - quarter turn in radians</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#hypot(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">hypot</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;y)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns sqrt(x^2 + y^2) without intermediate overflow or underflow.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#intValue()" class="member-name-link">intValue</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#inverse()" class="member-name-link">inverse</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#intValue()" class="member-name-link">intValue</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#inverse()" class="member-name-link">inverse</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the multiplicative inverse of this element.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">inverse</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;element)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">inverse</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;element)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the multiplicative inverse of a non-zero element.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns <code>true</code> if this set contains no elements.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isInfinite()" class="member-name-link">isInfinite</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isMultiplicationCommutative()" class="member-name-link">isMultiplicationCommutative</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isInfinite()" class="member-name-link">isInfinite</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isMultiplicationCommutative()" class="member-name-link">isMultiplicationCommutative</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Fields always have commutative multiplication.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isNaN()" class="member-name-link">isNaN</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isNegative()" class="member-name-link">isNegative</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isOne()" class="member-name-link">isOne</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isNaN()" class="member-name-link">isNaN</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isNegative()" class="member-name-link">isNegative</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isOne()" class="member-name-link">isOne</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Checks if this element is the multiplicative identity (one).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isPositive()" class="member-name-link">isPositive</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isZero()" class="member-name-link">isZero</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isPositive()" class="member-name-link">isPositive</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isZero()" class="member-name-link">isZero</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Checks if this element is the additive identity (zero).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#log()" class="member-name-link">log</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#ln10E()" class="member-name-link">ln10E</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Natural logarithm of 10</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#ln2E()" class="member-name-link">ln2E</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Natural logarithm of 2</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#log()" class="member-name-link">log</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the natural logarithm of this number.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#log10()" class="member-name-link">log10</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#log10()" class="member-name-link">log10</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the base-10 logarithm of this number.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#longValue()" class="member-name-link">longValue</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#max(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">max</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>long</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#longValue()" class="member-name-link">longValue</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#max(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">max</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the maximum of this and another number.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#min(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">min</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#min(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">min</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the minimum of this and another number.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#mod(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">mod</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#mod(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">mod</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the modulo of this number (always non-negative).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#multiply(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">multiply</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#multiply(org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">multiply</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;other)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the product of this element and another.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">multiply</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;left,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">multiply</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;left,
  <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;right)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the product of two elements.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#nanE()" class="member-name-link">nanE</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">The real number NaN</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#negate()" class="member-name-link">negate</a>()</code></div>
@@ -497,29 +515,39 @@ less than or equal to the argument and is equal to a mathematical integer.</div>
 <div class="block">Returns the additive inverse (negation) of an element.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(double)" class="member-name-link">of</a><wbr>(double&nbsp;value)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#negativeInfinityE()" class="member-name-link">negativeInfinityE</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Negative infinity</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(double)" class="member-name-link">of</a><wbr>(double&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a real number from a double value.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(float)" class="member-name-link">of</a><wbr>(float&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(float)" class="member-name-link">of</a><wbr>(float&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a real number from a float value.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(java.lang.String)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(java.lang.String)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a real number from a String representation.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(java.math.BigDecimal)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a>&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(java.math.BigDecimal)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a>&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Creates a real number from a BigDecimal value.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#one()" class="member-name-link">one</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#one()" class="member-name-link">one</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the multiplicative identity (one element).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#oneE()" class="member-name-link">oneE</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">The real number 1</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#operate(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">operate</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;left,
@@ -527,9 +555,19 @@ less than or equal to the argument and is equal to a mathematical integer.</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Performs the binary operation on two elements.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pow(double)" class="member-name-link">pow</a><wbr>(double&nbsp;exponent)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#piE()" class="member-name-link">piE</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">The real number PI</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#positiveInfinityE()" class="member-name-link">positiveInfinityE</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Positive infinity</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#pow(double)" class="member-name-link">pow</a><wbr>(double&nbsp;exponent)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns this number raised to a power.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
@@ -543,9 +581,9 @@ less than or equal to the argument and is equal to a mathematical integer.</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the remainder of this number divided by another.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#round()" class="member-name-link">round</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#round()" class="member-name-link">round</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the closest long to the argument, with ties rounding to positive
 infinity.</div>
 </div>
@@ -554,14 +592,14 @@ infinity.</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the sign of this number (-1, 0, or 1).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sin()" class="member-name-link">sin</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sin()" class="member-name-link">sin</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the sine of this number (in radians).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sinh()" class="member-name-link">sinh</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#sinh()" class="member-name-link">sinh</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the hyperbolic sine of this number.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
@@ -572,41 +610,50 @@ infinity.</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the difference of this element and another.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#subtract(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)" class="member-name-link">subtract</a><wbr>(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;left,
- <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;right)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the difference of two elements.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tan()" class="member-name-link">tan</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#tan()" class="member-name-link">tan</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the tangent of this number (in radians).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#tanh()" class="member-name-link">tanh</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#tanh()" class="member-name-link">tanh</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the hyperbolic tangent of this number.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toDegrees()" class="member-name-link">toDegrees</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toDegrees()" class="member-name-link">toDegrees</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Converts an angle measured in radians to an approximately equivalent angle
 measured in degrees.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toRadians()" class="member-name-link">toRadians</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toRadians()" class="member-name-link">toRadians</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Converts an angle measured in degrees to an approximately equivalent angle
 measured in radians.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#zero()" class="member-name-link">zero</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>abstract <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#twoE()" class="member-name-link">twoE</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">The real number 2</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#twoPiE()" class="member-name-link">twoPiE</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">2Ãâ‚¬ - commonly used in angular calculations</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#zero()" class="member-name-link">zero</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the additive identity (zero element).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#zeroE()" class="member-name-link">zeroE</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">The real number 0</div>
 </div>
 </div>
 </div>
@@ -619,7 +666,7 @@ measured in radians.</div>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.structures.groups.AbelianGroup">Methods inherited from interface&nbsp;<a href="../../structures/groups/AbelianGroup.html#method-summary" title="interface in org.episteme.core.mathematics.structures.groups">AbelianGroup</a></h3>
-<code><a href="../../structures/groups/AbelianGroup.html#isCommutative()" title="isCommutative()">isCommutative</a></code></div>
+<code><a href="../../structures/groups/AbelianGroup.html#isCommutative()" title="isCommutative()">isCommutative</a>, <a href="../../structures/groups/AbelianGroup.html#subtract(E,E)" title="subtract(Real, Real)">subtract</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.mathematics.structures.groups.AbelianMonoid">Methods inherited from interface&nbsp;<a href="../../structures/groups/AbelianMonoid.html#method-summary" title="interface in org.episteme.core.mathematics.structures.groups">AbelianMonoid</a></h3>
 <code><a href="../../structures/groups/AbelianMonoid.html#identity()" title="identity()">identity</a>, <a href="../../structures/groups/AbelianMonoid.html#isCommutative()" title="isCommutative()">isCommutative</a></code></div>
@@ -648,7 +695,6 @@ measured in radians.</div>
 <h3>ZERO</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">ZERO</span></div>
-<div class="block">The real number 0</div>
 </div>
 </section>
 </li>
@@ -657,7 +703,6 @@ measured in radians.</div>
 <h3>ONE</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">ONE</span></div>
-<div class="block">The real number 1</div>
 </div>
 </section>
 </li>
@@ -666,7 +711,6 @@ measured in radians.</div>
 <h3>NaN</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">NaN</span></div>
-<div class="block">The real number NaN</div>
 </div>
 </section>
 </li>
@@ -675,7 +719,6 @@ measured in radians.</div>
 <h3>PI</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">PI</span></div>
-<div class="block">The real number PI</div>
 </div>
 </section>
 </li>
@@ -684,7 +727,6 @@ measured in radians.</div>
 <h3>E</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">E</span></div>
-<div class="block">The real number E</div>
 </div>
 </section>
 </li>
@@ -693,7 +735,6 @@ measured in radians.</div>
 <h3>TWO</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">TWO</span></div>
-<div class="block">The real number 2</div>
 </div>
 </section>
 </li>
@@ -702,7 +743,6 @@ measured in radians.</div>
 <h3>TWO_PI</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">TWO_PI</span></div>
-<div class="block">2Ãâ‚¬ - commonly used in angular calculations</div>
 </div>
 </section>
 </li>
@@ -711,7 +751,6 @@ measured in radians.</div>
 <h3>HALF_PI</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">HALF_PI</span></div>
-<div class="block">Ãâ‚¬/2 - quarter turn in radians</div>
 </div>
 </section>
 </li>
@@ -720,7 +759,6 @@ measured in radians.</div>
 <h3>POSITIVE_INFINITY</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">POSITIVE_INFINITY</span></div>
-<div class="block">Positive infinity</div>
 </div>
 </section>
 </li>
@@ -729,7 +767,6 @@ measured in radians.</div>
 <h3>NEGATIVE_INFINITY</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">NEGATIVE_INFINITY</span></div>
-<div class="block">Negative infinity</div>
 </div>
 </section>
 </li>
@@ -738,7 +775,6 @@ measured in radians.</div>
 <h3>LN2</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">LN2</span></div>
-<div class="block">Natural logarithm of 2</div>
 </div>
 </section>
 </li>
@@ -747,7 +783,6 @@ measured in radians.</div>
 <h3>LN10</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">LN10</span></div>
-<div class="block">Natural logarithm of 10</div>
 </div>
 </section>
 </li>
@@ -759,6 +794,114 @@ measured in radians.</div>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="zeroE()">
+<h3>zeroE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">zeroE</span>()</div>
+<div class="block">The real number 0</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="oneE()">
+<h3>oneE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">oneE</span>()</div>
+<div class="block">The real number 1</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="nanE()">
+<h3>nanE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">nanE</span>()</div>
+<div class="block">The real number NaN</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="piE()">
+<h3>piE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">piE</span>()</div>
+<div class="block">The real number PI</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="eE()">
+<h3>eE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">eE</span>()</div>
+<div class="block">The real number E</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="twoE()">
+<h3>twoE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">twoE</span>()</div>
+<div class="block">The real number 2</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="twoPiE()">
+<h3>twoPiE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">twoPiE</span>()</div>
+<div class="block">2Ãâ‚¬ - commonly used in angular calculations</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="halfPiE()">
+<h3>halfPiE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">halfPiE</span>()</div>
+<div class="block">Ãâ‚¬/2 - quarter turn in radians</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="positiveInfinityE()">
+<h3>positiveInfinityE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">positiveInfinityE</span>()</div>
+<div class="block">Positive infinity</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="negativeInfinityE()">
+<h3>negativeInfinityE</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">negativeInfinityE</span>()</div>
+<div class="block">Negative infinity</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="ln2E()">
+<h3>ln2E</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">ln2E</span>()</div>
+<div class="block">Natural logarithm of 2</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="ln10E()">
+<h3>ln10E</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">ln10E</span>()</div>
+<div class="block">Natural logarithm of 10</div>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="of(double)">
 <h3>of</h3>
@@ -1117,7 +1260,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="pow(double)">
 <h3>pow</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">pow</span><wbr><span class="parameters">(double&nbsp;exponent)</span></div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">pow</span><wbr><span class="parameters">(double&nbsp;exponent)</span></div>
 <div class="block">Returns this number raised to a power.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -1132,7 +1275,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="exp()">
 <h3>exp</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">exp</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">exp</span>()</div>
 <div class="block">Returns e raised to this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1145,7 +1288,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="log()">
 <h3>log</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">log</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">log</span>()</div>
 <div class="block">Returns the natural logarithm of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1158,7 +1301,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="log10()">
 <h3>log10</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">log10</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">log10</span>()</div>
 <div class="block">Returns the base-10 logarithm of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1171,7 +1314,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="sin()">
 <h3>sin</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">sin</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">sin</span>()</div>
 <div class="block">Returns the sine of this number (in radians).</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1184,7 +1327,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="cos()">
 <h3>cos</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">cos</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">cos</span>()</div>
 <div class="block">Returns the cosine of this number (in radians).</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1197,7 +1340,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="tan()">
 <h3>tan</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">tan</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">tan</span>()</div>
 <div class="block">Returns the tangent of this number (in radians).</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1210,7 +1353,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="asin()">
 <h3>asin</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">asin</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">asin</span>()</div>
 <div class="block">Returns the arcsine of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1223,7 +1366,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="acos()">
 <h3>acos</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">acos</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">acos</span>()</div>
 <div class="block">Returns the arccosine of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1236,7 +1379,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="atan()">
 <h3>atan</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">atan</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">atan</span>()</div>
 <div class="block">Returns the arctangent of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1249,7 +1392,7 @@ For any non-zero element e: e.multiply(e.inverse()) = e.one()
 <section class="detail" id="atan2(org.episteme.core.mathematics.numbers.real.Real)">
 <h3>atan2</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">atan2</span><wbr><span class="parameters">(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;x)</span></div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">atan2</span><wbr><span class="parameters">(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;x)</span></div>
 <div class="block">Returns the angle theta from the conversion of rectangular coordinates (x, y)
 to polar coordinates (r, theta).</div>
 <dl class="notes">
@@ -1265,7 +1408,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="sinh()">
 <h3>sinh</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">sinh</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">sinh</span>()</div>
 <div class="block">Returns the hyperbolic sine of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1278,7 +1421,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="cosh()">
 <h3>cosh</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">cosh</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">cosh</span>()</div>
 <div class="block">Returns the hyperbolic cosine of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1291,7 +1434,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="tanh()">
 <h3>tanh</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">tanh</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">tanh</span>()</div>
 <div class="block">Returns the hyperbolic tangent of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1304,7 +1447,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="asinh()">
 <h3>asinh</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">asinh</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">asinh</span>()</div>
 <div class="block">Returns the inverse hyperbolic sine of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1317,7 +1460,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="acosh()">
 <h3>acosh</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">acosh</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">acosh</span>()</div>
 <div class="block">Returns the inverse hyperbolic cosine of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1330,7 +1473,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="atanh()">
 <h3>atanh</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">atanh</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">atanh</span>()</div>
 <div class="block">Returns the inverse hyperbolic tangent of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1343,7 +1486,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="cbrt()">
 <h3>cbrt</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">cbrt</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">cbrt</span>()</div>
 <div class="block">Returns the cube root of this number.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1356,7 +1499,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="hypot(org.episteme.core.mathematics.numbers.real.Real)">
 <h3>hypot</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">hypot</span><wbr><span class="parameters">(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;y)</span></div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">hypot</span><wbr><span class="parameters">(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;y)</span></div>
 <div class="block">Returns sqrt(x^2 + y^2) without intermediate overflow or underflow.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -1371,7 +1514,7 @@ to polar coordinates (r, theta).</div>
 <section class="detail" id="ceil()">
 <h3>ceil</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">ceil</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">ceil</span>()</div>
 <div class="block">Returns the smallest (closest to negative infinity) double value that is
 greater than or equal to the argument and is equal to a mathematical integer.</div>
 <dl class="notes">
@@ -1385,7 +1528,7 @@ greater than or equal to the argument and is equal to a mathematical integer.</d
 <section class="detail" id="floor()">
 <h3>floor</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">floor</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">floor</span>()</div>
 <div class="block">Returns the largest (closest to positive infinity) double value that is
 less than or equal to the argument and is equal to a mathematical integer.</div>
 <dl class="notes">
@@ -1399,7 +1542,7 @@ less than or equal to the argument and is equal to a mathematical integer.</div>
 <section class="detail" id="round()">
 <h3>round</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">round</span>()</div>
+<div class="member-signature"><span class="modifiers">public abstract</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">round</span>()</div>
 <div class="block">Returns the closest long to the argument, with ties rounding to positive
 infinity.</div>
 <dl class="notes">
@@ -1643,63 +1786,6 @@ Delegates to <a href="../../structures/groups/AbelianMonoid.html#identity()"><co
 </section>
 </li>
 <li>
-<section class="detail" id="subtract(org.episteme.core.mathematics.numbers.real.Real,org.episteme.core.mathematics.numbers.real.Real)">
-<h3>subtract</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">subtract</span><wbr><span class="parameters">(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;left,
- <a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;right)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../structures/groups/AbelianGroup.html#subtract(E,E)">AbelianGroup</a></code></span></div>
-<div class="block">Returns the difference of two elements.
-<p>
-Defined as: a - b = a + (-b)
-</p></div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../../structures/groups/AbelianGroup.html#subtract(E,E)">subtract</a></code>&nbsp;in interface&nbsp;<code><a href="../../structures/groups/AbelianGroup.html" title="interface in org.episteme.core.mathematics.structures.groups">AbelianGroup</a>&lt;<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
-<dt>Parameters:</dt>
-<dd><code>left</code> - the minuend</dd>
-<dd><code>right</code> - the subtrahend</dd>
-<dt>Returns:</dt>
-<dd>a - b</dd>
-<dt>See Also:</dt>
-<dd>
-<ul class="tag-list-long">
-<li><a href="../../structures/groups/AbelianMonoid.html#add(E,E)"><code>AbelianMonoid.add(Object, Object)</code></a></li>
-<li><a href="../../structures/groups/AbelianGroup.html#negate(E)"><code>AbelianGroup.negate(Object)</code></a></li>
-</ul>
-</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="negate(org.episteme.core.mathematics.numbers.real.Real)">
-<h3>negate</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">negate</span><wbr><span class="parameters">(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;element)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../structures/groups/AbelianGroup.html#negate(E)">AbelianGroup</a></code></span></div>
-<div class="block">Returns the additive inverse (negation) of an element.
-<p>
-Satisfies: a + (-a) = (-a) + a = 0
-</p></div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../../structures/groups/AbelianGroup.html#negate(E)">negate</a></code>&nbsp;in interface&nbsp;<code><a href="../../structures/groups/AbelianGroup.html" title="interface in org.episteme.core.mathematics.structures.groups">AbelianGroup</a>&lt;<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
-<dt>Parameters:</dt>
-<dd><code>element</code> - the element to negate</dd>
-<dt>Returns:</dt>
-<dd>-element</dd>
-<dt>See Also:</dt>
-<dd>
-<ul class="tag-list">
-<li><a href="../../structures/groups/Group.html#inverse(E)"><code>Group.inverse(Object)</code></a></li>
-</ul>
-</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="one()">
 <h3>one</h3>
 <div class="horizontal-scroll">
@@ -1757,6 +1843,33 @@ Multiplication must be associative and distribute over addition.
 <dd><code><a href="../../structures/rings/Semiring.html#isMultiplicationCommutative()">isMultiplicationCommutative</a></code>&nbsp;in interface&nbsp;<code><a href="../../structures/rings/Semiring.html" title="interface in org.episteme.core.mathematics.structures.rings">Semiring</a>&lt;<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd>always <code>true</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="negate(org.episteme.core.mathematics.numbers.real.Real)">
+<h3>negate</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">negate</span><wbr><span class="parameters">(<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&nbsp;element)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../structures/groups/AbelianGroup.html#negate(E)">AbelianGroup</a></code></span></div>
+<div class="block">Returns the additive inverse (negation) of an element.
+<p>
+Satisfies: a + (-a) = (-a) + a = 0
+</p></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../structures/groups/AbelianGroup.html#negate(E)">negate</a></code>&nbsp;in interface&nbsp;<code><a href="../../structures/groups/AbelianGroup.html" title="interface in org.episteme.core.mathematics.structures.groups">AbelianGroup</a>&lt;<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
+<dt>Parameters:</dt>
+<dd><code>element</code> - the element to negate</dd>
+<dt>Returns:</dt>
+<dd>-element</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../structures/groups/Group.html#inverse(E)"><code>Group.inverse(Object)</code></a></li>
+</ul>
+</dd>
 </dl>
 </div>
 </section>
@@ -1873,6 +1986,19 @@ It is the unique set containing no elements.
 <dd><code><a href="../../structures/sets/Set.html#isEmpty()">isEmpty</a></code>&nbsp;in interface&nbsp;<code><a href="../../structures/sets/Set.html" title="interface in org.episteme.core.mathematics.structures.sets">Set</a>&lt;<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></dd>
 <dt>Returns:</dt>
 <dd><code>true</code> if this set is empty</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getScalarRing()">
+<h3>getScalarRing</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;<a href="Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">getScalarRing</span>()</div>
+<div class="block">Returns the ring structure for real numbers.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this instance (as it implements Field<Real>)</dd>
 </dl>
 </div>
 </section>

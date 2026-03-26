@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -62,8 +62,6 @@ loadScripts(document, 'script');</script>
 <li><a href="#getInstance()" tabindex="0">getInstance()</a></li>
 <li><a href="#staticSelect(java.lang.String)" tabindex="0">staticSelect(String)</a></li>
 <li><a href="#staticAllBackends()" tabindex="0">staticAllBackends()</a></li>
-<li><a href="#select(java.lang.String)" tabindex="0">select(String)</a></li>
-<li><a href="#getAllBackends()" tabindex="0">getAllBackends()</a></li>
 <li><a href="#getPreferredId()" tabindex="0">getPreferredId()</a></li>
 <li><a href="#setPreferredId(java.lang.String)" tabindex="0">setPreferredId(String)</a></li>
 <li><a href="#getActiveBackend()" tabindex="0">getActiveBackend()</a></li>
@@ -78,7 +76,7 @@ loadScripts(document, 'script');</script>
 <h1 title="Class QuantumBackendManager" class="title">Class QuantumBackendManager</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance"><a href="../../../core/technical/backend/AbstractBackendManager.html" title="class in org.episteme.core.technical.backend">org.episteme.core.technical.backend.AbstractBackendManager</a>&lt;<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&gt;
+<div class="inheritance"><a href="../../../core/technical/backend/AbstractBackendManager.html" title="class in org.episteme.core.technical.backend">org.episteme.core.technical.backend.AbstractBackendManager</a>&lt;<a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a>&gt;
 <div class="inheritance">org.episteme.natural.physics.quantum.QuantumBackendManager</div>
 </div>
 </div>
@@ -86,7 +84,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">QuantumBackendManager</span>
-<span class="extends-implements">extends <a href="../../../core/technical/backend/AbstractBackendManager.html" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a>&lt;<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&gt;</span></div>
+<span class="extends-implements">extends <a href="../../../core/technical/backend/AbstractBackendManager.html" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a>&lt;<a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a>&gt;</span></div>
 <div class="block">Manager for quantum computing backends.
 <p>
 Manages discovery and selection of quantum backends including:
@@ -108,7 +106,7 @@ Qiskit, Amazon Braket, Strange, Quantum4J, and Python-based backends.
 <h2>Field Summary</h2>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.episteme.core.technical.backend.AbstractBackendManager">Fields inherited from class&nbsp;<a href="../../../core/technical/backend/AbstractBackendManager.html#field-summary" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a></h3>
-<code><a href="../../../core/technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../../../core/technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../../../core/technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a></code></div>
+<code><a href="../../../core/technical/backend/AbstractBackendManager.html#backendClass">backendClass</a>, <a href="../../../core/technical/backend/AbstractBackendManager.html#backends">backends</a>, <a href="../../../core/technical/backend/AbstractBackendManager.html#defaultBackend">defaultBackend</a>, <a href="../../../core/technical/backend/AbstractBackendManager.html#logger">logger</a></code></div>
 </section>
 </li>
 <!-- ========== METHOD SUMMARY =========== -->
@@ -116,40 +114,26 @@ Qiskit, Amazon Braket, Strange, Quantum4J, and Python-based backends.
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button><button id="method-summary-table-tab6" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab6', 3)" class="table-tab">Deprecated Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getActiveBackend()" class="member-name-link">getActiveBackend</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the active quantum backend.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a><wbr>&lt;<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#getAllBackends()" class="member-name-link">getAllBackends</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use staticAllBackends</div>
-</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="QuantumBackendManager.html" title="class in org.episteme.natural.physics.quantum">QuantumBackendManager</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferredId()" class="member-name-link">getPreferredId</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="QuantumBackendManager.html" title="class in org.episteme.natural.physics.quantum">QuantumBackendManager</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getInstance()" class="member-name-link">getInstance</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPreferredId()" class="member-name-link">getPreferredId</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the preferred backend ID.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6"><code>static <a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#select(java.lang.String)" class="member-name-link">select</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use staticSelect</div>
-</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#selectBestBackend()" class="member-name-link">selectBestBackend</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Selects the best available backend based on priority.</div>
@@ -159,10 +143,10 @@ Qiskit, Amazon Braket, Strange, Quantum4J, and Python-based backends.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the preferred backend ID.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a><wbr>&lt;<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a><wbr>&lt;<a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticAllBackends()" class="member-name-link">staticAllBackends</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#staticSelect(java.lang.String)" class="member-name-link">staticSelect</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
@@ -197,7 +181,7 @@ Qiskit, Amazon Braket, Strange, Quantum4J, and Python-based backends.
 <section class="detail" id="staticSelect(java.lang.String)">
 <h3>staticSelect</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></span>&nbsp;<span class="element-name">staticSelect</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a></span>&nbsp;<span class="element-name">staticSelect</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
 </div>
 </section>
 </li>
@@ -205,31 +189,7 @@ Qiskit, Amazon Braket, Strange, Quantum4J, and Python-based backends.
 <section class="detail" id="staticAllBackends()">
 <h3>staticAllBackends</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&gt;</span>&nbsp;<span class="element-name">staticAllBackends</span>()</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="select(java.lang.String)">
-<h3>select</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>
-</span><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></span>&nbsp;<span class="element-name">select</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use staticSelect</div>
-</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getAllBackends()">
-<h3>getAllBackends</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>
-</span><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&gt;</span>&nbsp;<span class="element-name">getAllBackends</span>()</div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use staticAllBackends</div>
-</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a>&gt;</span>&nbsp;<span class="element-name">staticAllBackends</span>()</div>
 </div>
 </section>
 </li>
@@ -259,7 +219,7 @@ Qiskit, Amazon Braket, Strange, Quantum4J, and Python-based backends.
 <section class="detail" id="getActiveBackend()">
 <h3>getActiveBackend</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></span>&nbsp;<span class="element-name">getActiveBackend</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a></span>&nbsp;<span class="element-name">getActiveBackend</span>()</div>
 <div class="block">Returns the active quantum backend.</div>
 </div>
 </section>
@@ -268,12 +228,12 @@ Qiskit, Amazon Braket, Strange, Quantum4J, and Python-based backends.
 <section class="detail" id="selectBestBackend()">
 <h3>selectBestBackend</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a></span>&nbsp;<span class="element-name">selectBestBackend</span>()</div>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a></span>&nbsp;<span class="element-name">selectBestBackend</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from class:&nbsp;<code><a href="../../../core/technical/backend/AbstractBackendManager.html#selectBestBackend()">AbstractBackendManager</a></code></span></div>
 <div class="block">Selects the best available backend based on priority.</div>
 <dl class="notes">
 <dt>Overrides:</dt>
-<dd><code><a href="../../../core/technical/backend/AbstractBackendManager.html#selectBestBackend()">selectBestBackend</a></code>&nbsp;in class&nbsp;<code><a href="../../../core/technical/backend/AbstractBackendManager.html" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a>&lt;<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&gt;</code></dd>
+<dd><code><a href="../../../core/technical/backend/AbstractBackendManager.html#selectBestBackend()">selectBestBackend</a></code>&nbsp;in class&nbsp;<code><a href="../../../core/technical/backend/AbstractBackendManager.html" title="class in org.episteme.core.technical.backend">AbstractBackendManager</a>&lt;<a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a>&gt;</code></dd>
 </dl>
 </div>
 </section>

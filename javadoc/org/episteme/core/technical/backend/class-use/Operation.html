@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -59,21 +59,42 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Package</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.technical.backend">org.episteme.core.technical.backend</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.distributed">org.episteme.core.distributed</a></div>
 <div class="col-last even-row-color">
+<div class="block">Distributed computing infrastructure for Episteme.</div>
+</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.backend">org.episteme.core.technical.backend</a></div>
+<div class="col-last odd-row-color">
 <div class="block">Provides a Service Provider Interface (SPI) for implementing</div>
 </div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.backend.cpu">org.episteme.core.technical.backend.cpu</a></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><a href="#org.episteme.core.technical.backend.cpu">org.episteme.core.technical.backend.cpu</a></div>
+<div class="col-last even-row-color">
 <div class="block">Provides the default CPU backend using pure Java.</div>
 </div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.technical.backend.gpu.cuda">org.episteme.core.technical.backend.gpu.cuda</a></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.backend.gpu.opencl">org.episteme.core.technical.backend.gpu.opencl</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.nativ.technical.backend.gpu.cuda">org.episteme.nativ.technical.backend.gpu.cuda</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.technical.backend.gpu.opencl">org.episteme.nativ.technical.backend.gpu.opencl</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
+<li>
+<section class="detail" id="org.episteme.core.distributed">
+<h2>Uses of <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a> in <a href="../../../distributed/package-summary.html">org.episteme.core.distributed</a></h2>
+<div class="caption"><span>Methods in <a href="../../../distributed/package-summary.html">org.episteme.core.distributed</a> with parameters of type <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>&lt;T&gt;&nbsp;T</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">DistributedExecutionContext.</span><code><a href="../../../distributed/DistributedExecutionContext.html#execute(org.episteme.core.technical.backend.Operation)" class="member-name-link">execute</a><wbr>(<a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a>&lt;T&gt;&nbsp;operation)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>&lt;T&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html" title="class or interface in java.util.concurrent" class="external-link">CompletableFuture</a><wbr>&lt;T&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">DistributedExecutionContext.</span><code><a href="../../../distributed/DistributedExecutionContext.html#executeAsync(org.episteme.core.technical.backend.Operation)" class="member-name-link">executeAsync</a><wbr>(<a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a>&lt;T&gt;&nbsp;operation)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="org.episteme.core.technical.backend">
 <h2>Uses of <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a> in <a href="../package-summary.html">org.episteme.core.technical.backend</a></h2>
@@ -110,29 +131,29 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.technical.backend.gpu.cuda">
-<h2>Uses of <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a> in <a href="../gpu/cuda/package-summary.html">org.episteme.core.technical.backend.gpu.cuda</a></h2>
-<div class="caption"><span>Methods in <a href="../gpu/cuda/package-summary.html">org.episteme.core.technical.backend.gpu.cuda</a> with parameters of type <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a></span></div>
+<section class="detail" id="org.episteme.nativ.technical.backend.gpu.cuda">
+<h2>Uses of <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a> in <a href="../../../../nativ/technical/backend/gpu/cuda/package-summary.html">org.episteme.nativ.technical.backend.gpu.cuda</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../nativ/technical/backend/gpu/cuda/package-summary.html">org.episteme.nativ.technical.backend.gpu.cuda</a> with parameters of type <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>&lt;T&gt;&nbsp;T</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">CUDAExecutionContext.</span><code><a href="../gpu/cuda/CUDAExecutionContext.html#execute(org.episteme.core.technical.backend.Operation)" class="member-name-link">execute</a><wbr>(<a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a>&lt;T&gt;&nbsp;operation)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">CUDAExecutionContext.</span><code><a href="../../../../nativ/technical/backend/gpu/cuda/CUDAExecutionContext.html#execute(org.episteme.core.technical.backend.Operation)" class="member-name-link">execute</a><wbr>(<a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a>&lt;T&gt;&nbsp;operation)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.technical.backend.gpu.opencl">
-<h2>Uses of <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a> in <a href="../gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></h2>
-<div class="caption"><span>Methods in <a href="../gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a> with parameters of type <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a></span></div>
+<section class="detail" id="org.episteme.nativ.technical.backend.gpu.opencl">
+<h2>Uses of <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a> in <a href="../../../../nativ/technical/backend/gpu/opencl/package-summary.html">org.episteme.nativ.technical.backend.gpu.opencl</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../nativ/technical/backend/gpu/opencl/package-summary.html">org.episteme.nativ.technical.backend.gpu.opencl</a> with parameters of type <a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>&lt;T&gt;&nbsp;T</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">OpenCLExecutionContext.</span><code><a href="../gpu/opencl/OpenCLExecutionContext.html#execute(org.episteme.core.technical.backend.Operation)" class="member-name-link">execute</a><wbr>(<a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a>&lt;T&gt;&nbsp;operation)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">OpenCLExecutionContext.</span><code><a href="../../../../nativ/technical/backend/gpu/opencl/OpenCLExecutionContext.html#execute(org.episteme.core.technical.backend.Operation)" class="member-name-link">execute</a><wbr>(<a href="../Operation.html" title="interface in org.episteme.core.technical.backend">Operation</a>&lt;T&gt;&nbsp;operation)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,6 +60,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E(java.lang.String,int)" tabindex="0">WorkerNode(String, int)</a></li>
+<li><a href="#%3Cinit%3E(io.grpc.ManagedChannel)" tabindex="0">WorkerNode(ManagedChannel)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -67,6 +68,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#start()" tabindex="0">start()</a></li>
 <li><a href="#stop()" tabindex="0">stop()</a></li>
 <li><a href="#shutdown()" tabindex="0">shutdown()</a></li>
+<li><a href="#register()" tabindex="0">register()</a></li>
+<li><a href="#pollAndExecute()" tabindex="0">pollAndExecute()</a></li>
 <li><a href="#main(java.lang.String%5B%5D)" tabindex="0">main(String[])</a></li>
 </ol>
 </li>
@@ -115,9 +118,13 @@ acceleration when available.
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.lang.String,int)" class="member-name-link">WorkerNode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;host,
- int&nbsp;port)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(io.grpc.ManagedChannel)" class="member-name-link">WorkerNode</a><wbr>(io.grpc.ManagedChannel&nbsp;channel)</code></div>
 <div class="col-last even-row-color">
+<div class="block">Creates a new WorkerNode with an existing channel (useful for testing).</div>
+</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.lang.String,int)" class="member-name-link">WorkerNode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;host,
+ int&nbsp;port)</code></div>
+<div class="col-last odd-row-color">
 <div class="block">Creates a new WorkerNode connected to the specified server.</div>
 </div>
 </div>
@@ -139,6 +146,12 @@ acceleration when available.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Main entry point for the worker node.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#pollAndExecute()" class="member-name-link">pollAndExecute</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#register()" class="member-name-link">register</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shutdown()" class="member-name-link">shutdown</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -186,6 +199,19 @@ acceleration when available.
 </div>
 </section>
 </li>
+<li>
+<section class="detail" id="&lt;init&gt;(io.grpc.ManagedChannel)">
+<h3>WorkerNode</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">WorkerNode</span><wbr><span class="parameters">(io.grpc.ManagedChannel&nbsp;channel)</span></div>
+<div class="block">Creates a new WorkerNode with an existing channel (useful for testing).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>channel</code> - the channel to use</dd>
+</dl>
+</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -218,6 +244,22 @@ acceleration when available.
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">shutdown</span>()</div>
 <div class="block">Shuts down the gRPC channel.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="register()">
+<h3>register</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">register</span>()</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="pollAndExecute()">
+<h3>pollAndExecute</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">pollAndExecute</span>()</div>
 </div>
 </section>
 </li>

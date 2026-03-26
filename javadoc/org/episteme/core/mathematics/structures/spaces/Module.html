@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -64,6 +64,7 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#getScalarRing()" tabindex="0">getScalarRing()</a></li>
 <li><a href="#scale(R,M)" tabindex="0">scale(R, M)</a></li>
+<li><a href="#scale(R)" tabindex="0">scale(R)</a></li>
 </ol>
 </li>
 </ol>
@@ -124,7 +125,7 @@ A left R-module M consists of:
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -135,10 +136,15 @@ A left R-module M consists of:
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns the ring of scalars for this module.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#type-param-M" title="type parameter in Module">M</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#scale(R,M)" class="member-name-link">scale</a><wbr>(<a href="#type-param-R" title="type parameter in Module">R</a>&nbsp;scalar,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="#type-param-M" title="type parameter in Module">M</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#scale(R)" class="member-name-link">scale</a><wbr>(<a href="#type-param-R" title="type parameter in Module">R</a>&nbsp;scalar)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Convenience scalar multiplication (r Ã— this).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#type-param-M" title="type parameter in Module">M</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#scale(R,M)" class="member-name-link">scale</a><wbr>(<a href="#type-param-R" title="type parameter in Module">R</a>&nbsp;scalar,
  <a href="#type-param-M" title="type parameter in Module">M</a>&nbsp;moduleElement)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Scalar multiplication (r Ãƒâ€” m).</div>
 </div>
 </div>
@@ -199,6 +205,21 @@ A left R-module M consists of:
 <dd><code>moduleElement</code> - the module element m Ã¢Ë†Ë† M</dd>
 <dt>Returns:</dt>
 <dd>r Ãƒâ€” m</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="scale(R)">
+<h3 id="scale(java.lang.Object)">scale</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="#type-param-M" title="type parameter in Module">M</a></span>&nbsp;<span class="element-name">scale</span><wbr><span class="parameters">(<a href="#type-param-R" title="type parameter in Module">R</a>&nbsp;scalar)</span></div>
+<div class="block">Convenience scalar multiplication (r Ã— this).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>scalar</code> - the scalar r âˆˆ R</dd>
+<dt>Returns:</dt>
+<dd>r Ã— this</dd>
 </dl>
 </div>
 </section>

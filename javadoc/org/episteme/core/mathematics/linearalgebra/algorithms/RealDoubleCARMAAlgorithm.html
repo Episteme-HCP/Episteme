@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -84,8 +84,8 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Implementation of the CARMA Algorithm specialized for the double primitive type.
 <p>
-This version uses SIMDDoubleMatrix and direct double[] manipulations
-to achieve maximum performance on hardware supporting vector instructions.
+This version uses SIMDDirect recursion on indices to avoid data copying
+and achieve communication-optimal performance with minimal GC overhead.
 </p></div>
 </div>
 </section>

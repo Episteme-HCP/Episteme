@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,6 +60,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
 <li><a href="#field-detail" tabindex="0">Field Details</a>
 <ol class="toc-list">
+<li><a href="#logger" tabindex="0">logger</a></li>
 <li><a href="#backends" tabindex="0">backends</a></li>
 <li><a href="#defaultBackend" tabindex="0">defaultBackend</a></li>
 <li><a href="#backendClass" tabindex="0">backendClass</a></li>
@@ -99,7 +100,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <dl class="notes">
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="../../media/AudioBackendManager.html" title="class in org.episteme.core.media">AudioBackendManager</a>, <a href="BackendManager.html" title="class in org.episteme.core.technical.backend">BackendManager</a>, <a href="../../ui/viewers/mathematics/discrete/GraphBackendManager.html" title="class in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackendManager</a>, <a href="../../../social/ui/viewers/geography/MapBackendManager.html" title="class in org.episteme.social.ui.viewers.geography">MapBackendManager</a>, <a href="../../../natural/physics/classical/mechanics/MechanicsBackendManager.html" title="class in org.episteme.natural.physics.classical.mechanics">MechanicsBackendManager</a>, <a href="../../../natural/ui/viewers/chemistry/MolecularBackendManager.html" title="class in org.episteme.natural.ui.viewers.chemistry">MolecularBackendManager</a>, <a href="../../ui/viewers/mathematics/analysis/plotting/PlottingBackendManager.html" title="class in org.episteme.core.ui.viewers.mathematics.analysis.plotting">PlottingBackendManager</a>, <a href="../../../natural/physics/quantum/QuantumBackendManager.html" title="class in org.episteme.natural.physics.quantum">QuantumBackendManager</a>, <a href="../../mathematics/linearalgebra/tensors/TensorBackendManager.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackendManager</a></code></dd>
+<dd><code><a href="../../media/AudioBackendManager.html" title="class in org.episteme.core.media">AudioBackendManager</a>, <a href="BackendManager.html" title="class in org.episteme.core.technical.backend">BackendManager</a>, <a href="../../ui/viewers/mathematics/discrete/GraphBackendManager.html" title="class in org.episteme.core.ui.viewers.mathematics.discrete">GraphBackendManager</a>, <a href="../../mathematics/linearalgebra/LinearAlgebraBackendManager.html" title="class in org.episteme.core.mathematics.linearalgebra">LinearAlgebraBackendManager</a>, <a href="../../../social/ui/viewers/geography/MapBackendManager.html" title="class in org.episteme.social.ui.viewers.geography">MapBackendManager</a>, <a href="../../../natural/physics/classical/mechanics/collision/MechanicsBackendManager.html" title="class in org.episteme.natural.physics.classical.mechanics.collision">MechanicsBackendManager</a>, <a href="../../../natural/ui/viewers/chemistry/MolecularBackendManager.html" title="class in org.episteme.natural.ui.viewers.chemistry">MolecularBackendManager</a>, <a href="../../ui/viewers/mathematics/analysis/plotting/PlottingBackendManager.html" title="class in org.episteme.core.ui.viewers.mathematics.analysis.plotting">PlottingBackendManager</a>, <a href="../../../natural/physics/quantum/QuantumBackendManager.html" title="class in org.episteme.natural.physics.quantum">QuantumBackendManager</a>, <a href="../../mathematics/linearalgebra/tensors/TensorBackendManager.html" title="class in org.episteme.core.mathematics.linearalgebra.tensors">TensorBackendManager</a>, <a href="../../media/VideoBackendManager.html" title="class in org.episteme.core.media">VideoBackendManager</a>, <a href="../../media/VisionBackendManager.html" title="class in org.episteme.core.media">VisionBackendManager</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
@@ -134,6 +135,9 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>protected <a href="#type-param-T" title="type parameter in AbstractBackendManager">T</a></code></div>
 <div class="col-second even-row-color"><code><a href="#defaultBackend" class="member-name-link">defaultBackend</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected final org.slf4j.Logger</code></div>
+<div class="col-second odd-row-color"><code><a href="#logger" class="member-name-link">logger</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -220,6 +224,14 @@ loadScripts(document, 'script');</script>
 <section class="field-details" id="field-detail">
 <h2>Field Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="logger">
+<h3>logger</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">org.slf4j.Logger</span>&nbsp;<span class="element-name">logger</span></div>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="backends">
 <h3>backends</h3>

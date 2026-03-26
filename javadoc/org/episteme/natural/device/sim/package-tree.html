@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -63,9 +63,22 @@ loadScripts(document, 'script');</script>
 <ul>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
 <ul>
-<li class="circle">org.episteme.core.device.sim.<a href="../../../core/device/sim/SimulatedDevice.html" class="type-name-link" title="class in org.episteme.core.device.sim">SimulatedDevice</a> (implements org.episteme.core.device.<a href="../../../core/device/Device.html" title="interface in org.episteme.core.device">Device</a>)
+<li class="circle">org.episteme.core.device.<a href="../../../core/device/AbstractDevice.html" class="type-name-link" title="class in org.episteme.core.device">AbstractDevice</a> (implements org.episteme.core.device.<a href="../../../core/device/Device.html" title="interface in org.episteme.core.device">Device</a>)
+<ul>
+<li class="circle">org.episteme.core.device.<a href="../../../core/device/AbstractActuator.html" class="type-name-link" title="class in org.episteme.core.device">AbstractActuator</a>&lt;C&gt; (implements org.episteme.core.device.<a href="../../../core/device/Actuator.html" title="interface in org.episteme.core.device">Actuator</a>&lt;C&gt;)
+<ul>
+<li class="circle">org.episteme.core.device.sim.<a href="../../../core/device/sim/AbstractSimulatedActuator.html" class="type-name-link" title="class in org.episteme.core.device.sim">AbstractSimulatedActuator</a>&lt;C&gt;
 <ul>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedCentrifuge.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedCentrifuge</a> (implements org.episteme.natural.device.actuators.<a href="../actuators/Centrifuge.html" title="interface in org.episteme.natural.device.actuators">Centrifuge</a>)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="circle">org.episteme.core.device.<a href="../../../core/device/AbstractSensor.html" class="type-name-link" title="class in org.episteme.core.device">AbstractSensor</a>&lt;Q&gt; (implements org.episteme.core.device.<a href="../../../core/device/Sensor.html" title="interface in org.episteme.core.device">Sensor</a>&lt;Q&gt;)
+<ul>
+<li class="circle">org.episteme.core.device.sim.<a href="../../../core/device/sim/AbstractSimulatedSensor.html" class="type-name-link" title="class in org.episteme.core.device.sim">AbstractSimulatedSensor</a>&lt;Q&gt;
+<ul>
+<li class="circle">org.episteme.natural.device.sim.<a href="SimulatedHumidityProbe.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedHumidityProbe</a> (implements org.episteme.natural.device.sensors.<a href="../sensors/HumidityProbe.html" title="interface in org.episteme.natural.device.sensors">HumidityProbe</a>)</li>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedMicroscope.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedMicroscope</a> (implements org.episteme.natural.device.sensors.<a href="../sensors/Microscope.html" title="interface in org.episteme.natural.device.sensors">Microscope</a>)</li>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedMultimeter.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedMultimeter</a> (implements org.episteme.natural.device.sensors.<a href="../sensors/Multimeter.html" title="interface in org.episteme.natural.device.sensors">Multimeter</a>)</li>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedOscilloscope.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedOscilloscope</a> (implements org.episteme.natural.device.sensors.<a href="../sensors/Oscilloscope.html" title="interface in org.episteme.natural.device.sensors">Oscilloscope</a>)</li>
@@ -74,11 +87,19 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedSeismograph.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedSeismograph</a> (implements org.episteme.natural.device.sensors.<a href="../sensors/Seismograph.html" title="interface in org.episteme.natural.device.sensors">Seismograph</a>)</li>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedSpectrometer.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedSpectrometer</a> (implements org.episteme.natural.device.sensors.<a href="../sensors/Spectrometer.html" title="interface in org.episteme.natural.device.sensors">Spectrometer</a>)</li>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedTemperatureProbe.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedTemperatureProbe</a> (implements org.episteme.natural.device.sensors.<a href="../sensors/TemperatureProbe.html" title="interface in org.episteme.natural.device.sensors">TemperatureProbe</a>)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="circle">org.episteme.core.device.sim.<a href="../../../core/device/sim/AbstractSimulatedDevice.html" class="type-name-link" title="class in org.episteme.core.device.sim">AbstractSimulatedDevice</a>
+<ul>
+<li class="circle">org.episteme.natural.device.sim.<a href="SimulatedTelescope.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedTelescope</a> (implements org.episteme.natural.device.transducers.<a href="../transducers/Telescope.html" title="interface in org.episteme.natural.device.transducers">Telescope</a>)</li>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedVitalSignsMonitor.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedVitalSignsMonitor</a> (implements org.episteme.natural.medicine.<a href="../../medicine/VitalSignsMonitor.html" title="interface in org.episteme.natural.medicine">VitalSignsMonitor</a>)</li>
 <li class="circle">org.episteme.natural.device.sim.<a href="SimulatedWeatherStation.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedWeatherStation</a> (implements org.episteme.natural.device.instruments.<a href="../instruments/WeatherStation.html" title="interface in org.episteme.natural.device.instruments">WeatherStation</a>)</li>
 </ul>
 </li>
-<li class="circle">org.episteme.natural.device.sim.<a href="SimulatedTelescope.html" class="type-name-link" title="class in org.episteme.natural.device.sim">SimulatedTelescope</a> (implements org.episteme.natural.device.transducers.<a href="../transducers/Telescope.html" title="interface in org.episteme.natural.device.transducers">Telescope</a>)</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

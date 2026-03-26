@@ -95,27 +95,25 @@ public class HighPrecisionComplianceTest {
             List<AlgorithmProvider> allowed = new ArrayList<>();
             allowed.add(rawProvider);
             
-            // 1. Transcendental support for RealBig/Complex math
-            for (AlgorithmProvider p : AlgorithmManager.getProviders(org.episteme.core.mathematics.numbers.real.TranscendentalProvider.class)) {
-                if (p.getName().equals(MPFR_NUMBERS) || p.getName().contains("Java Math")) {
-                    allowed.add(p);
-                    break;
-                }
+            // 1. Transcendental support for RealBig/Complex math - include ALL available
+            for (AlgorithmProvider p : AlgorithmManager.getService().getProviders(org.episteme.core.mathematics.numbers.real.TranscendentalProvider.class)) {
+                allowed.add(p);
             }
             
-            // 2. Leaf provider for recursive/distributed backends
-            if (rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider ||
-                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider ||
-                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider) {
+            // 2. Leaf and Sparse fallbacks for distributed/recursive providers
+            if (rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider ||
+                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider ||
+                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider) {
+                
+                // Always add CPU Dense and CPU Sparse as baseline fallbacks
                 for (LinearAlgebraProvider<?> p : discoverHPProviders()) {
-                    if (p.getName().equals(CPU_DENSE)) {
+                    if (p.getName().equals(CPU_DENSE) || p.getName().equals("Episteme CPU (Sparse)")) {
                         allowed.add(p);
-                        break;
                     }
                 }
             }
 
-            AlgorithmManager.setService(new TestingAlgorithmService(allowed));
+            AlgorithmManager.setService(new org.episteme.core.technical.algorithm.TestingAlgorithmService(allowed));
             
             try {
                 org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {

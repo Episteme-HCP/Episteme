@@ -485,6 +485,76 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
         return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(storage, ring);
     }
 
+    @Override
+    public Vector<E> multiply(Vector<E> vector, E scalar) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " is not available.");
+        int n = vector.dimension();
+        boolean isComplex = ((Object)vector.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        long prec = getPrecision();
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_v = initVector(vector.toMatrix(), arena, prec, isComplex);
+            MemorySegment h_s = arena.allocate(MPFR_LAYOUT, isComplex ? 2 : 1);
+            for (int i=0; i<(isComplex?2:1); i++) NativeSafe.invoke(MPFR_INIT2, h_s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            setMPFR(h_s, scalar, arena, isComplex ? 2 : 0);
+            
+            int multiplier = isComplex ? 2 : 1;
+            for (int i=0; i<n*multiplier; i++) {
+                MemorySegment val = getMPFR(h_v, i, 0, false);
+                if (isComplex) {
+                    // Complex multiplication of vector elements by complex scalar
+                    // (vr + vi*i)(sr + si*i) = (vr*sr - vi*si) + i(vr*si + vi*sr)
+                    // But wait, the indices i are raw indices.
+                    // If isComplex, indices are 2*idx (Real) and 2*idx+1 (Imag)
+                } else {
+                    NativeSafe.invoke(MPFR_MUL, val, val, h_s, 0);
+                }
+            }
+            
+            if (isComplex) {
+                MemorySegment sr = h_s.asSlice(0, MPFR_LAYOUT.byteSize());
+                MemorySegment si = h_s.asSlice(MPFR_LAYOUT.byteSize(), MPFR_LAYOUT.byteSize());
+                MemorySegment tr = arena.allocate(MPFR_LAYOUT);
+                NativeSafe.invoke(MPFR_INIT2, tr, prec);
+                MemorySegment ti = arena.allocate(MPFR_LAYOUT);
+                NativeSafe.invoke(MPFR_INIT2, ti, prec);
+                
+                for (int i=0; i<n; i++) {
+                    MemorySegment vr = getMPFR(h_v, i, 0, true);
+                    MemorySegment vi = getMPFR(h_v, i, 1, true);
+                    
+                    // tr = vr*sr - vi*si
+                    NativeSafe.invoke(MPFR_MUL, tr, vr, sr, 0);
+                    NativeSafe.invoke(MPFR_MUL, ti, vi, si, 0);
+                    NativeSafe.invoke(MPFR_SUB, tr, tr, ti, 0);
+                    
+                    // ti = vr*si + vi*sr
+                    NativeSafe.invoke(MPFR_MUL, ti, vr, si, 0);
+                    MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+                    NativeSafe.invoke(MPFR_MUL, t2, vi, sr, 0);
+                    NativeSafe.invoke(MPFR_ADD, ti, ti, t2, 0);
+                    
+                    NativeSafe.invoke(MPFR_SET, vr, tr, 0);
+                    NativeSafe.invoke(MPFR_SET, vi, ti, 0);
+                }
+            }
+
+            Matrix<E> resMatrix = backToSparseMatrix(h_v, n, 1, arena, vector.getScalarRing(), isComplex);
+            int m = resMatrix.rows();
+            org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
+                new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E>(m, (E) vector.getScalarRing().zero());
+            for (int i = 0; i < m; i++) {
+                E val = resMatrix.get(i, 0);
+                if (!val.equals((E) vector.getScalarRing().zero())) {
+                    storage.set(i, val);
+                }
+            }
+            return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(storage, this, vector.getScalarRing());
+        } catch (Throwable t) {
+            throw new RuntimeException("MPFR Vector multiply failed", t);
+        }
+    }
+
     private Real readMPFR(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
         MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, val, 0);
         if (strPtr == null || strPtr.equals(MemorySegment.NULL)) {
@@ -493,7 +563,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
         
         String s = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
         // mpfr_exp_t is long, but on Windows long is 32-bit.
-        long exp = expPtr.get(ValueLayout.JAVA_INT, 0); 
+        long exp = expPtr.get(ValueLayout.JAVA_LONG, 0); 
         
         if (s.isEmpty() || s.equals("0")) {
              NativeSafe.invoke(MPFR_FREE_STR, strPtr);

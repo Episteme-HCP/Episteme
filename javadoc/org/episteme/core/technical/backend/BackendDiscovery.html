@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -70,6 +70,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#TYPE_AUDIO" tabindex="0">TYPE_AUDIO</a></li>
 <li><a href="#TYPE_DISTRIBUTED" tabindex="0">TYPE_DISTRIBUTED</a></li>
 <li><a href="#TYPE_NETWORK" tabindex="0">TYPE_NETWORK</a></li>
+<li><a href="#TYPE_IO" tabindex="0">TYPE_IO</a></li>
+<li><a href="#TYPE_ML" tabindex="0">TYPE_ML</a></li>
+<li><a href="#TYPE_VISION" tabindex="0">TYPE_VISION</a></li>
+<li><a href="#TYPE_VIDEO" tabindex="0">TYPE_VIDEO</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -151,13 +155,19 @@ while this class loads the generic <a href="Backend.html" title="interface in or
 <div class="col-second even-row-color"><code><a href="#TYPE_GRAPH" class="member-name-link">TYPE_GRAPH</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#TYPE_LINEAR_ALGEBRA" class="member-name-link">TYPE_LINEAR_ALGEBRA</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#TYPE_IO" class="member-name-link">TYPE_IO</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#TYPE_MAP" class="member-name-link">TYPE_MAP</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TYPE_LINEAR_ALGEBRA" class="member-name-link">TYPE_LINEAR_ALGEBRA</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#TYPE_MATH" class="member-name-link">TYPE_MATH</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#TYPE_MAP" class="member-name-link">TYPE_MAP</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TYPE_MATH" class="member-name-link">TYPE_MATH</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#TYPE_ML" class="member-name-link">TYPE_ML</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#TYPE_MOLECULAR" class="member-name-link">TYPE_MOLECULAR</a></code></div>
@@ -173,6 +183,12 @@ while this class loads the generic <a href="Backend.html" title="interface in or
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#TYPE_TENSOR" class="member-name-link">TYPE_TENSOR</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#TYPE_VIDEO" class="member-name-link">TYPE_VIDEO</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TYPE_VISION" class="member-name-link">TYPE_VISION</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -401,6 +417,70 @@ while this class loads the generic <a href="Backend.html" title="interface in or
 <dd>
 <ul class="tag-list">
 <li><a href="../../../../../constant-values.html#org.episteme.core.technical.backend.BackendDiscovery.TYPE_NETWORK">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="TYPE_IO">
+<h3>TYPE_IO</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">TYPE_IO</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.core.technical.backend.BackendDiscovery.TYPE_IO">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="TYPE_ML">
+<h3>TYPE_ML</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">TYPE_ML</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.core.technical.backend.BackendDiscovery.TYPE_ML">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="TYPE_VISION">
+<h3>TYPE_VISION</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">TYPE_VISION</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.core.technical.backend.BackendDiscovery.TYPE_VISION">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="TYPE_VIDEO">
+<h3>TYPE_VIDEO</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">TYPE_VIDEO</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="tag-list">
+<li><a href="../../../../../constant-values.html#org.episteme.core.technical.backend.BackendDiscovery.TYPE_VIDEO">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>

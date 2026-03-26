@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -62,6 +62,10 @@ loadScripts(document, 'script');</script>
 <li><a href="#getVector()" tabindex="0">getVector()</a></li>
 <li><a href="#getVectorOrBuilder()" tabindex="0">getVectorOrBuilder()</a></li>
 <li><a href="#getScalar()" tabindex="0">getScalar()</a></li>
+<li><a href="#getImaginary()" tabindex="0">getImaginary()</a></li>
+<li><a href="#getIsComplex()" tabindex="0">getIsComplex()</a></li>
+<li><a href="#getHpScalar()" tabindex="0">getHpScalar()</a></li>
+<li><a href="#getHpScalarBytes()" tabindex="0">getHpScalarBytes()</a></li>
 </ol>
 </li>
 </ol>
@@ -99,6 +103,28 @@ extends com.google.protobuf.MessageOrBuilder</span></div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpScalar()" class="member-name-link">getHpScalar</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">
+For high-precision scalars</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>com.google.protobuf.ByteString</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getHpScalarBytes()" class="member-name-link">getHpScalarBytes</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">
+For high-precision scalars</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getImaginary()" class="member-name-link">getImaginary</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block"><code>double imaginary = 3;</code></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getIsComplex()" class="member-name-link">getIsComplex</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block"><code>bool is_complex = 4;</code></div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getScalar()" class="member-name-link">getScalar</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
@@ -183,6 +209,66 @@ extends com.google.protobuf.MessageOrBuilder</span></div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>The scalar.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getImaginary()">
+<h3>getImaginary</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">double</span>&nbsp;<span class="element-name">getImaginary</span>()</div>
+<div class="block"><code>double imaginary = 3;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The imaginary.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getIsComplex()">
+<h3>getIsComplex</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name">getIsComplex</span>()</div>
+<div class="block"><code>bool is_complex = 4;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The isComplex.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpScalar()">
+<h3>getHpScalar</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getHpScalar</span>()</div>
+<div class="block"><pre>
+For high-precision scalars
+</pre>
+
+<code>string hp_scalar = 5;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The hpScalar.</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getHpScalarBytes()">
+<h3>getHpScalarBytes</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="return-type">com.google.protobuf.ByteString</span>&nbsp;<span class="element-name">getHpScalarBytes</span>()</div>
+<div class="block"><pre>
+For high-precision scalars
+</pre>
+
+<code>string hp_scalar = 5;</code></div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The bytes for hpScalar.</dd>
 </dl>
 </div>
 </section>

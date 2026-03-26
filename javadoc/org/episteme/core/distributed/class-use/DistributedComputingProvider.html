@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -61,8 +61,10 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="#org.episteme.benchmarks.benchmark.benchmarks">org.episteme.benchmarks.benchmark.benchmarks</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.distributed.providers">org.episteme.core.distributed.providers</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.distributed.backends">org.episteme.core.distributed.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.technical.backend.distributed">org.episteme.core.technical.backend.distributed</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
@@ -101,22 +103,38 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.distributed.providers">
-<h2>Uses of <a href="../DistributedComputingProvider.html" title="interface in org.episteme.core.distributed">DistributedComputingProvider</a> in <a href="../providers/package-summary.html">org.episteme.core.distributed.providers</a></h2>
-<div class="caption"><span>Classes in <a href="../providers/package-summary.html">org.episteme.core.distributed.providers</a> that implement <a href="../DistributedComputingProvider.html" title="interface in org.episteme.core.distributed">DistributedComputingProvider</a></span></div>
+<section class="detail" id="org.episteme.core.distributed.backends">
+<h2>Uses of <a href="../DistributedComputingProvider.html" title="interface in org.episteme.core.distributed">DistributedComputingProvider</a> in <a href="../backends/package-summary.html">org.episteme.core.distributed.backends</a></h2>
+<div class="caption"><span>Classes in <a href="../backends/package-summary.html">org.episteme.core.distributed.backends</a> that implement <a href="../DistributedComputingProvider.html" title="interface in org.episteme.core.distributed">DistributedComputingProvider</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../providers/MPIComputingProvider.html" class="type-name-link" title="class in org.episteme.core.distributed.providers">MPIComputingProvider</a></code></div>
+<div class="col-second even-row-color"><code><a href="../backends/MPIDistributedBackend.html" class="type-name-link" title="class in org.episteme.core.distributed.backends">MPIDistributedBackend</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">MPI Distributed Computing Provider.</div>
+<div class="block">MPI Distributed Computing Backend.</div>
 </div>
 <div class="col-first odd-row-color"><code>class&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../providers/SparkComputingProvider.html" class="type-name-link" title="class in org.episteme.core.distributed.providers">SparkComputingProvider</a></code></div>
+<div class="col-second odd-row-color"><code><a href="../backends/SparkDistributedBackend.html" class="type-name-link" title="class in org.episteme.core.distributed.backends">SparkDistributedBackend</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">Apache Spark Distributed Computing Provider.</div>
+<div class="block">Apache Spark Distributed Computing Backend.</div>
+</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.technical.backend.distributed">
+<h2>Uses of <a href="../DistributedComputingProvider.html" title="interface in org.episteme.core.distributed">DistributedComputingProvider</a> in <a href="../../technical/backend/distributed/package-summary.html">org.episteme.core.technical.backend.distributed</a></h2>
+<div class="caption"><span>Subinterfaces of <a href="../DistributedComputingProvider.html" title="interface in org.episteme.core.distributed">DistributedComputingProvider</a> in <a href="../../technical/backend/distributed/package-summary.html">org.episteme.core.technical.backend.distributed</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Interface</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>interface&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../../technical/backend/distributed/DistributedBackend.html" class="type-name-link" title="interface in org.episteme.core.technical.backend.distributed">DistributedBackend</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Backend interface for distributed computing systems.</div>
 </div>
 </div>
 </section>

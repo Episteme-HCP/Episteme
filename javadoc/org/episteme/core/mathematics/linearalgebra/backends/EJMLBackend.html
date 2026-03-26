@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,6 +60,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
 <ol class="toc-list">
 <li><a href="#%3Cinit%3E()" tabindex="0">EJMLBackend()</a></li>
+<li><a href="#%3Cinit%3E(org.episteme.core.mathematics.structures.rings.Field)" tabindex="0">EJMLBackend(Field)</a></li>
 </ol>
 </li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
@@ -70,7 +71,30 @@ loadScripts(document, 'script');</script>
 <li><a href="#getDescription()" tabindex="0">getDescription()</a></li>
 <li><a href="#isAvailable()" tabindex="0">isAvailable()</a></li>
 <li><a href="#getPriority()" tabindex="0">getPriority()</a></li>
+<li><a href="#score(org.episteme.core.technical.algorithm.OperationContext)" tabindex="0">score(OperationContext)</a></li>
+<li><a href="#createContext()" tabindex="0">createContext()</a></li>
 <li><a href="#createBackend()" tabindex="0">createBackend()</a></li>
+<li><a href="#shutdown()" tabindex="0">shutdown()</a></li>
+<li><a href="#isCompatible(org.episteme.core.mathematics.structures.rings.Ring)" tabindex="0">isCompatible(Ring)</a></li>
+<li><a href="#add(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">add(Vector, Vector)</a></li>
+<li><a href="#subtract(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">subtract(Vector, Vector)</a></li>
+<li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Vector,E)" tabindex="0">multiply(Vector, E)</a></li>
+<li><a href="#dot(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">dot(Vector, Vector)</a></li>
+<li><a href="#add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">add(Matrix, Matrix)</a></li>
+<li><a href="#subtract(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">subtract(Matrix, Matrix)</a></li>
+<li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">multiply(Matrix, Matrix)</a></li>
+<li><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">multiply(Matrix, Vector)</a></li>
+<li><a href="#inverse(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">inverse(Matrix)</a></li>
+<li><a href="#determinant(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">determinant(Matrix)</a></li>
+<li><a href="#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">solve(Matrix, Vector)</a></li>
+<li><a href="#transpose(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">transpose(Matrix)</a></li>
+<li><a href="#scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">scale(E, Matrix)</a></li>
+<li><a href="#norm(org.episteme.core.mathematics.linearalgebra.Vector)" tabindex="0">norm(Vector)</a></li>
+<li><a href="#qr(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">qr(Matrix)</a></li>
+<li><a href="#svd(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">svd(Matrix)</a></li>
+<li><a href="#eigen(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">eigen(Matrix)</a></li>
+<li><a href="#lu(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">lu(Matrix)</a></li>
+<li><a href="#cholesky(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">cholesky(Matrix)</a></li>
 </ol>
 </li>
 </ol>
@@ -78,22 +102,28 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<h1 title="Class EJMLBackend" class="title">Class EJMLBackend</h1>
+<h1 title="Class EJMLBackend" class="title">Class EJMLBackend&lt;<span id="type-param-E">E</span>&gt;</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance">org.episteme.core.mathematics.linearalgebra.backends.EJMLBackend</div>
+<div class="inheritance">org.episteme.core.mathematics.linearalgebra.backends.EJMLBackend&lt;E&gt;</div>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dd><code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;E&gt;, <a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, <a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>, <a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>, <a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
-<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">EJMLBackend</span>
+<div class="type-signature"><span class="annotations">@AutoService({<a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>.class,<a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a>.class,<a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>.class})
+</span><span class="modifiers">public class </span><span class="element-name type-name-label">EJMLBackend&lt;E&gt;</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></span></div>
-<div class="block">Backend for EJML (Efficient Java Matrix Library).</div>
+implements <a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a>, <a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;E&gt;</span></div>
+<div class="block">CPU compute backend for EJML (Efficient Java Matrix Library).
+<p>
+EJML is a high-performance, pure Java linear algebra library focused on
+dense matrices. This backend wraps the EJML linear algebra provider and
+integrates it into the Episteme backend discovery system.
+</p></div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.0</dd>
@@ -114,6 +144,8 @@ implements <a href="../../../technical/backend/Backend.html" title="interface in
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">EJMLBackend</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.structures.rings.Field)" class="member-name-link">EJMLBackend</a><wbr>(<a href="../../structures/rings/Field.html" title="interface in org.episteme.core.mathematics.structures.rings">Field</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;field)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -128,44 +160,142 @@ implements <a href="../../../technical/backend/Backend.html" title="interface in
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createBackend()" class="member-name-link">createBackend</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">add</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#add(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">add</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../matrices/solvers/CholeskyResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">CholeskyResult</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cholesky(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">cholesky</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the Cholesky decomposition of the specified matrix.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createBackend()" class="member-name-link">createBackend</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Creates and returns the backend instance (or returns self if it is the
 backend).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDescription()" class="member-name-link">getDescription</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../technical/backend/ExecutionContext.html" title="interface in org.episteme.core.technical.backend">ExecutionContext</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createContext()" class="member-name-link">createContext</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Creates an execution context for running operations.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-E" title="type parameter in EJMLBackend">E</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#determinant(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">determinant</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-E" title="type parameter in EJMLBackend">E</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dot(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">dot</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../matrices/solvers/EigenResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenResult</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#eigen(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">eigen</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns a description of the backend.</div>
+<div class="block">Computes the eigenvalue decomposition of the specified matrix.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getId()" class="member-name-link">getId</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDescription()" class="member-name-link">getDescription</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a description of the backend.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getId()" class="member-name-link">getId</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the unique identifier for this backend (e.g., "javafx", "jmol",
 "cuda").</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the display name for UI presentation.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPriority()" class="member-name-link">getPriority</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPriority()" class="member-name-link">getPriority</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the priority for auto-selection (higher = preferred).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the backend type category (e.g., "plotting", "molecular", "tensor",
 "math").</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">inverse</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAvailable()" class="member-name-link">isAvailable</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCompatible(org.episteme.core.mathematics.structures.rings.Ring)" class="member-name-link">isCompatible</a><wbr>(<a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;?&gt;&nbsp;ring)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Checks if this provider is compatible with the given ring.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../matrices/solvers/LUResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUResult</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#lu(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">lu</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the LU decomposition of the specified matrix.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">multiply</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">multiply</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.linearalgebra.Vector,E)" class="member-name-link">multiply</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;v,
+ <a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&nbsp;s)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type-param-E" title="type parameter in EJMLBackend">E</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#norm(org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">norm</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../matrices/solvers/QRResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">QRResult</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#qr(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">qr</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the QR decomposition of the specified matrix.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">scale</a><wbr>(<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&nbsp;s,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#score(org.episteme.core.technical.algorithm.OperationContext)" class="member-name-link">score</a><wbr>(<a href="../../../technical/algorithm/OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Scores this provider for a specific operation context.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shutdown()" class="member-name-link">shutdown</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">solve</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#subtract(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">subtract</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#subtract(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)" class="member-name-link">subtract</a><wbr>(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../matrices/solvers/SVDResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">SVDResult</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#svd(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">svd</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Computes the Singular Value Decomposition (SVD) of the specified matrix.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#transpose(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">transpose</a><wbr>(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -173,8 +303,17 @@ backend).</div>
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#method-summary" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.technical.algorithm.AlgorithmProvider">Methods inherited from interface&nbsp;<a href="../../../technical/algorithm/AlgorithmProvider.html#method-summary" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></h3>
+<code><a href="../../../technical/algorithm/AlgorithmProvider.html#getMetadata()" title="getMetadata()">getMetadata</a></code></div>
+<div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.Backend">Methods inherited from interface&nbsp;<a href="../../../technical/backend/Backend.html#method-summary" title="interface in org.episteme.core.technical.backend">Backend</a></h3>
-<code><a href="../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a></code></div>
+<code><a href="../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a>, <a href="../../../technical/backend/Backend.html#getStatusMessage()" title="getStatusMessage()">getStatusMessage</a>, <a href="../../../technical/backend/Backend.html#isExplicitlyDisabled()" title="isExplicitlyDisabled()">isExplicitlyDisabled</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.cpu.CPUBackend">Methods inherited from interface&nbsp;<a href="../../../technical/backend/cpu/CPUBackend.html#method-summary" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></h3>
+<code><a href="../../../technical/backend/cpu/CPUBackend.html#getAcceleratorType()" title="getAcceleratorType()">getAcceleratorType</a>, <a href="../../../technical/backend/cpu/CPUBackend.html#supportsComplexNumbers()" title="supportsComplexNumbers()">supportsComplexNumbers</a>, <a href="../../../technical/backend/cpu/CPUBackend.html#supportsFloatingPoint()" title="supportsFloatingPoint()">supportsFloatingPoint</a>, <a href="../../../technical/backend/cpu/CPUBackend.html#supportsParallelOps()" title="supportsParallelOps()">supportsParallelOps</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider">Methods inherited from interface&nbsp;<a href="../LinearAlgebraProvider.html#method-summary" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a></h3>
+<code><a href="../LinearAlgebraProvider.html#acos(org.episteme.core.mathematics.linearalgebra.Matrix)" title="acos(Matrix)">acos</a>, <a href="../LinearAlgebraProvider.html#acosh(org.episteme.core.mathematics.linearalgebra.Matrix)" title="acosh(Matrix)">acosh</a>, <a href="../LinearAlgebraProvider.html#asin(org.episteme.core.mathematics.linearalgebra.Matrix)" title="asin(Matrix)">asin</a>, <a href="../LinearAlgebraProvider.html#asinh(org.episteme.core.mathematics.linearalgebra.Matrix)" title="asinh(Matrix)">asinh</a>, <a href="../LinearAlgebraProvider.html#atan(org.episteme.core.mathematics.linearalgebra.Matrix)" title="atan(Matrix)">atan</a>, <a href="../LinearAlgebraProvider.html#atanh(org.episteme.core.mathematics.linearalgebra.Matrix)" title="atanh(Matrix)">atanh</a>, <a href="../LinearAlgebraProvider.html#cbrt(org.episteme.core.mathematics.linearalgebra.Matrix)" title="cbrt(Matrix)">cbrt</a>, <a href="../LinearAlgebraProvider.html#configure(java.util.Map)" title="configure(Map)">configure</a>, <a href="../LinearAlgebraProvider.html#cos(org.episteme.core.mathematics.linearalgebra.Matrix)" title="cos(Matrix)">cos</a>, <a href="../LinearAlgebraProvider.html#cosh(org.episteme.core.mathematics.linearalgebra.Matrix)" title="cosh(Matrix)">cosh</a>, <a href="../LinearAlgebraProvider.html#exp(org.episteme.core.mathematics.linearalgebra.Matrix)" title="exp(Matrix)">exp</a>, <a href="../LinearAlgebraProvider.html#getAlgorithmType()" title="getAlgorithmType()">getAlgorithmType</a>, <a href="../LinearAlgebraProvider.html#getEnvironmentInfo()" title="getEnvironmentInfo()">getEnvironmentInfo</a>, <a href="../LinearAlgebraProvider.html#log(org.episteme.core.mathematics.linearalgebra.Matrix)" title="log(Matrix)">log</a>, <a href="../LinearAlgebraProvider.html#log10(org.episteme.core.mathematics.linearalgebra.Matrix)" title="log10(Matrix)">log10</a>, <a href="../LinearAlgebraProvider.html#pow(org.episteme.core.mathematics.linearalgebra.Matrix,E)" title="pow(Matrix, E)">pow</a>, <a href="../LinearAlgebraProvider.html#sin(org.episteme.core.mathematics.linearalgebra.Matrix)" title="sin(Matrix)">sin</a>, <a href="../LinearAlgebraProvider.html#sinh(org.episteme.core.mathematics.linearalgebra.Matrix)" title="sinh(Matrix)">sinh</a>, <a href="../LinearAlgebraProvider.html#solve(org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult,org.episteme.core.mathematics.linearalgebra.Vector)" title="solve(CholeskyResult, Vector)">solve</a>, <a href="../LinearAlgebraProvider.html#solve(org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult,org.episteme.core.mathematics.linearalgebra.Vector)" title="solve(LUResult, Vector)">solve</a>, <a href="../LinearAlgebraProvider.html#solve(org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult,org.episteme.core.mathematics.linearalgebra.Vector)" title="solve(QRResult, Vector)">solve</a>, <a href="../LinearAlgebraProvider.html#sqrt(org.episteme.core.mathematics.linearalgebra.Matrix)" title="sqrt(Matrix)">sqrt</a>, <a href="../LinearAlgebraProvider.html#tan(org.episteme.core.mathematics.linearalgebra.Matrix)" title="tan(Matrix)">tan</a>, <a href="../LinearAlgebraProvider.html#tanh(org.episteme.core.mathematics.linearalgebra.Matrix)" title="tanh(Matrix)">tanh</a></code></div>
 </section>
 </li>
 </ul>
@@ -191,6 +330,14 @@ backend).</div>
 <h3>EJMLBackend</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">EJMLBackend</span>()</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(org.episteme.core.mathematics.structures.rings.Field)">
+<h3>EJMLBackend</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">EJMLBackend</span><wbr><span class="parameters">(<a href="../../structures/rings/Field.html" title="interface in org.episteme.core.mathematics.structures.rings">Field</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;field)</span></div>
 </div>
 </section>
 </li>
@@ -213,6 +360,10 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/cpu/CPUBackend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -228,6 +379,8 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getId()">getId</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#getId()">getId</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -241,7 +394,11 @@ backend).</div>
 <div class="block">Returns the display name for UI presentation.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
+<dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -256,6 +413,8 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -266,8 +425,14 @@ backend).</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isAvailable</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/backend/Backend.html#isAvailable()">Backend</a></code></span></div>
-<div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
+<div class="block">Checks if this backend is currently available (libraries loaded, etc.).
+<p>
+Default implementation checks <a href="../../../technical/backend/Backend.html#isExplicitlyDisabled()"><code>Backend.isExplicitlyDisabled()</code></a> and returns
+false if it is.
+</p></div>
 <dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
 </dl>
@@ -284,7 +449,59 @@ backend).</div>
 Used when multiple backends are available.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
+<dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="score(org.episteme.core.technical.algorithm.OperationContext)">
+<h3>score</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">score</span><wbr><span class="parameters">(<a href="../../../technical/algorithm/OperationContext.html" title="class in org.episteme.core.technical.algorithm">OperationContext</a>&nbsp;context)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)">AlgorithmProvider</a></code></span></div>
+<div class="block">Scores this provider for a specific operation context.
+<p>
+Higher scores indicate better suitability. Used by
+<a href="../../../technical/algorithm/ProviderSelector.html" title="class in org.episteme.core.technical.algorithm"><code>ProviderSelector</code></a> for context-aware selection.
+</p>
+<p>
+Default implementation returns <a href="../../../technical/algorithm/AlgorithmProvider.html#getPriority()"><code>AlgorithmProvider.getPriority()</code></a>, so existing
+providers behave identically without changes.
+</p></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)">score</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)">score</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+<dt>Parameters:</dt>
+<dd><code>context</code> - the operation context (data size, hints, etc.)</dd>
+<dt>Returns:</dt>
+<dd>suitability score (higher = better)</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="createContext()">
+<h3>createContext</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../technical/backend/ExecutionContext.html" title="interface in org.episteme.core.technical.backend">ExecutionContext</a></span>&nbsp;<span class="element-name">createContext</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html#createContext()">ComputeBackend</a></code></span></div>
+<div class="block">Creates an execution context for running operations.
+<p>
+The context should be used within a try-with-resources block to ensure
+proper cleanup of resources.
+</p></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#createContext()">createContext</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Returns:</dt>
+<dd>new execution context</dd>
 </dl>
 </div>
 </section>
@@ -300,8 +517,291 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#createBackend()">createBackend</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#createBackend()">createBackend</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
 <dt>Returns:</dt>
 <dd>The backend implementation object</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="shutdown()">
+<h3>shutdown</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">shutdown</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/backend/Backend.html#shutdown()">Backend</a></code></span></div>
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.
+Use this to release hardware resources, close file handles, or stop
+background threads.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/Backend.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isCompatible(org.episteme.core.mathematics.structures.rings.Ring)">
+<h3>isCompatible</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCompatible</span><wbr><span class="parameters">(<a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a>&lt;?&gt;&nbsp;ring)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../LinearAlgebraProvider.html#isCompatible(org.episteme.core.mathematics.structures.rings.Ring)">LinearAlgebraProvider</a></code></span></div>
+<div class="block">Checks if this provider is compatible with the given ring.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#isCompatible(org.episteme.core.mathematics.structures.rings.Ring)">isCompatible</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="add(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)">
+<h3>add</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">add</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#add(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)">add</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="subtract(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)">
+<h3>subtract</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">subtract</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#subtract(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)">subtract</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.Vector,E)">
+<h3 id="multiply(org.episteme.core.mathematics.linearalgebra.Vector,java.lang.Object)">multiply</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;v,
+ <a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&nbsp;s)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#multiply(org.episteme.core.mathematics.linearalgebra.Vector,E)">multiply</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="dot(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)">
+<h3>dot</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-E" title="type parameter in EJMLBackend">E</a></span>&nbsp;<span class="element-name">dot</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#dot(org.episteme.core.mathematics.linearalgebra.Vector,org.episteme.core.mathematics.linearalgebra.Vector)">dot</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>add</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">add</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#add(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)">add</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="subtract(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>subtract</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">subtract</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#subtract(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)">subtract</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>multiply</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Matrix)">multiply</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)">
+<h3>multiply</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">multiply</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#multiply(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)">multiply</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="inverse(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>inverse</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">inverse</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#inverse(org.episteme.core.mathematics.linearalgebra.Matrix)">inverse</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="determinant(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>determinant</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-E" title="type parameter in EJMLBackend">E</a></span>&nbsp;<span class="element-name">determinant</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#determinant(org.episteme.core.mathematics.linearalgebra.Matrix)">determinant</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)">
+<h3>solve</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">solve</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a,
+ <a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;b)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector)">solve</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="transpose(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>transpose</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">transpose</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#transpose(org.episteme.core.mathematics.linearalgebra.Matrix)">transpose</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3 id="scale(java.lang.Object,org.episteme.core.mathematics.linearalgebra.Matrix)">scale</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">scale</span><wbr><span class="parameters">(<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&nbsp;s,
+ <a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#scale(E,org.episteme.core.mathematics.linearalgebra.Matrix)">scale</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="norm(org.episteme.core.mathematics.linearalgebra.Vector)">
+<h3>norm</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="#type-param-E" title="type parameter in EJMLBackend">E</a></span>&nbsp;<span class="element-name">norm</span><wbr><span class="parameters">(<a href="../Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#norm(org.episteme.core.mathematics.linearalgebra.Vector)">norm</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="qr(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>qr</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../matrices/solvers/QRResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">QRResult</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">qr</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../LinearAlgebraProvider.html#qr(org.episteme.core.mathematics.linearalgebra.Matrix)">LinearAlgebraProvider</a></code></span></div>
+<div class="block">Computes the QR decomposition of the specified matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#qr(org.episteme.core.mathematics.linearalgebra.Matrix)">qr</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="svd(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>svd</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../matrices/solvers/SVDResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">SVDResult</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">svd</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../LinearAlgebraProvider.html#svd(org.episteme.core.mathematics.linearalgebra.Matrix)">LinearAlgebraProvider</a></code></span></div>
+<div class="block">Computes the Singular Value Decomposition (SVD) of the specified matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#svd(org.episteme.core.mathematics.linearalgebra.Matrix)">svd</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="eigen(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>eigen</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../matrices/solvers/EigenResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenResult</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">eigen</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../LinearAlgebraProvider.html#eigen(org.episteme.core.mathematics.linearalgebra.Matrix)">LinearAlgebraProvider</a></code></span></div>
+<div class="block">Computes the eigenvalue decomposition of the specified matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#eigen(org.episteme.core.mathematics.linearalgebra.Matrix)">eigen</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="lu(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>lu</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../matrices/solvers/LUResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">LUResult</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">lu</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../LinearAlgebraProvider.html#lu(org.episteme.core.mathematics.linearalgebra.Matrix)">LinearAlgebraProvider</a></code></span></div>
+<div class="block">Computes the LU decomposition of the specified matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#lu(org.episteme.core.mathematics.linearalgebra.Matrix)">lu</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="cholesky(org.episteme.core.mathematics.linearalgebra.Matrix)">
+<h3>cholesky</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../matrices/solvers/CholeskyResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">CholeskyResult</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</span>&nbsp;<span class="element-name">cholesky</span><wbr><span class="parameters">(<a href="../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;&nbsp;a)</span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../LinearAlgebraProvider.html#cholesky(org.episteme.core.mathematics.linearalgebra.Matrix)">LinearAlgebraProvider</a></code></span></div>
+<div class="block">Computes the Cholesky decomposition of the specified matrix.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../LinearAlgebraProvider.html#cholesky(org.episteme.core.mathematics.linearalgebra.Matrix)">cholesky</a></code>&nbsp;in interface&nbsp;<code><a href="../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="#type-param-E" title="type parameter in EJMLBackend">E</a>&gt;</code></dd>
 </dl>
 </div>
 </section>

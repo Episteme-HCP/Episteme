@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -68,11 +68,15 @@ loadScripts(document, 'script');</script>
 <li><a href="#createImage(java.lang.Object,int,int)" tabindex="0">createImage(Object, int, int)</a></li>
 <li><a href="#getType()" tabindex="0">getType()</a></li>
 <li><a href="#getId()" tabindex="0">getId()</a></li>
+<li><a href="#getBackendName()" tabindex="0">getBackendName()</a></li>
 <li><a href="#getName()" tabindex="0">getName()</a></li>
 <li><a href="#getDescription()" tabindex="0">getDescription()</a></li>
 <li><a href="#isAvailable()" tabindex="0">isAvailable()</a></li>
 <li><a href="#getPriority()" tabindex="0">getPriority()</a></li>
 <li><a href="#createBackend()" tabindex="0">createBackend()</a></li>
+<li><a href="#shutdown()" tabindex="0">shutdown()</a></li>
+<li><a href="#getAcceleratorType()" tabindex="0">getAcceleratorType()</a></li>
+<li><a href="#createContext()" tabindex="0">createContext()</a></li>
 </ol>
 </li>
 </ol>
@@ -88,15 +92,15 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="../VisionAlgorithmBackend.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;, <a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, <a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dd><code><a href="../VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;, <a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a>, <a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>, <a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>, <a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>, <a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
 </dl>
 <hr>
 <div class="horizontal-scroll">
-<div class="type-signature"><span class="annotations">@AutoService({<a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>.class,<a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a>.class,<a href="../VisionAlgorithmBackend.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a>.class})
+<div class="type-signature"><span class="annotations">@AutoService({<a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a>.class,<a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a>.class,<a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a>.class,<a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a>.class})
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">JavaAWTVisionBackend</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="../VisionAlgorithmBackend.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</span></div>
-<div class="block">Basic VisionAlgorithmBackend using standard Java AWT (BufferedImage).</div>
+implements <a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a>, <a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></span></div>
+<div class="block">Basic VisionAlgorithmProvider using standard Java AWT (BufferedImage).</div>
 <dl class="notes">
 <dt>Author:</dt>
 <dd>Silvere Martin-Michiellot, Gemini AI (Google DeepMind)</dd>
@@ -141,44 +145,65 @@ implements <a href="../VisionAlgorithmBackend.html" title="interface in org.epis
 <div class="block">Creates and returns the backend instance (or returns self if it is the
 backend).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createImage(java.lang.Object,int,int)" class="member-name-link">createImage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;data,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../technical/backend/ExecutionContext.html" title="interface in org.episteme.core.technical.backend">ExecutionContext</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createContext()" class="member-name-link">createContext</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Creates an execution context for running operations.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createImage(java.lang.Object,int,int)" class="member-name-link">createImage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;data,
  int&nbsp;width,
  int&nbsp;height)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Creates a new image from the given data.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../technical/backend/HardwareAccelerator.html" title="enum class in org.episteme.core.technical.backend">HardwareAccelerator</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAcceleratorType()" class="member-name-link">getAcceleratorType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the type of hardware accelerator used by this backend.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDescription()" class="member-name-link">getDescription</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBackendName()" class="member-name-link">getBackendName</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns a description of the backend.</div>
+<div class="block">Returns the friendly name of this backend instance.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getId()" class="member-name-link">getId</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDescription()" class="member-name-link">getDescription</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns a description of the backend.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getId()" class="member-name-link">getId</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the unique identifier for this backend (e.g., "javafx", "jmol",
 "cuda").</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the display name for UI presentation.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPriority()" class="member-name-link">getPriority</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPriority()" class="member-name-link">getPriority</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the priority for auto-selection (higher = preferred).</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the backend type category (e.g., "plotting", "molecular", "tensor",
 "math").</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAvailable()" class="member-name-link">isAvailable</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAvailable()" class="member-name-link">isAvailable</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#shutdown()" class="member-name-link">shutdown</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.</div>
 </div>
 </div>
 </div>
@@ -188,13 +213,16 @@ backend).</div>
 <code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.technical.algorithm.AlgorithmProvider">Methods inherited from interface&nbsp;<a href="../../../technical/algorithm/AlgorithmProvider.html#method-summary" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></h3>
-<code><a href="../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)" title="score(OperationContext)">score</a></code></div>
+<code><a href="../../../technical/algorithm/AlgorithmProvider.html#getMetadata()" title="getMetadata()">getMetadata</a>, <a href="../../../technical/algorithm/AlgorithmProvider.html#score(org.episteme.core.technical.algorithm.OperationContext)" title="score(OperationContext)">score</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.Backend">Methods inherited from interface&nbsp;<a href="../../../technical/backend/Backend.html#method-summary" title="interface in org.episteme.core.technical.backend">Backend</a></h3>
-<code><a href="../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a></code></div>
+<code><a href="../../../technical/backend/Backend.html#getAlgorithmProviders()" title="getAlgorithmProviders()">getAlgorithmProviders</a>, <a href="../../../technical/backend/Backend.html#getStatusMessage()" title="getStatusMessage()">getStatusMessage</a>, <a href="../../../technical/backend/Backend.html#isExplicitlyDisabled()" title="isExplicitlyDisabled()">isExplicitlyDisabled</a></code></div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.episteme.core.media.vision.VisionAlgorithmBackend">Methods inherited from interface&nbsp;<a href="../VisionAlgorithmBackend.html#method-summary" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a></h3>
-<code><a href="../VisionAlgorithmBackend.html#getAlgorithmType()" title="getAlgorithmType()">getAlgorithmType</a></code></div>
+<h3 id="methods-inherited-from-class-org.episteme.core.technical.backend.cpu.CPUBackend">Methods inherited from interface&nbsp;<a href="../../../technical/backend/cpu/CPUBackend.html#method-summary" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></h3>
+<code><a href="../../../technical/backend/cpu/CPUBackend.html#supportsComplexNumbers()" title="supportsComplexNumbers()">supportsComplexNumbers</a>, <a href="../../../technical/backend/cpu/CPUBackend.html#supportsFloatingPoint()" title="supportsFloatingPoint()">supportsFloatingPoint</a>, <a href="../../../technical/backend/cpu/CPUBackend.html#supportsParallelOps()" title="supportsParallelOps()">supportsParallelOps</a></code></div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.episteme.core.media.vision.VisionAlgorithmProvider">Methods inherited from interface&nbsp;<a href="../VisionAlgorithmProvider.html#method-summary" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a></h3>
+<code><a href="../VisionAlgorithmProvider.html#getAlgorithmType()" title="getAlgorithmType()">getAlgorithmType</a></code></div>
 </section>
 </li>
 </ul>
@@ -228,11 +256,11 @@ backend).</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a></span>&nbsp;<span class="element-name">apply</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&nbsp;image,
  <a href="../ImageOp.html" title="interface in org.episteme.core.media.vision">ImageOp</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;&nbsp;op)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../VisionAlgorithmBackend.html#apply(T,org.episteme.core.media.vision.ImageOp)">VisionAlgorithmBackend</a></code></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../VisionAlgorithmProvider.html#apply(T,org.episteme.core.media.vision.ImageOp)">VisionAlgorithmProvider</a></code></span></div>
 <div class="block">Applies a generic operation to an image.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../VisionAlgorithmBackend.html#apply(T,org.episteme.core.media.vision.ImageOp)">apply</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmBackend.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dd><code><a href="../VisionAlgorithmProvider.html#apply(T,org.episteme.core.media.vision.ImageOp)">apply</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -244,11 +272,11 @@ backend).</div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a></span>&nbsp;<span class="element-name">createImage</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;data,
  int&nbsp;width,
  int&nbsp;height)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../VisionAlgorithmBackend.html#createImage(java.lang.Object,int,int)">VisionAlgorithmBackend</a></code></span></div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../VisionAlgorithmProvider.html#createImage(java.lang.Object,int,int)">VisionAlgorithmProvider</a></code></span></div>
 <div class="block">Creates a new image from the given data.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../VisionAlgorithmBackend.html#createImage(java.lang.Object,int,int)">createImage</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmBackend.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dd><code><a href="../VisionAlgorithmProvider.html#createImage(java.lang.Object,int,int)">createImage</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
 </dl>
 </div>
 </section>
@@ -264,6 +292,12 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/cpu/CPUBackend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -279,6 +313,24 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getId()">getId</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#getId()">getId</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#getId()">getId</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getBackendName()">
+<h3>getBackendName</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getBackendName</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../VisionBackend.html#getBackendName()">VisionBackend</a></code></span></div>
+<div class="block">Returns the friendly name of this backend instance.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#getBackendName()">getBackendName</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -295,6 +347,10 @@ backend).</div>
 <dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../VisionAlgorithmProvider.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -309,6 +365,10 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#getDescription()">getDescription</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -319,14 +379,20 @@ backend).</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isAvailable</span>()</div>
 <div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/backend/Backend.html#isAvailable()">Backend</a></code></span></div>
-<div class="block">Checks if this backend is currently available (libraries loaded, etc.).</div>
+<div class="block">Checks if this backend is currently available (libraries loaded, etc.).
+<p>
+Default implementation checks <a href="../../../technical/backend/Backend.html#isExplicitlyDisabled()"><code>Backend.isExplicitlyDisabled()</code></a> and returns
+false if it is.
+</p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
 <dt>Specified by:</dt>
-<dd><code><a href="../VisionAlgorithmBackend.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmBackend.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dd><code><a href="../VisionAlgorithmProvider.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#isAvailable()">isAvailable</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -345,7 +411,9 @@ Used when multiple backends are available.</div>
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
 <dt>Specified by:</dt>
-<dd><code><a href="../VisionAlgorithmBackend.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmBackend.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmBackend</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dd><code><a href="../VisionAlgorithmProvider.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#getPriority()">getPriority</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
 </dl>
 </div>
 </section>
@@ -361,8 +429,77 @@ backend).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../../technical/backend/Backend.html#createBackend()">createBackend</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#createBackend()">createBackend</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#createBackend()">createBackend</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
 <dt>Returns:</dt>
 <dd>The backend implementation object</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="shutdown()">
+<h3>shutdown</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">shutdown</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/backend/Backend.html#shutdown()">Backend</a></code></span></div>
+<div class="block">Called when the application is shutting down or the backend is being
+replaced.
+Use this to release hardware resources, close file handles, or stop
+background threads.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/algorithm/AlgorithmProvider.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/algorithm/AlgorithmProvider.html" title="interface in org.episteme.core.technical.algorithm">AlgorithmProvider</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/Backend.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/Backend.html" title="interface in org.episteme.core.technical.backend">Backend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../VisionAlgorithmProvider.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../VisionAlgorithmProvider.html" title="interface in org.episteme.core.media.vision">VisionAlgorithmProvider</a>&lt;<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.desktop/java/awt/image/BufferedImage.html" title="class or interface in java.awt.image" class="external-link">BufferedImage</a>&gt;</code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#shutdown()">shutdown</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getAcceleratorType()">
+<h3>getAcceleratorType</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../technical/backend/HardwareAccelerator.html" title="enum class in org.episteme.core.technical.backend">HardwareAccelerator</a></span>&nbsp;<span class="element-name">getAcceleratorType</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html#getAcceleratorType()">ComputeBackend</a></code></span></div>
+<div class="block">Returns the type of hardware accelerator used by this backend.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#getAcceleratorType()">getAcceleratorType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/cpu/CPUBackend.html#getAcceleratorType()">getAcceleratorType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/cpu/CPUBackend.html" title="interface in org.episteme.core.technical.backend.cpu">CPUBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#getAcceleratorType()">getAcceleratorType</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
+<dt>Returns:</dt>
+<dd>the accelerator type</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="createContext()">
+<h3>createContext</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../technical/backend/ExecutionContext.html" title="interface in org.episteme.core.technical.backend">ExecutionContext</a></span>&nbsp;<span class="element-name">createContext</span>()</div>
+<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html#createContext()">ComputeBackend</a></code></span></div>
+<div class="block">Creates an execution context for running operations.
+<p>
+The context should be used within a try-with-resources block to ensure
+proper cleanup of resources.
+</p></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../../technical/backend/ComputeBackend.html#createContext()">createContext</a></code>&nbsp;in interface&nbsp;<code><a href="../../../technical/backend/ComputeBackend.html" title="interface in org.episteme.core.technical.backend">ComputeBackend</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="../../VisionBackend.html#createContext()">createContext</a></code>&nbsp;in interface&nbsp;<code><a href="../../VisionBackend.html" title="interface in org.episteme.core.media">VisionBackend</a></code></dd>
+<dt>Returns:</dt>
+<dd>new execution context</dd>
 </dl>
 </div>
 </section>

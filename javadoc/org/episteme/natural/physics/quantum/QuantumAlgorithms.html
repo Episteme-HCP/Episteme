@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -70,7 +70,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#groverSearch(int,int)" tabindex="0">groverSearch(int, int)</a></li>
 <li><a href="#qft(int)" tabindex="0">qft(int)</a></li>
 <li><a href="#inverseQft(int)" tabindex="0">inverseQft(int)</a></li>
-<li><a href="#createGroverCircuit(org.episteme.core.technical.backend.quantum.QuantumBackend,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" tabindex="0">createGroverCircuit(QuantumBackend, QuantumBackend.QuantumCircuit, int)</a></li>
+<li><a href="#createGroverCircuit(org.episteme.natural.technical.backend.quantum.QuantumBackend,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" tabindex="0">createGroverCircuit(QuantumBackend, QuantumBackend.QuantumCircuit, int)</a></li>
 <li><a href="#shor(int)" tabindex="0">shor(int)</a></li>
 </ol>
 </li>
@@ -138,9 +138,9 @@ Information. Cambridge University Press.</li>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../../core/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#createGroverCircuit(org.episteme.core.technical.backend.quantum.QuantumBackend,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">createGroverCircuit</a><wbr>(<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&nbsp;backend,
- <a href="../../../core/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;oracle,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#createGroverCircuit(org.episteme.natural.technical.backend.quantum.QuantumBackend,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">createGroverCircuit</a><wbr>(<a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a>&nbsp;backend,
+ <a href="../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;oracle,
  int&nbsp;numQubits)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Generates a quantum circuit for Grover's search algorithm.
@@ -311,11 +311,11 @@ QFT|jÃƒÂ¢Ã…Â¸Ã‚Â© = (1/sqrt(N)) ÃƒÅ½Ã‚Â£_k exp(2ÃƒÂ�
 </section>
 </li>
 <li>
-<section class="detail" id="createGroverCircuit(org.episteme.core.technical.backend.quantum.QuantumBackend,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)">
+<section class="detail" id="createGroverCircuit(org.episteme.natural.technical.backend.quantum.QuantumBackend,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)">
 <h3>createGroverCircuit</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../../core/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></span>&nbsp;<span class="element-name">createGroverCircuit</span><wbr><span class="parameters">(<a href="../../../core/technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend</a>&nbsp;backend,
- <a href="../../../core/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;oracle,
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></span>&nbsp;<span class="element-name">createGroverCircuit</span><wbr><span class="parameters">(<a href="../../technical/backend/quantum/QuantumBackend.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend</a>&nbsp;backend,
+ <a href="../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;oracle,
  int&nbsp;numQubits)</span></div>
 <div class="block">Generates a quantum circuit for Grover's search algorithm.
 constructs initialization + iterations * (oracle + diffusion).</div>

@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -61,6 +61,8 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="#org.episteme.server.server.proto">org.episteme.server.server.proto</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.server.server.service">org.episteme.server.server.service</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
@@ -73,10 +75,19 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.Builder.</span><code><a href="../VectorResponse.Builder.html#build()" class="member-name-link">build</a>()</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#biCGSTAB(org.episteme.server.server.proto.IterativeSolverRequest)" class="member-name-link">biCGSTAB</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request)</code></div>
+<div class="col-last even-row-color">
+<div class="block">
+Iterative Solvers</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.Builder.</span><code><a href="../VectorResponse.Builder.html#build()" class="member-name-link">build</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.Builder.</span><code><a href="../VectorResponse.Builder.html#buildPartial()" class="member-name-link">buildPartial</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.Builder.</span><code><a href="../VectorResponse.Builder.html#buildPartial()" class="member-name-link">buildPartial</a>()</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#conjugateGradient(org.episteme.server.server.proto.IterativeSolverRequest)" class="member-name-link">conjugateGradient</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#getDefaultInstance()" class="member-name-link">getDefaultInstance</a>()</code></div>
@@ -88,91 +99,115 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#getDefaultInstanceForType()" class="member-name-link">getDefaultInstanceForType</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#linearSolve(org.episteme.server.server.proto.MatrixVectorRequest)" class="member-name-link">linearSolve</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#gMRES(org.episteme.server.server.proto.GMRESRequest)" class="member-name-link">gMRES</a><wbr>(<a href="../GMRESRequest.html" title="class in org.episteme.server.server.proto">GMRESRequest</a>&nbsp;request)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#matrixVectorMultiply(org.episteme.server.server.proto.MatrixVectorRequest)" class="member-name-link">matrixVectorMultiply</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request)</code></div>
-<div class="col-last even-row-color">
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#linearSolve(org.episteme.server.server.proto.MatrixVectorRequest)" class="member-name-link">linearSolve</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#matrixVectorMultiply(org.episteme.server.server.proto.MatrixVectorRequest)" class="member-name-link">matrixVectorMultiply</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request)</code></div>
+<div class="col-last odd-row-color">
 <div class="block">
 Matrix-Vector operations</div>
 </div>
-<div class="col-first odd-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseDelimitedFrom(java.io.InputStream)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseDelimitedFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseDelimitedFrom(java.io.InputStream)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(byte%5B%5D)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseDelimitedFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseDelimitedFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(byte%5B%5D,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(byte%5B%5D)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.ByteString)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(byte%5B%5D,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(byte[]&nbsp;data,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.ByteString,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.ByteString)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.CodedInputStream)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.ByteString,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.ByteString&nbsp;data,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.CodedInputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.CodedInputStream)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.io.InputStream)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(com.google.protobuf.CodedInputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(com.google.protobuf.CodedInputStream&nbsp;input,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.io.InputStream)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.nio.ByteBuffer)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.io.InputStream,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;input,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.nio.ByteBuffer,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data,
- com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.nio.ByteBuffer)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#vectorAdd(org.episteme.server.server.proto.VectorRequest)" class="member-name-link">vectorAdd</a><wbr>(<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>&nbsp;request)</code></div>
-<div class="col-last odd-row-color">
+<div class="col-first odd-row-color"><code>static <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#parseFrom(java.nio.ByteBuffer,com.google.protobuf.ExtensionRegistryLite)" class="member-name-link">parseFrom</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/ByteBuffer.html" title="class or interface in java.nio" class="external-link">ByteBuffer</a>&nbsp;data,
+ com.google.protobuf.ExtensionRegistryLite&nbsp;extensionRegistry)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#vectorAdd(org.episteme.server.server.proto.VectorRequest)" class="member-name-link">vectorAdd</a><wbr>(<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>&nbsp;request)</code></div>
+<div class="col-last even-row-color">
 <div class="block">
 Vector operations</div>
 </div>
-<div class="col-first even-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#vectorScale(org.episteme.server.server.proto.VectorScaleRequest)" class="member-name-link">vectorScale</a><wbr>(<a href="../VectorScaleRequest.html" title="class in org.episteme.server.server.proto">VectorScaleRequest</a>&nbsp;request)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#vectorSubtract(org.episteme.server.server.proto.VectorRequest)" class="member-name-link">vectorSubtract</a><wbr>(<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>&nbsp;request)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#vectorScale(org.episteme.server.server.proto.VectorScaleRequest)" class="member-name-link">vectorScale</a><wbr>(<a href="../VectorScaleRequest.html" title="class in org.episteme.server.server.proto">VectorScaleRequest</a>&nbsp;request)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceBlockingStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceBlockingStub.html#vectorSubtract(org.episteme.server.server.proto.VectorRequest)" class="member-name-link">vectorSubtract</a><wbr>(<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>&nbsp;request)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="caption"><span>Methods in <a href="../package-summary.html">org.episteme.server.server.proto</a> that return types with arguments of type <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getLinearSolveMethod()" class="member-name-link">getLinearSolveMethod</a>()</code></div>
+<div class="col-first even-row-color"><code>com.google.common.util.concurrent.ListenableFuture<wbr>&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceFutureStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceFutureStub.html#biCGSTAB(org.episteme.server.server.proto.IterativeSolverRequest)" class="member-name-link">biCGSTAB</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request)</code></div>
+<div class="col-last even-row-color">
+<div class="block">
+Iterative Solvers</div>
+</div>
+<div class="col-first odd-row-color"><code>com.google.common.util.concurrent.ListenableFuture<wbr>&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceFutureStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceFutureStub.html#conjugateGradient(org.episteme.server.server.proto.IterativeSolverRequest)" class="member-name-link">conjugateGradient</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getBiCGSTABMethod()" class="member-name-link">getBiCGSTABMethod</a>()</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getConjugateGradientMethod()" class="member-name-link">getConjugateGradientMethod</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../GMRESRequest.html" title="class in org.episteme.server.server.proto">GMRESRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getGMRESMethod()" class="member-name-link">getGMRESMethod</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getMatrixVectorMultiplyMethod()" class="member-name-link">getMatrixVectorMultiplyMethod</a>()</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getLinearSolveMethod()" class="member-name-link">getLinearSolveMethod</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>com.google.protobuf.Parser<wbr>&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#getParserForType()" class="member-name-link">getParserForType</a>()</code></div>
+<div class="col-first even-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getMatrixVectorMultiplyMethod()" class="member-name-link">getMatrixVectorMultiplyMethod</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getVectorAddMethod()" class="member-name-link">getVectorAddMethod</a>()</code></div>
+<div class="col-first odd-row-color"><code>com.google.protobuf.Parser<wbr>&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">VectorResponse.</span><code><a href="../VectorResponse.html#getParserForType()" class="member-name-link">getParserForType</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../VectorScaleRequest.html" title="class in org.episteme.server.server.proto">VectorScaleRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getVectorScaleMethod()" class="member-name-link">getVectorScaleMethod</a>()</code></div>
+<div class="col-first even-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getVectorAddMethod()" class="member-name-link">getVectorAddMethod</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getVectorSubtractMethod()" class="member-name-link">getVectorSubtractMethod</a>()</code></div>
+<div class="col-first odd-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../VectorScaleRequest.html" title="class in org.episteme.server.server.proto">VectorScaleRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getVectorScaleMethod()" class="member-name-link">getVectorScaleMethod</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static io.grpc.MethodDescriptor<wbr>&lt;<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>, <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.</span><code><a href="../MatrixServiceGrpc.html#getVectorSubtractMethod()" class="member-name-link">getVectorSubtractMethod</a>()</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>com.google.common.util.concurrent.ListenableFuture<wbr>&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceFutureStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceFutureStub.html#gMRES(org.episteme.server.server.proto.GMRESRequest)" class="member-name-link">gMRES</a><wbr>(<a href="../GMRESRequest.html" title="class in org.episteme.server.server.proto">GMRESRequest</a>&nbsp;request)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>com.google.common.util.concurrent.ListenableFuture<wbr>&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceFutureStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceFutureStub.html#linearSolve(org.episteme.server.server.proto.MatrixVectorRequest)" class="member-name-link">linearSolve</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request)</code></div>
@@ -216,6 +251,36 @@ Vector operations</div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>default void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.AsyncService.</span><code><a href="../MatrixServiceGrpc.AsyncService.html#biCGSTAB(org.episteme.server.server.proto.IterativeSolverRequest,io.grpc.stub.StreamObserver)" class="member-name-link">biCGSTAB</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last even-row-color">
+<div class="block">
+Iterative Solvers</div>
+</div>
+<div class="col-first odd-row-color"><code>void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceStub.html#biCGSTAB(org.episteme.server.server.proto.IterativeSolverRequest,io.grpc.stub.StreamObserver)" class="member-name-link">biCGSTAB</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">
+Iterative Solvers</div>
+</div>
+<div class="col-first even-row-color"><code>default void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.AsyncService.</span><code><a href="../MatrixServiceGrpc.AsyncService.html#conjugateGradient(org.episteme.server.server.proto.IterativeSolverRequest,io.grpc.stub.StreamObserver)" class="member-name-link">conjugateGradient</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceStub.html#conjugateGradient(org.episteme.server.server.proto.IterativeSolverRequest,io.grpc.stub.StreamObserver)" class="member-name-link">conjugateGradient</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>default void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.AsyncService.</span><code><a href="../MatrixServiceGrpc.AsyncService.html#gMRES(org.episteme.server.server.proto.GMRESRequest,io.grpc.stub.StreamObserver)" class="member-name-link">gMRES</a><wbr>(<a href="../GMRESRequest.html" title="class in org.episteme.server.server.proto">GMRESRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceStub.html#gMRES(org.episteme.server.server.proto.GMRESRequest,io.grpc.stub.StreamObserver)" class="member-name-link">gMRES</a><wbr>(<a href="../GMRESRequest.html" title="class in org.episteme.server.server.proto">GMRESRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>default void</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">MatrixServiceGrpc.AsyncService.</span><code><a href="../MatrixServiceGrpc.AsyncService.html#linearSolve(org.episteme.server.server.proto.MatrixVectorRequest,io.grpc.stub.StreamObserver)" class="member-name-link">linearSolve</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request,
  io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
@@ -266,6 +331,49 @@ Vector operations</div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>void</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceGrpc.MatrixServiceStub.</span><code><a href="../MatrixServiceGrpc.MatrixServiceStub.html#vectorSubtract(org.episteme.server.server.proto.VectorRequest,io.grpc.stub.StreamObserver)" class="member-name-link">vectorSubtract</a><wbr>(<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.server.server.service">
+<h2>Uses of <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a> in <a href="../../service/package-summary.html">org.episteme.server.server.service</a></h2>
+<div class="caption"><span>Method parameters in <a href="../../service/package-summary.html">org.episteme.server.server.service</a> with type arguments of type <a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#biCGSTAB(org.episteme.server.server.proto.IterativeSolverRequest,io.grpc.stub.StreamObserver)" class="member-name-link">biCGSTAB</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#conjugateGradient(org.episteme.server.server.proto.IterativeSolverRequest,io.grpc.stub.StreamObserver)" class="member-name-link">conjugateGradient</a><wbr>(<a href="../IterativeSolverRequest.html" title="class in org.episteme.server.server.proto">IterativeSolverRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#gMRES(org.episteme.server.server.proto.GMRESRequest,io.grpc.stub.StreamObserver)" class="member-name-link">gMRES</a><wbr>(<a href="../GMRESRequest.html" title="class in org.episteme.server.server.proto">GMRESRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#linearSolve(org.episteme.server.server.proto.MatrixVectorRequest,io.grpc.stub.StreamObserver)" class="member-name-link">linearSolve</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#matrixVectorMultiply(org.episteme.server.server.proto.MatrixVectorRequest,io.grpc.stub.StreamObserver)" class="member-name-link">matrixVectorMultiply</a><wbr>(<a href="../MatrixVectorRequest.html" title="class in org.episteme.server.server.proto">MatrixVectorRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#vectorAdd(org.episteme.server.server.proto.VectorRequest,io.grpc.stub.StreamObserver)" class="member-name-link">vectorAdd</a><wbr>(<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#vectorScale(org.episteme.server.server.proto.VectorScaleRequest,io.grpc.stub.StreamObserver)" class="member-name-link">vectorScale</a><wbr>(<a href="../VectorScaleRequest.html" title="class in org.episteme.server.server.proto">VectorScaleRequest</a>&nbsp;request,
+ io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">MatrixServiceImpl.</span><code><a href="../../service/MatrixServiceImpl.html#vectorSubtract(org.episteme.server.server.proto.VectorRequest,io.grpc.stub.StreamObserver)" class="member-name-link">vectorSubtract</a><wbr>(<a href="../VectorRequest.html" title="class in org.episteme.server.server.proto">VectorRequest</a>&nbsp;request,
  io.grpc.stub.StreamObserver&lt;<a href="../VectorResponse.html" title="class in org.episteme.server.server.proto">VectorResponse</a>&gt;&nbsp;responseObserver)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>

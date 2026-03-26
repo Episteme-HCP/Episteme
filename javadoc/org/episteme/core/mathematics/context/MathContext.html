@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -60,28 +60,26 @@ loadScripts(document, 'script');</script>
 </ol>
 </li>
 <li><a href="#nested-class-summary" tabindex="0">Nested Class Summary</a></li>
-<li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
-<li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
-<ol class="toc-list">
-<li><a href="#%3Cinit%3E(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode,org.episteme.core.mathematics.context.ComputeMode,java.math.MathContext)" tabindex="0">MathContext(MathContext.RealPrecision, MathContext.OverflowMode, ComputeMode, MathContext)</a></li>
-<li><a href="#%3Cinit%3E(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode,org.episteme.core.mathematics.context.ComputeMode)" tabindex="0">MathContext(MathContext.RealPrecision, MathContext.OverflowMode, ComputeMode)</a></li>
-<li><a href="#%3Cinit%3E(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode)" tabindex="0">MathContext(MathContext.RealPrecision, MathContext.OverflowMode)</a></li>
-</ol>
-</li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
-<li><a href="#getDefault()" tabindex="0">getDefault()</a></li>
-<li><a href="#setDefault(org.episteme.core.mathematics.context.MathContext)" tabindex="0">setDefault(MathContext)</a></li>
 <li><a href="#getCurrent()" tabindex="0">getCurrent()</a></li>
 <li><a href="#setCurrent(org.episteme.core.mathematics.context.MathContext)" tabindex="0">setCurrent(MathContext)</a></li>
 <li><a href="#reset()" tabindex="0">reset()</a></li>
+<li><a href="#isCancelled()" tabindex="0">isCancelled()</a></li>
+<li><a href="#setCancelled(boolean)" tabindex="0">setCancelled(boolean)</a></li>
+<li><a href="#checkCurrentCancelled()" tabindex="0">checkCurrentCancelled()</a></li>
+<li><a href="#checkCancelled()" tabindex="0">checkCancelled()</a></li>
+<li><a href="#getNumericalConfiguration()" tabindex="0">getNumericalConfiguration()</a></li>
 <li><a href="#fast()" tabindex="0">fast()</a></li>
 <li><a href="#normal()" tabindex="0">normal()</a></li>
 <li><a href="#exact()" tabindex="0">exact()</a></li>
 <li><a href="#unsafe()" tabindex="0">unsafe()</a></li>
 <li><a href="#compute(java.util.function.Supplier)" tabindex="0">compute(Supplier)</a></li>
 <li><a href="#getRealPrecision()" tabindex="0">getRealPrecision()</a></li>
+<li><a href="#isHighPrecision()" tabindex="0">isHighPrecision()</a></li>
+<li><a href="#isDoubleOrHigherPrecision()" tabindex="0">isDoubleOrHigherPrecision()</a></li>
+<li><a href="#isFastPrecision()" tabindex="0">isFastPrecision()</a></li>
 <li><a href="#getOverflowMode()" tabindex="0">getOverflowMode()</a></li>
 <li><a href="#isOverflowCheckingEnabled()" tabindex="0">isOverflowCheckingEnabled()</a></li>
 <li><a href="#getComputeMode()" tabindex="0">getComputeMode()</a></li>
@@ -90,6 +88,7 @@ loadScripts(document, 'script');</script>
 <li><a href="#withOverflowMode(org.episteme.core.mathematics.context.MathContext.OverflowMode)" tabindex="0">withOverflowMode(MathContext.OverflowMode)</a></li>
 <li><a href="#withComputeMode(org.episteme.core.mathematics.context.ComputeMode)" tabindex="0">withComputeMode(ComputeMode)</a></li>
 <li><a href="#withJavaMathContext(java.math.MathContext)" tabindex="0">withJavaMathContext(MathContext)</a></li>
+<li><a href="#withPrecision(int)" tabindex="0">withPrecision(int)</a></li>
 <li><a href="#toString()" tabindex="0">toString()</a></li>
 </ol>
 </li>
@@ -151,36 +150,6 @@ Real result = MathContext.exact().compute(() -&gt; {
 </div>
 </section>
 </li>
-<!-- ======== CONSTRUCTOR SUMMARY ======== -->
-<li>
-<section class="constructor-summary" id="constructor-summary">
-<h2>Constructor Summary</h2>
-<div class="caption"><span>Constructors</span></div>
-<div class="summary-table two-column-summary">
-<div class="table-header col-first">Constructor</div>
-<div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode)" class="member-name-link">MathContext</a><wbr>(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision,
- <a href="MathContext.OverflowMode.html" title="enum class in org.episteme.core.mathematics.context">MathContext.OverflowMode</a>&nbsp;overflowMode)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Creates a new computation context (default AUTO compute mode).</div>
-</div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode,org.episteme.core.mathematics.context.ComputeMode)" class="member-name-link">MathContext</a><wbr>(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision,
- <a href="MathContext.OverflowMode.html" title="enum class in org.episteme.core.mathematics.context">MathContext.OverflowMode</a>&nbsp;overflowMode,
- <a href="ComputeMode.html" title="enum class in org.episteme.core.mathematics.context">ComputeMode</a>&nbsp;computeMode)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Creates a new computation context with default java.math.MathContext
-(DECIMAL64).</div>
-</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode,org.episteme.core.mathematics.context.ComputeMode,java.math.MathContext)" class="member-name-link">MathContext</a><wbr>(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision,
- <a href="MathContext.OverflowMode.html" title="enum class in org.episteme.core.mathematics.context">MathContext.OverflowMode</a>&nbsp;overflowMode,
- <a href="ComputeMode.html" title="enum class in org.episteme.core.mathematics.context">ComputeMode</a>&nbsp;computeMode,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/MathContext.html" title="class or interface in java.math" class="external-link">MathContext</a>&nbsp;javaMathContext)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Creates a new computation context.</div>
-</div>
-</div>
-</section>
-</li>
 <!-- ========== METHOD SUMMARY =========== -->
 <li>
 <section class="method-summary" id="method-summary">
@@ -192,6 +161,16 @@ Real result = MathContext.exact().compute(() -&gt; {
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#checkCancelled()" class="member-name-link">checkCancelled</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Synonym for checkCurrentCancelled to match legacy and provider APIs.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#checkCurrentCancelled()" class="member-name-link">checkCurrentCancelled</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Checks if the current thread's context is cancelled.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>&lt;T&gt;&nbsp;T</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#compute(java.util.function.Supplier)" class="member-name-link">compute</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/function/Supplier.html" title="class or interface in java.util.function" class="external-link">Supplier</a>&lt;T&gt;&nbsp;computation)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -215,17 +194,17 @@ Real result = MathContext.exact().compute(() -&gt; {
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getCurrent()" class="member-name-link">getCurrent</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the current thread-local context (view of ComputeContext).</div>
+<div class="block">Returns the current thread-local context.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDefault()" class="member-name-link">getDefault</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Returns the default context.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/MathContext.html" title="class or interface in java.math" class="external-link">MathContext</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getJavaMathContext()" class="member-name-link">getJavaMathContext</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/MathContext.html" title="class or interface in java.math" class="external-link">MathContext</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getJavaMathContext()" class="member-name-link">getJavaMathContext</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the java.math.MathContext.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="NumericalConfiguration.html" title="class in org.episteme.core.mathematics.context">NumericalConfiguration</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getNumericalConfiguration()" class="member-name-link">getNumericalConfiguration</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns the numerical configuration for the current thread.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MathContext.OverflowMode.html" title="enum class in org.episteme.core.mathematics.context">MathContext.OverflowMode</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOverflowMode()" class="member-name-link">getOverflowMode</a>()</code></div>
@@ -236,6 +215,26 @@ Real result = MathContext.exact().compute(() -&gt; {
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRealPrecision()" class="member-name-link">getRealPrecision</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the real number precision mode.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isCancelled()" class="member-name-link">isCancelled</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns true if the current context has been cancelled.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isDoubleOrHigherPrecision()" class="member-name-link">isDoubleOrHigherPrecision</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if the precision is NORMAL or EXACT.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isFastPrecision()" class="member-name-link">isFastPrecision</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if the precision is FAST.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isHighPrecision()" class="member-name-link">isHighPrecision</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if the precision is EXACT.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isOverflowCheckingEnabled()" class="member-name-link">isOverflowCheckingEnabled</a>()</code></div>
@@ -250,17 +249,17 @@ Real result = MathContext.exact().compute(() -&gt; {
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#reset()" class="member-name-link">reset</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Resets thread-local context to default.</div>
+<div class="block">Resets the current thread-local context to defaults.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setCurrent(org.episteme.core.mathematics.context.MathContext)" class="member-name-link">setCurrent</a><wbr>(<a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a>&nbsp;context)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setCancelled(boolean)" class="member-name-link">setCancelled</a><wbr>(boolean&nbsp;cancelled)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Sets the current thread-local context (updates ComputeContext).</div>
+<div class="block">Sets the cancellation state for the current context.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setDefault(org.episteme.core.mathematics.context.MathContext)" class="member-name-link">setDefault</a><wbr>(<a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a>&nbsp;context)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setCurrent(org.episteme.core.mathematics.context.MathContext)" class="member-name-link">setCurrent</a><wbr>(<a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a>&nbsp;context)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Sets the global default context.</div>
+<div class="block">Sets the current thread-local context.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
@@ -285,9 +284,14 @@ Real result = MathContext.exact().compute(() -&gt; {
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a new context with the specified overflow mode.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withRealPrecision(org.episteme.core.mathematics.context.MathContext.RealPrecision)" class="member-name-link">withRealPrecision</a><wbr>(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#withPrecision(int)" class="member-name-link">withPrecision</a><wbr>(int&nbsp;precision)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Returns a new context with the specified precision (EXACT mode).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#withRealPrecision(org.episteme.core.mathematics.context.MathContext.RealPrecision)" class="member-name-link">withRealPrecision</a><wbr>(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a new context with the specified real precision.</div>
 </div>
 </div>
@@ -302,77 +306,17 @@ Real result = MathContext.exact().compute(() -&gt; {
 </section>
 <section class="details">
 <ul class="details-list">
-<!-- ========= CONSTRUCTOR DETAIL ======== -->
-<li>
-<section class="constructor-details" id="constructor-detail">
-<h2>Constructor Details</h2>
-<ul class="member-list">
-<li>
-<section class="detail" id="&lt;init&gt;(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode,org.episteme.core.mathematics.context.ComputeMode,java.math.MathContext)">
-<h3>MathContext</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MathContext</span><wbr><span class="parameters">(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision,
- <a href="MathContext.OverflowMode.html" title="enum class in org.episteme.core.mathematics.context">MathContext.OverflowMode</a>&nbsp;overflowMode,
- <a href="ComputeMode.html" title="enum class in org.episteme.core.mathematics.context">ComputeMode</a>&nbsp;computeMode,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/MathContext.html" title="class or interface in java.math" class="external-link">MathContext</a>&nbsp;javaMathContext)</span></div>
-<div class="block">Creates a new computation context.</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="&lt;init&gt;(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode,org.episteme.core.mathematics.context.ComputeMode)">
-<h3>MathContext</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MathContext</span><wbr><span class="parameters">(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision,
- <a href="MathContext.OverflowMode.html" title="enum class in org.episteme.core.mathematics.context">MathContext.OverflowMode</a>&nbsp;overflowMode,
- <a href="ComputeMode.html" title="enum class in org.episteme.core.mathematics.context">ComputeMode</a>&nbsp;computeMode)</span></div>
-<div class="block">Creates a new computation context with default java.math.MathContext
-(DECIMAL64).</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="&lt;init&gt;(org.episteme.core.mathematics.context.MathContext.RealPrecision,org.episteme.core.mathematics.context.MathContext.OverflowMode)">
-<h3>MathContext</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">MathContext</span><wbr><span class="parameters">(<a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a>&nbsp;realPrecision,
- <a href="MathContext.OverflowMode.html" title="enum class in org.episteme.core.mathematics.context">MathContext.OverflowMode</a>&nbsp;overflowMode)</span></div>
-<div class="block">Creates a new computation context (default AUTO compute mode).</div>
-</div>
-</section>
-</li>
-</ul>
-</section>
-</li>
 <!-- ============ METHOD DETAIL ========== -->
 <li>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="getDefault()">
-<h3>getDefault</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></span>&nbsp;<span class="element-name">getDefault</span>()</div>
-<div class="block">Returns the default context.</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="setDefault(org.episteme.core.mathematics.context.MathContext)">
-<h3>setDefault</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDefault</span><wbr><span class="parameters">(<a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a>&nbsp;context)</span></div>
-<div class="block">Sets the global default context.</div>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="getCurrent()">
 <h3>getCurrent</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></span>&nbsp;<span class="element-name">getCurrent</span>()</div>
-<div class="block">Returns the current thread-local context (view of ComputeContext).</div>
+<div class="block">Returns the current thread-local context.</div>
 </div>
 </section>
 </li>
@@ -381,7 +325,7 @@ Real result = MathContext.exact().compute(() -&gt; {
 <h3>setCurrent</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCurrent</span><wbr><span class="parameters">(<a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a>&nbsp;context)</span></div>
-<div class="block">Sets the current thread-local context (updates ComputeContext).</div>
+<div class="block">Sets the current thread-local context.</div>
 </div>
 </section>
 </li>
@@ -390,7 +334,56 @@ Real result = MathContext.exact().compute(() -&gt; {
 <h3>reset</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">reset</span>()</div>
-<div class="block">Resets thread-local context to default.</div>
+<div class="block">Resets the current thread-local context to defaults.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isCancelled()">
+<h3>isCancelled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isCancelled</span>()</div>
+<div class="block">Returns true if the current context has been cancelled.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="setCancelled(boolean)">
+<h3>setCancelled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setCancelled</span><wbr><span class="parameters">(boolean&nbsp;cancelled)</span></div>
+<div class="block">Sets the cancellation state for the current context.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="checkCurrentCancelled()">
+<h3>checkCurrentCancelled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">checkCurrentCancelled</span>()</div>
+<div class="block">Checks if the current thread's context is cancelled.</div>
+<dl class="notes">
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/RuntimeException.html" title="class or interface in java.lang" class="external-link">RuntimeException</a></code> - if cancelled</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="checkCancelled()">
+<h3>checkCancelled</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">checkCancelled</span>()</div>
+<div class="block">Synonym for checkCurrentCancelled to match legacy and provider APIs.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getNumericalConfiguration()">
+<h3>getNumericalConfiguration</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="NumericalConfiguration.html" title="class in org.episteme.core.mathematics.context">NumericalConfiguration</a></span>&nbsp;<span class="element-name">getNumericalConfiguration</span>()</div>
+<div class="block">Returns the numerical configuration for the current thread.</div>
 </div>
 </section>
 </li>
@@ -445,6 +438,33 @@ Real result = MathContext.exact().compute(() -&gt; {
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="MathContext.RealPrecision.html" title="enum class in org.episteme.core.mathematics.context">MathContext.RealPrecision</a></span>&nbsp;<span class="element-name">getRealPrecision</span>()</div>
 <div class="block">Gets the real number precision mode.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isHighPrecision()">
+<h3>isHighPrecision</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isHighPrecision</span>()</div>
+<div class="block">Returns true if the precision is EXACT.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isDoubleOrHigherPrecision()">
+<h3>isDoubleOrHigherPrecision</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isDoubleOrHigherPrecision</span>()</div>
+<div class="block">Returns true if the precision is NORMAL or EXACT.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isFastPrecision()">
+<h3>isFastPrecision</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isFastPrecision</span>()</div>
+<div class="block">Returns true if the precision is FAST.</div>
 </div>
 </section>
 </li>
@@ -517,6 +537,21 @@ Real result = MathContext.exact().compute(() -&gt; {
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></span>&nbsp;<span class="element-name">withJavaMathContext</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/math/MathContext.html" title="class or interface in java.math" class="external-link">MathContext</a>&nbsp;javaMathContext)</span></div>
 <div class="block">Returns a new context with the specified java.math.MathContext.</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="withPrecision(int)">
+<h3>withPrecision</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="MathContext.html" title="class in org.episteme.core.mathematics.context">MathContext</a></span>&nbsp;<span class="element-name">withPrecision</span><wbr><span class="parameters">(int&nbsp;precision)</span></div>
+<div class="block">Returns a new context with the specified precision (EXACT mode).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>precision</code> - the number of digits</dd>
+<dt>Returns:</dt>
+<dd>the new context</dd>
+</dl>
 </div>
 </section>
 </li>

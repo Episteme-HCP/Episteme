@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -59,13 +59,21 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Package</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.algebra.groups">org.episteme.core.mathematics.algebra.groups</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.benchmarks.benchmark.benchmarks">org.episteme.benchmarks.benchmark.benchmarks</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.algebra.intervals">org.episteme.core.mathematics.algebra.intervals</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.algebra.groups">org.episteme.core.mathematics.algebra.groups</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.analysis.chaos">org.episteme.core.mathematics.analysis.chaos</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.algebra.intervals">org.episteme.core.mathematics.algebra.intervals</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.analysis.transform">org.episteme.core.mathematics.analysis.transform</a></div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.analysis.chaos">org.episteme.core.mathematics.analysis.chaos</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.analysis.fft">org.episteme.core.mathematics.analysis.fft</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.analysis.fft.providers">org.episteme.core.mathematics.analysis.fft.providers</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.analysis.transform">org.episteme.core.mathematics.analysis.transform</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.linearalgebra">org.episteme.core.mathematics.linearalgebra</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><a href="#org.episteme.core.mathematics.linearalgebra.vectors">org.episteme.core.mathematics.linearalgebra.vectors</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -82,15 +90,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.core.mathematics.sets">org.episteme.core.mathematics.sets</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.technical.algorithm">org.episteme.core.technical.algorithm</a></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.algorithm.fft">org.episteme.core.technical.algorithm.fft</a></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.core.technical.backend.gpu.opencl">org.episteme.core.technical.backend.gpu.opencl</a></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><a href="#org.episteme.core.technical.backend.quantum">org.episteme.core.technical.backend.quantum</a></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><a href="#org.episteme.nativ.technical.algorithm.fft">org.episteme.nativ.technical.algorithm.fft</a></div>
+<div class="col-first even-row-color"><a href="#org.episteme.nativ.mathematics.analysis.fft.backends">org.episteme.nativ.mathematics.analysis.fft.backends</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.natural.physics.classical.waves">org.episteme.natural.physics.classical.waves</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -98,9 +98,45 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><a href="#org.episteme.natural.physics.quantum.backends">org.episteme.natural.physics.quantum.backends</a></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><a href="#org.episteme.natural.technical.backend.quantum">org.episteme.natural.technical.backend.quantum</a></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
+<li>
+<section class="detail" id="org.episteme.benchmarks.benchmark.benchmarks">
+<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../../benchmarks/benchmark/benchmarks/package-summary.html">org.episteme.benchmarks.benchmark.benchmarks</a></h2>
+<div class="caption"><span>Classes in <a href="../../../../../benchmarks/benchmark/benchmarks/package-summary.html">org.episteme.benchmarks.benchmark.benchmarks</a> that implement interfaces with type arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../../../../../benchmarks/benchmark/benchmarks/ComplexLinearAlgebraBenchmark.html" class="type-name-link" title="class in org.episteme.benchmarks.benchmark.benchmarks">ComplexLinearAlgebraBenchmark</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Systematic benchmark for High-Precision Complex Linear Algebra.</div>
+</div>
+</div>
+<div class="caption"><span>Methods in <a href="../../../../../benchmarks/benchmark/benchmarks/package-summary.html">org.episteme.benchmarks.benchmark.benchmarks</a> that return types with arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a><wbr>&lt;<a href="../../../linearalgebra/LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ComplexLinearAlgebraBenchmark.</span><code><a href="../../../../../benchmarks/benchmark/benchmarks/ComplexLinearAlgebraBenchmark.html#getProviderClass()" class="member-name-link">getProviderClass</a>()</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+<div class="caption"><span>Method parameters in <a href="../../../../../benchmarks/benchmark/benchmarks/package-summary.html">org.episteme.benchmarks.benchmark.benchmarks</a> with type arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ComplexLinearAlgebraBenchmark.</span><code><a href="../../../../../benchmarks/benchmark/benchmarks/ComplexLinearAlgebraBenchmark.html#setProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider)" class="member-name-link">setProvider</a><wbr>(<a href="../../../linearalgebra/LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;provider)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
 <li>
 <section class="detail" id="org.episteme.core.mathematics.algebra.groups">
 <h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../algebra/groups/package-summary.html">org.episteme.core.mathematics.algebra.groups</a></h2>
@@ -349,6 +385,76 @@ approximation.</div>
 </section>
 </li>
 <li>
+<section class="detail" id="org.episteme.core.mathematics.analysis.fft">
+<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../analysis/fft/package-summary.html">org.episteme.core.mathematics.analysis.fft</a></h2>
+<div class="caption"><span>Methods in <a href="../../../analysis/fft/package-summary.html">org.episteme.core.mathematics.analysis.fft</a> that return <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../analysis/fft/FFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../analysis/fft/FFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+<div class="caption"><span>Methods in <a href="../../../analysis/fft/package-summary.html">org.episteme.core.mathematics.analysis.fft</a> with parameters of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../analysis/fft/FFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../analysis/fft/FFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.mathematics.analysis.fft.providers">
+<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../analysis/fft/providers/package-summary.html">org.episteme.core.mathematics.analysis.fft.providers</a></h2>
+<div class="caption"><span>Methods in <a href="../../../analysis/fft/providers/package-summary.html">org.episteme.core.mathematics.analysis.fft.providers</a> that return <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../analysis/fft/providers/MulticoreFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../analysis/fft/providers/StandardFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../analysis/fft/providers/MulticoreFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../analysis/fft/providers/StandardFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+<div class="caption"><span>Methods in <a href="../../../analysis/fft/providers/package-summary.html">org.episteme.core.mathematics.analysis.fft.providers</a> with parameters of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../analysis/fft/providers/MulticoreFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../analysis/fft/providers/StandardFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../analysis/fft/providers/MulticoreFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../analysis/fft/providers/StandardFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
 <section class="detail" id="org.episteme.core.mathematics.analysis.transform">
 <h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../analysis/transform/package-summary.html">org.episteme.core.mathematics.analysis.transform</a></h2>
 <div class="caption"><span>Classes in <a href="../../../analysis/transform/package-summary.html">org.episteme.core.mathematics.analysis.transform</a> that implement interfaces with type arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
@@ -446,6 +552,27 @@ algorithm.</div>
 <div class="col-last odd-row-color">
 <div class="block">Computes the Forward FFT of a complex vector.</div>
 </div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.core.mathematics.linearalgebra">
+<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../linearalgebra/package-summary.html">org.episteme.core.mathematics.linearalgebra</a></h2>
+<div class="caption"><span>Method parameters in <a href="../../../linearalgebra/package-summary.html">org.episteme.core.mathematics.linearalgebra</a> with type arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static void</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">HighPrecisionAuditOperations.</span><code><a href="../../../linearalgebra/HighPrecisionAuditOperations.html#runComplexAudit(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider,int,org.episteme.core.mathematics.linearalgebra.HighPrecisionAuditOperations.AuditAction)" class="member-name-link">runComplexAudit</a><wbr>(<a href="../../../linearalgebra/LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;p,
+ int&nbsp;n,
+ <a href="../../../linearalgebra/HighPrecisionAuditOperations.AuditAction.html" title="interface in org.episteme.core.mathematics.linearalgebra">HighPrecisionAuditOperations.AuditAction</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;action)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static void</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">HighPrecisionAuditOperations.</span><code><a href="../../../linearalgebra/HighPrecisionAuditOperations.html#runComplexAudit(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider,int,org.episteme.core.mathematics.linearalgebra.HighPrecisionAuditOperations.AuditAction)" class="member-name-link">runComplexAudit</a><wbr>(<a href="../../../linearalgebra/LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra">LinearAlgebraProvider</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;p,
+ int&nbsp;n,
+ <a href="../../../linearalgebra/HighPrecisionAuditOperations.AuditAction.html" title="interface in org.episteme.core.mathematics.linearalgebra">HighPrecisionAuditOperations.AuditAction</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;action)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -589,44 +716,56 @@ atan(z) = (i/2) * log((1-iz)/(1+iz))</div>
 atanh(z) = 0.5 * log((1 + z) / (1 - z))</div>
 </div>
 <div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#conjugate()" class="member-name-link">conjugate</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#cbrt()" class="member-name-link">cbrt</a>()</code></div>
+<div class="col-last even-row-color">
+<div class="block">Returns the cube root of this complex number.
+cbrt(z) = z^(1/3)</div>
+</div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#cos()" class="member-name-link">cos</a>()</code></div>
-<div class="col-last odd-row-color">
+<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#conjugate()" class="member-name-link">conjugate</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#cos()" class="member-name-link">cos</a>()</code></div>
+<div class="col-last even-row-color">
 <div class="block">Returns the cosine of this complex number.
 cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)</div>
 </div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#cosh()" class="member-name-link">cosh</a>()</code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#cosh()" class="member-name-link">cosh</a>()</code></div>
+<div class="col-last odd-row-color">
 <div class="block">Returns the hyperbolic cosine of this complex number.
 cosh(z) = (exp(z) + exp(-z)) / 2</div>
 </div>
-<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#divide(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;other)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#divide(org.episteme.core.mathematics.numbers.complex.Complex,org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a,
- <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;b)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#divide(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;other)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#exp()" class="member-name-link">exp</a>()</code></div>
-<div class="col-last odd-row-color">
+<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#divide(org.episteme.core.mathematics.numbers.complex.Complex,org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a,
+ <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;b)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#exp()" class="member-name-link">exp</a>()</code></div>
+<div class="col-last even-row-color">
 <div class="block">Returns e raised to this complex number.
 exp(a + bi) = e^a * (cos(b) + i*sin(b))</div>
 </div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#inverse()" class="member-name-link">inverse</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#inverse(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">inverse</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#inverse()" class="member-name-link">inverse</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#log()" class="member-name-link">log</a>()</code></div>
-<div class="col-last even-row-color">
+<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#inverse(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">inverse</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#log()" class="member-name-link">log</a>()</code></div>
+<div class="col-last odd-row-color">
 <div class="block">Returns the natural logarithm of this complex number.
 log(z) = ln(|z|) + i*arg(z)</div>
+</div>
+<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#log10()" class="member-name-link">log10</a>()</code></div>
+<div class="col-last even-row-color">
+<div class="block">Returns the base-10 logarithm of this complex number.
+log10(z) = log(z) / log(10)</div>
 </div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">Complex.</span><code><a href="../Complex.html#multiply(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">multiply</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;other)</code></div>
@@ -880,195 +1019,42 @@ z^w = exp(w * log(z))</div>
 </section>
 </li>
 <li>
-<section class="detail" id="org.episteme.core.technical.algorithm">
-<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a></h2>
-<div class="caption"><span>Methods in <a href="../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a> that return <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<section class="detail" id="org.episteme.nativ.mathematics.analysis.fft.backends">
+<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../../nativ/mathematics/analysis/fft/backends/package-summary.html">org.episteme.nativ.mathematics.analysis.fft.backends</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../../nativ/mathematics/analysis/fft/backends/package-summary.html">org.episteme.nativ.mathematics.analysis.fft.backends</a> that return <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../../technical/algorithm/FFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Performs a 1D inverse FFT on Complex data.</div>
-</div>
-<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../../technical/algorithm/FFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Performs a 1D forward FFT on Complex data.</div>
-</div>
-</div>
-<div class="caption"><span>Methods in <a href="../../../../technical/algorithm/package-summary.html">org.episteme.core.technical.algorithm</a> with parameters of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../../technical/algorithm/FFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Performs a 1D inverse FFT on Complex data.</div>
-</div>
-<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">FFTProvider.</span><code><a href="../../../../technical/algorithm/FFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Performs a 1D forward FFT on Complex data.</div>
-</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.core.technical.algorithm.fft">
-<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../technical/algorithm/fft/package-summary.html">org.episteme.core.technical.algorithm.fft</a></h2>
-<div class="caption"><span>Methods in <a href="../../../../technical/algorithm/fft/package-summary.html">org.episteme.core.technical.algorithm.fft</a> that return <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/MulticoreFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeFFTBackend.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/StandardFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">NativeOpenCLFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeOpenCLFFTBackend.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/MulticoreFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeFFTBackend.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/StandardFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">NativeOpenCLFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeOpenCLFFTBackend.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
-<div class="caption"><span>Methods in <a href="../../../../technical/algorithm/fft/package-summary.html">org.episteme.core.technical.algorithm.fft</a> with parameters of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="caption"><span>Methods in <a href="../../../../../nativ/mathematics/analysis/fft/backends/package-summary.html">org.episteme.nativ.mathematics.analysis.fft.backends</a> with parameters of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/MulticoreFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeFFTBackend.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/StandardFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">NativeOpenCLFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeOpenCLFFTBackend.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">MulticoreFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/MulticoreFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">NativeFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeFFTBackend.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">StandardFFTProvider.</span><code><a href="../../../../technical/algorithm/fft/StandardFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.core.technical.backend.gpu.opencl">
-<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a></h2>
-<div class="caption"><span>Methods in <a href="../../../../technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a> that return <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">OpenCLFFTProvider.</span><code><a href="../../../../technical/backend/gpu/opencl/OpenCLFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">OpenCLFFTProvider.</span><code><a href="../../../../technical/backend/gpu/opencl/OpenCLFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-</div>
-<div class="caption"><span>Methods in <a href="../../../../technical/backend/gpu/opencl/package-summary.html">org.episteme.core.technical.backend.gpu.opencl</a> with parameters of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">OpenCLFFTProvider.</span><code><a href="../../../../technical/backend/gpu/opencl/OpenCLFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">OpenCLFFTProvider.</span><code><a href="../../../../technical/backend/gpu/opencl/OpenCLFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.core.technical.backend.quantum">
-<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../technical/backend/quantum/package-summary.html">org.episteme.core.technical.backend.quantum</a></h2>
-<div class="caption"><span>Methods in <a href="../../../../technical/backend/quantum/package-summary.html">org.episteme.core.technical.backend.quantum</a> that return types with arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">QuantumBackend.QuantumResult.</span><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumResult.html#getStatevector()" class="member-name-link">getStatevector</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../technical/backend/quantum/QuantumAlgorithmProvider.html#stateTomography(org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;circuit,
- int&nbsp;shots)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Performs quantum state tomography to reconstruct a density matrix.</div>
-</div>
-</div>
-<div class="caption"><span>Method parameters in <a href="../../../../technical/backend/quantum/package-summary.html">org.episteme.core.technical.backend.quantum</a> with type arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../technical/backend/quantum/QuantumAlgorithmProvider.html#matrixToUnitary(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">matrixToUnitary</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;matrix)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Converts a classical matrix to a quantum unitary operator.</div>
-</div>
-<div class="col-first odd-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../technical/backend/quantum/QuantumAlgorithmProvider.html#qaoa(org.episteme.core.mathematics.linearalgebra.Matrix,int)" class="member-name-link">qaoa</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;costHamiltonian,
- int&nbsp;layers)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Performs Quantum Approximate Optimization Algorithm (QAOA).</div>
-</div>
-<div class="col-first even-row-color"><code>double</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../technical/backend/quantum/QuantumAlgorithmProvider.html#quantumPhaseEstimation(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector,int)" class="member-name-link">quantumPhaseEstimation</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;unitary,
- <a href="../../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;eigenstate,
- int&nbsp;precision)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Performs Quantum Phase Estimation (QPE).</div>
-</div>
-<div class="col-first odd-row-color"><code>double</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../technical/backend/quantum/QuantumAlgorithmProvider.html#quantumPhaseEstimation(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector,int)" class="member-name-link">quantumPhaseEstimation</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;unitary,
- <a href="../../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;eigenstate,
- int&nbsp;precision)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Performs Quantum Phase Estimation (QPE).</div>
-</div>
-<div class="col-first even-row-color"><code>double</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../technical/backend/quantum/QuantumAlgorithmProvider.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;hamiltonian,
- <a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;ansatz,
- <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;optimizer)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Performs Variational Quantum Eigensolver (VQE) to find ground state energy.</div>
-</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="org.episteme.nativ.technical.algorithm.fft">
-<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../../nativ/technical/algorithm/fft/package-summary.html">org.episteme.nativ.technical.algorithm.fft</a></h2>
-<div class="caption"><span>Methods in <a href="../../../../../nativ/technical/algorithm/fft/package-summary.html">org.episteme.nativ.technical.algorithm.fft</a> that return <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">NativeFFTProvider.</span><code><a href="../../../../../nativ/technical/algorithm/fft/NativeFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">NativeFFTProvider.</span><code><a href="../../../../../nativ/technical/algorithm/fft/NativeFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-</div>
-<div class="caption"><span>Methods in <a href="../../../../../nativ/technical/algorithm/fft/package-summary.html">org.episteme.nativ.technical.algorithm.fft</a> with parameters of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">NativeFFTProvider.</span><code><a href="../../../../../nativ/technical/algorithm/fft/NativeFFTProvider.html#inverseTransformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">inverseTransformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">NativeFFTProvider.</span><code><a href="../../../../../nativ/technical/algorithm/fft/NativeFFTProvider.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">NativeOpenCLFFTBackend.</span><code><a href="../../../../../nativ/mathematics/analysis/fft/backends/NativeOpenCLFFTBackend.html#transformComplex(org.episteme.core.mathematics.numbers.complex.Complex%5B%5D)" class="member-name-link">transformComplex</a><wbr>(<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>[]&nbsp;data)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
@@ -1188,23 +1174,23 @@ z^w = exp(w * log(z))</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code><a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">AmazonBraketBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/AmazonBraketBackend.html#stateTomography(org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
+<div class="col-second even-row-color"><span class="type-name-label">AmazonBraketBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/AmazonBraketBackend.html#stateTomography(org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
  int&nbsp;s)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">PythonQuantumBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/PythonQuantumBackend.html#stateTomography(org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
+<div class="col-second odd-row-color"><span class="type-name-label">PythonQuantumBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/PythonQuantumBackend.html#stateTomography(org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
  int&nbsp;s)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">QiskitBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/QiskitBackend.html#stateTomography(org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
+<div class="col-second even-row-color"><span class="type-name-label">QiskitBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/QiskitBackend.html#stateTomography(org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
  int&nbsp;s)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">Quantum4JBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/Quantum4JBackend.html#stateTomography(org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
+<div class="col-second odd-row-color"><span class="type-name-label">Quantum4JBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/Quantum4JBackend.html#stateTomography(org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
  int&nbsp;s)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">StrangeBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/StrangeBackend.html#stateTomography(org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
+<div class="col-second even-row-color"><span class="type-name-label">StrangeBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/StrangeBackend.html#stateTomography(org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;c,
  int&nbsp;s)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
@@ -1213,38 +1199,38 @@ z^w = exp(w * log(z))</div>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
+<div class="col-first even-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">AmazonBraketBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/AmazonBraketBackend.html#matrixToUnitary(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">matrixToUnitary</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;m)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
+<div class="col-first odd-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">PythonQuantumBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/PythonQuantumBackend.html#matrixToUnitary(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">matrixToUnitary</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;m)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
+<div class="col-first even-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">QiskitBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/QiskitBackend.html#matrixToUnitary(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">matrixToUnitary</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;m)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
+<div class="col-first odd-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">Quantum4JBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/Quantum4JBackend.html#matrixToUnitary(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">matrixToUnitary</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;m)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
+<div class="col-first even-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">StrangeBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/StrangeBackend.html#matrixToUnitary(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">matrixToUnitary</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;m)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
+<div class="col-first odd-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">AmazonBraketBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/AmazonBraketBackend.html#qaoa(org.episteme.core.mathematics.linearalgebra.Matrix,int)" class="member-name-link">qaoa</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
  int&nbsp;l)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
+<div class="col-first even-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">PythonQuantumBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/PythonQuantumBackend.html#qaoa(org.episteme.core.mathematics.linearalgebra.Matrix,int)" class="member-name-link">qaoa</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
  int&nbsp;l)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
+<div class="col-first odd-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">QiskitBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/QiskitBackend.html#qaoa(org.episteme.core.mathematics.linearalgebra.Matrix,int)" class="member-name-link">qaoa</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
  int&nbsp;l)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
+<div class="col-first even-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">Quantum4JBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/Quantum4JBackend.html#qaoa(org.episteme.core.mathematics.linearalgebra.Matrix,int)" class="member-name-link">qaoa</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
  int&nbsp;l)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../../../../technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
+<div class="col-first odd-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">StrangeBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/StrangeBackend.html#qaoa(org.episteme.core.mathematics.linearalgebra.Matrix,int)" class="member-name-link">qaoa</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
  int&nbsp;l)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -1299,30 +1285,88 @@ z^w = exp(w * log(z))</div>
  int&nbsp;p)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>double</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">AmazonBraketBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/AmazonBraketBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
- <a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
+<div class="col-second even-row-color"><span class="type-name-label">AmazonBraketBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/AmazonBraketBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
+ <a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;o)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>double</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">PythonQuantumBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/PythonQuantumBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;hamiltonian,
- <a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;ansatz,
+<div class="col-second odd-row-color"><span class="type-name-label">PythonQuantumBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/PythonQuantumBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;hamiltonian,
+ <a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;ansatz,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;optimizer)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>double</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">QiskitBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/QiskitBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
- <a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
+<div class="col-second even-row-color"><span class="type-name-label">QiskitBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/QiskitBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
+ <a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;o)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>double</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">Quantum4JBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/Quantum4JBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
- <a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
+<div class="col-second odd-row-color"><span class="type-name-label">Quantum4JBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/Quantum4JBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
+ <a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;o)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>double</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">StrangeBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/StrangeBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
- <a href="../../../../technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.core.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
+<div class="col-second even-row-color"><span class="type-name-label">StrangeBackend.</span><code><a href="../../../../../natural/physics/quantum/backends/StrangeBackend.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;h,
+ <a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;a,
  <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;o)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.episteme.natural.technical.backend.quantum">
+<h2>Uses of <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a> in <a href="../../../../../natural/technical/backend/quantum/package-summary.html">org.episteme.natural.technical.backend.quantum</a></h2>
+<div class="caption"><span>Methods in <a href="../../../../../natural/technical/backend/quantum/package-summary.html">org.episteme.natural.technical.backend.quantum</a> that return types with arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">QuantumBackend.QuantumResult.</span><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumResult.html#getStatevector()" class="member-name-link">getStatevector</a>()</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../../natural/technical/backend/quantum/QuantumAlgorithmProvider.html#stateTomography(org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,int)" class="member-name-link">stateTomography</a><wbr>(<a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;circuit,
+ int&nbsp;shots)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Performs quantum state tomography to reconstruct a density matrix.</div>
+</div>
+</div>
+<div class="caption"><span>Method parameters in <a href="../../../../../natural/technical/backend/quantum/package-summary.html">org.episteme.natural.technical.backend.quantum</a> with type arguments of type <a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../../natural/technical/backend/quantum/QuantumAlgorithmProvider.html#matrixToUnitary(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">matrixToUnitary</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;matrix)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Converts a classical matrix to a quantum unitary operator.</div>
+</div>
+<div class="col-first odd-row-color"><code><a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumResult.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumResult</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../../natural/technical/backend/quantum/QuantumAlgorithmProvider.html#qaoa(org.episteme.core.mathematics.linearalgebra.Matrix,int)" class="member-name-link">qaoa</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;costHamiltonian,
+ int&nbsp;layers)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Performs Quantum Approximate Optimization Algorithm (QAOA).</div>
+</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../../natural/technical/backend/quantum/QuantumAlgorithmProvider.html#quantumPhaseEstimation(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector,int)" class="member-name-link">quantumPhaseEstimation</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;unitary,
+ <a href="../../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;eigenstate,
+ int&nbsp;precision)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Performs Quantum Phase Estimation (QPE).</div>
+</div>
+<div class="col-first odd-row-color"><code>double</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../../natural/technical/backend/quantum/QuantumAlgorithmProvider.html#quantumPhaseEstimation(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.Vector,int)" class="member-name-link">quantumPhaseEstimation</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;unitary,
+ <a href="../../../linearalgebra/Vector.html" title="interface in org.episteme.core.mathematics.linearalgebra">Vector</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;eigenstate,
+ int&nbsp;precision)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Performs Quantum Phase Estimation (QPE).</div>
+</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">QuantumAlgorithmProvider.</span><code><a href="../../../../../natural/technical/backend/quantum/QuantumAlgorithmProvider.html#vqe(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.natural.technical.backend.quantum.QuantumBackend.QuantumCircuit,java.lang.String)" class="member-name-link">vqe</a><wbr>(<a href="../../../linearalgebra/Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;&nbsp;hamiltonian,
+ <a href="../../../../../natural/technical/backend/quantum/QuantumBackend.QuantumCircuit.html" title="interface in org.episteme.natural.technical.backend.quantum">QuantumBackend.QuantumCircuit</a>&nbsp;ansatz,
+ <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;optimizer)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Performs Variational Quantum Eigensolver (VQE) to find ground state energy.</div>
+</div>
 </div>
 </section>
 </li>

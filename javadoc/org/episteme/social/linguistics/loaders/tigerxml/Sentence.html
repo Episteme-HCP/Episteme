@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -78,7 +78,6 @@ loadScripts(document, 'script');</script>
 <li><a href="#getPrevSentence(int)" tabindex="0">getPrevSentence(int)</a></li>
 <li><a href="#getSpan()" tabindex="0">getSpan()</a></li>
 <li><a href="#getNTCount()" tabindex="0">getNTCount()</a></li>
-<li><a href="#getNoOfNTs()" tabindex="0">getNoOfNTs()</a></li>
 <li><a href="#getNT(int)" tabindex="0">getNT(int)</a></li>
 <li><a href="#getNT(java.lang.String)" tabindex="0">getNT(String)</a></li>
 <li><a href="#getT(java.lang.String)" tabindex="0">getT(String)</a></li>
@@ -92,7 +91,6 @@ loadScripts(document, 'script');</script>
 <li><a href="#getVROOT()" tabindex="0">getVROOT()</a></li>
 <li><a href="#hasRootNT()" tabindex="0">hasRootNT()</a></li>
 <li><a href="#getTCount()" tabindex="0">getTCount()</a></li>
-<li><a href="#getNoOfTs()" tabindex="0">getNoOfTs()</a></li>
 <li><a href="#getT(int)" tabindex="0">getT(int)</a></li>
 <li><a href="#addT(org.episteme.social.linguistics.loaders.tigerxml.T)" tabindex="0">addT(T)</a></li>
 <li><a href="#setText(java.lang.String)" tabindex="0">setText(String)</a></li>
@@ -192,7 +190,7 @@ from the passed DOM Element.</div>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button><button id="method-summary-table-tab6" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab6', 3)" class="table-tab">Deprecated Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -253,20 +251,6 @@ ArrayList of the corpus containing this sentence.</div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the sentence object succeeding this sentence in the sentences
 ArrayList of the corpus containing this sentence by n.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#getNoOfNTs()" class="member-name-link">getNoOfNTs</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">As of org.episteme.social.ml.tigerxml 1.1 - use <a href="#getNTCount()"><code>getNTCount()</code></a> instead.</div>
-</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#getNoOfTs()" class="member-name-link">getNoOfTs</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">As of org.episteme.social.ml.tigerxml 1.1 - use <a href="#getTCount()"><code>getTCount()</code></a> instead.</div>
-</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="NT.html" title="class in org.episteme.social.linguistics.loaders.tigerxml">NT</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNT(int)" class="member-name-link">getNT</a><wbr>(int&nbsp;i)</code></div>
@@ -619,23 +603,6 @@ ArrayList of the corpus containing this sentence by n.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="getNoOfNTs()">
-<h3>getNoOfNTs</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getNoOfNTs</span>()</div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">As of org.episteme.social.ml.tigerxml 1.1 - use <a href="#getNTCount()"><code>getNTCount()</code></a> instead.</div>
-</div>
-<div class="block">Returns the number of NT objects in the sentence.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>An <code>integer</code> denoting the number of non-terminals in
-        this sentence.</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="getNT(int)">
 <h3>getNT</h3>
 <div class="horizontal-scroll">
@@ -820,22 +787,6 @@ holds all other nodes.</div>
 <h3>getTCount</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getTCount</span>()</div>
-<div class="block">Returns the number of T objects in the sentence.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>An integer denoting the number of terminals in this sentence.</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getNoOfTs()">
-<h3>getNoOfTs</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getNoOfTs</span>()</div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">As of org.episteme.social.ml.tigerxml 1.1 - use <a href="#getTCount()"><code>getTCount()</code></a> instead.</div>
-</div>
 <div class="block">Returns the number of T objects in the sentence.</div>
 <dl class="notes">
 <dt>Returns:</dt>

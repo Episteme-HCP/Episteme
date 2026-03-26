@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -113,6 +113,8 @@ loadScripts(document, 'script');</script>
 <li><a href="#asinh()" tabindex="0">asinh()</a></li>
 <li><a href="#acosh()" tabindex="0">acosh()</a></li>
 <li><a href="#atanh()" tabindex="0">atanh()</a></li>
+<li><a href="#log10()" tabindex="0">log10()</a></li>
+<li><a href="#cbrt()" tabindex="0">cbrt()</a></li>
 <li><a href="#toString()" tabindex="0">toString()</a></li>
 <li><a href="#equals(java.lang.Object)" tabindex="0">equals(Object)</a></li>
 <li><a href="#hashCode()" tabindex="0">hashCode()</a></li>
@@ -244,100 +246,112 @@ atan(z) = (i/2) * log((1-iz)/(1+iz))</div>
 <div class="block">Returns the inverse hyperbolic tangent of this complex number.
 atanh(z) = 0.5 * log((1 + z) / (1 - z))</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characteristic()" class="member-name-link">characteristic</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cbrt()" class="member-name-link">cbrt</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the cube root of this complex number.
+cbrt(z) = z^(1/3)</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#characteristic()" class="member-name-link">characteristic</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the characteristic of this field.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#conjugate()" class="member-name-link">conjugate</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#contains(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">contains</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;element)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#conjugate()" class="member-name-link">conjugate</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#contains(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">contains</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;element)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Tests whether this set contains the specified element.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cos()" class="member-name-link">cos</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cos()" class="member-name-link">cos</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the cosine of this complex number.
 cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cosh()" class="member-name-link">cosh</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#cosh()" class="member-name-link">cosh</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the hyperbolic cosine of this complex number.
 cosh(z) = (exp(z) + exp(-z)) / 2</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#description()" class="member-name-link">description</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#description()" class="member-name-link">description</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a human-readable description of this set.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#divide(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;other)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#divide(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;other)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns this element divided by another.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#divide(org.episteme.core.mathematics.numbers.complex.Complex,org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#divide(org.episteme.core.mathematics.numbers.complex.Complex,org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">divide</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a,
  <a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;b)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the quotient of two elements (division).</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;obj)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exp()" class="member-name-link">exp</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;obj)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exp()" class="member-name-link">exp</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns e raised to this complex number.
 exp(a + bi) = e^a * (cos(b) + i*sin(b))</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getImaginary()" class="member-name-link">getImaginary</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getReal()" class="member-name-link">getReal</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getImaginary()" class="member-name-link">getImaginary</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a><wbr>&lt;<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getScalarRing()" class="member-name-link">getScalarRing</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getReal()" class="member-name-link">getReal</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../structures/rings/Ring.html" title="interface in org.episteme.core.mathematics.structures.rings">Ring</a><wbr>&lt;<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getScalarRing()" class="member-name-link">getScalarRing</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the ring structure for complex numbers.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#imaginary()" class="member-name-link">imaginary</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#imaginary()" class="member-name-link">imaginary</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the imaginary part as a double.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse()" class="member-name-link">inverse</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse()" class="member-name-link">inverse</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the multiplicative inverse of this element.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">inverse</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#inverse(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">inverse</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;a)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the multiplicative inverse of a non-zero element.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEmpty()" class="member-name-link">isEmpty</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns <code>true</code> if this set contains no elements.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isMultiplicationCommutative()" class="member-name-link">isMultiplicationCommutative</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isMultiplicationCommutative()" class="member-name-link">isMultiplicationCommutative</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Fields always have commutative multiplication.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#log()" class="member-name-link">log</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#log()" class="member-name-link">log</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the natural logarithm of this complex number.
 log(z) = ln(|z|) + i*arg(z)</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#log10()" class="member-name-link">log10</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the base-10 logarithm of this complex number.
+log10(z) = log(z) / log(10)</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#multiply(org.episteme.core.mathematics.numbers.complex.Complex)" class="member-name-link">multiply</a><wbr>(<a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a>&nbsp;other)</code></div>
@@ -1261,6 +1275,34 @@ atanh(z) = 0.5 * log((1 + z) / (1 - z))</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>atanh(this)</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="log10()">
+<h3>log10</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span>&nbsp;<span class="element-name">log10</span>()</div>
+<div class="block">Returns the base-10 logarithm of this complex number.
+log10(z) = log(z) / log(10)</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>log10(this)</dd>
+</dl>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="cbrt()">
+<h3>cbrt</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Complex.html" title="class in org.episteme.core.mathematics.numbers.complex">Complex</a></span>&nbsp;<span class="element-name">cbrt</span>()</div>
+<div class="block">Returns the cube root of this complex number.
+cbrt(z) = z^(1/3)</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>cube root of this</dd>
 </dl>
 </div>
 </section>

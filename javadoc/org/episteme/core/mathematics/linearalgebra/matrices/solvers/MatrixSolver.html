@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -63,7 +63,6 @@ loadScripts(document, 'script');</script>
 <li><a href="#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.numbers.real.Real%5B%5D,org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver.Strategy)" tabindex="0">solve(Matrix, Real[], MatrixSolver.Strategy)</a></li>
 <li><a href="#recommend(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">recommend(Matrix)</a></li>
 <li><a href="#isSymmetric(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">isSymmetric(Matrix)</a></li>
-<li><a href="#isLikelyPositiveDefinite(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">isLikelyPositiveDefinite(Matrix)</a></li>
 </ol>
 </li>
 </ol>
@@ -81,14 +80,10 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">MatrixSolver</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Unified solver for linear systems with automatic or explicit algorithm
-selection.
+<div class="block">Unified solver for linear systems with automatic or explicit algorithm selection.
 <p>
 Analyzes matrix properties and selects the optimal decomposition method.
-Harmonized with
-* <p>
-<b>Reference:</b><br>
-Press, W. H., Teukolsky, S. A., Vetterling, W. T., <span class="invalid-tag">invalid input: '&amp;'</span> Flannery, B. P. (2007). <i>Numerical Recipes: The Art of Scientific Computing</i> (3rd ed.). Cambridge University Press.
+Delegates to the active <a href="../../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra"><code>LinearAlgebraProvider</code></a> for computations.
 </p></div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -129,32 +124,24 @@ Press, W. H., Teukolsky, S. A., Vetterling, W. T., <span class="invalid-tag">inv
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isLikelyPositiveDefinite(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">isLikelyPositiveDefinite</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Checks if a matrix is likely positive definite using diagonal dominance
-heuristic.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isSymmetric(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">isSymmetric</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isSymmetric(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">isSymmetric</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixSolver.Strategy.html" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">MatrixSolver.Strategy</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#recommend(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">recommend</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Checks if a matrix is symmetric.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="MatrixSolver.Strategy.html" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">MatrixSolver.Strategy</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#recommend(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">recommend</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Recommends the best solver strategy for the given matrix.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.numbers.real.Real%5B%5D)" class="member-name-link">solve</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.numbers.real.Real%5B%5D)" class="member-name-link">solve</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
  <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;b)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Solves Ax = b with automatic algorithm selection.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.numbers.real.Real%5B%5D,org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver.Strategy)" class="member-name-link">solve</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#solve(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.numbers.real.Real%5B%5D,org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver.Strategy)" class="member-name-link">solve</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
  <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;b,
  <a href="MatrixSolver.Strategy.html" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">MatrixSolver.Strategy</a>&nbsp;strategy)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Solves Ax = b with explicit algorithm selection.</div>
 </div>
 </div>
@@ -181,13 +168,6 @@ heuristic.</div>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</span>&nbsp;<span class="element-name">solve</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A,
  <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;b)</span></div>
 <div class="block">Solves Ax = b with automatic algorithm selection.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>A</code> - coefficient matrix</dd>
-<dd><code>b</code> - right-hand side vector</dd>
-<dt>Returns:</dt>
-<dd>solution vector x</dd>
-</dl>
 </div>
 </section>
 </li>
@@ -199,14 +179,6 @@ heuristic.</div>
  <a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]&nbsp;b,
  <a href="MatrixSolver.Strategy.html" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">MatrixSolver.Strategy</a>&nbsp;strategy)</span></div>
 <div class="block">Solves Ax = b with explicit algorithm selection.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>A</code> - coefficient matrix</dd>
-<dd><code>b</code> - right-hand side vector</dd>
-<dd><code>strategy</code> - the algorithm to use</dd>
-<dt>Returns:</dt>
-<dd>solution vector x</dd>
-</dl>
 </div>
 </section>
 </li>
@@ -216,12 +188,6 @@ heuristic.</div>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="MatrixSolver.Strategy.html" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">MatrixSolver.Strategy</a></span>&nbsp;<span class="element-name">recommend</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</span></div>
 <div class="block">Recommends the best solver strategy for the given matrix.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>A</code> - the coefficient matrix</dd>
-<dt>Returns:</dt>
-<dd>recommended strategy</dd>
-</dl>
 </div>
 </section>
 </li>
@@ -230,33 +196,6 @@ heuristic.</div>
 <h3>isSymmetric</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isSymmetric</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</span></div>
-<div class="block">Checks if a matrix is symmetric.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>A</code> - the matrix to check</dd>
-<dt>Returns:</dt>
-<dd>true if symmetric</dd>
-</dl>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="isLikelyPositiveDefinite(org.episteme.core.mathematics.linearalgebra.Matrix)">
-<h3>isLikelyPositiveDefinite</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isLikelyPositiveDefinite</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;A)</span></div>
-<div class="block">Checks if a matrix is likely positive definite using diagonal dominance
-heuristic.
-<p>
-This is a quick check, not a proof. More robust check would require
-attempting Cholesky and catching failure.
-</p></div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>A</code> - symmetric matrix</dd>
-<dt>Returns:</dt>
-<dd>true if likely positive definite</dd>
-</dl>
 </div>
 </section>
 </li>

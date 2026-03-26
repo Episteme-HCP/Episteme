@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -84,9 +84,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">GMRES (Generalized Minimal Residual) solver.
 <p>
-Solves Ax = b for general non-symmetric matrices.
-Uses Arnoldi iteration to build Krylov subspace.
-Memory efficient for large sparse systems.
+This class now delegates to the active <a href="../../../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra"><code>LinearAlgebraProvider</code></a> via <a href="../../../../../technical/algorithm/AlgorithmManager.html" title="class in org.episteme.core.technical.algorithm"><code>AlgorithmManager</code></a>.
 </p></div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -176,17 +174,6 @@ Memory efficient for large sparse systems.
  int&nbsp;maxIterations,
  int&nbsp;restarts)</span></div>
 <div class="block">Solves Ax = b using GMRES with restarts.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>A</code> - matrix (can be non-symmetric)</dd>
-<dd><code>b</code> - right-hand side</dd>
-<dd><code>x0</code> - initial guess</dd>
-<dd><code>tolerance</code> - convergence tolerance</dd>
-<dd><code>maxIterations</code> - max iterations per restart</dd>
-<dd><code>restarts</code> - number of restarts</dd>
-<dt>Returns:</dt>
-<dd>approximate solution</dd>
-</dl>
 </div>
 </section>
 </li>

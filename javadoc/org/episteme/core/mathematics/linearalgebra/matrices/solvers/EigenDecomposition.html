@@ -35,7 +35,7 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
 <li><a href="../../../../../../../search.html">Search</a></li>
 </ul>
-<div class="about-language"><b>Episteme 1.0.0-SNAPSHOT</b></div>
+<div class="about-language"><b>Episteme 1.0.0-beta1</b></div>
 </div>
 </div>
 <div class="sub-nav">
@@ -55,16 +55,16 @@ loadScripts(document, 'script');</script>
 <div class="toc-header">Contents&nbsp;<input type="text" class="filter-input" disabled placeholder="Filter contents (type .)" aria-label="Filter table of contents" autocomplete="off" spellcheck="false"><input type="reset" class="reset-filter" disabled tabindex="-1" value="Reset"></div>
 <ol class="toc-list" tabindex="-1">
 <li><a href="#" tabindex="0">Description</a></li>
-<li><a href="#nested-class-summary" tabindex="0">Nested Class Summary</a></li>
+<li><a href="#constructor-summary" tabindex="0">Constructor Summary</a></li>
 <li><a href="#method-summary" tabindex="0">Method Summary</a></li>
+<li><a href="#constructor-detail" tabindex="0">Constructor Details</a>
+<ol class="toc-list">
+<li><a href="#%3Cinit%3E()" tabindex="0">EigenDecomposition()</a></li>
+</ol>
+</li>
 <li><a href="#method-detail" tabindex="0">Method Details</a>
 <ol class="toc-list">
-<li><a href="#decompose(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition.Algorithm)" tabindex="0">decompose(Matrix, EigenDecomposition.Algorithm)</a></li>
 <li><a href="#decompose(org.episteme.core.mathematics.linearalgebra.Matrix)" tabindex="0">decompose(Matrix)</a></li>
-<li><a href="#getEigenvalues()" tabindex="0">getEigenvalues()</a></li>
-<li><a href="#getEigenvectors()" tabindex="0">getEigenvectors()</a></li>
-<li><a href="#getEigenvector(int)" tabindex="0">getEigenvector(int)</a></li>
-<li><a href="#spectralRadius()" tabindex="0">spectralRadius()</a></li>
 </ol>
 </li>
 </ol>
@@ -82,11 +82,9 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">EigenDecomposition</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Eigenvalue and Eigenvector decomposition.
+<div class="block">Eigenvalue Decomposition.
 <p>
-Finds eigenvalues λ and eigenvectors v such that Av = λv.
-Uses QR algorithm for general matrices, power iteration for largest
-eigenvalue.
+This class delegates to the active <a href="../../LinearAlgebraProvider.html" title="interface in org.episteme.core.mathematics.linearalgebra"><code>LinearAlgebraProvider</code></a> via <a href="../../../../technical/algorithm/AlgorithmManager.html" title="class in org.episteme.core.technical.algorithm"><code>AlgorithmManager</code></a>.
 </p></div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -98,20 +96,16 @@ eigenvalue.
 </section>
 <section class="summary">
 <ul class="summary-list">
-<!-- ======== NESTED CLASS SUMMARY ======== -->
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
-<section class="nested-class-summary" id="nested-class-summary">
-<h2>Nested Class Summary</h2>
-<div class="caption"><span>Nested Classes</span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Class</div>
+<section class="constructor-summary" id="constructor-summary">
+<h2>Constructor Summary</h2>
+<div class="caption"><span>Constructors</span></div>
+<div class="summary-table two-column-summary">
+<div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static enum&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="EigenDecomposition.Algorithm.html" class="type-name-link" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenDecomposition.Algorithm</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">Computes eigendecomposition using QR algorithm.</div>
-</div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">EigenDecomposition</a>()</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -120,39 +114,16 @@ eigenvalue.
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="EigenDecomposition.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenDecomposition</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="EigenResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenResult</a><wbr>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#decompose(org.episteme.core.mathematics.linearalgebra.Matrix)" class="member-name-link">decompose</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Computes eigendecomposition using default simplified algorithm.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="EigenDecomposition.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenDecomposition</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#decompose(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition.Algorithm)" class="member-name-link">decompose</a><wbr>(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix,
- <a href="EigenDecomposition.Algorithm.html" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenDecomposition.Algorithm</a>&nbsp;algo)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Computes eigendecomposition using QR algorithm and specified eigenvector
-method.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEigenvalues()" class="member-name-link">getEigenvalues</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEigenvector(int)" class="member-name-link">getEigenvector</a><wbr>(int&nbsp;index)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Gets specific eigenvector (column i).</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a><wbr>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEigenvectors()" class="member-name-link">getEigenvectors</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#spectralRadius()" class="member-name-link">spectralRadius</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Spectral radius (largest absolute eigenvalue).</div>
+<div class="block">Computes Eigenvalue decomposition using the best available LinearAlgebraProvider.</div>
 </div>
 </div>
 </div>
@@ -166,66 +137,39 @@ method.</div>
 </section>
 <section class="details">
 <ul class="details-list">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<li>
+<section class="constructor-details" id="constructor-detail">
+<h2>Constructor Details</h2>
+<ul class="member-list">
+<li>
+<section class="detail" id="&lt;init&gt;()">
+<h3>EigenDecomposition</h3>
+<div class="horizontal-scroll">
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">EigenDecomposition</span>()</div>
+</div>
+</section>
+</li>
+</ul>
+</section>
+</li>
 <!-- ============ METHOD DETAIL ========== -->
 <li>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="decompose(org.episteme.core.mathematics.linearalgebra.Matrix,org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenDecomposition.Algorithm)">
-<h3>decompose</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="EigenDecomposition.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenDecomposition</a></span>&nbsp;<span class="element-name">decompose</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix,
- <a href="EigenDecomposition.Algorithm.html" title="enum class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenDecomposition.Algorithm</a>&nbsp;algo)</span></div>
-<div class="block">Computes eigendecomposition using QR algorithm and specified eigenvector
-method.
-<p>
-Iteratively applies QR decomposition: A_k+1 = R_k * Q_k
-Converges to Schur form (upper triangular), diagonal = eigenvalues.
-</p></div>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="decompose(org.episteme.core.mathematics.linearalgebra.Matrix)">
 <h3>decompose</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="EigenDecomposition.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenDecomposition</a></span>&nbsp;<span class="element-name">decompose</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix)</span></div>
-<div class="block">Computes eigendecomposition using default simplified algorithm.</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getEigenvalues()">
-<h3>getEigenvalues</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</span>&nbsp;<span class="element-name">getEigenvalues</span>()</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getEigenvectors()">
-<h3>getEigenvectors</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">getEigenvectors</span>()</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getEigenvector(int)">
-<h3>getEigenvector</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>[]</span>&nbsp;<span class="element-name">getEigenvector</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
-<div class="block">Gets specific eigenvector (column i).</div>
-</div>
-</section>
-</li>
-<li>
-<section class="detail" id="spectralRadius()">
-<h3>spectralRadius</h3>
-<div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a></span>&nbsp;<span class="element-name">spectralRadius</span>()</div>
-<div class="block">Spectral radius (largest absolute eigenvalue).</div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="EigenResult.html" title="class in org.episteme.core.mathematics.linearalgebra.matrices.solvers">EigenResult</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;</span>&nbsp;<span class="element-name">decompose</span><wbr><span class="parameters">(<a href="../../Matrix.html" title="interface in org.episteme.core.mathematics.linearalgebra">Matrix</a>&lt;<a href="../../../numbers/real/Real.html" title="class in org.episteme.core.mathematics.numbers.real">Real</a>&gt;&nbsp;matrix)</span></div>
+<div class="block">Computes Eigenvalue decomposition using the best available LinearAlgebraProvider.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>matrix</code> - the square matrix to decompose</dd>
+<dt>Returns:</dt>
+<dd>the result containing eigenvalues and eigenvectors</dd>
+</dl>
 </div>
 </section>
 </li>
