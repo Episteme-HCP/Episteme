@@ -19,7 +19,7 @@ import java.util.function.BiConsumer;
 public class HighPrecisionAuditOperations {
 
     public interface AuditAction<T> {
-        void run(String opName, Runnable test);
+        void run(String opName, java.util.function.Supplier<Object> test);
     }
 
     public static void runRealBigAudit(LinearAlgebraProvider<RealBig> p, int n, AuditAction<RealBig> action) {
@@ -45,28 +45,28 @@ public class HighPrecisionAuditOperations {
         action.run("RB:Norm", () -> p.norm(v));
         action.run("RB:LU", () -> p.lu(invA));
         action.run("RB:QR", () -> p.qr(A));
-        action.run("RB:SVD", () -> p.svd(A)); // Fixed: SVD on A
+        action.run("RB:SVD", () -> p.svd(A)); 
         action.run("RB:Chol", () -> p.cholesky(spdA));
         action.run("RB:Eigen", () -> p.eigen(invA));
 
         // Iterative Solvers (Sparse)
         action.run("RB:BiCGSTAB", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                sp.bicgstab(invA, v, createRealBigVector(RealBig.create(BigDecimal.ZERO), n, p), RealBig.create(new BigDecimal("1e-8")), 100);
+                return sp.bicgstab(invA, v, createRealBigVector(RealBig.create(BigDecimal.ZERO), n, p), RealBig.create(new BigDecimal("1e-8")), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("RB:ConjGrad", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                sp.conjugateGradient(spdA, v, createRealBigVector(RealBig.create(BigDecimal.ZERO), n, p), RealBig.create(new BigDecimal("1e-8")), 100);
+                return sp.conjugateGradient(spdA, v, createRealBigVector(RealBig.create(BigDecimal.ZERO), n, p), RealBig.create(new BigDecimal("1e-8")), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("RB:GMRES", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                sp.gmres(invA, v, createRealBigVector(RealBig.create(BigDecimal.ZERO), n, p), RealBig.create(new BigDecimal("1e-8")), 100, 5);
+                return sp.gmres(invA, v, createRealBigVector(RealBig.create(BigDecimal.ZERO), n, p), RealBig.create(new BigDecimal("1e-8")), 100, 5);
             } else throw new UnsupportedOperationException("Not sparse");
         });
 
-        // Transcendentals (Always size 1 for simplicity of domain)
+        // Transcendentals
         Matrix<RealBig> T = createRealBigMatrix(new BigDecimal("0.5"), 1, p);
         action.run("RB:Exp", () -> p.exp(T));
         action.run("RB:Sin", () -> p.sin(T));
@@ -108,28 +108,28 @@ public class HighPrecisionAuditOperations {
         action.run("C:Norm", () -> p.norm(v));
         action.run("C:LU", () -> p.lu(invA));
         action.run("C:QR", () -> p.qr(A));
-        action.run("C:SVD", () -> p.svd(A)); // Fixed: SVD on A
+        action.run("C:SVD", () -> p.svd(A)); 
         action.run("C:Chol", () -> p.cholesky(spdA));
         action.run("C:Eigen", () -> p.eigen(invA));
 
         // Iterative
         action.run("C:BiCGSTAB", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                sp.bicgstab(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100);
+                return sp.bicgstab(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("C:ConjGrad", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                sp.conjugateGradient(spdA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100);
+                return sp.conjugateGradient(spdA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("C:GMRES", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                sp.gmres(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100, 5);
+                return sp.gmres(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100, 5);
             } else throw new UnsupportedOperationException("Not sparse");
         });
 
-        // Transcendentals (Always size 1)
+        // Transcendentals
         Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, p);
         action.run("C:Exp", () -> p.exp(T));
         action.run("C:Log", () -> p.log(createComplexMatrix(Complex.of(2.0, 0.5), 1, p)));

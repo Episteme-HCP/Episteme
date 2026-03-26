@@ -2,8 +2,8 @@ package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraBackend;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraProvider;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRSparseLinearAlgebraProvider;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraBackend;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRSparseLinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.junit.jupiter.api.Test;
 import java.util.*;
@@ -27,8 +27,8 @@ public class IsolatedComplianceTest {
         
         // Explicitly test our target backends
         providers.add(new NativeCPULinearAlgebraBackend());
-        providers.add(new NativeMPFRDenseLinearAlgebraProvider<Real>());
-        providers.add(new NativeMPFRSparseLinearAlgebraProvider<Real>());
+        providers.add(new NativeMPFRDenseLinearAlgebraBackend<Real>());
+        providers.add(new NativeMPFRSparseLinearAlgebraBackend<Real>());
 
         List<ComplianceResult> results = new ArrayList<>();
 

@@ -15,8 +15,6 @@ import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
 
 import org.junit.jupiter.api.Test;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -41,10 +39,8 @@ public class HighPrecisionPerformanceTest {
         List<LinearAlgebraProvider<?>> providers = discoverHPProviders();
         BenchmarkReporter reporter = new BenchmarkReporter("High-Precision Performance Audit");
         reporter.setComments(
-            "1. Episteme (Strassen) demonstrates significant performance gains over Standard for Complex Matrix Solve operations (6ms vs 12ms).\n" +
-            "2. Native MPFR Dense shows unusually high latency for Complex Inversion (1592ms), likely due to high JNI overhead or non-optimized arbitrary-precision loops.\n" +
-            "3. CPUSparseLinearAlgebraProvider shows significant overhead on Add operations for dense matrix types compared to dedicated dense providers.\n" +
-            "4. CARMA (Recursive Architecture) shows competitive latencies but is currently limited by missing transcendental support."
+            "High-precision performance audit evaluating 68+ operations across diverse numeric domains (RealBig, Complex).\n" +
+            "Metrics represent execution time in milliseconds (ms) for " + MATRIX_SIZE + "x" + MATRIX_SIZE + " matrices."
         );
         
         reporter.addSection("Methodology", "Measuring execution time (ms) for 68+ operations on " + MATRIX_SIZE + "x" + MATRIX_SIZE + " matrices.");
@@ -65,13 +61,17 @@ public class HighPrecisionPerformanceTest {
                 @SuppressWarnings("unchecked")
                 Ring<RealBig> rbRing = (Ring<RealBig>) (Object) rbVal.getScalarRing();
                 if (provider.isCompatible(rbRing)) {
-                    benchmarkRealBig(metrics, (LinearAlgebraProvider<RealBig>) (Object) provider);
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<RealBig> realBigProvider = (LinearAlgebraProvider<RealBig>) (Object) provider;
+                    benchmarkRealBig(metrics, realBigProvider);
                 }
 
                 // Complex Domain
                 Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
                 if (provider.isCompatible(complexRing)) {
-                    benchmarkComplex(metrics, (LinearAlgebraProvider<Complex>) (Object) provider);
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<Complex> complexProvider = (LinearAlgebraProvider<Complex>) (Object) provider;
+                    benchmarkComplex(metrics, complexProvider);
                 }
 
                 BenchmarkResult res = new BenchmarkResult(
@@ -95,24 +95,40 @@ public class HighPrecisionPerformanceTest {
         reporter.generateReport();
     }
 
+    @SuppressWarnings("unchecked")
     private void benchmarkRealBig(Map<String, Object> metrics, LinearAlgebraProvider<RealBig> p) {
-        HighPrecisionAuditOperations.runRealBigAudit(p, MATRIX_SIZE, (op, test) -> measure(metrics, op, test));
+        HighPrecisionAuditOperations.runRealBigAudit(p, MATRIX_SIZE, (op, test) -> {
+            try {
+                // Warmup
+                for (int i = 0; i < 2; i++) test.get();
+                long start = System.nanoTime();
+                int iters = 3;
+                for (int i = 0; i < iters; i++) test.get();
+                long end = System.nanoTime();
+                double durationMs = (end - start) / (1_000_000.0 * iters);
+                metrics.put(op, durationMs);
+            } catch (Throwable t) {
+                metrics.put(op, -1.0);
+            }
+        });
     }
 
+    @SuppressWarnings("unchecked")
     private void benchmarkComplex(Map<String, Object> metrics, LinearAlgebraProvider<Complex> p) {
-        HighPrecisionAuditOperations.runComplexAudit(p, MATRIX_SIZE, (op, test) -> measure(metrics, op, test));
-    }
-    private void measure(Map<String, Object> metrics, String name, Runnable op) {
-        try {
-            // Warmup
-            for (int i = 0; i < 2; i++) op.run();
-            long start = System.nanoTime();
-            int iters = 3;
-            for (int i = 0; i < iters; i++) op.run();
-            metrics.put(name, (System.nanoTime() - start) / (1_000_000.0 * iters));
-        } catch (Throwable t) {
-            metrics.put(name, -1.0);
-        }
+        HighPrecisionAuditOperations.runComplexAudit(p, MATRIX_SIZE, (op, test) -> {
+            try {
+                // Warmup
+                for (int i = 0; i < 2; i++) test.get();
+                long start = System.nanoTime();
+                int iters = 3;
+                for (int i = 0; i < iters; i++) test.get();
+                long end = System.nanoTime();
+                double durationMs = (end - start) / (1_000_000.0 * iters);
+                metrics.put(op, durationMs);
+            } catch (Throwable t) {
+                metrics.put(op, -1.0);
+            }
+        });
     }
 
     private List<LinearAlgebraProvider<?>> discoverHPProviders() {

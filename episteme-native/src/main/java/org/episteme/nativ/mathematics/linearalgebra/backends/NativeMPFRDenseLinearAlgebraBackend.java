@@ -35,9 +35,9 @@ import static org.episteme.nativ.mathematics.analysis.NativeMPFRNumbers.*;
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
-public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E>, NativeBackend, CPUBackend {
+public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, NativeBackend, CPUBackend {
 
-    private static final Logger logger = LoggerFactory.getLogger(NativeMPFRDenseLinearAlgebraProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(NativeMPFRDenseLinearAlgebraBackend.class);
     private static final Linker LINKER = Linker.nativeLinker();
     private static boolean AVAILABLE = false;
 
@@ -823,7 +823,7 @@ public class NativeMPFRDenseLinearAlgebraProvider<E> implements LinearAlgebraBac
         NativeSafe.invoke(MPFR_FREE_STR, strPtr);
         
         try {
-            return org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal(sb.toString()));
+            return org.episteme.core.mathematics.numbers.real.Real.of(new java.math.BigDecimal(sb.toString()));
         } catch (NumberFormatException e) {
             logger.error("Failed to parse MPFR string: '{}' (exp={}) - Final string: '{}'", s, exp, sb);
             if (s.contains("@")) return Real.NaN;

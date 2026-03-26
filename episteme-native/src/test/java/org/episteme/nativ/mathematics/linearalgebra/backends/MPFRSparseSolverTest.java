@@ -44,7 +44,7 @@ public class MPFRSparseSolverTest {
             SparseMatrix<Real> A = new SparseMatrix<>(storage, Real.ZERO);
             Vector<Real> b = DenseVector.of(Arrays.asList(Real.of(5.0), Real.of(5.0), Real.of(3.0)), Reals.getInstance());
             
-            NativeMPFRSparseLinearAlgebraProvider<Real> provider = new NativeMPFRSparseLinearAlgebraProvider<>();
+            NativeMPFRSparseLinearAlgebraBackend<Real> provider = new NativeMPFRSparseLinearAlgebraBackend<>();
             assertTrue(provider.isAvailable(), "MPFR Backend should be available");
             
             Vector<Real> x = provider.solve(A, b);
@@ -76,7 +76,7 @@ public class MPFRSparseSolverTest {
             SparseMatrix<Real> A = new SparseMatrix<>(storage, Real.ZERO);
             Vector<Real> b = DenseVector.of(Arrays.asList(bVals), Reals.getInstance());
             
-            NativeMPFRSparseLinearAlgebraProvider<Real> provider = new NativeMPFRSparseLinearAlgebraProvider<>();
+            NativeMPFRSparseLinearAlgebraBackend<Real> provider = new NativeMPFRSparseLinearAlgebraBackend<>();
             
             // Set high precision in context (50 digits)
             // MathContext.exact() is usually very high already, but let's be explicit if possible.

@@ -184,9 +184,9 @@ public class HighPrecisionComplianceTest {
     }
 
 
-    private <E> void testOp(ComplianceResult res, String opName, LinearAlgebraProvider<E> provider, Runnable test) {
+    private <E> void testOp(ComplianceResult res, String opName, LinearAlgebraProvider<E> provider, java.util.function.Supplier<Object> test) {
         try {
-            test.run();
+            test.get();
             res.status.put(opName, "✅ PASS");
         } catch (UnsupportedOperationException e) {
             res.status.put(opName, "❌ N/A");

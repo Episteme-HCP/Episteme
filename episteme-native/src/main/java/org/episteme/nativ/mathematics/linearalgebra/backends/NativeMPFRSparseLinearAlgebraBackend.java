@@ -39,9 +39,9 @@ import com.google.auto.service.AutoService;
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
-public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E>, SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
+public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
-    private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);
     private static final Linker LINKER = Linker.nativeLinker();
     private static boolean AVAILABLE = false;
 
@@ -59,6 +59,18 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
     private static MethodHandle MPFR_SET;
     private static MethodHandle MPFR_SET_D;
     private static MethodHandle MPFR_FREE_STR;
+    private static MethodHandle MPFR_EXP;
+    private static MethodHandle MPFR_LOG;
+    private static MethodHandle MPFR_LOG10;
+    private static MethodHandle MPFR_SIN;
+    private static MethodHandle MPFR_COS;
+    private static MethodHandle MPFR_TAN;
+    private static MethodHandle MPFR_ASIN;
+    private static MethodHandle MPFR_ACOS;
+    private static MethodHandle MPFR_ATAN;
+    private static MethodHandle MPFR_SINH;
+    private static MethodHandle MPFR_COSH;
+    private static MethodHandle MPFR_TANH;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -86,6 +98,18 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
                 MPFR_SET = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT));
                 MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+                MPFR_EXP = lookup(mpfr, "mpfr_exp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_LOG = lookup(mpfr, "mpfr_log", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_LOG10 = lookup(mpfr, "mpfr_log10", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_SIN = lookup(mpfr, "mpfr_sin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_COS = lookup(mpfr, "mpfr_cos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_TAN = lookup(mpfr, "mpfr_tan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_ASIN = lookup(mpfr, "mpfr_asin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_ACOS = lookup(mpfr, "mpfr_acos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_ATAN = lookup(mpfr, "mpfr_atan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_SINH = lookup(mpfr, "mpfr_sinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_COSH = lookup(mpfr, "mpfr_cosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_TANH = lookup(mpfr, "mpfr_tanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null;
                 if (AVAILABLE) {
@@ -502,7 +526,7 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
         NativeSafe.invoke(MPFR_FREE_STR, strPtr);
         
         try {
-            return Real.of(new java.math.BigDecimal(sb.toString()));
+            return org.episteme.core.mathematics.numbers.real.Real.of(new java.math.BigDecimal(sb.toString()));
         } catch (NumberFormatException e) {
             logger.error("Failed to parse MPFR string: '{}' (exp={})", s, exp);
             throw new RuntimeException("Invalid MPFR numeric string: " + sb, e);
@@ -893,5 +917,68 @@ public class NativeMPFRSparseLinearAlgebraProvider<E> implements LinearAlgebraBa
             }
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(newStorage, (org.episteme.core.mathematics.structures.rings.Ring<E>) sa.getScalarRing());
+    }
+
+    @Override public Matrix<E> exp(Matrix<E> a) { return transcendentalOp(a, MPFR_EXP); }
+    @Override public Matrix<E> log(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG); }
+    @Override public Matrix<E> log10(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG10); }
+    @Override public Matrix<E> sin(Matrix<E> a) { return transcendentalOp(a, MPFR_SIN); }
+    @Override public Matrix<E> cos(Matrix<E> a) { return transcendentalOp(a, MPFR_COS); }
+    @Override public Matrix<E> tan(Matrix<E> a) { return transcendentalOp(a, MPFR_TAN); }
+    @Override public Matrix<E> asin(Matrix<E> a) { return transcendentalOp(a, MPFR_ASIN); }
+    @Override public Matrix<E> acos(Matrix<E> a) { return transcendentalOp(a, MPFR_ACOS); }
+    @Override public Matrix<E> atan(Matrix<E> a) { return transcendentalOp(a, MPFR_ATAN); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { return transcendentalOp(a, MPFR_SINH); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { return transcendentalOp(a, MPFR_COSH); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { return transcendentalOp(a, MPFR_TANH); }
+
+    private Matrix<E> transcendentalOp(Matrix<E> a, MethodHandle handle) {
+        if (handle == null) return LinearAlgebraBackend.super.exp(a); 
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
+        int rows = sa.rows();
+        int cols = sa.cols();
+        boolean isComplex = ((Object)sa.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (isComplex) return LinearAlgebraBackend.super.exp(a); 
+        long prec = getPrecision();
+        
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E>(rows, cols, (E) sa.getScalarRing().zero());
+        
+        int[] rowPtr = sa.getRowPointers();
+        int[] colIdx = sa.getColIndices();
+        Object[] vals = sa.getValues();
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment vTmp = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, vTmp, prec);
+            MemorySegment resTmp = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, resTmp, prec);
+            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+
+            for (int i = 0; i < rows; i++) {
+                for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
+                    setMPFR(vTmp, (E) vals[idx], arena, 0);
+                    NativeSafe.invoke(handle, resTmp, vTmp, 0);
+                    Real r = readMPFR(resTmp, expPtr, arena);
+                    storage.set(i, colIdx[idx], (E) r);
+                }
+            }
+            NativeSafe.invoke(MPFR_CLEAR, vTmp);
+            NativeSafe.invoke(MPFR_CLEAR, resTmp);
+        } catch (Throwable t) {
+            throw new RuntimeException("MPFR Sparse transcendental op failed", t);
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(storage, sa.getScalarRing());
+    }
+
+    @Override
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        return bicgstab(a, b, null, (E) Real.of("1e-25"), 1000);
+    }
+
+    @Override
+    public Matrix<E> inverse(Matrix<E> a) {
+        // Fallback to dense for inversion
+        return new NativeMPFRDenseLinearAlgebraBackend<E>().inverse(a);
     }
 }
