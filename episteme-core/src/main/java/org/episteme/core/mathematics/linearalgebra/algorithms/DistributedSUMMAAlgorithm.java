@@ -135,8 +135,8 @@ public class DistributedSUMMAAlgorithm {
         int cols = tile.cols();
         int size = rows * cols;
         
-        // Check if we are in High Precision mode
-        boolean isHP = rows > 0 && cols > 0 && tile.get(0, 0) instanceof org.episteme.core.mathematics.numbers.real.RealBig;
+        // Use the scalar ring to robustly detect High Precision
+        boolean isHP = tile.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig;
         
         if (isHP) {
             // For High Precision, we serialize to ByteBuffer to preserve full accuracy.

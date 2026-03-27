@@ -11,8 +11,15 @@ package org.episteme.core.mathematics.numbers.real;
  */
 final class RealConstants {
 
-    static final Real ZERO = RealDouble.create(0.0);
-    static final Real ONE = RealDouble.create(1.0);
+    static final Real DOUBLE_ZERO = RealDouble.create(0.0);
+    static final Real DOUBLE_ONE = RealDouble.create(1.0);
+    
+    static final Real BIG_ZERO = RealBig.create(java.math.BigDecimal.ZERO);
+    static final Real BIG_ONE = RealBig.create(java.math.BigDecimal.ONE);
+
+    static final Real ZERO = DOUBLE_ZERO; // Legacy/Default
+    static final Real ONE = DOUBLE_ONE;   // Legacy/Default
+    
     static final Real NaN = RealDouble.create(Double.NaN);
     static final Real PI = RealDouble.create(Math.PI);
     static final Real E = RealDouble.create(Math.E);

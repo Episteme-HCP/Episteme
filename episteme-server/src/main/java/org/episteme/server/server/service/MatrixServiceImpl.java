@@ -200,6 +200,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             Object scalar;
             if (request.getIsComplex()) {
                scalar = Complex.of(request.getScalar(), request.getImaginary());
+            } else if (!request.getHpScalar().isEmpty()) {
+               scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(request.getHpScalar());
             } else {
                scalar = Real.of(request.getScalar());
             }
@@ -433,10 +435,10 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             int idx = 0;
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    raw[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(hpData.get(idx++));
+                    raw[i][j] = org.episteme.core.mathematics.numbers.real.RealBig.of(hpData.get(idx++));
                 }
             }
-            return org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix.of(raw, org.episteme.core.mathematics.numbers.real.Real.of("0"));
+            return org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix.of(raw, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
         }
 
         ByteString byteData = proto.getData();
@@ -468,9 +470,9 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             List<String> hpData = proto.getHpDataList();
             List<org.episteme.core.mathematics.numbers.real.Real> data = new ArrayList<>(size);
             for (String s : hpData) {
-                data.add(org.episteme.core.mathematics.numbers.real.Real.of(s));
+                data.add(org.episteme.core.mathematics.numbers.real.RealBig.of(s));
             }
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(data, org.episteme.core.mathematics.numbers.real.Real.of("0"));
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(data, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
         }
 
         ByteString byteData = proto.getData();

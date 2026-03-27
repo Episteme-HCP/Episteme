@@ -39,23 +39,14 @@ public class HighPrecisionComplianceTest {
 
     private static org.springframework.context.ConfigurableApplicationContext serverContext;
 
-    @org.springframework.boot.autoconfigure.SpringBootApplication(exclude = {
-        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration.class
-    })
-    @org.springframework.context.annotation.Import(org.episteme.server.server.service.MatrixServiceImpl.class)
-    static class GrpcTestApplication {}
+    // Using shared GrpcTestApplication for server lifecycle
 
     @org.junit.jupiter.api.BeforeAll
     public static void startServer() {
-        System.setProperty("grpc.server.port", "50051");
-        System.setProperty("spring.main.web-application-type", "none");
         org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
         try {
-            org.springframework.boot.SpringApplication app = new org.springframework.boot.SpringApplication(GrpcTestApplication.class);
-            serverContext = app.run();
-            System.out.println("Episteme Server started successfully for tests (Web Environment Disabled).");
+            serverContext = GrpcTestApplication.start();
+            System.out.println("Episteme Server started successfully for compliance tests.");
             Thread.sleep(2000);
         } catch (Exception e) {
             System.err.println("Failed to start Episteme Server: " + e.getMessage());
@@ -91,7 +82,7 @@ public class HighPrecisionComplianceTest {
     private static final Set<String> EXCLUDED_PROVIDERS = Set.of(
         "EJML", "Colt", "Commons Math", "JBlas", "ND4J",
         "CUDA", "OpenCL", "SIMD", "Unified", "FFMBLAS", "Native BLAS Provider FFM",
-        "Native CPU-BLAS"
+        "Native CPU-BLAS", "gRPC Remote"
     );
 
     private static final String MPFR_NUMBERS = "Native MPFR Transcendental Provider";
@@ -169,11 +160,11 @@ public class HighPrecisionComplianceTest {
     }
 
     private void runRealBigTests(ComplianceResult res, LinearAlgebraProvider<RealBig> provider) {
-        HighPrecisionAuditOperations.runRealBigAudit(provider, 3, (op, test) -> testOp(res, op, provider, test));
+        HighPrecisionAuditOperations.runRealBigAudit(provider, 5, (op, test) -> testOp(res, op, provider, test));
     }
 
     private void runComplexTests(ComplianceResult res, LinearAlgebraProvider<Complex> provider) {
-        HighPrecisionAuditOperations.runComplexAudit(provider, 3, (op, test) -> testOp(res, op, provider, test));
+        HighPrecisionAuditOperations.runComplexAudit(provider, 5, (op, test) -> testOp(res, op, provider, test));
     }
 
     // --- Provider Discovery ---

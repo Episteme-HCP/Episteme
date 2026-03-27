@@ -14,6 +14,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
 
+
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -31,13 +32,10 @@ public class HighPrecisionPerformanceTest {
     public static void startServer() {
         org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
         try {
-            org.springframework.boot.SpringApplication app = new org.springframework.boot.SpringApplication(org.episteme.server.server.EpistemeApplication.class);
-            app.setWebApplicationType(org.springframework.boot.WebApplicationType.NONE);
-            serverContext = app.run();
-            System.out.println("Episteme Server started successfully for tests (Web Environment Disabled).");
-            Thread.sleep(2000);
+            serverContext = GrpcTestApplication.start();
+            System.out.println("Episteme gRPC Test Server started successfully for performance benchmarks.");
         } catch (Exception e) {
-            System.err.println("Failed to start Episteme Server: " + e.getMessage());
+            System.err.println("Failed to start Episteme gRPC Test Server: " + e.getMessage());
         }
     }
 

@@ -391,7 +391,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
             for (int i = 0; i < rows; i++) {
                 for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
                     if (isComplex) {
-                        org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) vals[idx];
+                        Object val = vals[idx];
+                        org.episteme.core.mathematics.numbers.complex.Complex cv = (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) ? c : org.episteme.core.mathematics.numbers.complex.Complex.of((org.episteme.core.mathematics.numbers.real.Real) val);
                         setMPFR(vR, (E) cv.getReal(), arena, 0);
                         setMPFR(vI, (E) cv.getImaginary(), arena, 0);
                         
@@ -565,8 +566,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
         }
         
         String s = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
-        // mpfr_exp_t is long, but on Windows long is 32-bit.
-        long exp = expPtr.get(ValueLayout.JAVA_INT, 0); 
+        // Read as 32-bit signed int and cast to long to ensure sign extension (e.g. 0xFFFFFFFF -> -1L)
+        // This is critical on Windows where mpfr_exp_t is 32-bit.
+        long exp = (long) expPtr.get(ValueLayout.JAVA_INT, 0); 
         
         if (s.isEmpty() || s.equals("0")) {
              NativeSafe.invoke(MPFR_FREE_STR, strPtr);
@@ -778,7 +780,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
 
                 for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
                     int col = colIdx[idx];
-                    org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) vals[idx];
+                    Object val = vals[idx];
+                    org.episteme.core.mathematics.numbers.complex.Complex cv = (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) ? c : org.episteme.core.mathematics.numbers.complex.Complex.of((org.episteme.core.mathematics.numbers.real.Real) val);
                     
                     MemorySegment xr = getMPFR(h_x, col, 0, true);
                     MemorySegment xi = getMPFR(h_x, col, 1, true);
@@ -954,7 +957,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
             // Result is real for a.dot(a)
             MemorySegment realRes = res.asSlice(0, MPFR_LAYOUT.byteSize());
             NativeSafe.invoke(MPFR_SQRT, realRes, realRes, 0);
-            return (E) (Object) readMPFR(realRes, arena.allocate(ValueLayout.JAVA_LONG), arena);
+            Real r = readMPFR(realRes, arena.allocate(ValueLayout.JAVA_LONG), arena);
+            if (isComplex) {
+                return (E) (Object) Complex.of(r, Real.ZERO);
+            } else {
+                return (E) (Object) r;
+            }
         } catch (Throwable t) {
             throw new RuntimeException("Sparse MPFR norm failed", t);
         }
@@ -1030,7 +1038,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
             NativeSafe.invoke(MPFR_INIT2, vTmp, prec);
             MemorySegment resTmp = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, resTmp, prec);
-            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
 
             for (int i = 0; i < rows; i++) {
                 for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {

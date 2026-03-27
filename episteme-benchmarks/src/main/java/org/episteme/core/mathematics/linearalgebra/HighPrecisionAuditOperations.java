@@ -23,8 +23,8 @@ public class HighPrecisionAuditOperations {
     }
 
     public static void runRealBigAudit(LinearAlgebraProvider<RealBig> p, int n, AuditAction<RealBig> action) {
-        RealBig val = RealBig.create(new BigDecimal("0.12345678901234567890123456789012345678901234567890"));
-        RealBig val2 = RealBig.create(new BigDecimal("2.71828182845904523536028747135266249775724709369995"));
+        RealBig val = RealBig.create(new java.math.BigDecimal("0.12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"));
+        RealBig val2 = RealBig.create(new java.math.BigDecimal("2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193"));
         
         Matrix<RealBig> A = createRealBigMatrix(val, n, p);
         Matrix<RealBig> B = createRealBigMatrix(val2, n, p);

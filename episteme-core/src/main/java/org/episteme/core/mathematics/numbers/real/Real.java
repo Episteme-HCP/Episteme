@@ -43,11 +43,17 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     private static final long serialVersionUID = 1L;
 
     /** The real number 0 */
-    public static Real zeroE() { return RealConstants.ZERO; }
+    public static Real zeroE() { 
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
+            RealConstants.BIG_ZERO : RealConstants.DOUBLE_ZERO; 
+    }
     public static final Real ZERO = RealConstants.ZERO;
 
     /** The real number 1 */
-    public static Real oneE() { return RealConstants.ONE; }
+    public static Real oneE() { 
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
+            RealConstants.BIG_ONE : RealConstants.DOUBLE_ONE; 
+    }
     public static final Real ONE = RealConstants.ONE;
 
     /** The real number NaN */

@@ -791,8 +791,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         }
         
         String s = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
-        // mpfr_exp_t is long, but on Windows long is 32-bit.
-        long exp = expPtr.get(ValueLayout.JAVA_INT, 0); 
+        // Read as 32-bit signed int and cast to long to ensure sign extension (e.g. 0xFFFFFFFF -> -1L)
+        // This is critical on Windows where mpfr_exp_t is 32-bit.
+        long exp = (long) expPtr.get(ValueLayout.JAVA_INT, 0); 
         
         if (s.isEmpty() || s.equals("0")) {
              NativeSafe.invoke(MPFR_FREE_STR, strPtr);
