@@ -197,20 +197,24 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         );
     }
 
-    @Override public Matrix<E> exp(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_EXP); return r != null ? r : LinearAlgebraBackend.super.exp(a); }
-    @Override public Matrix<E> log(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_LOG); return r != null ? r : LinearAlgebraBackend.super.log(a); }
-    @Override public Matrix<E> log10(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_LOG10); return r != null ? r : LinearAlgebraBackend.super.log10(a); }
-    @Override public Matrix<E> sin(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_SIN); return r != null ? r : LinearAlgebraBackend.super.sin(a); }
-    @Override public Matrix<E> cos(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_COS); return r != null ? r : LinearAlgebraBackend.super.cos(a); }
-    @Override public Matrix<E> tan(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_TAN); return r != null ? r : LinearAlgebraBackend.super.tan(a); }
-    @Override public Matrix<E> asin(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_ASIN); return r != null ? r : LinearAlgebraBackend.super.asin(a); }
-    @Override public Matrix<E> acos(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_ACOS); return r != null ? r : LinearAlgebraBackend.super.acos(a); }
-    @Override public Matrix<E> atan(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_ATAN); return r != null ? r : LinearAlgebraBackend.super.atan(a); }
-    @Override public Matrix<E> sinh(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_SINH); return r != null ? r : LinearAlgebraBackend.super.sinh(a); }
-    @Override public Matrix<E> cosh(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_COSH); return r != null ? r : LinearAlgebraBackend.super.cosh(a); }
-    @Override public Matrix<E> tanh(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_TANH); return r != null ? r : LinearAlgebraBackend.super.tanh(a); }
-    @Override public Matrix<E> sqrt(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_SQRT); return r != null ? r : LinearAlgebraBackend.super.sqrt(a); }
-    @Override public Matrix<E> cbrt(Matrix<E> a) { Matrix<E> r = transcendentalOp(a, MPFR_CBRT); return r != null ? r : LinearAlgebraBackend.super.cbrt(a); }
+    @Override public Matrix<E> exp(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.exp(a); Matrix<E> r = transcendentalOp(a, MPFR_EXP); return r != null ? r : LinearAlgebraBackend.super.exp(a); }
+    @Override public Matrix<E> log(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.log(a); Matrix<E> r = transcendentalOp(a, MPFR_LOG); return r != null ? r : LinearAlgebraBackend.super.log(a); }
+    @Override public Matrix<E> log10(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.log10(a); Matrix<E> r = transcendentalOp(a, MPFR_LOG10); return r != null ? r : LinearAlgebraBackend.super.log10(a); }
+    @Override public Matrix<E> sin(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.sin(a); Matrix<E> r = transcendentalOp(a, MPFR_SIN); return r != null ? r : LinearAlgebraBackend.super.sin(a); }
+    @Override public Matrix<E> cos(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.cos(a); Matrix<E> r = transcendentalOp(a, MPFR_COS); return r != null ? r : LinearAlgebraBackend.super.cos(a); }
+    @Override public Matrix<E> tan(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.tan(a); Matrix<E> r = transcendentalOp(a, MPFR_TAN); return r != null ? r : LinearAlgebraBackend.super.tan(a); }
+    @Override public Matrix<E> asin(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.asin(a); Matrix<E> r = transcendentalOp(a, MPFR_ASIN); return r != null ? r : LinearAlgebraBackend.super.asin(a); }
+    @Override public Matrix<E> acos(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.acos(a); Matrix<E> r = transcendentalOp(a, MPFR_ACOS); return r != null ? r : LinearAlgebraBackend.super.acos(a); }
+    @Override public Matrix<E> atan(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.atan(a); Matrix<E> r = transcendentalOp(a, MPFR_ATAN); return r != null ? r : LinearAlgebraBackend.super.atan(a); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.sinh(a); Matrix<E> r = transcendentalOp(a, MPFR_SINH); return r != null ? r : LinearAlgebraBackend.super.sinh(a); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.cosh(a); Matrix<E> r = transcendentalOp(a, MPFR_COSH); return r != null ? r : LinearAlgebraBackend.super.cosh(a); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.tanh(a); Matrix<E> r = transcendentalOp(a, MPFR_TANH); return r != null ? r : LinearAlgebraBackend.super.tanh(a); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.sqrt(a); Matrix<E> r = transcendentalOp(a, MPFR_SQRT); return r != null ? r : LinearAlgebraBackend.super.sqrt(a); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.cbrt(a); Matrix<E> r = transcendentalOp(a, MPFR_CBRT); return r != null ? r : LinearAlgebraBackend.super.cbrt(a); }
+
+    private boolean isComplex(Matrix<E> a) {
+        return ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
 
     @Override
     public Matrix<E> pow(Matrix<E> a, E exponent) {
@@ -224,8 +228,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         if (handle == null) return null; // Let the caller decide the fallback
         int m = a.rows();
         int n = a.cols();
-        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        if (isComplex) return LinearAlgebraBackend.super.exp(a); // Fallback for complex
         long prec = getPrecision();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, false);

@@ -37,6 +37,38 @@ import java.util.*;
  */
 public class HighPrecisionComplianceTest {
 
+    private static org.springframework.context.ConfigurableApplicationContext serverContext;
+
+    @org.springframework.boot.autoconfigure.SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration.class
+    })
+    @org.springframework.context.annotation.Import(org.episteme.server.server.service.MatrixServiceImpl.class)
+    static class GrpcTestApplication {}
+
+    @org.junit.jupiter.api.BeforeAll
+    public static void startServer() {
+        System.setProperty("grpc.server.port", "50051");
+        System.setProperty("spring.main.web-application-type", "none");
+        org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
+        try {
+            org.springframework.boot.SpringApplication app = new org.springframework.boot.SpringApplication(GrpcTestApplication.class);
+            serverContext = app.run();
+            System.out.println("Episteme Server started successfully for tests (Web Environment Disabled).");
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            System.err.println("Failed to start Episteme Server: " + e.getMessage());
+        }
+    }
+
+    @org.junit.jupiter.api.AfterAll
+    public static void stopServer() {
+        if (serverContext != null) {
+            serverContext.close();
+        }
+    }
+
     private static final String PROJECT_NAME = System.getProperty("org.episteme.project.name", "Episteme");
     
     // Standard results directory
@@ -187,7 +219,7 @@ public class HighPrecisionComplianceTest {
             test.get();
             res.status.put(opName, "✅ PASS");
         } catch (UnsupportedOperationException e) {
-            res.status.put(opName, "❌ N/A");
+            res.status.put(opName, "❌ N/A (" + e.getMessage() + ")");
         } catch (Throwable e) {
             // Find root cause
             Throwable root = e;

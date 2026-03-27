@@ -18,6 +18,7 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.GenericSparseSolvers;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Field;
@@ -71,6 +72,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
     private static MethodHandle MPFR_SINH;
     private static MethodHandle MPFR_COSH;
     private static MethodHandle MPFR_TANH;
+    private static MethodHandle MPFR_CBRT;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -110,6 +112,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
                 MPFR_SINH = lookup(mpfr, "mpfr_sinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_COSH = lookup(mpfr, "mpfr_cosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_TANH = lookup(mpfr, "mpfr_tanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_CBRT = lookup(mpfr, "mpfr_cbrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null;
                 if (AVAILABLE) {
@@ -563,7 +566,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
         
         String s = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
         // mpfr_exp_t is long, but on Windows long is 32-bit.
-        long exp = expPtr.get(ValueLayout.JAVA_LONG, 0); 
+        long exp = expPtr.get(ValueLayout.JAVA_INT, 0); 
         
         if (s.isEmpty() || s.equals("0")) {
              NativeSafe.invoke(MPFR_FREE_STR, strPtr);
@@ -989,26 +992,30 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
         return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(newStorage, (org.episteme.core.mathematics.structures.rings.Ring<E>) sa.getScalarRing());
     }
 
-    @Override public Matrix<E> exp(Matrix<E> a) { return transcendentalOp(a, MPFR_EXP); }
-    @Override public Matrix<E> log(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG); }
-    @Override public Matrix<E> log10(Matrix<E> a) { return transcendentalOp(a, MPFR_LOG10); }
-    @Override public Matrix<E> sin(Matrix<E> a) { return transcendentalOp(a, MPFR_SIN); }
-    @Override public Matrix<E> cos(Matrix<E> a) { return transcendentalOp(a, MPFR_COS); }
-    @Override public Matrix<E> tan(Matrix<E> a) { return transcendentalOp(a, MPFR_TAN); }
-    @Override public Matrix<E> asin(Matrix<E> a) { return transcendentalOp(a, MPFR_ASIN); }
-    @Override public Matrix<E> acos(Matrix<E> a) { return transcendentalOp(a, MPFR_ACOS); }
-    @Override public Matrix<E> atan(Matrix<E> a) { return transcendentalOp(a, MPFR_ATAN); }
-    @Override public Matrix<E> sinh(Matrix<E> a) { return transcendentalOp(a, MPFR_SINH); }
-    @Override public Matrix<E> cosh(Matrix<E> a) { return transcendentalOp(a, MPFR_COSH); }
-    @Override public Matrix<E> tanh(Matrix<E> a) { return transcendentalOp(a, MPFR_TANH); }
+    @Override public Matrix<E> exp(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.exp(a); return transcendentalOp(a, MPFR_EXP); }
+    @Override public Matrix<E> log(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.log(a); return transcendentalOp(a, MPFR_LOG); }
+    @Override public Matrix<E> log10(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.log10(a); return transcendentalOp(a, MPFR_LOG10); }
+    @Override public Matrix<E> sin(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.sin(a); return transcendentalOp(a, MPFR_SIN); }
+    @Override public Matrix<E> cos(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.cos(a); return transcendentalOp(a, MPFR_COS); }
+    @Override public Matrix<E> tan(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.tan(a); return transcendentalOp(a, MPFR_TAN); }
+    @Override public Matrix<E> asin(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.asin(a); return transcendentalOp(a, MPFR_ASIN); }
+    @Override public Matrix<E> acos(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.acos(a); return transcendentalOp(a, MPFR_ACOS); }
+    @Override public Matrix<E> atan(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.atan(a); return transcendentalOp(a, MPFR_ATAN); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.sinh(a); return transcendentalOp(a, MPFR_SINH); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.cosh(a); return transcendentalOp(a, MPFR_COSH); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.tanh(a); return transcendentalOp(a, MPFR_TANH); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.sqrt(a); return transcendentalOp(a, MPFR_SQRT); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { if (isComplex(a)) return LinearAlgebraBackend.super.cbrt(a); return transcendentalOp(a, MPFR_CBRT); }
+
+    private boolean isComplex(Matrix<E> a) {
+        return ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
 
     private Matrix<E> transcendentalOp(Matrix<E> a, MethodHandle handle) {
         if (handle == null) return LinearAlgebraBackend.super.exp(a); 
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
         int rows = sa.rows();
         int cols = sa.cols();
-        boolean isComplex = ((Object)sa.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        if (isComplex) return LinearAlgebraBackend.super.exp(a); 
         long prec = getPrecision();
         
         org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
@@ -1023,7 +1030,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
             NativeSafe.invoke(MPFR_INIT2, vTmp, prec);
             MemorySegment resTmp = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, resTmp, prec);
-            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_INT);
 
             for (int i = 0; i < rows; i++) {
                 for (int idx = rowPtr[i]; idx < rowPtr[i+1]; idx++) {
@@ -1042,13 +1049,75 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
     }
 
     @Override
+    public Vector<E> add(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        Field<E> field = (Field<E>) a.getScalarRing();
+        @SuppressWarnings("unchecked")
+        E[] res = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), a.dimension());
+        for (int i = 0; i < a.dimension(); i++) res[i] = field.add(a.get(i), b.get(i));
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(res)), this, field);
+    }
+    
+    @Override
+    public Vector<E> subtract(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        Field<E> field = (Field<E>) a.getScalarRing();
+        @SuppressWarnings("unchecked")
+        E[] res = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), a.dimension());
+        for (int i = 0; i < a.dimension(); i++) res[i] = field.subtract(a.get(i), b.get(i));
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(res)), this, field);
+    }
+    
+
+    @Override
+    public E determinant(Matrix<E> a) {
+        return GenericLU.determinant(a, (Field<E>) a.getScalarRing());
+    }
+
+    @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return bicgstab(a, b, null, (E) Real.of("1e-25"), 1000);
+        Field<E> field = (Field<E>) a.getScalarRing();
+        E tolerance = (E) (field.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex ? 
+            org.episteme.core.mathematics.numbers.complex.Complex.of(1e-8, 0) : org.episteme.core.mathematics.numbers.real.Real.of("1e-8"));
+        
+        @SuppressWarnings("unchecked")
+        E[] x0Arr = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), a.rows());
+        for (int i = 0; i < x0Arr.length; i++) x0Arr[i] = field.zero();
+        Vector<E> x0 = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(x0Arr)), this, field);
+        
+        return bicgstab(a, b, x0, tolerance, 1000);
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        // Fallback to dense for inversion
-        return new NativeMPFRDenseLinearAlgebraBackend<E>().inverse(a);
+        return GenericLU.inverse(a, (Field<E>) a.getScalarRing(), this);
+    }
+
+    @Override
+    public LUResult<E> lu(Matrix<E> a) {
+        return GenericLU.decompose(a, (Field<E>) a.getScalarRing(), this);
+    }
+
+    @Override
+    public QRResult<E> qr(Matrix<E> a) {
+        return GenericQR.decompose(a, (Field<E>) a.getScalarRing(), this);
+    }
+
+    @Override
+    public SVDResult<E> svd(Matrix<E> a) {
+        return GenericSVD.decompose(a, (Field<E>) a.getScalarRing());
+    }
+
+    @Override
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing());
+    }
+
+    @Override
+    public EigenResult<E> eigen(Matrix<E> a) {
+        return GenericEigen.decompose(a, (Field<E>) a.getScalarRing());
     }
 }

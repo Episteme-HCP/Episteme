@@ -24,6 +24,29 @@ import java.util.*;
  */
 public class HighPrecisionCorrectnessTest {
 
+    private static org.springframework.context.ConfigurableApplicationContext serverContext;
+
+    @org.junit.jupiter.api.BeforeAll
+    public static void startServer() {
+        org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
+        try {
+            org.springframework.boot.SpringApplication app = new org.springframework.boot.SpringApplication(org.episteme.server.server.EpistemeApplication.class);
+            app.setWebApplicationType(org.springframework.boot.WebApplicationType.NONE);
+            serverContext = app.run();
+            System.out.println("Episteme Server started successfully for tests (Web Environment Disabled).");
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            System.err.println("Failed to start Episteme Server: " + e.getMessage());
+        }
+    }
+
+    @org.junit.jupiter.api.AfterAll
+    public static void stopServer() {
+        if (serverContext != null) {
+            serverContext.close();
+        }
+    }
+
     private static final int MATRIX_SIZE = 10;
     private static final BigDecimal TOLERANCE_REALBIG = new BigDecimal("1e-25");
     private static final double TOLERANCE_COMPLEX = 1e-8;
