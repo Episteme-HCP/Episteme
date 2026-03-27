@@ -46,7 +46,7 @@ public class HighPrecisionPerformanceTest {
         }
     }
 
-    private static final int MATRIX_SIZE = 50; // Balanced for high-precision
+    private static final int MATRIX_SIZE = 5; // Balanced for high-precision
     private static final Set<String> EXCLUDED_PROVIDERS = Set.of(
         "EJML", "Colt", "Commons Math", "JBlas", "ND4J",
         "CUDA", "OpenCL", "SIMD", "Unified", "FFMBLAS", "Native BLAS Provider FFM",

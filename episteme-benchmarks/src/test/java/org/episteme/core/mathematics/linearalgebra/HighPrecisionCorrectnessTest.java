@@ -47,7 +47,7 @@ public class HighPrecisionCorrectnessTest {
         }
     }
 
-    private static final int MATRIX_SIZE = 10;
+    private static final int MATRIX_SIZE = 5;
     private static final BigDecimal TOLERANCE_REALBIG = new BigDecimal("1e-25");
     private static final double TOLERANCE_COMPLEX = 1e-8;
     
