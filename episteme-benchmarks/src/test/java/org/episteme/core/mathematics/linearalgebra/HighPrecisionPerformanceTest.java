@@ -58,7 +58,7 @@ public class HighPrecisionPerformanceTest {
     @Test
     public void runPerformanceBenchmark() throws IOException {
         List<LinearAlgebraProvider<?>> providers = discoverHPProviders();
-        BenchmarkReporter reporter = new BenchmarkReporter("High-Precision Performance Audit");
+        BenchmarkReporter reporter = new BenchmarkReporter("High-Precision");
         reporter.setComments(
             "High-precision performance audit evaluating 68+ operations across diverse numeric domains (RealBig, Complex).\n" +
             "Metrics represent execution time in milliseconds (ms) for " + MATRIX_SIZE + "x" + MATRIX_SIZE + " matrices."

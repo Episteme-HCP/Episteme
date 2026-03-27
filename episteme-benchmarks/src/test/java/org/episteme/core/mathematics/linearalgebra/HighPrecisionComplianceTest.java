@@ -82,7 +82,7 @@ public class HighPrecisionComplianceTest {
     private static final Set<String> EXCLUDED_PROVIDERS = Set.of(
         "EJML", "Colt", "Commons Math", "JBlas", "ND4J",
         "CUDA", "OpenCL", "SIMD", "Unified", "FFMBLAS", "Native BLAS Provider FFM",
-        "Native CPU-BLAS", "gRPC Remote"
+        "Native CPU-BLAS"
     );
 
     private static final String MPFR_NUMBERS = "Native MPFR Transcendental Provider";

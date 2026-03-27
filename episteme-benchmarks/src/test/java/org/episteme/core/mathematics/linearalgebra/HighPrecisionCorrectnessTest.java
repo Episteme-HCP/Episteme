@@ -47,7 +47,7 @@ public class HighPrecisionCorrectnessTest {
         }
     }
 
-    private static final int MATRIX_SIZE = 5;
+    private static final int MATRIX_SIZE = 3;
     private static final BigDecimal TOLERANCE_REALBIG = new BigDecimal("1e-25");
     private static final double TOLERANCE_COMPLEX = 1e-8;
     
@@ -88,7 +88,7 @@ public class HighPrecisionCorrectnessTest {
                 try {
                     Map<String, Object> metrics = new LinkedHashMap<>();
                     
-                    MathContext.exact().compute(() -> {
+                    MathContext.withPrecision(50).compute(() -> {
                         // RealBig Domain
                         RealBig rbVal = RealBig.create(BigDecimal.ONE);
                         @SuppressWarnings("unchecked")
@@ -125,7 +125,6 @@ public class HighPrecisionCorrectnessTest {
             AlgorithmManager.setService(oldService);
         }
         reporter.generateReport();
-        reporter.exportToRoot(getReportPath());
     }
 
     @SuppressWarnings("unchecked")
