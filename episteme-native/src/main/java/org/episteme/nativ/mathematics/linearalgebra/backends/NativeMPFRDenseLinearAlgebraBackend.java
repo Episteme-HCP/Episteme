@@ -33,9 +33,9 @@ import static org.episteme.nativ.mathematics.analysis.NativeMPFRNumbers.*;
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, CPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, LinearAlgebraBackend.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
-public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, NativeBackend, CPUBackend {
+public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRDenseLinearAlgebraBackend.class);
     private static final Linker LINKER = Linker.nativeLinker();
@@ -175,7 +175,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
     @Override
     public double score(OperationContext context) {
         if (!AVAILABLE) return -1.0;
-        return 50.0;
+        
+        double base = getPriority(); // 120
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            base += 1000.0; // King of precision
+        }
+        return base;
     }
 
     @Override

@@ -556,15 +556,20 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         if (!data.getHpDataList().isEmpty()) {
             List<String> hpData = data.getHpDataList();
             List<List<E>> matrixRows = new ArrayList<>();
-            int idx = 0;
-            for (int i = 0; i < rows; i++) {
-                List<E> row = new ArrayList<>();
-                for (int j = 0; j < cols; j++) {
-                    row.add((E) org.episteme.core.mathematics.numbers.real.Real.of(hpData.get(idx++)));
+            org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                int idx = 0;
+                for (int i = 0; i < rows; i++) {
+                    List<E> row = new ArrayList<>();
+                    for (int j = 0; j < cols; j++) {
+                        row.add((E) org.episteme.core.mathematics.numbers.real.Real.of(hpData.get(idx++)));
+                    }
+                    matrixRows.add(row);
                 }
-                matrixRows.add(row);
-            }
-            return DenseMatrix.of(matrixRows, field);
+                return null;
+            });
+            @SuppressWarnings("unchecked")
+            Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
+            return DenseMatrix.of(matrixRows, hpField);
         }
 
         ByteString byteData = data.getData();
@@ -632,10 +637,15 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         if (!data.getHpDataList().isEmpty()) {
             List<String> hpData = data.getHpDataList();
             List<E> elements = new ArrayList<>();
-            for (String s : hpData) {
-                elements.add((E) org.episteme.core.mathematics.numbers.real.Real.of(s));
-            }
-            return DenseVector.of(elements, field);
+            org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                for (String s : hpData) {
+                    elements.add((E) org.episteme.core.mathematics.numbers.real.Real.of(s));
+                }
+                return null;
+            });
+            @SuppressWarnings("unchecked")
+            Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
+            return DenseVector.of(elements, hpField);
         }
 
         ByteString byteData = data.getData();
@@ -661,7 +671,9 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @SuppressWarnings("unchecked")
     private E fromProtoScalar(ScalarResponse response) {
         if (!response.getHpValue().isEmpty()) {
-            return (E) org.episteme.core.mathematics.numbers.real.Real.of(response.getHpValue());
+            return org.episteme.core.mathematics.context.MathContext.exact().compute(() -> 
+                (E) org.episteme.core.mathematics.numbers.real.Real.of(response.getHpValue())
+            );
         }
         if (response.getIsComplex()) {
             return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(response.getValue(), response.getImaginary());

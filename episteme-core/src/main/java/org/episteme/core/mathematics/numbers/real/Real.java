@@ -188,14 +188,20 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * @return the Real instance
      */
     public static Real of(String value) {
+        if (value == null || value.isEmpty()) return Real.ZERO;
+        String v = value.trim();
+        if (v.equalsIgnoreCase("NaN")) return Real.NaN;
+        if (v.equalsIgnoreCase("Infinity") || v.equalsIgnoreCase("+Infinity")) return Real.POSITIVE_INFINITY;
+        if (v.equalsIgnoreCase("-Infinity")) return Real.NEGATIVE_INFINITY;
+
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
-                return RealFloat.create(Float.parseFloat(value));
+                return RealFloat.create(Float.parseFloat(v));
             case EXACT:
-                return RealBig.create(new BigDecimal(value));
+                return RealBig.create(new BigDecimal(v));
             case NORMAL:
             default:
-                return RealDouble.create(Double.parseDouble(value));
+                return RealDouble.create(Double.parseDouble(v));
         }
     }
 

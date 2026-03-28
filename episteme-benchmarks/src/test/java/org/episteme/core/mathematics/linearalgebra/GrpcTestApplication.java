@@ -21,7 +21,8 @@ import org.episteme.server.server.service.MatrixServiceImpl;
 @SpringBootApplication(exclude = {
     DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class,
-    DataSourceTransactionManagerAutoConfiguration.class
+    DataSourceTransactionManagerAutoConfiguration.class,
+    org.springframework.cloud.vault.config.VaultAutoConfiguration.class
 })
 @Import(MatrixServiceImpl.class)
 public class GrpcTestApplication {
@@ -29,6 +30,7 @@ public class GrpcTestApplication {
     public static ConfigurableApplicationContext start() {
         System.setProperty("grpc.server.port", "50051");
         System.setProperty("spring.main.web-application-type", "none");
+        System.setProperty("spring.cloud.compatibility-verifier.enabled", "false");
         SpringApplication app = new SpringApplication(GrpcTestApplication.class);
         return app.run();
     }

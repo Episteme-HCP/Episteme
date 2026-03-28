@@ -38,7 +38,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, CPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, LinearAlgebraBackend.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
 public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
