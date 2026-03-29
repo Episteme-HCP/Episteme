@@ -78,6 +78,7 @@ public class HighPrecisionPerformanceTest {
                 Map<String, Object> metrics = new LinkedHashMap<>();
                 
                 // RealBig Domain
+                RealBig rbVal = RealBig.create(BigDecimal.ONE);
                 @SuppressWarnings("unchecked")
                 Ring<RealBig> rbRing = (Ring<RealBig>) (Object) rbVal.getScalarRing();
                 if (provider.isCompatible(rbRing)) {
