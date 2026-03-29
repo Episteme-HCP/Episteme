@@ -35,6 +35,7 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import com.google.auto.service.AutoService;
@@ -515,18 +516,31 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         int rows = matrix.rows();
         int cols = matrix.cols();
         
-        boolean isComplex = rows > 0 && cols > 0 && ((Object)matrix.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        boolean isHP = rows > 0 && cols > 0 && ((Object)matrix.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.real.RealBig;
+        // Correctly detect complex ring
+        Object zero = matrix.getScalarRing().zero();
+        boolean isComplex = zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        
+        boolean isHPContext = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        String zeroClass = zero.getClass().getName();
+        boolean isHPRing = zeroClass.contains("RealBig") || zeroClass.contains("Complex");
+        boolean finalIsHP = isHPContext || isHPRing;
 
         MatrixData.Builder builder = MatrixData.newBuilder()
                 .setRows(rows)
                 .setCols(cols)
                 .setIsComplex(isComplex);
 
-        if (isHP && !isComplex) {
+        if (finalIsHP) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    builder.addHpData(matrix.get(i, j).toString());
+                    E val = matrix.get(i, j);
+                    if (isComplex) {
+                        org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) val;
+                        builder.addHpData(c.getReal().toString());
+                        builder.addHpData(c.getImaginary().toString());
+                    } else {
+                        builder.addHpData(val.toString());
+                    }
                 }
             }
         } else {
@@ -559,29 +573,29 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         if (!data.getHpDataList().isEmpty()) {
             List<String> hpData = data.getHpDataList();
             List<List<E>> matrixRows = new ArrayList<>();
-                Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
+            // Use RealBig.ZERO or Complex for ring
+            Object ring = isComplex ? org.episteme.core.mathematics.numbers.complex.Complex.of(RealBig.ZERO, RealBig.ZERO) : RealBig.ZERO;
+            
             org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
                 int idx = 0;
                 for (int i = 0; i < rows; i++) {
                     List<E> row = new ArrayList<>();
                     for (int j = 0; j < cols; j++) {
-                        String s = hpData.get(idx++);
-                        Real val = org.episteme.core.mathematics.numbers.real.RealBig.of(s);
-                        
-                        // Prevent ClassCastException if val is RealDouble (e.g. NaN) but E is RealBig
-                        if (val instanceof org.episteme.core.mathematics.numbers.real.RealDouble && 
-                            !val.getClass().isAssignableFrom(hpField.zero().getClass())) {
-                            LOG.error("Type mismatch during gRPC reconstruction: received {} ('{}') but expected {}", 
-                                val.getClass().getSimpleName(), s, hpField.zero().getClass().getSimpleName());
-                            throw new ClassCastException("Incompatible element type from gRPC: " + val.getClass().getSimpleName() + " cannot be used for high-precision matrix");
+                        if (isComplex) {
+                            Real re = RealBig.of(hpData.get(idx++));
+                            Real im = RealBig.of(hpData.get(idx++));
+                            row.add((E) org.episteme.core.mathematics.numbers.complex.Complex.of(re, im));
+                        } else {
+                            String s = hpData.get(idx++);
+                            Real val = RealBig.of(s);
+                            row.add((E) val);
                         }
-                        row.add((E) val);
                     }
                     matrixRows.add(row);
                 }
                 return null;
             });
-            return DenseMatrix.of(matrixRows, hpField);
+            return DenseMatrix.of(matrixRows, (Field<E>) ring);
         }
 
         ByteString byteData = data.getData();
@@ -611,16 +625,34 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
 
     private VectorData toProtoVector(Vector<E> vector) {
         int size = vector.dimension();
-        boolean isComplex = size > 0 && ((Object)vector.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        boolean isHP = size > 0 && ((Object)vector.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.real.RealBig;
+        
+        // Correctly detect complex ring
+        Object zero = vector.getScalarRing().zero();
+        boolean isComplex = zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        
+        boolean isHPContext = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        String zeroClass = zero.getClass().getName();
+        boolean isHPRing = zeroClass.contains("RealBig") || zeroClass.contains("Complex");
+        boolean isHP = isHPContext || isHPRing;
+
+        System.err.println("[CLIENT-DEBUG] Serializing vector: " + size + 
+            ", hpContext=" + isHPContext + ", hpRing=" + isHPRing + 
+            ", finalIsHP=" + isHP + ", zeroClass=" + zeroClass);
 
         VectorData.Builder builder = VectorData.newBuilder()
                 .setSize(size)
                 .setIsComplex(isComplex);
 
-        if (isHP && !isComplex) {
+        if (isHP) {
             for (int i = 0; i < size; i++) {
-                builder.addHpData(vector.get(i).toString());
+                E val = vector.get(i);
+                if (isComplex) {
+                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) val;
+                    builder.addHpData(c.getReal().toString());
+                    builder.addHpData(c.getImaginary().toString());
+                } else {
+                    builder.addHpData(val.toString());
+                }
             }
         } else {
             int multiplier = isComplex ? 2 : 1;
@@ -629,11 +661,11 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
 
             for (int i = 0; i < size; i++) {
                 if (isComplex) {
-                   org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) vector.get(i);
-                   db.put(c.getReal().doubleValue());
-                   db.put(c.getImaginary().doubleValue());
+                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) vector.get(i);
+                    db.put(c.getReal().doubleValue());
+                    db.put(c.getImaginary().doubleValue());
                 } else {
-                   db.put(toDouble(vector.get(i)));
+                    db.put(toDouble(vector.get(i)));
                 }
             }
             builder.setData(ByteString.copyFrom(bb));
@@ -649,14 +681,23 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         if (!data.getHpDataList().isEmpty()) {
             List<String> hpData = data.getHpDataList();
             List<E> elements = new ArrayList<>();
+            // Use RealBig.ZERO or Complex for ring
+            Object ring = isComplex ? org.episteme.core.mathematics.numbers.complex.Complex.of(RealBig.ZERO, RealBig.ZERO) : RealBig.ZERO;
+            
             org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
-                for (String s : hpData) {
-                    elements.add((E) org.episteme.core.mathematics.numbers.real.RealBig.of(s));
+                int idx = 0;
+                while (idx < hpData.size()) {
+                    if (isComplex) {
+                        Real re = RealBig.of(hpData.get(idx++));
+                        Real im = RealBig.of(hpData.get(idx++));
+                        elements.add((E) org.episteme.core.mathematics.numbers.complex.Complex.of(re, im));
+                    } else {
+                        elements.add((E) RealBig.of(hpData.get(idx++)));
+                    }
                 }
                 return null;
             });
-                    Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
-            return DenseVector.of(elements, hpField);
+            return DenseVector.of(elements, (Field<E>) ring);
         }
 
         ByteString byteData = data.getData();
@@ -682,12 +723,19 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @SuppressWarnings("unchecked")
     private E fromProtoScalar(ScalarResponse response) {
         if (!response.getHpValue().isEmpty()) {
-            return org.episteme.core.mathematics.context.MathContext.exact().compute(() -> 
-                (E) org.episteme.core.mathematics.numbers.real.Real.of(response.getHpValue())
-            );
+            return org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                String val = response.getHpValue();
+                if (response.getIsComplex() && val.contains(";")) {
+                    String[] parts = val.split(";");
+                    return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(
+                        RealBig.of(parts[0]), RealBig.of(parts[1]));
+                }
+                return (E) org.episteme.core.mathematics.numbers.real.RealBig.of(val);
+            });
         }
         if (response.getIsComplex()) {
-            return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(response.getValue(), response.getImaginary());
+            return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(
+                Real.of(response.getValue()), Real.of(response.getImaginary()));
         } else {
             return (E) Real.of(response.getValue());
         }

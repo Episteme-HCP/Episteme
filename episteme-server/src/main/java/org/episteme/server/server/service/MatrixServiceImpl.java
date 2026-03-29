@@ -70,20 +70,23 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
      * Executes an operation with a guaranteed high-precision provider if requested.
      */
     private <P extends AlgorithmProvider, R> R executeHP(boolean hp, Class<P> providerClass, Function<P, R> operation) {
-        if (hp) {
-            return MathContext.exact().compute(() -> {
-                P prov = ProviderSelector.select(
-                        providerClass,
-                        OperationContext.DEFAULT,
-                        p -> p.getName().contains("MPFR") || p.getName().contains("Big") // Force HP-capable backend
-                );
-                LOG.debug("Selected High-Precision Provider: {} for {}", prov.getName(), providerClass.getSimpleName());
+        try {
+            if (hp) {
+                return MathContext.exact().compute(() -> {
+                    P prov = ProviderSelector.select(
+                            providerClass,
+                            OperationContext.DEFAULT,
+                            p -> p.getName().contains("MPFR") || p.getName().contains("Big") // Force HP-capable backend
+                    );
+                    return operation.apply(prov);
+                });
+            } else {
+                P prov = ProviderSelector.select(providerClass);
+                LOG.debug("Selected Standard Provider: {} for {}", prov.getName(), providerClass.getSimpleName());
                 return operation.apply(prov);
-            });
-        } else {
-            P prov = ProviderSelector.select(providerClass);
-            LOG.debug("Selected Standard Provider: {} for {}", prov.getName(), providerClass.getSimpleName());
-            return operation.apply(prov);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Execution failed", e);
         }
     }
 
@@ -542,12 +545,16 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
 
     /** Detects whether a MatrixData payload contains high-precision data. */
     private boolean isHPRequest(MatrixData data) {
-        return data != null && !data.getHpDataList().isEmpty();
+        if (data == null) return false;
+        boolean hpDataPresent = !data.getHpDataList().isEmpty();
+        return hpDataPresent;
     }
 
     /** Detects whether a VectorData payload contains high-precision data. */
     private boolean isHPRequest(VectorData data) {
-        return data != null && !data.getHpDataList().isEmpty();
+        if (data == null) return false;
+        boolean hpDataPresent = !data.getHpDataList().isEmpty();
+        return hpDataPresent;
     }
 
     private void handleError(String op, Exception e, StreamObserver<?> responseObserver) {
@@ -573,11 +580,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                     for (int j = 0; j < cols; j++) {
                         int currentIdx = idx.getAndIncrement();
                         String s = hpData.get(currentIdx);
-                        if (LOG.isDebugEnabled() && currentIdx < 10) {
-                            LOG.debug("Server reconstructing HP element [{},{}]: '{}'", i, j, s);
-                        }
                         try {
-                            raw[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(s);
+                            raw[i][j] = org.episteme.core.mathematics.numbers.real.RealBig.of(s);
                         } catch (Exception e) {
                             LOG.error("Failed to parse high-precision string at [{},{}]: '{}'", i, j, s);
                             throw e;
@@ -643,18 +647,42 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     private MatrixData toProto(Matrix<?> matrix) {
         int rows = matrix.rows();
         int cols = matrix.cols();
-        boolean isComplex = matrix.getScalarRing() instanceof Complex;
-        boolean isHP = matrix.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig;
+        
+        Object zero = matrix.getScalarRing().zero();
+        boolean isComplex = zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        
+        boolean isHPContextM = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        String zeroClass = zero.getClass().getName();
+        boolean isHPRingM = zeroClass.contains("RealBig") || zeroClass.contains("Complex");
+        
+        // Element-level check
+        boolean isHPElementsM = false;
+        if (!isHPRingM && rows > 0 && cols > 0) {
+            Object first = matrix.get(0, 0);
+            if (first != null) {
+                String firstClass = first.getClass().getName();
+                isHPElementsM = firstClass.contains("RealBig") || firstClass.contains("Complex");
+            }
+        }
+        
+        boolean isHPM = isHPContextM || isHPRingM || isHPElementsM;
 
         MatrixData.Builder builder = MatrixData.newBuilder()
                 .setRows(rows)
                 .setCols(cols)
                 .setIsComplex(isComplex);
 
-        if (isHP && !isComplex) {
+        if (isHPM) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    builder.addHpData(matrix.get(i, j).toString());
+                    Object val = matrix.get(i, j);
+                    if (isComplex) {
+                        org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) val;
+                        builder.addHpData(c.getReal().toString());
+                        builder.addHpData(c.getImaginary().toString());
+                    } else {
+                        builder.addHpData(val.toString());
+                    }
                 }
             }
         } else {
@@ -685,16 +713,40 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
 
     private VectorData toProto(Vector<?> vector) {
         int size = vector.dimension();
-        boolean isComplex = vector.getScalarRing() instanceof Complex;
-        boolean isHP = vector.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig;
+        
+        // Correctly detect complex ring
+        Object zero = vector.getScalarRing().zero();
+        boolean isComplex = zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        
+        boolean isHPContextV = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        String zeroClass = zero.getClass().getName();
+        boolean isHPRingV = zeroClass.contains("RealBig") || zeroClass.contains("Complex");
+        
+        // Element-level check
+        boolean isHPElementsV = false;
+        if (!isHPRingV && size > 0) {
+            Object first = vector.get(0);
+            if (first != null) {
+                String firstClass = first.getClass().getName();
+                isHPElementsV = firstClass.contains("RealBig") || firstClass.contains("Complex");
+            }
+        }
+        boolean isHPV = isHPContextV || isHPRingV || isHPElementsV;
 
         VectorData.Builder builder = VectorData.newBuilder()
                 .setSize(size)
                 .setIsComplex(isComplex);
 
-        if (isHP && !isComplex) {
+        if (isHPV) {
             for (int i = 0; i < size; i++) {
-                builder.addHpData(vector.get(i).toString());
+                Object val = vector.get(i);
+                if (isComplex) {
+                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) val;
+                    builder.addHpData(c.getReal().toString());
+                    builder.addHpData(c.getImaginary().toString());
+                } else {
+                    builder.addHpData(val.toString());
+                }
             }
         } else {
             int multiplier = isComplex ? 2 : 1;
@@ -716,10 +768,17 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     }
 
     private ScalarResponse toProtoScalar(Object scalar) {
-        if (scalar instanceof Complex c) {
+        if (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) {
+            boolean isHP = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+            if (isHP) {
+                return ScalarResponse.newBuilder()
+                        .setHpValue(c.getReal().toString() + ";" + c.getImaginary().toString())
+                        .setIsComplex(true)
+                        .build();
+            }
             return ScalarResponse.newBuilder()
-                    .setValue(c.real())
-                    .setImaginary(c.imaginary())
+                    .setValue(c.getReal().doubleValue())
+                    .setImaginary(c.getImaginary().doubleValue())
                     .setIsComplex(true)
                     .build();
         } else if (scalar instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
@@ -738,6 +797,9 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                     .setIsComplex(false)
                     .build();
         }
-        throw new IllegalArgumentException("Unknown scalar type: " + scalar.getClass());
+        return ScalarResponse.newBuilder()
+                .setValue(0.0)
+                .setIsComplex(false)
+                .build();
     }
 }

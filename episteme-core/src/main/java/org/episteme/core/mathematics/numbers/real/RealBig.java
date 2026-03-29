@@ -39,6 +39,8 @@ public final class RealBig extends Real {
     private static final Logger logger = LoggerFactory.getLogger(RealBig.class);
 
     public static final RealBig NaN = new RealBig(null);
+    public static final RealBig ZERO = new RealBig(BigDecimal.ZERO);
+    public static final RealBig ONE = new RealBig(BigDecimal.ONE);
     private final BigDecimal value;
 
     private RealBig(BigDecimal value) {
@@ -94,6 +96,16 @@ public final class RealBig extends Real {
         }
         return RealBig.create(value.divide(other.bigDecimalValue(), 
             org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
+    }
+
+    @Override
+    public Real zero() {
+        return ZERO;
+    }
+
+    @Override
+    public Real one() {
+        return ONE;
     }
 
     @Override
