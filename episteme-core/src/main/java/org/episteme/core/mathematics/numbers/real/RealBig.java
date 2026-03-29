@@ -38,10 +38,18 @@ import org.slf4j.LoggerFactory;
 public final class RealBig extends Real {
     private static final Logger logger = LoggerFactory.getLogger(RealBig.class);
 
+    public static final RealBig NaN = new RealBig(null);
     private final BigDecimal value;
 
     private RealBig(BigDecimal value) {
         this.value = value;
+    }
+
+    public static RealBig of(String s) {
+        if (s == null || "NaN".equalsIgnoreCase(s) || "Infinity".equalsIgnoreCase(s) || "-Infinity".equalsIgnoreCase(s)) {
+            return NaN;
+        }
+        return new RealBig(new BigDecimal(s));
     }
 
     public static RealBig create(BigDecimal value) {
@@ -332,7 +340,7 @@ public final class RealBig extends Real {
 
     @Override
     public boolean isNaN() {
-        return false; // BigDecimal cannot be NaN
+        return value == null;
     }
 
     @Override
@@ -347,6 +355,7 @@ public final class RealBig extends Real {
 
     @Override
     public BigDecimal bigDecimalValue() {
+        if (value == null) return BigDecimal.ZERO; // Or throw? Most places check isNaN
         return value;
     }
 
@@ -364,17 +373,19 @@ public final class RealBig extends Real {
             return true;
         if (!(obj instanceof Real))
             return false;
-        return value.compareTo(((Real) obj).bigDecimalValue()) == 0;
+        Real other = (Real) obj;
+        if (this.isNaN() || other.isNaN()) return false;
+        return value.compareTo(other.bigDecimalValue()) == 0;
     }
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return value == null ? 0 : value.hashCode();
     }
 
     @Override
     public String toString() {
-        return value.toString();
+        return value == null ? "NaN" : value.toString();
     }
 
     @Override

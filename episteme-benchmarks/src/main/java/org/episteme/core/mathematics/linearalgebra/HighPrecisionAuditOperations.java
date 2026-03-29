@@ -9,8 +9,6 @@ import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.function.BiConsumer;
 
 /**
  * Shared operations for High-Precision audits (Compliance, Correctness, Performance).

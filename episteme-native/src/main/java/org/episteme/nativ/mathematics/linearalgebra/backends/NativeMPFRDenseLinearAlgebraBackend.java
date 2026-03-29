@@ -5,28 +5,28 @@
 
 package org.episteme.nativ.mathematics.linearalgebra.backends;
 
+import com.google.auto.service.AutoService;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.Optional;
-import org.episteme.core.technical.backend.Backend;
-import org.episteme.core.technical.backend.ComputeBackend;
-import org.episteme.core.technical.backend.cpu.CPUBackend;
-import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.mathematics.structures.rings.Field;
+import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.structures.rings.Field;
-import org.episteme.nativ.technical.backend.nativ.NativeSafe;
+import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.auto.service.AutoService;
-import static org.episteme.nativ.mathematics.analysis.NativeMPFRNumbers.*;
 
 
 /**
@@ -35,9 +35,9 @@ import static org.episteme.nativ.mathematics.analysis.NativeMPFRNumbers.*;
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, LinearAlgebraBackend.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
-public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
+public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, NativeBackend, CPUBackend {
 
-    private static final Logger logger = LoggerFactory.getLogger(NativeMPFRDenseLinearAlgebraBackend.class);
+    private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");
     private static final Linker LINKER = Linker.nativeLinker();
     private static boolean AVAILABLE = false;
 
@@ -52,7 +52,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
     private static MethodHandle MPFR_DIV;
     private static MethodHandle MPFR_SET;
     private static MethodHandle MPFR_CMP_ABS;
-    private static MethodHandle MPFR_FREE_STR;
     private static MethodHandle MPFR_SET_UI;
     private static MethodHandle MPFR_CMP;
     private static MethodHandle MPFR_ZERO_P;
@@ -88,7 +87,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
             Optional<SymbolLookup> mpfrLookup = NativeFFMLoader.loadLibrary("mpfr", Arena.global());
             if (mpfrLookup.isPresent()) {
                 SymbolLookup mpfr = mpfrLookup.get();
-                MPFR_INIT2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+                MPFR_INIT2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_CLEAR = lookup(mpfr, "mpfr_clear", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
                 MPFR_SET_STR = lookup(mpfr, "mpfr_set_str", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
                 MPFR_GET_STR = lookup(mpfr, "mpfr_get_str", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
@@ -98,7 +97,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
                 MPFR_DIV = lookup(mpfr, "mpfr_div", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SET = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_CMP_ABS = lookup(mpfr, "mpfr_cmpabs", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-                MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
                 MPFR_SET_UI = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
                 MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
                 MPFR_ZERO_P = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
@@ -227,6 +225,19 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
             return transcendentalOp2(a, (org.episteme.core.mathematics.numbers.real.Real)exponent, MPFR_POW);
         }
         return LinearAlgebraBackend.super.pow(a, exponent);
+    }
+
+    private void diag(String msg) {
+        logger.error("[MPFR-DIAG] {}", msg);
+    }
+
+    private long getPrecision() {
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        int digits = ctx.getJavaMathContext().getPrecision();
+        if (digits <= 0) digits = 256; 
+        long prec = (long) (digits * 3.322) + 1;
+        diag("[MPFR-DIAG] Requested Precision: " + prec + " bits (from " + digits + " digits)");
+        return prec;
     }
 
     private Matrix<E> transcendentalOp(Matrix<E> a, MethodHandle handle) {
@@ -534,7 +545,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         int multiplier = isComplex ? 2 : 1;
         MemorySegment vec = arena.allocate(MPFR_LAYOUT, (long) dimension * multiplier);
         for (int i = 0; i < dimension * multiplier; i++) {
-            NativeSafe.invoke(MPFR_INIT2, vec.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            MemorySegment slot = vec.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, slot, prec);
+            NativeSafe.invoke(MPFR_SET_UI, slot, 0L, 0); // Crucial: Zero-init because init2 sets to NaN
         }
         return vec;
     }
@@ -685,17 +698,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         }
     }
 
-    private long getPrecision() {
-        int digits = org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext().getPrecision();
-        if (digits <= 0) digits = 50;
-        return (long) (digits * 3.322) + 1;
-    }
 
     private MemorySegment allocateMatrix(int rows, int cols, Arena arena, long prec, boolean isComplex) throws Throwable {
         int multiplier = isComplex ? 2 : 1;
         MemorySegment mat = arena.allocate(MPFR_LAYOUT, (long) rows * cols * multiplier);
         for (int i = 0; i < rows * cols * multiplier; i++) {
-            NativeSafe.invoke(MPFR_INIT2, mat.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            MemorySegment slot = mat.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, slot, prec);
+            NativeSafe.invoke(MPFR_SET_UI, slot, 0L, 0); // Crucial: Zero-init
         }
         return mat;
     }
@@ -718,6 +728,13 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
                 }
             }
         }
+        
+        // Debug sample
+        MemorySegment sample = getMPFR(mat, 0, 0, cols, 0, false);
+        MemorySegment ePtr = arena.allocate(ValueLayout.JAVA_INT);
+        Real checkVal = readMPFR(sample, ePtr, arena);
+        diag("[MPFR-DIAG] initMatrix verify[0,0]: expected=" + storage.get(0,0) + ", actuallyReads=" + checkVal);
+        
         return mat;
     }
 
@@ -789,54 +806,29 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         }
     }
 
-    private Real readMPFR(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
-        MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, val, 0);
-        if (strPtr == null || strPtr.equals(MemorySegment.NULL)) {
-            return Real.ZERO;
-        }
+    private Real readMPFR(MemorySegment mpfr_t, MemorySegment expPtr, Arena arena) {
+        MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0, mpfr_t, 0);
+        if (strPtr == null || strPtr.equals(MemorySegment.NULL)) return RealBig.NaN;
         
-        String s = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
-        // Read as 32-bit signed int and cast to long to ensure sign extension (e.g. 0xFFFFFFFF -> -1L)
-        // This is critical on Windows where mpfr_exp_t is 32-bit.
-        long exp = (long) expPtr.get(ValueLayout.JAVA_INT, 0); 
+        String digits = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
+        long exp = expPtr.get(ValueLayout.JAVA_LONG, 0);
         
-        if (s.isEmpty() || s.equals("0")) {
-             NativeSafe.invoke(MPFR_FREE_STR, strPtr);
-             return Real.ZERO;
-        }
-
-        // Special handling for MPFR NaN/Inf
-        String su = s.toUpperCase();
-        if (su.equals("NAN") || su.contains("@NAN@")) {
-            NativeSafe.invoke(MPFR_FREE_STR, strPtr);
-            return Real.NaN;
-        }
+        // Special handling for MPFR NaN/Inf in the string itself (rare but possible)
+        String su = digits.toUpperCase();
+        if (su.equals("NAN") || su.contains("@NAN@")) return RealBig.NaN;
         if (su.equals("INF") || su.contains("@INF@") || su.contains("INFINITY")) {
-            boolean neg = s.startsWith("-");
-            NativeSafe.invoke(MPFR_FREE_STR, strPtr);
-            return neg ? Real.NEGATIVE_INFINITY : Real.POSITIVE_INFINITY;
+            return RealBig.NaN; // RealBig doesn't support Inf yet, use NaN as safe fallback for now
         }
 
-        StringBuilder sb = new StringBuilder();
-        if (s.startsWith("-")) {
-            if (s.length() > 1) {
-                sb.append("-0.").append(s.substring(1));
-            } else {
-                sb.append("-0"); 
-            }
-        } else {
-            sb.append("0.").append(s);
+        String sign = "";
+        if (digits.startsWith("-")) {
+            sign = "-";
+            digits = digits.substring(1);
         }
-        sb.append("E").append(exp);
-        NativeSafe.invoke(MPFR_FREE_STR, strPtr);
         
-        try {
-            return org.episteme.core.mathematics.numbers.real.Real.of(new java.math.BigDecimal(sb.toString()));
-        } catch (NumberFormatException e) {
-            logger.error("Failed to parse MPFR string: '{}' (exp={}) - Final string: '{}'", s, exp, sb);
-            if (s.contains("@")) return Real.NaN;
-            throw new RuntimeException("Invalid MPFR numeric string: " + sb + " (Original: " + s + ", Exp: " + exp + ")", e);
-        }
+        if (digits.isEmpty() || digits.equals("0")) return RealBig.of("0");
+        
+        return RealBig.of(sign + "0." + digits + "E" + exp);
     }
     @Override
     public QRResult<E> qr(Matrix<E> a) {
@@ -952,7 +944,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
             Matrix<E> lMat = backToMatrix_internal(h_L, n, n, arena, a.getScalarRing(), isComplex);
             Matrix<E> uMat = backToMatrix_internal(h_U, n, n, arena, a.getScalarRing(), isComplex);
             
-            @SuppressWarnings("unchecked")
             E[] pData = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), n);
             for (int i = 0; i < n; i++) {
                 if (isComplex) pData[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(perm[i]));
@@ -1407,7 +1398,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
             }
             
             // The determinant is now in detComp
-            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_INT); 
             E resDet;
             if (isComplex) {
                 resDet = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(

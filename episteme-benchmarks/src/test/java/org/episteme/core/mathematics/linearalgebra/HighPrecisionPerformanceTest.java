@@ -78,21 +78,20 @@ public class HighPrecisionPerformanceTest {
                 Map<String, Object> metrics = new LinkedHashMap<>();
                 
                 // RealBig Domain
-                RealBig rbVal = RealBig.create(BigDecimal.ONE);
                 @SuppressWarnings("unchecked")
                 Ring<RealBig> rbRing = (Ring<RealBig>) (Object) rbVal.getScalarRing();
                 if (provider.isCompatible(rbRing)) {
                     @SuppressWarnings("unchecked")
-                    LinearAlgebraProvider<RealBig> realBigProvider = (LinearAlgebraProvider<RealBig>) (Object) provider;
-                    benchmarkRealBig(metrics, realBigProvider);
+                    LinearAlgebraProvider<RealBig> rbProvider = (LinearAlgebraProvider<RealBig>) (Object) provider;
+                    benchmarkRealBig(metrics, rbProvider);
                 }
 
                 // Complex Domain
                 Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
                 if (provider.isCompatible(complexRing)) {
                     @SuppressWarnings("unchecked")
-                    LinearAlgebraProvider<Complex> complexProvider = (LinearAlgebraProvider<Complex>) (Object) provider;
-                    benchmarkComplex(metrics, complexProvider);
+                    LinearAlgebraProvider<Complex> cProvider = (LinearAlgebraProvider<Complex>) (Object) provider;
+                    benchmarkComplex(metrics, cProvider);
                 }
 
                 BenchmarkResult res = new BenchmarkResult(

@@ -5,7 +5,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import org.ejml.simple.SimpleMatrix;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -13,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AlgorithmService;
 import org.episteme.core.technical.algorithm.TestingAlgorithmService;
-import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.linearalgebra.Vector;
 
 /**
  * Systematic compliance test for all LinearAlgebraProvider implementations.

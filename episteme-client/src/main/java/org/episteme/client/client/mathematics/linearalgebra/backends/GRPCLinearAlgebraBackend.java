@@ -46,6 +46,8 @@ import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A LinearAlgebraProvider that offloads operations to a remote gRPC service.
@@ -66,6 +68,7 @@ import java.util.concurrent.TimeUnit;
  */
 @AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.class, org.episteme.core.technical.backend.ComputeBackend.class, Backend.class})
 public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E>, LinearAlgebraBackend<E>, org.episteme.core.technical.backend.ComputeBackend {
+    private static final Logger LOG = LoggerFactory.getLogger(GRPCLinearAlgebraBackend.class);
 
     private ManagedChannel channel;
     private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
@@ -556,19 +559,28 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         if (!data.getHpDataList().isEmpty()) {
             List<String> hpData = data.getHpDataList();
             List<List<E>> matrixRows = new ArrayList<>();
+                Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
             org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
                 int idx = 0;
                 for (int i = 0; i < rows; i++) {
                     List<E> row = new ArrayList<>();
                     for (int j = 0; j < cols; j++) {
-                        row.add((E) org.episteme.core.mathematics.numbers.real.Real.of(hpData.get(idx++)));
+                        String s = hpData.get(idx++);
+                        Real val = org.episteme.core.mathematics.numbers.real.RealBig.of(s);
+                        
+                        // Prevent ClassCastException if val is RealDouble (e.g. NaN) but E is RealBig
+                        if (val instanceof org.episteme.core.mathematics.numbers.real.RealDouble && 
+                            !val.getClass().isAssignableFrom(hpField.zero().getClass())) {
+                            LOG.error("Type mismatch during gRPC reconstruction: received {} ('{}') but expected {}", 
+                                val.getClass().getSimpleName(), s, hpField.zero().getClass().getSimpleName());
+                            throw new ClassCastException("Incompatible element type from gRPC: " + val.getClass().getSimpleName() + " cannot be used for high-precision matrix");
+                        }
+                        row.add((E) val);
                     }
                     matrixRows.add(row);
                 }
                 return null;
             });
-            @SuppressWarnings("unchecked")
-            Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
             return DenseMatrix.of(matrixRows, hpField);
         }
 
@@ -639,12 +651,11 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
             List<E> elements = new ArrayList<>();
             org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
                 for (String s : hpData) {
-                    elements.add((E) org.episteme.core.mathematics.numbers.real.Real.of(s));
+                    elements.add((E) org.episteme.core.mathematics.numbers.real.RealBig.of(s));
                 }
                 return null;
             });
-            @SuppressWarnings("unchecked")
-            Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
+                    Field<E> hpField = (Field<E>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO;
             return DenseVector.of(elements, hpField);
         }
 

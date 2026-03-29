@@ -207,6 +207,26 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
     }
 
     @Override
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        Matrix<E> aDense = toDense(a);
+        return new NativeMPFRDenseLinearAlgebraBackend<E>().solve(aDense, b);
+    }
+
+    private Matrix<E> toDense(Matrix<E> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        org.episteme.core.mathematics.structures.rings.Ring<E> ring = m.getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, ring.zero());
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                storage.set(i, j, m.get(i, j));
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage, this, ring);
+    }
+
+    @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         Matrix<E> res = multiply(a, b.toMatrix());
         int m = res.rows();
@@ -1060,7 +1080,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
     public Vector<E> add(Vector<E> a, Vector<E> b) {
         if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         Field<E> field = (Field<E>) a.getScalarRing();
-        @SuppressWarnings("unchecked")
         E[] res = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), a.dimension());
         for (int i = 0; i < a.dimension(); i++) res[i] = field.add(a.get(i), b.get(i));
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(
@@ -1071,32 +1090,15 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
         if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         Field<E> field = (Field<E>) a.getScalarRing();
-        @SuppressWarnings("unchecked")
         E[] res = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), a.dimension());
         for (int i = 0; i < a.dimension(); i++) res[i] = field.subtract(a.get(i), b.get(i));
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(
             new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(res)), this, field);
     }
-    
 
     @Override
     public E determinant(Matrix<E> a) {
         return GenericLU.determinant(a, (Field<E>) a.getScalarRing());
-    }
-
-    @Override
-    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        Field<E> field = (Field<E>) a.getScalarRing();
-        E tolerance = (E) (field.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex ? 
-            org.episteme.core.mathematics.numbers.complex.Complex.of(1e-8, 0) : org.episteme.core.mathematics.numbers.real.Real.of("1e-8"));
-        
-        @SuppressWarnings("unchecked")
-        E[] x0Arr = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), a.rows());
-        for (int i = 0; i < x0Arr.length; i++) x0Arr[i] = field.zero();
-        Vector<E> x0 = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(
-            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(x0Arr)), this, field);
-        
-        return bicgstab(a, b, x0, tolerance, 1000);
     }
 
     @Override

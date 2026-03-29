@@ -57,16 +57,6 @@ public class HighPrecisionCorrectnessTest {
         "Native CPU-BLAS"
     );
 
-    private String getReportPath() {
-        String customPath = System.getProperty("org.episteme.report.path");
-        if (customPath != null && !customPath.isEmpty()) return customPath;
-
-        String userDir = System.getProperty("user.dir");
-        java.nio.file.Path rootPath = java.nio.file.Paths.get(userDir);
-        if (rootPath.endsWith("episteme-benchmarks")) rootPath = rootPath.getParent();
-        return rootPath.resolve("docs/HIGH_PRECISION_CORRECTNESS_REPORT.md").toString();
-    }
-
     @Test
     public void runNumericalCorrectnessAudit() {
         AlgorithmService oldService = AlgorithmManager.getService();
@@ -94,13 +84,17 @@ public class HighPrecisionCorrectnessTest {
                         @SuppressWarnings("unchecked")
                         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) rbVal.getScalarRing();
                         if (prov.isCompatible(rbRing)) {
-                            auditRealBigCorrectness(metrics, (LinearAlgebraProvider<RealBig>) (Object) prov);
+                            @SuppressWarnings("unchecked")
+                            LinearAlgebraProvider<RealBig> providerRB = (LinearAlgebraProvider<RealBig>) (Object) prov;
+                            auditRealBigCorrectness(metrics, providerRB, rbRing);
                         }
                         
                         // Complex Domain
                         Ring<Complex> cRing = Complex.of(1.0, 0.0).getScalarRing();
                         if (prov.isCompatible(cRing)) {
-                            auditComplexCorrectness(metrics, (LinearAlgebraProvider<Complex>) (Object) prov);
+                            @SuppressWarnings("unchecked")
+                            LinearAlgebraProvider<Complex> providerC = (LinearAlgebraProvider<Complex>) (Object) prov;
+                            auditComplexCorrectness(metrics, providerC, cRing);
                         }
                         return null;
                     });
@@ -127,14 +121,11 @@ public class HighPrecisionCorrectnessTest {
         reporter.generateReport();
     }
 
-    @SuppressWarnings("unchecked")
-    private void auditRealBigCorrectness(Map<String, Object> metrics, LinearAlgebraProvider<RealBig> p) {
-        LinearAlgebraProvider<RealBig> groundTruth = (LinearAlgebraProvider<RealBig>) (Object) getGroundTruthProvider(RealBig.ZERO.getScalarRing());
+    private void auditRealBigCorrectness(Map<String, Object> metrics, LinearAlgebraProvider<RealBig> p, Ring<RealBig> ring) {
+        @SuppressWarnings("unchecked")
+        LinearAlgebraProvider<RealBig> groundTruth = (LinearAlgebraProvider<RealBig>) AlgorithmManager.getService().getProvider(LinearAlgebraProvider.class);
         HighPrecisionAuditOperations.runRealBigAudit(p, MATRIX_SIZE, (op, test) -> {
             test(metrics, op, p, test, () -> {
-                // To get the expected result, we must run the audit on the ground truth provider
-                // But HighPrecisionAuditOperations recreates the inputs.
-                // This is slightly inefficient but ensures consistency.
                 final Object[] refRes = new Object[1];
                 HighPrecisionAuditOperations.runRealBigAudit(groundTruth, MATRIX_SIZE, (refOp, refTest) -> {
                     if (refOp.equals(op)) refRes[0] = refTest.get();
@@ -144,9 +135,9 @@ public class HighPrecisionCorrectnessTest {
         });
     }
 
-    @SuppressWarnings("unchecked")
-    private void auditComplexCorrectness(Map<String, Object> metrics, LinearAlgebraProvider<Complex> p) {
-        LinearAlgebraProvider<Complex> groundTruth = (LinearAlgebraProvider<Complex>) (Object) getGroundTruthProvider(Complex.of(0, 0).getScalarRing());
+    private void auditComplexCorrectness(Map<String, Object> metrics, LinearAlgebraProvider<Complex> p, Ring<Complex> ring) {
+        @SuppressWarnings("unchecked")
+        LinearAlgebraProvider<Complex> groundTruth = (LinearAlgebraProvider<Complex>) AlgorithmManager.getService().getProvider(LinearAlgebraProvider.class);
         HighPrecisionAuditOperations.runComplexAudit(p, MATRIX_SIZE, (op, test) -> {
             test(metrics, op, p, test, () -> {
                 final Object[] refRes = new Object[1];
@@ -184,10 +175,6 @@ public class HighPrecisionCorrectnessTest {
         } catch (Throwable ex) {
             metrics.put(op, "❌ FAIL: " + ex.getMessage());
         }
-    }
-
-    private <E> LinearAlgebraProvider<E> getGroundTruthProvider(Ring<E> ring) {
-        return new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<>((org.episteme.core.mathematics.structures.rings.Field<E>) ring);
     }
 
     private <E> void assertNoFallback(LinearAlgebraProvider<E> p, Object result) {

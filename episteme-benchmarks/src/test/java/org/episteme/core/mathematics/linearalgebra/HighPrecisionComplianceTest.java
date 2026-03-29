@@ -12,15 +12,10 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-
 import org.episteme.core.technical.algorithm.AlgorithmService;
-import org.episteme.core.technical.algorithm.TestingAlgorithmService;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.io.IOException;
 import java.util.*;
+import java.io.IOException;
 
 
 
@@ -62,11 +57,6 @@ public class HighPrecisionComplianceTest {
 
     private static final String PROJECT_NAME = System.getProperty("org.episteme.project.name", "Episteme");
     
-    // Standard results directory
-    
-    private String getTimestamp() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-    }
     
     private String getReportPath() {
         String customPath = System.getProperty("org.episteme.report.path");
@@ -85,7 +75,6 @@ public class HighPrecisionComplianceTest {
         "Native CPU-BLAS"
     );
 
-    private static final String MPFR_NUMBERS = "Native MPFR Transcendental Provider";
     private static final String CPU_DENSE = "Episteme CPU (Dense)";
 
     private static class ComplianceResult {
@@ -94,6 +83,7 @@ public class HighPrecisionComplianceTest {
         Map<String, String> status = new LinkedHashMap<>();
     }
     @Test
+    @SuppressWarnings("unchecked")
     public void generateHighPrecisionReport() {
 
         List<LinearAlgebraProvider<?>> providers = discoverHPProviders();

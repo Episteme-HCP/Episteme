@@ -38,10 +38,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.context.MathContext;
-import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.mathematics.structures.rings.RingElement;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.ProviderSelector;
 
@@ -54,7 +51,6 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
@@ -571,18 +567,25 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         if (!proto.getHpDataList().isEmpty()) {
             List<String> hpData = proto.getHpDataList();
             org.episteme.core.mathematics.numbers.real.Real[][] raw = new org.episteme.core.mathematics.numbers.real.Real[rows][cols];
-            int idx = 0;
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    String s = hpData.get(idx++);
-                    try {
-                        raw[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(s);
-                    } catch (Exception e) {
-                        LOG.error("Failed to parse high-precision string at [{},{}]: '{}'", i, j, s);
-                        throw e;
+            java.util.concurrent.atomic.AtomicInteger idx = new java.util.concurrent.atomic.AtomicInteger(0);
+            org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        int currentIdx = idx.getAndIncrement();
+                        String s = hpData.get(currentIdx);
+                        if (LOG.isDebugEnabled() && currentIdx < 10) {
+                            LOG.debug("Server reconstructing HP element [{},{}]: '{}'", i, j, s);
+                        }
+                        try {
+                            raw[i][j] = org.episteme.core.mathematics.numbers.real.Real.of(s);
+                        } catch (Exception e) {
+                            LOG.error("Failed to parse high-precision string at [{},{}]: '{}'", i, j, s);
+                            throw e;
+                        }
                     }
                 }
-            }
+                return null;
+            });
             return org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix.of(raw, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
         }
 
