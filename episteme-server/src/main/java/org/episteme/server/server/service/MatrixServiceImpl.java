@@ -86,7 +86,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                 return operation.apply(prov);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Execution failed", e);
+            throw new RuntimeException("Execution failed: " + e.getMessage(), e);
         }
     }
 
@@ -177,10 +177,11 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             boolean hp = isHPRequest(request.getMatrix());
             executeHP(hp, LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
-                Matrix<?> result = prov.inverse(matrix);
-                responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+                Matrix<?> result = ((LinearAlgebraProvider<Object>) prov).inverse(matrix);
+                MatrixData protoResult = toProto(result);
+                responseObserver.onNext(MatrixResponse.newBuilder().setResult(protoResult).build());
                 responseObserver.onCompleted();
-                return null;
+                return result;
             });
         } catch (Exception e) {
             handleError("matrixInverse", e, responseObserver);

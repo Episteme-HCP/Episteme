@@ -87,7 +87,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
             Optional<SymbolLookup> mpfrLookup = NativeFFMLoader.loadLibrary("mpfr", Arena.global());
             if (mpfrLookup.isPresent()) {
                 SymbolLookup mpfr = mpfrLookup.get();
-                MPFR_INIT2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_INIT2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
                 MPFR_CLEAR = lookup(mpfr, "mpfr_clear", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
                 MPFR_SET_STR = lookup(mpfr, "mpfr_set_str", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
                 MPFR_GET_STR = lookup(mpfr, "mpfr_get_str", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
@@ -731,7 +731,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         
         // Debug sample
         MemorySegment sample = getMPFR(mat, 0, 0, cols, 0, false);
-        MemorySegment ePtr = arena.allocate(ValueLayout.JAVA_INT);
+        MemorySegment ePtr = arena.allocate(ValueLayout.JAVA_LONG);
         Real checkVal = readMPFR(sample, ePtr, arena);
         diag("[MPFR-DIAG] initMatrix verify[0,0]: expected=" + storage.get(0,0) + ", actuallyReads=" + checkVal);
         
@@ -828,7 +828,26 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         
         if (digits.isEmpty() || digits.equals("0")) return RealBig.of("0");
         
-        return RealBig.of(sign + "0." + digits + "E" + exp);
+        // Guard against exponent overflow for BigDecimal (int range)
+        // The exponent from mpfr_get_str represents where the decimal point goes:
+        // digits = "12345", exp = 3 means 123.45
+        // We construct: sign + "0." + digits, then adjust by exp
+        // Effective exponent for BigDecimal = exp - digits.length()
+        long effectiveScale = (long) digits.length() - exp;
+        if (effectiveScale > Integer.MAX_VALUE || effectiveScale < Integer.MIN_VALUE) {
+            // Truly extreme exponent — value is effectively 0 or infinity for our purposes
+            if (exp > 0) return RealBig.NaN; // overflow  
+            return RealBig.of("0"); // underflow
+        }
+        
+        try {
+            java.math.BigInteger unscaled = new java.math.BigInteger(sign + digits);
+            return RealBig.create(new java.math.BigDecimal(unscaled, (int) effectiveScale));
+        } catch (NumberFormatException e) {
+            logger.warn("readMPFR: Failed to parse MPFR value (digits={}, exp={}): {}", 
+                digits.length(), exp, e.getMessage());
+            return RealBig.NaN;
+        }
     }
     @Override
     public QRResult<E> qr(Matrix<E> a) {
@@ -1319,7 +1338,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
             return res;
         } catch (Throwable t) {
             logger.error("MPFR inverse failed: {}", t.getMessage());
-            throw new RuntimeException("MPFR inverse failed", t);
+            throw new RuntimeException("MPFR inverse failed: " + t.toString(), t);
         }
     }
 
@@ -1398,7 +1417,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
             }
             
             // The determinant is now in detComp
-            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_INT); 
+            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG); 
             E resDet;
             if (isComplex) {
                 resDet = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(
