@@ -28,8 +28,13 @@ public class GenericSVD {
         EigenResult<E> eigenV = GenericEigen.decompose(selfAdjV, field);
         Matrix<E> V = eigenV.V();
         
+        // Use a more generic class if possible to avoid precision leakage
+        Class<?> componentType = field.zero().getClass();
+        if (Real.class.isAssignableFrom(componentType)) componentType = Real.class;
+        if (Complex.class.isAssignableFrom(componentType)) componentType = Complex.class;
+
         @SuppressWarnings("unchecked")
-        E[] sValues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), Math.min(m, n));
+        E[] sValues = (E[]) java.lang.reflect.Array.newInstance(componentType, Math.min(m, n));
         for (int i = 0; i < sValues.length; i++) {
             E val = eigenV.D().get(i); // Use eigenvalues of A^T*A
             // Ensure non-negative before sqrt
@@ -59,6 +64,14 @@ public class GenericSVD {
     }
 
     private static <E> E max(E a, E b, Field<E> field) {
+        if (a instanceof Real && b instanceof Real) {
+            return ((Real) a).compareTo((Real) b) >= 0 ? a : b;
+        }
+        if (a instanceof Complex && b instanceof Complex) {
+            // Singular values of A^T*A are real even for complex A
+            return ((Complex) a).abs().compareTo(((Complex) b).abs()) >= 0 ? a : b;
+        }
+        
         double aD = absValueDouble(a, field);
         double bD = absValueDouble(b, field);
         return (aD >= bD) ? a : b;

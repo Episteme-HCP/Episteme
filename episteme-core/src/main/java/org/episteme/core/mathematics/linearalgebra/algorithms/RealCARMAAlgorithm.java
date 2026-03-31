@@ -25,8 +25,13 @@ public class RealCARMAAlgorithm {
         }
 
         org.episteme.core.mathematics.structures.rings.Ring<E> ring = A.getScalarRing();
+        
+        Class<?> componentType = ring.zero().getClass();
+        if (org.episteme.core.mathematics.numbers.real.Real.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.real.Real.class;
+        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+
         @SuppressWarnings("unchecked")
-        E[][] res = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m, n);
+        E[][] res = (E[][]) java.lang.reflect.Array.newInstance(componentType, m, n);
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 res[i][j] = ring.zero();

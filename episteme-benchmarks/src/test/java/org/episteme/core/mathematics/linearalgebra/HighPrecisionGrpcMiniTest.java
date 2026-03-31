@@ -75,8 +75,8 @@ public class HighPrecisionGrpcMiniTest {
                 }
             }
 
-            // Use RealBig.ZERO as ring to ensure correct HP detection on the wire
-            Matrix<Real> A = Matrix.of(data, (org.episteme.core.mathematics.structures.rings.Ring<Real>)(Object) RealBig.ZERO);
+            // Use Real.ring() to ensure correct HP detection on the wire
+            Matrix<Real> A = Matrix.of(data, Real.ring());
             
             System.out.println("[MiniTest] Matrix A ring zero type: " + A.getScalarRing().zero().getClass().getName());
             System.out.println("[MiniTest] Matrix A[0,0] type: " + A.get(0, 0).getClass().getName());

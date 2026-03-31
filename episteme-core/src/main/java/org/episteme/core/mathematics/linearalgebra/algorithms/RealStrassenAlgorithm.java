@@ -55,8 +55,13 @@ public class RealStrassenAlgorithm {
 
     private static <E> Matrix<E> combine(Matrix<E> C11, Matrix<E> C12, Matrix<E> C21, Matrix<E> C22) {
         int n = C11.rows() * 2;
+        
+        Class<?> componentType = C11.getScalarRing().zero().getClass();
+        if (org.episteme.core.mathematics.numbers.real.Real.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.real.Real.class;
+        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+
         @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(C11.getScalarRing().zero().getClass(), n, n);
+        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(componentType, n, n);
         int half = n / 2;
         
         for (int i = 0; i < half; i++) {
@@ -81,10 +86,15 @@ public class RealStrassenAlgorithm {
 
         // Simple padding for now. A better way would be dynamic peeling.
         org.episteme.core.mathematics.structures.rings.Ring<E> ring = A.getScalarRing();
+        
+        Class<?> componentType = ring.zero().getClass();
+        if (org.episteme.core.mathematics.numbers.real.Real.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.real.Real.class;
+        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+
         @SuppressWarnings("unchecked")
-        E[][] aPadded = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), p, p);
+        E[][] aPadded = (E[][]) java.lang.reflect.Array.newInstance(componentType, p, p);
         @SuppressWarnings("unchecked")
-        E[][] bPadded = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), p, p);
+        E[][] bPadded = (E[][]) java.lang.reflect.Array.newInstance(componentType, p, p);
         E zero = ring.zero();
         
         for(int i=0; i<p; i++) {
@@ -106,8 +116,13 @@ public class RealStrassenAlgorithm {
         int k = A.cols();
         int n = B.cols();
         org.episteme.core.mathematics.structures.rings.Ring<E> ring = A.getScalarRing();
+
+        Class<?> componentType = ring.zero().getClass();
+        if (org.episteme.core.mathematics.numbers.real.Real.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.real.Real.class;
+        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(componentType)) componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+
         @SuppressWarnings("unchecked")
-        E[][] res = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m, n);
+        E[][] res = (E[][]) java.lang.reflect.Array.newInstance(componentType, m, n);
         
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {

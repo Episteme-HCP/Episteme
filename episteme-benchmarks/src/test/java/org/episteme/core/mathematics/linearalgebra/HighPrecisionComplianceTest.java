@@ -120,8 +120,10 @@ public class HighPrecisionComplianceTest {
                 rawProvider.getName().contains("gRPC") || rawProvider.getName().contains("Remote")) {
                 
                 // Always add CPU Dense and CPU Sparse as baseline fallbacks
+                // AND include HP-capable providers for gRPC server-side execution in same JVM
                 for (LinearAlgebraProvider<?> p : discoverHPProviders()) {
-                    if (p.getName().equals(CPU_DENSE) || p.getName().equals("Episteme CPU (Sparse)")) {
+                    if (p.getName().equals(CPU_DENSE) || p.getName().equals("Episteme CPU (Sparse)") ||
+                        p.getName().contains("MPFR") || p.getName().contains("Big")) {
                         allowed.add(p);
                     }
                 }

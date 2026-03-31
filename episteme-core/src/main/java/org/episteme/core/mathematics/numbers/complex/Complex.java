@@ -464,8 +464,12 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
 
     /**
      * Returns the ring structure for complex numbers.
-     * @return this instance (as it implements Field<Complex>)
+     * @return the singleton/context-aware field instance
      */
+    public static org.episteme.core.mathematics.structures.rings.Ring<Complex> ring() {
+        return ZERO;
+    }
+
     public org.episteme.core.mathematics.structures.rings.Ring<Complex> getScalarRing() {
         return this;
     }

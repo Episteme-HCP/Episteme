@@ -30,10 +30,8 @@ public class HighPrecisionCorrectnessTest {
     public static void startServer() {
         org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
         try {
-            org.springframework.boot.SpringApplication app = new org.springframework.boot.SpringApplication(org.episteme.server.server.EpistemeApplication.class);
-            app.setWebApplicationType(org.springframework.boot.WebApplicationType.NONE);
-            serverContext = app.run();
-            System.out.println("Episteme Server started successfully for tests (Web Environment Disabled).");
+            serverContext = GrpcTestApplication.start();
+            System.out.println("Episteme Server started successfully for correctness audit.");
             Thread.sleep(2000);
         } catch (Exception e) {
             System.err.println("Failed to start Episteme Server: " + e.getMessage());
@@ -54,7 +52,7 @@ public class HighPrecisionCorrectnessTest {
     private static final Set<String> EXCLUDED_PROVIDERS = Set.of(
         "EJML", "Colt", "Commons Math", "JBlas", "ND4J",
         "CUDA", "OpenCL", "SIMD", "Unified", "FFMBLAS", "Native BLAS Provider FFM",
-        "Native CPU-BLAS"
+        "Native CPU-BLAS", "gRPC", "Remote"
     );
 
     @Test
