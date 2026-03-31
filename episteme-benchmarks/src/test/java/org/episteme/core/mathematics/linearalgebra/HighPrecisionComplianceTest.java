@@ -113,10 +113,11 @@ public class HighPrecisionComplianceTest {
                 allowed.add(p);
             }
             
-            // 2. Leaf and Sparse fallbacks for distributed/recursive providers
+            // 2. Leaf and Sparse fallbacks for distributed/recursive providers (and gRPC bridge)
             if (rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider ||
                 rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider ||
-                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider) {
+                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider ||
+                rawProvider.getName().contains("gRPC") || rawProvider.getName().contains("Remote")) {
                 
                 // Always add CPU Dense and CPU Sparse as baseline fallbacks
                 for (LinearAlgebraProvider<?> p : discoverHPProviders()) {

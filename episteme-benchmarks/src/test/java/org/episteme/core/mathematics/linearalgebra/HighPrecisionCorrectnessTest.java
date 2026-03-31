@@ -118,7 +118,20 @@ public class HighPrecisionCorrectnessTest {
         } finally {
             AlgorithmManager.setService(oldService);
         }
-        reporter.generateReport();
+        
+        String reportPath = getReportPath();
+        System.out.println("[INFO] Exporting correctness report to: " + reportPath);
+        reporter.exportMarkdown(reportPath);
+    }
+
+    private String getReportPath() {
+        String customPath = System.getProperty("org.episteme.report.path");
+        if (customPath != null && !customPath.isEmpty()) return customPath;
+        
+        String userDir = System.getProperty("user.dir");
+        java.nio.file.Path rootPath = java.nio.file.Paths.get(userDir);
+        if (rootPath.endsWith("episteme-benchmarks")) rootPath = rootPath.getParent();
+        return rootPath.resolve("docs/HIGH_PRECISION_CORRECTNESS_REPORT.md").toString();
     }
 
     private void auditRealBigCorrectness(Map<String, Object> metrics, LinearAlgebraProvider<RealBig> p, Ring<RealBig> ring) {

@@ -73,11 +73,19 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         try {
             if (hp) {
                 return MathContext.exact().compute(() -> {
-                    P prov = ProviderSelector.select(
-                            providerClass,
-                            OperationContext.DEFAULT,
-                            p -> p.getName().contains("MPFR") || p.getName().contains("Big") // Force HP-capable backend
-                    );
+                    P prov;
+                    try {
+                        prov = ProviderSelector.select(
+                                providerClass,
+                                OperationContext.DEFAULT,
+                                p -> p.getName().contains("MPFR") || p.getName().contains("Big") // Force HP-capable backend
+                        );
+                    } catch (java.util.NoSuchElementException e) {
+                        // Fallback to best available if no strict HP is found (prevents crash if native libs missing)
+                        prov = ProviderSelector.select(providerClass);
+                        LOG.warn("No strict HP provider (MPFR/Big) found for {}. Falling back to best available: {}", 
+                            providerClass.getSimpleName(), prov.getName());
+                    }
                     return operation.apply(prov);
                 });
             } else {
