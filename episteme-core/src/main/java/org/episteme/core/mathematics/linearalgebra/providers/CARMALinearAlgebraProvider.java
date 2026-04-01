@@ -39,9 +39,12 @@ public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
+        boolean isHighPrecision = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() || 
+                                 a.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig;
+        
         // Generic CARMA implementation
-        // SIMD fast path
-        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
+        // SIMD fast path - ONLY for standard double precision
+        if (!isHighPrecision && a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
             return (Matrix<E>) (Matrix<?>) RealDoubleCARMAAlgorithm.multiply(
                     (SIMDRealDoubleMatrix) a, (SIMDRealDoubleMatrix) b);
         }

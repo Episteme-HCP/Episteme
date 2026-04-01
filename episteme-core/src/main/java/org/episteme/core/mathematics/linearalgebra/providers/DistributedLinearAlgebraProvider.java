@@ -66,11 +66,12 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     @SuppressWarnings("unchecked")
     private <R> R executeOnLocal(Ring<E> ring, java.util.function.Function<LinearAlgebraProvider<E>, R> operation) {
         org.episteme.core.technical.algorithm.OperationContext.Builder builder = new org.episteme.core.technical.algorithm.OperationContext.Builder();
-        if (ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex)) {
+        boolean isHighPrecision = ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex);
+        if (isHighPrecision) {
             builder.addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION);
         }
         
-        return org.episteme.core.technical.algorithm.ProviderSelector.execute(
+        R result = org.episteme.core.technical.algorithm.ProviderSelector.execute(
             LinearAlgebraProvider.class, 
             builder.build(), 
             p -> {
@@ -80,6 +81,20 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
                 return operation.apply((LinearAlgebraProvider<E>) (Object) p);
             }
         );
+
+        // Safety check to avoid ClassCastException (RealDouble -> RealBig)
+        if (isHighPrecision && result instanceof Matrix<?> m) {
+            if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+            }
+        }
+        if (isHighPrecision && result instanceof Vector<?> v) {
+            if (v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -321,11 +336,12 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     @SuppressWarnings("unchecked")
     private <R> R executeOnSparseLocal(Ring<E> ring, java.util.function.Function<SparseLinearAlgebraProvider<E>, R> operation) {
         org.episteme.core.technical.algorithm.OperationContext.Builder builder = new org.episteme.core.technical.algorithm.OperationContext.Builder();
-        if (ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex)) {
+        boolean isHighPrecision = ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex);
+        if (isHighPrecision) {
             builder.addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION);
         }
 
-        return org.episteme.core.technical.algorithm.ProviderSelector.execute(
+        R result = org.episteme.core.technical.algorithm.ProviderSelector.execute(
             SparseLinearAlgebraProvider.class, 
             builder.build(), 
             p -> {
@@ -334,6 +350,19 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
                 return operation.apply((SparseLinearAlgebraProvider<E>) (Object) p);
             }
         );
+
+        if (isHighPrecision && result instanceof Matrix<?> m) {
+            if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+            }
+        }
+        if (isHighPrecision && result instanceof Vector<?> v) {
+            if (v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+            }
+        }
+
+        return result;
     }
 
     private Matrix<E> wrap(Matrix<E> m) {

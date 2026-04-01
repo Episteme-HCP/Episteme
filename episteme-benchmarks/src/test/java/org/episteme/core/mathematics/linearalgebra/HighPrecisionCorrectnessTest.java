@@ -24,24 +24,25 @@ import java.util.*;
  */
 public class HighPrecisionCorrectnessTest {
 
-    private static org.springframework.context.ConfigurableApplicationContext serverContext;
+    private static org.episteme.benchmarks.util.ServerOrchestrator orchestrator;
 
     @org.junit.jupiter.api.BeforeAll
     public static void startServer() {
         org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
         try {
-            serverContext = GrpcTestApplication.start();
+            orchestrator = new org.episteme.benchmarks.util.ServerOrchestrator();
+            orchestrator.startServer();
             System.out.println("Episteme Server started successfully for correctness audit.");
-            Thread.sleep(2000);
         } catch (Exception e) {
-            System.err.println("Failed to start Episteme Server: " + e.getMessage());
+            System.err.println("Failed to start Episteme Server via Orchestrator: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     @org.junit.jupiter.api.AfterAll
     public static void stopServer() {
-        if (serverContext != null) {
-            serverContext.close();
+        if (orchestrator != null) {
+            orchestrator.stopAll();
         }
     }
 

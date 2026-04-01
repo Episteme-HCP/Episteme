@@ -40,14 +40,17 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        // SIMD fast path
-        if (a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
+        boolean isHighPrecision = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() || 
+                                 a.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig;
+        
+        // SIMD fast path - ONLY for standard double precision
+        if (!isHighPrecision && a instanceof SIMDRealDoubleMatrix && b instanceof SIMDRealDoubleMatrix) {
             return (Matrix<E>) (Matrix<?>) RealDoubleStrassenAlgorithm.multiply(
                     (SIMDRealDoubleMatrix) a, (SIMDRealDoubleMatrix) b);
         }
         
-        // Fast path for RealDoubleMatrix
-        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix && b instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+        // Fast path for RealDoubleMatrix - ONLY for standard double precision
+        if (!isHighPrecision && a instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix && b instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
             org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rda = (org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) a;
             org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rdb = (org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) b;
             SIMDRealDoubleMatrix simda = new SIMDRealDoubleMatrix(a.rows(), a.cols(), rda.toDoubleArray());
