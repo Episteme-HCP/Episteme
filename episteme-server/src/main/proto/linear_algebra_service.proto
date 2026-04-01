@@ -6,6 +6,8 @@ option java_multiple_files = true;
 option java_package = "org.episteme.server.server.proto";
 option java_outer_classname = "LinearAlgebraServiceProto";
 
+import "common_types.proto";
+
 service MatrixService {
   // Matrix operations
   rpc MatrixMultiply (MatrixRequest) returns (MatrixResponse);
@@ -68,10 +70,12 @@ message EigenResponse {
 message MatrixRequest {
   MatrixData matrix_a = 1;
   MatrixData matrix_b = 2;
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message SingleMatrixRequest {
   MatrixData matrix = 1;
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message ScaleRequest {
@@ -80,6 +84,7 @@ message ScaleRequest {
   double imaginary = 3;
   bool is_complex = 4;
   string hp_scalar = 5; // For high-precision scalars (RealBig)
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message MatrixResponse {
@@ -97,10 +102,12 @@ message MatrixData {
 message VectorRequest {
   VectorData vector_a = 1;
   VectorData vector_b = 2;
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message SingleVectorRequest {
   VectorData vector = 1;
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message VectorScaleRequest {
@@ -109,6 +116,7 @@ message VectorScaleRequest {
   double imaginary = 3;
   bool is_complex = 4;
   string hp_scalar = 5; // For high-precision scalars
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message VectorResponse {
@@ -125,6 +133,7 @@ message VectorData {
 message MatrixVectorRequest {
   MatrixData matrix = 1;
   VectorData vector = 2;
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message ScalarResponse {
@@ -139,6 +148,7 @@ message IterativeSolverRequest {
   VectorData x0 = 3;
   ScalarResponse tolerance = 4;
   int32 max_iterations = 5;
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message GMRESRequest {
@@ -148,4 +158,5 @@ message GMRESRequest {
   ScalarResponse tolerance = 4;
   int32 max_iterations = 5;
   int32 restart = 6;
+  org.episteme.computing.common.NumericalContext context = 10;
 }

@@ -80,6 +80,19 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
                 Real.of(magnitude * Math.sin(phase)));
     }
 
+    public static Complex valueOf(String realStr, String imagStr) {
+        return new Complex(Real.valueOf(realStr), Real.valueOf(imagStr));
+    }
+
+    public static Complex valueOf(String s) {
+        if (s.contains(";")) {
+            String[] parts = s.split(";");
+            return valueOf(parts[0], parts[1]);
+        }
+        return of(Real.valueOf(s));
+    }
+
+
     public Real getReal() {
         return real;
     }
@@ -469,6 +482,7 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
     public static org.episteme.core.mathematics.structures.rings.Ring<Complex> ring() {
         return ZERO;
     }
+
 
     public org.episteme.core.mathematics.structures.rings.Ring<Complex> getScalarRing() {
         return this;

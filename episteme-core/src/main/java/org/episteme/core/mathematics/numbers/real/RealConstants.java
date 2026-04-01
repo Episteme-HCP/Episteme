@@ -24,6 +24,10 @@ final class RealConstants {
     static final Real PI = RealDouble.create(Math.PI);
     static final Real E = RealDouble.create(Math.E);
     
+    // High Precision constants
+    static final Real BIG_PI = RealBig.create(new java.math.BigDecimal("3.1415926535897932384626433832795028841971693993751"));
+    static final Real BIG_E = RealBig.create(new java.math.BigDecimal("2.7182818284590452353602874713526624977572470936999"));
+
     static final Real TWO = RealDouble.create(2.0);
     static final Real TWO_PI = RealDouble.create(2.0 * Math.PI);
     static final Real HALF_PI = RealDouble.create(Math.PI / 2.0);
@@ -32,6 +36,7 @@ final class RealConstants {
     
     static final Real LN2 = RealDouble.create(Math.log(2.0));
     static final Real LN10 = RealDouble.create(Math.log(10.0));
+
 
     private RealConstants() {}
 }

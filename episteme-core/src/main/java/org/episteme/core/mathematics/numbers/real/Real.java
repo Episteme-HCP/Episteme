@@ -61,12 +61,19 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     public static final Real NaN = RealConstants.NaN;
 
     /** The real number PI */
-    public static Real piE() { return RealConstants.PI; }
+    public static Real piE() { 
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
+            RealConstants.BIG_PI : RealConstants.PI; 
+    }
     public static final Real PI = RealConstants.PI;
 
     /** The real number E */
-    public static Real eE() { return RealConstants.E; }
+    public static Real eE() { 
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
+            RealConstants.BIG_E : RealConstants.E; 
+    }
     public static final Real E = RealConstants.E;
+
 
     /** The real number 2 */
     public static Real twoE() { return RealConstants.TWO; }
@@ -204,6 +211,11 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
                 return RealDouble.create(Double.parseDouble(v));
         }
     }
+
+    public static Real valueOf(String value) {
+        return of(value);
+    }
+
 
     // Package-private constructor
     Real() {
@@ -584,8 +596,9 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     }
 
     public static org.episteme.core.mathematics.structures.rings.Ring<Real> ring() {
-        return ZERO;
+        return org.episteme.core.mathematics.sets.Reals.getInstance();
     }
+
 
     /**
      * Returns the ring structure for real numbers.
