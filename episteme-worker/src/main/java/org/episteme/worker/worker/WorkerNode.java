@@ -30,6 +30,8 @@ import org.episteme.core.distributed.ComputationException;
 import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.distributed.TaskRegistry;
 import org.episteme.server.server.proto.*;
+import org.episteme.server.server.proto.common.NumericalContext;
+import org.episteme.core.mathematics.context.MathContext;
 
 import java.io.*;
 import java.util.Optional;
@@ -148,7 +150,31 @@ public class WorkerNode {
         logger.debug("Received task: {} type: {}", task.getTaskId(), task.getTaskType());
 
         try {
-            byte[] resultBytes = executeTask(task);
+            // Reconcile NumericalContext from proto
+            NumericalContext contextProto = task.getContext();
+            MathContext context;
+            if (contextProto != null && !contextProto.equals(NumericalContext.getDefaultInstance())) {
+                switch (contextProto.getRealPrecision()) {
+                    case EXACT -> context = MathContext.exact();
+                    case FAST -> context = MathContext.fast();
+                    default -> context = MathContext.normal();
+                }
+                if (contextProto.getMathContextPrecision() > 0) {
+                    context = MathContext.withPrecision(contextProto.getMathContextPrecision());
+                }
+            } else {
+                context = MathContext.getCurrent();
+            }
+
+            // Wrap execution in the reconciled context
+            byte[] resultBytes = context.compute(() -> {
+                try {
+                    return executeTask(task);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
             blockingStub.submitResult(TaskResult.newBuilder()
                     .setTaskId(task.getTaskId())
                     .setStatus(Status.COMPLETED)

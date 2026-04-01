@@ -41,6 +41,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.ProviderSelector;
+import org.episteme.server.server.proto.common.NumericalContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,32 +68,60 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     private static final Logger LOG = LoggerFactory.getLogger(MatrixServiceImpl.class);
 
     /**
-     * Executes an operation with a guaranteed high-precision provider if requested.
+     * Reconciles gRPC NumericalContext into a core MathContext.
      */
-    private <P extends AlgorithmProvider, R> R executeHP(boolean hp, Class<P> providerClass, Function<P, R> operation) {
+    private MathContext reconcileContext(NumericalContext proto) {
+        if (proto == null || proto.equals(NumericalContext.getDefaultInstance())) {
+            return MathContext.getCurrent();
+        }
+
+        MathContext context;
+        switch (proto.getRealPrecision()) {
+            case EXACT -> context = MathContext.exact();
+            case FAST -> context = MathContext.fast();
+            default -> context = MathContext.normal();
+        }
+
+        if (proto.getMathContextPrecision() > 0) {
+            context = MathContext.withPrecision(proto.getMathContextPrecision());
+        }
+
+        return context;
+    }
+
+    /**
+     * Executes an operation with governance from NumericalContext.
+     */
+    private <P extends AlgorithmProvider, R> R executeWithContext(NumericalContext context, Class<P> providerClass, Function<P, R> operation) {
         try {
-            if (hp) {
-                return MathContext.exact().compute(() -> {
-                    P prov;
-                    try {
+            MathContext mc = reconcileContext(context);
+            return mc.compute(() -> {
+                P prov;
+                try {
+                    // Use metadata from context if available (backend preference)
+                    String backendId = context.getBackendId();
+                    if (!backendId.isEmpty()) {
                         prov = ProviderSelector.select(
                                 providerClass,
                                 OperationContext.DEFAULT,
-                                p -> p.getName().contains("MPFR") || p.getName().contains("Big") // Force HP-capable backend
+                                p -> p.getName().equalsIgnoreCase(backendId) || p.getClass().getName().contains(backendId)
                         );
-                    } catch (java.util.NoSuchElementException e) {
-                        // Fallback to best available if no strict HP is found (prevents crash if native libs missing)
+                    } else if (mc.isHighPrecision()) {
+                        prov = ProviderSelector.select(
+                                providerClass,
+                                OperationContext.DEFAULT,
+                                p -> p.getName().contains("MPFR") || p.getName().contains("Big")
+                        );
+                    } else {
                         prov = ProviderSelector.select(providerClass);
-                        LOG.warn("No strict HP provider (MPFR/Big) found for {}. Falling back to best available: {}", 
-                            providerClass.getSimpleName(), prov.getName());
                     }
-                    return operation.apply(prov);
-                });
-            } else {
-                P prov = ProviderSelector.select(providerClass);
-                LOG.debug("Selected Standard Provider: {} for {}", prov.getName(), providerClass.getSimpleName());
+                } catch (java.util.NoSuchElementException e) {
+                    prov = ProviderSelector.select(providerClass);
+                    LOG.warn("Requested provider/precision not fully matched for {}. Falling back to: {}", 
+                        providerClass.getSimpleName(), prov.getName());
+                }
                 return operation.apply(prov);
-            }
+            });
         } catch (Exception e) {
             throw new RuntimeException("Execution failed: " + e.getMessage(), e);
         }
@@ -101,9 +130,8 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @Override
     public void matrixMultiply(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrixA()) || isHPRequest(request.getMatrixB());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
-                LOG.debug("Received Matrix Multiplication request (HP={})", hp);
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                LOG.debug("Received Matrix Multiplication request");
 
                 Matrix<?> matrixA = fromProto(request.getMatrixA());
                 Matrix<?> matrixB = fromProto(request.getMatrixB());
@@ -129,8 +157,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixAdd(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrixA()) || isHPRequest(request.getMatrixB());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> m1 = (Matrix<Object>) fromProto(request.getMatrixA());
                 Matrix<Object> m2 = (Matrix<Object>) fromProto(request.getMatrixB());
                 Matrix<?> result = prov.add(m1, m2);
@@ -147,8 +174,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixSubtract(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrixA()) || isHPRequest(request.getMatrixB());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> m1 = (Matrix<Object>) fromProto(request.getMatrixA());
                 Matrix<Object> m2 = (Matrix<Object>) fromProto(request.getMatrixB());
                 Matrix<?> result = prov.subtract(m1, m2);
@@ -165,8 +191,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixTranspose(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Matrix<?> result = prov.transpose(matrix);
                 responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
@@ -182,8 +207,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixInverse(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Matrix<?> result = ((LinearAlgebraProvider<Object>) prov).inverse(matrix);
                 MatrixData protoResult = toProto(result);
@@ -200,8 +224,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixScale(ScaleRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix()) || !request.getHpScalar().isEmpty();
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Object scalar;
                 if (request.getIsComplex()) {
@@ -225,8 +248,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixDeterminant(SingleMatrixRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Object det = prov.determinant(matrix);
                 responseObserver.onNext(toProtoScalar(det));
@@ -242,8 +264,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void vectorAdd(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getVectorA()) || isHPRequest(request.getVectorB());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
                 Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
                 Vector<?> result = prov.add(v1, v2);
@@ -260,8 +281,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void vectorSubtract(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getVectorA()) || isHPRequest(request.getVectorB());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
                 Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
                 Vector<?> result = prov.subtract(v1, v2);
@@ -278,8 +298,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void vectorScale(VectorScaleRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getVector()) || !request.getHpScalar().isEmpty();
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
                 Object scalar;
                 if (request.getIsComplex()) {
@@ -303,8 +322,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void vectorDot(VectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getVectorA()) || isHPRequest(request.getVectorB());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
                 Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
                 Object dot = prov.dot(v1, v2);
@@ -321,8 +339,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void vectorNorm(SingleVectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getVector());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
                 Object norm = prov.norm(vector);
                 responseObserver.onNext(toProtoScalar(norm));
@@ -338,8 +355,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixVectorMultiply(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix()) || isHPRequest(request.getVector());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
                 Vector<?> result = prov.multiply(matrix, vector);
@@ -356,8 +372,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void linearSolve(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix()) || isHPRequest(request.getVector());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
                 Vector<Object> result = prov.solve(matrix, vector);
@@ -374,8 +389,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixLU(SingleMatrixRequest request, StreamObserver<LUResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 LUResult<Object> result = prov.lu(matrix);
                 responseObserver.onNext(LUResponse.newBuilder()
@@ -395,8 +409,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixQR(SingleMatrixRequest request, StreamObserver<QRResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 QRResult<Object> result = prov.qr(matrix);
                 responseObserver.onNext(QRResponse.newBuilder()
@@ -415,8 +428,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixSVD(SingleMatrixRequest request, StreamObserver<SVDResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 SVDResult<Object> result = prov.svd(matrix);
                 responseObserver.onNext(SVDResponse.newBuilder()
@@ -436,8 +448,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixCholesky(SingleMatrixRequest request, StreamObserver<CholeskyResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 CholeskyResult<Object> result = prov.cholesky(matrix);
                 responseObserver.onNext(CholeskyResponse.newBuilder()
@@ -455,8 +466,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void matrixEigen(SingleMatrixRequest request, StreamObserver<EigenResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix());
-            executeHP(hp, LinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 EigenResult<Object> result = prov.eigen(matrix);
                 responseObserver.onNext(EigenResponse.newBuilder()
@@ -475,8 +485,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void biCGSTAB(IterativeSolverRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix()) || isHPRequest(request.getB()) || isHPRequest(request.getX0()) || !request.getTolerance().getHpValue().isEmpty();
-            executeHP(hp, SparseLinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), SparseLinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Vector<Object> b = (Vector<Object>) fromProto(request.getB());
                 Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
@@ -498,8 +507,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void conjugateGradient(IterativeSolverRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix()) || isHPRequest(request.getB()) || isHPRequest(request.getX0()) || !request.getTolerance().getHpValue().isEmpty();
-            executeHP(hp, SparseLinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), SparseLinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Vector<Object> b = (Vector<Object>) fromProto(request.getB());
                 Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
@@ -521,8 +529,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
     @SuppressWarnings("unchecked")
     public void gMRES(GMRESRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            boolean hp = isHPRequest(request.getMatrix()) || isHPRequest(request.getB()) || isHPRequest(request.getX0()) || !request.getTolerance().getHpValue().isEmpty();
-            executeHP(hp, SparseLinearAlgebraProvider.class, prov -> {
+            executeWithContext(request.getContext(), SparseLinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Vector<Object> b = (Vector<Object>) fromProto(request.getB());
                 Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
@@ -552,19 +559,6 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         }
     }
 
-    /** Detects whether a MatrixData payload contains high-precision data. */
-    private boolean isHPRequest(MatrixData data) {
-        if (data == null) return false;
-        boolean hpDataPresent = !data.getHpDataList().isEmpty();
-        return hpDataPresent;
-    }
-
-    /** Detects whether a VectorData payload contains high-precision data. */
-    private boolean isHPRequest(VectorData data) {
-        if (data == null) return false;
-        boolean hpDataPresent = !data.getHpDataList().isEmpty();
-        return hpDataPresent;
-    }
 
     private void handleError(String op, Exception e, StreamObserver<?> responseObserver) {
         LOG.error("Error during " + op, e);
