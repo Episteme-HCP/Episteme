@@ -8,6 +8,10 @@ package org.episteme.core.mathematics.linearalgebra.providers;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.structures.rings.Ring;
 
 /**
  * Linear Algebra Provider that forces the use of the Standard (Naive/Recursive) algorithm.
@@ -45,6 +49,59 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     @Override
     public boolean isAvailable() {
         return true;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        if (a.getScalarRing().zero() instanceof Real) {
+            LinearAlgebraProvider<Real> leaf = getLeafProvider((Ring<Real>) a.getScalarRing());
+            return wrap((Matrix<E>) (Matrix<?>) leaf.scale((Real) scalar, (Matrix<Real>) a));
+        }
+        return wrap(super.scale(scalar, a));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Matrix<E> transpose(Matrix<E> a) {
+        if (a.getScalarRing().zero() instanceof Real) {
+            LinearAlgebraProvider<Real> leaf = getLeafProvider((Ring<Real>) a.getScalarRing());
+            return wrap((Matrix<E>) (Matrix<?>) leaf.transpose((Matrix<Real>) a));
+        }
+        return wrap(super.transpose(a));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        if (a.getScalarRing().zero() instanceof Real) {
+            LinearAlgebraProvider<Real> leaf = getLeafProvider((Ring<Real>) a.getScalarRing());
+            return (Vector<E>) (Vector<?>) leaf.multiply((Matrix<Real>) a, (Vector<Real>) b);
+        }
+        return super.multiply(a, b);
+    }
+
+    @SuppressWarnings("unchecked")
+    private LinearAlgebraProvider<Real> getLeafProvider(Ring<Real> ring) {
+        org.episteme.core.technical.algorithm.OperationContext ctx = org.episteme.core.technical.algorithm.OperationContext.DEFAULT;
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
+            ctx = new org.episteme.core.technical.algorithm.OperationContext.Builder()
+                    .addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION)
+                    .build();
+        }
+
+        return (LinearAlgebraProvider<Real>) org.episteme.core.technical.algorithm.ProviderSelector.select(
+                LinearAlgebraProvider.class,
+                ctx,
+                p -> p != this && p.isCompatible(ring)
+        );
+    }
+
+    private Matrix<E> wrap(Matrix<E> m) {
+        if (m instanceof GenericMatrix) {
+            return ((GenericMatrix<E>) m).withProvider(this);
+        }
+        return m;
     }
 
     @Override

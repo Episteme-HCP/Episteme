@@ -182,6 +182,7 @@ public class GenericLU {
     }
 
     private static double absValue(Object element, Field<?> field) {
+        if (element == null) return 0.0;
         if (element instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
             // Use doubleValue() for pivot selection is generally fine, but rb.abs() is safer
             return rb.abs().doubleValue();

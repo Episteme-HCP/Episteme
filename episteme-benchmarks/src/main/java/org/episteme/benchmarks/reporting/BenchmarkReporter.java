@@ -32,6 +32,7 @@ public class BenchmarkReporter {
     private final java.util.List<BenchmarkResult> results = new ArrayList<>();
     private final Map<String, String> sections = new LinkedHashMap<>();
     private String comments = "";
+    private String footer = "";
 
     public BenchmarkReporter(String title) {
         this.title = title;
@@ -39,6 +40,10 @@ public class BenchmarkReporter {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public void setFooter(String footer) {
+        this.footer = footer;
     }
 
     public void addSection(String name, String content) {
@@ -83,6 +88,10 @@ public class BenchmarkReporter {
                     sb.append("\n");
                 }
                 sb.append("\n");
+            }
+
+            if (footer != null && !footer.isEmpty()) {
+                sb.append("\n").append(footer).append("\n");
             }
 
             Files.writeString(Paths.get(path), sb.toString());

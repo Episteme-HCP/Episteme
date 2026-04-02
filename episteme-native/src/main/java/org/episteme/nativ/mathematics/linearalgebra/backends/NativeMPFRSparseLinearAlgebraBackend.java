@@ -143,6 +143,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
     }
 
     @Override
+    public String getAlgorithmType() {
+        return "Sparse";
+    }
+
+    @Override
     public int getPriority() {
         return 120; // High priority for high-precision tasks
     }
@@ -621,7 +626,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBac
         NativeSafe.invoke(MPFR_FREE_STR, strPtr);
         
         try {
-            return org.episteme.core.mathematics.numbers.real.Real.of(new java.math.BigDecimal(sb.toString()));
+            java.math.BigDecimal raw = new java.math.BigDecimal(sb.toString());
+            // Explicitly round to the requested precision context for bit-perfect agreement
+            return org.episteme.core.mathematics.numbers.real.RealBig.create(raw.round(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
         } catch (NumberFormatException e) {
             logger.error("Failed to parse MPFR string: '{}' (exp={})", s, exp);
             throw new RuntimeException("Invalid MPFR numeric string: " + sb, e);

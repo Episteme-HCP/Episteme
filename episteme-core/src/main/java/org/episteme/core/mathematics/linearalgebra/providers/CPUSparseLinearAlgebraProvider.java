@@ -348,11 +348,21 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         Ring<E> r = a.getScalarRing();
-        int rows = a.rows();
-        org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage = new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(rows, r.zero());
-        for (int i = 0; i<rows; i++) {
+        SparseMatrix<E> s = ensureSparse(a, r);
+        int rows = s.rows();
+        int[] rowPtrs = s.getRowPointers();
+        int[] colIdxs = s.getColIndices();
+        Object[] values = s.getValues();
+        
+        org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(rows, r.zero());
+            
+        for (int i = 0; i < rows; i++) {
             E sum = r.zero();
-            for (int j=0; j<a.cols(); j++) sum = r.add(sum, r.multiply(a.get(i, j), b.get(j)));
+            for (int k = rowPtrs[i]; k < rowPtrs[i+1]; k++) {
+                @SuppressWarnings("unchecked") E val = (E) values[k];
+                sum = r.add(sum, r.multiply(val, b.get(colIdxs[k])));
+            }
             if (!sum.equals(r.zero())) storage.set(i, sum);
         }
         return wrap(new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, r));

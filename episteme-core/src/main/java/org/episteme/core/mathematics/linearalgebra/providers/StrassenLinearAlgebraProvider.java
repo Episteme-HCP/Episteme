@@ -111,6 +111,36 @@ public class StrassenLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
         }
         return m;
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        if (a.getScalarRing().zero() instanceof Real) {
+            LinearAlgebraProvider<Real> leaf = getLeafProvider((Ring<Real>) a.getScalarRing());
+            return wrap((Matrix<E>) (Matrix<?>) leaf.scale((Real) scalar, (Matrix<Real>) a));
+        }
+        return wrap(super.scale(scalar, a));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Matrix<E> transpose(Matrix<E> a) {
+        if (a.getScalarRing().zero() instanceof Real) {
+            LinearAlgebraProvider<Real> leaf = getLeafProvider((Ring<Real>) a.getScalarRing());
+            return wrap((Matrix<E>) (Matrix<?>) leaf.transpose((Matrix<Real>) a));
+        }
+        return wrap(super.transpose(a));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        if (a.getScalarRing().zero() instanceof Real) {
+            LinearAlgebraProvider<Real> leaf = getLeafProvider((Ring<Real>) a.getScalarRing());
+            return (Vector<E>) (Vector<?>) leaf.multiply((Matrix<Real>) a, (Vector<Real>) b);
+        }
+        return super.multiply(a, b);
+    }
     
     @Override
     public int getPriority() {

@@ -45,6 +45,10 @@ public final class RealBig extends Real {
 
     private RealBig(BigDecimal value) {
         this.value = value;
+        if (value == null && this != NaN) {
+             // This might happen if the constructor is called before NaN is initialized?
+             // But RealBig.NaN is static final and usually initialized first.
+        }
     }
 
     public static RealBig of(String s) {
@@ -60,6 +64,7 @@ public final class RealBig extends Real {
 
     @Override
     public Real add(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             return other;
         }
@@ -69,6 +74,7 @@ public final class RealBig extends Real {
 
     @Override
     public Real subtract(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             return other.negate();
         }
@@ -78,6 +84,7 @@ public final class RealBig extends Real {
 
     @Override
     public Real multiply(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             if (this.isZero()) {
                 return Real.NaN; // 0 * infinity = NaN
@@ -91,8 +98,12 @@ public final class RealBig extends Real {
 
     @Override
     public Real divide(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             return Real.ZERO; // x / infinity = 0
+        }
+        if (other.isZero()) {
+            return Real.NaN; // x / 0 = NaN for now (could be Infinity if directed)
         }
         return RealBig.create(value.divide(other.bigDecimalValue(), 
             org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
@@ -110,27 +121,33 @@ public final class RealBig extends Real {
 
     @Override
     public Real negate() {
+        if (this.isNaN()) return NaN;
         return RealBig.create(value.negate());
     }
 
     @Override
     public Real abs() {
+        if (this.isNaN()) return NaN;
         return RealBig.create(value.abs());
     }
 
     @Override
     public Real inverse() {
+        if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NaN;
         return RealBig.create(BigDecimal.ONE.divide(value, 
             org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real sqrt() {
+        if (this.isNaN()) return NaN;
         return RealBig.create(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real pow(int exp) {
+        if (this.isNaN()) return NaN;
         return RealBig.create(value.pow(exp));
     }
 
@@ -166,6 +183,7 @@ public final class RealBig extends Real {
 
     @Override
     public Real pow(double exponent) {
+        if (this.isNaN()) return NaN;
         BigDecimal res = computeTranscendental("pow", value, BigDecimal.valueOf(exponent));
         if (res != null) return RealBig.create(res);
         throw new UnsupportedOperationException("Transcendental 'pow' failed or was unavailable (no fallback allowed)");
@@ -173,6 +191,7 @@ public final class RealBig extends Real {
 
     @Override
     public Real pow(Real exp) {
+        if (this.isNaN() || exp.isNaN()) return NaN;
         if (exp.isInfinite()) {
             if (this.abs().compareTo(Real.ONE) > 0) {
                 return (exp.sign() > 0) ? Real.POSITIVE_INFINITY : Real.ZERO;
@@ -303,6 +322,7 @@ public final class RealBig extends Real {
 
     @Override
     public Real cbrt() {
+        if (this.isNaN()) return NaN;
         BigDecimal res = computeTranscendental("cbrt", value);
         if (res != null) return RealBig.create(res);
         throw new UnsupportedOperationException("Transcendental 'cbrt' failed or was unavailable (no fallback allowed)");
@@ -362,7 +382,7 @@ public final class RealBig extends Real {
 
     @Override
     public double doubleValue() {
-        return value.doubleValue();
+        return value == null ? Double.NaN : value.doubleValue();
     }
 
     @Override
@@ -373,6 +393,7 @@ public final class RealBig extends Real {
 
     @Override
     public int compareTo(Real other) {
+        if (this.isNaN() || other.isNaN()) return this.isNaN() ? (other.isNaN() ? 0 : 1) : -1;
         if (other.isInfinite()) {
             return (other.sign() > 0) ? -1 : 1; // Finite < +Inf, Finite > -Inf
         }

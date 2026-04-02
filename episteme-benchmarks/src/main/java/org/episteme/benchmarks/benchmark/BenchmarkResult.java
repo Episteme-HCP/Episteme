@@ -66,6 +66,12 @@ public record BenchmarkResult(
     /**
      * Convenience constructor for expanded results (e.g. from High-Precision Audit).
      */
+    public BenchmarkResult(String provider, String domain, Map<String, String> metrics) {
+        this(domain.toLowerCase().replace(" ", "_"), domain, provider, domain, "SUCCESS", 
+             System.currentTimeMillis(), 0, 1, 0, 0, 0, generateEnvInfo(), 
+             new java.util.HashMap<>(metrics));
+    }
+
     public BenchmarkResult(String name, String provider, String domain, double latencyMs) {
         this(name.toLowerCase().replace(" ", "_"), name, provider, domain, "SUCCESS", 
              System.currentTimeMillis(), (long)latencyMs, 1, latencyMs, 
