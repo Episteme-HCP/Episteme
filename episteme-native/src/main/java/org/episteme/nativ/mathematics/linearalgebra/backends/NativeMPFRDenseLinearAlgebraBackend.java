@@ -77,6 +77,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     public static MethodHandle MPFR_POW;
     public static MethodHandle MPFR_CONST_PI;
     public static MethodHandle MPFR_ATAN2;
+    public static MethodHandle MPFR_HYPOT;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -116,6 +117,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 MPFR_ASIN = lookup(mpfr, "mpfr_asin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_ACOS = lookup(mpfr, "mpfr_acos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_ATAN = lookup(mpfr, "mpfr_atan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_ATAN2 = lookup(mpfr, "mpfr_atan2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_HYPOT = lookup(mpfr, "mpfr_hypot", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SINH = lookup(mpfr, "mpfr_sinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_COSH = lookup(mpfr, "mpfr_cosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_TANH = lookup(mpfr, "mpfr_tanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
@@ -130,16 +133,22 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null && MPFR_MUL != null && MPFR_CMP_ABS != null && MPFR_SUB != null && MPFR_SET != null && MPFR_DIV != null && MPFR_SET_UI != null && MPFR_SET_D != null;
                 if (AVAILABLE) {
-                    logger.info("Native MPFR Dense Backend initialized (Panama).");
+                    logger.info("Native MPFR Dense Backend initialized (Panama). All core handles loaded.");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("MPFR Symbol Check: exp={}, log={}, sin={}, cos={}, pow={}, hypot={}", 
+                            MPFR_EXP != null, MPFR_LOG != null, MPFR_SIN != null, MPFR_COS != null, MPFR_POW != null, MPFR_HYPOT != null);
+                    }
                 } else {
-                    logger.warn("Native MPFR Dense Backend initialization partial - some handles missing:");
-                    if (MPFR_INIT2 == null) logger.warn("  - mpfr_init2 NOT FOUND");
-                    if (MPFR_ADD == null) logger.warn("  - mpfr_add NOT FOUND");
-                    if (MPFR_MUL == null) logger.warn("  - mpfr_mul NOT FOUND");
-                    if (MPFR_CMP_ABS == null) logger.warn("  - mpfr_cmpabs NOT FOUND");
-                    if (MPFR_SUB == null) logger.warn("  - mpfr_sub NOT FOUND");
-                    if (MPFR_SET == null) logger.warn("  - mpfr_set NOT FOUND");
-                    if (MPFR_DIV == null) logger.warn("  - mpfr_div NOT FOUND");
+                    logger.warn("Native MPFR Dense Backend initialization incomplete - core handles missing:");
+                    if (MPFR_INIT2 == null) logger.warn("  - mpfr_init2 MISSING");
+                    if (MPFR_ADD == null) logger.warn("  - mpfr_add MISSING");
+                    if (MPFR_MUL == null) logger.warn("  - mpfr_mul MISSING");
+                    if (MPFR_CMP_ABS == null) logger.warn("  - mpfr_cmpabs MISSING");
+                    if (MPFR_SUB == null) logger.warn("  - mpfr_sub MISSING");
+                    if (MPFR_SET == null) logger.warn("  - mpfr_set MISSING");
+                    if (MPFR_DIV == null) logger.warn("  - mpfr_div MISSING");
+                    if (MPFR_SET_UI == null) logger.warn("  - mpfr_set_ui MISSING");
+                    if (MPFR_SET_D == null) logger.warn("  - mpfr_set_d MISSING");
                 }
             }
         } catch (Throwable t) {
@@ -221,36 +230,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         long prec = (long) (digits * 3.322) + 1;
         diag("[MPFR-DIAG] Requested Precision: " + prec + " bits (from " + digits + " digits)");
         return prec;
-    }
-
-    private Matrix<E> transcendentalOp2(Matrix<E> a, org.episteme.core.mathematics.numbers.real.Real exponent, MethodHandle handle) {
-        if (handle == null) return SparseLinearAlgebraProvider.super.pow(a, (E)exponent);
-        int m = a.rows();
-        int n = a.cols();
-        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        if (isComplex) return SparseLinearAlgebraProvider.super.pow(a, (E)exponent);
-        long prec = getPrecision();
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment h_A = initMatrix(a, arena, prec, false);
-            MemorySegment h_C = allocateMatrix(m, n, arena, prec, false);
-            MemorySegment h_Exp = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, h_Exp, prec);
-            NativeSafe.invoke(MPFR_SET_STR, h_Exp, arena.allocateFrom(exponent.bigDecimalValue().toPlainString()), 10, 0);
-            
-            int rnd = 0;
-            for (int i = 0; i < m * n; i++) {
-                MemorySegment ra = h_A.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                MemorySegment rc = h_C.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                NativeSafe.invoke(handle, rc, ra, h_Exp, rnd);
-            }
-            Matrix<E> res = (Matrix<E>) backToMatrix_internal(h_C, m, n, arena, a.getScalarRing(), false);
-            NativeSafe.invoke(MPFR_CLEAR, h_Exp);
-            clearMPFRArray(h_A, m * n);
-            clearMPFRArray(h_C, m * n);
-            return res;
-        } catch (Throwable t) {
-            throw new RuntimeException("MPFR transcendental op2 failed", t);
-        }
     }
 
     @Override
@@ -618,12 +597,13 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
             MemorySegment h_C = allocateMatrix(m, n, arena, prec, isComplex);
     
+            MemorySegment sR = arena.allocate(MPFR_LAYOUT);
+            MemorySegment sI = arena.allocate(MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, sR, prec);
+            NativeSafe.invoke(MPFR_INIT2, sI, prec);
+    
             if (isComplex) {
-                org.episteme.core.mathematics.numbers.complex.Complex cs = (org.episteme.core.mathematics.numbers.complex.Complex)(Object)scalar;
-                MemorySegment sR = arena.allocate(MPFR_LAYOUT);
-                MemorySegment sI = arena.allocate(MPFR_LAYOUT);
-                NativeSafe.invoke(MPFR_INIT2, sR, prec);
-                NativeSafe.invoke(MPFR_INIT2, sI, prec);
+                org.episteme.core.mathematics.numbers.complex.Complex cs = (org.episteme.core.mathematics.numbers.complex.Complex) scalar;
                 NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
                 NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
     
@@ -1052,26 +1032,27 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         }
     }
 
-    @Override public Matrix<E> exp(Matrix<E> a) { return executeTranscendental(a, "exp"); }
-    @Override public Matrix<E> log(Matrix<E> a) { return executeTranscendental(a, "log"); }
-    @Override public Matrix<E> log10(Matrix<E> a) { return executeTranscendental(a, "log10"); }
-    @Override public Matrix<E> sin(Matrix<E> a) { return executeTranscendental(a, "sin"); }
-    @Override public Matrix<E> cos(Matrix<E> a) { return executeTranscendental(a, "cos"); }
-    @Override public Matrix<E> tan(Matrix<E> a) { return executeTranscendental(a, "tan"); }
-    @Override public Matrix<E> asin(Matrix<E> a) { return executeTranscendental(a, "asin"); }
-    @Override public Matrix<E> acos(Matrix<E> a) { return executeTranscendental(a, "acos"); }
-    @Override public Matrix<E> atan(Matrix<E> a) { return executeTranscendental(a, "atan"); }
-    @Override public Matrix<E> sinh(Matrix<E> a) { return executeTranscendental(a, "sinh"); }
-    @Override public Matrix<E> cosh(Matrix<E> a) { return executeTranscendental(a, "cosh"); }
-    @Override public Matrix<E> tanh(Matrix<E> a) { return executeTranscendental(a, "tanh"); }
-    @Override public Matrix<E> sqrt(Matrix<E> a) { return executeTranscendental(a, "sqrt"); }
-    @Override public Matrix<E> cbrt(Matrix<E> a) { return executeTranscendental(a, "cbrt"); }
-    @Override public Matrix<E> asinh(Matrix<E> a) { return executeTranscendental(a, "asinh"); }
-    @Override public Matrix<E> acosh(Matrix<E> a) { return executeTranscendental(a, "acosh"); }
-    @Override public Matrix<E> atanh(Matrix<E> a) { return executeTranscendental(a, "atanh"); }
-    @Override public Matrix<E> pow(Matrix<E> a, E exponent) { return executePow(a, exponent); }
+    @Override public Matrix<E> exp(Matrix<E> a) { return applyTranscendental(a, "exp"); }
+    @Override public Matrix<E> log(Matrix<E> a) { return applyTranscendental(a, "log"); }
+    @Override public Matrix<E> log10(Matrix<E> a) { return applyTranscendental(a, "log10"); }
+    @Override public Matrix<E> sin(Matrix<E> a) { return applyTranscendental(a, "sin"); }
+    @Override public Matrix<E> cos(Matrix<E> a) { return applyTranscendental(a, "cos"); }
+    @Override public Matrix<E> tan(Matrix<E> a) { return applyTranscendental(a, "tan"); }
+    @Override public Matrix<E> asin(Matrix<E> a) { return applyTranscendental(a, "asin"); }
+    @Override public Matrix<E> acos(Matrix<E> a) { return applyTranscendental(a, "acos"); }
+    @Override public Matrix<E> atan(Matrix<E> a) { return applyTranscendental(a, "atan"); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { return applyTranscendental(a, "sinh"); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { return applyTranscendental(a, "cosh"); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { return applyTranscendental(a, "tanh"); }
+    @Override public Matrix<E> asinh(Matrix<E> a) { return applyTranscendental(a, "asinh"); }
+    @Override public Matrix<E> acosh(Matrix<E> a) { return applyTranscendental(a, "acosh"); }
+    @Override public Matrix<E> atanh(Matrix<E> a) { return applyTranscendental(a, "atanh"); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { return applyTranscendental(a, "sqrt"); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { return applyTranscendental(a, "cbrt"); }
+    @Override public Matrix<E> pow(Matrix<E> a, E exponent) { return applyTranscendental(a, "pow", exponent); }
 
-    private Matrix<E> executeTranscendental(Matrix<E> a, String op) {
+    public Matrix<E> applyTranscendental(Matrix<E> a, String op, Object... args) {
+        if (op.equals("pow")) return executePow(a, (E) args[0]);
         int rows = a.rows();
         int cols = a.cols();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
@@ -1765,8 +1746,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment zero = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zero, prec);
             NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
             
-            int cmpX = (int) NativeSafe.invoke(MPFR_CMP, aR, zero, 0);
-            int cmpY = (int) NativeSafe.invoke(MPFR_CMP, aI, zero, 0);
+            int cmpX = (int) NativeSafe.invoke(MPFR_CMP, aR, zero);
+            int cmpY = (int) NativeSafe.invoke(MPFR_CMP, aI, zero);
             
             if (cmpX > 0) {
                 // atan2 = atan(y/x)
@@ -1949,7 +1930,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, sI);
         NativeSafe.invoke(MPFR_CLEAR, cR);
         NativeSafe.invoke(MPFR_CLEAR, cI);
-    }    private static MethodHandle MPFR_HYPOT;
+    }
 
     public void complexSqrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
         // sqrt(x + iy) = sqrt((|z| + x)/2) + i sign(y)sqrt((|z| - x)/2)
@@ -1987,7 +1968,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         if ((int) NativeSafe.invoke(MPFR_CMP, t1, zero) < 0) NativeSafe.invoke(MPFR_SET, t1, zero, 0);
         NativeSafe.invoke(MPFR_SQRT, resI, t1, 0);
         
-        if ((int) NativeSafe.invoke(MPFR_CMP, aI, zero, 0) < 0) { 
+        if ((int) NativeSafe.invoke(MPFR_CMP, aI, zero) < 0) { 
              NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
         }
         

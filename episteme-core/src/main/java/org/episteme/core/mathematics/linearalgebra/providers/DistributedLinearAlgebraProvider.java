@@ -78,7 +78,12 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
                 if (p == this || (ring != null && !p.isCompatible(ring))) {
                     throw new UnsupportedOperationException("Not suitable");
                 }
-                return operation.apply((LinearAlgebraProvider<E>) (Object) p);
+                org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected local provider: {} for operation", p.getName());
+                R res = operation.apply((LinearAlgebraProvider<E>) (Object) p);
+                if (res == null) {
+                    org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).warn("Provider {} returned null for operation!", p.getName());
+                }
+                return res;
             }
         );
 
@@ -347,7 +352,12 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             p -> {
                 if (p == this) throw new UnsupportedOperationException("Not suitable");
                 if (ring != null && !p.isCompatible(ring)) throw new UnsupportedOperationException("Not suitable");
-                return operation.apply((SparseLinearAlgebraProvider<E>) (Object) p);
+                org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected sparse local provider: {} for operation", p.getName());
+                R res = operation.apply((SparseLinearAlgebraProvider<E>) (Object) p);
+                if (res == null) {
+                    org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).warn("Sparse provider {} returned null for operation!", p.getName());
+                }
+                return res;
             }
         );
 
