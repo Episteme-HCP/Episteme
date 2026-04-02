@@ -214,6 +214,15 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         logger.debug("[MPFR-DIAG] {}", msg);
     }
 
+    private long getPrecision() {
+        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        int digits = ctx.getJavaMathContext().getPrecision();
+        if (digits <= 0) digits = 256; 
+        long prec = (long) (digits * 3.322) + 1;
+        diag("[MPFR-DIAG] Requested Precision: " + prec + " bits (from " + digits + " digits)");
+        return prec;
+    }
+
     private Matrix<E> transcendentalOp2(Matrix<E> a, org.episteme.core.mathematics.numbers.real.Real exponent, MethodHandle handle) {
         if (handle == null) return SparseLinearAlgebraProvider.super.pow(a, (E)exponent);
         int m = a.rows();
