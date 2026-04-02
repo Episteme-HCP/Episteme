@@ -18,13 +18,9 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.*;
-import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
-import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
@@ -35,8 +31,8 @@ import org.slf4j.LoggerFactory;
  * Arbitrary-precision Sparse Linear Algebra backend using MPFR (via Panama).
  * Optimized for CSR storage.
  */
-@com.google.auto.service.AutoService(LinearAlgebraProvider.class)
-public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, LinearAlgebraProvider<E>, SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
+@com.google.auto.service.AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, LinearAlgebraBackend.class})
+public class NativeMPFRSparseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);
     private static final Linker LINKER = Linker.nativeLinker();
     private static final boolean AVAILABLE;

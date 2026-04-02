@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandle;
 import java.util.Optional;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, LinearAlgebraBackend.class, CPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
-public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBackend<E>, NativeBackend, CPUBackend {
+public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CPUBackend, SparseLinearAlgebraProvider<E> {
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");
     private static final Linker LINKER = Linker.nativeLinker();
@@ -210,53 +210,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         );
     }
 
-    private boolean isComplex(Matrix<E> a) {
-        return ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-    }
-
     private void diag(String msg) {
         logger.debug("[MPFR-DIAG] {}", msg);
     }
 
-    private long getPrecision() {
-        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
-        int digits = ctx.getJavaMathContext().getPrecision();
-        if (digits <= 0) digits = 256; 
-        long prec = (long) (digits * 3.322) + 1;
-        diag("[MPFR-DIAG] Requested Precision: " + prec + " bits (from " + digits + " digits)");
-        return prec;
-    }
-
-    private Matrix<E> transcendentalOp(Matrix<E> a, MethodHandle handle) {
-        if (handle == null) return null; // Let the caller decide the fallback
-        int m = a.rows();
-        int n = a.cols();
-        long prec = getPrecision();
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment h_A = initMatrix(a, arena, prec, false);
-            MemorySegment h_C = allocateMatrix(m, n, arena, prec, false);
-            int rnd = 0; // MPFR_RNDN
-            for (int i = 0; i < m * n; i++) {
-                MemorySegment ra = h_A.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                MemorySegment rc = h_C.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                NativeSafe.invoke(handle, rc, ra, rnd);
-            }
-            Matrix<E> res = (Matrix<E>) backToMatrix_internal(h_C, m, n, arena, a.getScalarRing(), false);
-            // clear handled by arena? No, MPFR needs explicit clear for its internal allocs
-            clearMPFRArray(h_A, m * n);
-            clearMPFRArray(h_C, m * n);
-            return res;
-        } catch (Throwable t) {
-            throw new RuntimeException("MPFR transcendental op failed", t);
-        }
-    }
-
     private Matrix<E> transcendentalOp2(Matrix<E> a, org.episteme.core.mathematics.numbers.real.Real exponent, MethodHandle handle) {
-        if (handle == null) return LinearAlgebraBackend.super.pow(a, (E)exponent);
+        if (handle == null) return SparseLinearAlgebraProvider.super.pow(a, (E)exponent);
         int m = a.rows();
         int n = a.cols();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        if (isComplex) return LinearAlgebraBackend.super.pow(a, (E)exponent);
+        if (isComplex) return SparseLinearAlgebraProvider.super.pow(a, (E)exponent);
         long prec = getPrecision();
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initMatrix(a, arena, prec, false);

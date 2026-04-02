@@ -27,8 +27,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
-public class EpistemeLinearAlgebraBackend implements LinearAlgebraBackend<Real>, SparseLinearAlgebraProvider<Real>, SIMDBackend {
+@AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, Backend.class})
+public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, SIMDBackend {
 
     private final CPUDenseLinearAlgebraProvider<Real> denseProvider;
     private final CPUSparseLinearAlgebraProvider<Real> sparseProvider;
