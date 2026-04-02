@@ -54,8 +54,16 @@ public class BenchmarkReporter {
         results.add(result);
     }
 
+    public java.util.List<BenchmarkResult> getResults() {
+        return results;
+    }
+
     public void exportMarkdown(String path) {
         try {
+            java.nio.file.Path p = Paths.get(path);
+            if (p.getParent() != null) {
+                java.nio.file.Files.createDirectories(p.getParent());
+            }
             StringBuilder sb = new StringBuilder();
             sb.append("# ").append(title).append("\n\n");
             
@@ -71,12 +79,27 @@ public class BenchmarkReporter {
                     if (!keys.contains(k)) keys.add(k);
                 }));
                 
-                // Sort keys: RB: first, then C:, then the rest, each block sorted alphabetically
+                // Sort keys: RB: matrix, RB: transcendental, C: matrix, C: transcendental
                 keys.sort((a, b) -> {
-                    int prefixA = a.startsWith("R:") ? 0 : a.startsWith("RB:") ? 1 : a.startsWith("C:") ? 2 : 3;
-                    int prefixB = b.startsWith("R:") ? 0 : b.startsWith("RB:") ? 1 : b.startsWith("C:") ? 2 : 3;
-                    if (prefixA != prefixB) return Integer.compare(prefixA, prefixB);
-                    return a.compareTo(b);
+                    String[] ptsA = a.split(":");
+                    String[] ptsB = b.split(":");
+                    String prefA = ptsA[0]; String opA = ptsA.length > 1 ? ptsA[1] : "";
+                    String prefB = ptsB[0]; String opB = ptsB.length > 1 ? ptsB[1] : "";
+
+                    int domainA = prefA.equals("R:") ? 0 : prefA.equals("RB:") ? 1 : prefA.equals("C:") ? 2 : 3;
+                    int domainB = prefB.equals("R:") ? 0 : prefB.equals("RB:") ? 1 : prefB.equals("C:") ? 2 : 3;
+                    if (domainA != domainB) return Integer.compare(domainA, domainB);
+
+                    java.util.Set<String> matrixOps = java.util.Set.of(
+                        "Add", "Sub", "Scale", "Mul", "MatVec", "Trans", "Inv", "Det", "Solve",
+                        "Dot", "Norm", "LU", "QR", "SVD", "Chol", "Eigen", "BiCGSTAB", "ConjGrad", "GMRES"
+                    );
+
+                    boolean isMatA = matrixOps.contains(opA);
+                    boolean isMatB = matrixOps.contains(opB);
+                    if (isMatA != isMatB) return isMatA ? -1 : 1;
+
+                    return opA.compareTo(opB);
                 });
 
                 sb.append("| Provider | Domain | Status |");
@@ -102,7 +125,8 @@ public class BenchmarkReporter {
                 sb.append("\n").append(footer).append("\n");
             }
 
-            Files.writeString(Paths.get(path), sb.toString());
+            java.nio.file.Files.createDirectories(p.getParent());
+            Files.writeString(p, sb.toString());
             System.out.println("[INFO] Report exported to: " + path);
         } catch (IOException e) {
             System.err.println("[ERROR] Failed to export report: " + e.getMessage());

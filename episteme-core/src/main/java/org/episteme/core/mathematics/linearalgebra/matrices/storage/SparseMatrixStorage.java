@@ -52,6 +52,10 @@ public class SparseMatrixStorage<E> implements MatrixStorage<E> {
         this.zeroValue = zeroValue;
     }
 
+    public Map<Long, E> getData() {
+        return data;
+    }
+
     private SparseMatrixStorage(Map<Long, E> data, int rows, int cols, E zeroValue) {
         this.data = new HashMap<>(data);
         this.rowsCount = rows;

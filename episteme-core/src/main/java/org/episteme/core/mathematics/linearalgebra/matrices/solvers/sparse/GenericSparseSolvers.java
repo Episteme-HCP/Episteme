@@ -10,6 +10,7 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage;
@@ -30,7 +31,7 @@ public class GenericSparseSolvers {
         for (int iter = 0; iter < maxIterations; iter++) {
             E rhoOld = rho;
             rho = provider.dot(r0, r);
-            if (abs(rho, f) < 1e-25) break;
+            if (isSmaller(rho, 1e-25, f)) break;
 
             if (iter == 0) p = r;
             else {
@@ -42,7 +43,7 @@ public class GenericSparseSolvers {
             alpha = f.divide(rho, provider.dot(r0, v));
 
             Vector<E> s = provider.subtract(r, provider.multiply(v, alpha));
-            if (abs(provider.norm(s), f) < abs(tolerance, f)) {
+            if (isSmaller(provider.norm(s), tolerance, f)) {
                 x = provider.add(x, provider.multiply(p, alpha));
                 break;
             }
@@ -52,8 +53,8 @@ public class GenericSparseSolvers {
             x = provider.add(provider.add(x, provider.multiply(p, alpha)), provider.multiply(s, omega));
             r = provider.subtract(s, provider.multiply(t, omega));
             
-            if (abs(provider.norm(r), f) < abs(tolerance, f)) break;
-            if (abs(omega, f) < 1e-25) break;
+            if (isSmaller(provider.norm(r), tolerance, f)) break;
+            if (isSmaller(omega, 1e-25, f)) break;
         }
         return x;
     }
@@ -67,14 +68,14 @@ public class GenericSparseSolvers {
         for (int iter = 0; iter < maxIterations; iter++) {
             Vector<E> Ap = A.multiply(p);
             E pAp = provider.dot(p, Ap);
-            if (abs(pAp, f) < 1e-25) break;
+            if (isSmaller(pAp, 1e-25, f)) break;
             
             E alpha = f.divide(rsold, pAp);
             x = provider.add(x, provider.multiply(p, alpha));
             r = provider.subtract(r, provider.multiply(Ap, alpha));
 
             E rsnew = provider.dot(r, r);
-            if (abs(sqrt(rsnew, f), f) < abs(tolerance, f)) break;
+            if (isSmaller(sqrt(rsnew, f), tolerance, f)) break;
 
             E beta = f.divide(rsnew, rsold);
             p = provider.add(r, provider.multiply(p, beta));
@@ -89,7 +90,7 @@ public class GenericSparseSolvers {
         for (int r_idx = 0; r_idx < restarts; r_idx++) {
             Vector<E> r0_vec = provider.subtract(b, A.multiply(x));
             E beta_val = provider.norm(r0_vec);
-            if (abs(beta_val, f) < abs(tolerance, f)) return x;
+            if (isSmaller(beta_val, tolerance, f)) return x;
 
             int m = Math.min(maxIterations, n);
             @SuppressWarnings("unchecked")
@@ -108,7 +109,7 @@ public class GenericSparseSolvers {
                     w = provider.subtract(w, provider.multiply(V[i], H[i][j]));
                 }
                 H[j+1][j] = provider.norm(w);
-                if (abs(H[j+1][j], f) < 1e-25) {
+                if (isSmaller(H[j+1][j], 1e-25, f)) {
                     actual_m = j + 1;
                     break;
                 }
@@ -129,20 +130,22 @@ public class GenericSparseSolvers {
                 // Apply previous rotations
                 for (int k = 0; k < i; k++) {
                     E temp = f.add(f.multiply(cs[k], H[k][i]), f.multiply(sn[k], H[k+1][i]));
-                    H[k+1][i] = f.add(f.multiply(f.negate(sn[k]), H[k][i]), f.multiply(cs[k], H[k+1][i]));
+                    H[k+1][i] = f.add(f.multiply(f.negate(conjugate(sn[k])), H[k][i]), f.multiply(conjugate(cs[k]), H[k+1][i]));
                     H[k][i] = temp;
                 }
 
                 // Compute current rotation
                 E h1 = H[i][i];
                 E h2 = H[i+1][i];
-                if (abs(h2, f) < 1e-30) {
+                if (isSmaller(h2, 1e-30, f)) {
                     cs[i] = f.one();
                     sn[i] = f.zero();
                 } else {
-                    E t = sqrt(f.add(f.multiply(h1, h1), f.multiply(h2, h2)), f);
-                    cs[i] = f.divide(h1, t);
-                    sn[i] = f.divide(h2, t);
+                    E h1sq = getSquareNorm(h1, f);
+                    E h2sq = getSquareNorm(h2, f);
+                    E t = sqrt(f.add(h1sq, h2sq), f);
+                    cs[i] = f.divide(conjugate(h1), t);
+                    sn[i] = f.divide(conjugate(h2), t);
                 }
 
                 // Apply current rotation to H and s_vec
@@ -152,8 +155,7 @@ public class GenericSparseSolvers {
                 E s1 = s_vec[i];
                 s_vec[i] = f.multiply(cs[i], s1);
                 s_vec[i+1] = f.multiply(f.negate(sn[i]), s1);
-
-                if (abs(s_vec[i+1], f) < abs(tolerance, f)) {
+                if (isSmaller(s_vec[i+1], tolerance, f)) {
                     actual_m = i + 1;
                     break;
                 }
@@ -175,17 +177,46 @@ public class GenericSparseSolvers {
                 x = provider.add(x, provider.multiply(V[i], y[i]));
             }
 
-            if (abs(s_vec[actual_m], f) < abs(tolerance, f)) return x;
+            if (isSmaller(s_vec[actual_m], tolerance, f)) return x;
         }
         return x;
     }
 
+    private static boolean isSmaller(Object element, Object tolerance, Field<?> f) {
+        Object eAbs = (element instanceof Complex c) ? c.abs() : element;
+        Object tAbs = (tolerance instanceof Complex ct) ? ct.abs() : tolerance;
+
+        if (eAbs instanceof RealBig rb) {
+            java.math.BigDecimal val = rb.abs().bigDecimalValue();
+            if (tAbs instanceof RealBig rt) return val.compareTo(rt.abs().bigDecimalValue()) < 0;
+            if (tAbs instanceof Number nt) return val.compareTo(new java.math.BigDecimal(nt.toString())) < 0;
+            return val.doubleValue() < abs(tAbs, f);
+        }
+        
+        return abs(eAbs, f) < abs(tAbs, f);
+    }
+
     private static double abs(Object element, Field<?> f) {
-        if (element instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) return rb.abs().doubleValue();
+        if (element instanceof RealBig rb) return rb.abs().doubleValue();
         if (element instanceof Real r) return r.doubleValue();
         if (element instanceof Complex c) return c.abs().doubleValue();
         if (element instanceof Number n) return n.doubleValue();
         return 0.0;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E conjugate(E element) {
+        if (element instanceof Complex c) return (E) c.conjugate();
+        return element;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E getSquareNorm(E element, Field<E> f) {
+        if (element instanceof Complex c) {
+            Real abs = c.abs();
+            return (E) Complex.of(abs.multiply(abs));
+        }
+        return f.multiply(element, element);
     }
 
     @SuppressWarnings("unchecked")

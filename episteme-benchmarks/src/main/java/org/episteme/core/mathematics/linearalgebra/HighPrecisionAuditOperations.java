@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 public class HighPrecisionAuditOperations {
 
     public interface AuditAction<T> {
-        void run(String opName, java.util.function.Supplier<Object> test);
+        void run(String opName, java.util.function.Supplier<?> test);
     }
 
     // --- RealBig Individual Tests ---
@@ -214,8 +214,8 @@ public class HighPrecisionAuditOperations {
     public static void testComplexPow(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
 
     public static void runRealBigAudit(LinearAlgebraProvider<RealBig> p, int n, AuditAction<RealBig> action) {
-        RealBig val = RealBig.create(new java.math.BigDecimal("0.12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"));
-        RealBig val2 = RealBig.create(new java.math.BigDecimal("2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193"));
+        RealBig val = RealBig.create(new java.math.BigDecimal("0.1"));
+        RealBig val2 = RealBig.create(new java.math.BigDecimal("0.2"));
         
         Matrix<RealBig> A = createRealBigMatrix(val, n, p);
         Matrix<RealBig> B = createRealBigMatrix(val2, n, p);
@@ -223,6 +223,7 @@ public class HighPrecisionAuditOperations {
         Matrix<RealBig> invA = createInvertibleRealBigMatrix(n, p);
         Matrix<RealBig> spdA = createSPDRealBigMatrix(n, p);
 
+        // Basic
         action.run("RB:Add", () -> p.add(A, B));
         action.run("RB:Sub", () -> p.subtract(A, B));
         action.run("RB:Scale", () -> p.scale(val, A));
@@ -240,55 +241,55 @@ public class HighPrecisionAuditOperations {
         action.run("RB:Chol", () -> p.cholesky(spdA));
         action.run("RB:Eigen", () -> p.eigen(invA));
 
-        // Iterative Solvers (Sparse)
+        // Iterative
         action.run("RB:BiCGSTAB", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                return sp.bicgstab(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new BigDecimal("1e-8")), 100);
+                return sp.bicgstab(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("RB:ConjGrad", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                return sp.conjugateGradient(spdA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new BigDecimal("1e-8")), 100);
+                return sp.conjugateGradient(spdA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("RB:GMRES", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                return sp.gmres(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new BigDecimal("1e-8")), 100, 5);
+                return sp.gmres(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 100, 5);
             } else throw new UnsupportedOperationException("Not sparse");
         });
 
         // Transcendentals
-        Matrix<RealBig> T = createRealBigMatrix(new BigDecimal("0.5"), 1, p);
+        Matrix<RealBig> T = createRealBigMatrix(new java.math.BigDecimal("0.5"), 1, p);
         action.run("RB:Exp", () -> p.exp(T));
+        action.run("RB:Log", () -> p.log(createRealBigMatrix(new java.math.BigDecimal("2.0"), 1, p)));
+        action.run("RB:Log10", () -> p.log10(createRealBigMatrix(new java.math.BigDecimal("2.0"), 1, p)));
         action.run("RB:Sin", () -> p.sin(T));
         action.run("RB:Cos", () -> p.cos(T));
         action.run("RB:Tan", () -> p.tan(T));
-        action.run("RB:Log", () -> p.log(createRealBigMatrix(new BigDecimal("2.0"), 1, p)));
-        action.run("RB:Log10", () -> p.log10(createRealBigMatrix(new BigDecimal("2.0"), 1, p)));
         action.run("RB:Asin", () -> p.asin(T));
         action.run("RB:Acos", () -> p.acos(T));
         action.run("RB:Atan", () -> p.atan(T));
         action.run("RB:Sinh", () -> p.sinh(T));
         action.run("RB:Cosh", () -> p.cosh(T));
         action.run("RB:Tanh", () -> p.tanh(T));
-        action.run("RB:Sqrt", () -> p.sqrt(createRealBigMatrix(new BigDecimal("2.0"), 1, p)));
-        action.run("RB:Cbrt", () -> p.cbrt(createRealBigMatrix(new BigDecimal("2.0"), 1, p)));
-        action.run("RB:Pow", () -> p.pow(createRealBigMatrix(new BigDecimal("2.0"), 1, p), RealBig.create(new BigDecimal("3"))));
+        action.run("RB:Sqrt", () -> p.sqrt(createRealBigMatrix(new java.math.BigDecimal("2.0"), 1, p)));
+        action.run("RB:Cbrt", () -> p.cbrt(createRealBigMatrix(new java.math.BigDecimal("2.0"), 1, p)));
+        action.run("RB:Pow", () -> p.pow(createRealBigMatrix(new java.math.BigDecimal("2.0"), 1, p), RealBig.create(new java.math.BigDecimal("3.0"))));
     }
 
     public static void runComplexAudit(LinearAlgebraProvider<Complex> p, int n, AuditAction<Complex> action) {
-        Complex z1 = Complex.of(1.5, 2.3);
-        Complex z2 = Complex.of(0.7, -1.1);
-        
+        Complex z1 = Complex.of(0.1, 0.2);
+        Complex z2 = Complex.of(0.3, 0.4);
         Matrix<Complex> A = createComplexMatrix(z1, n, p);
         Matrix<Complex> B = createComplexMatrix(z2, n, p);
         Vector<Complex> v = createComplexVector(z1, n, p);
         Matrix<Complex> invA = createInvertibleComplexMatrix(n, p);
         Matrix<Complex> spdA = createSPDComplexMatrix(n, p);
 
+        // Basic
         action.run("C:Add", () -> p.add(A, B));
         action.run("C:Sub", () -> p.subtract(A, B));
-        action.run("C:Scale", () -> p.scale(z2, A));
+        action.run("C:Scale", () -> p.scale(Complex.of(2.0, 0), A));
         action.run("C:Mul", () -> p.multiply(A, B));
         action.run("C:MatVec", () -> p.multiply(A, v));
         action.run("C:Trans", () -> p.transpose(A));
@@ -306,17 +307,17 @@ public class HighPrecisionAuditOperations {
         // Iterative
         action.run("C:BiCGSTAB", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                return sp.bicgstab(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100);
+                return sp.bicgstab(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("C:ConjGrad", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                return sp.conjugateGradient(spdA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100);
+                return sp.conjugateGradient(spdA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 100);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("C:GMRES", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                return sp.gmres(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-8, 0), 100, 5);
+                return sp.gmres(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 100, 5);
             } else throw new UnsupportedOperationException("Not sparse");
         });
 
@@ -427,4 +428,5 @@ public class HighPrecisionAuditOperations {
         for (int i = 0; i < n; i++) data[i] = Complex.of(z.getReal().doubleValue() + i, z.getImaginary().doubleValue());
         return Vector.of(data, (Ring<Complex>) (Object) Complex.of(0, 0).getScalarRing());
     }
+
 }
