@@ -70,6 +70,14 @@ public class BenchmarkReporter {
                 results.forEach(r -> r.extraMetrics().keySet().forEach(k -> {
                     if (!keys.contains(k)) keys.add(k);
                 }));
+                
+                // Sort keys: RB: first, then C:, then the rest, each block sorted alphabetically
+                keys.sort((a, b) -> {
+                    int prefixA = a.startsWith("R:") ? 0 : a.startsWith("RB:") ? 1 : a.startsWith("C:") ? 2 : 3;
+                    int prefixB = b.startsWith("R:") ? 0 : b.startsWith("RB:") ? 1 : b.startsWith("C:") ? 2 : 3;
+                    if (prefixA != prefixB) return Integer.compare(prefixA, prefixB);
+                    return a.compareTo(b);
+                });
 
                 sb.append("| Provider | Domain | Status |");
                 for (String k : keys) sb.append(" ").append(k).append(" |");

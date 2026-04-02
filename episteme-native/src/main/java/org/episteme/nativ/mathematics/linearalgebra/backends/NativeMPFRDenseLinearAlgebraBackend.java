@@ -213,7 +213,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
     }
 
     private void diag(String msg) {
-        logger.error("[MPFR-DIAG] {}", msg);
+        logger.debug("[MPFR-DIAG] {}", msg);
     }
 
     private long getPrecision() {
@@ -718,7 +718,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraBack
         MemorySegment sample = getMPFR(mat, 0, 0, cols, 0, false);
         MemorySegment ePtr = arena.allocate(ValueLayout.JAVA_LONG);
         Real checkVal = readMPFR(sample, ePtr, arena);
-        diag("[MPFR-DIAG] initMatrix verify[0,0]: expected=" + storage.get(0,0) + ", actuallyReads=" + checkVal);
+        Object expected = storage.get(0,0);
+        
+        boolean mismatch = true;
+        if (expected instanceof Real r) {
+            mismatch = checkVal.subtract(r).abs().doubleValue() > 1e-30;
+        }
+        
+        if (mismatch) {
+            diag("initMatrix verify[0,0]: expected=" + expected + ", actuallyReads=" + checkVal);
+        }
         
         return mat;
     }
