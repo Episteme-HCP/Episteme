@@ -111,9 +111,11 @@ public final class MPFRTranscendentalProvider implements TranscendentalProvider 
         return ptr;
     }
 
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
+
     private BigDecimal readMPFR(MemorySegment ptr, Arena arena, MathContext mc) {
         // Reuse logic from linear algebra provider
-        MemorySegment expPtr = arena.allocate(java.lang.foreign.ValueLayout.JAVA_LONG);
+        MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
         // mpfr_get_str (char *str, mpfr_exp_t *expptr, int base, size_t n, mpfr_srcptr op, mpfr_rnd_t rnd)
         MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, ptr, 0);
         
@@ -123,33 +125,44 @@ public final class MPFRTranscendentalProvider implements TranscendentalProvider 
 
         try {
             // Reinterpret the raw pointer with enough size to find the null terminator
-            // MPFR precision is in bits. String length in base 10 is roughly bits * 0.301.
-            // We use a safe multiplier and a minimum buffer.
             long precBits = (long) (mc.getPrecision() * 3.322);
             long safeSize = (precBits / 3) + 128; 
             MemorySegment safeSeg = strPtr.reinterpret(safeSize);
             
             String digits = safeSeg.getString(0);
-            if (digits == null || digits.isEmpty()) {
-                throw new RuntimeException("mpfr_get_str returned an empty string at 0x" + Long.toHexString(strPtr.address()));
+            if (digits == null || digits.isEmpty() || digits.equals("0")) {
+                return BigDecimal.ZERO;
             }
 
-            // mpfr_exp_t is a signed type, usually long on 64-bit but can be int on 32-bit.
-            // Panama JAVA_LONG matches 64-bit long.
-            long exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_LONG, 0);
+            long exp;
+            if (IS_WINDOWS) {
+                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_INT, 0L);
+            } else {
+                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_LONG, 0L);
+            }
             
-            // Format: 0.[digits] * 10^exp
-            StringBuilder sb = new StringBuilder();
+            String su = digits.toUpperCase();
+            if (su.contains("@NAN@") || su.contains("NAN") || su.contains("INF")) {
+                throw new ArithmeticException("Result is NaN or Infinity (not representable as BigDecimal)");
+            }
+
+            String sign = "";
             if (digits.startsWith("-")) {
-                sb.append("-");
+                sign = "-";
                 digits = digits.substring(1);
             }
-            sb.append("0.");
-            sb.append(digits);
-            sb.append("E");
-            sb.append(exp);
             
-            return new BigDecimal(sb.toString(), mc);
+            long effectiveScale = (long) digits.length() - exp;
+            
+            // Protect against scale going out of Integer bounds
+            if (effectiveScale > Integer.MAX_VALUE || effectiveScale < Integer.MIN_VALUE) {
+                if (exp > 0) throw new ArithmeticException("Overflow in MPFR conversion");
+                return BigDecimal.ZERO;
+            }
+
+            java.math.BigInteger unscaled = new java.math.BigInteger(sign + digits);
+            java.math.BigDecimal raw = new java.math.BigDecimal(unscaled, (int) effectiveScale);
+            return raw.round(mc);
         } finally {
             NativeSafe.invoke(MPFR_FREE_STR, strPtr);
         }

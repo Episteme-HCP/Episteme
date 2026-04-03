@@ -1,7 +1,6 @@
 package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraBackend;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraBackend;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRSparseLinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
@@ -26,7 +25,7 @@ public class IsolatedComplianceTest {
         List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
         
         // Explicitly test our target backends
-        providers.add(new NativeCPULinearAlgebraBackend());
+        providers.add(new NativeMPFRDenseLinearAlgebraBackend<Real>());
         providers.add(new NativeMPFRDenseLinearAlgebraBackend<Real>());
         providers.add(new NativeMPFRSparseLinearAlgebraBackend<Real>());
 

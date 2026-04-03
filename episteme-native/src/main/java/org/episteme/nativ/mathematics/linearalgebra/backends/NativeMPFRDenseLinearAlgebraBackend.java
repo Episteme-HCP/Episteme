@@ -78,6 +78,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     public static MethodHandle MPFR_CONST_PI;
     public static MethodHandle MPFR_ATAN2;
     public static MethodHandle MPFR_HYPOT;
+    public static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -129,7 +130,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 MPFR_CBRT = lookup(mpfr, "mpfr_cbrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_POW = lookup(mpfr, "mpfr_pow", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_CONST_PI = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ATAN2 = lookup(mpfr, "mpfr_atan2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null && MPFR_MUL != null && MPFR_CMP_ABS != null && MPFR_SUB != null && MPFR_SET != null && MPFR_DIV != null && MPFR_SET_UI != null && MPFR_SET_D != null;
                 if (AVAILABLE) {
@@ -727,10 +728,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         }
     }
 
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
+
     private Matrix<E> backToMatrix_internal(MemorySegment mat, int rows, int cols, Arena arena, org.episteme.core.mathematics.structures.rings.Ring<E> ring, boolean isComplex) throws Throwable {
         org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(rows, cols, (E)ring.zero());
-        MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+        MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (isComplex) {
@@ -756,15 +759,21 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0, mpfr_t, 0);
         if (strPtr == null || strPtr.equals(MemorySegment.NULL)) return RealBig.NaN;
         
-        String digits = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
-        long exp = expPtr.get(ValueLayout.JAVA_LONG, 0);
-        
-        // Special handling for MPFR NaN/Inf in the string itself (rare but possible)
-        String su = digits.toUpperCase();
-        if (su.equals("NAN") || su.contains("@NAN@")) return RealBig.NaN;
-        if (su.equals("INF") || su.contains("@INF@") || su.contains("INFINITY")) {
-            return RealBig.NaN; // RealBig doesn't support Inf yet, use NaN as safe fallback for now
-        }
+        try {
+            String digits = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
+            long exp;
+            if (IS_WINDOWS) {
+                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_INT, 0L);
+            } else {
+                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_LONG, 0L);
+            }
+            
+            // Special handling for MPFR NaN/Inf in the string itself (rare but possible)
+            String su = digits.toUpperCase();
+            if (su.equals("NAN") || su.contains("@NAN@")) return RealBig.NaN;
+            if (su.equals("INF") || su.contains("@INF@") || su.contains("INFINITY")) {
+                return RealBig.NaN; // RealBig doesn't support Inf yet, use NaN as safe fallback for now
+            }
 
         String sign = "";
         if (digits.startsWith("-")) {
@@ -786,15 +795,22 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             return RealBig.of("0"); // underflow
         }
         
-        try {
-            java.math.BigInteger unscaled = new java.math.BigInteger(sign + digits);
-            java.math.BigDecimal raw = new java.math.BigDecimal(unscaled, (int) effectiveScale);
-            // Explicitly round to the requested precision context for bit-perfect agreement
-            return RealBig.create(raw.round(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
-        } catch (NumberFormatException e) {
-            logger.warn("readMPFR: Failed to parse MPFR value (digits={}, exp={}): {}", 
-                digits.length(), exp, e.getMessage());
-            return RealBig.NaN;
+            try {
+                java.math.BigInteger unscaled = new java.math.BigInteger(sign + digits);
+                java.math.BigDecimal raw = new java.math.BigDecimal(unscaled, (int) effectiveScale);
+                // Explicitly round to the requested precision context for bit-perfect agreement
+                return RealBig.create(raw.round(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
+            } catch (NumberFormatException e) {
+                logger.warn("readMPFR: Failed to parse MPFR value (digits={}, exp={}): {}", 
+                    digits.length(), exp, e.getMessage());
+                return RealBig.NaN;
+            }
+        } finally {
+            if (MPFR_FREE_STR != null) {
+                try {
+                    NativeSafe.invoke(MPFR_FREE_STR, strPtr);
+                } catch (Throwable t) {}
+            }
         }
     }
     @Override

@@ -71,6 +71,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private static MethodHandle MPFR_POW;
     private static MethodHandle MPFR_CBRT;
     private static MethodHandle MPFR_SET_D;
+    private static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -98,6 +99,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
                 MPFR_SET_UI = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
                 MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT));
+                MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
                 MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_NEG = lookup(mpfr, "mpfr_neg", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_EXP = lookup(mpfr, "mpfr_exp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
@@ -186,9 +188,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(storage, (Ring<E>)a.getScalarRing());
     }
 
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
+
     private Real readMPFR(MemorySegment val, Arena arena) {
         try {
-            return readMPFR_internal(val, arena.allocate(ValueLayout.JAVA_LONG), arena);
+            return readMPFR_internal(val, arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG), arena);
         } catch (Throwable t) {
             throw new RuntimeException("MPFR Read failed", t);
         }
@@ -197,13 +201,52 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private Real readMPFR_internal(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
         MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, val, 0);
         if (strPtr == null || strPtr.equals(MemorySegment.NULL)) return Real.ZERO;
-        String s = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
-        long exp = expPtr.get(ValueLayout.JAVA_LONG, 0);
         
-        StringBuilder sb = new StringBuilder();
-        if (s.startsWith("-")) { sb.append("-"); s = s.substring(1); }
-        sb.append("0.").append(s).append("E").append(exp);
-        return Real.of(sb.toString());
+        try {
+            // NativeSafe.scavenge does not exist in this backend. Oh wait, it does! (Wait, Dense uses it).
+            // Best to use reinterpret to avoid dependency if not imported.
+            String digits = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
+            long exp;
+            if (IS_WINDOWS) {
+                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_INT, 0L);
+            } else {
+                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_LONG, 0L);
+            }
+        
+        String su = digits.toUpperCase();
+        if (su.equals("NAN") || su.contains("@NAN@")) return org.episteme.core.mathematics.numbers.real.RealDouble.NaN; // Use RealDouble for NaN mapping
+        if (su.equals("INF") || su.contains("@INF@") || su.contains("INFINITY")) {
+            return org.episteme.core.mathematics.numbers.real.RealDouble.NaN; // Fallback
+        }
+
+        String sign = "";
+        if (digits.startsWith("-")) {
+            sign = "-";
+            digits = digits.substring(1);
+        }
+        
+        if (digits.isEmpty() || digits.equals("0")) return Real.ZERO;
+        
+        long effectiveScale = (long) digits.length() - exp;
+        if (effectiveScale > Integer.MAX_VALUE || effectiveScale < Integer.MIN_VALUE) {
+            if (exp > 0) return org.episteme.core.mathematics.numbers.real.RealDouble.NaN; 
+            return Real.ZERO;
+        }
+        
+            try {
+                java.math.BigInteger unscaled = new java.math.BigInteger(sign + digits);
+                java.math.BigDecimal raw = new java.math.BigDecimal(unscaled, (int) effectiveScale);
+                org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+                return Real.of(raw.round(ctx.getJavaMathContext()));
+            } catch (NumberFormatException e) {
+                logger.warn("readMPFR_internal: Failed to parse MPFR value (digits={}, exp={}): {}", digits.length(), exp, e.getMessage());
+                return Real.ZERO;
+            }
+        } finally {
+            if (MPFR_FREE_STR != null) {
+                NativeSafe.invoke(MPFR_FREE_STR, strPtr);
+            }
+        }
     }
 
     private void setMPFR(MemorySegment dest, E value, Arena arena) throws Throwable {
@@ -314,7 +357,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             spmv_internal(sa, h_b, res, prec, arena, isComplex);
             
             E[] resultArr = (E[]) new Object[sa.rows()];
-            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
             for (int i = 0; i < sa.rows(); i++) {
                 if (isComplex) {
                     Real re = readMPFR_internal(res.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
@@ -405,7 +448,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
                 NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
             } else {
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(scalar.toString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(((Real)scalar).bigDecimalValue().toPlainString()), 10, 0);
             }
 
             MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);

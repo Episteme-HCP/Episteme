@@ -102,7 +102,9 @@ public final class ProviderSelector {
      * @throws RuntimeException if all providers fail
      */
     public static <P extends AlgorithmProvider, R> R execute(Class<P> providerClass, OperationContext context, java.util.function.Function<P, R> operation) {
-        List<P> providers = AlgorithmManager.getProviders(providerClass);
+        List<P> rawProviders = AlgorithmManager.getProviders(providerClass);
+        // Copy to avoid ConcurrentModificationException during sorting or iteration
+        List<P> providers = new java.util.ArrayList<>(rawProviders);
         providers.sort(Comparator.comparingDouble((P p) -> p.score(context)).reversed());
 
         Throwable lastError = null;
