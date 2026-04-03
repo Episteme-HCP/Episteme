@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unchecked")
 public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);
+    private static final NativeMPFRDenseLinearAlgebraBackend<?> SHARED_DENSE = new NativeMPFRDenseLinearAlgebraBackend<>();
     private static final Linker LINKER = Linker.nativeLinker();
     private static final boolean AVAILABLE;
 
