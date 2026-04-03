@@ -5,12 +5,8 @@
 
 package org.episteme.core.mathematics.linearalgebra;
 
-import org.episteme.core.technical.algorithm.AlgorithmService;
-import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
 import org.junit.jupiter.api.Test;
@@ -54,8 +50,6 @@ public class HighPrecisionCorrectnessTest {
     }
 
     private static final int MATRIX_SIZE = 3;
-    private static final BigDecimal TOLERANCE_REALBIG = new BigDecimal("1e-25");
-    private static final double TOLERANCE_COMPLEX = 1e-8;
     
     private static final Set<String> ALLOWED_PROVIDERS = Set.of(
         "Episteme (Standard)",
@@ -91,7 +85,7 @@ public class HighPrecisionCorrectnessTest {
             // Ground truth uses Native MPFR (highest available local precision)
             LinearAlgebraProvider<RealBig> groundTruth = new org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraBackend<>();
             
-            auditProvider(p, (LinearAlgebraProvider<RealBig>) groundTruth, metrics);
+            auditProvider(p, groundTruth, metrics);
             
             BenchmarkResult result = new BenchmarkResult(name, "Linear Algebra (High-Precision Correctness)", metrics);
             reporter.addResult(result);
@@ -116,7 +110,7 @@ public class HighPrecisionCorrectnessTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void auditProvider(LinearAlgebraProvider<?> prov, LinearAlgebraProvider<RealBig> groundTruth, Map<String, String> metrics) {
+    private <T> void auditProvider(LinearAlgebraProvider<T> prov, LinearAlgebraProvider<RealBig> groundTruth, Map<String, String> metrics) {
         // HighPrecisionAuditOperations uses lambda to report back to our metrics map
         
         // 1. RealBig block
@@ -128,7 +122,10 @@ public class HighPrecisionCorrectnessTest {
                 } catch (UnsupportedOperationException ex) {
                     metrics.put(op, "⚠️ SKIP: " + ex.getMessage());
                 } catch (Throwable ex) {
-                    metrics.put(op, "❌ FAIL: " + ex.getMessage());
+                    String msg = ex.getMessage();
+                    if (msg == null || msg.isEmpty()) msg = ex.getClass().getSimpleName();
+                    else msg = ex.getClass().getSimpleName() + ": " + (msg.length() > 50 ? msg.substring(0, 47) + "..." : msg);
+                    metrics.put(op, "❌ FAIL: " + msg);
                 }
             });
         } catch (ClassCastException e) {
@@ -144,55 +141,20 @@ public class HighPrecisionCorrectnessTest {
                 } catch (UnsupportedOperationException ex) {
                     metrics.put(op, "⚠️ SKIP: " + ex.getMessage());
                 } catch (Throwable ex) {
-                    metrics.put(op, "❌ FAIL: " + ex.getMessage());
+                    String msg = ex.getMessage();
+                    if (msg == null || msg.isEmpty()) msg = ex.getClass().getSimpleName();
+                    else {
+                        // Include class name for context
+                        msg = ex.getClass().getSimpleName() + ": " + msg;
+                    }
+                    metrics.put(op, "❌ FAIL: " + msg);
+                    // Log the full stack trace for deep debugging
+                    System.err.println("Audit failure in " + prov.getName() + " for " + op + ":");
+                    ex.printStackTrace();
                 }
             });
         } catch (ClassCastException e) {
             // Provider might not support Complex
-        }
-    }
-
-    private <E> void assertNoFallback(LinearAlgebraProvider<E> p, Object result) {
-        if (result instanceof Matrix<?> m && m.getProvider() != null) {
-            if (!m.getProvider().getClass().getSimpleName().equals(p.getClass().getSimpleName()))
-                throw new UnsupportedOperationException("Fallback detected: " + m.getProvider().getClass().getSimpleName());
-        }
-    }
-
-    private void assertMatrixClose(Matrix<RealBig> actual, Matrix<RealBig> expected, BigDecimal tol, String msg) {
-        for (int i = 0; i < actual.rows(); i++) {
-            for (int j = 0; j < actual.cols(); j++) {
-                BigDecimal valA = actual.get(i, j).bigDecimalValue();
-                BigDecimal valE = expected.get(i, j).bigDecimalValue();
-                BigDecimal diff = valA.subtract(valE).abs();
-                if (diff.compareTo(tol) > 0) {
-                    System.err.printf("Accuracy Failure [%s] at [%d,%d]:%n  Actual:   %s%n  Expected: %s%n  Diff:     %s%n  Tol:      %s%n", 
-                        msg, i, j, valA.toPlainString(), valE.toPlainString(), diff.toPlainString(), tol.toPlainString());
-                    throw new AssertionError(msg + " at [" + i + "," + j + "] diff=" + diff.toPlainString());
-                }
-            }
-        }
-    }
-
-    private void assertVectorClose(Vector<RealBig> actual, Vector<RealBig> expected, BigDecimal tol, String msg) {
-        for (int i = 0; i < actual.dimension(); i++) {
-            BigDecimal valA = actual.get(i).bigDecimalValue();
-            BigDecimal valE = expected.get(i).bigDecimalValue();
-            BigDecimal diff = valA.subtract(valE).abs();
-            if (diff.compareTo(tol) > 0) {
-                System.err.printf("Accuracy Failure [%s] at [%d]:%n  Actual:   %s%n  Expected: %s%n  Diff:     %s%n  Tol:      %s%n", 
-                    msg, i, valA.toPlainString(), valE.toPlainString(), diff.toPlainString(), tol.toPlainString());
-                throw new AssertionError(msg + " at [" + i + "] diff=" + diff.toPlainString());
-            }
-        }
-    }
-
-    private void assertComplexMatrixClose(Matrix<Complex> actual, Matrix<Complex> expected, double tol, String msg) {
-        for (int i = 0; i < actual.rows(); i++) {
-            for (int j = 0; j < actual.cols(); j++) {
-                if (actual.get(i, j).subtract(expected.get(i, j)).abs().doubleValue() > tol)
-                    throw new AssertionError(msg + " at ["+i+","+j+"]");
-            }
         }
     }
 

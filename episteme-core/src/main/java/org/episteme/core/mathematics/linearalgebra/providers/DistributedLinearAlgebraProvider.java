@@ -11,6 +11,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.technical.algorithm.AlgorithmException;
 import com.google.auto.service.AutoService;
 
 /**
@@ -86,6 +87,10 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
                 return res;
             }
         );
+
+        if (result == null) {
+            throw new AlgorithmException("No suitable local provider found for operation in " + getName());
+        }
 
         // Safety check to avoid ClassCastException (RealDouble -> RealBig)
         if (isHighPrecision && result instanceof Matrix<?> m) {
@@ -360,6 +365,10 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
                 return res;
             }
         );
+
+        if (result == null) {
+            throw new AlgorithmException("No suitable local sparse provider found for operation in " + getName());
+        }
 
         if (isHighPrecision && result instanceof Matrix<?> m) {
             if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {

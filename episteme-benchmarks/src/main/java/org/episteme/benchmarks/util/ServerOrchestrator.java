@@ -16,10 +16,17 @@ public class ServerOrchestrator {
 
     public void startServer() throws IOException {
         System.out.println("[Orchestrator] Starting Episteme Server...");
+        
+        // Handle long classpath on Windows via @argfile
+        java.nio.file.Path argFile = java.nio.file.Files.createTempFile("episteme-classpath", ".args");
+        String cp = System.getProperty("java.class.path");
+        java.nio.file.Files.writeString(argFile, "-cp \"" + cp.replace("\\", "/") + "\"");
+        argFile.toFile().deleteOnExit();
+
         ProcessBuilder pb = new ProcessBuilder(
             javaPath,
             "--enable-preview",
-            "-cp", System.getProperty("java.class.path"),
+            "@" + argFile.toAbsolutePath(),
             "org.episteme.core.mathematics.linearalgebra.GrpcTestApplication"
         );
         pb.redirectErrorStream(true);
