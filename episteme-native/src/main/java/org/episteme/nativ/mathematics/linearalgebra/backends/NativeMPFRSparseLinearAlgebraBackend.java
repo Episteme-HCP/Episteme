@@ -303,7 +303,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (a.cols() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
         long prec = getPrecision();
-        boolean isComplex = ((Object)sa.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = isComplex(sa.getScalarRing());
         
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_b = initVector(b.toMatrix(), arena, prec, isComplex);
@@ -385,7 +385,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
         long prec = getPrecision();
         org.episteme.core.mathematics.structures.rings.Ring<E> ring = (org.episteme.core.mathematics.structures.rings.Ring<E>) sa.getScalarRing();
-        boolean isComplex = ((Object)sa.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = isComplex(sa.getScalarRing());
         
         org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E>(sa.rows(), sa.cols(), (E) ring.zero());
@@ -452,7 +452,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         Field<E> field = (Field<E>) a.getScalarRing();
         int n = a.dimension();
         long prec = getPrecision();
-        boolean isComplex = ((Object)field.zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = isComplex(field);
         
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment sR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR, prec);
@@ -461,10 +461,10 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             
             if (isComplex) {
                 org.episteme.core.mathematics.numbers.complex.Complex cs = (org.episteme.core.mathematics.numbers.complex.Complex) scalar;
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().toString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().toString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
             } else {
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(scalar.toString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(((Real)scalar).bigDecimalValue().toPlainString()), 10, 0);
             }
 
             MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
@@ -580,7 +580,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     public Vector<E> add(Vector<E> v1, Vector<E> v2) {
         if (v1.dimension() != v2.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         long prec = getPrecision();
-        boolean isComplex = ((Object)v1.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = isComplex(v1.getScalarRing());
         
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment t1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
@@ -626,7 +626,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     public Vector<E> subtract(Vector<E> v1, Vector<E> v2) {
         if (v1.dimension() != v2.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         long prec = getPrecision();
-        boolean isComplex = ((Object)v1.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = isComplex(v1.getScalarRing());
         
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment t1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
@@ -862,7 +862,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         
         long prec = getPrecision();
         try (Arena arena = Arena.ofConfined()) {
-            boolean isComplex = ((Object)v1.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+            boolean isComplex = isComplex(v1.getScalarRing());
             MemorySegment h_v1 = initVector(v1.toMatrix(), arena, prec, isComplex);
             MemorySegment h_v2 = initVector(v2.toMatrix(), arena, prec, isComplex);
             
@@ -943,14 +943,18 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override public Matrix<E> cbrt(Matrix<E> a) { return applyTranscendental(a, "cbrt"); }
 
     private boolean isComplex(Matrix<E> a) {
-        return ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        return isComplex(a.getScalarRing());
+    }
+
+    private boolean isComplex(Ring<?> ring) {
+        return ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     @SuppressWarnings("unchecked")
     public Matrix<E> applyTranscendental(Matrix<E> a, String op, Object... args) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " is not available.");
         long prec = getPrecision();
-        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = isComplex(a.getScalarRing());
         
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
         org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
@@ -985,7 +989,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
              NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(z.getReal().bigDecimalValue().toPlainString()), 10, 0);
              NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(z.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
              
-             NativeMPFRDenseLinearAlgebraBackend<E> dense = new NativeMPFRDenseLinearAlgebraBackend<>();
+             @SuppressWarnings("unchecked")
+             NativeMPFRDenseLinearAlgebraBackend<E> dense = (NativeMPFRDenseLinearAlgebraBackend<E>) SHARED_DENSE;
              switch (op.toLowerCase()) {
                  case "exp" -> dense.complexExp(resR, resI, aR, aI, prec, arena);
                  case "log" -> dense.complexLog(resR, resI, aR, aI, prec, arena);
@@ -1064,7 +1069,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override public E norm(Vector<E> v) { 
         long prec = getPrecision();
         try (Arena arena = Arena.ofConfined()) {
-            boolean isComplex = ((Object)v.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+            boolean isComplex = isComplex(v.getScalarRing());
             MemorySegment h_v = initVector(v.toMatrix(), arena, prec, isComplex);
             MemorySegment res = arena.allocate(MPFR_LAYOUT, isComplex ? 2 : 1);
             for (int i=0; i<(isComplex?2:1); i++) NativeSafe.invoke(MPFR_INIT2, res.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
