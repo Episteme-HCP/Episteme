@@ -3,7 +3,7 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.nativ.mathematics.analysis;
+package org.episteme.nativ.mathematics.numbers.real.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -48,6 +48,29 @@ public final class NativeMPFRNumbers {
     public static final MethodHandle MPFR_HYPOT;
     public static final MethodHandle MPFR_POW;
     
+    // Arithmetic Handles
+    public static final MethodHandle MPFR_ADD;
+    public static final MethodHandle MPFR_SUB;
+    public static final MethodHandle MPFR_MUL;
+    public static final MethodHandle MPFR_DIV;
+    public static final MethodHandle MPFR_NEG;
+    public static final MethodHandle MPFR_ABS;
+    public static final MethodHandle MPFR_CMP;
+    public static final MethodHandle MPFR_SET;
+    public static final MethodHandle MPFR_SET_UI;
+    public static final MethodHandle MPFR_CMP_ABS;
+    public static final MethodHandle MPFR_ZERO_P;
+    public static final MethodHandle MPFR_SET_D;
+    public static final MethodHandle MPFR_CONST_PI;
+
+    public static final MemoryLayout MPFR_LAYOUT = MemoryLayout.structLayout(
+        ValueLayout.JAVA_INT.withName("prec"),
+        ValueLayout.JAVA_INT.withName("sign"),
+        ValueLayout.JAVA_INT.withName("exp"),
+        MemoryLayout.paddingLayout(4),
+        ValueLayout.ADDRESS.withName("d")
+    );
+    
     // Core MPFR management
     public static final MethodHandle MPFR_INIT2;
     public static final MethodHandle MPFR_CLEAR;
@@ -63,6 +86,8 @@ public final class NativeMPFRNumbers {
         MethodHandle asin = null, acos = null, atan = null, atan2 = null;
         MethodHandle sinh = null, cosh = null, tanh = null, asinh = null, acosh = null, atanh = null;
         MethodHandle cbrt = null, sqrt = null, hypot = null, pow = null;
+        MethodHandle add = null, sub = null, mul = null, div = null, neg = null, abs = null, cmp = null;
+        MethodHandle set = null, set_ui = null, cmp_abs = null, zero_p = null, set_d = null, const_pi = null;
         MethodHandle init2 = null, clear = null, setStr = null, getStr = null, freeStr = null;
 
         try {
@@ -95,6 +120,29 @@ public final class NativeMPFRNumbers {
                 atan2 = lookup(mpfr, "mpfr_atan2", twoArg);
                 hypot = lookup(mpfr, "mpfr_hypot", twoArg);
                 pow = lookup(mpfr, "mpfr_pow", twoArg);
+
+                // Arithmetic functions: (rop, op1, op2, rnd)
+                add = lookup(mpfr, "mpfr_add", twoArg);
+                sub = lookup(mpfr, "mpfr_sub", twoArg);
+                mul = lookup(mpfr, "mpfr_mul", twoArg);
+                div = lookup(mpfr, "mpfr_div", twoArg);
+
+                // Arithmetic functions: (rop, op, rnd)
+                neg = lookup(mpfr, "mpfr_neg", oneArg);
+                abs = lookup(mpfr, "mpfr_abs", oneArg);
+
+                // Comparison: (op1, op2)
+                cmp = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS));
+
+                // Set functions
+                set = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT));
+                set_ui = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(JAVA_INT, ADDRESS, ValueLayout.JAVA_LONG, JAVA_INT));
+                set_d = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(JAVA_INT, ADDRESS, ValueLayout.JAVA_DOUBLE, JAVA_INT));
+
+                // Misc/Analysis
+                cmp_abs = lookup(mpfr, "mpfr_cmpabs", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS));
+                zero_p = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                const_pi = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(JAVA_INT, ADDRESS, JAVA_INT));
                 
                 // Management functions
                 init2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ADDRESS, ValueLayout.JAVA_LONG));
@@ -118,6 +166,8 @@ public final class NativeMPFRNumbers {
         MPFR_ASIN = asin; MPFR_ACOS = acos; MPFR_ATAN = atan; MPFR_ATAN2 = atan2;
         MPFR_SINH = sinh; MPFR_COSH = cosh; MPFR_TANH = tanh; MPFR_ASINH = asinh; MPFR_ACOSH = acosh; MPFR_ATANH = atanh;
         MPFR_CBRT = cbrt; MPFR_SQRT = sqrt; MPFR_HYPOT = hypot; MPFR_POW = pow;
+        MPFR_ADD = add; MPFR_SUB = sub; MPFR_MUL = mul; MPFR_DIV = div; MPFR_NEG = neg; MPFR_ABS = abs; MPFR_CMP = cmp;
+        MPFR_SET = set; MPFR_SET_UI = set_ui; MPFR_CMP_ABS = cmp_abs; MPFR_ZERO_P = zero_p; MPFR_SET_D = set_d; MPFR_CONST_PI = const_pi;
         MPFR_INIT2 = init2; MPFR_CLEAR = clear; MPFR_SET_STR = setStr; MPFR_GET_STR = getStr; MPFR_FREE_STR = freeStr;
         AVAILABLE = available;
         if (AVAILABLE) {
@@ -127,7 +177,7 @@ public final class NativeMPFRNumbers {
         }
     }
 
-    private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor desc) {
+    public static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor desc) {
         return lookup.find(name).map(s -> LINKER.downcallHandle(s, desc)).orElse(null);
     }
 

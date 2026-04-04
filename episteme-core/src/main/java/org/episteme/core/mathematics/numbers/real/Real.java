@@ -217,8 +217,8 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     }
 
 
-    // Package-private constructor
-    Real() {
+    // Protected constructor to allow subclassing across packages
+    protected Real() {
     }
 
     // --- Abstract operations ---

@@ -25,8 +25,12 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
+import org.episteme.nativ.mathematics.numbers.real.NativeRealBig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
+import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.*;
 
 
 /**
@@ -39,127 +43,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");
     private static final Linker LINKER = Linker.nativeLinker();
-    private static boolean AVAILABLE = false;
+    private static final boolean AVAILABLE = NativeMPFRNumbers.AVAILABLE;
 
-    // MPFR Handles
-    public static MethodHandle MPFR_INIT2;
-    public static MethodHandle MPFR_CLEAR;
-    public static MethodHandle MPFR_SET_STR;
-    public static MethodHandle MPFR_GET_STR;
-    public static MethodHandle MPFR_ADD;
-    public static MethodHandle MPFR_SUB;
-    public static MethodHandle MPFR_MUL;
-    public static MethodHandle MPFR_DIV;
-    public static MethodHandle MPFR_SET;
-    public static MethodHandle MPFR_CMP_ABS;
-    public static MethodHandle MPFR_SET_UI;
-    public static MethodHandle MPFR_CMP;
-    public static MethodHandle MPFR_ZERO_P;
-    public static MethodHandle MPFR_NEG;
-    public static MethodHandle MPFR_SET_D;
-    public static MethodHandle MPFR_EXP;
-    public static MethodHandle MPFR_LOG;
-    public static MethodHandle MPFR_LOG10;
-    public static MethodHandle MPFR_SIN;
-    public static MethodHandle MPFR_COS;
-    public static MethodHandle MPFR_TAN;
-    public static MethodHandle MPFR_ASIN;
-    public static MethodHandle MPFR_ACOS;
-    public static MethodHandle MPFR_ATAN;
-    public static MethodHandle MPFR_SINH;
-    public static MethodHandle MPFR_COSH;
-    public static MethodHandle MPFR_TANH;
-    public static MethodHandle MPFR_ASINH;
-    public static MethodHandle MPFR_ACOSH;
-    public static MethodHandle MPFR_ATANH;
-    public static MethodHandle MPFR_SQRT;
-    public static MethodHandle MPFR_CBRT;
-    public static MethodHandle MPFR_POW;
-    public static MethodHandle MPFR_CONST_PI;
-    public static MethodHandle MPFR_ATAN2;
-    public static MethodHandle MPFR_HYPOT;
-    public static MethodHandle MPFR_FREE_STR;
-
-    public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT.withName("prec"),
-        ValueLayout.JAVA_INT.withName("sign"),
-        ValueLayout.JAVA_INT.withName("exp"),
-        MemoryLayout.paddingLayout(4),
-        ValueLayout.ADDRESS.withName("d")
-    );
-
-    static {
-        try {
-            // Using the Arena-based version which returns Optional<SymbolLookup>
-            Optional<SymbolLookup> mpfrLookup = NativeFFMLoader.loadLibrary("mpfr", Arena.global());
-            if (mpfrLookup.isPresent()) {
-                SymbolLookup mpfr = mpfrLookup.get();
-                MPFR_INIT2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
-                MPFR_CLEAR = lookup(mpfr, "mpfr_clear", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
-                MPFR_SET_STR = lookup(mpfr, "mpfr_set_str", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
-                MPFR_GET_STR = lookup(mpfr, "mpfr_get_str", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ADD = lookup(mpfr, "mpfr_add", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SUB = lookup(mpfr, "mpfr_sub", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_MUL = lookup(mpfr, "mpfr_mul", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_DIV = lookup(mpfr, "mpfr_div", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SET = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_CMP_ABS = lookup(mpfr, "mpfr_cmpabs", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-                MPFR_SET_UI = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
-                MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-                MPFR_ZERO_P = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-                MPFR_NEG = lookup(mpfr, "mpfr_neg", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT));
-                MPFR_EXP = lookup(mpfr, "mpfr_exp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_LOG = lookup(mpfr, "mpfr_log", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_LOG10 = lookup(mpfr, "mpfr_log10", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SIN = lookup(mpfr, "mpfr_sin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_COS = lookup(mpfr, "mpfr_cos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_TAN = lookup(mpfr, "mpfr_tan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ASIN = lookup(mpfr, "mpfr_asin", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ACOS = lookup(mpfr, "mpfr_acos", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ATAN = lookup(mpfr, "mpfr_atan", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ATAN2 = lookup(mpfr, "mpfr_atan2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_HYPOT = lookup(mpfr, "mpfr_hypot", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SINH = lookup(mpfr, "mpfr_sinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_COSH = lookup(mpfr, "mpfr_cosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_TANH = lookup(mpfr, "mpfr_tanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ASINH = lookup(mpfr, "mpfr_asinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ACOSH = lookup(mpfr, "mpfr_acosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ATANH = lookup(mpfr, "mpfr_atanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_CBRT = lookup(mpfr, "mpfr_cbrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_POW = lookup(mpfr, "mpfr_pow", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_CONST_PI = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
-
-                AVAILABLE = MPFR_INIT2 != null && MPFR_ADD != null && MPFR_MUL != null && MPFR_CMP_ABS != null && MPFR_SUB != null && MPFR_SET != null && MPFR_DIV != null && MPFR_SET_UI != null && MPFR_SET_D != null;
-                if (AVAILABLE) {
-                    logger.info("Native MPFR Dense Backend initialized (Panama). All core handles loaded.");
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("MPFR Symbol Check: exp={}, log={}, sin={}, cos={}, pow={}, hypot={}", 
-                            MPFR_EXP != null, MPFR_LOG != null, MPFR_SIN != null, MPFR_COS != null, MPFR_POW != null, MPFR_HYPOT != null);
-                    }
-                } else {
-                    logger.warn("Native MPFR Dense Backend initialization incomplete - core handles missing:");
-                    if (MPFR_INIT2 == null) logger.warn("  - mpfr_init2 MISSING");
-                    if (MPFR_ADD == null) logger.warn("  - mpfr_add MISSING");
-                    if (MPFR_MUL == null) logger.warn("  - mpfr_mul MISSING");
-                    if (MPFR_CMP_ABS == null) logger.warn("  - mpfr_cmpabs MISSING");
-                    if (MPFR_SUB == null) logger.warn("  - mpfr_sub MISSING");
-                    if (MPFR_SET == null) logger.warn("  - mpfr_set MISSING");
-                    if (MPFR_DIV == null) logger.warn("  - mpfr_div MISSING");
-                    if (MPFR_SET_UI == null) logger.warn("  - mpfr_set_ui MISSING");
-                    if (MPFR_SET_D == null) logger.warn("  - mpfr_set_d MISSING");
-                }
-            }
-        } catch (Throwable t) {
-            logger.warn("Failed to initialize MPFR Backend: {}", t.getMessage());
-        }
-    }
-
-    private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor desc) {
-        return lookup.find(name).map(s -> LINKER.downcallHandle(s, desc)).orElse(null);
-    }
+    // Redundant handles removed, using NativeMPFRNumbers
 
     @Override public boolean isAvailable() { return AVAILABLE && !isExplicitlyDisabled(); }
     @Override public String getId() { return "native-mpfr-dense"; }
@@ -686,7 +572,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     }
 
     private void setMPFR(MemorySegment mpfr, Real val, Arena arena, int rnd) throws Throwable {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealDouble rd) {
+        if (val instanceof NativeRealBig nrb) {
+            NativeSafe.invoke(MPFR_SET, mpfr, nrb.getPtr(), rnd);
+        } else if (val instanceof org.episteme.core.mathematics.numbers.real.RealDouble rd) {
             NativeSafe.invoke(MPFR_SET_D, mpfr, rd.doubleValue(), rnd);
         } else {
             NativeSafe.invoke(MPFR_SET_STR, mpfr, arena.allocateFrom(val.bigDecimalValue().toPlainString()), 10, rnd);
@@ -757,59 +645,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     private Real readMPFR(MemorySegment mpfr_t, MemorySegment expPtr, Arena arena) {
         MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0, mpfr_t, 0);
-        if (strPtr == null || strPtr.equals(MemorySegment.NULL)) return RealBig.NaN;
+        if (strPtr == null || strPtr.address() == 0) return Real.ZERO;
         
         try {
-            String digits = NativeSafe.scavenge(strPtr, 1024, arena, "mpfr_get_str").segment().getString(0);
-            long exp;
-            if (IS_WINDOWS) {
-                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_INT, 0L);
-            } else {
-                exp = expPtr.get(java.lang.foreign.ValueLayout.JAVA_LONG, 0L);
-            }
-            
-            // Special handling for MPFR NaN/Inf in the string itself (rare but possible)
-            String su = digits.toUpperCase();
-            if (su.equals("NAN") || su.contains("@NAN@")) return RealBig.NaN;
-            if (su.equals("INF") || su.contains("@INF@") || su.contains("INFINITY")) {
-                return RealBig.NaN; // RealBig doesn't support Inf yet, use NaN as safe fallback for now
-            }
-
-        String sign = "";
-        if (digits.startsWith("-")) {
-            sign = "-";
-            digits = digits.substring(1);
-        }
-        
-        if (digits.isEmpty() || digits.equals("0")) return RealBig.of("0");
-        
-        // Guard against exponent overflow for BigDecimal (int range)
-        // The exponent from mpfr_get_str represents where the decimal point goes:
-        // digits = "12345", exp = 3 means 123.45
-        // We construct: sign + "0." + digits, then adjust by exp
-        // Effective exponent for BigDecimal = exp - digits.length()
-        long effectiveScale = (long) digits.length() - exp;
-        if (effectiveScale > Integer.MAX_VALUE || effectiveScale < Integer.MIN_VALUE) {
-            // Truly extreme exponent — value is effectively 0 or infinity for our purposes
-            if (exp > 0) return RealBig.NaN; // overflow  
-            return RealBig.of("0"); // underflow
-        }
-        
-            try {
-                java.math.BigInteger unscaled = new java.math.BigInteger(sign + digits);
-                java.math.BigDecimal raw = new java.math.BigDecimal(unscaled, (int) effectiveScale);
-                // Explicitly round to the requested precision context for bit-perfect agreement
-                return RealBig.create(raw.round(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
-            } catch (NumberFormatException e) {
-                logger.warn("readMPFR: Failed to parse MPFR value (digits={}, exp={}): {}", 
-                    digits.length(), exp, e.getMessage());
-                return RealBig.NaN;
-            }
+            String digits = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
+            return NativeRealBig.of(digits);
         } finally {
             if (MPFR_FREE_STR != null) {
-                try {
-                    NativeSafe.invoke(MPFR_FREE_STR, strPtr);
-                } catch (Throwable t) {}
+                NativeSafe.invoke(MPFR_FREE_STR, strPtr);
             }
         }
     }

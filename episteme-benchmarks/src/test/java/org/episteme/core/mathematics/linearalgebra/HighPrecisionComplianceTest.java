@@ -108,11 +108,7 @@ public class HighPrecisionComplianceTest {
             List<AlgorithmProvider> allowed = new ArrayList<>();
             allowed.add(rawProvider);
             
-            // 1. Transcendental support for RealBig/Complex math - include ALL available
-            for (AlgorithmProvider p : AlgorithmManager.getService().getProviders(org.episteme.core.mathematics.numbers.real.TranscendentalProvider.class)) {
-                allowed.add(p);
-            }
-            
+
             // 2. Leaf and Sparse fallbacks for distributed/recursive providers (and gRPC bridge)
             if (rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider ||
                 rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider ||

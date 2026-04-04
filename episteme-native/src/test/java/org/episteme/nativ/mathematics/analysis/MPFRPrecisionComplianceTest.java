@@ -10,6 +10,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
 
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -221,6 +221,13 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <!-- BigMath (High-Precision Transcendental Functions) -->
+        <dependency>
+            <groupId>ch.obermuhlner</groupId>
+            <artifactId>big-math</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+
         <!-- Monitoring (Micrometer + Prometheus) -->
         <dependency>
             <groupId>io.micrometer</groupId>

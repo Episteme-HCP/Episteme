@@ -24,8 +24,8 @@
 package org.episteme.core.mathematics.numbers.real;
 
 import java.math.BigDecimal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.math.MathContext;
+import ch.obermuhlner.math.big.BigDecimalMath;
 
 /**
  * Real number backed by arbitrary-precision {@link BigDecimal}.
@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  */
 public final class RealBig extends Real {
-    private static final Logger logger = LoggerFactory.getLogger(RealBig.class);
 
     public static final RealBig NaN = new RealBig(null);
     public static final RealBig ZERO = new RealBig(BigDecimal.ZERO);
@@ -151,188 +150,147 @@ public final class RealBig extends Real {
         return RealBig.create(value.pow(exp));
     }
 
-    private BigDecimal computeTranscendental(String function, BigDecimal value) {
-        try {
-            TranscendentalProvider provider = org.episteme.core.technical.algorithm.AlgorithmManager.getProvider(TranscendentalProvider.class);
-            if (provider != null && provider.isAvailable()) {
-                return provider.compute(function, value, org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext());
-            } else {
-                logger.info("Transcendental provider missing or unavailable for function {}: {}", function, provider);
-            }
-        } catch (Exception e) {
-            logger.error("Transcendental computation failed: {}", e.getMessage());
-            // Fallback to double math
-        }
-        return null;
-    }
-
-    private BigDecimal computeTranscendental(String function, BigDecimal v1, BigDecimal v2) {
-        try {
-            TranscendentalProvider provider = org.episteme.core.technical.algorithm.AlgorithmManager.getProvider(TranscendentalProvider.class);
-            if (provider != null && provider.isAvailable()) {
-                return provider.compute(function, v1, v2, org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext());
-            } else {
-                logger.info("Transcendental provider missing or unavailable for function {}: {}", function, provider);
-            }
-        } catch (Exception e) {
-            logger.error("Transcendental computation failed: {}", e.getMessage());
-            // Fallback to double math
-        }
-        return null;
-    }
-
     @Override
     public Real pow(double exponent) {
         if (this.isNaN()) return NaN;
-        BigDecimal res = computeTranscendental("pow", value, BigDecimal.valueOf(exponent));
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'pow' failed or was unavailable (no fallback allowed)");
+        return RealBig.create(BigDecimalMath.pow(value, BigDecimal.valueOf(exponent), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real pow(Real exp) {
         if (this.isNaN() || exp.isNaN()) return NaN;
-        if (exp.isInfinite()) {
-            if (this.abs().compareTo(Real.ONE) > 0) {
-                return (exp.sign() > 0) ? Real.POSITIVE_INFINITY : Real.ZERO;
-            } else if (this.abs().compareTo(Real.ONE) < 0) {
-                return (exp.sign() > 0) ? Real.ZERO : Real.POSITIVE_INFINITY;
-            } else {
-                return Real.NaN;
-            }
-        }
-        BigDecimal res = computeTranscendental("pow", value, exp.bigDecimalValue());
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'pow' failed or was unavailable (no fallback allowed)");
+        return RealBig.create(BigDecimalMath.pow(value, exp.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
-
-    // --- Transcendental Functions ---
 
     @Override
     public Real exp() {
-        BigDecimal res = computeTranscendental("exp", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'exp' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.exp(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real log() {
-        BigDecimal res = computeTranscendental("log", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'log' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.log(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real log10() {
-        BigDecimal res = computeTranscendental("log10", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'log10' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.log10(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real sin() {
-        BigDecimal res = computeTranscendental("sin", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'sin' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.sin(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real cos() {
-        BigDecimal res = computeTranscendental("cos", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'cos' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.cos(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real tan() {
-        BigDecimal res = computeTranscendental("tan", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'tan' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.tan(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real asin() {
-        BigDecimal res = computeTranscendental("asin", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'asin' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.asin(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real acos() {
-        BigDecimal res = computeTranscendental("acos", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'acos' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.acos(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real atan() {
-        BigDecimal res = computeTranscendental("atan", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'atan' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.atan(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real atan2(Real x) {
-        BigDecimal res = computeTranscendental("atan2", value, x.bigDecimalValue());
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'atan2' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN() || x.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.atan2(value, x.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real sinh() {
-        BigDecimal res = computeTranscendental("sinh", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'sinh' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.sinh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real cosh() {
-        BigDecimal res = computeTranscendental("cosh", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'cosh' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.cosh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real tanh() {
-        BigDecimal res = computeTranscendental("tanh", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'tanh' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.tanh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real asinh() {
-        BigDecimal res = computeTranscendental("asinh", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'asinh' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.asinh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real acosh() {
-        BigDecimal res = computeTranscendental("acosh", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'acosh' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.acosh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real atanh() {
-        BigDecimal res = computeTranscendental("atanh", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'atanh' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.atanh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real cbrt() {
         if (this.isNaN()) return NaN;
-        BigDecimal res = computeTranscendental("cbrt", value);
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'cbrt' failed or was unavailable (no fallback allowed)");
+        return RealBig.create(BigDecimalMath.pow(value, BigDecimal.ONE.divide(BigDecimal.valueOf(3), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real hypot(Real y) {
-        BigDecimal res = computeTranscendental("hypot", value, y.bigDecimalValue());
-        if (res != null) return RealBig.create(res);
-        throw new UnsupportedOperationException("Transcendental 'hypot' failed or was unavailable (no fallback allowed)");
+        if (this.isNaN() || y.isNaN()) return NaN;
+        MathContext mc = org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext();
+        BigDecimal x2 = value.multiply(value, mc);
+        BigDecimal y2 = y.bigDecimalValue().multiply(y.bigDecimalValue(), mc);
+        return RealBig.create(x2.add(y2, mc).sqrt(mc));
     }
 
     @Override
