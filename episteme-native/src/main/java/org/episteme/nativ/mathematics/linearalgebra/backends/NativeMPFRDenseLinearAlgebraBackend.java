@@ -8,7 +8,6 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import com.google.auto.service.AutoService;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
-import java.util.Optional;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -17,7 +16,6 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -42,7 +40,6 @@ import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNum
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CPUBackend, SparseLinearAlgebraProvider<E> {
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");
-    private static final Linker LINKER = Linker.nativeLinker();
     private static final boolean AVAILABLE = NativeMPFRNumbers.AVAILABLE;
 
     // Redundant handles removed, using NativeMPFRNumbers
@@ -616,20 +613,21 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         }
     }
 
-    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
-
     private Matrix<E> backToMatrix_internal(MemorySegment mat, int rows, int cols, Arena arena, org.episteme.core.mathematics.structures.rings.Ring<E> ring, boolean isComplex) throws Throwable {
         org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(rows, cols, (E)ring.zero());
-        MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
+        long prec = getPrecision();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (isComplex) {
-                    Real r = readMPFR(getMPFR(mat, i, j, cols, 0, true), expPtr, arena);
-                    Real img = readMPFR(getMPFR(mat, i, j, cols, 1, true), expPtr, arena);
-                    storage.set(i, j, (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, img));
+                    MemorySegment ptrR = getMPFR(mat, i, j, cols, 0, true);
+                    MemorySegment ptrI = getMPFR(mat, i, j, cols, 1, true);
+                    NativeRealBig r = NativeRealBig.copyFrom(ptrR, prec);
+                    NativeRealBig im = NativeRealBig.copyFrom(ptrI, prec);
+                    storage.set(i, j, (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
                 } else {
-                    storage.set(i, j, (E) (Object) readMPFR(getMPFR(mat, i, j, cols, 0, false), expPtr, arena));
+                    MemorySegment ptr = getMPFR(mat, i, j, cols, 0, false);
+                    storage.set(i, j, (E) (Object) NativeRealBig.copyFrom(ptr, prec));
                 }
             }
         }

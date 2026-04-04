@@ -174,6 +174,7 @@ public class GenericSparseSolvers {
                 for (int j = i + 1; j < actual_m; j++) {
                     y[i] = f.subtract(y[i], f.multiply(H[i][j], y[j]));
                 }
+                if (isSmaller(H[i][i], 1e-30, f)) break;
                 y[i] = f.divide(y[i], H[i][i]);
             }
 

@@ -61,6 +61,15 @@ public final class NativeRealBig extends Real {
         return new NativeRealBig(value, prec);
     }
 
+    /**
+     * Efficiently creates a new NativeRealBig by copying from an existing native mpfr_t.
+     */
+    public static NativeRealBig copyFrom(MemorySegment sourcePtr, long precision) {
+        NativeRealBig res = new NativeRealBig(precision);
+        NativeSafe.invoke(MPFR_SET, res.ptr, sourcePtr, 0);
+        return res;
+    }
+
     public static NativeRealBig of(BigDecimal value) {
         return of(value.toPlainString());
     }

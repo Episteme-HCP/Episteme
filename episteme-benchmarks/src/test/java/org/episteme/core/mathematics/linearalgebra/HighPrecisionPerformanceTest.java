@@ -65,6 +65,10 @@ public class HighPrecisionPerformanceTest {
         );
         
         reporter.addSection("Methodology", "Measuring execution time (ms) for 68+ operations on " + MATRIX_SIZE + "x" + MATRIX_SIZE + " matrices.");
+        reporter.addMetadata("Precision", org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext().getPrecision() + " decimal digits (" + (int)(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext().getPrecision() * 3.322) + " bits)");
+        reporter.addMetadata("Matrix Size", MATRIX_SIZE + "x" + MATRIX_SIZE);
+        reporter.addMetadata("JDK", System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
+        reporter.addMetadata("OS", System.getProperty("os.name") + " " + System.getProperty("os.arch"));
 
         for (LinearAlgebraProvider<?> provider : providers) {
             if (!provider.isAvailable()) continue;

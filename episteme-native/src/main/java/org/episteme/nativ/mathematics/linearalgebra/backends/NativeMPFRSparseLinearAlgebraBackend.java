@@ -7,7 +7,6 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
-import java.util.Optional;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -21,7 +20,6 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
-import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.nativ.mathematics.numbers.real.NativeRealBig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +36,6 @@ import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNum
 public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);
     private static final NativeMPFRDenseLinearAlgebraBackend<?> SHARED_DENSE = new NativeMPFRDenseLinearAlgebraBackend<>();
-    private static final Linker LINKER = Linker.nativeLinker();
 
     // Redundant handles removed, centralized in NativeMPFRNumbers
     private static final MemoryLayout MPFR_LAYOUT = NativeMPFRNumbers.MPFR_LAYOUT;
@@ -208,6 +205,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
                 NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
                 
+                // dotI = aR*bI - aI*bR
                 NativeSafe.invoke(MPFR_MUL, t1, aR, bI, 0);
                 NativeSafe.invoke(MPFR_MUL, t2, aI, bR, 0);
                 NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
@@ -323,8 +321,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 // dotI = xR*yI - xI*yR
                 NativeSafe.invoke(MPFR_MUL, t1, xiR, yiI, 0);
                 NativeSafe.invoke(MPFR_MUL, t2, xiI, yiR, 0);
-                NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
-                NativeSafe.invoke(MPFR_ADD, sumI, sumI, t2, 0);
+                NativeSafe.invoke(MPFR_ADD, sumI, sumI, t1, 0);
+                NativeSafe.invoke(MPFR_SUB, sumI, sumI, t2, 0);
             } else {
                 NativeSafe.invoke(MPFR_MUL, t1, xiR, yiR, 0);
                 NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);

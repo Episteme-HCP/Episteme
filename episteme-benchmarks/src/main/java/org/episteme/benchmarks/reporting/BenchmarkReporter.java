@@ -31,6 +31,7 @@ public class BenchmarkReporter {
     private final String title;
     private final java.util.List<BenchmarkResult> results = new ArrayList<>();
     private final Map<String, String> sections = new LinkedHashMap<>();
+    private final Map<String, String> metadata = new LinkedHashMap<>();
     private String comments = "";
     private String footer = "";
 
@@ -48,6 +49,10 @@ public class BenchmarkReporter {
 
     public void addSection(String name, String content) {
         sections.put(name, content);
+    }
+
+    public void addMetadata(String key, String value) {
+        metadata.put(key, value);
     }
 
     public void addResult(BenchmarkResult result) {
@@ -243,6 +248,23 @@ public class BenchmarkReporter {
                 document.add(commentPara);
             }
 
+            // Environment metadata table
+            if (!metadata.isEmpty()) {
+                document.add(new Paragraph(" "));
+                Font metaFont = FontFactory.getFont(FontFactory.HELVETICA, 10, new Color(80, 80, 80));
+                Paragraph metaHeader = new Paragraph("Test Environment", sectionFont);
+                metaHeader.setSpacingBefore(10);
+                document.add(metaHeader);
+                com.lowagie.text.pdf.PdfPTable metaTable = new com.lowagie.text.pdf.PdfPTable(2);
+                metaTable.setWidthPercentage(60);
+                metaTable.setHorizontalAlignment(Element.ALIGN_LEFT);
+                for (Map.Entry<String, String> e : metadata.entrySet()) {
+                    metaTable.addCell(new Paragraph(e.getKey(), metaFont));
+                    metaTable.addCell(new Paragraph(e.getValue(), metaFont));
+                }
+                document.add(metaTable);
+            }
+
             // Summary Table
             document.add(new Paragraph(" "));
             com.lowagie.text.pdf.PdfPTable table = new com.lowagie.text.pdf.PdfPTable(3);
@@ -258,7 +280,7 @@ public class BenchmarkReporter {
             document.add(table);
 
             // --- INDIVIDUAL OPERATION PAGES ---
-            Set<String> allOps = new LinkedHashSet<>();
+            java.util.Set<String> allOps = new java.util.LinkedHashSet<>();
             for (BenchmarkResult r : results) {
                 for (String key : r.extraMetrics().keySet()) {
                     if (key.endsWith(":latency")) {
@@ -352,65 +374,4 @@ public class BenchmarkReporter {
         return chart;
     }
 
-    private static void addDomainSection(Document document, PdfWriter writer, Font sectionFont, String title, java.util.List<BenchmarkResult> results, String categoryFilter) throws DocumentException {
-        Paragraph header = new Paragraph(title, sectionFont);
-        header.setAlignment(Element.ALIGN_CENTER);
-        header.setSpacingBefore(20);
-        document.add(header);
-        document.add(new Paragraph(" "));
-
-        JFreeChart chart = createChart(title, results, categoryFilter);
-        java.awt.image.BufferedImage bufferedImage = chart.createBufferedImage(750, 400);
-        try {
-            Image pdfImage = Image.getInstance(writer, bufferedImage, 1.0f);
-            pdfImage.setAlignment(Element.ALIGN_CENTER);
-            pdfImage.scaleToFit(700, 400);
-            document.add(pdfImage);
-        } catch (IOException e) {
-            throw new DocumentException(e);
-        }
-        document.add(new Paragraph(" "));
-    }
-
-    private static JFreeChart createChart(String title, java.util.List<BenchmarkResult> results, String categoryFilter) {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        if (categoryFilter == null) {
-            results.sort(Comparator.comparingDouble(BenchmarkResult::operationsPerSecond).reversed());
-            for (BenchmarkResult r : results) {
-                double val = r.operationsPerSecond();
-                if (!"SUCCESS".equals(r.status())) val = 0.01;
-                dataset.addValue(val, "Throughput", r.provider());
-            }
-        } else {
-            for (BenchmarkResult r : results) {
-                for (Map.Entry<String, Object> entry : r.extraMetrics().entrySet()) {
-                    if (entry.getKey().startsWith(categoryFilter + ":")) {
-                        String op = entry.getKey().substring(categoryFilter.length() + 1);
-                        double latency = (entry.getValue() instanceof Number) ? ((Number)entry.getValue()).doubleValue() : -1.0;
-                        if (latency > 0) dataset.addValue(latency, r.provider(), op);
-                    }
-                }
-            }
-        }
-
-        JFreeChart chart = ChartFactory.createBarChart(
-                title + (categoryFilter == null ? " | Scaling Performance" : " | Performance Latency (ms)"),
-                null,
-                categoryFilter == null ? "Throughput (Ops/sec)" : "Latency (ms) - Lower is Better",
-                dataset,
-                PlotOrientation.HORIZONTAL,
-                categoryFilter != null,
-                true, false);
-
-        chart.setBackgroundPaint(java.awt.Color.WHITE);
-        CategoryPlot plot = chart.getCategoryPlot();
-        BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new Color(0, 86, 179)); 
-        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
-        renderer.setShadowVisible(false);
-        renderer.setMaximumBarWidth(0.10);
-
-        return chart;
-    }
 }
