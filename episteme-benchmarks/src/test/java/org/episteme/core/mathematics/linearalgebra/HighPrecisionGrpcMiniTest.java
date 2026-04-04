@@ -5,8 +5,6 @@
 
 package org.episteme.core.mathematics.linearalgebra;
 
-import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.technical.algorithm.AlgorithmManager;

@@ -116,7 +116,6 @@ public class HighPrecisionPerformanceTest {
         reporter.generateReport();
     }
 
-    @SuppressWarnings("unchecked")
     private void benchmarkRealBig(Map<String, Object> metrics, LinearAlgebraProvider<RealBig> p) {
         HighPrecisionAuditOperations.runRealBigAudit(p, MATRIX_SIZE, (op, test) -> {
             try {
@@ -134,7 +133,6 @@ public class HighPrecisionPerformanceTest {
         });
     }
 
-    @SuppressWarnings("unchecked")
     private void benchmarkComplex(Map<String, Object> metrics, LinearAlgebraProvider<Complex> p) {
         HighPrecisionAuditOperations.runComplexAudit(p, MATRIX_SIZE, (op, test) -> {
             try {

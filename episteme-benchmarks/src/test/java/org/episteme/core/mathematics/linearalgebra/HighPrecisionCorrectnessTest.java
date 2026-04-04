@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -160,8 +159,7 @@ public class HighPrecisionCorrectnessTest {
 
     private List<LinearAlgebraProvider<?>> discoverHPProviders() {
         List<LinearAlgebraProvider<?>> providers = new ArrayList<>();
-        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-        for (LinearAlgebraProvider<?> p : loader) {
+        for (LinearAlgebraProvider<?> p : ServiceLoader.load(LinearAlgebraProvider.class)) {
             providers.add(p);
         }
         // Force sort to have deterministic report

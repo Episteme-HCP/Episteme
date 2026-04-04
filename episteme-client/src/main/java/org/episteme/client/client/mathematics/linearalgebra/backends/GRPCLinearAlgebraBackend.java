@@ -47,8 +47,6 @@ import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A LinearAlgebraProvider that offloads operations to a remote gRPC service.
@@ -68,9 +66,8 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  */
 @AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.class, org.episteme.core.technical.backend.ComputeBackend.class, Backend.class})
-public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E>, LinearAlgebraBackend<E>, org.episteme.core.technical.backend.ComputeBackend {
-    private static final Logger LOG = LoggerFactory.getLogger(GRPCLinearAlgebraBackend.class);
-
+public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E>, LinearAlgebraBackend<E> {
+    
     private ManagedChannel channel;
     private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
     private final Field<E> field;

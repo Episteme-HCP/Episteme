@@ -16,7 +16,6 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.sparse.*;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -39,15 +38,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private static final boolean AVAILABLE;
 
     private static MethodHandle MPFR_INIT2;
-    private static MethodHandle MPFR_CLEAR;
     private static MethodHandle MPFR_SET_STR;
     private static MethodHandle MPFR_GET_STR;
     private static MethodHandle MPFR_ADD;
     private static MethodHandle MPFR_SUB;
     private static MethodHandle MPFR_MUL;
-    private static MethodHandle MPFR_DIV;
     private static MethodHandle MPFR_SET;
-    private static MethodHandle MPFR_CMP;
     private static MethodHandle MPFR_SET_UI;
     private static MethodHandle MPFR_SQRT;
     private static MethodHandle MPFR_NEG;
@@ -63,14 +59,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private static MethodHandle MPFR_SINH;
     private static MethodHandle MPFR_COSH;
     private static MethodHandle MPFR_TANH;
-    private static MethodHandle MPFR_ASINH;
-    private static MethodHandle MPFR_ACOSH;
-    private static MethodHandle MPFR_ATANH;
-    private static MethodHandle MPFR_CONST_PI;
-    private static MethodHandle MPFR_ATAN2;
     private static MethodHandle MPFR_POW;
     private static MethodHandle MPFR_CBRT;
-    private static MethodHandle MPFR_SET_D;
     private static MethodHandle MPFR_FREE_STR;
 
     public static final StructLayout MPFR_LAYOUT = MemoryLayout.structLayout(
@@ -88,17 +78,13 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             if (mpfrLookup.isPresent()) {
                 SymbolLookup mpfr = mpfrLookup.get();
                 MPFR_INIT2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
-                MPFR_CLEAR = lookup(mpfr, "mpfr_clear", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
                 MPFR_SET_STR = lookup(mpfr, "mpfr_set_str", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
                 MPFR_GET_STR = lookup(mpfr, "mpfr_get_str", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_ADD = lookup(mpfr, "mpfr_add", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SUB = lookup(mpfr, "mpfr_sub", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_MUL = lookup(mpfr, "mpfr_mul", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_DIV = lookup(mpfr, "mpfr_div", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_SET = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
                 MPFR_SET_UI = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
-                MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT));
                 MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
                 MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_NEG = lookup(mpfr, "mpfr_neg", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
@@ -114,11 +100,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 MPFR_SINH = lookup(mpfr, "mpfr_sinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_COSH = lookup(mpfr, "mpfr_cosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_TANH = lookup(mpfr, "mpfr_tanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ASINH = lookup(mpfr, "mpfr_asinh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ACOSH = lookup(mpfr, "mpfr_acosh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ATANH = lookup(mpfr, "mpfr_atanh", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_CONST_PI = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-                MPFR_ATAN2 = lookup(mpfr, "mpfr_atan2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_POW = lookup(mpfr, "mpfr_pow", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
                 MPFR_CBRT = lookup(mpfr, "mpfr_cbrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
@@ -1162,7 +1143,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
-    @SuppressWarnings("unchecked")
     public Matrix<E> applyTranscendental(Matrix<E> a, String op, Object... args) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " is not available.");
         long prec = getPrecision();
@@ -1399,7 +1379,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private void solveSmallAndCheck(E[][] H, E beta, MemorySegment V, MemorySegment h_x, int n, int k, boolean isComplex, Ring<E> ring, long prec, Arena arena) throws Throwable {
         Matrix<E> hMat = Matrix.of(java.util.Arrays.stream(H).limit(k + 1).map(row -> java.util.Arrays.asList(row).subList(0, k)).collect(java.util.stream.Collectors.toList()), ring);
         
-        @SuppressWarnings("unchecked")
         E[] e1Data = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), k + 1);
         java.util.Arrays.fill(e1Data, ring.zero());
         e1Data[0] = beta;
@@ -1461,7 +1440,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
              NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(z.getReal().bigDecimalValue().toPlainString()), 10, 0);
              NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(z.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
              
-             @SuppressWarnings("unchecked")
              NativeMPFRDenseLinearAlgebraBackend<E> dense = (NativeMPFRDenseLinearAlgebraBackend<E>) SHARED_DENSE;
              switch (op.toLowerCase()) {
                  case "exp" -> dense.complexExp(resR, resI, aR, aI, prec, arena);
