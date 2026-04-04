@@ -181,5 +181,9 @@ public final class NativeMPFRNumbers {
         return lookup.find(name).map(s -> LINKER.downcallHandle(s, desc)).orElse(null);
     }
 
+    public static boolean isAvailable() {
+        return AVAILABLE;
+    }
+
     private NativeMPFRNumbers() {}
 }
