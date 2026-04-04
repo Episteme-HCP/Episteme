@@ -35,12 +35,15 @@ public class GenericSparseSolvers {
 
             if (iter == 0) p = r;
             else {
+                if (isSmaller(omega, 1e-30, f) || isSmaller(rhoOld, 1e-30, f)) break;
                 E beta = f.multiply(f.divide(rho, rhoOld), f.divide(alpha, omega));
                 p = provider.add(r, provider.multiply(provider.subtract(p, provider.multiply(v, omega)), beta));
             }
 
             v = A.multiply(p);
-            alpha = f.divide(rho, provider.dot(r0, v));
+            E vDotR0 = provider.dot(r0, v);
+            if (isSmaller(vDotR0, 1e-30, f)) break;
+            alpha = f.divide(rho, vDotR0);
 
             Vector<E> s = provider.subtract(r, provider.multiply(v, alpha));
             if (isSmaller(provider.norm(s), tolerance, f)) {
@@ -49,12 +52,14 @@ public class GenericSparseSolvers {
             }
 
             Vector<E> t = A.multiply(s);
-            omega = f.divide(provider.dot(t, s), provider.dot(t, t));
+            E tDotT = provider.dot(t, t);
+            if (isSmaller(tDotT, 1e-30, f)) break;
+            omega = f.divide(provider.dot(t, s), tDotT);
             x = provider.add(provider.add(x, provider.multiply(p, alpha)), provider.multiply(s, omega));
             r = provider.subtract(s, provider.multiply(t, omega));
             
             if (isSmaller(provider.norm(r), tolerance, f)) break;
-            if (isSmaller(omega, 1e-25, f)) break;
+            if (isSmaller(omega, 1e-30, f)) break;
         }
         return x;
     }

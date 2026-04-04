@@ -177,41 +177,160 @@ public class HighPrecisionAuditOperations {
         assertMatrixClose(prov.pow(T, s), groundTruth.pow(T, s), new BigDecimal("1e-25"), "RB:Pow");
     }
 
-    // --- Complex Individual Tests (Stubs) ---
-    public static void testComplexAdd(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexSubtract(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexScale(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexMultiply(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexMatVec(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexTranspose(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexInverse(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexDeterminant(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexSolve(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexDot(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexNorm(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexLU(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexQR(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexSVD(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexCholesky(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexEigen(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexBiCGSTAB(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexConjugateGradient(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexGMRES(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexExp(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexLog(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexLog10(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexSin(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexCos(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexTan(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexAsin(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexAcos(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexAtan(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexSinh(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexCosh(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexTanh(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexSqrt(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexCbrt(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
-    public static void testComplexPow(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {}
+    // --- Complex Individual Tests ---
+    public static void testComplexAdd(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Matrix<Complex> A = createComplexMatrix(Complex.of(0.1, 0.2), n, prov); Matrix<Complex> B = createComplexMatrix(Complex.of(0.3, 0.4), n, prov);
+        assertComplexMatrixClose(prov.add(A, B), groundTruth.add(A, B), new BigDecimal("1e-15"), "C:Add");
+    }
+    public static void testComplexSubtract(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Matrix<Complex> A = createComplexMatrix(Complex.of(0.1, 0.2), n, prov); Matrix<Complex> B = createComplexMatrix(Complex.of(0.3, 0.4), n, prov);
+        assertComplexMatrixClose(prov.subtract(A, B), groundTruth.subtract(A, B), new BigDecimal("1e-15"), "C:Sub");
+    }
+    public static void testComplexScale(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Matrix<Complex> A = createComplexMatrix(Complex.of(0.1, 0.2), n, prov); Complex s = Complex.of(2.0, 0.0);
+        assertComplexMatrixClose(prov.scale(s, A), groundTruth.scale(s, A), new BigDecimal("1e-15"), "C:Scale");
+    }
+    public static void testComplexMultiply(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Matrix<Complex> A = createComplexMatrix(Complex.of(0.1, 0.2), n, prov); Matrix<Complex> B = createComplexMatrix(Complex.of(0.3, 0.4), n, prov);
+        assertComplexMatrixClose(prov.multiply(A, B), groundTruth.multiply(A, B), new BigDecimal("1e-15"), "C:Mul");
+    }
+    public static void testComplexMatVec(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Matrix<Complex> A = createComplexMatrix(Complex.of(0.1, 0.2), n, prov); Vector<Complex> v = createComplexVector(Complex.of(0.5, 0.5), n, prov);
+        assertComplexVectorClose(prov.multiply(A, v), groundTruth.multiply(A, v), new BigDecimal("1e-15"), "C:MatVec");
+    }
+    public static void testComplexTranspose(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Matrix<Complex> A = createComplexMatrix(Complex.of(0.1, 0.2), n, prov);
+        assertComplexMatrixClose(prov.transpose(A), groundTruth.transpose(A), new BigDecimal("1e-15"), "C:Trans");
+    }
+    public static void testComplexInverse(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createInvertibleComplexMatrix(n, prov);
+        assertComplexMatrixClose(prov.inverse(A), groundTruth.inverse(A), new BigDecimal("1e-12"), "C:Inv");
+    }
+    public static void testComplexDeterminant(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createInvertibleComplexMatrix(n, prov);
+        assertComplexScalarClose(prov.determinant(A), groundTruth.determinant(A), new BigDecimal("1e-12"), "C:Det");
+    }
+    public static void testComplexSolve(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createInvertibleComplexMatrix(n, prov); Vector<Complex> b = createComplexVector(Complex.of(1.0, 0), n, prov);
+        assertComplexVectorClose(prov.solve(A, b), groundTruth.solve(A, b), new BigDecimal("1e-12"), "C:Solve");
+    }
+    public static void testComplexDot(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Vector<Complex> v = createComplexVector(Complex.of(0.5, 0.5), n, prov);
+        assertComplexScalarClose(prov.dot(v, v), groundTruth.dot(v, v), new BigDecimal("1e-15"), "C:Dot");
+    }
+    public static void testComplexNorm(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 3; Vector<Complex> v = createComplexVector(Complex.of(0.5, 0.5), n, prov);
+        assertComplexScalarClose(prov.norm(v), groundTruth.norm(v), new BigDecimal("1e-15"), "C:Norm");
+    }
+    public static void testComplexLU(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createInvertibleComplexMatrix(n, prov);
+        LUResult<Complex> lu = prov.lu(A);
+        assertComplexMatrixClose(prov.multiply(lu.getL(), lu.getU()), A, new BigDecimal("1e-12"), "C:LU");
+    }
+    public static void testComplexQR(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createComplexMatrix(Complex.of(0.5, 0.5), n, prov);
+        QRResult<Complex> qr = prov.qr(A);
+        assertComplexMatrixClose(prov.multiply(qr.getQ(), qr.getR()), A, new BigDecimal("1e-12"), "C:QR");
+    }
+    public static void testComplexSVD(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createComplexMatrix(Complex.of(0.5, 0.5), n, prov);
+        SVDResult<Complex> svd = prov.svd(A);
+        Matrix<Complex> S = toDiagonalMatrix(svd.getS(), prov);
+        assertComplexMatrixClose(prov.multiply(prov.multiply(svd.getU(), S), prov.transpose(svd.getV())), A, new BigDecimal("1e-10"), "C:SVD");
+    }
+    public static void testComplexCholesky(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createSPDComplexMatrix(n, prov);
+        CholeskyResult<Complex> chol = prov.cholesky(A);
+        assertComplexMatrixClose(prov.multiply(chol.getL(), prov.transpose(chol.getL())), A, new BigDecimal("1e-12"), "C:Chol");
+    }
+    public static void testComplexEigen(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        int n = 2; Matrix<Complex> A = createSPDComplexMatrix(n, prov);
+        EigenResult<Complex> eigen = prov.eigen(A);
+        Matrix<Complex> D = toDiagonalMatrix(eigen.getD(), prov);
+        assertComplexMatrixClose(prov.multiply(A, eigen.getV()), prov.multiply(eigen.getV(), D), new BigDecimal("1e-10"), "C:Eigen");
+    }
+    public static void testComplexBiCGSTAB(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        if (prov instanceof SparseLinearAlgebraProvider<Complex> sp) {
+            int n = 2; Matrix<Complex> A = createInvertibleComplexMatrix(n, prov); Vector<Complex> b = createComplexVector(Complex.of(1.0, 0), n, prov);
+            Vector<Complex> x0 = createComplexVector(Complex.of(0, 0), n, prov);
+            assertComplexVectorClose(sp.bicgstab(A, b, x0, Complex.of(1e-10, 0), 100), groundTruth.solve(A, b), new BigDecimal("1e-9"), "C:BiCGSTAB");
+        }
+    }
+    public static void testComplexConjugateGradient(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        if (prov instanceof SparseLinearAlgebraProvider<Complex> sp) {
+            int n = 2; Matrix<Complex> A = createSPDComplexMatrix(n, prov); Vector<Complex> b = createComplexVector(Complex.of(1.0, 0), n, prov);
+            Vector<Complex> x0 = createComplexVector(Complex.of(0, 0), n, prov);
+            assertComplexVectorClose(sp.conjugateGradient(A, b, x0, Complex.of(1e-10, 0), 100), groundTruth.solve(A, b), new BigDecimal("1e-9"), "C:ConjGrad");
+        }
+    }
+    public static void testComplexGMRES(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        if (prov instanceof SparseLinearAlgebraProvider<Complex> sp) {
+            int n = 2; Matrix<Complex> A = createInvertibleComplexMatrix(n, prov); Vector<Complex> b = createComplexVector(Complex.of(1.0, 0), n, prov);
+            Vector<Complex> x0 = createComplexVector(Complex.of(0, 0), n, prov);
+            assertComplexVectorClose(sp.gmres(A, b, x0, Complex.of(1e-10, 0), 100, 5), groundTruth.solve(A, b), new BigDecimal("1e-9"), "C:GMRES");
+        }
+    }
+
+    public static void testComplexExp(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.exp(T), groundTruth.exp(T), new BigDecimal("1e-15"), "C:Exp");
+    }
+    public static void testComplexLog(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(2.0, 0.5), 1, prov);
+        assertComplexMatrixClose(prov.log(T), groundTruth.log(T), new BigDecimal("1e-15"), "C:Log");
+    }
+    public static void testComplexLog10(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(2.0, 0.5), 1, prov);
+        assertComplexMatrixClose(prov.log10(T), groundTruth.log10(T), new BigDecimal("1e-15"), "C:Log10");
+    }
+    public static void testComplexSin(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.sin(T), groundTruth.sin(T), new BigDecimal("1e-15"), "C:Sin");
+    }
+    public static void testComplexCos(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.cos(T), groundTruth.cos(T), new BigDecimal("1e-15"), "C:Cos");
+    }
+    public static void testComplexTan(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.tan(T), groundTruth.tan(T), new BigDecimal("1e-15"), "C:Tan");
+    }
+    public static void testComplexAsin(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.asin(T), groundTruth.asin(T), new BigDecimal("1e-15"), "C:Asin");
+    }
+    public static void testComplexAcos(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.acos(T), groundTruth.acos(T), new BigDecimal("1e-15"), "C:Acos");
+    }
+    public static void testComplexAtan(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.atan(T), groundTruth.atan(T), new BigDecimal("1e-15"), "C:Atan");
+    }
+    public static void testComplexSinh(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.sinh(T), groundTruth.sinh(T), new BigDecimal("1e-15"), "C:Sinh");
+    }
+    public static void testComplexCosh(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.cosh(T), groundTruth.cosh(T), new BigDecimal("1e-15"), "C:Cosh");
+    }
+    public static void testComplexTanh(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(0.5, 0.1), 1, prov);
+        assertComplexMatrixClose(prov.tanh(T), groundTruth.tanh(T), new BigDecimal("1e-15"), "C:Tanh");
+    }
+    public static void testComplexSqrt(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(2.0, 0.5), 1, prov);
+        assertComplexMatrixClose(prov.sqrt(T), groundTruth.sqrt(T), new BigDecimal("1e-15"), "C:Sqrt");
+    }
+    public static void testComplexCbrt(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(2.0, 0.5), 1, prov);
+        assertComplexMatrixClose(prov.cbrt(T), groundTruth.cbrt(T), new BigDecimal("1e-15"), "C:Cbrt");
+    }
+    public static void testComplexPow(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
+        Matrix<Complex> T = createComplexMatrix(Complex.of(2.0, 0.5), 1, prov); Complex s = Complex.of(3, 0);
+        assertComplexMatrixClose(prov.pow(T, s), groundTruth.pow(T, s), new BigDecimal("1e-15"), "C:Pow");
+    }
 
     public static void runRealBigAudit(LinearAlgebraProvider<RealBig> p, int n, AuditAction<RealBig> action) {
         RealBig val = RealBig.create(new java.math.BigDecimal("0.1"));
@@ -350,6 +469,21 @@ public class HighPrecisionAuditOperations {
             }
         }
     }
+
+    private static void assertComplexMatrixClose(Matrix<Complex> actual, Matrix<Complex> expected, BigDecimal tol, String msg) {
+        for (int i = 0; i < actual.rows(); i++) {
+            for (int j = 0; j < actual.cols(); j++) {
+                BigDecimal reA = actual.get(i, j).getReal().bigDecimalValue();
+                BigDecimal imA = actual.get(i, j).getImaginary().bigDecimalValue();
+                BigDecimal reE = expected.get(i, j).getReal().bigDecimalValue();
+                BigDecimal imE = expected.get(i, j).getImaginary().bigDecimalValue();
+                if (reA.subtract(reE).abs().compareTo(tol) > 0 || imA.subtract(imE).abs().compareTo(tol) > 0) {
+                    throw new AssertionError(msg + " at [" + i + "," + j + "]");
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private static <T> Matrix<T> toDiagonalMatrix(Vector<T> v, LinearAlgebraProvider<T> p) {
         int n = v.dimension();
@@ -370,10 +504,35 @@ public class HighPrecisionAuditOperations {
             if (valA.subtract(valE).abs().compareTo(tol) > 0) throw new AssertionError(msg + " at [" + i + "]");
         }
     }
+
+    private static void assertComplexVectorClose(Vector<Complex> actual, Vector<Complex> expected, BigDecimal tol, String msg) {
+        for (int i = 0; i < actual.dimension(); i++) {
+            BigDecimal reA = actual.get(i).getReal().bigDecimalValue();
+            BigDecimal imA = actual.get(i).getImaginary().bigDecimalValue();
+            BigDecimal reE = expected.get(i).getReal().bigDecimalValue();
+            BigDecimal imE = expected.get(i).getImaginary().bigDecimalValue();
+            if (reA.subtract(reE).abs().compareTo(tol) > 0 || imA.subtract(imE).abs().compareTo(tol) > 0) {
+                throw new AssertionError(msg + " at [" + i + "]");
+            }
+        }
+    }
+
     private static void assertScalarClose(Object actual, Object expected, BigDecimal tol, String msg) {
         BigDecimal valA = (actual instanceof RealBig) ? ((RealBig)actual).bigDecimalValue() : BigDecimal.valueOf(((Number)actual).doubleValue());
         BigDecimal valE = (expected instanceof RealBig) ? ((RealBig)expected).bigDecimalValue() : BigDecimal.valueOf(((Number)expected).doubleValue());
         if (valA.subtract(valE).abs().compareTo(tol) > 0) throw new AssertionError(msg);
+    }
+
+    private static void assertComplexScalarClose(Object actual, Object expected, BigDecimal tol, String msg) {
+        Complex ca = (Complex) actual;
+        Complex ce = (Complex) expected;
+        BigDecimal reA = ca.getReal().bigDecimalValue();
+        BigDecimal imA = ca.getImaginary().bigDecimalValue();
+        BigDecimal reE = ce.getReal().bigDecimalValue();
+        BigDecimal imE = ce.getImaginary().bigDecimalValue();
+        if (reA.subtract(reE).abs().compareTo(tol) > 0 || imA.subtract(imE).abs().compareTo(tol) > 0) {
+            throw new AssertionError(msg);
+        }
     }
 
     @SuppressWarnings("unchecked")

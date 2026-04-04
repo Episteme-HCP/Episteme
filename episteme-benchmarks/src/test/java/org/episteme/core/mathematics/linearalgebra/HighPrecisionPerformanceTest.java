@@ -61,7 +61,7 @@ public class HighPrecisionPerformanceTest {
         BenchmarkReporter reporter = new BenchmarkReporter("High-Precision");
         reporter.setComments(
             "High-precision performance audit evaluating 68+ operations across diverse numeric domains (RealBig, Complex).\n" +
-            "Metrics represent execution time in milliseconds (ms) for " + MATRIX_SIZE + "x" + MATRIX_SIZE + " matrices."
+            "Metrics represent both Throughput (Operations/second) and Latency (mean time in ms) for " + MATRIX_SIZE + "x" + MATRIX_SIZE + " matrices."
         );
         
         reporter.addSection("Methodology", "Measuring execution time (ms) for 68+ operations on " + MATRIX_SIZE + "x" + MATRIX_SIZE + " matrices.");
@@ -120,15 +120,18 @@ public class HighPrecisionPerformanceTest {
         HighPrecisionAuditOperations.runRealBigAudit(p, MATRIX_SIZE, (op, test) -> {
             try {
                 // Warmup
-                for (int i = 0; i < 2; i++) test.get();
+                for (int i = 0; i < 5; i++) test.get();
                 long start = System.nanoTime();
-                int iters = 3;
+                int iters = 10;
                 for (int i = 0; i < iters; i++) test.get();
                 long end = System.nanoTime();
                 double durationMs = (end - start) / (1_000_000.0 * iters);
-                metrics.put(op, durationMs);
+                double throughput = 1000.0 / Math.max(durationMs, 1e-9);
+                metrics.put(op + ":latency", durationMs);
+                metrics.put(op + ":throughput", throughput);
             } catch (Throwable t) {
-                metrics.put(op, -1.0);
+                metrics.put(op + ":latency", -1.0);
+                metrics.put(op + ":throughput", 0.0);
             }
         });
     }
@@ -137,15 +140,18 @@ public class HighPrecisionPerformanceTest {
         HighPrecisionAuditOperations.runComplexAudit(p, MATRIX_SIZE, (op, test) -> {
             try {
                 // Warmup
-                for (int i = 0; i < 2; i++) test.get();
+                for (int i = 0; i < 5; i++) test.get();
                 long start = System.nanoTime();
-                int iters = 3;
+                int iters = 10;
                 for (int i = 0; i < iters; i++) test.get();
                 long end = System.nanoTime();
                 double durationMs = (end - start) / (1_000_000.0 * iters);
-                metrics.put(op, durationMs);
+                double throughput = 1000.0 / Math.max(durationMs, 1e-9);
+                metrics.put(op + ":latency", durationMs);
+                metrics.put(op + ":throughput", throughput);
             } catch (Throwable t) {
-                metrics.put(op, -1.0);
+                metrics.put(op + ":latency", -1.0);
+                metrics.put(op + ":throughput", 0.0);
             }
         });
     }

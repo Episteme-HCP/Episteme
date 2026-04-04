@@ -140,10 +140,9 @@ public class BenchmarkReporter {
         String baseDir = rootPath.resolve("docs/benchmark-results").toString();
         new java.io.File(baseDir).mkdirs();
         
-        String cleanTitle = title.replace(" ", "-").replaceAll("[^a-zA-Z0-9-]", "");
-        String baseName = baseDir + "/benchmark-results-" + cleanTitle + "-" + timestamp;
+        String baseName = baseDir + "/benchmark_result_high_precision_" + timestamp;
         
-        System.out.println("[INFO] Generating standardized reports to: " + baseName);
+        System.out.println("[INFO] Generating standardized high-precision audit reports to: " + baseName);
         exportJson(baseName + ".json");
         generateReport(baseName + ".pdf");
     }
@@ -214,60 +213,84 @@ public class BenchmarkReporter {
     }
 
     public void generateReport(String pdfPath) {
-        System.out.println("[INFO] Generating PDF from " + results.size() + " results to " + pdfPath);
+        System.out.println("[INFO] Generating High-Precision Audit PDF (" + results.size() + " providers) to " + pdfPath);
         Document document = new Document(PageSize.A4.rotate());
         try {
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdfPath));
             document.open();
 
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, new Color(0, 51, 102));
-            Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.GRAY);
-            Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, new Color(0, 102, 204));
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 28, new Color(0, 51, 102));
+            Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA, 12, Color.GRAY);
+            Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, new Color(0, 102, 204));
+            Font footerFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.LIGHT_GRAY);
 
-            Paragraph titlePara = new Paragraph(title, titleFont);
+            // --- SUMMARY PAGE ---
+            Paragraph titlePara = new Paragraph(title + " High-Precision Audit", titleFont);
             titlePara.setAlignment(Element.ALIGN_CENTER);
-            titlePara.setSpacingBefore(10);
+            titlePara.setSpacingBefore(100);
             document.add(titlePara);
 
-            Paragraph subtitle = new Paragraph("Precision Performance Analytics | Generated: " + 
+            Paragraph subtitle = new Paragraph("Comprehensive Mathematical Compliance & Performance Report\nGenerated: " + 
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), subTitleFont);
             subtitle.setAlignment(Element.ALIGN_CENTER);
+            subtitle.setSpacingAfter(50);
             document.add(subtitle);
 
             if (comments != null && !comments.isEmpty()) {
-                Font commentFont = FontFactory.getFont(FontFactory.HELVETICA, 11, Color.BLACK);
-                Paragraph commentPara = new Paragraph("Analytical Comments:\n" + comments, commentFont);
-                commentPara.setSpacingAfter(20);
+                Font commentFont = FontFactory.getFont(FontFactory.HELVETICA, 12, Color.BLACK);
+                Paragraph commentPara = new Paragraph("Executive Summary:\n" + comments, commentFont);
+                commentPara.setSpacingBefore(30);
                 document.add(commentPara);
             }
 
-            Map<String, java.util.List<BenchmarkResult>> grouped = results.stream()
-                .collect(Collectors.groupingBy(BenchmarkResult::domain));
+            // Summary Table
+            document.add(new Paragraph(" "));
+            com.lowagie.text.pdf.PdfPTable table = new com.lowagie.text.pdf.PdfPTable(3);
+            table.setWidthPercentage(80);
+            table.addCell("Provider");
+            table.addCell("Domain");
+            table.addCell("Status");
+            for (BenchmarkResult r : results) {
+                table.addCell(r.provider());
+                table.addCell(r.domain());
+                table.addCell(r.status());
+            }
+            document.add(table);
 
-            java.util.List<String> sortedDomains = grouped.keySet().stream().sorted().collect(Collectors.toList());
-
-            for (String domain : sortedDomains) {
-                java.util.List<BenchmarkResult> domainResults = grouped.get(domain);
-                Set<String> categories = new LinkedHashSet<>();
-                for (BenchmarkResult r : domainResults) {
-                    for (String key : r.extraMetrics().keySet()) {
-                        if (key.contains(":")) categories.add(key.split(":")[0]);
-                    }
-                }
-
-                if (categories.isEmpty()) {
-                    addDomainSection(document, writer, sectionFont, domain, domainResults, null);
-                } else {
-                    Paragraph domainHeader = new Paragraph(domain, sectionFont);
-                    domainHeader.setAlignment(Element.ALIGN_CENTER);
-                    domainHeader.setSpacingBefore(30);
-                    document.add(domainHeader);
-
-                    for (String category : categories) {
-                        addDomainSection(document, writer, sectionFont, category, domainResults, category);
+            // --- INDIVIDUAL OPERATION PAGES ---
+            Set<String> allOps = new LinkedHashSet<>();
+            for (BenchmarkResult r : results) {
+                for (String key : r.extraMetrics().keySet()) {
+                    if (key.endsWith(":latency")) {
+                        allOps.add(key.replace(":latency", ""));
+                    } else if (!key.contains(":")) {
+                        allOps.add(key);
                     }
                 }
             }
+
+            for (String op : allOps) {
+                document.newPage();
+                Paragraph opHeader = new Paragraph("Operation Audit: " + op, sectionFont);
+                opHeader.setAlignment(Element.ALIGN_LEFT);
+                opHeader.setSpacingAfter(20);
+                document.add(opHeader);
+
+                // Throughput Chart
+                JFreeChart throughputChart = createOperationChart(op, "Throughput", "Ops/sec (Higher is Better)", results, false);
+                addChartToPdf(document, writer, throughputChart);
+
+                document.add(new Paragraph(" "));
+
+                // Latency Chart
+                JFreeChart latencyChart = createOperationChart(op, "Latency", "Latency (ms) (Lower is Better)", results, true);
+                addChartToPdf(document, writer, latencyChart);
+                
+                Paragraph opFooter = new Paragraph("Episteme High-Precision Audit Service | " + op, footerFont);
+                opFooter.setAlignment(Element.ALIGN_RIGHT);
+                document.add(opFooter);
+            }
+
             document.close();
         } catch (Exception e) {
             System.err.println("Error generating PDF report: " + e.getMessage());
@@ -275,6 +298,58 @@ public class BenchmarkReporter {
         } finally {
             if (document.isOpen()) document.close();
         }
+    }
+
+    private void addChartToPdf(Document document, PdfWriter writer, JFreeChart chart) throws DocumentException {
+        java.awt.image.BufferedImage bufferedImage = chart.createBufferedImage(750, 240);
+        try {
+            Image pdfImage = Image.getInstance(writer, bufferedImage, 1.0f);
+            pdfImage.setAlignment(Element.ALIGN_CENTER);
+            pdfImage.scaleToFit(700, 240);
+            document.add(pdfImage);
+        } catch (IOException e) {
+            throw new DocumentException(e);
+        }
+    }
+
+    private JFreeChart createOperationChart(String op, String metricType, String yLabel, java.util.List<BenchmarkResult> results, boolean isLatency) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for (BenchmarkResult r : results) {
+            String key = isLatency ? op + ":latency" : op + ":throughput";
+            Object valObj = r.extraMetrics().get(key);
+            if (valObj == null && !isLatency) {
+                 // Fallback to legacy key or manual calc if throughput not present
+                 valObj = r.extraMetrics().get(op);
+                 if (valObj instanceof Number n && n.doubleValue() > 0 && !isLatency) {
+                     // If it's legacy duration, convert to ops/sec
+                     // but wait, duration is what we have. Let's stick to the new format.
+                 }
+            }
+            
+            double val = (valObj instanceof Number n) ? n.doubleValue() : 0.0;
+            if (val > 0) {
+                dataset.addValue(val, metricType, r.provider());
+            }
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                op + " | " + metricType,
+                null,
+                yLabel,
+                dataset,
+                PlotOrientation.HORIZONTAL,
+                false, true, false);
+
+        chart.setBackgroundPaint(java.awt.Color.WHITE);
+        CategoryPlot plot = chart.getCategoryPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, isLatency ? new Color(220, 53, 69) : new Color(40, 167, 69)); 
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
+        renderer.setShadowVisible(false);
+        renderer.setMaximumBarWidth(0.15);
+
+        return chart;
     }
 
     private static void addDomainSection(Document document, PdfWriter writer, Font sectionFont, String title, java.util.List<BenchmarkResult> results, String categoryFilter) throws DocumentException {

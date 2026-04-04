@@ -310,8 +310,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             MemorySegment yiR = y.asSlice(i * stride * layoutSize, MPFR_LAYOUT);
             
             if (isComplex) {
-                MemorySegment xiI = x.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                MemorySegment yiI = y.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment xiI = x.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment yiI = y.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                 
                 // dot = sum(conj(x) * y) = sum((xR-i*xI)*(yR+i*yI))
                 // dotR = xR*yR + xI*yI
@@ -1423,6 +1423,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             for (int i=0; i<(isComplex?2:1); i++) NativeSafe.invoke(MPFR_INIT2, res.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
             dotProduct(h_v, h_v, v.dimension(), res, prec, arena, isComplex);
             MemorySegment realPart = res.asSlice(0, MPFR_LAYOUT.byteSize());
+            if (isComplex) {
+                // For complex norm, we have |z|^2 = re^2 + im^2 in the real part if dotProduct is adjusted,
+                // or we need to sum re and im if they are separated.
+                // dotProduct for complex (aR-i*aI)*(aR+i*aI) = aR^2 + aI^2, which is stored in sumR.
+            }
             NativeSafe.invoke(MPFR_SQRT, realPart, realPart, 0);
             Real val = readMPFR(realPart, arena);
             if (isComplex) {
