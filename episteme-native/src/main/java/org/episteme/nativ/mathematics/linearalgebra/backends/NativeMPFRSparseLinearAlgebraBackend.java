@@ -373,20 +373,191 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         }
     }
 
-    private void spmv_internal(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa, MemorySegment h_b, MemorySegment res, long prec, Arena arena, boolean isComplex) throws Throwable {
+    private void axpy_internal(MemorySegment y, E alpha, MemorySegment x, int n, long prec, Arena arena, boolean isComplex) throws Throwable {
+        MemorySegment aR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, aR, prec);
+        MemorySegment aI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+        if (isComplex) NativeSafe.invoke(MPFR_INIT2, aI, prec);
+        
+        if (isComplex) {
+            Complex c = (Complex) alpha;
+            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(c.getReal().bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+        } else {
+            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(((Real)alpha).bigDecimalValue().toPlainString()), 10, 0);
+        }
+
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+
+        long layoutSize = MPFR_LAYOUT.byteSize();
+        int stride = isComplex ? 2 : 1;
+        for (int i = 0; i < n; i++) {
+            MemorySegment xiR = x.asSlice(i * stride * layoutSize, MPFR_LAYOUT);
+            MemorySegment yiR = y.asSlice(i * stride * layoutSize, MPFR_LAYOUT);
+            
+            if (isComplex) {
+                MemorySegment xiI = x.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                MemorySegment yiI = y.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                
+                // y = a*x + y: (aR+i*aI)*(xR+i*xI) + (yR+i*yI)
+                NativeSafe.invoke(MPFR_MUL, t1, aR, xiR, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, aI, xiI, 0);
+                NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                NativeSafe.invoke(MPFR_ADD, yiR, yiR, t1, 0);
+                
+                NativeSafe.invoke(MPFR_MUL, t1, aR, xiI, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, aI, xiR, 0);
+                NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                NativeSafe.invoke(MPFR_ADD, yiI, yiI, t1, 0);
+            } else {
+                NativeSafe.invoke(MPFR_MUL, t1, aR, xiR, 0);
+                NativeSafe.invoke(MPFR_ADD, yiR, yiR, t1, 0);
+            }
+        }
+    }
+
+    private E dot_internal(MemorySegment x, MemorySegment y, int n, long prec, Arena arena, boolean isComplex, Ring<E> ring) throws Throwable {
+        MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, prec); NativeSafe.invoke(MPFR_SET_UI, sumR, 0, 0);
+        MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+        if (isComplex) { NativeSafe.invoke(MPFR_INIT2, sumI, prec); NativeSafe.invoke(MPFR_SET_UI, sumI, 0, 0); }
+        
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+
+        long layoutSize = MPFR_LAYOUT.byteSize();
+        int stride = isComplex ? 2 : 1;
+        for (int i = 0; i < n; i++) {
+            MemorySegment xiR = x.asSlice(i * stride * layoutSize, MPFR_LAYOUT);
+            MemorySegment yiR = y.asSlice(i * stride * layoutSize, MPFR_LAYOUT);
+            
+            if (isComplex) {
+                MemorySegment xiI = x.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment yiI = y.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                
+                // dot = sum(conj(x) * y) = sum((xR-i*xI)*(yR+i*yI))
+                // dotR = xR*yR + xI*yI
+                NativeSafe.invoke(MPFR_MUL, t1, xiR, yiR, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, xiI, yiI, 0);
+                NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
+                NativeSafe.invoke(MPFR_ADD, sumR, sumR, t2, 0);
+                
+                // dotI = xR*yI - xI*yR
+                NativeSafe.invoke(MPFR_MUL, t1, xiR, yiI, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, xiI, yiR, 0);
+                NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                NativeSafe.invoke(MPFR_ADD, sumI, sumI, t2, 0);
+            } else {
+                NativeSafe.invoke(MPFR_MUL, t1, xiR, yiR, 0);
+                NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
+            }
+        }
+        
+        if (isComplex) {
+            return (E) (Object) Complex.of(readMPFR(sumR, arena), readMPFR(sumI, arena));
+        } else {
+            return (E) (Object) readMPFR(sumR, arena);
+        }
+    }
+
+    private E norm_internal(MemorySegment x, int n, long prec, Arena arena, boolean isComplex, Ring<E> ring) throws Throwable {
+        MemorySegment sumSq = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumSq, prec); NativeSafe.invoke(MPFR_SET_UI, sumSq, 0, 0);
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
+
+        int stride = isComplex ? 2 : 1;
+        long layoutSize = MPFR_LAYOUT.byteSize();
+        for (int i = 0; i < n * stride; i++) {
+            MemorySegment val = x.asSlice(i * layoutSize, MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_MUL, t1, val, val, 0);
+            NativeSafe.invoke(MPFR_ADD, sumSq, sumSq, t1, 0);
+        }
+        
+        MemorySegment res = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, res, prec);
+        NativeSafe.invoke(MPFR_SQRT, res, sumSq, 0);
+        return (E) (Object) readMPFR(res, arena);
+    }
+
+    private void copy_internal(MemorySegment dest, MemorySegment src, int n, boolean isComplex) throws Throwable {
+        int stride = isComplex ? 2 : 1;
+        long layoutSize = MPFR_LAYOUT.byteSize();
+        for (int i = 0; i < n * stride; i++) {
+            NativeSafe.invoke(MPFR_SET, dest.asSlice(i * layoutSize, MPFR_LAYOUT), src.asSlice(i * layoutSize, MPFR_LAYOUT), 0);
+        }
+    }
+
+    private void scale_internal(MemorySegment x, E alpha, int n, long prec, Arena arena, boolean isComplex) throws Throwable {
+        MemorySegment aR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, aR, prec);
+        MemorySegment aI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+        if (isComplex) NativeSafe.invoke(MPFR_INIT2, aI, prec);
+        
+        if (isComplex) {
+            Complex c = (Complex) alpha;
+            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(c.getReal().bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+        } else {
+            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(((Real)alpha).bigDecimalValue().toPlainString()), 10, 0);
+        }
+
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+
+        int stride = isComplex ? 2 : 1;
+        for (int i = 0; i < n * stride; i += stride) {
+            MemorySegment xiR = x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            if (isComplex) {
+                MemorySegment xiI = x.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                // Complex mul: (aR+i*aI)*(xiR+i*xiI)
+                NativeSafe.invoke(MPFR_MUL, t1, aR, xiR, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, aI, xiI, 0);
+                NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0); // Reuse t1 for real part
+                
+                NativeSafe.invoke(MPFR_MUL, t2, aR, xiI, 0);
+                NativeSafe.invoke(MPFR_MUL, xiI, aI, xiR, 0); // Reuse xiI for imag part temp
+                NativeSafe.invoke(MPFR_ADD, xiI, t2, xiI, 0);
+                NativeSafe.invoke(MPFR_SET, xiR, t1, 0);
+            } else {
+                NativeSafe.invoke(MPFR_MUL, xiR, xiR, aR, 0);
+            }
+        }
+    }
+
+    private MemorySegment initNativeValues(Object[] vals, long prec, Arena arena, boolean isComplex) throws Throwable {
+        int n = vals.length;
+        int stride = isComplex ? 2 : 1;
+        long layoutSize = MPFR_LAYOUT.byteSize();
+        MemorySegment nativeVals = arena.allocate(MPFR_LAYOUT, n * stride);
+        for (int i = 0; i < n; i++) {
+            Object v = vals[i];
+            MemorySegment vR = nativeVals.asSlice(i * stride * layoutSize, MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_INIT2, vR, prec);
+            if (isComplex) {
+                MemorySegment vI = nativeVals.asSlice((i * stride + 1) * layoutSize, MPFR_LAYOUT);
+                NativeSafe.invoke(MPFR_INIT2, vI, prec);
+                if (v instanceof Complex cv) {
+                    NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, vI, arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                } else if (v instanceof Real rv) {
+                    NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_UI, vI, 0L, 0);
+                }
+            } else {
+                NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(((Real)v).bigDecimalValue().toPlainString()), 10, 0);
+            }
+        }
+        return nativeVals;
+    }
+
+    private void spmv_internal(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa, MemorySegment h_vals, MemorySegment h_b, MemorySegment res, long prec, Arena arena, boolean isComplex) throws Throwable {
         int[] rowPtr = sa.getRowPointers();
         int[] colIdx = sa.getColIndices();
-        Object[] vals = sa.getValues();
-        
+        long layoutSize = MPFR_LAYOUT.byteSize();
+        int stride = isComplex ? 2 : 1;
+
         MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, prec);
         MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
         if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, prec);
         
         MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
         MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
-        MemorySegment valR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, valR, prec);
-        MemorySegment valI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-        if (isComplex) NativeSafe.invoke(MPFR_INIT2, valI, prec);
 
         for (int i = 0; i < sa.rows(); i++) {
             NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
@@ -394,15 +565,13 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             
             for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
                 int col = colIdx[k];
+                MemorySegment valR = h_vals.asSlice(k * stride * layoutSize, MPFR_LAYOUT);
+                
                 if (isComplex) {
-                    org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) vals[k];
-                    NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, valI, arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    MemorySegment valI = h_vals.asSlice((k * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                    MemorySegment bR = h_b.asSlice(col * 2 * layoutSize, MPFR_LAYOUT);
+                    MemorySegment bI = h_b.asSlice((col * 2 + 1) * layoutSize, MPFR_LAYOUT);
                     
-                    MemorySegment bR = h_b.asSlice(col * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                    MemorySegment bI = h_b.asSlice((col * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                    
-                    // Complex mul: (valR + i*valI)*(bR + i*bI) = (valR*bR - valI*bI) + i(valR*bI + valI*bR)
                     NativeSafe.invoke(MPFR_MUL, t1, valR, bR, 0);
                     NativeSafe.invoke(MPFR_MUL, t2, valI, bI, 0);
                     NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
@@ -413,15 +582,19 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
                     NativeSafe.invoke(MPFR_ADD, sumI, sumI, t1, 0);
                 } else {
-                    NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(((Real)vals[k]).bigDecimalValue().toPlainString()), 10, 0);
-                    MemorySegment bval = h_b.asSlice(col * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                    MemorySegment bval = h_b.asSlice(col * layoutSize, MPFR_LAYOUT);
                     NativeSafe.invoke(MPFR_MUL, t1, valR, bval, 0);
                     NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
                 }
             }
-            NativeSafe.invoke(MPFR_SET, res.asSlice(i * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), sumR, 0);
-            if (isComplex) NativeSafe.invoke(MPFR_SET, res.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), sumI, 0);
+            NativeSafe.invoke(MPFR_SET, res.asSlice(i * stride * layoutSize, MPFR_LAYOUT), sumR, 0);
+            if (isComplex) NativeSafe.invoke(MPFR_SET, res.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), sumI, 0);
         }
+    }
+
+    private void spmv_internal(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa, MemorySegment h_b, MemorySegment res, long prec, Arena arena, boolean isComplex) throws Throwable {
+        MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, isComplex);
+        spmv_internal(sa, h_vals, h_b, res, prec, arena, isComplex);
     }
 
     @Override
@@ -463,10 +636,15 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
             for (int i = 0; i < sa.rows(); i++) {
                 for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
+                    Object val = vals[k];
                     if (isComplex) {
-                        org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) vals[k];
-                        NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                        NativeSafe.invoke(MPFR_SET_STR, valI, arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                        if (val instanceof Complex cv) {
+                            NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, valI, arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                        } else {
+                            NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(((Real)val).bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_UI, valI, 0L, 0);
+                        }
                         
                         // (valR + i*valI)*(sR + i*sI) = (valR*sR - valI*sI) + i(valR*sI + valI*sR)
                         NativeSafe.invoke(MPFR_MUL, t1, valR, sR, 0);
@@ -479,7 +657,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                         
                         storage.set(i, colIdx[k], (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena)));
                     } else {
-                        NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(((Real)vals[k]).bigDecimalValue().toPlainString()), 10, 0);
+                        NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(((Real)val).bigDecimalValue().toPlainString()), 10, 0);
                         NativeSafe.invoke(MPFR_MUL, resR, valR, sR, 0);
                         storage.set(i, colIdx[k], (E) (Object) readMPFR(resR, arena));
                     }
@@ -938,16 +1116,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        return GenericSparseSolvers.bicgstab(this, a, b, x0, tolerance, maxIterations, (Field<E>) a.getScalarRing());
-    }
-
-    @Override
-    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
-        return GenericSparseSolvers.gmres(this, a, b, x0, tolerance, maxIterations, restarts, (Field<E>) a.getScalarRing());
-    }
-
-    @Override
     public Matrix<E> transpose(Matrix<E> a) {
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
         int rows = sa.rows();
@@ -1021,6 +1189,266 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             }
         }
         return sa;
+    }
+
+    @Override
+    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
+        int n = sa.rows();
+        long prec = getPrecision();
+        boolean isComplex = isComplex(sa.getScalarRing());
+        Ring<E> ring = sa.getScalarRing();
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, isComplex);
+            MemorySegment h_b = initVector(b.toMatrix(), arena, prec, isComplex);
+            MemorySegment h_x = initVector(x0.toMatrix(), arena, prec, isComplex);
+            
+            MemorySegment r = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment p = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment q = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            for (int i=0; i<n*(isComplex?2:1); i++) {
+                NativeSafe.invoke(MPFR_INIT2, r.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, p.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, q.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            }
+
+            spmv_internal(sa, h_vals, h_x, r, prec, arena, isComplex);
+            axpy_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE)), h_b, n, prec, arena, isComplex);
+            scale_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE)), n, prec, arena, isComplex);
+            
+            copy_internal(p, r, n, isComplex);
+            E rho = dot_internal(r, r, n, prec, arena, isComplex, ring);
+            
+            for (int k = 0; k < maxIterations; k++) {
+                spmv_internal(sa, h_vals, p, q, prec, arena, isComplex);
+                E pq = dot_internal(p, q, n, prec, arena, isComplex, ring);
+                E alpha = divide(isComplex, rho, pq);
+                
+                axpy_internal(h_x, alpha, p, n, prec, arena, isComplex);
+                axpy_internal(r, negate(isComplex, alpha), q, n, prec, arena, isComplex);
+                
+                E normR = norm_internal(r, n, prec, arena, isComplex, ring);
+                if (compare(normR, tolerance) < 0) break;
+                
+                E rhoNew = dot_internal(r, r, n, prec, arena, isComplex, ring);
+                E beta = divide(isComplex, rhoNew, rho);
+                scale_internal(p, beta, n, prec, arena, isComplex);
+                axpy_internal(p, (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE), r, n, prec, arena, isComplex);
+                rho = rhoNew;
+            }
+            return backToVector(h_x, n, isComplex, ring, arena);
+        } catch (Throwable t) {
+            throw new RuntimeException("Native MPFR Conjugate Gradient failed", t);
+        }
+    }
+
+    @Override
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
+        int n = sa.rows();
+        long prec = getPrecision();
+        boolean isComplex = isComplex(sa.getScalarRing());
+        Ring<E> ring = sa.getScalarRing();
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, isComplex);
+            MemorySegment h_b = initVector(b.toMatrix(), arena, prec, isComplex);
+            MemorySegment h_x = initVector(x0.toMatrix(), arena, prec, isComplex);
+            
+            MemorySegment r0hat = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment r = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment p = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment v = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment s = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment t = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            
+            for (int i=0; i<n*(isComplex?2:1); i++) {
+                NativeSafe.invoke(MPFR_INIT2, r0hat.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, r.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, p.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, v.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, s.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, t.asSlice(i*MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            }
+
+            spmv_internal(sa, h_vals, h_x, r, prec, arena, isComplex);
+            axpy_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE)), h_b, n, prec, arena, isComplex);
+            scale_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE)), n, prec, arena, isComplex);
+            copy_internal(r0hat, r, n, isComplex);
+            
+            E rho = (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE);
+            E alpha = (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE);
+            E omega = (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE);
+            
+            for (int i = 0; i < maxIterations; i++) {
+                E rhoNew = dot_internal(r0hat, r, n, prec, arena, isComplex, ring);
+                E beta = multiply(isComplex, divide(isComplex, rhoNew, rho), divide(isComplex, alpha, omega));
+                
+                axpy_internal(p, negate(isComplex, omega), v, n, prec, arena, isComplex);
+                scale_internal(p, beta, n, prec, arena, isComplex);
+                axpy_internal(p, (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE), r, n, prec, arena, isComplex);
+                
+                spmv_internal(sa, h_vals, p, v, prec, arena, isComplex);
+                alpha = divide(isComplex, rhoNew, dot_internal(r0hat, v, n, prec, arena, isComplex, ring));
+                
+                copy_internal(s, r, n, isComplex);
+                axpy_internal(s, negate(isComplex, alpha), v, n, prec, arena, isComplex);
+                
+                if (compare(norm_internal(s, n, prec, arena, isComplex, ring), tolerance) < 0) {
+                    axpy_internal(h_x, alpha, p, n, prec, arena, isComplex);
+                    break;
+                }
+                
+                spmv_internal(sa, h_vals, s, t, prec, arena, isComplex);
+                omega = divide(isComplex, dot_internal(t, s, n, prec, arena, isComplex, ring), dot_internal(t, t, n, prec, arena, isComplex, ring));
+                
+                axpy_internal(h_x, alpha, p, n, prec, arena, isComplex);
+                axpy_internal(h_x, omega, s, n, prec, arena, isComplex);
+                
+                copy_internal(r, s, n, isComplex);
+                axpy_internal(r, negate(isComplex, omega), t, n, prec, arena, isComplex);
+                
+                if (compare(norm_internal(r, n, prec, arena, isComplex, ring), tolerance) < 0) break;
+                rho = rhoNew;
+            }
+            return backToVector(h_x, n, isComplex, ring, arena);
+        } catch (Throwable th) {
+            throw new RuntimeException("Native MPFR BiCGSTAB failed", th);
+        }
+    }
+
+    @Override
+    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
+        int n = sa.rows();
+        int m = restarts;
+        long prec = getPrecision();
+        boolean isComplex = isComplex(sa.getScalarRing());
+        Ring<E> ring = sa.getScalarRing();
+        
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, isComplex);
+            MemorySegment h_x = initVector(x0.toMatrix(), arena, prec, isComplex);
+            MemorySegment h_b = initVector(b.toMatrix(), arena, prec, isComplex);
+            
+            MemorySegment V = arena.allocate(MPFR_LAYOUT, (m + 1) * n * (isComplex ? 2 : 1));
+            for (int i = 0; i < (m + 1) * n * (isComplex ? 2 : 1); i++) {
+                NativeSafe.invoke(MPFR_INIT2, V.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            }
+            
+            MemorySegment r = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            MemorySegment w = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            for (int i = 0; i < n * (isComplex ? 2 : 1); i++) {
+                NativeSafe.invoke(MPFR_INIT2, r.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+                NativeSafe.invoke(MPFR_INIT2, w.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            }
+
+            for (int iter = 0; iter < maxIterations / m + 1; iter++) {
+                spmv_internal(sa, h_vals, h_x, r, prec, arena, isComplex);
+                axpy_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE)), h_b, n, prec, arena, isComplex);
+                scale_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE)), n, prec, arena, isComplex);
+                
+                E beta = norm_internal(r, n, prec, arena, isComplex, ring);
+                if (compare(beta, tolerance) < 0) break;
+                
+                E invBeta = divide(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE), beta);
+                copy_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), r, n, isComplex);
+                scale_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), invBeta, n, prec, arena, isComplex);
+                
+                E[][] H = (E[][]) new Object[m + 1][m];
+                
+                int k;
+                for (k = 0; k < m; k++) {
+                    MemorySegment vk = V.asSlice(k * n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize());
+                    spmv_internal(sa, h_vals, vk, w, prec, arena, isComplex);
+                    
+                    for (int j = 0; j <= k; j++) {
+                        MemorySegment vj = V.asSlice(j * n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize());
+                        H[j][k] = dot_internal(vj, w, n, prec, arena, isComplex, ring);
+                        axpy_internal(w, negate(isComplex, H[j][k]), vj, n, prec, arena, isComplex);
+                    }
+                    
+                    H[k + 1][k] = norm_internal(w, n, prec, arena, isComplex, ring);
+                    
+                    if (compare(H[k + 1][k], tolerance) < 0) {
+                        solveSmallAndCheck(H, beta, V, h_x, n, k + 1, isComplex, ring, prec, arena);
+                        return backToVector(h_x, n, isComplex, ring, arena);
+                    }
+                    
+                    E invH = divide(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE), H[k + 1][k]);
+                    MemorySegment vkplus1 = V.asSlice((k + 1) * n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize());
+                    copy_internal(vkplus1, w, n, isComplex);
+                    scale_internal(vkplus1, invH, n, prec, arena, isComplex);
+                }
+                
+                solveSmallAndCheck(H, beta, V, h_x, n, m, isComplex, ring, prec, arena);
+                
+                spmv_internal(sa, h_vals, h_x, r, prec, arena, isComplex);
+                axpy_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE)), h_b, n, prec, arena, isComplex);
+                scale_internal(r, negate(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE)), n, prec, arena, isComplex);
+                if (compare(norm_internal(r, n, prec, arena, isComplex, ring), tolerance) < 0) break;
+            }
+            
+            return backToVector(h_x, n, isComplex, ring, arena);
+        } catch (Throwable th) {
+            throw new RuntimeException("Native MPFR GMRES failed", th);
+        }
+    }
+
+    private void solveSmallAndCheck(E[][] H, E beta, MemorySegment V, MemorySegment h_x, int n, int k, boolean isComplex, Ring<E> ring, long prec, Arena arena) throws Throwable {
+        Matrix<E> hMat = Matrix.of(java.util.Arrays.stream(H).limit(k + 1).map(row -> java.util.Arrays.asList(row).subList(0, k)).collect(java.util.stream.Collectors.toList()), ring);
+        
+        @SuppressWarnings("unchecked")
+        E[] e1Data = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), k + 1);
+        java.util.Arrays.fill(e1Data, ring.zero());
+        e1Data[0] = beta;
+        Vector<E> e1 = Vector.of(e1Data, ring);
+        
+        // Use GenericQR for small Hessenberg system solve as Native Dense doesn't override qr() yet.
+        QRResult<E> qr = GenericQR.decompose(hMat, (Field<E>) ring, (LinearAlgebraProvider<E>) SHARED_DENSE);
+        Vector<E> y = GenericQR.solve(qr, e1, (Field<E>) ring, (LinearAlgebraProvider<E>) SHARED_DENSE);
+        
+        for (int j = 0; j < k; j++) {
+            MemorySegment vj = V.asSlice(j * n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize());
+            axpy_internal(h_x, y.get(j), vj, n, prec, arena, isComplex);
+        }
+    }
+
+    private int compare(E a, E b) {
+        if (a instanceof Real ra && b instanceof Real rb) return ra.compareTo(rb);
+        if (a instanceof Complex ca && b instanceof Complex cb) return ca.abs().compareTo(cb.abs());
+        return 0;
+    }
+
+    private E negate(boolean isComplex, E val) {
+        if (isComplex) return (E)(Object)((Complex)val).negate();
+        return (E)(Object)((Real)val).negate();
+    }
+
+    private E divide(boolean isComplex, E a, E b) {
+        if (isComplex) return (E)(Object)((Complex)a).divide((Complex)b);
+        return (E)(Object)((Real)a).divide((Real)b);
+    }
+
+    private E multiply(boolean isComplex, E a, E b) {
+        if (isComplex) return (E)(Object)((Complex)a).multiply((Complex)b);
+        return (E)(Object)((Real)a).multiply((Real)b);
+    }
+
+    private Vector<E> backToVector(MemorySegment h_x, int n, boolean isComplex, Ring<E> ring, Arena arena) throws Throwable {
+        E[] resultArr = (E[]) new Object[n];
+        MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
+        for (int i = 0; i < n; i++) {
+            if (isComplex) {
+                Real re = readMPFR_internal(h_x.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                Real im = readMPFR_internal(h_x.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                resultArr[i] = (E) (Object) Complex.of(re, im);
+            } else {
+                resultArr[i] = (E) (Object) readMPFR_internal(h_x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+            }
+        }
+        return Vector.of(java.util.Arrays.asList(resultArr), ring);
     }
 
     private org.episteme.core.mathematics.numbers.complex.Complex complexTranscendental(org.episteme.core.mathematics.numbers.complex.Complex z, String op, long prec, Arena arena, Object... args) {
