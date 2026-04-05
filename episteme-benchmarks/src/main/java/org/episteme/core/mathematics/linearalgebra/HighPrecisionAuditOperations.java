@@ -363,17 +363,17 @@ public class HighPrecisionAuditOperations {
         // Iterative
         action.run("RB:BiCGSTAB", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                return sp.bicgstab(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 100);
+                return sp.bicgstab(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 10);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("RB:ConjGrad", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                return sp.conjugateGradient(spdA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 100);
+                return sp.conjugateGradient(spdA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 10);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("RB:GMRES", () -> {
             if (p instanceof SparseLinearAlgebraProvider<RealBig> sp) {
-                return sp.gmres(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 100, 5);
+                return sp.gmres(invA, v, createRealBigVector(RealBig.ZERO, n, p), RealBig.create(new java.math.BigDecimal("1e-15")), 10, 5);
             } else throw new UnsupportedOperationException("Not sparse");
         });
 
@@ -426,17 +426,17 @@ public class HighPrecisionAuditOperations {
         // Iterative
         action.run("C:BiCGSTAB", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                return sp.bicgstab(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 100);
+                return sp.bicgstab(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 10);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("C:ConjGrad", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                return sp.conjugateGradient(spdA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 100);
+                return sp.conjugateGradient(spdA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 10);
             } else throw new UnsupportedOperationException("Not sparse");
         });
         action.run("C:GMRES", () -> {
             if (p instanceof SparseLinearAlgebraProvider<Complex> sp) {
-                return sp.gmres(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 100, 5);
+                return sp.gmres(invA, v, createComplexVector(Complex.of(0, 0), n, p), Complex.of(1e-15, 0), 10, 5);
             } else throw new UnsupportedOperationException("Not sparse");
         });
 

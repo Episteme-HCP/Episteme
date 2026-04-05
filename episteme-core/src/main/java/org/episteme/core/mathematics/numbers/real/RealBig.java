@@ -141,6 +141,14 @@ public final class RealBig extends Real {
     @Override
     public Real sqrt() {
         if (this.isNaN()) return NaN;
+        // Handle numerical noise: if slightly negative, clamp to zero
+        if (value.signum() < 0) {
+            // Check if it's very close to zero
+            if (value.abs().doubleValue() < 1e-30) {
+                return ZERO;
+            }
+            throw new ArithmeticException("Square root of a negative BigDecimal: " + value);
+        }
         return RealBig.create(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
