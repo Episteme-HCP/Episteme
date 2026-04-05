@@ -26,6 +26,11 @@ public final class NativeMPFRNumbers {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRNumbers.class);
     private static final Linker LINKER = Linker.nativeLinker();
     
+    // Platform-dependent C 'long' size
+    public static final ValueLayout.OfLong JAVA_LONG = ValueLayout.JAVA_LONG;
+    public static final ValueLayout C_LONG = System.getProperty("os.name").toLowerCase().contains("win") 
+                                            ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG;
+    
     // MPFR Function Handles
     public static final MethodHandle MPFR_EXP;
     public static final MethodHandle MPFR_LOG;
@@ -59,9 +64,13 @@ public final class NativeMPFRNumbers {
     public static final MethodHandle MPFR_SET;
     public static final MethodHandle MPFR_SET_UI;
     public static final MethodHandle MPFR_CMP_ABS;
-    public static final MethodHandle MPFR_ZERO_P;
     public static final MethodHandle MPFR_SET_D;
     public static final MethodHandle MPFR_CONST_PI;
+    public static final MethodHandle MPFR_ZERO_P;
+    public static final MethodHandle MPFR_NAN_P;
+    public static final MethodHandle MPFR_INF_P;
+    public static final MethodHandle MPFR_NUMBER_P;
+    public static final MethodHandle MPFR_CMP_SI;
 
     public static final MemoryLayout MPFR_LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_INT.withName("prec"),
@@ -88,6 +97,7 @@ public final class NativeMPFRNumbers {
         MethodHandle cbrt = null, sqrt = null, hypot = null, pow = null;
         MethodHandle add = null, sub = null, mul = null, div = null, neg = null, abs = null, cmp = null;
         MethodHandle set = null, set_ui = null, cmp_abs = null, zero_p = null, set_d = null, const_pi = null;
+        MethodHandle nan_p = null, inf_p = null, number_p = null, cmp_si = null;
         MethodHandle init2 = null, clear = null, setStr = null, getStr = null, freeStr = null;
 
         try {
@@ -136,12 +146,16 @@ public final class NativeMPFRNumbers {
 
                 // Set functions
                 set = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT));
-                set_ui = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(JAVA_INT, ADDRESS, ValueLayout.JAVA_LONG, JAVA_INT));
+                set_ui = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(JAVA_INT, ADDRESS, JAVA_LONG, JAVA_INT));
                 set_d = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(JAVA_INT, ADDRESS, ValueLayout.JAVA_DOUBLE, JAVA_INT));
 
                 // Misc/Analysis
                 cmp_abs = lookup(mpfr, "mpfr_cmpabs", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS));
                 zero_p = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                nan_p = lookup(mpfr, "mpfr_nan_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                inf_p = lookup(mpfr, "mpfr_inf_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                number_p = lookup(mpfr, "mpfr_number_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                cmp_si = lookup(mpfr, "mpfr_cmp_si", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG));
                 const_pi = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(JAVA_INT, ADDRESS, JAVA_INT));
                 
                 // Management functions
@@ -168,6 +182,7 @@ public final class NativeMPFRNumbers {
         MPFR_CBRT = cbrt; MPFR_SQRT = sqrt; MPFR_HYPOT = hypot; MPFR_POW = pow;
         MPFR_ADD = add; MPFR_SUB = sub; MPFR_MUL = mul; MPFR_DIV = div; MPFR_NEG = neg; MPFR_ABS = abs; MPFR_CMP = cmp;
         MPFR_SET = set; MPFR_SET_UI = set_ui; MPFR_CMP_ABS = cmp_abs; MPFR_ZERO_P = zero_p; MPFR_SET_D = set_d; MPFR_CONST_PI = const_pi;
+        MPFR_NAN_P = nan_p; MPFR_INF_P = inf_p; MPFR_NUMBER_P = number_p; MPFR_CMP_SI = cmp_si;
         MPFR_INIT2 = init2; MPFR_CLEAR = clear; MPFR_SET_STR = setStr; MPFR_GET_STR = getStr; MPFR_FREE_STR = freeStr;
         AVAILABLE = available;
         if (AVAILABLE) {

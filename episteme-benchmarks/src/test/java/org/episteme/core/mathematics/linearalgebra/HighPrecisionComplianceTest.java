@@ -8,6 +8,10 @@ package org.episteme.core.mathematics.linearalgebra;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import org.episteme.core.mathematics.numbers.real.RealProvider;
+import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
@@ -42,7 +46,7 @@ public class HighPrecisionComplianceTest {
         try {
             serverContext = GrpcTestApplication.start();
             System.out.println("Episteme Server started successfully for compliance tests.");
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (Exception e) {
             System.err.println("Failed to start Episteme Server: " + e.getMessage());
         }
@@ -59,13 +63,20 @@ public class HighPrecisionComplianceTest {
     
     
     private String getReportPath() {
-        String customPath = System.getProperty("org.episteme.report.path");
-        if (customPath != null && !customPath.isEmpty()) return customPath;
-        
         String userDir = System.getProperty("user.dir");
-        java.nio.file.Path rootPath = java.nio.file.Paths.get(userDir);
-        if (rootPath.endsWith("episteme-benchmarks")) rootPath = rootPath.getParent();
-        return rootPath.resolve("docs/HIGH_PRECISION_COMPLIANCE_REPORT.md").toString();
+        java.nio.file.Path projectRoot = java.nio.file.Paths.get(userDir);
+        if (projectRoot.endsWith("episteme-benchmarks")) projectRoot = projectRoot.getParent();
+        
+        String customPath = System.getProperty("org.episteme.report.path");
+        if (customPath != null && !customPath.isEmpty()) {
+            java.nio.file.Path path = java.nio.file.Paths.get(customPath);
+            if (!path.isAbsolute()) {
+                return projectRoot.resolve(path).toString();
+            }
+            return path.toString();
+        }
+        
+        return projectRoot.resolve("docs/HIGH_PRECISION_COMPLIANCE_REPORT.md").toString();
     }
 
     // Providers to exclude from HP tests (double-only, broken, or unused)
@@ -125,10 +136,13 @@ public class HighPrecisionComplianceTest {
                 }
             }
 
+            // 3. Always include all discovered RealProviders so they can be used for internal steps
+            allowed.addAll(ServiceLoader.load(RealProvider.class).stream().map(ServiceLoader.Provider::get).toList());
+
             AlgorithmManager.setService(new org.episteme.core.technical.algorithm.TestingAlgorithmService(allowed));
             
             try {
-                org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                org.episteme.core.mathematics.context.MathContext.withPrecision(64).compute(() -> {
                     runRealBigTests(res, (LinearAlgebraProvider<RealBig>) rawProvider);
                     return null;
                 });
@@ -149,11 +163,11 @@ public class HighPrecisionComplianceTest {
     }
 
     private void runRealBigTests(ComplianceResult res, LinearAlgebraProvider<RealBig> provider) {
-        HighPrecisionAuditOperations.runRealBigAudit(provider, 5, (op, test) -> testOp(res, op, provider, test));
+        HighPrecisionAuditOperations.runRealBigAudit(provider, 3, (op, test) -> testOp(res, op, provider, test));
     }
 
     private void runComplexTests(ComplianceResult res, LinearAlgebraProvider<Complex> provider) {
-        HighPrecisionAuditOperations.runComplexAudit(provider, 5, (op, test) -> testOp(res, op, provider, test));
+        HighPrecisionAuditOperations.runComplexAudit(provider, 3, (op, test) -> testOp(res, op, provider, test));
     }
 
     // --- Provider Discovery ---

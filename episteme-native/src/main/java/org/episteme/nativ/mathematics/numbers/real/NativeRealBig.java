@@ -8,6 +8,7 @@ package org.episteme.nativ.mathematics.numbers.real;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import static java.lang.foreign.ValueLayout.ADDRESS;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -42,7 +43,12 @@ public final class NativeRealBig extends Real {
         this.ptr = arena.allocate(32); // Approximate size for mpfr_t
         NativeSafe.invoke(MPFR_INIT2, ptr, precision);
         
-        MemorySegment str = arena.allocateFrom(value);
+        String mpfrValue = value;
+        if (value.equalsIgnoreCase("nan")) mpfrValue = "@NaN@";
+        else if (value.equalsIgnoreCase("infinity") || value.equalsIgnoreCase("inf")) mpfrValue = "@Inf@";
+        else if (value.equalsIgnoreCase("-infinity") || value.equalsIgnoreCase("-inf")) mpfrValue = "-@Inf@";
+
+        MemorySegment str = arena.allocateFrom(mpfrValue);
         NativeSafe.invoke(MPFR_SET_STR, ptr, str, 10, 0); // 0 = RNDN
     }
 
@@ -157,8 +163,7 @@ public final class NativeRealBig extends Real {
 
     @Override
     public boolean isZero() {
-        // mpfr_cmp_si (op, 0)
-        return bigDecimalValue().signum() == 0; // Temporary fallback until cmp_si added
+        return ((Number) NativeSafe.invoke(MPFR_ZERO_P, this.ptr)).intValue() != 0;
     }
 
     @Override
@@ -168,18 +173,20 @@ public final class NativeRealBig extends Real {
 
     @Override
     public boolean isNaN() {
-        // mpfr_nan_p (op)
-        return false; 
+        return ((Number) NativeSafe.invoke(MPFR_NAN_P, this.ptr)).intValue() != 0;
     }
 
     @Override
     public boolean isInfinite() {
-        // mpfr_inf_p (op)
-        return false;
+        return ((Number) NativeSafe.invoke(MPFR_INF_P, this.ptr)).intValue() != 0;
     }
 
     @Override
     public double doubleValue() {
+        if (isNaN()) return Double.NaN;
+        if (isInfinite()) {
+            return (((Number) NativeSafe.invoke(MPFR_CMP_SI, this.ptr, 0L)).intValue() > 0) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+        }
         return bigDecimalValue().doubleValue();
     }
 
@@ -197,6 +204,9 @@ public final class NativeRealBig extends Real {
                 String digits = safeSeg.getString(0);
                 
                 if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
+                if (digits.contains("@NaN@") || digits.contains("@Inf@") || digits.contains("NaN") || digits.contains("Inf")) {
+                    return BigDecimal.ZERO; 
+                }
 
                 long exp = IS_WINDOWS ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
                 
@@ -207,8 +217,13 @@ public final class NativeRealBig extends Real {
                 }
                 
                 long effectiveScale = (long) digits.length() - exp;
-                BigInteger unscaled = new BigInteger(sign + digits);
-                return new BigDecimal(unscaled, (int) effectiveScale);
+                try {
+                    BigInteger unscaled = new BigInteger(sign + digits);
+                    return new BigDecimal(unscaled, (int) effectiveScale);
+                } catch (NumberFormatException e) {
+                    // Fallback for any other unexpected MPFR strings
+                    return BigDecimal.ZERO;
+                }
             } finally {
                 NativeSafe.invoke(MPFR_FREE_STR, strPtr);
             }
@@ -369,7 +384,7 @@ public final class NativeRealBig extends Real {
     @Override
     public int compareTo(Real other) {
         if (other instanceof NativeRealBig n) {
-            return (int) NativeSafe.invoke(MPFR_CMP, this.ptr, n.ptr);
+            return ((Number) NativeSafe.invoke(MPFR_CMP, this.ptr, n.ptr)).intValue();
         }
         return bigDecimalValue().compareTo(other.bigDecimalValue());
     }
@@ -387,6 +402,10 @@ public final class NativeRealBig extends Real {
 
     @Override
     public String toString() {
-        return bigDecimalValue().toString();
+        if (isNaN()) return "NaN";
+        if (isInfinite()) {
+            return (((Number) NativeSafe.invoke(MPFR_CMP_SI, this.ptr, 0L)).intValue() > 0) ? "Infinity" : "-Infinity";
+        }
+        return bigDecimalValue().toPlainString();
     }
 }

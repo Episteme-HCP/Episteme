@@ -8,6 +8,8 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import com.google.auto.service.AutoService;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
+import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.*;
+import static java.lang.foreign.ValueLayout.ADDRESS;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -28,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
-import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.*;
 
 
 /**
@@ -71,6 +72,19 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         return true; 
+    }
+
+    private Class<?> componentType(org.episteme.core.mathematics.structures.rings.Ring<E> field) {
+        Class<?> c = field.zero().getClass();
+        if (Real.class.isAssignableFrom(c)) return Real.class;
+        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(c)) return org.episteme.core.mathematics.numbers.complex.Complex.class;
+        return c;
+    }
+    
+    // Explicitly check for disabled backend
+    @Override
+    public boolean isExplicitlyDisabled() {
+        return "true".equalsIgnoreCase(System.getProperty("episteme.backend.mpfr.disabled"));
     }
 
     @Override
@@ -118,7 +132,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     @Override
     public E dot(Vector<E> a, Vector<E> b) {
-        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        checkDimensionsDot(a, b);
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
         try (Arena arena = Arena.ofConfined()) {
@@ -127,13 +141,15 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
             MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             NativeSafe.invoke(MPFR_INIT2, sumR, prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, prec);
-            NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, 0);
-            if (isComplex) NativeSafe.invoke(MPFR_SET_STR, sumI, arena.allocateFrom("0"), 10, 0);
+            NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
+            if (isComplex) {
+                NativeSafe.invoke(MPFR_INIT2, sumI, prec);
+                NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, 0);
+            }
 
             MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
-            MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, t1, prec);
+            MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, t2, prec);
 
             int n = a.dimension();
@@ -145,12 +161,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     MemorySegment bi = getMPFRVector(h_B, i, 1, true);
                     // Hermitian dot: sum(a_i^H * b_i) = sum((ar - i*ai) * (br + i*bi))
                     // Real part: ar*br + ai*bi
-                    // Imag part: ar*bi - ai*br
                     NativeSafe.invoke(MPFR_MUL, t1, ar, br, 0);
                     NativeSafe.invoke(MPFR_MUL, t2, ai, bi, 0);
                     NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
                     NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
 
+                    // Imag part: ar*bi - ai*br
                     NativeSafe.invoke(MPFR_MUL, t1, ar, bi, 0);
                     NativeSafe.invoke(MPFR_MUL, t2, ai, br, 0);
                     NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
@@ -768,7 +784,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             Matrix<E> lMat = backToMatrix_internal(h_L, n, n, arena, a.getScalarRing(), isComplex);
             Matrix<E> uMat = backToMatrix_internal(h_U, n, n, arena, a.getScalarRing(), isComplex);
             
-            E[] pData = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), n);
+            E[] pData = (E[]) java.lang.reflect.Array.newInstance(componentType(a.getScalarRing()), n);
             for (int i = 0; i < n; i++) {
                 if (isComplex) pData[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(perm[i]));
                 else pData[i] = (E) (Object) Real.of(perm[i]);
@@ -2048,6 +2064,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     private void checkDimensionsAdd(Matrix<?> a, Matrix<?> b) {
         if (a.rows() != b.rows() || a.cols() != b.cols()) throw new IllegalArgumentException("Matrix dimensions do not match");
+    }
+
+    private void checkDimensionsDot(Vector<?> a, Vector<?> b) {
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Vector dimensions do not match");
     }
 
     public static MethodHandle getHandle(String function) {
