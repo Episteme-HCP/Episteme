@@ -19,11 +19,11 @@ public class GenericEigen {
         if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
 
         @SuppressWarnings("unchecked")
-        E[][] A = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+        E[][] A = (E[][]) java.lang.reflect.Array.newInstance(componentType(field), n, n);
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
 
         @SuppressWarnings("unchecked")
-        E[][] V = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+        E[][] V = (E[][]) java.lang.reflect.Array.newInstance(componentType(field), n, n);
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) V[i][j] = (i == j) ? field.one() : field.zero();
 
         int maxSweeps = 50;
@@ -107,7 +107,7 @@ public class GenericEigen {
         }
 
         @SuppressWarnings("unchecked")
-        E[] eigenvalues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] eigenvalues = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         for (int i = 0; i < n; i++) eigenvalues[i] = A[i][i];
 
         return new EigenResult<>(
@@ -126,6 +126,13 @@ public class GenericEigen {
             return (E) Complex.of(res);
         }
         return (E) res;
+    }
+
+    private static Class<?> componentType(Field<?> field) {
+        Class<?> c = field.zero().getClass();
+        if (Real.class.isAssignableFrom(c)) return Real.class;
+        if (Complex.class.isAssignableFrom(c)) return Complex.class;
+        return c;
     }
 
     private static boolean isNegative(Object element, Field<?> field) {

@@ -25,7 +25,7 @@ public class GenericLU {
         if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
 
         @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(componentType(field), n, n);
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = matrix.get(i, j);
 
         int[] perm = new int[n];
@@ -78,7 +78,7 @@ public class GenericLU {
         }
 
         @SuppressWarnings("unchecked")
-        E[] pData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] pData = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         for (int i = 0; i < n; i++) {
             if (field.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
                 @SuppressWarnings("unchecked")
@@ -111,9 +111,9 @@ public class GenericLU {
     public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int n = lu.L().rows();
         @SuppressWarnings("unchecked")
-        E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] x = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         @SuppressWarnings("unchecked")
-        E[] pb = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] pb = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
 
         Vector<E> p = lu.P();
         for (int i = 0; i < n; i++) {
@@ -121,7 +121,7 @@ public class GenericLU {
         }
 
         @SuppressWarnings("unchecked")
-        E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] y = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         Matrix<E> l = lu.L();
         for (int i = 0; i < n; i++) {
             E sum = field.zero();
@@ -172,13 +172,20 @@ public class GenericLU {
         E[] invFlat = (E[]) new Object[n * n];
         for (int j = 0; j < n; j++) {
             @SuppressWarnings("unchecked")
-            E[] e = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+            E[] e = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
             for (int i = 0; i < n; i++) e[i] = (i == j) ? field.one() : field.zero();
             Vector<E> ev = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(e)), provider, field);
             Vector<E> x = solve(lu, ev, field, provider);
             for (int i = 0; i < n; i++) invFlat[i * n + j] = x.get(i);
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(n, n, invFlat), provider, field);
+    }
+
+    private static Class<?> componentType(Field<?> field) {
+        Class<?> c = field.zero().getClass();
+        if (Real.class.isAssignableFrom(c)) return Real.class;
+        if (Complex.class.isAssignableFrom(c)) return Complex.class;
+        return c;
     }
 
     private static double absValue(Object element, Field<?> field) {

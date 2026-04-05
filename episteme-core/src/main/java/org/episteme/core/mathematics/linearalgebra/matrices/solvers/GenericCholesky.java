@@ -21,7 +21,7 @@ public class GenericCholesky {
         if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
 
         @SuppressWarnings("unchecked")
-        E[][] lData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+        E[][] lData = (E[][]) java.lang.reflect.Array.newInstance(componentType(field), n, n);
         for (int i = 0; i < n; i++) java.util.Arrays.fill(lData[i], field.zero());
 
         for (int j = 0; j < n; j++) {
@@ -45,7 +45,7 @@ public class GenericCholesky {
         int n = l.rows();
         
         @SuppressWarnings("unchecked")
-        E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] y = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         for (int i = 0; i < n; i++) {
             E sum = field.zero();
             for (int j = 0; j < i; j++) sum = field.add(sum, field.multiply(l.get(i, j), y[j]));
@@ -53,7 +53,7 @@ public class GenericCholesky {
         }
 
         @SuppressWarnings("unchecked")
-        E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] x = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         for (int i = n - 1; i >= 0; i--) {
             E sum = field.zero();
             for (int j = i + 1; j < n; j++) sum = field.add(sum, field.multiply(conjugate(l.get(j, i), field), x[j]));
@@ -67,6 +67,13 @@ public class GenericCholesky {
     private static <E> E conjugate(E element, Field<E> field) {
         if (element instanceof Complex) return (E) ((Complex) element).conjugate();
         return element;
+    }
+
+    private static Class<?> componentType(Field<?> field) {
+        Class<?> c = field.zero().getClass();
+        if (Real.class.isAssignableFrom(c)) return Real.class;
+        if (Complex.class.isAssignableFrom(c)) return Complex.class;
+        return c;
     }
 
     @SuppressWarnings("unchecked")

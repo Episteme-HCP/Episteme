@@ -346,8 +346,11 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     public Matrix<E> one() {
         // Identity
+        Class<?> ct = ring.zero().getClass();
+        if (org.episteme.core.mathematics.numbers.real.Real.class.isAssignableFrom(ct)) ct = org.episteme.core.mathematics.numbers.real.Real.class;
+        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(ct)) ct = org.episteme.core.mathematics.numbers.complex.Complex.class;
         @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows(), cols());
+        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ct, rows(), cols());
         GenericMatrix<E> m = (GenericMatrix<E>) Matrix.of(data, ring);
         // Implementation detail: create storage directly.
         return m; // simplified

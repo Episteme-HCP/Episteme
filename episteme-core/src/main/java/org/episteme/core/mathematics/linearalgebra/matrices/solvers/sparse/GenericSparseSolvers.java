@@ -101,7 +101,7 @@ public class GenericSparseSolvers {
             @SuppressWarnings("unchecked")
             Vector<E>[] V = (Vector<E>[]) new Vector[m + 1];
             @SuppressWarnings("unchecked")
-            E[][] H = (E[][]) java.lang.reflect.Array.newInstance(f.zero().getClass(), m + 1, m);
+            E[][] H = (E[][]) java.lang.reflect.Array.newInstance(componentType(f), m + 1, m);
             
             V[0] = provider.multiply(r0_vec, f.divide(f.one(), beta_val));
 
@@ -123,11 +123,11 @@ public class GenericSparseSolvers {
 
             // Solve Least Squares: min || beta*e1 - Hy || using Givens Rotations
             @SuppressWarnings("unchecked")
-            E[] sn = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), actual_m);
+            E[] sn = (E[]) java.lang.reflect.Array.newInstance(componentType(f), actual_m);
             @SuppressWarnings("unchecked")
-            E[] cs = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), actual_m);
+            E[] cs = (E[]) java.lang.reflect.Array.newInstance(componentType(f), actual_m);
             @SuppressWarnings("unchecked")
-            E[] s_vec = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), actual_m + 1);
+            E[] s_vec = (E[]) java.lang.reflect.Array.newInstance(componentType(f), actual_m + 1);
             java.util.Arrays.fill(s_vec, f.zero());
             s_vec[0] = beta_val;
 
@@ -168,7 +168,7 @@ public class GenericSparseSolvers {
 
             // Back substitution
             @SuppressWarnings("unchecked")
-            E[] y = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), actual_m);
+            E[] y = (E[]) java.lang.reflect.Array.newInstance(componentType(f), actual_m);
             for (int i = actual_m - 1; i >= 0; i--) {
                 y[i] = s_vec[i];
                 for (int j = i + 1; j < actual_m; j++) {
@@ -200,6 +200,13 @@ public class GenericSparseSolvers {
         }
         
         return abs(eAbs, f) < abs(tAbs, f);
+    }
+
+    private static Class<?> componentType(Field<?> field) {
+        Class<?> c = field.zero().getClass();
+        if (Real.class.isAssignableFrom(c)) return Real.class;
+        if (Complex.class.isAssignableFrom(c)) return Complex.class;
+        return c;
     }
 
     private static double abs(Object element, Field<?> f) {

@@ -25,13 +25,13 @@ public class GenericQR {
         int n = matrix.cols();
         
         @SuppressWarnings("unchecked")
-        E[][] qData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m, n);
+        E[][] qData = (E[][]) java.lang.reflect.Array.newInstance(componentType(field), m, n);
         @SuppressWarnings("unchecked")
-        E[][] rData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
+        E[][] rData = (E[][]) java.lang.reflect.Array.newInstance(componentType(field), n, n);
         
         for (int j = 0; j < n; j++) {
             @SuppressWarnings("unchecked")
-            E[] v = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m);
+            E[] v = (E[]) java.lang.reflect.Array.newInstance(componentType(field), m);
             for (int i = 0; i < m; i++) v[i] = matrix.get(i, j);
             
             for (int i = 0; i < j; i++) {
@@ -74,7 +74,7 @@ public class GenericQR {
         
         // x = R^-1 * Q^T * b
         @SuppressWarnings("unchecked")
-        E[] qtB = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] qtB = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         for (int i = 0; i < n; i++) {
             E dot = field.zero();
             for (int k = 0; k < q.rows(); k++) dot = field.add(dot, field.multiply(conjugate(q.get(k, i), field), b.get(k)));
@@ -82,7 +82,7 @@ public class GenericQR {
         }
         
         @SuppressWarnings("unchecked")
-        E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
+        E[] x = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         for (int i = n - 1; i >= 0; i--) {
             E sum = field.zero();
             for (int j = i + 1; j < n; j++) sum = field.add(sum, field.multiply(r.get(i, j), x[j]));
@@ -103,6 +103,13 @@ public class GenericQR {
     private static <E> E conjugate(E element, Field<E> field) {
         if (element instanceof Complex) return (E) ((Complex) element).conjugate();
         return element;
+    }
+
+    private static Class<?> componentType(Field<?> field) {
+        Class<?> c = field.zero().getClass();
+        if (Real.class.isAssignableFrom(c)) return Real.class;
+        if (Complex.class.isAssignableFrom(c)) return Complex.class;
+        return c;
     }
 
     @SuppressWarnings("unchecked")
