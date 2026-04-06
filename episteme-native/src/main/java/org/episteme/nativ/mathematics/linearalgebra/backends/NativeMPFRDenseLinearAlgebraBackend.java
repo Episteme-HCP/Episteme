@@ -1034,13 +1034,20 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (a.rows() != a.cols()) {
-            // Rectangular solve (Least Squares) via Normal Equations: A^T A x = A^T b
-            Matrix<E> at = transpose(a);
-            Matrix<E> ata = multiply(at, a);
-            Vector<E> atb = multiply(at, b);
-            return solve(ata, atb);
+        if (a.rows() == a.cols()) {
+            return solveSquare(a, b);
         }
+        // Rectangular solve
+        if (a.rows() > a.cols()) {
+            // Overdetermined: Least Squares via Normal Equations A^T A x = A^T b
+            Matrix<E> at = transpose(a);
+            return solve(multiply(at, a), multiply(at, b));
+        } else {
+            // Underdetermined: Minimum Norm Solution x = A^T (A A^T)^-1 b
+            Matrix<E> at = transpose(a);
+            return multiply(at, solve(multiply(a, at), b));
+        }
+    }
         if (a.rows() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         int n = a.rows();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;

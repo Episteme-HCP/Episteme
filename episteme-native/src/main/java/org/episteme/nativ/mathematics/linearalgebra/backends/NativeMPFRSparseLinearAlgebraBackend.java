@@ -992,14 +992,20 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (a.rows() != a.cols()) {
-            // Rectangular solve (Least Squares) via Normal Equations: A^T A x = A^T b
-            Matrix<E> at = transpose(a);
-            Matrix<E> ata = multiply(at, a);
-            Vector<E> atb = multiply(at, b);
-            return solve(ata, atb);
+        if (a.rows() == a.cols()) {
+            // Square system
+            return bicgstab(a, b, Vector.zeros(b.dimension(), (org.episteme.core.mathematics.structures.rings.Ring<E>) b.getScalarRing()), (E)Real.of("1e-20"), 1000);
         }
-        return bicgstab(a, b, Vector.zeros(b.dimension(), (org.episteme.core.mathematics.structures.rings.Ring<E>) b.getScalarRing()), (E)Real.of("1e-20"), 1000);
+        // Rectangular solve
+        if (a.rows() > a.cols()) {
+            // Overdetermined: x = (A^T A)^-1 A^T b
+            Matrix<E> at = transpose(a);
+            return solve(multiply(at, a), multiply(at, b));
+        } else {
+            // Underdetermined: x = A^T (A A^T)^-1 b (minimum norm solution)
+            Matrix<E> at = transpose(a);
+            return multiply(at, solve(multiply(a, at), b));
+        }
     }
 
     public Vector<E> solve(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> a, Vector<E> b) {

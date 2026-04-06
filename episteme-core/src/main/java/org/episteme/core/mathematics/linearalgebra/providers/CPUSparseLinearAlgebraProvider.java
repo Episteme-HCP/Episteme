@@ -424,21 +424,26 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (a.rows() != a.cols()) {
-            // Normal Equations: A^T A x = A^T b
-            Matrix<E> at = transpose(a);
-            Matrix<E> ata = multiply(at, a);
-            Vector<E> atb = multiply(at, b);
-            return solve(ata, atb);
-        }
-        Field<E> f = (Field<E>) a.getScalarRing();
-        E tol;
-        if (f.one() instanceof Real) tol = (E) Real.of(1e-12);
-        else if (f.one() instanceof Complex) tol = (E) Complex.of(1e-12, 0);
-        else if (f.one() instanceof org.episteme.core.mathematics.numbers.real.RealBig) tol = (E) org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal("1e-12"));
-        else tol = f.zero(); // Fallback
+        if (a.rows() == a.cols()) {
+            Field<E> f = (Field<E>) a.getScalarRing();
+            E tol;
+            if (f.one() instanceof Real) tol = (E) Real.of(1e-12);
+            else if (f.one() instanceof Complex) tol = (E) Complex.of(1e-12, 0);
+            else if (f.one() instanceof org.episteme.core.mathematics.numbers.real.RealBig) tol = (E) org.episteme.core.mathematics.numbers.real.RealBig.create(new java.math.BigDecimal("1e-12"));
+            else tol = f.zero(); // Fallback
 
-        return bicgstab(a, b, org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), f), tol, 1000);
+            return bicgstab(a, b, org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), f), tol, 1000);
+        }
+        // Rectangular solve
+        if (a.rows() > a.cols()) {
+            // Overdetermined: x = (A^T A)^-1 A^T b
+            Matrix<E> at = transpose(a);
+            return solve(multiply(at, a), multiply(at, b));
+        } else {
+            // Underdetermined: x = A^T (A A^T)^-1 b (minimum norm solution)
+            Matrix<E> at = transpose(a);
+            return multiply(at, solve(multiply(a, at), b));
+        }
     }
 
 
