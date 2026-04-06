@@ -823,7 +823,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     @SuppressWarnings("unchecked")
     public Matrix<E> inverse(Matrix<E> a) {
         if (a.rows() != a.cols()) {
-            throw new IllegalArgumentException("Matrix must be square");
+             // Moore-Penrose Pseudo-inverse via Normal Equations
+             Matrix<E> at = transpose(a);
+             if (a.rows() > a.cols()) {
+                 return multiply(inverse(multiply(at, a)), at);
+             } else {
+                 return multiply(at, inverse(multiply(a, at)));
+             }
         }
         if (isReal(a)) {
             return (Matrix<E>) (Object) JavaLU.inverse((Matrix<Real>) (Object) a);
@@ -848,6 +854,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (a.rows() != b.dimension()) {
             throw new IllegalArgumentException("Matrix rows and vector dimension must match");
+        }
+        if (a.rows() != a.cols()) {
+            if (isReal(a) && isReal(b)) {
+                return (Vector<E>) (Object) JavaQR.solve(JavaQR.decompose((Matrix<Real>) (Object) a), (Vector<Real>) (Object) b);
+            }
+            return GenericQR.solve(GenericQR.decompose(a, (Field<E>) a.getScalarRing()), b, (Field<E>) a.getScalarRing());
         }
         if (isReal(a) && isReal(b)) {
             return (Vector<E>) JavaLU.solve((Matrix<Real>) a, (Vector<Real>) b);

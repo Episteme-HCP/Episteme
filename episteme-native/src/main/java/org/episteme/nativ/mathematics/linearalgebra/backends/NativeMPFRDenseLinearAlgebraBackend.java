@@ -1034,7 +1034,13 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        if (a.rows() != a.cols()) {
+            // Rectangular solve (Least Squares) via Normal Equations: A^T A x = A^T b
+            Matrix<E> at = transpose(a);
+            Matrix<E> ata = multiply(at, a);
+            Vector<E> atb = multiply(at, b);
+            return solve(ata, atb);
+        }
         if (a.rows() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         int n = a.rows();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
@@ -1161,7 +1167,17 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        if (a.rows() != a.cols()) {
+            // Rectangular inverse (Moore-Penrose Pseudo-inverse)
+            // A+ = (A^T A)^-1 A^T  if m > n
+            // A+ = A^T (A A^T)^-1  if m < n
+            Matrix<E> at = transpose(a);
+            if (a.rows() > a.cols()) {
+                return multiply(inverse(multiply(at, a)), at);
+            } else {
+                return multiply(at, inverse(multiply(a, at)));
+            }
+        }
         int n = a.rows();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision(); // MPFR_RNDN

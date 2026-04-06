@@ -161,7 +161,14 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> inverse(Matrix<E> a) {
-        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        if (a.rows() != a.cols()) {
+            Matrix<E> at = transpose(a);
+            if (a.rows() > a.cols()) {
+                return multiply(inverse(multiply(at, a)), at);
+            } else {
+                return multiply(at, inverse(multiply(a, at)));
+            }
+        }
         int n = a.rows();
         Field<E> f = (Field<E>) (Object) a.getScalarRing();
         E[] invData = (E[]) (Object) java.lang.reflect.Array.newInstance(f.zero().getClass(), n * n);
@@ -417,6 +424,13 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (a.rows() != a.cols()) {
+            // Normal Equations: A^T A x = A^T b
+            Matrix<E> at = transpose(a);
+            Matrix<E> ata = multiply(at, a);
+            Vector<E> atb = multiply(at, b);
+            return solve(ata, atb);
+        }
         Field<E> f = (Field<E>) a.getScalarRing();
         E tol;
         if (f.one() instanceof Real) tol = (E) Real.of(1e-12);
@@ -426,6 +440,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
         return bicgstab(a, b, org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), f), tol, 1000);
     }
+
 
     @Override
     public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {

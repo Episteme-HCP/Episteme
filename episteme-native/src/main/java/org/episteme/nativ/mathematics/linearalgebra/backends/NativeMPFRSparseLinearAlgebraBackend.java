@@ -992,6 +992,13 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (a.rows() != a.cols()) {
+            // Rectangular solve (Least Squares) via Normal Equations: A^T A x = A^T b
+            Matrix<E> at = transpose(a);
+            Matrix<E> ata = multiply(at, a);
+            Vector<E> atb = multiply(at, b);
+            return solve(ata, atb);
+        }
         return bicgstab(a, b, Vector.zeros(b.dimension(), (org.episteme.core.mathematics.structures.rings.Ring<E>) b.getScalarRing()), (E)Real.of("1e-20"), 1000);
     }
 
@@ -1450,7 +1457,19 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override public E determinant(Matrix<E> a) { return GenericLU.determinant(a, (Field<E>) a.getScalarRing()); }
-    @Override public Matrix<E> inverse(Matrix<E> a) { return GenericLU.inverse(a, (Field<E>) a.getScalarRing(), this); }
+    @Override
+    public Matrix<E> inverse(Matrix<E> a) {
+        if (a.rows() != a.cols()) {
+            // Rectangular inverse (Moore-Penrose Pseudo-inverse)
+            Matrix<E> at = transpose(a);
+            if (a.rows() > a.cols()) {
+                return multiply(inverse(multiply(at, a)), at);
+            } else {
+                return multiply(at, inverse(multiply(a, at)));
+            }
+        }
+        return GenericLU.inverse(a, (Field<E>) a.getScalarRing(), this);
+    }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { return GenericLU.decompose(a, (Field<E>) a.getScalarRing(), this); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) { return GenericQR.decompose(a, (Field<E>) a.getScalarRing(), this); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) { return GenericSVD.decompose(a, (Field<E>) a.getScalarRing()); }
