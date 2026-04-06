@@ -97,10 +97,11 @@ public final class NativeMPFRNumbers {
             ).withName("__mpfr_struct_64");
         } else {
             MPFR_LAYOUT = MemoryLayout.structLayout(
-                C_LONG.withName("prec"),      // offset 0
-                JAVA_INT.withName("sign"),    // offset 4
-                C_LONG.withName("exp"),       // offset 8
-                ADDRESS.withName("d")         // offset 12
+                C_LONG.withName("prec"),      // offset 0 (4 bytes)
+                JAVA_INT.withName("sign"),    // offset 4 (4 bytes)
+                C_LONG.withName("exp"),       // offset 8 (4 bytes)
+                MemoryLayout.paddingLayout(4), // offset 12 (4 bytes padding)
+                ADDRESS.withName("d")         // offset 16 (8 bytes)
             ).withName("__mpfr_struct_32");
         }
 
