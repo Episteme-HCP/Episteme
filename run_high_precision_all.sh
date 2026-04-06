@@ -4,6 +4,17 @@
 
 set -e
 
+# Initialize SDKMAN to ensure Java 25 is available in non-interactive shells
+if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+    sdk use java 25-open || echo "Warning: Could not switch to Java 25 via SDKMAN"
+else
+    echo "Warning: SDKMAN not found at $HOME/.sdkman"
+fi
+
+# Double check Java version
+echo "Using Java: $(java -version 2>&1 | head -n 1)"
+
 echo "=========================================="
 echo "Compiling the project once..."
 echo "=========================================="
