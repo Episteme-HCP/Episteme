@@ -46,14 +46,45 @@ public class NativeSafe {
         }
 
         try {
+            // First, try direct invocation
             return handle.invokeWithArguments(args);
-        } catch (java.lang.invoke.WrongMethodTypeException wmte) {
-            // Try to be more explicit if it's a type mismatch
-            logger.warn("Native Invoke: Type mismatch for {}, attempting spreader fallback. Error: {}", handle, wmte.getMessage());
+        } catch (java.lang.ClassCastException | java.lang.invoke.WrongMethodTypeException e) {
+            // If it's a type mismatch (like Long vs int on Windows), attempt manual coercion
+            logger.debug("Native Invoke: Type mismatch or cast error for {}. Attempting manual coercion of arguments.", handle);
+            Object[] coercedArgs = new Object[args.length];
+            Class<?>[] ptypes = handle.type().parameterArray();
+            
+            for (int i = 0; i < args.length; i++) {
+                Object arg = args[i];
+                if (arg == null) {
+                    coercedArgs[i] = null;
+                    continue;
+                }
+                
+                Class<?> expected = ptypes[i];
+                if (expected == int.class || expected == Integer.class) {
+                    if (arg instanceof Number num) coercedArgs[i] = num.intValue();
+                    else coercedArgs[i] = arg;
+                } else if (expected == long.class || expected == Long.class) {
+                    if (arg instanceof Number num) coercedArgs[i] = num.longValue();
+                    else coercedArgs[i] = arg;
+                } else if (expected == float.class || expected == Float.class) {
+                    if (arg instanceof Number num) coercedArgs[i] = num.floatValue();
+                    else coercedArgs[i] = arg;
+                } else if (expected == double.class || expected == Double.class) {
+                    if (arg instanceof Number num) coercedArgs[i] = num.doubleValue();
+                    else coercedArgs[i] = arg;
+                } else {
+                    coercedArgs[i] = arg;
+                }
+            }
+            
             try {
-                return handle.asSpreader(Object[].class, args.length).invoke(args);
+                return handle.invokeWithArguments(coercedArgs);
             } catch (Throwable t2) {
-                throw new RuntimeException("Native boundary protection (spreader fallback failed): " + t2.getMessage(), t2);
+                // If coercion also fails, provide a very detailed error and rethrow the original or the new one
+                logger.error("Native boundary protection: Manual coercion failed for handle {}. Original error: {}", handle, e.getMessage());
+                throw (t2 instanceof RuntimeException) ? (RuntimeException)t2 : new RuntimeException(t2);
             }
         } catch (Throwable t) {
             logger.error("CRITICAL: Native call failed! Handle: {}", handle);

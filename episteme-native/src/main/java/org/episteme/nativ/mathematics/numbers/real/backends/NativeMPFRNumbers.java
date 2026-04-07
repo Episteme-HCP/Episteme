@@ -210,6 +210,11 @@ public final class NativeMPFRNumbers {
         return lookup.find(name).map(s -> LINKER.downcallHandle(s, desc)).orElse(null);
     }
 
+    public static Object c_long(long value) {
+        if (C_LONG.byteSize() == 4) return (int) value;
+        return value;
+    }
+
     public static boolean isAvailable() {
         return AVAILABLE;
     }
