@@ -472,7 +472,21 @@ public class LinearAlgebraComplianceTest {
             results.add(res);
         }
 
+        // --- Report Generation ---
         printMarkdownReport(results);
+        
+        // --- Resource Cleanup ---
+        System.out.println("[ComplianceTest] Cleaning up resources...");
+        for (LinearAlgebraProvider<Real> p : rawProviders) {
+            if (p instanceof org.episteme.core.technical.backend.Backend b) {
+                try {
+                    System.out.println("[ComplianceTest] Shutting down: " + b.getName());
+                    b.shutdown();
+                } catch (Throwable t) {
+                    System.err.println("Warning: Error during shutdown of " + b.getName() + ": " + t.getMessage());
+                }
+            }
+        }
     }
 
     private void assertRelativeEquals(double expected, double actual, double tol) {
