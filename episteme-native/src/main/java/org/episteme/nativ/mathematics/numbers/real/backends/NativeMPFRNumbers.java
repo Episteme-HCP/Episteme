@@ -26,10 +26,16 @@ public final class NativeMPFRNumbers {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRNumbers.class);
     private static final Linker LINKER = Linker.nativeLinker();
     
-    // Platform-dependent C 'long' size
-    public static final ValueLayout.OfLong JAVA_LONG = ValueLayout.JAVA_LONG;
-    public static final ValueLayout C_LONG = System.getProperty("os.name").toLowerCase().contains("win") 
-                                            ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG;
+    // Platform-dependent C 'long' size - Windows 'long' is always 32-bit (LLP64), Linux/macOS 'long' is 64-bit (LP64)
+    public static final ValueLayout JAVA_LONG = ValueLayout.JAVA_LONG;
+    public static final ValueLayout C_LONG = (Linker.nativeLinker().canonicalLayouts().get("long") != null && 
+                                              Linker.nativeLinker().canonicalLayouts().get("long").byteSize() == 4)
+                                              ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG;
+    
+    public static Object c_long(long value) {
+        if (C_LONG.byteSize() == 4) return (int) value;
+        return value;
+    }
     
     // MPFR Function Handles
     public static final MethodHandle MPFR_EXP;
@@ -208,11 +214,6 @@ public final class NativeMPFRNumbers {
 
     public static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor desc) {
         return lookup.find(name).map(s -> LINKER.downcallHandle(s, desc)).orElse(null);
-    }
-
-    public static Object c_long(long value) {
-        if (C_LONG.byteSize() == 4) return (int) value;
-        return value;
     }
 
     public static boolean isAvailable() {

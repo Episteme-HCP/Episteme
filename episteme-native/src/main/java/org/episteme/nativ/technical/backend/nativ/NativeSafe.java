@@ -46,13 +46,16 @@ public class NativeSafe {
         }
 
         try {
-            // First, try direct invocation
+            // 1. Primary Attempt: Direct invocation using Panama MethodHandle
             return handle.invokeWithArguments(args);
-        } catch (java.lang.ClassCastException | java.lang.invoke.WrongMethodTypeException e) {
-            // If it's a type mismatch (like Long vs int on Windows), attempt manual coercion
-            logger.debug("Native Invoke: Type mismatch or cast error for {}. Attempting manual coercion of arguments.", handle);
+        } catch (Throwable t1) {
+            // 2. Secondary Attempt: Type Coercion fallback
+            // This handles cases like Long vs int mismatches on Windows, or double/float mismatches.
+            logger.debug("Native Invoke: Call failed for {}. Attempting platform-aware coercion. Error: {}", handle, t1.getMessage());
+            
             Object[] coercedArgs = new Object[args.length];
             Class<?>[] ptypes = handle.type().parameterArray();
+            boolean coerced = false;
             
             for (int i = 0; i < args.length; i++) {
                 Object arg = args[i];
@@ -62,45 +65,54 @@ public class NativeSafe {
                 }
                 
                 Class<?> expected = ptypes[i];
-                if (expected == int.class || expected == Integer.class) {
-                    if (arg instanceof Number num) coercedArgs[i] = num.intValue();
-                    else coercedArgs[i] = arg;
-                } else if (expected == long.class || expected == Long.class) {
-                    if (arg instanceof Number num) coercedArgs[i] = num.longValue();
-                    else coercedArgs[i] = arg;
-                } else if (expected == float.class || expected == Float.class) {
-                    if (arg instanceof Number num) coercedArgs[i] = num.floatValue();
-                    else coercedArgs[i] = arg;
-                } else if (expected == double.class || expected == Double.class) {
-                    if (arg instanceof Number num) coercedArgs[i] = num.doubleValue();
-                    else coercedArgs[i] = arg;
+                if (expected.isPrimitive()) {
+                    if (arg instanceof Number num) {
+                        if (expected == int.class) {
+                            int val = num.intValue();
+                            coercedArgs[i] = val;
+                            if (arg instanceof Long) coerced = true;
+                        } else if (expected == long.class) {
+                            coercedArgs[i] = num.longValue();
+                        } else if (expected == float.class) {
+                            coercedArgs[i] = num.floatValue();
+                        } else if (expected == double.class) {
+                            coercedArgs[i] = num.doubleValue();
+                        } else {
+                            coercedArgs[i] = arg;
+                        }
+                    } else {
+                        coercedArgs[i] = arg;
+                    }
                 } else {
                     coercedArgs[i] = arg;
                 }
             }
             
+            if (coerced) {
+                logger.debug("Native Invoke: Coerced arguments (e.g. Long -> int) for handle {}", handle);
+            }
+            
             try {
                 return handle.invokeWithArguments(coercedArgs);
             } catch (Throwable t2) {
-                // If coercion also fails, provide a very detailed error and rethrow the original or the new one
-                logger.error("Native boundary protection: Manual coercion failed for handle {}. Original error: {}", handle, e.getMessage());
-                throw (t2 instanceof RuntimeException) ? (RuntimeException)t2 : new RuntimeException(t2);
-            }
-        } catch (Throwable t) {
-            logger.error("CRITICAL: Native call failed! Handle: {}", handle);
-            for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof MemorySegment seg) {
-                    try {
-                        logger.error("  Arg[{}]: MemorySegment(address=0x{}, size={})", i, Long.toHexString(seg.address()), seg.byteSize());
-                    } catch (UnsupportedOperationException e) {
-                        logger.error("  Arg[{}]: MemorySegment(address=UNAVAILABLE, size={})", i, seg.byteSize());
+                // 3. Final Fallback: Critical Failure reporting
+                logger.error("CRITICAL: Native call failed after coercion! Handle: {}", handle);
+                for (int i = 0; i < args.length; i++) {
+                    Object a = args[i];
+                    if (a instanceof MemorySegment seg) {
+                        try {
+                            logger.error("  Arg[{}]: MemorySegment(address=0x{}, size={})", i, Long.toHexString(seg.address()), seg.byteSize());
+                        } catch (UnsupportedOperationException ex) {
+                            logger.error("  Arg[{}]: MemorySegment(address=UNAVAILABLE, size={})", i, seg.byteSize());
+                        }
+                    } else {
+                        logger.error("  Arg[{}]: {} ({})", i, a, a != null ? a.getClass().getSimpleName() : "null");
                     }
-                } else {
-                    logger.error("  Arg[{}]: {} ({})", i, args[i], args[i] != null ? args[i].getClass().getSimpleName() : "null");
                 }
+                // Rethrow the coercion error as a RuntimeException if it isn't one.
+                if (t2 instanceof RuntimeException) throw (RuntimeException) t2;
+                throw new RuntimeException("Native boundary failure (after coercion attempt): " + t2.getMessage(), t2);
             }
-            if (t instanceof RuntimeException) throw (RuntimeException) t;
-            throw new RuntimeException("Native boundary protection: " + t.getMessage(), t);
         }
     }
 
