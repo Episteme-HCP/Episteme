@@ -143,11 +143,16 @@ public final class RealBig extends Real {
         if (this.isNaN()) return NaN;
         // Handle numerical noise: if slightly negative, clamp to zero
         if (value.signum() < 0) {
-            // Check if it's very close to zero
-            if (value.abs().doubleValue() < 1e-30) {
+            // Check if it's very close to zero - use a relative epsilon based on current context precision
+            java.math.MathContext mc = org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext();
+            // A safer threshold: 10 * 10^-precision (e.g. 1e-33 for prec=34)
+            // Or better, 1e-(precision-2) as already used but with more explicit logic.
+            BigDecimal threshold = BigDecimal.valueOf(1, Math.max(0, mc.getPrecision() - 2)); 
+            if (value.abs().compareTo(threshold) < 0) {
                 return ZERO;
             }
-            throw new ArithmeticException("Square root of a negative BigDecimal: " + value);
+            throw new ArithmeticException("Square root of a negative BigDecimal: " + value 
+                + " (is beyond the numerical safety threshold of " + threshold + ")");
         }
         return RealBig.create(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }

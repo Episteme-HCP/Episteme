@@ -217,10 +217,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
                 }
             }
-            // Add mpfr_sqrt handle if not present
-            SymbolLookup mpfr = NativeFFMLoader.loadLibrary("mpfr", Arena.global()).get();
-            MethodHandle sqrt = lookup(mpfr, "mpfr_sqrt", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-            NativeSafe.invoke(sqrt, sumR, sumR, 0);
+            NativeSafe.invoke(MPFR_SQRT, sumR, sumR, 0);
 
             MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
             if (isComplex) {

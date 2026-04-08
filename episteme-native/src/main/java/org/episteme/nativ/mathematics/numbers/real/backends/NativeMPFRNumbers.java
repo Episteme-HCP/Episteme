@@ -210,5 +210,30 @@ public final class NativeMPFRNumbers {
         return AVAILABLE;
     }
 
+    // --- Safe Utility Wrappers ---
+    
+    /**
+     * Centralized mpfr_sqrt implementation with safety checks.
+     */
+    public static int sqrt(MemorySegment rop, MemorySegment op, int rnd) {
+        if (!AVAILABLE) throw new IllegalStateException("MPFR not available");
+        try {
+            return (int) MPFR_SQRT.invokeExact(rop, op, rnd);
+        } catch (Throwable t) {
+            throw new RuntimeException("mpfr_sqrt failed", t);
+        }
+    }
+
+    /**
+     * Universal comparison utility for mpfr_t.
+     */
+    public static int compare(MemorySegment op1, MemorySegment op2) {
+        try {
+            return (int) MPFR_CMP.invokeExact(op1, op2);
+        } catch (Throwable t) {
+            throw new RuntimeException("mpfr_cmp failed", t);
+        }
+    }
+
     private NativeMPFRNumbers() {}
 }

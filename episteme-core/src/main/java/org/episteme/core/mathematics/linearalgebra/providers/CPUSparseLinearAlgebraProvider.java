@@ -25,6 +25,8 @@ package org.episteme.core.mathematics.linearalgebra.providers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
 
@@ -316,8 +318,43 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     public E dot(Vector<E> a, Vector<E> b) {
         Ring<E> r = a.getScalarRing();
         E sum = r.zero();
-        for (int i = 0; i < a.dimension(); i++) {
-            sum = r.add(sum, r.multiply(conjugate(a.get(i)), b.get(i)));
+        
+        // Optimize for sparse storage
+        if (a.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> sa && 
+            b.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> sb) {
+            
+            Map<Integer, E> mapA = sa.getNonZeros();
+            Map<Integer, E> mapB = sb.getNonZeros();
+            
+            // Iterate over the smaller map for efficiency
+            if (mapA.size() < mapB.size()) {
+                for (Map.Entry<Integer, E> entry : mapA.entrySet()) {
+                    E valB = mapB.get(entry.getKey());
+                    if (valB != null) {
+                        sum = r.add(sum, r.multiply(conjugate(entry.getValue()), valB));
+                    }
+                }
+            } else {
+                for (Map.Entry<Integer, E> entry : mapB.entrySet()) {
+                    E valA = mapA.get(entry.getKey());
+                    if (valA != null) {
+                        sum = r.add(sum, r.multiply(conjugate(valA), entry.getValue()));
+                    }
+                }
+            }
+        } else if (a.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> sa) {
+            for (Map.Entry<Integer, E> entry : sa.getNonZeros().entrySet()) {
+                sum = r.add(sum, r.multiply(conjugate(entry.getValue()), b.get(entry.getKey())));
+            }
+        } else if (b.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> sb) {
+            for (Map.Entry<Integer, E> entry : sb.getNonZeros().entrySet()) {
+                sum = r.add(sum, r.multiply(conjugate(a.get(entry.getKey())), entry.getValue()));
+            }
+        } else {
+            // Dense fallback
+            for (int i = 0; i < a.dimension(); i++) {
+                sum = r.add(sum, r.multiply(conjugate(a.get(i)), b.get(i)));
+            }
         }
         return sum;
     }
@@ -331,8 +368,8 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @SuppressWarnings("unchecked")
     private E conjugate(E element) {
-        if (element instanceof Complex) {
-            return (E) ((Complex) element).conjugate();
+        if (element instanceof Complex c) {
+            return (E) c.conjugate();
         }
         return element;
     }

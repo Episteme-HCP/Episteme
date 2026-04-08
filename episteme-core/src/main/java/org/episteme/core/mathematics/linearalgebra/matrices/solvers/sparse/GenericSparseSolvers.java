@@ -235,8 +235,22 @@ public class GenericSparseSolvers {
     @SuppressWarnings("unchecked")
     private static <E> E sqrt(E element, Field<E> f) {
         Object res = null;
-        if (element instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) res = rb.sqrt();
-        else if (element instanceof Real r) res = r.sqrt();
+        if (element instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
+            try {
+                // Safeguard: if it's negative and small, RealBig.sqrt() will already handle clamping.
+                // If it's negative and large, it indicates divergence.
+                res = rb.sqrt();
+            } catch (ArithmeticException e) {
+                // Better error message for solver divergence cases
+                throw new ArithmeticException("Divergence in iterative solver: " + e.getMessage() + ". This may be caused by a non-positive-definite matrix or precision loss.");
+            }
+        }
+        else if (element instanceof Real r) {
+            if (r.doubleValue() < -1e-12) {
+                 throw new ArithmeticException("Significant negative value passed to sqrt in solver: " + r);
+            }
+            res = r.sqrt();
+        }
         else if (element instanceof Complex c) res = c.sqrt();
         else {
             try {

@@ -1252,9 +1252,10 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 copy_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), r, n, isComplex);
                 scale_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), invBeta, n, prec, arena, isComplex);
                 
-                E[][] H = (E[][]) java.lang.reflect.Array.newInstance(java.lang.reflect.Array.newInstance(componentType(ring), 0).getClass(), m + 1);
+                Class<E> elementClass = (Class<E>) ring.zero().getClass();
+                E[][] H = (E[][]) java.lang.reflect.Array.newInstance(java.lang.reflect.Array.newInstance(elementClass, 0).getClass(), m + 1);
                 for (int i = 0; i <= m; i++) {
-                    H[i] = (E[]) java.lang.reflect.Array.newInstance(componentType(ring), m);
+                    H[i] = (E[]) java.lang.reflect.Array.newInstance(elementClass, m);
                 }
                 
                 int k;
@@ -1291,7 +1292,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             
             return backToVector(h_x, n, isComplex, ring, arena);
         } catch (Throwable th) {
-            throw new RuntimeException("Native MPFR GMRES failed", th);
+            String msg = "Native MPFR GMRES failed at iteration " + (maxIterations / m + 1);
+            logger.error(msg, th);
+            throw new RuntimeException(msg + ": " + th.getMessage(), th);
         }
     }
 
@@ -1316,21 +1319,36 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private int compare(E a, E b) {
         if (a instanceof Real ra && b instanceof Real rb) return ra.compareTo(rb);
         if (a instanceof Complex ca && b instanceof Complex cb) return ca.abs().compareTo(cb.abs());
-        return 0;
+        
+        // Mixed comparison via absolute values
+        Real absA = (a instanceof Complex ca) ? ca.abs() : (Real) a;
+        Real absB = (b instanceof Complex cb) ? cb.abs() : (Real) b;
+        return absA.compareTo(absB);
     }
 
     private E negate(boolean isComplex, E val) {
-        if (isComplex) return (E)(Object)((Complex)val).negate();
+        if (isComplex) {
+            Complex c = (val instanceof Complex cv) ? cv : Complex.of((Real) val);
+            return (E)(Object) c.negate();
+        }
         return (E)(Object)((Real)val).negate();
     }
 
     private E divide(boolean isComplex, E a, E b) {
-        if (isComplex) return (E)(Object)((Complex)a).divide((Complex)b);
+        if (isComplex) {
+            Complex ca = (a instanceof Complex c) ? c : Complex.of((Real) a);
+            Complex cb = (b instanceof Complex c) ? c : Complex.of((Real) b);
+            return (E)(Object) ca.divide(cb);
+        }
         return (E)(Object)((Real)a).divide((Real)b);
     }
 
     private E multiply(boolean isComplex, E a, E b) {
-        if (isComplex) return (E)(Object)((Complex)a).multiply((Complex)b);
+        if (isComplex) {
+            Complex ca = (a instanceof Complex c) ? c : Complex.of((Real) a);
+            Complex cb = (b instanceof Complex c) ? c : Complex.of((Real) b);
+            return (E)(Object) ca.multiply(cb);
+        }
         return (E)(Object)((Real)a).multiply((Real)b);
     }
 
