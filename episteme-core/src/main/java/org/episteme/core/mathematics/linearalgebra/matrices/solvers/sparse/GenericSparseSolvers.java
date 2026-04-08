@@ -69,6 +69,7 @@ public class GenericSparseSolvers {
         Vector<E> r = provider.subtract(b, A.multiply(x));
         Vector<E> p = r;
         E rsold = provider.dot(r, r);
+        E rsinitial = rsold;
 
         for (int iter = 0; iter < maxIterations; iter++) {
             Vector<E> Ap = A.multiply(p);
@@ -80,6 +81,15 @@ public class GenericSparseSolvers {
             r = provider.subtract(r, provider.multiply(Ap, alpha));
 
             E rsnew = provider.dot(r, r);
+            if (isSmaller(rsnew, tolerance, f)) break; // Square of tolerance check
+            
+            // Divergence check: if residual squared norm becomes huge relative to initial
+            if (isGreater(rsnew, 1e50, f) && isGreater(rsnew, f.multiply(rsinitial, f.one()), f)) {
+                 if (isGreater(f.divide(rsnew, rsinitial), 1e40, f)) {
+                    throw new ArithmeticException("Conjugate Gradient Divergence: residual squared norm grew from " + rsinitial + " to " + rsnew);
+                 }
+            }
+
             if (isSmaller(sqrt(rsnew, f), tolerance, f)) break;
 
             E beta = f.divide(rsnew, rsold);
@@ -142,6 +152,8 @@ public class GenericSparseSolvers {
                 // Compute current rotation
                 E h1 = H[i][i];
                 E h2 = H[i+1][i];
+                if (h1 == null || h2 == null) throw new NullPointerException("Hessenberg matrix entry is null at [" + i + "][" + i + "]");
+                
                 if (isSmaller(h2, 1e-30, f)) {
                     cs[i] = f.one();
                     sn[i] = f.zero();
@@ -200,6 +212,20 @@ public class GenericSparseSolvers {
         }
         
         return abs(eAbs, f) < abs(tAbs, f);
+    }
+
+    private static boolean isGreater(Object element, Object threshold, Field<?> f) {
+        Object eAbs = (element instanceof Complex c) ? c.abs() : element;
+        Object tAbs = (threshold instanceof Complex ct) ? ct.abs() : threshold;
+
+        if (eAbs instanceof RealBig rb) {
+            java.math.BigDecimal val = rb.abs().bigDecimalValue();
+            if (tAbs instanceof RealBig rt) return val.compareTo(rt.abs().bigDecimalValue()) > 0;
+            if (tAbs instanceof Number nt) return val.compareTo(new java.math.BigDecimal(nt.toString())) > 0;
+            return val.doubleValue() > abs(tAbs, f);
+        }
+        
+        return abs(eAbs, f) > abs(tAbs, f);
     }
 
     private static Class<?> componentType(Field<?> field) {
