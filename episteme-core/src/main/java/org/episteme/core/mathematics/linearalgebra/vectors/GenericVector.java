@@ -83,30 +83,21 @@ public class GenericVector<E> implements Vector<E> {
     public Matrix<E> toMatrix() {
         // Convert vector to Column Matrix (n x 1)
         int dim = storage.dimension();
-        // Fallback to Object array if we can't get class easily?
-        // Actually, we can use the first element if any.
-        E zero = ring.zero();
-        Class<?> componentType = zero.getClass();
-        
-        @SuppressWarnings("unchecked")
-        E[][] matrixData = (E[][]) java.lang.reflect.Array.newInstance(componentType, dim, 1);
+        // Use Object[][] to avoid ArrayStoreException on mixed Real implementations
+        Object[][] matrixData = new Object[dim][1];
         for (int i = 0; i < dim; i++) {
-            @SuppressWarnings("unchecked")
-            E[] row = (E[]) java.lang.reflect.Array.newInstance(componentType, 1);
-            row[0] = storage.get(i);
-            matrixData[i] = row;
+            matrixData[i][0] = storage.get(i);
         }
-        return (GenericMatrix<E>) Matrix.of(matrixData, ring);
+        return (GenericMatrix<E>) Matrix.of((E[][]) matrixData, ring);
     }
 
     public Tensor<E> toTensor() {
         int dim = dimension();
-        @SuppressWarnings("unchecked")
-        E[] data = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), dim);
+        Object[] data = new Object[dim];
         for (int i = 0; i < dim; i++) {
             data[i] = get(i);
         }
-        return Tensor.of(data, dimension());
+        return Tensor.of((E[]) data, dimension());
     }
 
     // ================= Vector<E> Implementation =================

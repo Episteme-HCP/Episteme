@@ -74,12 +74,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         return true; 
     }
 
-    private Class<?> componentType(org.episteme.core.mathematics.structures.rings.Ring<E> field) {
-        Class<?> c = field.zero().getClass();
-        if (Real.class.isAssignableFrom(c)) return Real.class;
-        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(c)) return org.episteme.core.mathematics.numbers.complex.Complex.class;
-        return c;
-    }
     
     // Explicitly check for disabled backend
     @Override
@@ -140,17 +134,17 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment h_B = initVector(b, arena, prec, isComplex);
             MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
             MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            NativeSafe.invoke(MPFR_INIT2, sumR, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
             NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
             if (isComplex) {
-                NativeSafe.invoke(MPFR_INIT2, sumI, c_long(prec));
+                NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
                 NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, 0);
             }
 
             MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, t1, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
             MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, t2, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
 
             int n = a.dimension();
             for (int i = 0; i < n; i++) {
@@ -196,11 +190,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment h_A = initVector(a, arena, prec, isComplex);
             MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, sumR, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
             NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, 0);
 
             MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, t1, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
 
             int n = a.dimension();
             for (int i = 0; i < n; i++) {
@@ -250,9 +244,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment h_C = allocateMatrix(m, n, arena, prec, isComplex);
 
             MemorySegment temp1 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, temp1, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, temp1, c_long((int) prec));
             MemorySegment temp2 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, temp2, c_long(prec)); // MPFR_RNDN
+            NativeSafe.invoke(MPFR_INIT2, temp2, c_long((int) prec)); // MPFR_RNDN
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     if (isComplex) {
@@ -323,9 +317,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment h_Y = allocateVector(m, arena, prec, isComplex);
             
             MemorySegment temp1 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, temp1, prec);
+            NativeSafe.invoke(MPFR_INIT2, temp1, (int) prec);
             MemorySegment temp2 = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, temp2, prec);
+            NativeSafe.invoke(MPFR_INIT2, temp2, (int) prec);
             for (int i = 0; i < m; i++) {
                 if (isComplex) {
                     MemorySegment sumR = getMPFRVector(h_Y, i, 0, true);
@@ -379,7 +373,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         MemorySegment vec = arena.allocate(MPFR_LAYOUT, (long) dimension * multiplier);
         for (int i = 0; i < dimension * multiplier; i++) {
             MemorySegment slot = vec.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, slot, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, slot, c_long((int) prec));
             NativeSafe.invoke(MPFR_SET_UI, slot, 0L, 0); // Crucial: Zero-init because init2 sets to NaN
         }
         return vec;
@@ -496,8 +490,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     
             MemorySegment sR = arena.allocate(MPFR_LAYOUT);
             MemorySegment sI = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, sR, prec);
-            NativeSafe.invoke(MPFR_INIT2, sI, prec);
+            NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
+            NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
     
             if (isComplex) {
                 org.episteme.core.mathematics.numbers.complex.Complex cs = (org.episteme.core.mathematics.numbers.complex.Complex) scalar;
@@ -509,11 +503,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     MemorySegment aI = h_A.asSlice((long) (i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment cR = h_C.asSlice((long) i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment cI = h_C.asSlice((long) (i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                    complexMultiply(cR, cI, aR, aI, sR, sI, prec, arena);
+                    complexMultiply(cR, cI, aR, aI, sR, sI, (int) prec, arena);
                 }
             } else {
                 MemorySegment s = arena.allocate(MPFR_LAYOUT);
-                NativeSafe.invoke(MPFR_INIT2, s, prec);
+                NativeSafe.invoke(MPFR_INIT2, s, (int) prec);
                 String valStr = (scalar instanceof Real rs) ? rs.bigDecimalValue().toPlainString() : scalar.toString();
                 NativeSafe.invoke(MPFR_SET_STR, s, arena.allocateFrom(valStr), 10, 0);
     
@@ -538,7 +532,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         MemorySegment mat = arena.allocate(MPFR_LAYOUT, (long) rows * cols * multiplier);
         for (int i = 0; i < rows * cols * multiplier; i++) {
             MemorySegment slot = mat.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, slot, c_long(prec));
+            NativeSafe.invoke(MPFR_INIT2, slot, c_long((int) prec));
             NativeSafe.invoke(MPFR_SET_UI, slot, 0L, 0); // Crucial: Zero-init
         }
         return mat;
@@ -635,12 +629,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 if (isComplex) {
                     MemorySegment ptrR = getMPFR(mat, i, j, cols, 0, true);
                     MemorySegment ptrI = getMPFR(mat, i, j, cols, 1, true);
-                    NativeRealBig r = NativeRealBig.copyFrom(ptrR, prec);
-                    NativeRealBig im = NativeRealBig.copyFrom(ptrI, prec);
+                    NativeRealBig r = NativeRealBig.copyFrom(ptrR, (int) prec);
+                    NativeRealBig im = NativeRealBig.copyFrom(ptrI, (int) prec);
                     storage.set(i, j, (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
                 } else {
                     MemorySegment ptr = getMPFR(mat, i, j, cols, 0, false);
-                    storage.set(i, j, (E) (Object) NativeRealBig.copyFrom(ptr, prec));
+                    storage.set(i, j, (E) (Object) NativeRealBig.copyFrom(ptr, (int) prec));
                 }
             }
         }
@@ -702,21 +696,21 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
             MemorySegment factorR = arena.allocate(MPFR_LAYOUT);
             MemorySegment factorI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            NativeSafe.invoke(MPFR_INIT2, factorR, prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, factorI, prec);
+            NativeSafe.invoke(MPFR_INIT2, factorR, (int) prec);
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, factorI, (int) prec);
 
             for (int k = 0; k < n; k++) {
                 int pivotRow = k;
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
-                        if (compareComplexMagnitude(h_A, i, pivotRow, k, n, arena, prec)) pivotRow = i;
+                        if (compareComplexMagnitude(h_A, i, pivotRow, k, n, arena, (int) prec)) pivotRow = i;
                     } else {
                         if ((int) NativeSafe.invoke(MPFR_CMP_ABS, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, pivotRow, k, n, 0, false)) > 0) pivotRow = i;
                     }
                 }
 
                 if (pivotRow != k) {
-                    swapRows(h_A, k, pivotRow, n, isComplex, arena, prec);
+                    swapRows(h_A, k, pivotRow, n, isComplex, arena, (int) prec);
                     int tmpP = perm[k];
                     perm[k] = perm[pivotRow];
                     perm[pivotRow] = tmpP;
@@ -726,21 +720,21 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     if (isComplex) {
                         complexDivide(factorR, factorI, 
                             getMPFR(h_A, i, k, n, 0, true), getMPFR(h_A, i, k, n, 1, true),
-                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), prec, arena);
+                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
                         
                         // Store factor in L part
                         NativeSafe.invoke(MPFR_SET, getMPFR(h_A, i, k, n, 0, true), factorR, rnd);
                         NativeSafe.invoke(MPFR_SET, getMPFR(h_A, i, k, n, 1, true), factorI, rnd);
 
                         for (int j = k + 1; j < n; j++) {
-                            complexSubtractMul(h_A, i, j, factorR, factorI, h_A, k, j, n, arena, prec);
+                            complexSubtractMul(h_A, i, j, factorR, factorI, h_A, k, j, n, arena, (int) prec);
                         }
                     } else {
                         NativeSafe.invoke(MPFR_DIV, factorR, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
                         NativeSafe.invoke(MPFR_SET, getMPFR(h_A, i, k, n, 0, false), factorR, rnd);
                         
                         for (int j = k + 1; j < n; j++) {
-                            subtractMulReal(h_A, i, j, factorR, h_A, k, j, n, arena, prec);
+                            subtractMulReal(h_A, i, j, factorR, h_A, k, j, n, arena, (int) prec);
                         }
                     }
                 }
@@ -781,12 +775,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             Matrix<E> lMat = backToMatrix_internal(h_L, n, n, arena, a.getScalarRing(), isComplex);
             Matrix<E> uMat = backToMatrix_internal(h_U, n, n, arena, a.getScalarRing(), isComplex);
             
-            E[] pData = (E[]) java.lang.reflect.Array.newInstance(componentType(a.getScalarRing()), n);
+            Object[] pData = new Object[n];
             for (int i = 0; i < n; i++) {
                 if (isComplex) pData[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(perm[i]));
                 else pData[i] = (E) (Object) Real.of(perm[i]);
             }
-            Vector<E> pVec = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(java.util.Arrays.asList(pData)), (LinearAlgebraProvider<E>) this, a.getScalarRing());
+            Vector<E> pVec = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(pData)), (LinearAlgebraProvider<E>) this, a.getScalarRing());
 
             NativeSafe.invoke(MPFR_CLEAR, factorR);
             if (isComplex) NativeSafe.invoke(MPFR_CLEAR, factorI);
@@ -832,8 +826,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment h_y = allocateVector(n, arena, prec, isComplex);
             MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
             MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            NativeSafe.invoke(MPFR_INIT2, sumR, prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, prec);
+            NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
 
             // Forward Substitution Ly = Pb
             for (int i = 0; i < n; i++) {
@@ -841,9 +835,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 if (isComplex) NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, rnd);
                 for (int j = 0; j < i; j++) {
                     if (isComplex) {
-                        complexAddMul(sumR, sumI, getMPFR(h_L, i, j, n, 0, true), getMPFR(h_L, i, j, n, 1, true), getMPFRVector(h_y, j, 0, true), getMPFRVector(h_y, j, 1, true), prec, arena);
+                        complexAddMul(sumR, sumI, getMPFR(h_L, i, j, n, 0, true), getMPFR(h_L, i, j, n, 1, true), getMPFRVector(h_y, j, 0, true), getMPFRVector(h_y, j, 1, true), (int) prec, arena);
                     } else {
-                        MemorySegment term = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, term, prec);
+                        MemorySegment term = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, term, (int) prec);
                         NativeSafe.invoke(MPFR_MUL, term, getMPFR(h_L, i, j, n, 0, false), getMPFRVector(h_y, j, 0, false), rnd);
                         NativeSafe.invoke(MPFR_ADD, sumR, sumR, term, rnd);
                         NativeSafe.invoke(MPFR_CLEAR, term);
@@ -864,9 +858,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 if (isComplex) NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, rnd);
                 for (int j = i + 1; j < n; j++) {
                     if (isComplex) {
-                        complexAddMul(sumR, sumI, getMPFR(h_U, i, j, n, 0, true), getMPFR(h_U, i, j, n, 1, true), getMPFRVector(h_x, j, 0, true), getMPFRVector(h_x, j, 1, true), prec, arena);
+                        complexAddMul(sumR, sumI, getMPFR(h_U, i, j, n, 0, true), getMPFR(h_U, i, j, n, 1, true), getMPFRVector(h_x, j, 0, true), getMPFRVector(h_x, j, 1, true), (int) prec, arena);
                     } else {
-                        MemorySegment term = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, term, prec);
+                        MemorySegment term = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, term, (int) prec);
                         NativeSafe.invoke(MPFR_MUL, term, getMPFR(h_U, i, j, n, 0, false), getMPFRVector(h_x, j, 0, false), rnd);
                         NativeSafe.invoke(MPFR_ADD, sumR, sumR, term, rnd);
                         NativeSafe.invoke(MPFR_CLEAR, term);
@@ -879,7 +873,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 if (isComplex) {
                     NativeSafe.invoke(MPFR_SUB, xiR, getMPFRVector(h_y, i, 0, true), sumR, rnd);
                     NativeSafe.invoke(MPFR_SUB, xiI, getMPFRVector(h_y, i, 1, true), sumI, rnd);
-                    complexDivide(xiR, xiI, xiR, xiI, getMPFR(h_U, i, i, n, 0, true), getMPFR(h_U, i, i, n, 1, true), prec, arena);
+                    complexDivide(xiR, xiI, xiR, xiI, getMPFR(h_U, i, i, n, 0, true), getMPFR(h_U, i, i, n, 1, true), (int) prec, arena);
                 } else {
                     NativeSafe.invoke(MPFR_SUB, xiR, getMPFRVector(h_y, i, 0, false), sumR, rnd);
                     NativeSafe.invoke(MPFR_DIV, xiR, xiR, getMPFR(h_U, i, i, n, 0, false), rnd);
@@ -940,7 +934,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                         MemorySegment resI = getMPFR(h_Res, i, j, cols, 1, true);
                         MemorySegment aR = getMPFR(h_A, i, j, cols, 0, true);
                         MemorySegment aI = getMPFR(h_A, i, j, cols, 1, true);
-                        invokeComplexOp(op, resR, resI, aR, aI, prec, arena);
+                        invokeComplexOp(op, resR, resI, aR, aI, (int) prec, arena);
                     } else if (handle != null) {
                         NativeSafe.invoke(handle, getMPFR(h_Res, i, j, cols, 0, false), getMPFR(h_A, i, j, cols, 0, false), rnd);
                     } else {
@@ -970,9 +964,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment h_Res = allocateMatrix(rows, cols, arena, prec, isComplex);
             
             MemorySegment h_ExponentR = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, h_ExponentR, prec);
+            NativeSafe.invoke(MPFR_INIT2, h_ExponentR, (int) prec);
             MemorySegment h_ExponentI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, h_ExponentI, prec);
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, h_ExponentI, (int) prec);
 
             if (isComplex) {
                 org.episteme.core.mathematics.numbers.complex.Complex ce = (org.episteme.core.mathematics.numbers.complex.Complex) exponent;
@@ -990,15 +984,15 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                         MemorySegment aR = getMPFR(h_A, i, j, cols, 0, true);
                         MemorySegment aI = getMPFR(h_A, i, j, cols, 1, true);
                         
-                        MemorySegment logAR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAR, prec);
-                        MemorySegment logAI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAI, prec);
-                        complexLog(logAR, logAI, aR, aI, prec, arena);
+                        MemorySegment logAR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAR, (int) prec);
+                        MemorySegment logAI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAI, (int) prec);
+                        complexLog(logAR, logAI, aR, aI, (int) prec, arena);
                         
-                        MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, prec);
-                        MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, prec);
-                        complexMultiply(prodR, prodI, h_ExponentR, h_ExponentI, logAR, logAI, prec, arena);
+                        MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
+                        MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
+                        complexMultiply(prodR, prodI, h_ExponentR, h_ExponentI, logAR, logAI, (int) prec, arena);
                         
-                        complexExp(resR, resI, prodR, prodI, prec, arena);
+                        complexExp(resR, resI, prodR, prodI, (int) prec, arena);
                         
                         NativeSafe.invoke(MPFR_CLEAR, logAR); NativeSafe.invoke(MPFR_CLEAR, logAI);
                         NativeSafe.invoke(MPFR_CLEAR, prodR); NativeSafe.invoke(MPFR_CLEAR, prodI);
@@ -1063,11 +1057,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             if (isComplex) {
                 tempFactorR = arena.allocate(MPFR_LAYOUT); tempFactorI = arena.allocate(MPFR_LAYOUT);
                 sumR = arena.allocate(MPFR_LAYOUT); sumI = arena.allocate(MPFR_LAYOUT);
-                NativeSafe.invoke(MPFR_INIT2, tempFactorR, prec); NativeSafe.invoke(MPFR_INIT2, tempFactorI, prec);
-                NativeSafe.invoke(MPFR_INIT2, sumR, prec); NativeSafe.invoke(MPFR_INIT2, sumI, prec);
+                NativeSafe.invoke(MPFR_INIT2, tempFactorR, (int) prec); NativeSafe.invoke(MPFR_INIT2, tempFactorI, (int) prec);
+                NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec); NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
             } else {
                 tempFactor = arena.allocate(MPFR_LAYOUT); sum = arena.allocate(MPFR_LAYOUT); term = arena.allocate(MPFR_LAYOUT);
-                NativeSafe.invoke(MPFR_INIT2, tempFactor, prec); NativeSafe.invoke(MPFR_INIT2, sum, prec); NativeSafe.invoke(MPFR_INIT2, term, prec);
+                NativeSafe.invoke(MPFR_INIT2, tempFactor, (int) prec); NativeSafe.invoke(MPFR_INIT2, sum, (int) prec); NativeSafe.invoke(MPFR_INIT2, term, (int) prec);
             }
             
             // Partial Pivoting GEPP
@@ -1075,7 +1069,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 int pivot = k;
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
-                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, prec)) {
+                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, (int) prec)) {
                             pivot = i;
                         }
                     } else {
@@ -1086,8 +1080,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 }
                 
                 if (pivot != k) {
-                    swapRows(h_A, k, pivot, n, isComplex, arena, prec);
-                    swapRowsVector(h_B, k, pivot, isComplex, arena, prec);
+                    swapRows(h_A, k, pivot, n, isComplex, arena, (int) prec);
+                    swapRowsVector(h_B, k, pivot, isComplex, arena, (int) prec);
                 }
                 
                 // Gaussian Elimination
@@ -1096,19 +1090,19 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                         complexDivide(tempFactorR, tempFactorI, 
                             getMPFR(h_A, i, k, n, 0, true), getMPFR(h_A, i, k, n, 1, true),
                             getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true),
-                            prec, arena);
+                            (int) prec, arena);
                         
                         for (int j = k; j < n; j++) {
-                            complexSubtractMul(h_A, i, j, tempFactorR, tempFactorI, h_A, k, j, n, arena, prec);
+                            complexSubtractMul(h_A, i, j, tempFactorR, tempFactorI, h_A, k, j, n, arena, (int) prec);
                         }
-                        complexSubtractMulVector(h_B, i, tempFactorR, tempFactorI, h_B, k, arena, prec);
+                        complexSubtractMulVector(h_B, i, tempFactorR, tempFactorI, h_B, k, arena, (int) prec);
                     } else {
                         NativeSafe.invoke(MPFR_DIV, tempFactor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
                         
                         for (int j = k; j < n; j++) {
-                            subtractMulReal(h_A, i, j, tempFactor, h_A, k, j, n, arena, prec);
+                            subtractMulReal(h_A, i, j, tempFactor, h_A, k, j, n, arena, (int) prec);
                         }
-                        subtractMulVectorReal(h_B, i, tempFactor, h_B, k, arena, prec);
+                        subtractMulVectorReal(h_B, i, tempFactor, h_B, k, arena, (int) prec);
                     }
                 }
             }
@@ -1124,7 +1118,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                         complexAddMul(sumR, sumI, 
                             getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true),
                             getMPFRVector(h_X, j, 0, true), getMPFRVector(h_X, j, 1, true),
-                            prec, arena);
+                            (int) prec, arena);
                     }
                     
                     MemorySegment xiR = getMPFRVector(h_X, i, 0, true);
@@ -1134,7 +1128,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     
                     complexDivide(xiR, xiI, xiR, xiI, 
                         getMPFR(h_A, i, i, n, 0, true), getMPFR(h_A, i, i, n, 1, true),
-                        prec, arena);
+                        (int) prec, arena);
                 } else {
                     NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, 0);
                     
@@ -1206,7 +1200,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 int pivot = k;
                 if (isComplex) {
                     for (int i = k + 1; i < n; i++) {
-                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, prec)) pivot = i;
+                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, (int) prec)) pivot = i;
                     }
                 } else {
                     for (int i = k + 1; i < n; i++) {
@@ -1215,8 +1209,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 }
 
                 if (pivot != k) {
-                    swapRows(h_A, k, pivot, n, isComplex, arena, prec);
-                    swapRows(h_Inv, k, pivot, n, isComplex, arena, prec);
+                    swapRows(h_A, k, pivot, n, isComplex, arena, (int) prec);
+                    swapRows(h_Inv, k, pivot, n, isComplex, arena, (int) prec);
                 }
                 
                 // Check for singular matrix
@@ -1235,25 +1229,25 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 if (isComplex) {
                     MemorySegment pR = arena.allocate(MPFR_LAYOUT);
                     MemorySegment pI = arena.allocate(MPFR_LAYOUT);
-                    NativeSafe.invoke(MPFR_INIT2, pR, prec);
-                    NativeSafe.invoke(MPFR_INIT2, pI, prec);
+                    NativeSafe.invoke(MPFR_INIT2, pR, (int) prec);
+                    NativeSafe.invoke(MPFR_INIT2, pI, (int) prec);
                     NativeSafe.invoke(MPFR_SET, pR, getMPFR(h_A, k, k, n, 0, true), rnd);
                     NativeSafe.invoke(MPFR_SET, pI, getMPFR(h_A, k, k, n, 1, true), rnd);
                     
                     for (int j = 0; j < n; j++) {
                         complexDivide(getMPFR(h_A, k, j, n, 0, true), getMPFR(h_A, k, j, n, 1, true),
                             getMPFR(h_A, k, j, n, 0, true), getMPFR(h_A, k, j, n, 1, true),
-                            pR, pI, prec, arena);
+                            pR, pI, (int) prec, arena);
                         complexDivide(getMPFR(h_Inv, k, j, n, 0, true), getMPFR(h_Inv, k, j, n, 1, true),
                             getMPFR(h_Inv, k, j, n, 0, true), getMPFR(h_Inv, k, j, n, 1, true),
-                            pR, pI, prec, arena);
+                            pR, pI, (int) prec, arena);
                     }
                     // Set A[k][k] to 1+0i explicitly for stability
                     NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_A, k, k, n, 0, true), 1L, rnd);
                     NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_A, k, k, n, 1, true), 0L, rnd);
                 } else {
                     MemorySegment pivotVal = arena.allocate(MPFR_LAYOUT);
-                    NativeSafe.invoke(MPFR_INIT2, pivotVal, prec);
+                    NativeSafe.invoke(MPFR_INIT2, pivotVal, (int) prec);
                     NativeSafe.invoke(MPFR_SET, pivotVal, getMPFR(h_A, k, k, n, 0, false), rnd);
                     
                     for (int j = 0; j < n; j++) {
@@ -1269,23 +1263,23 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     if (isComplex) {
                         MemorySegment fR = arena.allocate(MPFR_LAYOUT);
                         MemorySegment fI = arena.allocate(MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_INIT2, fR, prec);
-                        NativeSafe.invoke(MPFR_INIT2, fI, prec);
+                        NativeSafe.invoke(MPFR_INIT2, fR, (int) prec);
+                        NativeSafe.invoke(MPFR_INIT2, fI, (int) prec);
                         NativeSafe.invoke(MPFR_SET, fR, getMPFR(h_A, i, k, n, 0, true), 0);
                         NativeSafe.invoke(MPFR_SET, fI, getMPFR(h_A, i, k, n, 1, true), 0);
                         
                         for (int j = 0; j < n; j++) {
-                            complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, prec);
-                            complexSubtractMul(h_Inv, i, j, fR, fI, h_Inv, k, j, n, arena, prec);
+                            complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, (int) prec);
+                            complexSubtractMul(h_Inv, i, j, fR, fI, h_Inv, k, j, n, arena, (int) prec);
                         }
                     } else {
                         MemorySegment factor = arena.allocate(MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_INIT2, factor, prec);
+                        NativeSafe.invoke(MPFR_INIT2, factor, (int) prec);
                         NativeSafe.invoke(MPFR_SET, factor, getMPFR(h_A, i, k, n, 0, false), 0);
                         
                         for (int j = 0; j < n; j++) {
-                            subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, prec);
-                            subtractMulReal(h_Inv, i, j, factor, h_Inv, k, j, n, arena, prec);
+                            subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, (int) prec);
+                            subtractMulReal(h_Inv, i, j, factor, h_Inv, k, j, n, arena, (int) prec);
                         }
                     }
                 }
@@ -1311,11 +1305,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
             MemorySegment[] detComp = new MemorySegment[2]; // detComp[0] for real, detComp[1] for imag
             detComp[0] = arena.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, detComp[0], prec);
+            NativeSafe.invoke(MPFR_INIT2, detComp[0], (int) prec);
             NativeSafe.invoke(MPFR_SET_UI, detComp[0], 1L, 0); // Initialize det to 1
             if (isComplex) {
                 detComp[1] = arena.allocate(MPFR_LAYOUT);
-                NativeSafe.invoke(MPFR_INIT2, detComp[1], prec);
+                NativeSafe.invoke(MPFR_INIT2, detComp[1], (int) prec);
                 NativeSafe.invoke(MPFR_SET_UI, detComp[1], 0L, 0); // Initialize imag part to 0
             }
 
@@ -1323,14 +1317,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 int pivot = k;
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
-                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, prec)) pivot = i;
+                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, (int) prec)) pivot = i;
                     } else {
                         if ((int) NativeSafe.invoke(MPFR_CMP_ABS, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, pivot, k, n, 0, false)) > 0) pivot = i;
                     }
                 }
                 
                 if (pivot != k) {
-                    swapRows(h_A, k, pivot, n, isComplex, arena, prec);
+                    swapRows(h_A, k, pivot, n, isComplex, arena, (int) prec);
                     NativeSafe.invoke(MPFR_NEG, detComp[0], detComp[0], 0); // Flip sign of determinant
                     if (isComplex) NativeSafe.invoke(MPFR_NEG, detComp[1], detComp[1], 0);
                 }
@@ -1338,7 +1332,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                 // Multiply determinant by A[k][k]
                 if (isComplex) {
                     complexMultiply(detComp[0], detComp[1], detComp[0], detComp[1], 
-                        getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), prec, arena);
+                        getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
                 } else {
                     NativeSafe.invoke(MPFR_MUL, detComp[0], detComp[0], getMPFR(h_A, k, k, n, 0, false), 0);
                 }
@@ -1360,16 +1354,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     if (isComplex) {
                         MemorySegment fR = arena.allocate(MPFR_LAYOUT);
                         MemorySegment fI = arena.allocate(MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_INIT2, fR, prec);
-                        NativeSafe.invoke(MPFR_INIT2, fI, prec);
+                        NativeSafe.invoke(MPFR_INIT2, fR, (int) prec);
+                        NativeSafe.invoke(MPFR_INIT2, fI, (int) prec);
                         complexDivide(fR, fI, getMPFR(h_A, i, k, n, 0, true), getMPFR(h_A, i, k, n, 1, true),
-                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), prec, arena);
-                        for (int j = k; j < n; j++) complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, prec);
+                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
+                        for (int j = k; j < n; j++) complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, (int) prec);
                     } else {
                         MemorySegment factor = arena.allocate(MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_INIT2, factor, prec);
+                        NativeSafe.invoke(MPFR_INIT2, factor, (int) prec);
                         NativeSafe.invoke(MPFR_DIV, factor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), 0);
-                        for (int j = k; j < n; j++) subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, prec);
+                        for (int j = k; j < n; j++) subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, (int) prec);
                     }
                 }
             }
@@ -1397,7 +1391,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
 
 
-    private void subtractMulReal(MemorySegment h_Mat, int r, int c, MemorySegment factor, MemorySegment h_Source, int rs, int cs, int cols, Arena arena, long prec) {
+    private void subtractMulReal(MemorySegment h_Mat, int r, int c, MemorySegment factor, MemorySegment h_Source, int rs, int cs, int cols, Arena arena, int prec) {
         MemorySegment dst = getMPFR(h_Mat, r, c, cols, 0, false);
         MemorySegment src = getMPFR(h_Source, rs, cs, cols, 0, false);
         MemorySegment term = arena.allocate(MPFR_LAYOUT);
@@ -1406,7 +1400,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SUB, dst, dst, term, 0);
     }
 
-    private void subtractMulVectorReal(MemorySegment h_Vec, int r, MemorySegment factor, MemorySegment h_Source, int rs, Arena arena, long prec) {
+    private void subtractMulVectorReal(MemorySegment h_Vec, int r, MemorySegment factor, MemorySegment h_Source, int rs, Arena arena, int prec) {
         MemorySegment dst = getMPFRVector(h_Vec, r, 0, false);
         MemorySegment src = getMPFRVector(h_Source, rs, 0, false);
         MemorySegment term = arena.allocate(MPFR_LAYOUT);
@@ -1415,7 +1409,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SUB, dst, dst, term, 0);
     }
 
-    private boolean compareComplexMagnitude(MemorySegment h_Mat, int r1, int r2, int col, int n, Arena arena, long prec) throws Throwable {
+    private boolean compareComplexMagnitude(MemorySegment h_Mat, int r1, int r2, int col, int n, Arena arena, int prec) throws Throwable {
         MemorySegment mag1 = arena.allocate(MPFR_LAYOUT);
         MemorySegment mag2 = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, mag1, prec);
@@ -1427,7 +1421,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         return (int) NativeSafe.invoke(MPFR_CMP, mag1, mag2) > 0;
     }
 
-    private void complexMagnitudeSquared(MemorySegment res, MemorySegment r, MemorySegment i, long prec, Arena arena) {
+    private void complexMagnitudeSquared(MemorySegment res, MemorySegment r, MemorySegment i, int prec, Arena arena) {
         MemorySegment t = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, t, prec);
         NativeSafe.invoke(MPFR_MUL, res, r, r, 0);
@@ -1435,7 +1429,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_ADD, res, res, t, 0);
     }
 
-    private void complexDivide(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, long prec, Arena arena) {
+    private void complexDivide(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena) {
         MemorySegment denom = arena.allocate(MPFR_LAYOUT);
         MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
         MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
@@ -1474,7 +1468,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, outI);
     }
 
-    private void complexSubtractMul(MemorySegment h_Mat, int r, int c, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, int cs, int n, Arena arena, long prec) {
+    private void complexSubtractMul(MemorySegment h_Mat, int r, int c, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, int cs, int n, Arena arena, int prec) {
         MemorySegment dstR = getMPFR(h_Mat, r, c, n, 0, true);
         MemorySegment dstI = getMPFR(h_Mat, r, c, n, 1, true);
         MemorySegment srcR = getMPFR(h_Src, rs, cs, n, 0, true);
@@ -1482,8 +1476,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         
         MemorySegment tR = arena.allocate(MPFR_LAYOUT);
         MemorySegment tI = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, tR, prec);
-        NativeSafe.invoke(MPFR_INIT2, tI, prec);
+        NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, tI, (int) prec);
         
         // t = f * src
         NativeSafe.invoke(MPFR_MUL, tR, fR, srcR, 0);
@@ -1491,7 +1485,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0); // tR = fR*srcR - fI*srcI
         
         NativeSafe.invoke(MPFR_MUL, tI, fR, srcI, 0);
-        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tEmp, prec);
+        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
         NativeSafe.invoke(MPFR_MUL, tEmp, fI, srcR, 0);
         NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0); // tI = fR*srcI + fI*srcR
         
@@ -1500,7 +1494,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SUB, dstI, dstI, tI, 0);
     }
 
-    private void complexSubtractMulVector(MemorySegment h_Vec, int r, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, Arena arena, long prec) {
+    private void complexSubtractMulVector(MemorySegment h_Vec, int r, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, Arena arena, int prec) {
         MemorySegment dstR = getMPFRVector(h_Vec, r, 0, true);
         MemorySegment dstI = getMPFRVector(h_Vec, r, 1, true);
         MemorySegment srcR = getMPFRVector(h_Src, rs, 0, true);
@@ -1516,7 +1510,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0);
         
         NativeSafe.invoke(MPFR_MUL, tI, fR, srcI, 0);
-        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tEmp, prec);
+        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
         NativeSafe.invoke(MPFR_MUL, tEmp, fI, srcR, 0);
         NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
         
@@ -1524,7 +1518,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SUB, dstI, dstI, tI, 0);
     }
 
-    private void complexMultiply(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, long prec, Arena arena) {
+    private void complexMultiply(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena) {
         MemorySegment tR = arena.allocate(MPFR_LAYOUT);
         MemorySegment tI = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, tR, prec);
@@ -1545,11 +1539,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SET, resI, tI, 0);
     }
 
-    private void complexAddMul(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, long prec, Arena arena) {
+    private void complexAddMul(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena) {
         MemorySegment tR = arena.allocate(MPFR_LAYOUT);
         MemorySegment tI = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, tR, prec);
-        NativeSafe.invoke(MPFR_INIT2, tI, prec);
+        NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, tI, (int) prec);
         
         // t = a * b
         NativeSafe.invoke(MPFR_MUL, tR, aR, bR, 0);
@@ -1557,7 +1551,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0);
         
         NativeSafe.invoke(MPFR_MUL, tI, aR, bI, 0);
-        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tEmp, prec);
+        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
         NativeSafe.invoke(MPFR_MUL, tEmp, aI, bR, 0);
         NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
         
@@ -1566,7 +1560,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_ADD, resI, resI, tI, 0);
     }
 
-    private void swapRows(MemorySegment h_Mat, int r1, int r2, int n, boolean isComplex, Arena arena, long prec) {
+    private void swapRows(MemorySegment h_Mat, int r1, int r2, int n, boolean isComplex, Arena arena, int prec) {
         int multiplier = isComplex ? 2 : 1;
         for (int j = 0; j < n * multiplier; j++) {
             MemorySegment m1 = h_Mat.asSlice(((long)r1 * n * multiplier + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
@@ -1579,7 +1573,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         }
     }
 
-    private void swapRowsVector(MemorySegment h_Vec, int r1, int r2, boolean isComplex, Arena arena, long prec) {
+    private void swapRowsVector(MemorySegment h_Vec, int r1, int r2, boolean isComplex, Arena arena, int prec) {
         int multiplier = isComplex ? 2 : 1;
         for (int j = 0; j < multiplier; j++) {
             MemorySegment m1 = getMPFRVector(h_Vec, r1, j, isComplex);
@@ -1594,7 +1588,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     // --- Complex Transcendental Arithmetic ---
 
-    public void complexExp(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexExp(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         MemorySegment expR = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, expR, prec);
         NativeSafe.invoke(MPFR_EXP, expR, aR, 0);
@@ -1614,7 +1608,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, sinI);
     }
 
-    public void complexLog(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexLog(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // resR = 0.5 * log(aR^2 + aI^2)
         MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
         MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
@@ -1636,7 +1630,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             MemorySegment pi = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, pi, prec);
             NativeSafe.invoke(MPFR_CONST_PI, pi, 0);
             
-            MemorySegment zero = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zero, prec);
+            MemorySegment zero = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zero, (int) prec);
             NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
             
             int cmpX = (int) NativeSafe.invoke(MPFR_CMP, aR, zero);
@@ -1673,26 +1667,26 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, t2);
     }
 
-    public void complexLog10(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexLog10(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         complexLog(resR, resI, aR, aI, prec, arena);
         MemorySegment log10 = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, log10, prec);
+        NativeSafe.invoke(MPFR_INIT2, log10, (int) prec);
         NativeSafe.invoke(MPFR_SET_STR, log10, arena.allocateFrom("2.3025850929940456840179914546843642076011"), 10, 0); // ln(10) approx
         NativeSafe.invoke(MPFR_DIV, resR, resR, log10, 0);
         NativeSafe.invoke(MPFR_DIV, resI, resI, log10, 0);
         NativeSafe.invoke(MPFR_CLEAR, log10);
     }
 
-    public void complexSin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexSin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // sin(x + iy) = sin(x)cosh(y) + i cos(x)sinh(y)
         MemorySegment sR = arena.allocate(MPFR_LAYOUT);
         MemorySegment cR = arena.allocate(MPFR_LAYOUT);
         MemorySegment shI = arena.allocate(MPFR_LAYOUT);
         MemorySegment chI = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, sR, prec);
-        NativeSafe.invoke(MPFR_INIT2, cR, prec);
-        NativeSafe.invoke(MPFR_INIT2, shI, prec);
-        NativeSafe.invoke(MPFR_INIT2, chI, prec);
+        NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, shI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chI, (int) prec);
         
         NativeSafe.invoke(MPFR_SIN, sR, aR, 0);
         NativeSafe.invoke(MPFR_COS, cR, aR, 0);
@@ -1708,16 +1702,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, chI);
     }
 
-    public void complexCos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexCos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // cos(x + iy) = cos(x)cosh(y) - i sin(x)sinh(y)
         MemorySegment sR = arena.allocate(MPFR_LAYOUT);
         MemorySegment cR = arena.allocate(MPFR_LAYOUT);
         MemorySegment shI = arena.allocate(MPFR_LAYOUT);
         MemorySegment chI = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, sR, prec);
-        NativeSafe.invoke(MPFR_INIT2, cR, prec);
-        NativeSafe.invoke(MPFR_INIT2, shI, prec);
-        NativeSafe.invoke(MPFR_INIT2, chI, prec);
+        NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, shI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chI, (int) prec);
         
         NativeSafe.invoke(MPFR_SIN, sR, aR, 0);
         NativeSafe.invoke(MPFR_COS, cR, aR, 0);
@@ -1734,7 +1728,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, chI);
     }
 
-    public void complexTan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexTan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // tan(z) = sin(z) / cos(z)
         MemorySegment sR = arena.allocate(MPFR_LAYOUT);
         MemorySegment sI = arena.allocate(MPFR_LAYOUT);
@@ -1755,16 +1749,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, cI);
     }
 
-    public void complexSinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexSinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // sinh(x + iy) = sinh(x)cos(y) + i cosh(x)sin(y)
         MemorySegment shR = arena.allocate(MPFR_LAYOUT);
         MemorySegment chR = arena.allocate(MPFR_LAYOUT);
         MemorySegment sI = arena.allocate(MPFR_LAYOUT);
         MemorySegment cI = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, shR, prec);
-        NativeSafe.invoke(MPFR_INIT2, chR, prec);
-        NativeSafe.invoke(MPFR_INIT2, sI, prec);
-        NativeSafe.invoke(MPFR_INIT2, cI, prec);
+        NativeSafe.invoke(MPFR_INIT2, shR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cI, (int) prec);
         
         NativeSafe.invoke(MPFR_SINH, shR, aR, 0);
         NativeSafe.invoke(MPFR_COSH, chR, aR, 0);
@@ -1780,16 +1774,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, cI);
     }
 
-    public void complexCosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexCosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // cosh(x + iy) = cosh(x)cos(y) + i sinh(x)sin(y)
         MemorySegment shR = arena.allocate(MPFR_LAYOUT);
         MemorySegment chR = arena.allocate(MPFR_LAYOUT);
         MemorySegment sI = arena.allocate(MPFR_LAYOUT);
         MemorySegment cI = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, shR, prec);
-        NativeSafe.invoke(MPFR_INIT2, chR, prec);
-        NativeSafe.invoke(MPFR_INIT2, sI, prec);
-        NativeSafe.invoke(MPFR_INIT2, cI, prec);
+        NativeSafe.invoke(MPFR_INIT2, shR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cI, (int) prec);
         
         NativeSafe.invoke(MPFR_SINH, shR, aR, 0);
         NativeSafe.invoke(MPFR_COSH, chR, aR, 0);
@@ -1805,7 +1799,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, cI);
     }
 
-    public void complexTanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexTanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // tanh(z) = sinh(z) / cosh(z)
         MemorySegment sR = arena.allocate(MPFR_LAYOUT);
         MemorySegment sI = arena.allocate(MPFR_LAYOUT);
@@ -1825,7 +1819,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, cI);
     }
 
-    public void complexSqrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexSqrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // sqrt(x + iy) = sqrt((|z| + x)/2) + i sign(y)sqrt((|z| - x)/2)
         MemorySegment norm = arena.allocate(MPFR_LAYOUT);
         MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
@@ -1850,7 +1844,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_MUL, t1, t1, t2, 0);
         
         // Domain guard: Ensure t1 >= 0 due to precision noise
-        MemorySegment zero = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zero, prec);
+        MemorySegment zero = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zero, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
         if ((int) NativeSafe.invoke(MPFR_CMP, t1, zero) < 0) NativeSafe.invoke(MPFR_SET, t1, zero, 0);
         NativeSafe.invoke(MPFR_SQRT, resR, t1, 0);
@@ -1872,36 +1866,36 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     }
 
     
-    public void complexAsin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexAsin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // asin(z) = -i log(iz + sqrt(1 - z^2))
-        MemorySegment izR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izR, prec);
-        MemorySegment izI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izI, prec);
+        MemorySegment izR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izR, (int) prec);
+        MemorySegment izI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izI, (int) prec);
         // iz = (0 + i)*(aR + i*aI) = -aI + i*aR
         NativeSafe.invoke(MPFR_NEG, izR, aI, 0);
         NativeSafe.invoke(MPFR_SET, izI, aR, 0);
         
-        MemorySegment z2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2R, prec);
-        MemorySegment z2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2I, prec);
+        MemorySegment z2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2R, (int) prec);
+        MemorySegment z2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2I, (int) prec);
         complexMultiply(z2R, z2I, aR, aI, aR, aI, prec, arena);
         
-        MemorySegment oneMinusZ2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, oneMinusZ2R, prec);
-        MemorySegment oneMinusZ2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, oneMinusZ2I, prec);
+        MemorySegment oneMinusZ2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, oneMinusZ2R, (int) prec);
+        MemorySegment oneMinusZ2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, oneMinusZ2I, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, oneMinusZ2R, 1L, 0);
         NativeSafe.invoke(MPFR_SET_UI, oneMinusZ2I, 0L, 0);
         NativeSafe.invoke(MPFR_SUB, oneMinusZ2R, oneMinusZ2R, z2R, 0);
         NativeSafe.invoke(MPFR_SUB, oneMinusZ2I, oneMinusZ2I, z2I, 0);
         
-        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtR, prec);
-        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtI, prec);
+        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtR, (int) prec);
+        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtI, (int) prec);
         complexSqrt(sqrtR, sqrtI, oneMinusZ2R, oneMinusZ2I, prec, arena);
         
-        MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, prec);
-        MemorySegment sumI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumI, prec);
+        MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
+        MemorySegment sumI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
         NativeSafe.invoke(MPFR_ADD, sumR, izR, sqrtR, 0);
         NativeSafe.invoke(MPFR_ADD, sumI, izI, sqrtI, 0);
         
-        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, prec);
-        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, prec);
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
         complexLog(logR, logI, sumR, sumI, prec, arena);
         
         // res = -i * log = -i * (logR + i*logI) = logI - i*logR
@@ -1916,15 +1910,15 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, logR); NativeSafe.invoke(MPFR_CLEAR, logI);
     }
     
-    public void complexAcos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexAcos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // acos(z) = pi/2 - asin(z)
-        MemorySegment asinR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, asinR, prec);
-        MemorySegment asinI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, asinI, prec);
+        MemorySegment asinR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, asinR, (int) prec);
+        MemorySegment asinI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, asinI, (int) prec);
         complexAsin(asinR, asinI, aR, aI, prec, arena);
         
-        MemorySegment piHalf = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, piHalf, prec);
+        MemorySegment piHalf = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, piHalf, (int) prec);
         NativeSafe.invoke(MPFR_CONST_PI, piHalf, 0);
-        MemorySegment two = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, two, prec);
+        MemorySegment two = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, two, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
         NativeSafe.invoke(MPFR_DIV, piHalf, piHalf, two, 0);
         
@@ -1935,40 +1929,40 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, piHalf); NativeSafe.invoke(MPFR_CLEAR, two);
     }
     
-    public void complexAtan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexAtan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // atan(z) = i/2 log((1-iz)/(1+iz))
         // iz = -aI + i*aR
-        MemorySegment izR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izR, prec);
-        MemorySegment izI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izI, prec);
+        MemorySegment izR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izR, (int) prec);
+        MemorySegment izI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, izI, (int) prec);
         NativeSafe.invoke(MPFR_NEG, izR, aI, 0);
         NativeSafe.invoke(MPFR_SET, izI, aR, 0);
         
-        MemorySegment numR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, numR, prec);
-        MemorySegment numI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, numI, prec);
+        MemorySegment numR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, numR, (int) prec);
+        MemorySegment numI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, numI, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, numR, 1L, 0);
         NativeSafe.invoke(MPFR_SET_UI, numI, 0L, 0);
         NativeSafe.invoke(MPFR_SUB, numR, numR, izR, 0);
         NativeSafe.invoke(MPFR_SUB, numI, numI, izI, 0);
         
-        MemorySegment denR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, denR, prec);
-        MemorySegment denI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, denI, prec);
+        MemorySegment denR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, denR, (int) prec);
+        MemorySegment denI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, denI, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, denR, 1L, 0);
         NativeSafe.invoke(MPFR_SET_UI, denI, 0L, 0);
         NativeSafe.invoke(MPFR_ADD, denR, denR, izR, 0);
         NativeSafe.invoke(MPFR_ADD, denI, denI, izI, 0);
         
-        MemorySegment divR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divR, prec);
-        MemorySegment divI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divI, prec);
+        MemorySegment divR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divR, (int) prec);
+        MemorySegment divI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divI, (int) prec);
         complexDivide(divR, divI, numR, numI, denR, denI, prec, arena);
         
-        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, prec);
-        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, prec);
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
         complexLog(logR, logI, divR, divI, prec, arena);
         
         // res = i/2 * log = i/2 * (logR + i*logI) = -logI/2 + i*logR/2
         NativeSafe.invoke(MPFR_SET, resR, logI, 0);
         NativeSafe.invoke(MPFR_NEG, resR, resR, 0);
-        MemorySegment check = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, check, prec);
+        MemorySegment check = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, check, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, check, 2L, 0);
         NativeSafe.invoke(MPFR_DIV, resR, resR, check, 0);
         
@@ -1983,52 +1977,52 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, check);
     }
 
-    public void complexAsinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexAsinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // asinh(z) = log(z + sqrt(z^2 + 1))
-        MemorySegment z2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2R, prec);
-        MemorySegment z2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2I, prec);
+        MemorySegment z2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2R, (int) prec);
+        MemorySegment z2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, z2I, (int) prec);
         complexMultiply(z2R, z2I, aR, aI, aR, aI, prec, arena);
         
         NativeSafe.invoke(MPFR_SET_UI, resR, 1L, 0);
         NativeSafe.invoke(MPFR_ADD, z2R, z2R, resR, 0);
         
-        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtR, prec);
-        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtI, prec);
+        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtR, (int) prec);
+        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sqrtI, (int) prec);
         complexSqrt(sqrtR, sqrtI, z2R, z2I, prec, arena);
         
         NativeSafe.invoke(MPFR_ADD, z2R, aR, sqrtR, 0);
         NativeSafe.invoke(MPFR_ADD, z2I, aI, sqrtI, 0);
         
-        complexLog(resR, resI, z2R, z2I, prec, arena);
+        complexLog(resR, resI, z2R, z2I, (int) prec, arena);
         
         NativeSafe.invoke(MPFR_CLEAR, z2R); NativeSafe.invoke(MPFR_CLEAR, z2I);
         NativeSafe.invoke(MPFR_CLEAR, sqrtR); NativeSafe.invoke(MPFR_CLEAR, sqrtI);
     }
     
-    public void complexAcosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexAcosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // acosh(z) = log(z + sqrt(z + 1)sqrt(z - 1))
-        MemorySegment zp1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zp1R, prec);
-        MemorySegment zm1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zm1R, prec);
+        MemorySegment zp1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zp1R, (int) prec);
+        MemorySegment zm1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, zm1R, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, zp1R, 1L, 0);
         NativeSafe.invoke(MPFR_ADD, zp1R, aR, zp1R, 0);
         NativeSafe.invoke(MPFR_SET_UI, zm1R, 1L, 0);
         NativeSafe.invoke(MPFR_SUB, zm1R, aR, zm1R, 0);
         
-        MemorySegment s1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s1R, prec);
-        MemorySegment s1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s1I, prec);
-        MemorySegment s2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s2R, prec);
-        MemorySegment s2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s2I, prec);
+        MemorySegment s1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s1R, (int) prec);
+        MemorySegment s1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s1I, (int) prec);
+        MemorySegment s2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s2R, (int) prec);
+        MemorySegment s2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s2I, (int) prec);
         complexSqrt(s1R, s1I, zp1R, aI, prec, arena);
         complexSqrt(s2R, s2I, zm1R, aI, prec, arena);
         
-        MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, prec);
-        MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, prec);
-        complexMultiply(prodR, prodI, s1R, s1I, s2R, s2I, prec, arena);
+        MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
+        MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
+        complexMultiply(prodR, prodI, s1R, s1I, s2R, s2I, (int) prec, arena);
         
         NativeSafe.invoke(MPFR_ADD, prodR, aR, prodR, 0);
         NativeSafe.invoke(MPFR_ADD, prodI, aI, prodI, 0);
         
-        complexLog(resR, resI, prodR, prodI, prec, arena);
+        complexLog(resR, resI, prodR, prodI, (int) prec, arena);
         
         NativeSafe.invoke(MPFR_CLEAR, zp1R); NativeSafe.invoke(MPFR_CLEAR, zm1R);
         NativeSafe.invoke(MPFR_CLEAR, s1R); NativeSafe.invoke(MPFR_CLEAR, s1I);
@@ -2036,25 +2030,25 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, prodR); NativeSafe.invoke(MPFR_CLEAR, prodI);
     }
     
-    public void complexAtanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexAtanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // atanh(z) = 0.5 log((1+z)/(1-z))
-        MemorySegment p1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, p1R, prec);
-        MemorySegment m1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, m1R, prec);
+        MemorySegment p1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, p1R, (int) prec);
+        MemorySegment m1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, m1R, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, p1R, 1L, 0);
         NativeSafe.invoke(MPFR_ADD, p1R, p1R, aR, 0);
         NativeSafe.invoke(MPFR_SET_UI, m1R, 1L, 0);
         NativeSafe.invoke(MPFR_SUB, m1R, m1R, aR, 0);
         
-        MemorySegment m1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, m1I, prec);
+        MemorySegment m1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, m1I, (int) prec);
         NativeSafe.invoke(MPFR_NEG, m1I, aI, 0);
         
-        MemorySegment divR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divR, prec);
-        MemorySegment divI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divI, prec);
-        complexDivide(divR, divI, p1R, aI, m1R, m1I, prec, arena);
+        MemorySegment divR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divR, (int) prec);
+        MemorySegment divI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, divI, (int) prec);
+        complexDivide(divR, divI, p1R, aI, m1R, m1I, (int) prec, arena);
         
-        complexLog(resR, resI, divR, divI, prec, arena);
+        complexLog(resR, resI, divR, divI, (int) prec, arena);
         
-        MemorySegment half = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, half, prec);
+        MemorySegment half = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, half, (int) prec);
         NativeSafe.invoke(MPFR_SET_D, half, 0.5, 0);
         NativeSafe.invoke(MPFR_MUL, resR, resR, half, 0);
         NativeSafe.invoke(MPFR_MUL, resI, resI, half, 0);
@@ -2064,13 +2058,13 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_CLEAR, divI); NativeSafe.invoke(MPFR_CLEAR, half);
     }
     
-    public void complexCbrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, long prec, Arena arena) {
+    public void complexCbrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
         // cbrt(z) = exp(1/3 * log(z))
-        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, prec);
-        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, prec);
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
         complexLog(logR, logI, aR, aI, prec, arena);
         
-        MemorySegment three = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, three, prec);
+        MemorySegment three = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, three, (int) prec);
         NativeSafe.invoke(MPFR_SET_UI, three, 3L, 0);
         
         NativeSafe.invoke(MPFR_DIV, logR, logR, three, 0);
@@ -2114,7 +2108,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         };
     }
 
-    public static void invokeComplexOp(String function, MemorySegment rcR, MemorySegment rcI, MemorySegment raR, MemorySegment raI, long prec, Arena arena) {
+    public static void invokeComplexOp(String function, MemorySegment rcR, MemorySegment rcI, MemorySegment raR, MemorySegment raI, int prec, Arena arena) {
         NativeMPFRDenseLinearAlgebraBackend<Object> backend = new NativeMPFRDenseLinearAlgebraBackend<>();
         switch (function.toLowerCase()) {
             case "exp" -> backend.complexExp(rcR, rcI, raR, raI, prec, arena);
@@ -2137,14 +2131,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
             default -> throw new UnsupportedOperationException("Native complex op not implemented: " + function);
         }
     }
-    public void complexPow(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment eR, MemorySegment eI, long prec, Arena arena) {
+    public void complexPow(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment eR, MemorySegment eI, int prec, Arena arena) {
         // z^w = exp(w * log(z))
-        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, prec);
-        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, prec);
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
         complexLog(logR, logI, aR, aI, prec, arena);
         
-        MemorySegment wLogR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, wLogR, prec);
-        MemorySegment wLogI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, wLogI, prec);
+        MemorySegment wLogR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, wLogR, (int) prec);
+        MemorySegment wLogI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, wLogI, (int) prec);
         complexMultiply(wLogR, wLogI, eR, eI, logR, logI, prec, arena);
         
         complexExp(resR, resI, wLogR, wLogI, prec, arena);
