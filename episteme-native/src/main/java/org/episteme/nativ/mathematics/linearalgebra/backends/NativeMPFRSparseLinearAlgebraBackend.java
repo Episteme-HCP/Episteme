@@ -1256,6 +1256,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 E[][] H = (E[][]) java.lang.reflect.Array.newInstance(java.lang.reflect.Array.newInstance(elementClass, 0).getClass(), m + 1);
                 for (int i = 0; i <= m; i++) {
                     H[i] = (E[]) java.lang.reflect.Array.newInstance(elementClass, m);
+                    java.util.Arrays.fill(H[i], ring.zero());
                 }
                 
                 int k;

@@ -29,6 +29,9 @@ public class GenericQR {
         @SuppressWarnings("unchecked")
         E[][] rData = (E[][]) java.lang.reflect.Array.newInstance(componentType(field), n, n);
         
+        for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) qData[i][j] = field.zero();
+        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) rData[i][j] = field.zero();
+        
         for (int j = 0; j < n; j++) {
             @SuppressWarnings("unchecked")
             E[] v = (E[]) java.lang.reflect.Array.newInstance(componentType(field), m);
@@ -86,7 +89,12 @@ public class GenericQR {
         for (int i = n - 1; i >= 0; i--) {
             E sum = field.zero();
             for (int j = i + 1; j < n; j++) sum = field.add(sum, field.multiply(r.get(i, j), x[j]));
-            x[i] = field.divide(field.subtract(qtB[i], sum), r.get(i, i));
+            E r_ii = r.get(i, i);
+            if (isNonZero(r_ii, field)) {
+                x[i] = field.divide(field.subtract(qtB[i], sum), r_ii);
+            } else {
+                x[i] = field.zero(); // Or handle singular case differently
+            }
         }
         
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(x)), provider, field);

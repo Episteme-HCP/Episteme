@@ -8,10 +8,10 @@ package org.episteme.core.mathematics.linearalgebra;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import java.util.Optional;
+
 import java.util.ServiceLoader;
 import org.episteme.core.mathematics.numbers.real.RealProvider;
-import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
+
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
