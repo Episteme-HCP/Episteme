@@ -152,357 +152,356 @@ public class LinearAlgebraComplianceTest {
 
         List<ComplianceResult> results = new ArrayList<>();
 
-        for (LinearAlgebraProvider<Real> provider : providers) {
-            System.out.println("Starting compliance tests for provider: " + provider.getName());
-            ComplianceResult res = new ComplianceResult();
-            res.providerName = provider.getName();
-            
-            if (!provider.isAvailable()) {
-                res.environment = "DISABLED";
-                System.out.println("Provider " + provider.getName() + " is disabled. Skipping tests.");
-                results.add(res);
-                continue;
-            }
-
-            // Strictly isolate the provider under test, but allow delegation for decorators
-            List<AlgorithmProvider> allowed = new ArrayList<>();
-            allowed.add(provider);
-            if (provider instanceof DistributedLinearAlgebraProvider || 
-                provider.getName().contains("Remote") ||
-                provider.getName().contains("CARMA") ||
-                provider.getName().contains("Strassen")) {
-                // Allow these decorators to delegate to standard CPU for local tasks
-                for (LinearAlgebraProvider<Real> p : rawProviders) {
-                    if (p.getName().equals("Episteme CPU (Standard)")) {
-                        allowed.add((AlgorithmProvider) p);
-                        break;
+        try {
+            for (LinearAlgebraProvider<Real> provider : providers) {
+                System.out.println("Starting compliance tests for provider: " + provider.getName());
+                ComplianceResult res = new ComplianceResult();
+                res.providerName = provider.getName();
+                
+                if (!provider.isAvailable()) {
+                    res.environment = "DISABLED";
+                    System.out.println("Provider " + provider.getName() + " is disabled. Skipping tests.");
+                    results.add(res);
+                    continue;
+                }
+    
+                // Strictly isolate the provider under test, but allow delegation for decorators
+                List<AlgorithmProvider> allowed = new ArrayList<>();
+                allowed.add(provider);
+                if (provider instanceof DistributedLinearAlgebraProvider || 
+                    provider.getName().contains("Remote") ||
+                    provider.getName().contains("CARMA") ||
+                    provider.getName().contains("Strassen")) {
+                    // Allow these decorators to delegate to standard CPU for local tasks
+                    for (LinearAlgebraProvider<Real> p : rawProviders) {
+                        if (p.getName().equals("Episteme CPU (Standard)")) {
+                            allowed.add((AlgorithmProvider) p);
+                            break;
+                        }
                     }
                 }
+                AlgorithmService oldService = AlgorithmManager.getService();
+                AlgorithmManager.setService(new TestingAlgorithmService(allowed));
+                
+                try {
+                    res.environment = provider.getEnvironmentInfo();
+                    
+                    testOperation(res, "Transpose", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Matrix<Real> result = provider.transpose(a);
+                        SimpleMatrix expected = new SimpleMatrix(aData).transpose();
+                        verifyMatrix(expected, result, TOLERANCE);
+                    });
+    
+                    testOperation(res, "Dot", () -> {
+                        Random rand = new Random(42);
+                        double[] aData = new double[SIZE];
+                        double[] bData = new double[SIZE];
+                        for (int i = 0; i < SIZE; i++) {
+                            aData[i] = rand.nextGaussian();
+                            bData[i] = rand.nextGaussian();
+                        }
+                        Vector<Real> a = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
+                        Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                        Real result = provider.dot(a, b);
+                        double expected = 0;
+                        for (int i = 0; i < SIZE; i++) expected += aData[i] * bData[i];
+                        assertEquals(expected, result.doubleValue(), 1e-7);
+                    });
+    
+                    testOperation(res, "Norm", () -> {
+                        Random rand = new Random(42);
+                        double[] aData = new double[SIZE];
+                        for (int i = 0; i < SIZE; i++) aData[i] = rand.nextGaussian();
+                        Vector<Real> a = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
+                        Real result = provider.norm(a);
+                        double sumSq = 0;
+                        for (double d : aData) sumSq += d * d;
+                        assertEquals(Math.sqrt(sumSq), result.doubleValue(), 1e-7);
+                    });
+    
+                    testOperation(res, "Add", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        double[][] bData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        RealDoubleMatrix b = RealDoubleMatrix.of(bData);
+                        Matrix<Real> result = provider.add(a, b);
+                        SimpleMatrix expected = new SimpleMatrix(aData).plus(new SimpleMatrix(bData));
+                        verifyMatrix(expected, result, TOLERANCE);
+                    });
+    
+                    testOperation(res, "Subtract", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        double[][] bData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        RealDoubleMatrix b = RealDoubleMatrix.of(bData);
+                        Matrix<Real> result = provider.subtract(a, b);
+                        SimpleMatrix expected = new SimpleMatrix(aData).minus(new SimpleMatrix(bData));
+                        verifyMatrix(expected, result, TOLERANCE);
+                    });
+    
+                    testOperation(res, "Scale", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        double scale = 3.14159;
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Matrix<Real> result = provider.scale(Real.of(scale), a);
+                        SimpleMatrix expected = new SimpleMatrix(aData).scale(scale);
+                        verifyMatrix(expected, result, TOLERANCE);
+                    });
+    
+                    testOperation(res, "Multiply", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        double[][] bData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        RealDoubleMatrix b = RealDoubleMatrix.of(bData);
+                        Matrix<Real> result = provider.multiply(a, b);
+                        SimpleMatrix expected = new SimpleMatrix(aData).mult(new SimpleMatrix(bData));
+                        verifyMatrix(expected, result, TOLERANCE);
+                    });
+    
+                    testOperation(res, "Inverse", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Matrix<Real> result = provider.inverse(a);
+                        SimpleMatrix expected = new SimpleMatrix(aData).invert();
+                        verifyMatrix(expected, result, 1e-7);
+                    });
+    
+                    testOperation(res, "LU", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        LUResult<Real> result = provider.lu(a);
+                        verifyLU(a, result);
+                    });
+    
+                    testOperation(res, "QR", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        QRResult<Real> result = provider.qr(a);
+                        verifyQR(a, result);
+                    });
+    
+                    testOperation(res, "SVD", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(50, 40, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        SVDResult<Real> result = provider.svd(a);
+                        verifySVD(a, result);
+                    });
+    
+                    testOperation(res, "Cholesky", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        SimpleMatrix mat = new SimpleMatrix(aData);
+                        SimpleMatrix posDef = mat.transpose().mult(mat).plus(SimpleMatrix.identity(SIZE));
+                        double[][] pdData = toArray(posDef);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(pdData);
+                        CholeskyResult<Real> result = provider.cholesky(a);
+                        verifyCholesky(a, result);
+                    });
+    
+                    testOperation(res, "Eigen", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        // Symmetric for easier verification
+                        SimpleMatrix mat = new SimpleMatrix(aData);
+                        SimpleMatrix sym = mat.plus(mat.transpose());
+                        double[][] symData = toArray(sym);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(symData);
+                        EigenResult<Real> result = provider.eigen(a);
+                        verifyEigen(a, result);
+                    });
+    
+                    testOperation(res, "Determinant", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Real det = provider.determinant(a);
+                        double expected = new SimpleMatrix(aData).determinant();
+                        // Increased tolerance for 20x20 determinants due to accumulation
+                        assertRelativeEquals(expected, det.doubleValue(), 1e-3);
+                    });
+    
+                    testOperation(res, "Solve", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        double[] bData = new double[SIZE];
+                        for (int i = 0; i < SIZE; i++) bData[i] = rand.nextGaussian();
+                        
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                        
+                        Vector<Real> x = provider.solve(a, b);
+                        SimpleMatrix matA = new SimpleMatrix(aData);
+                        SimpleMatrix vecB = new SimpleMatrix(SIZE, 1, true, bData);
+                        SimpleMatrix expectedX = matA.solve(vecB);
+                        
+                        for (int i = 0; i < SIZE; i++) {
+                            assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-5);
+                        }
+                    });
+    
+                    testOperation(res, "BiCGSTAB", () -> {
+                        if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
+                        SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
+                        Random rand = new Random(42);
+                        int n = 30;
+                        double[][] aData = randomData(n, n, rand);
+                        for(int i=0; i<n; i++) aData[i][i] = 10.0 + Math.abs(aData[i][i]);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        double[] bData = new double[n];
+                        for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
+                        Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                        Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
+                        Vector<Real> x = sparseProvider.bicgstab(a, b, x0, Real.of(1e-8), 2000);
+                        Vector<Real> ax = provider.multiply(a, x);
+                        for (int i = 0; i < n; i++) {
+                            assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
+                        }
+                    });
+    
+                    testOperation(res, "ConjugateGradient", () -> {
+                        if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
+                        SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
+                        Random rand = new Random(42);
+                        int n = 30;
+                        double[][] aData = randomData(n, n, rand);
+                        SimpleMatrix mat = new SimpleMatrix(aData);
+                        SimpleMatrix spd = mat.transpose().mult(mat).plus(SimpleMatrix.identity(n).scale(5.0));
+                        RealDoubleMatrix a = RealDoubleMatrix.of(toArray(spd));
+                        double[] bData = new double[n];
+                        for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
+                        Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                        Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
+                        Vector<Real> x = sparseProvider.conjugateGradient(a, b, x0, Real.of(1e-8), 2000);
+                        Vector<Real> ax = provider.multiply(a, x);
+                        for (int i = 0; i < n; i++) {
+                            assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
+                        }
+                    });
+    
+                    testOperation(res, "GMRES", () -> {
+                        if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
+                        SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
+                        Random rand = new Random(42);
+                        int n = 30;
+                        double[][] aData = randomData(n, n, rand);
+                        for(int i=0; i<n; i++) aData[i][i] = 10.0 + Math.abs(aData[i][i]);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        double[] bData = new double[n];
+                        for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
+                        Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                        Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
+                        Vector<Real> x = sparseProvider.gmres(a, b, x0, Real.of(1e-8), 2000, 30);
+                        Vector<Real> ax = provider.multiply(a, x);
+                        for (int i = 0; i < n; i++) {
+                            assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
+                        }
+                    });
+    
+                    testOperation(res, "Transpose (Rect)", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(15, 25, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Matrix<Real> result = provider.transpose(a);
+                        SimpleMatrix expected = new SimpleMatrix(aData).transpose();
+                        verifyMatrix(expected, result, TOLERANCE);
+                    });
+    
+                    testOperation(res, "Multiply (Rect)", () -> {
+                        Random rand = new Random(42);
+                        int m = 20, k = 15, n = 25;
+                        double[][] aData = randomData(m, k, rand);
+                        double[][] bData = randomData(k, n, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        RealDoubleMatrix b = RealDoubleMatrix.of(bData);
+                        Matrix<Real> result = provider.multiply(a, b);
+                        SimpleMatrix expected = new SimpleMatrix(aData).mult(new SimpleMatrix(bData));
+                        verifyMatrix(expected, result, TOLERANCE);
+                    });
+    
+                    testOperation(res, "Inverse (Rect)", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(25, 20, rand);
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Matrix<Real> result = provider.inverse(a);
+                        SimpleMatrix expected = new SimpleMatrix(aData).pseudoInverse();
+                        verifyMatrix(expected, result, 1e-4);
+                    });
+    
+                    testOperation(res, "Solve (Rect)", () -> {
+                        Random rand = new Random(42);
+                        int rows = 30, cols = 20;
+                        double[][] aData = randomData(rows, cols, rand);
+                        double[] bData = new double[rows];
+                        for (int i = 0; i < rows; i++) bData[i] = rand.nextGaussian();
+                        
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                        
+                        Vector<Real> x = provider.solve(a, b);
+                        SimpleMatrix matA = new SimpleMatrix(aData);
+                        SimpleMatrix vecB = new SimpleMatrix(rows, 1, true, bData);
+                        SimpleMatrix expectedX = matA.solve(vecB); // Least squares
+                        
+                        for (int i = 0; i < cols; i++) {
+                            assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-4);
+                        }
+                    });
+    
+                    testOperation(res, "Solve (Triangular)", () -> {
+                        Random rand = new Random(42);
+                        double[][] aData = randomData(SIZE, SIZE, rand);
+                        // Make U (upper triangular)
+                        for (int i = 0; i < SIZE; i++) {
+                            for (int j = 0; j < i; j++) aData[i][j] = 0.0;
+                            aData[i][i] += 2.0; // Ensure non-singular
+                        }
+                        double[] bData = new double[SIZE];
+                        for (int i = 0; i < SIZE; i++) bData[i] = rand.nextGaussian();
+                        
+                        RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                        Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
+                        
+                        Vector<Real> x = provider.solve(a, b);
+                        SimpleMatrix matA = new SimpleMatrix(aData);
+                        SimpleMatrix vecB = new SimpleMatrix(SIZE, 1, true, bData);
+                        SimpleMatrix expectedX = matA.solve(vecB);
+                        
+                        for (int i = 0; i < SIZE; i++) {
+                            assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-5);
+                        }
+                    });
+    
+                } finally {
+                    AlgorithmManager.setService(oldService);
+                }
+    
+                results.add(res);
             }
-            AlgorithmService oldService = AlgorithmManager.getService();
-            AlgorithmManager.setService(new TestingAlgorithmService(allowed));
-            
-            try {
-                res.environment = provider.getEnvironmentInfo();
-                
-                testOperation(res, "Transpose", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Matrix<Real> result = provider.transpose(a);
-                SimpleMatrix expected = new SimpleMatrix(aData).transpose();
-                verifyMatrix(expected, result, TOLERANCE);
-            });
-
-            testOperation(res, "Dot", () -> {
-                Random rand = new Random(42);
-                double[] aData = new double[SIZE];
-                double[] bData = new double[SIZE];
-                for (int i = 0; i < SIZE; i++) {
-                    aData[i] = rand.nextGaussian();
-                    bData[i] = rand.nextGaussian();
+        } finally {
+            System.out.println("[ComplianceTest] Cleaning up resources...");
+            Set<LinearAlgebraProvider<Real>> toClose = new HashSet<>(rawProviders);
+            for (LinearAlgebraProvider<Real> p : toClose) {
+                try {
+                    p.close();
+                } catch (Throwable t) {
+                    System.err.println("Warning: Error during close of " + p.getName() + ": " + t.getMessage());
                 }
-                Vector<Real> a = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
-                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
-                Real result = provider.dot(a, b);
-                double expected = 0;
-                for (int i = 0; i < SIZE; i++) expected += aData[i] * bData[i];
-                assertEquals(expected, result.doubleValue(), 1e-7);
-            });
-
-            testOperation(res, "Norm", () -> {
-                Random rand = new Random(42);
-                double[] aData = new double[SIZE];
-                for (int i = 0; i < SIZE; i++) aData[i] = rand.nextGaussian();
-                Vector<Real> a = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(aData);
-                Real result = provider.norm(a);
-                double sumSq = 0;
-                for (double d : aData) sumSq += d * d;
-                assertEquals(Math.sqrt(sumSq), result.doubleValue(), 1e-7);
-            });
-
-            testOperation(res, "Add", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                double[][] bData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                RealDoubleMatrix b = RealDoubleMatrix.of(bData);
-                Matrix<Real> result = provider.add(a, b);
-                SimpleMatrix expected = new SimpleMatrix(aData).plus(new SimpleMatrix(bData));
-                verifyMatrix(expected, result, TOLERANCE);
-            });
-
-            testOperation(res, "Subtract", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                double[][] bData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                RealDoubleMatrix b = RealDoubleMatrix.of(bData);
-                Matrix<Real> result = provider.subtract(a, b);
-                SimpleMatrix expected = new SimpleMatrix(aData).minus(new SimpleMatrix(bData));
-                verifyMatrix(expected, result, TOLERANCE);
-            });
-
-            testOperation(res, "Scale", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                double scale = 3.14159;
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Matrix<Real> result = provider.scale(Real.of(scale), a);
-                SimpleMatrix expected = new SimpleMatrix(aData).scale(scale);
-                verifyMatrix(expected, result, TOLERANCE);
-            });
-
-            testOperation(res, "Multiply", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                double[][] bData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                RealDoubleMatrix b = RealDoubleMatrix.of(bData);
-                Matrix<Real> result = provider.multiply(a, b);
-                SimpleMatrix expected = new SimpleMatrix(aData).mult(new SimpleMatrix(bData));
-                verifyMatrix(expected, result, TOLERANCE);
-            });
-
-            testOperation(res, "Inverse", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Matrix<Real> result = provider.inverse(a);
-                SimpleMatrix expected = new SimpleMatrix(aData).invert();
-                verifyMatrix(expected, result, 1e-7);
-            });
-
-            testOperation(res, "LU", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                LUResult<Real> result = provider.lu(a);
-                verifyLU(a, result);
-            });
-
-            testOperation(res, "QR", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                QRResult<Real> result = provider.qr(a);
-                verifyQR(a, result);
-            });
-
-            testOperation(res, "SVD", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(50, 40, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                SVDResult<Real> result = provider.svd(a);
-                verifySVD(a, result);
-            });
-
-            testOperation(res, "Cholesky", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                SimpleMatrix mat = new SimpleMatrix(aData);
-                SimpleMatrix posDef = mat.transpose().mult(mat).plus(SimpleMatrix.identity(SIZE));
-                double[][] pdData = toArray(posDef);
-                RealDoubleMatrix a = RealDoubleMatrix.of(pdData);
-                CholeskyResult<Real> result = provider.cholesky(a);
-                verifyCholesky(a, result);
-            });
-
-            testOperation(res, "Eigen", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                // Symmetric for easier verification
-                SimpleMatrix mat = new SimpleMatrix(aData);
-                SimpleMatrix sym = mat.plus(mat.transpose());
-                double[][] symData = toArray(sym);
-                RealDoubleMatrix a = RealDoubleMatrix.of(symData);
-                EigenResult<Real> result = provider.eigen(a);
-                verifyEigen(a, result);
-            });
-
-            testOperation(res, "Determinant", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Real det = provider.determinant(a);
-                double expected = new SimpleMatrix(aData).determinant();
-                // Increased tolerance for 20x20 determinants due to accumulation
-                assertRelativeEquals(expected, det.doubleValue(), 1e-3);
-            });
-
-            testOperation(res, "Solve", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                double[] bData = new double[SIZE];
-                for (int i = 0; i < SIZE; i++) bData[i] = rand.nextGaussian();
-                
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
-                
-                Vector<Real> x = provider.solve(a, b);
-                SimpleMatrix matA = new SimpleMatrix(aData);
-                SimpleMatrix vecB = new SimpleMatrix(SIZE, 1, true, bData);
-                SimpleMatrix expectedX = matA.solve(vecB);
-                
-                for (int i = 0; i < SIZE; i++) {
-                    assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-5);
-                }
-            });
-
-            testOperation(res, "BiCGSTAB", () -> {
-                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
-                SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
-                Random rand = new Random(42);
-                int n = 30;
-                double[][] aData = randomData(n, n, rand);
-                for(int i=0; i<n; i++) aData[i][i] = 10.0 + Math.abs(aData[i][i]);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                double[] bData = new double[n];
-                for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
-                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
-                Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
-                Vector<Real> x = sparseProvider.bicgstab(a, b, x0, Real.of(1e-8), 2000);
-                Vector<Real> ax = provider.multiply(a, x);
-                for (int i = 0; i < n; i++) {
-                    assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
-                }
-            });
-
-            testOperation(res, "ConjugateGradient", () -> {
-                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
-                SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
-                Random rand = new Random(42);
-                int n = 30;
-                double[][] aData = randomData(n, n, rand);
-                SimpleMatrix mat = new SimpleMatrix(aData);
-                SimpleMatrix spd = mat.transpose().mult(mat).plus(SimpleMatrix.identity(n).scale(5.0));
-                RealDoubleMatrix a = RealDoubleMatrix.of(toArray(spd));
-                double[] bData = new double[n];
-                for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
-                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
-                Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
-                Vector<Real> x = sparseProvider.conjugateGradient(a, b, x0, Real.of(1e-8), 2000);
-                Vector<Real> ax = provider.multiply(a, x);
-                for (int i = 0; i < n; i++) {
-                    assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
-                }
-            });
-
-            testOperation(res, "GMRES", () -> {
-                if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException("Not a sparse provider");
-                SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
-                Random rand = new Random(42);
-                int n = 30;
-                double[][] aData = randomData(n, n, rand);
-                for(int i=0; i<n; i++) aData[i][i] = 10.0 + Math.abs(aData[i][i]);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                double[] bData = new double[n];
-                for (int i = 0; i < n; i++) bData[i] = rand.nextGaussian();
-                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
-                Vector<Real> x0 = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new double[n]);
-                Vector<Real> x = sparseProvider.gmres(a, b, x0, Real.of(1e-8), 2000, 30);
-                Vector<Real> ax = provider.multiply(a, x);
-                for (int i = 0; i < n; i++) {
-                    assertRelativeEquals(b.get(i).doubleValue(), ax.get(i).doubleValue(), 1e-4);
-                }
-            });
-
-            testOperation(res, "Transpose (Rect)", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(15, 25, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Matrix<Real> result = provider.transpose(a);
-                SimpleMatrix expected = new SimpleMatrix(aData).transpose();
-                verifyMatrix(expected, result, TOLERANCE);
-            });
-
-            testOperation(res, "Multiply (Rect)", () -> {
-                Random rand = new Random(42);
-                int m = 20, k = 15, n = 25;
-                double[][] aData = randomData(m, k, rand);
-                double[][] bData = randomData(k, n, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                RealDoubleMatrix b = RealDoubleMatrix.of(bData);
-                Matrix<Real> result = provider.multiply(a, b);
-                SimpleMatrix expected = new SimpleMatrix(aData).mult(new SimpleMatrix(bData));
-                verifyMatrix(expected, result, TOLERANCE);
-            });
-
-            testOperation(res, "Inverse (Rect)", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(25, 20, rand);
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Matrix<Real> result = provider.inverse(a);
-                SimpleMatrix expected = new SimpleMatrix(aData).pseudoInverse();
-                verifyMatrix(expected, result, 1e-4);
-            });
-
-            testOperation(res, "Solve (Rect)", () -> {
-                Random rand = new Random(42);
-                int rows = 30, cols = 20;
-                double[][] aData = randomData(rows, cols, rand);
-                double[] bData = new double[rows];
-                for (int i = 0; i < rows; i++) bData[i] = rand.nextGaussian();
-                
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
-                
-                Vector<Real> x = provider.solve(a, b);
-                SimpleMatrix matA = new SimpleMatrix(aData);
-                SimpleMatrix vecB = new SimpleMatrix(rows, 1, true, bData);
-                SimpleMatrix expectedX = matA.solve(vecB); // Least squares
-                
-                for (int i = 0; i < cols; i++) {
-                    assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-4);
-                }
-            });
-
-            testOperation(res, "Solve (Triangular)", () -> {
-                Random rand = new Random(42);
-                double[][] aData = randomData(SIZE, SIZE, rand);
-                // Make U (upper triangular)
-                for (int i = 0; i < SIZE; i++) {
-                    for (int j = 0; j < i; j++) aData[i][j] = 0.0;
-                    aData[i][i] += 2.0; // Ensure non-singular
-                }
-                double[] bData = new double[SIZE];
-                for (int i = 0; i < SIZE; i++) bData[i] = rand.nextGaussian();
-                
-                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
-                Vector<Real> b = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(bData);
-                
-                Vector<Real> x = provider.solve(a, b);
-                SimpleMatrix matA = new SimpleMatrix(aData);
-                SimpleMatrix vecB = new SimpleMatrix(SIZE, 1, true, bData);
-                SimpleMatrix expectedX = matA.solve(vecB);
-                
-                for (int i = 0; i < SIZE; i++) {
-                    assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-5);
-                }
-            });
-
-            } finally {
-                AlgorithmManager.setService(oldService);
             }
-
-            results.add(res);
         }
 
         // --- Report Generation ---
         printMarkdownReport(results);
-        
-        // --- Resource Cleanup ---
-        System.out.println("[ComplianceTest] Cleaning up resources...");
-        for (LinearAlgebraProvider<Real> p : rawProviders) {
-            if (p instanceof org.episteme.core.technical.backend.Backend b) {
-                try {
-                    System.out.println("[ComplianceTest] Shutting down: " + b.getName());
-                    b.shutdown();
-                } catch (Throwable t) {
-                    System.err.println("Warning: Error during shutdown of " + b.getName() + ": " + t.getMessage());
-                }
-            }
-        }
     }
 
     private void assertRelativeEquals(double expected, double actual, double tol) {

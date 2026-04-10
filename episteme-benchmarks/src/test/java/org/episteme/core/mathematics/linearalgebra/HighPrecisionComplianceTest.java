@@ -98,64 +98,77 @@ public class HighPrecisionComplianceTest {
     public void generateHighPrecisionReport() {
 
         List<LinearAlgebraProvider<?>> providers = discoverHPProviders();
+        Set<LinearAlgebraProvider<?>> allDiscovered = new HashSet<>(providers);
         List<ComplianceResult> results = new ArrayList<>();
 
-        for (LinearAlgebraProvider<?> rawProvider : providers) {
-            System.out.println("Starting HP compliance tests for: " + rawProvider.getName());
-            ComplianceResult res = new ComplianceResult();
-            res.providerName = rawProvider.getName();
-            
-            if (!rawProvider.isAvailable()) {
-                res.environment = "DISABLED";
-                results.add(res);
-                continue;
-            }
-            res.environment = rawProvider.getEnvironmentInfo();
-            
-            // Strictly isolate the provider under test, but include necessary support providers
-            AlgorithmService oldService = AlgorithmManager.getService();
-            
-            // Find support providers
-            List<AlgorithmProvider> allowed = new ArrayList<>();
-            allowed.add(rawProvider);
-            
-
-            // 2. Leaf and Sparse fallbacks for distributed/recursive providers (and gRPC bridge)
-            if (rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider ||
-                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider ||
-                rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider ||
-                rawProvider.getName().contains("gRPC") || rawProvider.getName().contains("Remote")) {
+        try {
+            for (LinearAlgebraProvider<?> rawProvider : providers) {
+                System.out.println("Starting HP compliance tests for: " + rawProvider.getName());
+                ComplianceResult res = new ComplianceResult();
+                res.providerName = rawProvider.getName();
                 
-                // Always add CPU Dense and CPU Sparse as baseline fallbacks
-                // AND include HP-capable providers for gRPC server-side execution in same JVM
-                for (LinearAlgebraProvider<?> p : discoverHPProviders()) {
-                    if (p.getName().equals(CPU_DENSE) || p.getName().equals("Episteme CPU (Sparse)") ||
-                        p.getName().contains("MPFR") || p.getName().contains("Big")) {
-                        allowed.add(p);
+                if (!rawProvider.isAvailable()) {
+                    res.environment = "DISABLED";
+                    results.add(res);
+                    continue;
+                }
+                res.environment = rawProvider.getEnvironmentInfo();
+                
+                // Strictly isolate the provider under test, but include necessary support providers
+                AlgorithmService oldService = AlgorithmManager.getService();
+                
+                // Find support providers
+                List<AlgorithmProvider> allowed = new ArrayList<>();
+                allowed.add(rawProvider);
+                
+    
+                // 2. Leaf and Sparse fallbacks for distributed/recursive providers (and gRPC bridge)
+                if (rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider ||
+                    rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.CARMALinearAlgebraProvider ||
+                    rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider ||
+                    rawProvider.getName().contains("gRPC") || rawProvider.getName().contains("Remote")) {
+                    
+                    // Always add CPU Dense and CPU Sparse as baseline fallbacks
+                    // AND include HP-capable providers for gRPC server-side execution in same JVM
+                    List<LinearAlgebraProvider<?>> hpProviders = discoverHPProviders();
+                    allDiscovered.addAll(hpProviders);
+                    for (LinearAlgebraProvider<?> p : hpProviders) {
+                        if (p.getName().equals(CPU_DENSE) || p.getName().equals("Episteme CPU (Sparse)") ||
+                            p.getName().contains("MPFR") || p.getName().contains("Big")) {
+                            allowed.add(p);
+                        }
                     }
                 }
-            }
-
-            // 3. Always include all discovered RealProviders so they can be used for internal steps
-            allowed.addAll(ServiceLoader.load(RealProvider.class).stream().map(ServiceLoader.Provider::get).toList());
-
-            AlgorithmManager.setService(new org.episteme.core.technical.algorithm.TestingAlgorithmService(allowed));
-            
-            try {
-                org.episteme.core.mathematics.context.MathContext.withPrecision(64).compute(() -> {
-                    runRealBigTests(res, (LinearAlgebraProvider<RealBig>) rawProvider);
-                    return null;
-                });
-
-                // === COMPLEX DOMAIN ===
-                Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
-                if (rawProvider.isCompatible(complexRing)) {
-                    runComplexTests(res, (LinearAlgebraProvider<Complex>) rawProvider);
+    
+                // 3. Always include all discovered RealProviders so they can be used for internal steps
+                allowed.addAll(ServiceLoader.load(RealProvider.class).stream().map(ServiceLoader.Provider::get).toList());
+    
+                AlgorithmManager.setService(new org.episteme.core.technical.algorithm.TestingAlgorithmService(allowed));
+                
+                try {
+                    org.episteme.core.mathematics.context.MathContext.withPrecision(64).compute(() -> {
+                        runRealBigTests(res, (LinearAlgebraProvider<RealBig>) rawProvider);
+                        return null;
+                    });
+    
+                    // === COMPLEX DOMAIN ===
+                    Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
+                    if (rawProvider.isCompatible(complexRing)) {
+                        runComplexTests(res, (LinearAlgebraProvider<Complex>) rawProvider);
+                    }
+    
+                    results.add(res);
+                } finally {
+                    AlgorithmManager.setService(oldService);
                 }
-
-                results.add(res);
-            } finally {
-                AlgorithmManager.setService(oldService);
+            }
+        } finally {
+            for (LinearAlgebraProvider<?> p : allDiscovered) {
+                try {
+                    p.close();
+                } catch (Exception e) {
+                    System.err.println("Warning: Failed to close provider " + p.getName() + ": " + e.getMessage());
+                }
             }
         }
 

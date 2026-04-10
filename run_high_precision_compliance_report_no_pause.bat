@@ -34,6 +34,6 @@ taskkill /FI "WINDOWTITLE eq EpistemeServer*" /T /F >nul 2>&1
 echo.
 echo Compliance report generated at:
 echo - docs/HIGH_PRECISION_COMPLIANCE_REPORT.md
-pause
+
 endlocal
 

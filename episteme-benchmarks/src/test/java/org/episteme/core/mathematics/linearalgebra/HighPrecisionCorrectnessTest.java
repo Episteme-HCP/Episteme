@@ -74,23 +74,35 @@ public class HighPrecisionCorrectnessTest {
         System.out.println("Discovered Providers: " + discovered.size());
         for (LinearAlgebraProvider<?> p : discovered) System.out.println(" - " + p.getName());
 
-        for (LinearAlgebraProvider<?> p : discovered) {
-            String name = p.getName();
-            if (!ALLOWED_PROVIDERS.contains(name)) {
-                System.out.println("Skipping Provider (not in allowlist): " + name);
-                continue;
+        try {
+            for (LinearAlgebraProvider<?> p : discovered) {
+                String name = p.getName();
+                if (!ALLOWED_PROVIDERS.contains(name)) {
+                    System.out.println("Skipping Provider (not in allowlist): " + name);
+                    continue;
+                }
+                
+                System.out.println("Auditing Provider: " + name);
+                Map<String, String> metrics = new LinkedHashMap<>();
+                
+                // Ground truth uses Native MPFR (highest available local precision)
+                try (LinearAlgebraProvider<RealBig> groundTruth = new org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraBackend<>()) {
+                    auditProvider(p, groundTruth, metrics);
+                } catch (Exception e) {
+                    System.err.println("Error closing ground truth provider: " + e.getMessage());
+                }
+                
+                BenchmarkResult result = new BenchmarkResult(name, "Linear Algebra (High-Precision Correctness)", metrics);
+                reporter.addResult(result);
             }
-            
-            System.out.println("Auditing Provider: " + name);
-            Map<String, String> metrics = new LinkedHashMap<>();
-            
-            // Ground truth uses Native MPFR (highest available local precision)
-            LinearAlgebraProvider<RealBig> groundTruth = new org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraBackend<>();
-            
-            auditProvider(p, groundTruth, metrics);
-            
-            BenchmarkResult result = new BenchmarkResult(name, "Linear Algebra (High-Precision Correctness)", metrics);
-            reporter.addResult(result);
+        } finally {
+            for (LinearAlgebraProvider<?> p : discovered) {
+                try {
+                    p.close();
+                } catch (Exception e) {
+                    System.err.println("Warning: Failed to close provider " + p.getName() + ": " + e.getMessage());
+                }
+            }
         }
 
         boolean hasFailures = false;

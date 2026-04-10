@@ -36,7 +36,7 @@ import org.episteme.core.technical.algorithm.OperationContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
+public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.AutoCloseable {
 
     /**
      * Checks if this provider is compatible with the given ring.
@@ -315,5 +315,10 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
     @Override
     default String getAlgorithmType() {
         return "Linear Algebra";
+    }
+
+    @Override
+    default void close() {
+        // No-op by default
     }
 }

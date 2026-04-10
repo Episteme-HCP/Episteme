@@ -26,7 +26,6 @@ package org.episteme.core.mathematics.linearalgebra.providers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
 

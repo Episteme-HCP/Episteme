@@ -193,7 +193,7 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-inprocess</artifactId>
             <version>1.60.0</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

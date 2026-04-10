@@ -192,6 +192,13 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
      * Shuts down the gRPC channel gracefully.
      */
     @Override
+    public void close() {
+        shutdown();
+    }
+
+    /**
+     * Shuts down the gRPC channel gracefully.
+     */
     public void shutdown() {
         if (channel != null) {
             try {
@@ -634,9 +641,6 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         boolean isHPRing = zeroClass.contains("RealBig") || zeroClass.contains("Complex");
         boolean isHP = isHPContext || isHPRing;
 
-        System.err.println("[CLIENT-DEBUG] Serializing vector: " + size + 
-            ", hpContext=" + isHPContext + ", hpRing=" + isHPRing + 
-            ", finalIsHP=" + isHP + ", zeroClass=" + zeroClass);
 
         VectorData.Builder builder = VectorData.newBuilder()
                 .setSize(size)

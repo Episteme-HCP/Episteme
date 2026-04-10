@@ -70,51 +70,61 @@ public class HighPrecisionPerformanceTest {
         reporter.addMetadata("JDK", System.getProperty("java.version") + " (" + System.getProperty("java.vendor") + ")");
         reporter.addMetadata("OS", System.getProperty("os.name") + " " + System.getProperty("os.arch"));
 
-        for (LinearAlgebraProvider<?> provider : providers) {
-            if (!provider.isAvailable()) continue;
-            
-            System.out.println("Benchmarking performance for: " + provider.getName());
-            
-            AlgorithmService oldService = AlgorithmManager.getService();
-            AlgorithmManager.setService(new TestingAlgorithmService(provider));
-            
-            try {
-                Map<String, Object> metrics = new LinkedHashMap<>();
+        try {
+            for (LinearAlgebraProvider<?> provider : providers) {
+                if (!provider.isAvailable()) continue;
                 
-                // RealBig Domain
-                RealBig rbVal = RealBig.create(BigDecimal.ONE);
-                @SuppressWarnings("unchecked")
-                Ring<RealBig> rbRing = (Ring<RealBig>) (Object) rbVal.getScalarRing();
-                if (provider.isCompatible(rbRing)) {
+                System.out.println("Benchmarking performance for: " + provider.getName());
+                
+                AlgorithmService oldService = AlgorithmManager.getService();
+                AlgorithmManager.setService(new TestingAlgorithmService(provider));
+                
+                try {
+                    Map<String, Object> metrics = new LinkedHashMap<>();
+                    
+                    // RealBig Domain
+                    RealBig rbVal = RealBig.create(BigDecimal.ONE);
                     @SuppressWarnings("unchecked")
-                    LinearAlgebraProvider<RealBig> rbProvider = (LinearAlgebraProvider<RealBig>) (Object) provider;
-                    benchmarkRealBig(metrics, rbProvider);
+                    Ring<RealBig> rbRing = (Ring<RealBig>) (Object) rbVal.getScalarRing();
+                    if (provider.isCompatible(rbRing)) {
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<RealBig> rbProvider = (LinearAlgebraProvider<RealBig>) (Object) provider;
+                        benchmarkRealBig(metrics, rbProvider);
+                    }
+    
+                    // Complex Domain
+                    Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
+                    if (provider.isCompatible(complexRing)) {
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<Complex> cProvider = (LinearAlgebraProvider<Complex>) (Object) provider;
+                        benchmarkComplex(metrics, cProvider);
+                    }
+    
+                    BenchmarkResult res = new BenchmarkResult(
+                        "hp-perf-" + provider.getName().toLowerCase().replace(" ", "-"),
+                        provider.getName(),
+                        provider.getClass().getSimpleName(),
+                        "Linear Algebra (High-Precision Performance)",
+                        "SUCCESS",
+                        System.currentTimeMillis(),
+                        0, 0, 0, 0, 0,
+                        new java.util.HashMap<>(),
+                        metrics
+                    );
+                    reporter.addResult(res);
+                } catch (Throwable t) {
+                    System.err.println("Benchmark failed for " + provider.getName() + ": " + t.getMessage());
+                } finally {
+                    AlgorithmManager.setService(oldService);
                 }
-
-                // Complex Domain
-                Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
-                if (provider.isCompatible(complexRing)) {
-                    @SuppressWarnings("unchecked")
-                    LinearAlgebraProvider<Complex> cProvider = (LinearAlgebraProvider<Complex>) (Object) provider;
-                    benchmarkComplex(metrics, cProvider);
+            }
+        } finally {
+            for (LinearAlgebraProvider<?> p : providers) {
+                try {
+                    p.close();
+                } catch (Exception e) {
+                    System.err.println("Warning: Failed to close provider " + p.getName() + ": " + e.getMessage());
                 }
-
-                BenchmarkResult res = new BenchmarkResult(
-                    "hp-perf-" + provider.getName().toLowerCase().replace(" ", "-"),
-                    provider.getName(),
-                    provider.getClass().getSimpleName(),
-                    "Linear Algebra (High-Precision Performance)",
-                    "SUCCESS",
-                    System.currentTimeMillis(),
-                    0, 0, 0, 0, 0,
-                    new java.util.HashMap<>(),
-                    metrics
-                );
-                reporter.addResult(res);
-            } catch (Throwable t) {
-                System.err.println("Benchmark failed for " + provider.getName() + ": " + t.getMessage());
-            } finally {
-                AlgorithmManager.setService(oldService);
             }
         }
         reporter.generateReport();
