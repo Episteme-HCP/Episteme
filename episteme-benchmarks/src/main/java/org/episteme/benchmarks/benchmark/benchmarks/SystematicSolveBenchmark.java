@@ -37,7 +37,11 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
 
     @Override
     public String getDescription() {
-        return "Linear System Solver (Ax=B, 800x800), Double Precision";
+        String base = "Linear System Solver (Ax=B, 800x800), Double Precision";
+        if (isHighPrecision(currentProvider)) {
+            return base + " [High-Precision Throttling Applied: 16x16 at Normal Precision]";
+        }
+        return base;
     }
 
     @Override
@@ -47,15 +51,17 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
 
     @Override
     public void setup() {
+        int hpSize = 16;
+        int actualSize = isHighPrecision(currentProvider) ? hpSize : SIZE;
         matricesA = new RealDoubleMatrix[POOL_SIZE];
         vectorsB = new RealDoubleVector[POOL_SIZE];
         Random r = new Random(42);
         
         for (int p = 0; p < POOL_SIZE; p++) {
-            double[][] dataA = new double[SIZE][SIZE];
-            for (int i = 0; i < SIZE; i++) {
+            double[][] dataA = new double[actualSize][actualSize];
+            for (int i = 0; i < actualSize; i++) {
                 double sum = 0;
-                for (int j = 0; j < SIZE; j++) {
+                for (int j = 0; j < actualSize; j++) {
                     if (i != j) {
                         dataA[i][j] = r.nextDouble();
                         sum += Math.abs(dataA[i][j]);
@@ -65,8 +71,8 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
             }
             matricesA[p] = RealDoubleMatrix.of(dataA);
             
-            double[] dataB = new double[SIZE];
-            for (int i = 0; i < SIZE; i++) dataB[i] = r.nextDouble();
+            double[] dataB = new double[actualSize];
+            for (int i = 0; i < actualSize; i++) dataB[i] = r.nextDouble();
             vectorsB[p] = RealDoubleVector.of(dataB);
         }
     }
@@ -79,9 +85,11 @@ public class SystematicSolveBenchmark implements SystematicBenchmark<LinearAlgeb
     @Override
     public void run() {
         if (currentProvider != null) {
-            for (int i = 0; i < POOL_SIZE; i++) {
-                currentProvider.solve(matricesA[i], vectorsB[i]);
-            }
+            runThrottled(currentProvider, () -> {
+                for (int i = 0; i < POOL_SIZE; i++) {
+                    currentProvider.solve(matricesA[i], vectorsB[i]);
+                }
+            });
         }
     }
 

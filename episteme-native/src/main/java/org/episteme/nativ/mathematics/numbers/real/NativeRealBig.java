@@ -41,7 +41,7 @@ public final class NativeRealBig extends Real {
         this.arena = Arena.ofAuto();
         this.precision = precision;
         this.ptr = arena.allocate(32); // Approximate size for mpfr_t
-        NativeSafe.invoke(MPFR_INIT2, ptr, precision);
+        NativeSafe.invoke(MPFR_INIT2, ptr, (int) precision);
         
         String mpfrValue = value;
         if (value.equalsIgnoreCase("nan")) mpfrValue = "@NaN@";
@@ -59,7 +59,7 @@ public final class NativeRealBig extends Real {
         this.arena = Arena.ofAuto();
         this.precision = precision;
         this.ptr = arena.allocate(32);
-        NativeSafe.invoke(MPFR_INIT2, ptr, precision);
+        NativeSafe.invoke(MPFR_INIT2, ptr, (int) precision);
     }
 
     public static NativeRealBig of(String value) {

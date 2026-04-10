@@ -38,7 +38,11 @@ public class SystematicSparseMatrixBenchmark implements SystematicBenchmark<Spar
 
     @Override
     public String getDescription() {
-        return "Sparse Matrix Multiplication (1000x1000, 5% sparsity)";
+        String base = "Sparse Matrix Multiplication (1000x1000, 5% sparsity)";
+        if (isHighPrecision(currentProvider)) {
+            return base + " [High-Precision Throttling Applied: 32x32 at Normal Precision]";
+        }
+        return base;
     }
 
     @Override
@@ -49,23 +53,25 @@ public class SystematicSparseMatrixBenchmark implements SystematicBenchmark<Spar
     @Override
     @SuppressWarnings("unchecked")
     public void setup() {
+        int hpSize = 32;
+        int actualSize = isHighPrecision(currentProvider) ? hpSize : SIZE;
         matricesA = new SparseMatrix[POOL_SIZE];
         matricesB = new SparseMatrix[POOL_SIZE];
         Random r = new Random(42);
         Reals ring = Reals.getInstance();
         
         for (int p = 0; p < POOL_SIZE; p++) {
-            SparseMatrix<Real> a = SparseMatrix.zeros(SIZE, SIZE, ring);
-            SparseMatrix<Real> b = SparseMatrix.zeros(SIZE, SIZE, ring);
+            SparseMatrix<Real> a = SparseMatrix.zeros(actualSize, actualSize, ring);
+            SparseMatrix<Real> b = SparseMatrix.zeros(actualSize, actualSize, ring);
             
-            for (int i = 0; i < SIZE; i++) {
-                for (int k = 0; k < SIZE * SPARSITY; k++) {
-                    a.set(i, r.nextInt(SIZE), Real.of(r.nextDouble()));
+            for (int i = 0; i < actualSize; i++) {
+                for (int k = 0; k < actualSize * SPARSITY; k++) {
+                    a.set(i, r.nextInt(actualSize), Real.of(r.nextDouble()));
                 }
             }
-            for (int i = 0; i < SIZE; i++) {
-                for (int k = 0; k < SIZE * SPARSITY; k++) {
-                    b.set(i, r.nextInt(SIZE), Real.of(r.nextDouble()));
+            for (int i = 0; i < actualSize; i++) {
+                for (int k = 0; k < actualSize * SPARSITY; k++) {
+                    b.set(i, r.nextInt(actualSize), Real.of(r.nextDouble()));
                 }
             }
             matricesA[p] = a;
@@ -84,9 +90,11 @@ public class SystematicSparseMatrixBenchmark implements SystematicBenchmark<Spar
     @Override
     public void run() {
         if (currentProvider != null) {
-            for (int i = 0; i < POOL_SIZE; i++) {
-                currentProvider.multiply(matricesA[i], matricesB[i]);
-            }
+            runThrottled(currentProvider, () -> {
+                for (int i = 0; i < POOL_SIZE; i++) {
+                    currentProvider.multiply(matricesA[i], matricesB[i]);
+                }
+            });
         }
     }
 

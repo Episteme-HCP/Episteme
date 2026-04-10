@@ -35,7 +35,11 @@ public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlg
 
     @Override
     public String getDescription() {
-        return "Matrix Inversion (500x500), Double Precision";
+        String base = "Matrix Inversion (500x500), Double Precision";
+        if (isHighPrecision(currentProvider)) {
+            return base + " [High-Precision Throttling Applied: 16x16 at Normal Precision]";
+        }
+        return base;
     }
 
     @Override
@@ -45,14 +49,16 @@ public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlg
 
     @Override
     public void setup() {
+        int hpSize = 16;
+        int actualSize = isHighPrecision(currentProvider) ? hpSize : SIZE;
         matricesA = new RealDoubleMatrix[POOL_SIZE];
         Random r = new Random(42);
         
         for (int p = 0; p < POOL_SIZE; p++) {
-            double[][] data = new double[SIZE][SIZE];
-            for (int i = 0; i < SIZE; i++) {
+            double[][] data = new double[actualSize][actualSize];
+            for (int i = 0; i < actualSize; i++) {
                 double sum = 0;
-                for (int j = 0; j < SIZE; j++) {
+                for (int j = 0; j < actualSize; j++) {
                     if (i != j) {
                         data[i][j] = r.nextDouble();
                         sum += Math.abs(data[i][j]);
@@ -72,9 +78,11 @@ public class SystematicInverseBenchmark implements SystematicBenchmark<LinearAlg
     @Override
     public void run() {
         if (currentProvider != null) {
-            for (int i = 0; i < POOL_SIZE; i++) {
-                currentProvider.inverse(matricesA[i]);
-            }
+            runThrottled(currentProvider, () -> {
+                for (int i = 0; i < POOL_SIZE; i++) {
+                    currentProvider.inverse(matricesA[i]);
+                }
+            });
         }
     }
 

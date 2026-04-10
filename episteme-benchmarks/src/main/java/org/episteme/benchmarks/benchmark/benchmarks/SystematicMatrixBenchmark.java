@@ -58,7 +58,11 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
 
     @Override
     public String getDescription() {
-        return "Dense Matrix Multiplication (1024x1024), Double Precision";
+        String base = "Dense Matrix Multiplication (1024x1024), Double Precision";
+        if (isHighPrecision(currentProvider)) {
+            return base + " [High-Precision Throttling Applied: 32x32 at Normal Precision]";
+        }
+        return base;
     }
 
     @Override
@@ -68,7 +72,8 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
 
     @Override
     public void setup() {
-        int actualSize = dryRun ? DRY_RUN_SIZE : SIZE;
+        int hpSize = 32;
+        int actualSize = dryRun ? DRY_RUN_SIZE : (isHighPrecision(currentProvider) ? hpSize : SIZE);
         matricesA = new RealDoubleMatrix[POOL_SIZE];
         matricesB = new RealDoubleMatrix[POOL_SIZE];
         Random r = new Random(42);
@@ -90,9 +95,11 @@ public class SystematicMatrixBenchmark implements SystematicBenchmark<LinearAlge
     @Override
     public void run() {
         if (currentProvider != null) {
-            for (int i = 0; i < POOL_SIZE; i++) {
-                currentProvider.multiply(matricesA[i], matricesB[i]);
-            }
+            runThrottled(currentProvider, () -> {
+                for (int i = 0; i < POOL_SIZE; i++) {
+                    currentProvider.multiply(matricesA[i], matricesB[i]);
+                }
+            });
         }
     }
 

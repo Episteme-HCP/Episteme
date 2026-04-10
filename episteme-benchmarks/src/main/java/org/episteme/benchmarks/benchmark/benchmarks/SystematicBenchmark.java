@@ -62,4 +62,27 @@ public interface SystematicBenchmark<P extends AlgorithmProvider> extends Runnab
      * Sets the provider instance for a specific benchmark execution.
      */
     void setProvider(P provider);
+
+    /**
+     * Helper to detect high-precision providers that should be throttled for large datasets.
+     */
+    default boolean isHighPrecision(org.episteme.core.technical.algorithm.AlgorithmProvider p) {
+        if (p == null) return false;
+        String name = p.getName().toLowerCase();
+        return name.contains("mpfr") || name.contains("high precision") || name.contains("bigmath");
+    }
+
+    /**
+     * Executes a runnable in a throttled context (normal precision) if the provider is high-precision.
+     */
+    default void runThrottled(org.episteme.core.technical.algorithm.AlgorithmProvider p, Runnable runnable) {
+        if (isHighPrecision(p)) {
+            org.episteme.core.mathematics.context.MathContext.normal().compute(() -> {
+                runnable.run();
+                return null;
+            });
+        } else {
+            runnable.run();
+        }
+    }
 }
