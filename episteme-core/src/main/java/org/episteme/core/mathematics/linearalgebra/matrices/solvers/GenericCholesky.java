@@ -28,6 +28,14 @@ public class GenericCholesky {
             E sum = field.zero();
             for (int k = 0; k < j; k++) sum = field.add(sum, field.multiply(lData[j][k], conjugate(lData[j][k], field)));
             E val = field.subtract(matrix.get(j, j), sum);
+            
+            // Stability check: if val is too small, matrix is not positive definite or is singular
+            if (val instanceof Real && ((Real)val).doubleValue() <= 1e-30) {
+                throw new ArithmeticException("Cholesky decomposition failed: matrix is singular or not positive-definite at index " + j + " (val=" + val + ")");
+            } else if (val instanceof Complex && ((Complex)val).abs().doubleValue() <= 1e-30) {
+                 throw new ArithmeticException("Cholesky decomposition failed: matrix is singular or not positive-definite at index " + j + " (abs(val)=" + ((Complex)val).abs() + ")");
+            }
+
             lData[j][j] = sqrt(val, field);
 
             for (int i = j + 1; i < n; i++) {

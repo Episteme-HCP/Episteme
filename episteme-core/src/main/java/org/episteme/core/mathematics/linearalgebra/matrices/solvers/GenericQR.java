@@ -46,7 +46,14 @@ public class GenericQR {
             
             E norm = norm(v, field);
             rData[j][j] = norm;
-            if (isNonZero(norm, field)) {
+            
+            // Stability check: use epsilon for high-precision stability
+            boolean isNonZero = false;
+            if (norm instanceof Real) isNonZero = ((Real) norm).doubleValue() > 1e-30;
+            else if (norm instanceof Complex) isNonZero = ((Complex) norm).abs().doubleValue() > 1e-30;
+            else isNonZero = isNonZero(norm, field);
+
+            if (isNonZero) {
                 for (int i = 0; i < m; i++) qData[i][j] = field.divide(v[i], norm);
             } else {
                 for (int i = 0; i < m; i++) qData[i][j] = field.zero();

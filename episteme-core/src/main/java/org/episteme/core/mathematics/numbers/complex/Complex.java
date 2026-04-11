@@ -249,7 +249,9 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
      * @return ln(this)
      */
     public Complex log() {
-        return new Complex(abs().log(), arg());
+        Real r = abs();
+        if (r.isZero()) return Complex.of(Real.NEGATIVE_INFINITY, Real.ZERO);
+        return new Complex(r.log(), arg());
     }
 
     /**

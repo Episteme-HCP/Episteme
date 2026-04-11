@@ -140,6 +140,9 @@ public final class NativeRealBig extends Real {
 
     @Override
     public Real sqrt() {
+        if (this.isNaN()) return NaN;
+        if (this.isZero()) return ZERO;
+        if (this.sign() < 0) return Real.NaN;
         NativeRealBig result = new NativeRealBig(precision);
         NativeSafe.invoke(MPFR_SQRT, result.ptr, this.ptr, 0);
         return result;
@@ -233,6 +236,9 @@ public final class NativeRealBig extends Real {
 
     @Override
     public Real log() {
+        if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NEGATIVE_INFINITY;
+        if (this.sign() < 0) return Real.NaN;
         NativeRealBig res = new NativeRealBig(precision);
         NativeSafe.invoke(MPFR_LOG, res.ptr, this.ptr, 0);
         return res;
@@ -240,6 +246,9 @@ public final class NativeRealBig extends Real {
 
     @Override
     public Real log10() {
+        if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NEGATIVE_INFINITY;
+        if (this.sign() < 0) return Real.NaN;
         NativeRealBig res = new NativeRealBig(precision);
         NativeSafe.invoke(MPFR_LOG10, res.ptr, this.ptr, 0);
         return res;

@@ -1072,9 +1072,15 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     swapRowsVector(h_B, k, pivot, isComplex, arena, (int) prec);
                 }
                 
-                // Gaussian Elimination
+                // Gaussian Elimination with stability check
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
+                        MemorySegment absK = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, absK, (int) prec);
+                        complexMagnitude(absK, getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
+                        double dVal = readMPFR(absK, arena.allocate(ValueLayout.JAVA_LONG), arena);
+                        NativeSafe.invoke(MPFR_CLEAR, absK);
+                        if (dVal <= 1e-30) throw new ArithmeticException("Singular matrix during elimination (pivot below epsilon)");
+
                         complexDivide(tempFactorR, tempFactorI, 
                             getMPFR(h_A, i, k, n, 0, true), getMPFR(h_A, i, k, n, 1, true),
                             getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true),
@@ -1085,6 +1091,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                         }
                         complexSubtractMulVector(h_B, i, tempFactorR, tempFactorI, h_B, k, arena, (int) prec);
                     } else {
+                        MemorySegment absK = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, absK, (int) prec);
+                        NativeSafe.invoke(MPFR_ABS, absK, getMPFR(h_A, k, k, n, 0, false), 0);
+                        double dVal = readMPFR(absK, arena.allocate(ValueLayout.JAVA_LONG), arena);
+                        NativeSafe.invoke(MPFR_CLEAR, absK);
+                        if (dVal <= 1e-30) throw new ArithmeticException("Singular matrix during elimination (pivot below epsilon)");
+
                         NativeSafe.invoke(MPFR_DIV, tempFactor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
                         
                         for (int j = k; j < n; j++) {
@@ -1201,16 +1213,19 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     swapRows(h_Inv, k, pivot, n, isComplex, arena, (int) prec);
                 }
                 
-                // Check for singular matrix
+                // Check for singular matrix with magnitude-based epsilon
                 if (isComplex) {
-                    if ((int) NativeSafe.invoke(MPFR_ZERO_P, getMPFR(h_A, k, k, n, 0, true)) != 0 &&
-                        (int) NativeSafe.invoke(MPFR_ZERO_P, getMPFR(h_A, k, k, n, 1, true)) != 0) {
-                        throw new ArithmeticException("Singular matrix");
-                    }
+                    MemorySegment absK = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, absK, (int) prec);
+                    complexMagnitude(absK, getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
+                    double dVal = readMPFR(absK, arena.allocate(ValueLayout.JAVA_LONG), arena);
+                    NativeSafe.invoke(MPFR_CLEAR, absK);
+                    if (dVal <= 1e-30) throw new ArithmeticException("Singular matrix (magnitude below epsilon)");
                 } else {
-                    if ((int) NativeSafe.invoke(MPFR_ZERO_P, getMPFR(h_A, k, k, n, 0, false)) != 0) {
-                        throw new ArithmeticException("Singular matrix");
-                    }
+                    MemorySegment absK = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, absK, (int) prec);
+                    NativeSafe.invoke(MPFR_ABS, absK, getMPFR(h_A, k, k, n, 0, false), 0);
+                    double dVal = readMPFR(absK, arena.allocate(ValueLayout.JAVA_LONG), arena);
+                    NativeSafe.invoke(MPFR_CLEAR, absK);
+                    if (dVal <= 1e-30) throw new ArithmeticException("Singular matrix (magnitude below epsilon)");
                 }
 
                 // Normalize pivot row
@@ -1606,9 +1621,17 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
         NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
         NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
-        NativeSafe.invoke(MPFR_LOG, t1, t1, 0);
-        NativeSafe.invoke(MPFR_SET_D, t2, 0.5, 0);
-        NativeSafe.invoke(MPFR_MUL, resR, t1, t2, 0);
+
+        // Guard against log(0)
+        boolean isZero = ((Number) NativeSafe.invoke(MPFR_ZERO_P, t1)).intValue() != 0;
+        if (!isZero) {
+            NativeSafe.invoke(MPFR_LOG, t1, t1, 0);
+            NativeSafe.invoke(MPFR_SET_D, t2, 0.5, 0);
+            NativeSafe.invoke(MPFR_MUL, resR, t1, t2, 0);
+        } else {
+            // log(0) = -Inf. Use a very small number since we lack singleton -Inf for mpfr_t here
+            NativeSafe.invoke(MPFR_SET_SI, resR, -1000000L, 0);
+        }
         
         // resI = atan2(aI, aR)
         if (MPFR_ATAN2 != null) {

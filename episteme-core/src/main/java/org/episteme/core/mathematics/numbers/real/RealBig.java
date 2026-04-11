@@ -187,6 +187,8 @@ public final class RealBig extends Real {
     @Override
     public Real log() {
         if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NEGATIVE_INFINITY;
+        if (this.sign() < 0) return Real.NaN;
         return RealBig.create(BigDecimalMath.log(value, 
             org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
@@ -194,6 +196,8 @@ public final class RealBig extends Real {
     @Override
     public Real log10() {
         if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NEGATIVE_INFINITY;
+        if (this.sign() < 0) return Real.NaN;
         return RealBig.create(BigDecimalMath.log10(value, 
             org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
