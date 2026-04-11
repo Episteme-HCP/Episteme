@@ -151,8 +151,7 @@ public final class RealBig extends Real {
             if (value.abs().compareTo(threshold) < 0) {
                 return ZERO;
             }
-            throw new ArithmeticException("Square root of a negative BigDecimal: " + value 
-                + " (is beyond the numerical safety threshold of " + threshold + ")");
+            return Real.NaN;
         }
         return RealBig.create(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }

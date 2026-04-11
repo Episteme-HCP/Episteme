@@ -187,7 +187,7 @@ public final class NativeRealBig extends Real {
         if (isInfinite()) {
             return (((Number) NativeSafe.invoke(MPFR_CMP_SI, this.ptr, 0L)).intValue() > 0) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         }
-        return bigDecimalValue().doubleValue();
+        return (double) NativeSafe.invoke(MPFR_GET_D, this.ptr, 0); // 0 is rounding mode (usually RNDN)
     }
 
     @Override

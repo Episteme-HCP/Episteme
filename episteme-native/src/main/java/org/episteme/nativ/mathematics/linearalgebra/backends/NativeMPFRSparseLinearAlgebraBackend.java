@@ -1467,7 +1467,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         }
     }
 
-    @Override public E determinant(Matrix<E> a) { return GenericLU.determinant(a, (Field<E>) a.getScalarRing()); }
+    @Override public E determinant(Matrix<E> a) { return GenericLU.determinant(a, (Field<E>) a.getScalarRing(), this); }
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
         if (a.rows() != a.cols()) {

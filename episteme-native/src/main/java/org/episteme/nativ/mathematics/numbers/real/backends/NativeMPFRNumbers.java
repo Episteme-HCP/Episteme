@@ -78,6 +78,8 @@ public final class NativeMPFRNumbers {
     public static final MethodHandle MPFR_INF_P;
     public static final MethodHandle MPFR_NUMBER_P;
     public static final MethodHandle MPFR_CMP_SI;
+    public static final MethodHandle MPFR_SET_INF;
+    public static final MethodHandle MPFR_SET_NAN;
 
     public static final MemoryLayout MPFR_LAYOUT;
     
@@ -87,6 +89,7 @@ public final class NativeMPFRNumbers {
     public static final MethodHandle MPFR_SET_STR;
     public static final MethodHandle MPFR_GET_STR;
     public static final MethodHandle MPFR_FREE_STR;
+    public static final MethodHandle MPFR_GET_D;
 
     public static final boolean AVAILABLE;
 
@@ -119,6 +122,8 @@ public final class NativeMPFRNumbers {
         MethodHandle add = null, sub = null, mul = null, div = null, neg = null, abs = null, cmp = null;
         MethodHandle set = null, set_ui = null, set_si = null, cmp_abs = null, zero_p = null, set_d = null, const_pi = null;
         MethodHandle nan_p = null, inf_p = null, number_p = null, cmp_si = null;
+        MethodHandle set_inf = null, set_nan = null;
+        MethodHandle get_d = null;
         MethodHandle init2 = null, clear = null, setStr = null, getStr = null, freeStr = null;
 
         try {
@@ -179,6 +184,9 @@ public final class NativeMPFRNumbers {
                 number_p = lookup(mpfr, "mpfr_number_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
                 cmp_si = lookup(mpfr, "mpfr_cmp_si", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG));
                 const_pi = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(JAVA_INT, ADDRESS, JAVA_INT));
+                set_inf = lookup(mpfr, "mpfr_set_inf", FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT));
+                set_nan = lookup(mpfr, "mpfr_set_nan", FunctionDescriptor.ofVoid(ADDRESS));
+                get_d = lookup(mpfr, "mpfr_get_d", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ADDRESS, JAVA_INT));
                 
                 // Management functions
                 init2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ADDRESS, C_LONG));
@@ -200,6 +208,8 @@ public final class NativeMPFRNumbers {
         MPFR_ADD = add; MPFR_SUB = sub; MPFR_MUL = mul; MPFR_DIV = div; MPFR_NEG = neg; MPFR_ABS = abs; MPFR_CMP = cmp;
         MPFR_SET = set; MPFR_SET_UI = set_ui; MPFR_SET_SI = set_si; MPFR_CMP_ABS = cmp_abs; MPFR_ZERO_P = zero_p; MPFR_SET_D = set_d; MPFR_CONST_PI = const_pi;
         MPFR_NAN_P = nan_p; MPFR_INF_P = inf_p; MPFR_NUMBER_P = number_p; MPFR_CMP_SI = cmp_si;
+        MPFR_SET_INF = set_inf; MPFR_SET_NAN = set_nan;
+        MPFR_GET_D = get_d;
         MPFR_INIT2 = init2; MPFR_CLEAR = clear; MPFR_SET_STR = setStr; MPFR_GET_STR = getStr; MPFR_FREE_STR = freeStr;
         AVAILABLE = available;
     }

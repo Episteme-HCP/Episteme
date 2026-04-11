@@ -45,8 +45,8 @@ public class GenericQR {
             
             // Stability check: use epsilon for high-precision stability
             boolean isNonZero = false;
-            if (norm instanceof Real) isNonZero = ((Real) norm).doubleValue() > 1e-30;
-            else if (norm instanceof Complex) isNonZero = ((Complex) norm).abs().doubleValue() > 1e-30;
+            if (norm instanceof Real) isNonZero = ((Real) norm).doubleValue() > 1e-60;
+            else if (norm instanceof Complex) isNonZero = ((Complex) norm).abs().doubleValue() > 1e-60;
             else isNonZero = isNonZero(norm, field);
 
             if (isNonZero) {

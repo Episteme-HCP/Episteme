@@ -44,7 +44,8 @@ public class GenericEigen {
             }
 
             // Convergence check using maxOffDouble relative to diagonal or absolute
-            if (maxOffDouble < 1e-35) break; // Using a much smaller epsilon for HP
+            // For high-precision, we can aim for much smaller than 1e-35
+            if (maxOffDouble < 1e-60) break;
 
             E app = A[p][p];
             E aqq = A[q][q];
@@ -56,7 +57,7 @@ public class GenericEigen {
             
             // Stability check for theta calculation
             double twoApqAbs = absValueDouble(twoApq, field);
-            if (twoApqAbs < 1e-45) break; // Should have been caught by maxOffDouble, but extra safety
+            if (twoApqAbs < 1e-70) break; // Singularity or underflow safety
             
             E theta = field.divide(diff, twoApq);
             

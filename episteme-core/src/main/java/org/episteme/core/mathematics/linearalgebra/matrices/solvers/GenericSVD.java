@@ -39,7 +39,9 @@ public class GenericSVD {
             E val = eigenV.D().get(i); // Use eigenvalues of A^T*A
             // Stability: ensure non-negative and handle numerical noise
             double dVal = absValueDouble(val, field);
-            if (dVal < 1e-35) sValues[i] = field.zero();
+            // High-precision safety: singular values of A^T*A should be >= 0.
+            // If slightly negative due to noise, clamp to zero.
+            if (dVal < 1e-60) sValues[i] = field.zero();
             else sValues[i] = sqrt(max(val, field.zero(), field), field);
         }
         

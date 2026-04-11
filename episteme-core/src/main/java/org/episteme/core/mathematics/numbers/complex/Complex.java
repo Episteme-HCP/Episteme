@@ -101,6 +101,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
         return imaginary;
     }
 
+    public boolean isNaN() {
+        return real.isNaN() || imaginary.isNaN();
+    }
+
     /**
      * Returns the real part as a double.
      * 
@@ -249,6 +253,7 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
      * @return ln(this)
      */
     public Complex log() {
+        if (this.isNaN()) return Complex.of(Real.NaN, Real.NaN);
         Real r = abs();
         if (r.isZero()) return Complex.of(Real.NEGATIVE_INFINITY, Real.ZERO);
         return new Complex(r.log(), arg());

@@ -846,7 +846,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (isReal(a)) {
             return (E) (Object) JavaLU.determinant((Matrix<Real>) (Object) a);
         }
-        return GenericLU.determinant(a, (Field<E>) a.getScalarRing());
+        return GenericLU.determinant(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
@@ -859,7 +859,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             if (isReal(a) && isReal(b)) {
                 return (Vector<E>) (Object) JavaQR.solve(JavaQR.decompose((Matrix<Real>) (Object) a), (Vector<Real>) (Object) b);
             }
-            return GenericQR.solve(GenericQR.decompose(a, (Field<E>) a.getScalarRing()), b, (Field<E>) a.getScalarRing());
+            return GenericQR.solve(GenericQR.decompose(a, (Field<E>) a.getScalarRing(), this), b, (Field<E>) a.getScalarRing(), this);
         }
         if (isReal(a) && isReal(b)) {
             return (Vector<E>) JavaLU.solve((Matrix<Real>) a, (Vector<Real>) b);
@@ -896,7 +896,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (CholeskyResult<E>) JavaCholesky.decompose((Matrix<Real>) a);
         }
-        return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
@@ -905,7 +905,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (SVDResult<E>) JavaSVD.decompose((Matrix<Real>) a);
         }
-        return GenericSVD.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericSVD.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
@@ -914,7 +914,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (EigenResult<E>) JavaEigen.decompose((Matrix<Real>) a);
         }
-        return GenericEigen.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericEigen.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
@@ -923,7 +923,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (b.getScalarRing() instanceof Reals) {
             return (Vector<E>) JavaLU.solve((LUResult<Real>) lu, (Vector<Real>) b);
         }
-        return GenericLU.solve(lu, b, (Field<E>) b.getScalarRing());
+        return GenericLU.solve(lu, b, (Field<E>) b.getScalarRing(), this);
     }
 
     @Override
@@ -932,7 +932,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (b.getScalarRing() instanceof Reals) {
             return (Vector<E>) JavaQR.solve((QRResult<Real>) qr, (Vector<Real>) b);
         }
-        return GenericQR.solve(qr, b, (Field<E>) b.getScalarRing());
+        return GenericQR.solve(qr, b, (Field<E>) b.getScalarRing(), this);
     }
 
     @Override
@@ -941,7 +941,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (b.getScalarRing() instanceof Reals) {
             return (Vector<E>) JavaCholesky.solve((CholeskyResult<Real>) cholesky, (Vector<Real>) b);
         }
-        return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing());
+        return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing(), this);
     }
 
 

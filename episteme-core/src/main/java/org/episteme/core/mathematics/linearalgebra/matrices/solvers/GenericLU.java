@@ -104,19 +104,17 @@ public class GenericLU {
     }
 
     public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
-        int n = lu.L().rows();
+        int n = b.dimension();
         @SuppressWarnings("unchecked")
-        E[] x = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
+        E[] y = (E[]) new Object[n];
         @SuppressWarnings("unchecked")
-        E[] pb = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
+        E[] x = (E[]) new Object[n];
+        
+        // pb = P * b
+        @SuppressWarnings("unchecked")
+        E[] pb = (E[]) new Object[n];
+        for (int i = 0; i < n; i++) pb[i] = b.get(toInt(lu.P().get(i)));
 
-        Vector<E> p = lu.P();
-        for (int i = 0; i < n; i++) {
-            pb[i] = b.get(toInt(p.get(i)));
-        }
-
-        @SuppressWarnings("unchecked")
-        E[] y = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         Matrix<E> l = lu.L();
         for (int i = 0; i < n; i++) {
             E sum = field.zero();
@@ -138,8 +136,8 @@ public class GenericLU {
         return solve(decompose(a, field, provider), b, field, provider);
     }
 
-    public static <E> E determinant(Matrix<E> a, Field<E> field) {
-        LUResult<E> lu = decompose(a, field, null);
+    public static <E> E determinant(Matrix<E> a, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
+        LUResult<E> lu = decompose(a, field, provider);
         E det = field.one();
         int n = a.rows();
         for (int i = 0; i < n; i++) det = field.multiply(det, lu.U().get(i, i));
