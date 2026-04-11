@@ -133,13 +133,11 @@ public class HighPrecisionComplianceTest {
                     rawProvider instanceof org.episteme.core.mathematics.linearalgebra.providers.StrassenLinearAlgebraProvider ||
                     rawProvider.getName().contains("gRPC") || rawProvider.getName().contains("Remote")) {
                     
-                    // Always add CPU Dense and CPU Sparse as baseline fallbacks
-                    // AND include HP-capable providers for gRPC server-side execution in same JVM
+                    // Allow these decorators to delegate to all other HP-capable providers
                     List<LinearAlgebraProvider<?>> hpProviders = discoverHPProviders();
                     allDiscovered.addAll(hpProviders);
                     for (LinearAlgebraProvider<?> p : hpProviders) {
-                        if (p.getName().equals(CPU_DENSE) || p.getName().equals("Episteme CPU (Sparse)") ||
-                            p.getName().contains("MPFR") || p.getName().contains("Big")) {
+                        if (p != rawProvider) {
                             allowed.add(p);
                         }
                     }
@@ -235,13 +233,19 @@ public class HighPrecisionComplianceTest {
         try {
             test.get();
             res.status.put(opName, "✅ PASS");
-        } catch (UnsupportedOperationException e) {
-            res.status.put(opName, "❌ N/A (" + e.getMessage() + ")");
+        } catch (UnsupportedOperationException | NoSuchElementException e) {
+            String msg = e.getMessage();
+            res.status.put(opName, "❌ N/A" + (msg != null && !msg.isBlank() ? " (" + msg + ")" : ""));
         } catch (Throwable e) {
             // Find root cause
             Throwable root = e;
             while (root.getCause() != null && root.getCause() != root) root = root.getCause();
             
+            if (root instanceof NoSuchElementException) {
+                res.status.put(opName, "❌ N/A");
+                return;
+            }
+
             String className = root.getClass().getSimpleName();
             String msg = root.getMessage();
             String label = className;

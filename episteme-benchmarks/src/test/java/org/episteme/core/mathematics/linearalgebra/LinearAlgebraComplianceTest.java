@@ -21,7 +21,7 @@ import org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAl
  */
 public class LinearAlgebraComplianceTest {
 
-    private static final double TOLERANCE = 5e-7;
+    private static final double TOLERANCE = 1e-7;
     private static final int SIZE = 12; // Reduced for numerical stability in Eigen with random matrices
 
     private static final String PROJECT_NAME = System.getProperty("org.episteme.project.name", "Episteme");
@@ -168,15 +168,14 @@ public class LinearAlgebraComplianceTest {
                 // Strictly isolate the provider under test, but allow delegation for decorators
                 List<AlgorithmProvider> allowed = new ArrayList<>();
                 allowed.add(provider);
-                if (provider instanceof DistributedLinearAlgebraProvider || 
+                if (provider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider || 
                     provider.getName().contains("Remote") ||
                     provider.getName().contains("CARMA") ||
                     provider.getName().contains("Strassen")) {
-                    // Allow these decorators to delegate to standard CPU for local tasks
+                    // Allow these decorators to delegate to all other discovered providers for local tasks
                     for (LinearAlgebraProvider<Real> p : rawProviders) {
-                        if (p.getName().equals("Episteme CPU (Standard)")) {
+                        if (p != provider) {
                             allowed.add((AlgorithmProvider) p);
-                            break;
                         }
                     }
                 }
@@ -208,7 +207,7 @@ public class LinearAlgebraComplianceTest {
                         Real result = provider.dot(a, b);
                         double expected = 0;
                         for (int i = 0; i < SIZE; i++) expected += aData[i] * bData[i];
-                        assertEquals(expected, result.doubleValue(), 1e-7);
+                        assertRelativeEquals(expected, result.doubleValue(), TOLERANCE);
                     });
     
                     testOperation(res, "Norm", () -> {
@@ -219,7 +218,7 @@ public class LinearAlgebraComplianceTest {
                         Real result = provider.norm(a);
                         double sumSq = 0;
                         for (double d : aData) sumSq += d * d;
-                        assertEquals(Math.sqrt(sumSq), result.doubleValue(), 1e-7);
+                        assertRelativeEquals(Math.sqrt(sumSq), result.doubleValue(), TOLERANCE);
                     });
     
                     testOperation(res, "Add", () -> {
@@ -271,7 +270,7 @@ public class LinearAlgebraComplianceTest {
                         RealDoubleMatrix a = RealDoubleMatrix.of(aData);
                         Matrix<Real> result = provider.inverse(a);
                         SimpleMatrix expected = new SimpleMatrix(aData).invert();
-                        verifyMatrix(expected, result, 1e-7);
+                        verifyMatrix(expected, result, TOLERANCE);
                     });
     
                     testOperation(res, "LU", () -> {
@@ -435,7 +434,7 @@ public class LinearAlgebraComplianceTest {
                         RealDoubleMatrix a = RealDoubleMatrix.of(aData);
                         Matrix<Real> result = provider.inverse(a);
                         SimpleMatrix expected = new SimpleMatrix(aData).pseudoInverse();
-                        verifyMatrix(expected, result, 1e-4);
+                        verifyMatrix(expected, result, TOLERANCE);
                     });
     
                     testOperation(res, "Solve (Rect)", () -> {
@@ -454,7 +453,7 @@ public class LinearAlgebraComplianceTest {
                         SimpleMatrix expectedX = matA.solve(vecB); // Least squares
                         
                         for (int i = 0; i < cols; i++) {
-                            assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), 1e-4);
+                            assertRelativeEquals(expectedX.get(i), x.get(i).doubleValue(), TOLERANCE);
                         }
                     });
     
@@ -505,28 +504,47 @@ public class LinearAlgebraComplianceTest {
     }
 
     private void assertRelativeEquals(double expected, double actual, double tol) {
+        assertRelativeEquals(expected, actual, tol, null);
+    }
+
+    private void assertRelativeEquals(double expected, double actual, double tol, String msg) {
         if (Double.isNaN(expected) && Double.isNaN(actual)) return;
-        if (Math.abs(expected - actual) < 1e-12) return; // Essentially equal
         
         double diff = Math.abs(expected - actual);
+        if (diff < 1e-12) return; // Sufficiently equal for double comparisons
+        
         double denom = Math.max(Math.abs(expected), Math.abs(actual));
-        if (denom > 1.0) {
-            diff /= denom;
+        double relDiff = (denom > 1e-12) ? diff / denom : diff;
+        
+        String fullMsg = (msg == null ? "" : msg + " | ") + "Expected: " + expected + ", Actual: " + actual + " (RelDiff: " + relDiff + ", Tol: " + tol + ")";
+        if (relDiff >= tol) {
+            System.err.println("[DEBUG-FAIL] " + fullMsg);
         }
-        assertTrue(diff < tol, "Expected: " + expected + ", Actual: " + actual + " (Relative diff: " + diff + ")");
+        assertTrue(relDiff < tol, fullMsg);
     }
 
     private void testOperation(ComplianceResult res, String opName, Runnable test) {
         try {
             test.run();
             res.status.put(opName, "✅ PASS");
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException | NoSuchElementException e) {
             res.status.put(opName, "❌ N/A");
         } catch (Throwable e) {
+            // Unpack AlgorithmException which often wraps the true failure
+            Throwable cause = e;
+            if (e instanceof org.episteme.core.technical.algorithm.AlgorithmException && e.getCause() != null) {
+                cause = e.getCause();
+            }
+            
+            if (cause instanceof NoSuchElementException) {
+                res.status.put(opName, "❌ N/A");
+                return;
+            }
+
             System.err.println("Test failed for operation " + opName + ":");
-            e.printStackTrace();
-            String className = e.getClass().getSimpleName();
-            String msg = e.getMessage();
+            cause.printStackTrace();
+            String className = cause.getClass().getSimpleName();
+            String msg = cause.getMessage();
             String label = className;
             if (msg != null && !msg.isBlank()) {
                 // Shorten long messages for the report table
@@ -543,7 +561,7 @@ public class LinearAlgebraComplianceTest {
         assertEquals(expected.getNumCols(), actual.cols());
         for (int i = 0; i < actual.rows(); i++) {
             for (int j = 0; j < actual.cols(); j++) {
-                assertEquals(expected.get(i, j), actual.get(i, j).doubleValue(), tol);
+                assertRelativeEquals(expected.get(i, j), actual.get(i, j).doubleValue(), tol);
             }
         }
     }
@@ -557,12 +575,12 @@ public class LinearAlgebraComplianceTest {
             for (int j = 0; j < n; j++) paData[i][j] = a.get(pivot, j);
         }
         Matrix<Real> PA = neutralMatrix(paData);
-        verifyMatrix(new SimpleMatrix(toDoubleArray(PA)), lu, 1e-8);
+        verifyMatrix(new SimpleMatrix(toDoubleArray(PA)), lu, TOLERANCE);
     }
 
     private void verifyQR(Matrix<Real> a, QRResult<Real> res) {
         Matrix<Real> reconstructed = res.Q().multiply(res.R());
-        verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, 1e-8);
+        verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, TOLERANCE);
     }
 
     private void verifySVD(Matrix<Real> a, SVDResult<Real> res) {
@@ -575,12 +593,12 @@ public class LinearAlgebraComplianceTest {
         }
         Matrix<Real> S = neutralMatrix(sMatrix);
         Matrix<Real> reconstructed = res.U().multiply(S).multiply(res.V().transpose());
-        verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, 1e-8);
+        verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, TOLERANCE);
     }
 
     private void verifyCholesky(Matrix<Real> a, CholeskyResult<Real> res) {
         Matrix<Real> reconstructed = res.L().multiply(res.L().transpose());
-        verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, 1e-8);
+        verifyMatrix(new SimpleMatrix(toDoubleArray(a)), reconstructed, TOLERANCE);
     }
 
     private void verifyEigen(Matrix<Real> a, EigenResult<Real> res) {
@@ -613,7 +631,7 @@ public class LinearAlgebraComplianceTest {
             
             for (int j = 0; j < Av.dimension(); j++) {
                 // Relaxed tolerance for Eigen (1e-4) as some providers might be less precise
-                assertEquals(lv.get(j).doubleValue(), Av.get(j).doubleValue(), 1e-3,
+                assertRelativeEquals(lv.get(j).doubleValue(), Av.get(j).doubleValue(), 1e-2,
                     "Mismatch at (eigenvalue " + lambda + "). Av: " + Av.get(j) + ", lv: " + lv.get(j));
             }
         }

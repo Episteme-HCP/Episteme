@@ -647,17 +647,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     }
 
     private Real readMPFR(MemorySegment mpfr_t, MemorySegment expPtr, Arena arena) {
-        MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0, mpfr_t, 0);
-        if (strPtr == null || strPtr.address() == 0) return Real.ZERO;
-        
-        try {
-            String digits = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
-            return NativeRealBig.of(digits);
-        } finally {
-            if (MPFR_FREE_STR != null) {
-                NativeSafe.invoke(MPFR_FREE_STR, strPtr);
-            }
-        }
+        return NativeRealBig.copyFrom(mpfr_t, getPrecision());
     }
     @Override
     public QRResult<E> qr(Matrix<E> a) {

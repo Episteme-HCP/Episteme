@@ -99,28 +99,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
 
     private Real readMPFR(MemorySegment val, Arena arena) {
-        try {
-            return readMPFR_internal(val, arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG), arena);
-        } catch (Throwable t) {
-            throw new RuntimeException("MPFR Read failed", t);
-        }
+        return NativeRealBig.copyFrom(val, getPrecision());
     }
     
     private Real readMPFR_internal(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
-        MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, val, 0);
-        if (strPtr == null || strPtr.address() == 0) return Real.ZERO;
-        
-        try {
-            // long precBits = val.get(ValueLayout.JAVA_INT, 0); // Read precision from mpfr_t (rough check)
-            // Reinterpret and read string to create NativeRealBig or RealBig
-            // Actually, for simplicity and unified results, let's create a NativeRealBig directly
-            String digits = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
-            return NativeRealBig.of(digits);
-        } finally {
-            if (MPFR_FREE_STR != null) {
-                NativeSafe.invoke(MPFR_FREE_STR, strPtr);
-            }
-        }
+        return NativeRealBig.copyFrom(val, getPrecision());
     }
 
     private void setMPFR(MemorySegment dest, E value, Arena arena) throws Throwable {

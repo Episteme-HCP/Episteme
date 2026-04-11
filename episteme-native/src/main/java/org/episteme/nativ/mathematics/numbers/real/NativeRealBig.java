@@ -191,39 +191,36 @@ public final class NativeRealBig extends Real {
     public BigDecimal bigDecimalValue() {
         try (Arena local = Arena.ofConfined()) {
             MemorySegment expPtr = local.allocate(IS_WINDOWS ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG);
-            MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, MemorySegment.NULL, expPtr, 10, 0L, ptr, 0);
+            MemorySegment buf = arena.allocate(2048);
+            MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, buf, expPtr, 10, 2048L, ptr, 0);
             
-            if (strPtr == null || strPtr.address() == 0) return BigDecimal.ZERO;
+            if (strPtr.equals(MemorySegment.NULL)) return BigDecimal.ZERO;
 
-            try {
-                long safeSize = (precision / 3) + 128;
-                MemorySegment safeSeg = strPtr.reinterpret(safeSize);
-                String digits = safeSeg.getString(0);
-                
-                if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
-                if (digits.contains("@NaN@") || digits.contains("@Inf@") || digits.contains("NaN") || digits.contains("Inf")) {
-                    return BigDecimal.ZERO; 
-                }
-
-                long exp = IS_WINDOWS ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
-                
-                String sign = "";
-                if (digits.startsWith("-")) {
-                    sign = "-";
-                    digits = digits.substring(1);
-                }
-                
-                long effectiveScale = (long) digits.length() - exp;
-                try {
-                    BigInteger unscaled = new BigInteger(sign + digits);
-                    return new BigDecimal(unscaled, (int) effectiveScale);
-                } catch (NumberFormatException e) {
-                    // Fallback for any other unexpected MPFR strings
-                    return BigDecimal.ZERO;
-                }
-            } finally {
-                NativeSafe.invoke(MPFR_FREE_STR, strPtr);
+            String digits = strPtr.reinterpret(2048).getString(0);
+            
+            if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
+            if (digits.contains("@NaN@") || digits.contains("@Inf@") || digits.contains("NaN") || digits.contains("Inf")) {
+                return BigDecimal.ZERO; 
             }
+
+            long exp = IS_WINDOWS ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
+            
+            String sign = "";
+            if (digits.startsWith("-")) {
+                sign = "-";
+                digits = digits.substring(1);
+            }
+            
+            long effectiveScale = (long) digits.length() - exp;
+            try {
+                BigInteger unscaled = new BigInteger(sign + digits);
+                return new BigDecimal(unscaled, (int) effectiveScale);
+            } catch (NumberFormatException e) {
+                // Fallback for any other unexpected MPFR strings
+                return BigDecimal.ZERO;
+            }
+        } catch (Throwable t) {
+            return BigDecimal.ZERO;
         }
     }
 
