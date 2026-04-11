@@ -3,9 +3,7 @@ package org.episteme.benchmarks.benchmark;
 import org.episteme.benchmarks.benchmark.benchmarks.SystematicMatrixBenchmark;
 import org.episteme.benchmarks.benchmark.benchmarks.SystematicInverseBenchmark;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.junit.jupiter.api.Test;
 import java.util.Map;
 
@@ -39,7 +37,7 @@ public class BenchmarkThrottlingTest {
     @SuppressWarnings("unchecked")
     public void testMatrixBenchmarkThrottling() {
         SystematicMatrixBenchmark benchmark = new SystematicMatrixBenchmark();
-        benchmark.setProvider((LinearAlgebraProvider)new MockHPProvider());
+        benchmark.setProvider((LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>)new MockHPProvider());
         
         // Check Description
         assertTrue(benchmark.getDescription().contains("High-Precision Throttling Applied"), "Description should contain throttling note");
@@ -54,7 +52,7 @@ public class BenchmarkThrottlingTest {
     @Test
     public void testInverseBenchmarkThrottling() {
         SystematicInverseBenchmark benchmark = new SystematicInverseBenchmark();
-        benchmark.setProvider((LinearAlgebraProvider)new MockHPProvider());
+        benchmark.setProvider((LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>)new MockHPProvider());
         
         // Check Description
         assertTrue(benchmark.getDescription().contains("High-Precision Throttling Applied"), "Description should contain throttling note");

@@ -599,9 +599,8 @@ public class Circuit {
         Vector<Real> b = new DenseVector<>(bList, org.episteme.core.mathematics.sets.Reals.getInstance());
 
         // 3. Solve using Provider
-        try {
-            LinearAlgebraProvider<Real> provider = new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Real>(
-                    org.episteme.core.mathematics.sets.Reals.getInstance());
+        try (LinearAlgebraProvider<Real> provider = new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Real>(
+                org.episteme.core.mathematics.sets.Reals.getInstance())) {
             Vector<Real> x = provider.solve(A, b);
 
             // 4. Write result back to circuitRightSide (which acts as solution holder)

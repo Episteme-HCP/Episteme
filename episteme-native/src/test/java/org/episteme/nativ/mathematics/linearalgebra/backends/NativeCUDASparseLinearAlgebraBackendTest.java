@@ -19,11 +19,11 @@ public class NativeCUDASparseLinearAlgebraBackendTest {
 
     @Test
     public void testSolvers() {
-        NativeCUDASparseLinearAlgebraBackend backend = new NativeCUDASparseLinearAlgebraBackend();
-        if (!backend.isAvailable()) {
-            System.err.println("CUDA not available, skipping solver tests.");
-            return;
-        }
+        try (NativeCUDASparseLinearAlgebraBackend backend = new NativeCUDASparseLinearAlgebraBackend()) {
+            if (!backend.isAvailable()) {
+                System.err.println("CUDA not available, skipping solver tests.");
+                return;
+            }
 
         org.episteme.core.mathematics.sets.Reals reals = org.episteme.core.mathematics.sets.Reals.getInstance();
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<org.episteme.core.mathematics.numbers.real.Real> A = 
@@ -54,6 +54,7 @@ public class NativeCUDASparseLinearAlgebraBackendTest {
         org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> xGM = 
             backend.gmres(A, b, x0, tol, 10, 5);
         assertArrayEquals(new double[]{1.0, 2.0, 3.0}, toArray(xGM), 1e-8);
+        }
     }
 
     private double[] toArray(org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> v) {

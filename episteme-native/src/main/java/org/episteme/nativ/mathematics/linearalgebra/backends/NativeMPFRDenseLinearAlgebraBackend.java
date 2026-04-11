@@ -9,7 +9,6 @@ import com.google.auto.service.AutoService;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.*;
-import static java.lang.foreign.ValueLayout.ADDRESS;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -24,7 +23,6 @@ import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
-import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.nativ.mathematics.numbers.real.NativeRealBig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2109,26 +2107,27 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
     }
 
     public static void invokeComplexOp(String function, MemorySegment rcR, MemorySegment rcI, MemorySegment raR, MemorySegment raI, int prec, Arena arena) {
-        NativeMPFRDenseLinearAlgebraBackend<Object> backend = new NativeMPFRDenseLinearAlgebraBackend<>();
-        switch (function.toLowerCase()) {
-            case "exp" -> backend.complexExp(rcR, rcI, raR, raI, prec, arena);
-            case "log" -> backend.complexLog(rcR, rcI, raR, raI, prec, arena);
-            case "log10" -> backend.complexLog10(rcR, rcI, raR, raI, prec, arena);
-            case "sin" -> backend.complexSin(rcR, rcI, raR, raI, prec, arena);
-            case "cos" -> backend.complexCos(rcR, rcI, raR, raI, prec, arena);
-            case "tan" -> backend.complexTan(rcR, rcI, raR, raI, prec, arena);
-            case "sinh" -> backend.complexSinh(rcR, rcI, raR, raI, prec, arena);
-            case "cosh" -> backend.complexCosh(rcR, rcI, raR, raI, prec, arena);
-            case "tanh" -> backend.complexTanh(rcR, rcI, raR, raI, prec, arena);
-            case "sqrt" -> backend.complexSqrt(rcR, rcI, raR, raI, prec, arena);
-            case "asin" -> backend.complexAsin(rcR, rcI, raR, raI, prec, arena);
-            case "acos" -> backend.complexAcos(rcR, rcI, raR, raI, prec, arena);
-            case "atan" -> backend.complexAtan(rcR, rcI, raR, raI, prec, arena);
-            case "asinh" -> backend.complexAsinh(rcR, rcI, raR, raI, prec, arena);
-            case "acosh" -> backend.complexAcosh(rcR, rcI, raR, raI, prec, arena);
-            case "atanh" -> backend.complexAtanh(rcR, rcI, raR, raI, prec, arena);
-            case "cbrt" -> backend.complexCbrt(rcR, rcI, raR, raI, prec, arena);
-            default -> throw new UnsupportedOperationException("Native complex op not implemented: " + function);
+        try (NativeMPFRDenseLinearAlgebraBackend<Object> backend = new NativeMPFRDenseLinearAlgebraBackend<>()) {
+            switch (function.toLowerCase()) {
+                case "exp" -> backend.complexExp(rcR, rcI, raR, raI, prec, arena);
+                case "log" -> backend.complexLog(rcR, rcI, raR, raI, prec, arena);
+                case "log10" -> backend.complexLog10(rcR, rcI, raR, raI, prec, arena);
+                case "sin" -> backend.complexSin(rcR, rcI, raR, raI, prec, arena);
+                case "cos" -> backend.complexCos(rcR, rcI, raR, raI, prec, arena);
+                case "tan" -> backend.complexTan(rcR, rcI, raR, raI, prec, arena);
+                case "sinh" -> backend.complexSinh(rcR, rcI, raR, raI, prec, arena);
+                case "cosh" -> backend.complexCosh(rcR, rcI, raR, raI, prec, arena);
+                case "tanh" -> backend.complexTanh(rcR, rcI, raR, raI, prec, arena);
+                case "sqrt" -> backend.complexSqrt(rcR, rcI, raR, raI, prec, arena);
+                case "asin" -> backend.complexAsin(rcR, rcI, raR, raI, prec, arena);
+                case "acos" -> backend.complexAcos(rcR, rcI, raR, raI, prec, arena);
+                case "atan" -> backend.complexAtan(rcR, rcI, raR, raI, prec, arena);
+                case "asinh" -> backend.complexAsinh(rcR, rcI, raR, raI, prec, arena);
+                case "acosh" -> backend.complexAcosh(rcR, rcI, raR, raI, prec, arena);
+                case "atanh" -> backend.complexAtanh(rcR, rcI, raR, raI, prec, arena);
+                case "cbrt" -> backend.complexCbrt(rcR, rcI, raR, raI, prec, arena);
+                default -> throw new UnsupportedOperationException("Native complex op not implemented: " + function);
+            }
         }
     }
     public void complexPow(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment eR, MemorySegment eI, int prec, Arena arena) {

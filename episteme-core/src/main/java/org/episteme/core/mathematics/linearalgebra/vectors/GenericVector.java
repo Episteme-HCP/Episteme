@@ -80,6 +80,7 @@ public class GenericVector<E> implements Vector<E> {
 
     // ================= Conversions =================
 
+    @SuppressWarnings("unchecked")
     public Matrix<E> toMatrix() {
         // Convert vector to Column Matrix (n x 1)
         int dim = storage.dimension();
@@ -91,6 +92,7 @@ public class GenericVector<E> implements Vector<E> {
         return (GenericMatrix<E>) Matrix.of((E[][]) matrixData, ring);
     }
 
+    @SuppressWarnings("unchecked")
     public Tensor<E> toTensor() {
         int dim = dimension();
         Object[] data = new Object[dim];

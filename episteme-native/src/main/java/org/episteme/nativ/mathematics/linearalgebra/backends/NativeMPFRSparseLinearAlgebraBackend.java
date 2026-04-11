@@ -65,20 +65,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return true; 
     }
 
-    private Class<?> componentType(Ring<E> field) {
-        if (field == null) return Object.class;
-        E zero = field.zero();
-        if (zero == null) return Object.class;
-        
-        Class<?> c = zero.getClass();
-        if (Real.class.isAssignableFrom(c)) return Real.class;
-        if (Complex.class.isAssignableFrom(c)) return Complex.class;
-        
-        // Fallback for native types if they don't yet expose the interface correctly in this context
-        if (c.getName().contains("NativeRealBig")) return Real.class;
-        
-        return c;
-    }
 
     @Override
     public double score(org.episteme.core.technical.algorithm.OperationContext context) {

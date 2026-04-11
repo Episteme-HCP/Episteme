@@ -37,21 +37,22 @@ public class NativeMPFRBackendTest {
             System.err.println("'libs' directory NOT found at expected root!");
         }
 
-        NativeMPFRDenseLinearAlgebraBackend<Real> provider = new NativeMPFRDenseLinearAlgebraBackend<>();
-        System.out.println("MPFR Backend Availability: " + provider.isAvailable());
-        if (!provider.isAvailable()) {
-            System.err.println("Failure cause for 'mpfr': " + org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.getFailureCause("mpfr"));
+        try (NativeMPFRDenseLinearAlgebraBackend<Real> provider = new NativeMPFRDenseLinearAlgebraBackend<>()) {
+            System.out.println("MPFR Backend Availability: " + provider.isAvailable());
+            if (!provider.isAvailable()) {
+                System.err.println("Failure cause for 'mpfr': " + org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.getFailureCause("mpfr"));
+            }
+            assertTrue(provider.isAvailable(), "MPFR Backend should be available after build");
         }
-        assertTrue(provider.isAvailable(), "MPFR Backend should be available after build");
     }
 
     @Test
     public void testSimpleMultiplication() {
-        NativeMPFRDenseLinearAlgebraBackend<Real> provider = new NativeMPFRDenseLinearAlgebraBackend<>();
-        if (!provider.isAvailable()) {
-            System.err.println("Skipping test: MPFR not available");
-            return;
-        }
+        try (NativeMPFRDenseLinearAlgebraBackend<Real> provider = new NativeMPFRDenseLinearAlgebraBackend<>()) {
+            if (!provider.isAvailable()) {
+                System.err.println("Skipping test: MPFR not available");
+                return;
+            }
 
         Ring<Real> ring = Real.ZERO;
         Real[][] dataA = {
@@ -75,5 +76,6 @@ public class NativeMPFRBackendTest {
         // Check a few values
         assertEquals(a.get(0, 0).bigDecimalValue(), c.get(0, 0).bigDecimalValue());
         assertEquals(a.get(1, 1).bigDecimalValue(), c.get(1, 1).bigDecimalValue());
+        }
     }
 }

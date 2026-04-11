@@ -8,12 +8,9 @@ package org.episteme.nativ.mathematics.numbers.real;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import static java.lang.foreign.ValueLayout.ADDRESS;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.*;
@@ -368,7 +365,6 @@ public final class NativeRealBig extends Real {
 
     @Override
     public Real ceil() {
-        NativeRealBig result = new NativeRealBig(precision);
         // mpfr_ceil (rop, op) -> mpfr_rint_ceil
         return NativeRealBig.of(bigDecimalValue().setScale(0, java.math.RoundingMode.CEILING));
     }

@@ -12,11 +12,11 @@ public class NativeFFMBLASComplexTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testComplexMultiply() {
-        NativeFFMBLASBackend backend = new NativeFFMBLASBackend();
-        if (!backend.isAvailable()) {
-            System.out.println("Native BLAS not available, skipping test.");
-            return;
-        }
+        try (NativeFFMBLASBackend backend = new NativeFFMBLASBackend()) {
+            if (!backend.isAvailable()) {
+                System.out.println("Native BLAS not available, skipping test.");
+                return;
+            }
 
         // A = [1+i]
         // B = [2+2i]
@@ -41,5 +41,6 @@ public class NativeFFMBLASComplexTest {
         Complex res = (Complex)(Object)C.get(0, 0);
         assertEquals(0.0, res.real(), 1e-9);
         assertEquals(4.0, res.imaginary(), 1e-9);
+        }
     }
 }
