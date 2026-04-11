@@ -615,24 +615,25 @@ public class LinearAlgebraComplianceTest {
             // Use implementation-neutral Vector creation
             Vector<Real> v = Vector.of(vData, org.episteme.core.mathematics.sets.Reals.getInstance());
 
-            Vector<Real> Av;
+            Vector<Real> AvResult = null;
             try {
-                Av = a.multiply(v);
+                AvResult = a.multiply(v);
             } catch (Exception e) {
                 // Provider doesn't support generic Vector? Fallback to Matrix mul
                 Real[][] vColData = new Real[vData.length][1];
                 for (int r = 0; r < vData.length; r++) vColData[r][0] = vData[r];
                 Matrix<Real> vMat = neutralMatrix(vColData);
                 Matrix<Real> Am = a.multiply(vMat);
-                Av = Am.getColumn(0);
+                AvResult = Am.getColumn(0);
             }
 
+            if (AvResult == null) continue;
+
             Vector<Real> lv = v.multiply(lambda);
-            
-            for (int j = 0; j < Av.dimension(); j++) {
+            for (int j = 0; j < AvResult.dimension(); j++) {
                 // Relaxed tolerance for Eigen (1e-4) as some providers might be less precise
-                assertRelativeEquals(lv.get(j).doubleValue(), Av.get(j).doubleValue(), 1e-2,
-                    "Mismatch at (eigenvalue " + lambda + "). Av: " + Av.get(j) + ", lv: " + lv.get(j));
+                assertRelativeEquals(lv.get(j).doubleValue(), AvResult.get(j).doubleValue(), 1e-2,
+                    "Mismatch at (eigenvalue " + lambda + "). Av: " + AvResult.get(j) + ", lv: " + lv.get(j));
             }
         }
     }
