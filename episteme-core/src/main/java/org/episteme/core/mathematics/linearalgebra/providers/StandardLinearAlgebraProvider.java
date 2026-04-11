@@ -107,7 +107,7 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     public SVDResult<E> svd(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
         if (ring instanceof Field) {
-            return GenericSVD.decompose(a, (Field<E>) ring);
+            return GenericSVD.decompose(a, (Field<E>) ring, this);
         }
         throw new UnsupportedOperationException("SVD requires a Field scalar structure.");
     }

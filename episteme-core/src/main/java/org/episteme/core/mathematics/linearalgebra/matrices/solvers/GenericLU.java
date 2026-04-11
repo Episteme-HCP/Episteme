@@ -16,10 +16,6 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
  */
 public class GenericLU {
 
-    public static <E> LUResult<E> decompose(Matrix<E> matrix, Field<E> field) {
-        return decompose(matrix, field, null);
-    }
-
     public static <E> LUResult<E> decompose(Matrix<E> matrix, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int n = matrix.rows();
         if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
@@ -51,7 +47,7 @@ public class GenericLU {
                 perm[maxRow] = tempPerm;
             }
 
-            if (maxValDouble > 0) { // Check for non-singularity
+            if (maxValDouble > 1e-30) { // Check for non-singularity with epsilon
                 E pivot = data[k][k];
                 for (int i = k + 1; i < n; i++) {
                     E factor = field.divide(data[i][k], pivot);
@@ -60,6 +56,9 @@ public class GenericLU {
                         data[i][j] = field.subtract(data[i][j], field.multiply(factor, data[k][j]));
                     }
                 }
+            } else {
+                // To prevent infinite/NaN propagation if it's barely non-zero but fails pivot selection
+                data[k][k] = field.zero(); 
             }
         }
 
@@ -104,10 +103,6 @@ public class GenericLU {
         a[j] = temp;
     }
 
-    public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field) {
-        return solve(lu, b, field, null);
-    }
-
     public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int n = lu.L().rows();
         @SuppressWarnings("unchecked")
@@ -139,16 +134,12 @@ public class GenericLU {
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(x)), provider, field);
     }
 
-    public static <E> Vector<E> solve(Matrix<E> a, Vector<E> b, Field<E> field) {
-        return solve(a, b, field, null);
-    }
-
     public static <E> Vector<E> solve(Matrix<E> a, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         return solve(decompose(a, field, provider), b, field, provider);
     }
 
     public static <E> E determinant(Matrix<E> a, Field<E> field) {
-        LUResult<E> lu = decompose(a, field);
+        LUResult<E> lu = decompose(a, field, null);
         E det = field.one();
         int n = a.rows();
         for (int i = 0; i < n; i++) det = field.multiply(det, lu.U().get(i, i));
@@ -159,10 +150,6 @@ public class GenericLU {
         }
         if (swaps % 2 != 0) det = field.negate(det);
         return det;
-    }
-
-    public static <E> Matrix<E> inverse(Matrix<E> a, Field<E> field) {
-        return inverse(a, field, null);
     }
 
     public static <E> Matrix<E> inverse(Matrix<E> a, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {

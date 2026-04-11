@@ -16,10 +16,6 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
  */
 public class GenericQR {
 
-    public static <E> QRResult<E> decompose(Matrix<E> matrix, Field<E> field) {
-        return decompose(matrix, field, null);
-    }
-
     public static <E> QRResult<E> decompose(Matrix<E> matrix, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int m = matrix.rows();
         int n = matrix.cols();
@@ -73,10 +69,6 @@ public class GenericQR {
         return new QRResult<>(qMat, rMat);
     }
 
-    public static <E> Vector<E> solve(QRResult<E> qr, Vector<E> b, Field<E> field) {
-        return solve(qr, b, field, null);
-    }
-
     public static <E> Vector<E> solve(QRResult<E> qr, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         Matrix<E> q = qr.Q();
         Matrix<E> r = qr.R();
@@ -108,9 +100,9 @@ public class GenericQR {
     }
 
     private static <E> boolean isNonZero(E element, Field<E> field) {
-        if (element instanceof Real) return !((Real) element).isZero();
-        if (element instanceof Complex) return !((Complex) element).isZero();
-        if (element instanceof Number) return ((Number) element).doubleValue() != 0.0;
+        if (element instanceof Real) return ((Real) element).abs().doubleValue() > 1e-30;
+        if (element instanceof Complex) return ((Complex) element).abs().doubleValue() > 1e-30;
+        if (element instanceof Number) return Math.abs(((Number) element).doubleValue()) > 1e-30;
         return !field.zero().equals(element);
     }
 

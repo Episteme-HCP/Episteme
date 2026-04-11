@@ -16,7 +16,7 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
  */
 public class GenericCholesky {
 
-    public static <E> CholeskyResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+    public static <E> CholeskyResult<E> decompose(Matrix<E> matrix, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int n = matrix.rows();
         if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
 
@@ -45,10 +45,21 @@ public class GenericCholesky {
             }
         }
 
-        return new CholeskyResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(lData, field));
+        return new CholeskyResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, flatten(lData, n, field)), provider, field));
     }
 
-    public static <E> Vector<E> solve(CholeskyResult<E> c, Vector<E> b, Field<E> field) {
+    private static <E> E[] flatten(E[][] data, int n, Field<E> field) {
+        @SuppressWarnings("unchecked")
+        E[] flat = (E[]) new Object[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                flat[i * n + j] = data[i][j];
+            }
+        }
+        return flat;
+    }
+
+    public static <E> Vector<E> solve(CholeskyResult<E> c, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         Matrix<E> l = c.L();
         int n = l.rows();
         
@@ -68,7 +79,7 @@ public class GenericCholesky {
             x[i] = field.divide(field.subtract(y[i], sum), conjugate(l.get(i, i), field));
         }
 
-        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(x)), provider, field);
     }
 
     @SuppressWarnings("unchecked")

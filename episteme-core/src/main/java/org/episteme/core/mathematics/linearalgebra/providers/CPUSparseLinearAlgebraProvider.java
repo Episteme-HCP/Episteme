@@ -82,33 +82,33 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     public CholeskyResult<E> cholesky(Matrix<E> a) {
-        return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
     public SVDResult<E> svd(Matrix<E> a) {
-        return GenericSVD.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericSVD.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
     public EigenResult<E> eigen(Matrix<E> a) {
-        return GenericEigen.decompose(a, (Field<E>) a.getScalarRing());
+        return GenericEigen.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        return GenericLU.solve(lu, b, (Field<E>) (Object) b.getScalarRing());
+        return GenericLU.solve(lu, b, (Field<E>) (Object) b.getScalarRing(), this);
     }
 
     @Override
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
-        return GenericQR.solve(qr, b, (Field<E>) b.getScalarRing());
+        return GenericQR.solve(qr, b, (Field<E>) b.getScalarRing(), this);
     }
 
     @Override
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
-        return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing());
+        return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing(), this);
     }
 
     @Override

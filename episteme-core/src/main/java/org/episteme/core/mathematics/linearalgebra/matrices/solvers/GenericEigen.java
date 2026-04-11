@@ -14,7 +14,7 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
  * Placeholder for Generic Eigen Decomposition.
  */
 public class GenericEigen {
-    public static <E> EigenResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+    public static <E> EigenResult<E> decompose(Matrix<E> matrix, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int n = matrix.rows();
         if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
 
@@ -53,6 +53,11 @@ public class GenericEigen {
             // theta = (aqq - app) / (2 * apq)
             E diff = field.subtract(aqq, app);
             E twoApq = field.add(apq, apq);
+            
+            // Stability check for theta calculation
+            double twoApqAbs = absValueDouble(twoApq, field);
+            if (twoApqAbs < 1e-45) break; // Should have been caught by maxOffDouble, but extra safety
+            
             E theta = field.divide(diff, twoApq);
             
             // t = sign(theta) / (|theta| + sqrt(theta^2 + 1))
@@ -111,9 +116,20 @@ public class GenericEigen {
         for (int i = 0; i < n; i++) eigenvalues[i] = A[i][i];
 
         return new EigenResult<>(
-            new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(V, field),
-            org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(eigenvalues), field)
+            new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, flatten(V, n, field)), provider, field),
+            new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(eigenvalues)), provider, field)
         );
+    }
+
+    private static <E> E[] flatten(E[][] data, int n, Field<E> field) {
+        @SuppressWarnings("unchecked")
+        E[] flat = (E[]) new Object[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                flat[i * n + j] = data[i][j];
+            }
+        }
+        return flat;
     }
 
     @SuppressWarnings("unchecked")

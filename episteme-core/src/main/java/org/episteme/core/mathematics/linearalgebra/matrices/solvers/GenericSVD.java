@@ -14,18 +14,18 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
  * Placeholder for Generic SVD Decomposition.
  */
 public class GenericSVD {
-    public static <E> SVDResult<E> decompose(Matrix<E> matrix, Field<E> field) {
+    public static <E> SVDResult<E> decompose(Matrix<E> matrix, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int m = matrix.rows();
         int n = matrix.cols();
         
         // A*A^T for U and Sigma^2
         Matrix<E> selfAdjU = matrix.multiply(matrix.transpose()); 
-        EigenResult<E> eigenU = GenericEigen.decompose(selfAdjU, field);
+        EigenResult<E> eigenU = GenericEigen.decompose(selfAdjU, field, provider);
         Matrix<E> U = eigenU.V();
 
         // A^T*A for V and Sigma^2 (more stable for V)
         Matrix<E> selfAdjV = matrix.transpose().multiply(matrix); 
-        EigenResult<E> eigenV = GenericEigen.decompose(selfAdjV, field);
+        EigenResult<E> eigenV = GenericEigen.decompose(selfAdjV, field, provider);
         Matrix<E> V = eigenV.V();
         
         // Use a more generic class if possible to avoid precision leakage
@@ -37,11 +37,13 @@ public class GenericSVD {
         E[] sValues = (E[]) java.lang.reflect.Array.newInstance(componentType, Math.min(m, n));
         for (int i = 0; i < sValues.length; i++) {
             E val = eigenV.D().get(i); // Use eigenvalues of A^T*A
-            // Ensure non-negative before sqrt
-            sValues[i] = sqrt(max(val, field.zero(), field), field);
+            // Stability: ensure non-negative and handle numerical noise
+            double dVal = absValueDouble(val, field);
+            if (dVal < 1e-35) sValues[i] = field.zero();
+            else sValues[i] = sqrt(max(val, field.zero(), field), field);
         }
         
-        return new SVDResult<E>(U, org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(sValues), field), V);
+        return new SVDResult<E>(U, new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(java.util.Arrays.asList(sValues)), provider, field), V);
     }
 
     @SuppressWarnings("unchecked")
