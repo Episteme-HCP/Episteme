@@ -9,9 +9,9 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.decomposition.SingularValueDecomposition;
 import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericSVD;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
@@ -60,7 +60,7 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     }
 
     @Override
-    public <E> Matrix<E> scale(E scalar, Matrix<E> a) {
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
         int rows = a.rows();
         int cols = a.cols();
         Ring<E> ring = a.getScalarRing();
@@ -74,7 +74,7 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     }
 
     @Override
-    public <E> Matrix<E> transpose(Matrix<E> a) {
+    public Matrix<E> transpose(Matrix<E> a) {
         int rows = a.rows();
         int cols = a.cols();
         Ring<E> ring = a.getScalarRing();
@@ -88,7 +88,7 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     }
 
     @Override
-    public <E> Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         int rows = a.rows();
         int cols = a.cols();
         if (cols != b.dimension()) throw new IllegalArgumentException("Dimensions do not match");
@@ -106,10 +106,10 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
 
     @Override
     @SuppressWarnings("unchecked")
-    public <E> SingularValueDecomposition<E> svd(Matrix<E> a) {
+    public SVDResult<E> svd(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
         if (ring instanceof Field) {
-            return (SingularValueDecomposition<E>) GenericSVD.decompose(a, (Field<E>) ring);
+            return (SVDResult<E>) GenericSVD.decompose(a, (Field<E>) ring);
         }
         throw new UnsupportedOperationException("SVD requires a Field scalar structure.");
     }
