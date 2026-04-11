@@ -30,12 +30,17 @@ public class HighPrecisionPerformanceTest {
 
     @org.junit.jupiter.api.BeforeAll
     public static void startServer() {
+        if (Boolean.getBoolean("episteme.test.skip-server-startup")) {
+            System.out.println("Skipping Episteme Server startup (episteme.test.skip-server-startup=true)");
+            return;
+        }
+
         org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
         try {
             serverContext = GrpcTestApplication.start();
             System.out.println("Episteme gRPC Test Server started successfully for performance benchmarks.");
         } catch (Exception e) {
-            System.err.println("Failed to start Episteme gRPC Test Server: " + e.getMessage());
+            System.err.println("Failed to start Episteme gRPC Test Server (it might be already running): " + e.getMessage());
         }
     }
 

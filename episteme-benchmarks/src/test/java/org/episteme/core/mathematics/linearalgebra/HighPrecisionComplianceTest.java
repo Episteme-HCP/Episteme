@@ -42,13 +42,18 @@ public class HighPrecisionComplianceTest {
 
     @org.junit.jupiter.api.BeforeAll
     public static void startServer() {
+        if (Boolean.getBoolean("episteme.test.skip-server-startup")) {
+            System.out.println("Skipping Episteme Server startup (episteme.test.skip-server-startup=true)");
+            return;
+        }
+        
         org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
         try {
             serverContext = GrpcTestApplication.start();
             System.out.println("Episteme Server started successfully for compliance tests.");
             Thread.sleep(5000);
         } catch (Exception e) {
-            System.err.println("Failed to start Episteme Server: " + e.getMessage());
+            System.err.println("Failed to start Episteme Server (it might be already running): " + e.getMessage());
         }
     }
 
@@ -187,19 +192,24 @@ public class HighPrecisionComplianceTest {
     private List<LinearAlgebraProvider<?>> discoverHPProviders() {
         Map<String, LinearAlgebraProvider<?>> providers = new LinkedHashMap<>();
         
+        boolean disableGrpc = Boolean.getBoolean("episteme.backend.disable.grpc-math");
+        
         @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> prov : loader) {
             if (isExcludedProvider(prov.getName())) continue;
+            if (disableGrpc && (prov.getName().contains("Remote") || prov.getName().contains("gRPC"))) continue;
             providers.put(prov.getName(), prov);
         }
 
         try {
             for (Backend b : BackendDiscovery.getInstance().getProviders()) {
+                if (disableGrpc && (b.getName().contains("Remote") || b.getName().contains("gRPC"))) continue;
                 try {
                     for (var ap : b.getAlgorithmProviders()) {
                         if (ap instanceof LinearAlgebraProvider<?> p) {
                             if (isExcludedProvider(p.getName())) continue;
+                            if (disableGrpc && (p.getName().contains("Remote") || p.getName().contains("gRPC"))) continue;
                             providers.putIfAbsent(p.getName(), p);
                         }
                     }

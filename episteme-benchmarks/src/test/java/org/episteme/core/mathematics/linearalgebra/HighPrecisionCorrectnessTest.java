@@ -26,6 +26,11 @@ public class HighPrecisionCorrectnessTest {
 
     @BeforeAll
     public static void startServer() {
+        if (Boolean.getBoolean("episteme.test.skip-server-startup")) {
+            System.out.println("Skipping Episteme Server startup (episteme.test.skip-server-startup=true)");
+            return;
+        }
+
         // Force high precision for the entire audit session
         org.episteme.core.mathematics.context.MathContext.setCurrent(
             org.episteme.core.mathematics.context.MathContext.withPrecision(100));
@@ -36,7 +41,7 @@ public class HighPrecisionCorrectnessTest {
             orchestrator.startServer();
             System.out.println("Episteme Server started successfully for correctness audit (100-digit context enabled).");
         } catch (Exception e) {
-            System.err.println("Failed to start Episteme Server via Orchestrator: " + e.getMessage());
+            System.err.println("Failed to start Episteme Server via Orchestrator (it might be already running): " + e.getMessage());
             e.printStackTrace();
         }
     }

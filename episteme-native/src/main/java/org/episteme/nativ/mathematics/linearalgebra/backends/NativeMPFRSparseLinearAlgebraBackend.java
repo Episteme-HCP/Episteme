@@ -66,9 +66,17 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     private Class<?> componentType(Ring<E> field) {
-        Class<?> c = field.zero().getClass();
+        if (field == null) return Object.class;
+        E zero = field.zero();
+        if (zero == null) return Object.class;
+        
+        Class<?> c = zero.getClass();
         if (Real.class.isAssignableFrom(c)) return Real.class;
         if (Complex.class.isAssignableFrom(c)) return Complex.class;
+        
+        // Fallback for native types if they don't yet expose the interface correctly in this context
+        if (c.getName().contains("NativeRealBig")) return Real.class;
+        
         return c;
     }
 
@@ -589,7 +597,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             MemorySegment resI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) NativeSafe.invoke(MPFR_INIT2, resI, (int) prec);
 
-            E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
+            E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(Object.class, n);
             for (int i = 0; i < n; i++) {
                 E val = a.get(i);
                 if (isComplex) {
@@ -707,7 +715,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             MemorySegment resI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) NativeSafe.invoke(MPFR_INIT2, resI, (int) prec);
 
-            E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(componentType(v1.getScalarRing()), v1.dimension());
+            E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(Object.class, v1.dimension());
             for (int i = 0; i < v1.dimension(); i++) {
                 E valA = v1.get(i);
                 E valB = v2.get(i);
@@ -753,7 +761,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             MemorySegment resI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) NativeSafe.invoke(MPFR_INIT2, resI, (int) prec);
 
-            E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(componentType(v1.getScalarRing()), v1.dimension());
+            E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(Object.class, v1.dimension());
             for (int i = 0; i < v1.dimension(); i++) {
                 E valA = v1.get(i);
                 E valB = v2.get(i);
@@ -1258,7 +1266,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 copy_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), r, n, isComplex);
                 scale_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), invBeta, n, prec, arena, isComplex);
                 
-                E[][] H = (E[][]) java.lang.reflect.Array.newInstance(componentType(ring), m + 1, m);
+            // Create H with explicit interface type to avoid ArrayStoreException when storing NativeRealBig
+            E[][] H = (E[][]) java.lang.reflect.Array.newInstance(Object.class, m + 1, m);
+            for (int i = 0; i <= m; i++) {
+                H[i] = (E[]) java.lang.reflect.Array.newInstance(Object.class, m);
+            }
                 for (int i = 0; i <= m; i++) {
                     java.util.Arrays.fill(H[i], ring.zero());
                 }
@@ -1306,7 +1318,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private void solveSmallAndCheck(E[][] H, E beta, MemorySegment V, MemorySegment h_x, int n, int k, boolean isComplex, Ring<E> ring, int prec, Arena arena) throws Throwable {
         Matrix<E> hMat = Matrix.of(java.util.Arrays.stream(H).limit(k + 1).map(row -> java.util.Arrays.asList(row).subList(0, k)).collect(java.util.stream.Collectors.toList()), ring);
         
-        E[] e1Data = (E[]) java.lang.reflect.Array.newInstance(componentType(ring), k + 1);
+        E[] e1Data = (E[]) java.lang.reflect.Array.newInstance(Object.class, k + 1);
         java.util.Arrays.fill(e1Data, ring.zero());
         e1Data[0] = beta;
         Vector<E> e1 = Vector.of(e1Data, ring);
@@ -1359,7 +1371,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     private Vector<E> backToVector(MemorySegment h_x, int n, boolean isComplex, Ring<E> ring, Arena arena) throws Throwable {
-        E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(componentType(ring), n);
+        E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(Object.class, n);
         MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
         for (int i = 0; i < n; i++) {
             if (isComplex) {
