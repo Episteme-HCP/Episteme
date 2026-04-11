@@ -194,12 +194,12 @@ public final class NativeRealBig extends Real {
     public BigDecimal bigDecimalValue() {
         try (Arena local = Arena.ofConfined()) {
             MemorySegment expPtr = local.allocate(IS_WINDOWS ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG);
-            MemorySegment buf = arena.allocate(2048);
-            MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, buf, expPtr, 10, 2048L, ptr, 0);
+            MemorySegment buf = arena.allocate(10000); // Safe sizing margin
+            MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, buf, expPtr, 10, 0L, ptr, 0); // 0L lets MPFR determine exact string len
             
             if (strPtr.equals(MemorySegment.NULL)) return BigDecimal.ZERO;
 
-            String digits = strPtr.reinterpret(2048).getString(0);
+            String digits = strPtr.reinterpret(10000).getString(0);
             
             if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
             if (digits.contains("@NaN@") || digits.contains("@Inf@") || digits.contains("NaN") || digits.contains("Inf")) {

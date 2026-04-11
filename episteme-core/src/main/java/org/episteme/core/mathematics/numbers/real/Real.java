@@ -139,6 +139,9 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         }
         if (Double.isNaN(value))
             return nanE();
+        if (Double.isInfinite(value)) {
+            return value > 0 ? positiveInfinityE() : negativeInfinityE();
+        }
 
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
@@ -167,6 +170,9 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         }
         if (Float.isNaN(value))
             return NaN;
+        if (Float.isInfinite(value)) {
+            return value > 0 ? POSITIVE_INFINITY : NEGATIVE_INFINITY;
+        }
 
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
