@@ -150,7 +150,11 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                 
                 Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "lapacke_dsyev");
                 if (s_dsyev.isPresent()) {
-                    dsyev = linker.downcallHandle(s_dsyev.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                    FunctionDescriptor dsyevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, 
+                        ValueLayout.JAVA_INT, java.lang.foreign.AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                        java.lang.foreign.AddressLayout.ADDRESS);
+                    dsyev = linker.downcallHandle(s_dsyev.get(), dsyevDesc);
                 }
 
                 dpotrf = lookup.find("LAPACKE_dpotrf")
@@ -374,9 +378,8 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         try {
             MemorySegment aSeg = MemorySegment.ofBuffer(A);
             MemorySegment wSeg = MemorySegment.ofBuffer(W);
-            return (int) DSYEV_HANDLE.invoke(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
+            return (int) DSYEV_HANDLE.invokeExact(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
         } catch (Throwable t) {
-            t.printStackTrace();
             throw new RuntimeException("LAPACK dsyev failed", t);
         }
     }

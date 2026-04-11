@@ -31,11 +31,11 @@ public class GenericSparseSolvers {
         for (int iter = 0; iter < maxIterations; iter++) {
             E rhoOld = rho;
             rho = provider.dot(r0, r);
-            if (isSmaller(rho, 1e-25, f)) break;
+            if (isSmaller(rho, 1e-31, f) && isSmaller(rhoOld, 1e-31, f)) break;
 
             if (iter == 0) p = r;
             else {
-                if (isSmaller(omega, 1e-30, f) || isSmaller(rhoOld, 1e-30, f)) break;
+                if (isSmaller(omega, 1e-31, f) || isSmaller(rhoOld, 1e-31, f)) break;
                 E beta = f.multiply(f.divide(rho, rhoOld), f.divide(alpha, omega));
                 p = provider.add(r, provider.multiply(provider.subtract(p, provider.multiply(v, omega)), beta));
             }
@@ -154,15 +154,20 @@ public class GenericSparseSolvers {
                 E h2 = H[i+1][i];
                 if (h1 == null || h2 == null) throw new NullPointerException("Hessenberg matrix entry is null at [" + i + "][" + i + "]");
                 
-                if (isSmaller(h2, 1e-30, f)) {
+                if (isSmaller(h2, 1e-31, f)) {
                     cs[i] = f.one();
                     sn[i] = f.zero();
                 } else {
                     E h1sq = getSquareNorm(h1, f);
                     E h2sq = getSquareNorm(h2, f);
-                    E t = sqrt(f.add(h1sq, h2sq), f);
-                    cs[i] = f.divide(conjugate(h1), t);
-                    sn[i] = f.divide(conjugate(h2), t);
+                    E sumSq = f.add(h1sq, h2sq);
+                    if (isSmaller(sumSq, 1e-35, f)) {
+                         cs[i] = f.one(); sn[i] = f.zero();
+                    } else {
+                        E t = sqrt(sumSq, f);
+                        cs[i] = f.divide(conjugate(h1), t);
+                        sn[i] = f.divide(conjugate(h2), t);
+                    }
                 }
 
                 // Apply current rotation to H and s_vec
@@ -186,8 +191,11 @@ public class GenericSparseSolvers {
                 for (int j = i + 1; j < actual_m; j++) {
                     y[i] = f.subtract(y[i], f.multiply(H[i][j], y[j]));
                 }
-                if (isSmaller(H[i][i], 1e-30, f)) break;
-                y[i] = f.divide(y[i], H[i][i]);
+                if (isSmaller(H[i][i], 1e-31, f)) {
+                    y[i] = f.zero();
+                } else {
+                    y[i] = f.divide(y[i], H[i][i]);
+                }
             }
 
             // Update x = x + Vy

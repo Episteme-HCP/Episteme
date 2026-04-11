@@ -20,12 +20,12 @@ import org.junit.jupiter.api.Test;
 public class NativeFFMComplianceTest {
 
     private static AlgorithmService originalService;
-    private static NativeFFMBLASBackend backend;
+    private static NativeFFMBLASBackend<?> backend;
 
     @BeforeAll
     public static void setup() {
         originalService = AlgorithmManager.getService();
-        backend = new NativeFFMBLASBackend();
+        backend = new NativeFFMBLASBackend<>();
         
         // Force AlgorithmManager to only see this backend
         AlgorithmManager.setService(new TestingAlgorithmService(backend));

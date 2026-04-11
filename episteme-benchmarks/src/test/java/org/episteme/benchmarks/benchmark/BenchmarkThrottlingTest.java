@@ -34,7 +34,6 @@ public class BenchmarkThrottlingTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testMatrixBenchmarkThrottling() {
         SystematicMatrixBenchmark benchmark = new SystematicMatrixBenchmark();
         benchmark.setProvider((LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>)new MockHPProvider());

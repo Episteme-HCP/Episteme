@@ -12,7 +12,7 @@ public class NativeFFMBLASComplexTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testComplexMultiply() {
-        try (NativeFFMBLASBackend backend = new NativeFFMBLASBackend()) {
+        try (NativeFFMBLASBackend<Real> backend = new NativeFFMBLASBackend<>()) {
             if (!backend.isAvailable()) {
                 System.out.println("Native BLAS not available, skipping test.");
                 return;

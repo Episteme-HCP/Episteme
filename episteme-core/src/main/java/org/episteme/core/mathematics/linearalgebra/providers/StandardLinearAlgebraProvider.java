@@ -19,7 +19,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
-import org.episteme.core.technical.algorithm.OperationContext;
 
 /**
  * Linear Algebra Provider that forces the use of the Standard (Naive/Recursive) algorithm.
@@ -105,29 +104,12 @@ public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvi
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public SVDResult<E> svd(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
         if (ring instanceof Field) {
-            return (SVDResult<E>) GenericSVD.decompose(a, (Field<E>) ring);
+            return GenericSVD.decompose(a, (Field<E>) ring);
         }
         throw new UnsupportedOperationException("SVD requires a Field scalar structure.");
-    }
-
-    @SuppressWarnings("unchecked")
-    private LinearAlgebraProvider<Real> getLeafProvider(Ring<Real> ring) {
-        org.episteme.core.technical.algorithm.OperationContext ctx = org.episteme.core.technical.algorithm.OperationContext.DEFAULT;
-        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
-            ctx = new org.episteme.core.technical.algorithm.OperationContext.Builder()
-                    .addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION)
-                    .build();
-        }
-
-        return (LinearAlgebraProvider<Real>) org.episteme.core.technical.algorithm.ProviderSelector.select(
-                LinearAlgebraProvider.class,
-                ctx,
-                p -> p != this && p.isCompatible(ring)
-        );
     }
 
     private Matrix<E> wrap(Matrix<E> m) {

@@ -13,7 +13,7 @@ public class NativeLUTest {
     public void testLU() {
         try {
             System.out.println("Starting LU test...");
-            try (NativeFFMBLASBackend backend = new NativeFFMBLASBackend()) {
+            try (NativeFFMBLASBackend<Real> backend = new NativeFFMBLASBackend<>()) {
                 int n = 3;
                 DenseMatrixStorage<Real> storage = new DenseMatrixStorage<>(n, n, Real.ZERO);
                 for(int i=0; i<n; i++) {
@@ -21,7 +21,7 @@ public class NativeLUTest {
                         storage.set(i, j, Real.of(Math.random()));
                     }
                 }
-                Matrix<Real> mat = new GenericMatrix<>(storage, backend, Reals.getInstance());
+                Matrix<Real> mat = new GenericMatrix<Real>(storage, backend, Reals.getInstance());
                 System.out.println("Calling LU...");
                 backend.lu(mat);
                 System.out.println("LU SUCCESS!");

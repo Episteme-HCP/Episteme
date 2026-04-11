@@ -91,8 +91,6 @@ public class HighPrecisionComplianceTest {
         "Native CPU-BLAS"
     );
 
-    private static final String CPU_DENSE = "Episteme CPU (Dense)";
-
     private static class ComplianceResult {
         String providerName;
         String environment;
