@@ -69,7 +69,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex); 
+        if (ring == null) return false;
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
+        Object zero = ring.zero();
+        return zero instanceof org.episteme.core.mathematics.numbers.real.Real || 
+               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     
@@ -400,19 +405,29 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         return vec.asSlice(index * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
     }
 
-    private Vector<E> backToVector_internal(MemorySegment h_Vec, int dim, Arena arena, org.episteme.core.mathematics.structures.rings.Ring<E> ring, boolean isComplex) throws Throwable {
-        java.util.List<E> list = new java.util.ArrayList<E>(dim);
-        MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
-        for (int i = 0; i < dim; i++) {
-            if (isComplex) {
-                Real r = readMPFR(getMPFRVector(h_Vec, i, 0, true), expPtr, arena);
-                Real img = readMPFR(getMPFRVector(h_Vec, i, 1, true), expPtr, arena);
-                list.add((E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, img));
-            } else {
-                list.add((E) (Object) readMPFR(getMPFRVector(h_Vec, i, 0, false), expPtr, arena));
+    private Vector<E> backToVector_internal(MemorySegment h_Vec, int n, Arena arena, org.episteme.core.mathematics.structures.rings.Ring<E> ring, boolean isComplex) throws Throwable {
+        try {
+            java.util.List<E> list = new java.util.ArrayList<E>(n);
+            MemorySegment expPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            boolean useRealDouble = !isComplex && ring instanceof org.episteme.core.mathematics.sets.Reals;
+            for (int i = 0; i < n; i++) {
+                if (isComplex) {
+                    NativeRealBig r = (NativeRealBig) readMPFR(getMPFRVector(h_Vec, i, 0, true), expPtr, arena);
+                    NativeRealBig img = (NativeRealBig) readMPFR(getMPFRVector(h_Vec, i, 1, true), expPtr, arena);
+                    list.add((E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, img));
+                } else {
+                    NativeRealBig res = (NativeRealBig) readMPFR(getMPFRVector(h_Vec, i, 0, false), expPtr, arena);
+                    if (useRealDouble) {
+                        list.add((E) (Object) org.episteme.core.mathematics.numbers.real.RealDouble.create(res.doubleValue()));
+                    } else {
+                        list.add((E) (Object) res);
+                    }
+                }
             }
+            return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(list), (LinearAlgebraProvider<E>) this, ring);
+        } catch (Throwable t) {
+            throw new RuntimeException("MPFR backToVector failed", t);
         }
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(list), (LinearAlgebraProvider<E>) this, ring);
     }
 
     @Override
@@ -607,6 +622,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(rows, cols, (E)ring.zero());
         long prec = getPrecision();
+        boolean useRealDouble = !isComplex && ring instanceof org.episteme.core.mathematics.sets.Reals;
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (isComplex) {
@@ -617,7 +634,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
                     storage.set(i, j, (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
                 } else {
                     MemorySegment ptr = getMPFR(h_Mat, i, j, cols, 0, false);
-                    storage.set(i, j, (E) (Object) NativeRealBig.copyFrom(ptr, (int) prec));
+                    NativeRealBig res = NativeRealBig.copyFrom(ptr, (int) prec);
+                    if (useRealDouble) {
+                        storage.set(i, j, (E) (Object) org.episteme.core.mathematics.numbers.real.RealDouble.create(res.doubleValue()));
+                    } else {
+                        storage.set(i, j, (E) (Object) res);
+                    }
                 }
             }
         }

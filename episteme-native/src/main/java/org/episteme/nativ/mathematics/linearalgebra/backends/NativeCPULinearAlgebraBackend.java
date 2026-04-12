@@ -138,17 +138,17 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
                 dscal = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-                // LAPACKE (Standard C interface names)
-                dgesv = lookup.find("LAPACKE_dgesv")
+                // LAPACKE (Standard C interface names and variants)
+                dgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "dgesv_")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 
-                dgetrf = lookup.find("LAPACKE_dgetrf")
+                dgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetrf", "dgetrf", "dgetrf_")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                dgetri = lookup.find("LAPACKE_dgetri")
+                dgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetri", "dgetri", "dgetri_")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "lapacke_dsyev");
+                Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "dsyev", "dsyev_");
                 if (s_dsyev.isPresent()) {
                     FunctionDescriptor dsyevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, 
@@ -157,10 +157,10 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                     dsyev = linker.downcallHandle(s_dsyev.get(), dsyevDesc);
                 }
 
-                dpotrf = lookup.find("LAPACKE_dpotrf")
+                dpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dpotrf", "dpotrf", "dpotrf_")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-                dgeqrf = lookup.find("LAPACKE_dgeqrf")
+                dgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgeqrf", "dgeqrf", "dgeqrf_")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                 dorgqr = lookup.find("LAPACKE_dorgqr")
@@ -496,27 +496,61 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
 
     @Override
-    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        if (AVAILABLE) {
-            RealDoubleMatrix adm = (a instanceof RealDoubleMatrix) ? (RealDoubleMatrix) a : RealDoubleMatrix.of(toDoubleArray(a), a.rows(), a.cols());
-            RealDoubleMatrix bdm = (b instanceof RealDoubleMatrix) ? (RealDoubleMatrix) b : RealDoubleMatrix.of(toDoubleArray(b), b.rows(), b.cols());
-            
-            if (adm.cols() != bdm.rows()) {
-                throw new IllegalArgumentException("Matrix dimension mismatch: " + adm.cols() + " != " + bdm.rows());
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+        int m = a.rows();
+        int n = a.cols();
+        Matrix<Real> res = a.copy();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                res.set(i, j, a.get(i, j).add(b.get(i, j)));
             }
-
-            int m = adm.rows();
-            int k = adm.cols();
-            int n = bdm.cols();
-            
-            RealDoubleMatrix cdm = RealDoubleMatrix.direct(m, n);
-            DoubleBuffer aBuf = ensureDirect(adm);
-            DoubleBuffer bBuf = ensureDirect(bdm);
-            
-            dgemm(m, n, k, aBuf, k, bBuf, n, cdm.getBuffer(), n, 1.0, 0.0);
-            return cdm;
         }
-        throw new UnsupportedOperationException(getName() + ": multiply() not available");
+        return res;
+    }
+
+    @Override
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+        int m = a.rows();
+        int n = a.cols();
+        Matrix<Real> res = a.copy();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                res.set(i, j, a.get(i, j).subtract(b.get(i, j)));
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+        int m = a.rows();
+        int n = a.cols();
+        Matrix<Real> res = a.copy();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                res.set(i, j, a.get(i, j).multiply(scalar));
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+        if (a.cols() != b.rows()) throw new IllegalArgumentException("Incompatible dimensions: " + a.cols() + " != " + b.rows());
+        if (AVAILABLE && DGEMM_HANDLE != null) {
+            int m = a.rows();
+            int k = a.cols();
+            int n = b.cols();
+            
+            // Optimization for RealDoubleMatrix if possible
+            double[] aData = toDoubleArray(a);
+            double[] bData = toDoubleArray(b);
+            double[] cData = new double[m * n];
+            
+            dgemm(m, n, k, DoubleBuffer.wrap(aData), k, DoubleBuffer.wrap(bData), n, DoubleBuffer.wrap(cData), n, 1.0, 0.0);
+            return fromDoubleArray(cData, m, n);
+        }
+        return GenericSolver.multiply(a, b, a.getScalarRing(), this);
     }
 
     @Override

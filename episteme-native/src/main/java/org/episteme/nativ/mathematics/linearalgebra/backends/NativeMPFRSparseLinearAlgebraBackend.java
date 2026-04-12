@@ -62,7 +62,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex); 
+        if (ring == null) return false;
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
+        Object zero = ring.zero();
+        return zero instanceof org.episteme.core.mathematics.numbers.real.Real || 
+               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
 
@@ -1340,15 +1345,21 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     private Vector<E> backToVector(MemorySegment h_x, int n, boolean isComplex, Ring<E> ring, Arena arena) throws Throwable {
-        E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(Object.class, n);
+        E[] resultArr = (E[]) new Object[n];
         MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
+        boolean useRealDouble = !isComplex && ring instanceof org.episteme.core.mathematics.sets.Reals;
         for (int i = 0; i < n; i++) {
             if (isComplex) {
                 Real re = readMPFR_internal(h_x.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
                 Real im = readMPFR_internal(h_x.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
                 resultArr[i] = (E) (Object) Complex.of(re, im);
             } else {
-                resultArr[i] = (E) (Object) readMPFR_internal(h_x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                NativeRealBig res = (NativeRealBig) readMPFR_internal(h_x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                if (useRealDouble) {
+                    resultArr[i] = (E) (Object) org.episteme.core.mathematics.numbers.real.RealDouble.create(res.doubleValue());
+                } else {
+                    resultArr[i] = (E) (Object) res;
+                }
             }
         }
         return Vector.of(java.util.Arrays.asList(resultArr), ring);

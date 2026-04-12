@@ -1299,14 +1299,20 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-            double[] arrA = toDoubleArray(a);
-            double[] arrB = toDoubleArray(b);
-            MemorySegment.copy(arrB, 0, segX, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrB.length, (long)len));
-            MemorySegment.copy(arrA, 0, segY, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, (long)len));
-            try { DAXPY.invokeExact(len, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
-            return createDenseMatrix(result, m, n, a);
+                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
+                ZAXPY.invokeExact(m * n, alpha, segX, 1, segY, 1);
+                double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
+                return fromInterlacedDoubleArray(resData, m, n);
+            } catch (Throwable t) { throw new RuntimeException("ZAXPY failed", t); }
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            try { DAXPY.invokeExact(m * n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
+            return fromDoubleArray(resData, m, n);
         }
     }
 
@@ -1314,24 +1320,21 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": Matrix scale() not available");
         int m = a.rows(), n = a.cols();
-        int len = m * n;
         if (isComplex(a)) {
-            org.episteme.core.mathematics.numbers.complex.Complex cScalar = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) scalar;
-            try (Arena arena = Arena.ofConfined()) {
+            org.episteme.core.mathematics.numbers.complex.Complex sc = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) scalar;
+             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, cScalar.real(), cScalar.imaginary());
-                ZSCAL.invokeExact(len, alpha, segX, 1);
-                double[] result = segX.toArray(ValueLayout.JAVA_DOUBLE);
-                return createDenseMatrix(result, m, n, a);
-            } catch (Throwable t) { throw new RuntimeException("ZSCAL matrix failed", t); }
+                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, sc.real(), sc.imaginary());
+                ZSCAL.invokeExact(m * n, alpha, segX, 1);
+                double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
+                return fromInterlacedDoubleArray(resData, m, n);
+            } catch (Throwable t) { throw new RuntimeException("ZSCAL failed", t); }
         }
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-            double[] arrA = toDoubleArray(a);
-            MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, (long)len));
-            try { DSCAL.invokeExact(len, ((Real)(Object)scalar).doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            double[] result = segX.toArray(ValueLayout.JAVA_DOUBLE);
-            return createDenseMatrix(result, m, n, a);
+            MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            try { DSCAL.invokeExact(m * n, ((Real)(Object)scalar).doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
+            return fromDoubleArray(resData, m, n);
         }
     }
 
