@@ -46,11 +46,7 @@ public class LinearAlgebraComplianceTest {
                 String name = "Unknown";
                 try { name = p.getName(); } catch(Throwable t) {}
                 System.out.println("[ComplianceTest] Discovered via SPI: " + p.getClass().getName() + " (" + name + ")");
-                if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
-                    @SuppressWarnings("unchecked")
-                    LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
-                    rawProviders.add(typed);
-                }
+                rawProviders.add(p);
             } catch (Throwable e) {
                 System.err.println("Error loading SPI provider:");
                 e.printStackTrace();
@@ -79,11 +75,7 @@ public class LinearAlgebraComplianceTest {
                         String name = "Unknown";
                         try { name = p.getName(); } catch(Throwable t) {}
                         System.out.println("[ComplianceTest]   Found provider: " + ap.getClass().getName() + " (" + name + ")");
-                        if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
-                            @SuppressWarnings("unchecked")
-                            LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
-                            rawProviders.add(typed);
-                        }
+                            rawProviders.add(p);
                     }
                 }
             }
@@ -141,7 +133,9 @@ public class LinearAlgebraComplianceTest {
             String name = p.getName();
             if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                 if (name.contains("EJML") && realGroundTruth == null) {
-                    realGroundTruth = (LinearAlgebraProvider<Real>) p;
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) p;
+                    realGroundTruth = typed;
                     System.out.println("[ComplianceTest] Selected Real Ground Truth: " + name);
                 }
             }
@@ -524,9 +518,13 @@ public class LinearAlgebraComplianceTest {
         if (element instanceof org.episteme.core.mathematics.numbers.real.Real r) return (int) r.doubleValue();
         if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return (int) c.real();
         try {
-            String s = element.toString();
+            String s = element.toString().trim();
+            if (s.startsWith("(")) s = s.substring(1);
+            if (s.endsWith(")")) s = s.substring(0, s.length() - 1);
             if (s.contains("+")) s = s.substring(0, s.indexOf("+")).trim();
-            return (int) Double.parseDouble(s);
+            if (s.contains("-") && s.lastIndexOf("-") > 0) s = s.substring(0, s.lastIndexOf("-")).trim();
+            if (s.contains(";")) s = s.substring(0, s.indexOf(";")).trim();
+            return (int) Math.round(Double.parseDouble(s));
         } catch (Exception e) {
             return 0;
         }
@@ -686,6 +684,10 @@ public class LinearAlgebraComplianceTest {
             if (path.getParent() != null) java.nio.file.Files.createDirectories(path.getParent());
             java.nio.file.Files.writeString(path, report);
         } catch (IOException e) { e.printStackTrace(); }
+        
+        System.out.println("\n[ComplianceTest] Report generation complete. Shutting down AlgorithmService...");
+        AlgorithmManager.getService().shutdown();
+        System.out.println("[ComplianceTest] Shutdown complete. Test method finishing.");
     }
 
     private <E> double absValueDouble(E element, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {

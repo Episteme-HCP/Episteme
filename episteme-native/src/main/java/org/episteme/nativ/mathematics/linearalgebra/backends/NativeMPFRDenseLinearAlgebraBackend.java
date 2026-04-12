@@ -69,7 +69,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealBig || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex); 
+        return ring != null && (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex); 
     }
 
     
