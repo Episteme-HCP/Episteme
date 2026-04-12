@@ -28,14 +28,20 @@ import com.google.auto.service.AutoService;
  * @since 1.2
  */
 @AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, Backend.class})
-public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, SIMDBackend {
+public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, SIMDBackend {
 
-    private final CPUDenseLinearAlgebraProvider<Real> denseProvider;
-    private final CPUSparseLinearAlgebraProvider<Real> sparseProvider;
+    private final CPUDenseLinearAlgebraProvider<E> denseProvider;
+    private final CPUSparseLinearAlgebraProvider<E> sparseProvider;
 
+    @SuppressWarnings("unchecked")
     public EpistemeLinearAlgebraBackend() {
-        this.denseProvider = new CPUDenseLinearAlgebraProvider<>();
-        this.sparseProvider = new CPUSparseLinearAlgebraProvider<>();
+        this.denseProvider = new CPUDenseLinearAlgebraProvider<>(null);
+        this.sparseProvider = new CPUSparseLinearAlgebraProvider<>(null);
+    }
+
+    public EpistemeLinearAlgebraBackend(org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        this.denseProvider = new CPUDenseLinearAlgebraProvider<>((ring instanceof org.episteme.core.mathematics.structures.rings.Field) ? (org.episteme.core.mathematics.structures.rings.Field<E>)ring : null);
+        this.sparseProvider = new CPUSparseLinearAlgebraProvider<>(ring);
     }
 
     @Override
@@ -66,9 +72,12 @@ public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider
     @Override
     public boolean isCompatible(Ring<?> ring) {
         if (ring == null) return false;
-        String name = ring.getClass().getName();
-        // Unified backend currently only supports Real delegation correctly
-        return name.contains("Reals") || (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real);
+        // Optimized check for supported CPU implementations (Real and Complex)
+        Object zero = ring.zero();
+        return ring instanceof org.episteme.core.mathematics.sets.Reals ||
+               ring instanceof org.episteme.core.mathematics.sets.Complexes ||
+               zero instanceof org.episteme.core.mathematics.numbers.real.Real ||
+               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     @Override
@@ -95,132 +104,133 @@ public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider
 
     // --- Delegation Logic ---
 
-    private LinearAlgebraProvider<Real> getProvider(Matrix<Real> a) {
-        return (a instanceof SparseMatrix) ? sparseProvider : denseProvider;
+    @SuppressWarnings("unchecked")
+    private LinearAlgebraProvider<E> getProvider(Matrix<E> a) {
+        return (a instanceof SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
     }
 
     @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
+    public Vector<E> add(Vector<E> a, Vector<E> b) {
         return denseProvider.add(a, b);
     }
 
     @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
+    public Vector<E> subtract(Vector<E> a, Vector<E> b) {
         return denseProvider.subtract(a, b);
     }
 
     @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
+    public Vector<E> multiply(Vector<E> vector, E scalar) {
         return denseProvider.multiply(vector, scalar);
     }
 
     @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) {
+    public E dot(Vector<E> a, Vector<E> b) {
         return denseProvider.dot(a, b);
     }
 
     @Override
-    public Real norm(Vector<Real> a) {
+    public E norm(Vector<E> a) {
         return denseProvider.norm(a);
     }
 
     @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
         return getProvider(a).add(a, b);
     }
 
     @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
         return getProvider(a).subtract(a, b);
     }
 
     @Override
-    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+    public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         return getProvider(a).multiply(a, b);
     }
 
     @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         return getProvider(a).multiply(a, b);
     }
 
     @Override
-    public Matrix<Real> transpose(Matrix<Real> a) {
+    public Matrix<E> transpose(Matrix<E> a) {
         return getProvider(a).transpose(a);
     }
 
     @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
         return getProvider(a).scale(scalar, a);
     }
 
     @Override
-    public Real determinant(Matrix<Real> a) {
+    public E determinant(Matrix<E> a) {
         return denseProvider.determinant(a);
     }
 
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) {
+    public Matrix<E> inverse(Matrix<E> a) {
         return denseProvider.inverse(a);
     }
 
     @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         return getProvider(a).solve(a, b);
     }
 
     @Override
-    public LUResult<Real> lu(Matrix<Real> a) {
+    public LUResult<E> lu(Matrix<E> a) {
         return denseProvider.lu(a);
     }
 
     @Override
-    public QRResult<Real> qr(Matrix<Real> a) {
+    public QRResult<E> qr(Matrix<E> a) {
         return denseProvider.qr(a);
     }
 
     @Override
-    public SVDResult<Real> svd(Matrix<Real> a) {
+    public SVDResult<E> svd(Matrix<E> a) {
         return denseProvider.svd(a);
     }
 
     @Override
-    public CholeskyResult<Real> cholesky(Matrix<Real> a) {
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
         return denseProvider.cholesky(a);
     }
 
     @Override
-    public EigenResult<Real> eigen(Matrix<Real> a) {
+    public EigenResult<E> eigen(Matrix<E> a) {
         return denseProvider.eigen(a);
     }
 
     @Override
-    public Vector<Real> solve(LUResult<Real> lu, Vector<Real> b) {
+    public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
         return denseProvider.solve(lu, b);
     }
 
     @Override
-    public Vector<Real> solve(QRResult<Real> qr, Vector<Real> b) {
+    public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
         return denseProvider.solve(qr, b);
     }
 
     @Override
-    public Vector<Real> solve(CholeskyResult<Real> cholesky, Vector<Real> b) {
+    public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
         return denseProvider.solve(cholesky, b);
     }
 
     @Override
-    public Vector<Real> bicgstab(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
         return sparseProvider.bicgstab(a, b, x0, tolerance, maxIterations);
     }
 
     @Override
-    public Vector<Real> conjugateGradient(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations) {
+    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
         return sparseProvider.conjugateGradient(a, b, x0, tolerance, maxIterations);
     }
 
     @Override
-    public Vector<Real> gmres(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations, int restarts) {
+    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
         return sparseProvider.gmres(a, b, x0, tolerance, maxIterations, restarts);
     }
 
