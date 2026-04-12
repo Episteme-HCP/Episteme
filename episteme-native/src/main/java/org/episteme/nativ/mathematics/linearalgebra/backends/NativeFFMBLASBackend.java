@@ -497,11 +497,14 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private Vector<E> createDenseVector(double[] data, int n, Matrix<E> ref) {
         List<E> list = new ArrayList<>(n);
         Ring<E> ring = (Ring<E>) ref.getScalarRing();
-        for (double v : data) {
-            if (isComplex(ref)) {
-                list.add((E)(Object)org.episteme.core.mathematics.numbers.complex.Complex.of(v));
-            } else {
-                list.add((E)(Object)Real.of(v));
+        boolean complex = isComplex(ref);
+        if (complex) {
+            for (int i = 0; i < n; i++) {
+                list.add((E)(Object)org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]));
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+                list.add((E)(Object)Real.of(data[i]));
             }
         }
         return new DenseVector<>(list, ring);
@@ -509,29 +512,42 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        if (!IS_AVAILABLE || DOMATCOPY == null) throw new UnsupportedOperationException(getName() + ": transpose() not available");
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": transpose() not available");
+        int m = a.rows(), n = a.cols();
+        if (isComplex(a)) {
+            double[] data = toInterlacedDoubleArray(a);
+            double[] res = new double[data.length];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    res[(j * m + i) * 2] = data[(i * n + j) * 2];
+                    res[(j * m + i) * 2 + 1] = data[(i * n + j) * 2 + 1];
+                }
+            }
+            return (Matrix<E>) createDenseMatrix(res, n, m, a);
+        }
         
-        int rows = a.rows();
-        int cols = a.cols();
-        
-        if (!isComplex(a)) {
-            org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix res = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.direct(cols, rows);
+        if (DOMATCOPY != null) {
+            org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix res = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.direct(n, m);
             try (Arena arena = Arena.ofConfined()) {
                 double[] arrA = toDoubleArray(a);
-                MemorySegment segA = arena.allocate(ValueLayout.JAVA_DOUBLE, arrA.length);
-                MemorySegment.copy(arrA, 0, segA, ValueLayout.JAVA_DOUBLE, 0L, arrA.length);
+                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
                 MemorySegment segC = MemorySegment.ofBuffer(res.getBuffer());
-                DOMATCOPY.invokeExact(CblasRowMajor, 112, rows, cols, 1.0, segA, cols, segC, rows);
+                DOMATCOPY.invokeExact(CblasRowMajor, 112, m, n, 1.0, segA, n, segC, m);
                 return (Matrix<E>) (Matrix<?>) res;
             } catch (Throwable t) {
                 logger.error("FFM BLAS Transpose failed: {}", t.getMessage());
-                throw new RuntimeException("FFM Transpose Operation Failed", t);
             }
-        } else {
-            // Complex transpose (conjugate transpose if needed by caller, but interface says transpose)
-            // For now, avoid recursion by throwing UOE if we don't have a native impl
-            throw new UnsupportedOperationException(getName() + ": Complex transpose() not yet implemented natively");
         }
+
+        // Fallback or if DOMATCOPY fails
+        double[] data = toDoubleArray(a);
+        double[] res = new double[data.length];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                res[j * m + i] = data[i * n + j];
+            }
+        }
+        return (Matrix<E>) createDenseMatrix(res, n, m, a);
     }
     
     @Override
@@ -1306,29 +1322,132 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         }
     }
 
+
     @Override
-    public Matrix<E> transpose(Matrix<E> a) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": transpose() not available");
-        int m = a.rows(), n = a.cols();
-        if (isComplex(a)) {
-            double[] data = toInterlacedDoubleArray(a);
-            double[] res = new double[data.length];
-            for (int i = 0; i < m; i++) {
-                for (int j = 0; j < n; j++) {
-                    res[(j * m + i) * 2] = data[(i * n + j) * 2];
-                    res[(j * m + i) * 2 + 1] = data[(i * n + j) * 2 + 1];
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": cholesky() not available");
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        boolean complex = isComplex(a);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, complex ? toInterlacedDoubleArray(a) : toDoubleArray(a));
+            int info;
+            if (complex) {
+                if (ZPOTRF == null) throw new UnsupportedOperationException("ZPOTRF not available");
+                info = (int) ZPOTRF.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+            } else {
+                if (DPOTRF == null) throw new UnsupportedOperationException("DPOTRF not available");
+                info = (int) DPOTRF.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+            }
+            if (info != 0) throw new ArithmeticException("POTRF failed: " + info);
+            
+            double[] resData = segA.toArray(ValueLayout.JAVA_DOUBLE);
+            // Zero out upper triangle for Cholesky factor L
+            if (complex) {
+                for (int i = 0; i < n; i++) {
+                    for (int j = i + 1; j < n; j++) {
+                        resData[(i * n + j) * 2] = 0;
+                        resData[(i * n + j) * 2 + 1] = 0;
+                    }
+                }
+            } else {
+                for (int i = 0; i < n; i++) {
+                    for (int j = i + 1; j < n; j++) {
+                        resData[i * n + j] = 0;
+                    }
                 }
             }
-            return fromInterlacedDoubleArray(res, n, m);
-        }
-        double[] data = toDoubleArray(a);
-        double[] res = new double[data.length];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                res[j * m + i] = data[i * n + j];
+            Matrix<E> L = createDenseMatrix(resData, n, n, a);
+            return new CholeskyResult<>(L);
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public LUResult<E> lu(Matrix<E> a) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": lu() not available");
+        int m = a.rows(), n = a.cols();
+        boolean complex = isComplex(a);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, complex ? toInterlacedDoubleArray(a) : toDoubleArray(a));
+            MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, Math.min(m, n));
+            int info;
+            if (complex) {
+                if (ZGETRF == null) throw new UnsupportedOperationException("ZGETRF not available");
+                info = (int) ZGETRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
+            } else {
+                if (DGETRF == null) throw new UnsupportedOperationException("DGETRF not available");
+                info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
             }
-        }
-        return fromDoubleArray(res, n, m);
+            if (info < 0) throw new IllegalArgumentException("GETRF failed: illegal argument " + (-info));
+            
+            double[] packedData = segA.toArray(ValueLayout.JAVA_DOUBLE);
+            int[] ipiv = segIpiv.toArray(ValueLayout.JAVA_INT);
+            
+            // Reconstruct L, U, P
+            int minMN = Math.min(m, n);
+            double[] lData = complex ? new double[m * minMN * 2] : new double[m * minMN];
+            double[] uData = complex ? new double[minMN * n * 2] : new double[minMN * n];
+            
+            if (complex) {
+                // L: unit diagonal, lower triangle of packedData
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j < Math.min(i, n); j++) {
+                        lData[(i * minMN + j) * 2] = packedData[(i * n + j) * 2];
+                        lData[(i * minMN + j) * 2 + 1] = packedData[(i * n + j) * 2 + 1];
+                    }
+                    if (i < minMN) {
+                        lData[(i * minMN + i) * 2] = 1.0;
+                        lData[(i * minMN + i) * 2 + 1] = 0.0;
+                    }
+                }
+                // U: upper triangle of packedData
+                for (int i = 0; i < minMN; i++) {
+                    for (int j = i; j < n; j++) {
+                        uData[(i * n + j) * 2] = packedData[(i * n + j) * 2];
+                        uData[(i * n + j) * 2 + 1] = packedData[(i * n + j) * 2 + 1];
+                    }
+                }
+            } else {
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j < Math.min(i, n); j++) {
+                        lData[i * minMN + j] = packedData[i * n + j];
+                    }
+                    if (i < minMN) lData[i * minMN + i] = 1.0;
+                }
+                for (int i = 0; i < minMN; i++) {
+                    for (int j = i; j < n; j++) {
+                        uData[i * n + j] = packedData[i * n + j];
+                    }
+                }
+            }
+            
+            Matrix<E> L = createDenseMatrix(lData, m, minMN, a);
+            Matrix<E> U = createDenseMatrix(uData, minMN, n, a);
+            
+            // Convert ipiv to permutation indices. 
+            // LAPACK ipiv is a series of swaps.
+            int[] pIndices = new int[m];
+            for (int i = 0; i < m; i++) pIndices[i] = i;
+            for (int i = 0; i < ipiv.length; i++) {
+                int swapIdx = ipiv[i] - 1; // 1-indexed to 0-indexed
+                if (swapIdx != i) {
+                    int tmp = pIndices[i];
+                    pIndices[i] = pIndices[swapIdx];
+                    pIndices[swapIdx] = tmp;
+                }
+            }
+            
+            List<E> pList = new ArrayList<>(m);
+            for (int idx : pIndices) {
+                if (complex) pList.add((E)(Object)org.episteme.core.mathematics.numbers.complex.Complex.of(idx, 0));
+                else pList.add((E)(Object)Real.of(idx));
+            }
+            Vector<E> P = Vector.of(pList, (Ring<E>)a.getScalarRing());
+            
+            return new LUResult<>(L, U, P);
+        } catch (Throwable t) { throw new RuntimeException(t); }
     }
 
     @Override
@@ -1342,14 +1461,14 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, sc.real(), sc.imaginary());
                 ZSCAL.invokeExact(m * n, alpha, segX, 1);
                 double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
-                return fromInterlacedDoubleArray(resData, m, n);
+                return createDenseMatrix(resData, m, n, a);
             } catch (Throwable t) { throw new RuntimeException("ZSCAL failed", t); }
         }
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             try { DSCAL.invokeExact(m * n, ((Real)(Object)scalar).doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
             double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
-            return fromDoubleArray(resData, m, n);
+            return createDenseMatrix(resData, m, n, a);
         }
     }
 
@@ -1388,6 +1507,76 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return null; 
+        return null;
+    }
+
+    private boolean isComplex(Object o) {
+        Ring<?> ring = null;
+        if (o instanceof Matrix) ring = ((Matrix<?>) o).getScalarRing();
+        else if (o instanceof Vector) ring = ((Vector<?>) o).getScalarRing();
+        return ring != null && ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
+    private double[] toDoubleArray(Object o) {
+        if (o instanceof Matrix) {
+            Matrix<Real> m = (Matrix<Real>) o;
+            if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) return ((org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix)m).toDoubleArray();
+            double[] d = new double[m.rows() * m.cols()];
+            for (int i = 0; i < m.rows(); i++)
+                for (int j = 0; j < m.cols(); j++) d[i * m.cols() + j] = m.get(i, j).doubleValue();
+            return d;
+        } else if (o instanceof Vector) {
+            Vector<Real> v = (Vector<Real>) o;
+            double[] d = new double[v.dimension()];
+            for (int i = 0; i < v.dimension(); i++) d[i] = v.get(i).doubleValue();
+            return d;
+        }
+        throw new IllegalArgumentException("Unknown type: " + o.getClass());
+    }
+
+    private double[] toInterlacedDoubleArray(Object o) {
+        if (o instanceof Matrix) {
+            Matrix<org.episteme.core.mathematics.numbers.complex.Complex> m = (Matrix<org.episteme.core.mathematics.numbers.complex.Complex>) o;
+            double[] d = new double[m.rows() * m.cols() * 2];
+            for (int i = 0; i < m.rows(); i++) {
+                for (int j = 0; j < m.cols(); j++) {
+                    org.episteme.core.mathematics.numbers.complex.Complex c = m.get(i, j);
+                    d[(i * m.cols() + j) * 2] = c.real();
+                    d[(i * m.cols() + j) * 2 + 1] = c.imaginary();
+                }
+            }
+            return d;
+        } else if (o instanceof Vector) {
+            Vector<org.episteme.core.mathematics.numbers.complex.Complex> v = (Vector<org.episteme.core.mathematics.numbers.complex.Complex>) o;
+            double[] d = new double[v.dimension() * 2];
+            for (int i = 0; i < v.dimension(); i++) {
+                org.episteme.core.mathematics.numbers.complex.Complex c = v.get(i);
+                d[i * 2] = c.real();
+                d[i * 2 + 1] = c.imaginary();
+            }
+            return d;
+        }
+        throw new IllegalArgumentException("Unknown type: " + o.getClass());
+    }
+
+    private Matrix<E> createDenseMatrix(double[] data, int rows, int cols, Matrix<E> ref) {
+        Ring<E> ring = (Ring<E>) ref.getScalarRing();
+        if (isComplex(ref)) {
+            org.episteme.core.mathematics.numbers.complex.Complex[][] arr = new org.episteme.core.mathematics.numbers.complex.Complex[rows][cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    arr[i][j] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[(i * cols + j) * 2], data[(i * cols + j) * 2 + 1]);
+                }
+            }
+            return new DenseMatrix<>((E[][]) arr, ring);
+        } else {
+            Real[][] arr = new Real[rows][cols];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    arr[i][j] = Real.of(data[i * cols + j]);
+                }
+            }
+            return new DenseMatrix<>((E[][]) arr, ring);
+        }
     }
 }

@@ -36,7 +36,7 @@ import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
-public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CPUBackend, SparseLinearAlgebraProvider<E> {
+public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");
     private static final boolean AVAILABLE = NativeMPFRNumbers.AVAILABLE;
@@ -1313,6 +1313,123 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements NativeBackend, CP
         } catch (Throwable t) {
             logger.error("MPFR determinant failed: {}", t.getMessage());
             throw new RuntimeException("MPFR determinant failed", t);
+        }
+    }
+    
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        int n = a.rows();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        long prec = getPrecision();
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_A = initMatrix(a, arena, prec, isComplex);
+            MemorySegment h_L = allocateMatrix(n, n, arena, prec, isComplex);
+            
+            // Temporary variables for summation
+            MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
+            MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
+
+            MemorySegment termR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, termR, (int) prec);
+            MemorySegment termI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, termI, (int) prec);
+
+            for (int j = 0; j < n; j++) {
+                // 1. Diagonal element: L[j][j] = sqrt(A[j][j] - sum(L[j][k] * conj(L[j][k])))
+                NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
+                if (isComplex) NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, 0);
+
+                for (int k = 0; k < j; k++) {
+                    if (isComplex) {
+                        MemorySegment ljkR = getMPFR(h_L, j, k, n, 0, true);
+                        MemorySegment ljkI = getMPFR(h_L, j, k, n, 1, true);
+                        // L[j][k] * conj(L[j][k]) = r^2 + i^2 (purely real)
+                        NativeSafe.invoke(MPFR_MUL, termR, ljkR, ljkR, 0);
+                        NativeSafe.invoke(MPFR_MUL, termI, ljkI, ljkI, 0);
+                        NativeSafe.invoke(MPFR_ADD, termR, termR, termI, 0);
+                        NativeSafe.invoke(MPFR_ADD, sumR, sumR, termR, 0);
+                    } else {
+                        MemorySegment ljk = getMPFR(h_L, j, k, n, 0, false);
+                        NativeSafe.invoke(MPFR_MUL, termR, ljk, ljk, 0);
+                        NativeSafe.invoke(MPFR_ADD, sumR, sumR, termR, 0);
+                    }
+                }
+
+                MemorySegment ljjR = getMPFR(h_L, j, j, n, 0, isComplex);
+                NativeSafe.invoke(MPFR_SUB, ljjR, getMPFR(h_A, j, j, n, 0, isComplex), sumR, 0);
+                
+                // check for positive definite
+                if ((int) NativeSafe.invoke(MPFR_CMP_SI, ljjR, 0L) <= 0) {
+                    throw new ArithmeticException("Matrix is not positive definite at index " + j);
+                }
+                NativeSafe.invoke(MPFR_SQRT, ljjR, ljjR, 0);
+                if (isComplex) NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_L, j, j, n, 1, true), 0L, 0);
+
+                // 2. Off-diagonal elements: L[i][j] = (A[i][j] - sum(L[i][k] * conj(L[j][k]))) / L[j][j]
+                for (int i = j + 1; i < n; i++) {
+                    NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
+                    if (isComplex) NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, 0);
+
+                    for (int k = 0; k < j; k++) {
+                        if (isComplex) {
+                            // sum += L[i][k] * conj(L[j][k])
+                            MemorySegment likR = getMPFR(h_L, i, k, n, 0, true);
+                            MemorySegment likI = getMPFR(h_L, i, k, n, 1, true);
+                            MemorySegment ljkR = getMPFR(h_L, j, k, n, 0, true);
+                            MemorySegment ljkI = getMPFR(h_L, j, k, n, 1, true);
+                            
+                            // (a+bi)(c-di) = (ac+bd) + i(bc-ad)
+                            NativeSafe.invoke(MPFR_MUL, termR, likR, ljkR, 0); // ac
+                            NativeSafe.invoke(MPFR_MUL, termI, likI, ljkI, 0); // bd
+                            NativeSafe.invoke(MPFR_ADD, termR, termR, termI, 0); // ac+bd
+                            
+                            NativeSafe.invoke(MPFR_MUL, termI, likI, ljkR, 0); // bc
+                            MemorySegment ad = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, ad, (int) prec);
+                            NativeSafe.invoke(MPFR_MUL, ad, likR, ljkI, 0); // ad
+                            NativeSafe.invoke(MPFR_SUB, termI, termI, ad, 0); // bc-ad
+                            
+                            NativeSafe.invoke(MPFR_ADD, sumR, sumR, termR, 0);
+                            NativeSafe.invoke(MPFR_ADD, sumI, sumI, termI, 0);
+                        } else {
+                            NativeSafe.invoke(MPFR_MUL, termR, getMPFR(h_L, i, k, n, 0, false), getMPFR(h_L, j, k, n, 0, false), 0);
+                            NativeSafe.invoke(MPFR_ADD, sumR, sumR, termR, 0);
+                        }
+                    }
+
+                    if (isComplex) {
+                        MemorySegment lijR = getMPFR(h_L, i, j, n, 0, true);
+                        MemorySegment lijI = getMPFR(h_L, i, j, n, 1, true);
+                        NativeSafe.invoke(MPFR_SUB, lijR, getMPFR(h_A, i, j, n, 0, true), sumR, 0);
+                        NativeSafe.invoke(MPFR_SUB, lijI, getMPFR(h_A, i, j, n, 1, true), sumI, 0);
+                        
+                        // Divide by L[j][j] (which is real)
+                        NativeSafe.invoke(MPFR_DIV, lijR, lijR, ljjR, 0);
+                        NativeSafe.invoke(MPFR_DIV, lijI, lijI, ljjR, 0);
+                    } else {
+                        MemorySegment lij = getMPFR(h_L, i, j, n, 0, false);
+                        NativeSafe.invoke(MPFR_SUB, lij, getMPFR(h_A, i, j, n, 0, false), sumR, 0);
+                        NativeSafe.invoke(MPFR_DIV, lij, lij, ljjR, 0);
+                    }
+                }
+            }
+
+            Matrix<E> L = backToMatrix_internal(h_L, n, n, arena, a.getScalarRing(), isComplex);
+            
+            // Clean up
+            NativeSafe.invoke(MPFR_CLEAR, sumR);
+            if (isComplex) NativeSafe.invoke(MPFR_CLEAR, sumI);
+            NativeSafe.invoke(MPFR_CLEAR, termR);
+            if (isComplex) NativeSafe.invoke(MPFR_CLEAR, termI);
+            
+            clearMPFRArray(h_A, n * n * (isComplex ? 2 : 1));
+            clearMPFRArray(h_L, n * n * (isComplex ? 2 : 1));
+
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(L);
+        } catch (Throwable t) {
+            logger.error("MPFR cholesky failed: {}", t.getMessage());
+            throw new RuntimeException("MPFR cholesky failed", t);
         }
     }
 

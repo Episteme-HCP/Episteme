@@ -17,6 +17,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.mathematics.linearalgebra.GenericSolver;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -501,19 +502,39 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     private boolean isNativeCompatible(Matrix<Real> a) {
         if (!AVAILABLE) return false;
-        if (a instanceof RealDoubleMatrix) return true;
-        // Check underlying storage for GenericMatrix compatibility (robust against cross-module classloading)
-        try {
-            org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real> storage = a.getStorage();
-            return storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage;
-        } catch (Exception e) {
-            return false;
+        // Permissive: if we can extract it to a double array, it's compatible
+        return true; 
+    }
+
+    private DoubleBuffer ensureDirect(Matrix<Real> a) {
+        if (a instanceof RealDoubleMatrix) {
+            RealDoubleMatrix rdm = (RealDoubleMatrix) a;
+            if (rdm.getBuffer().isDirect()) return rdm.getBuffer();
         }
+        double[] data = toDoubleArray(a);
+        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
+            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        db.put(data);
+        db.flip();
+        return db;
+    }
+
+    private DoubleBuffer ensureDirect(Vector<Real> v) {
+        if (v instanceof RealDoubleVector) {
+            RealDoubleVector rdv = (RealDoubleVector) v;
+            if (rdv.getBuffer().isDirect()) return rdv.getBuffer();
+        }
+        double[] data = toDoubleArray(v);
+        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
+            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        db.put(data);
+        db.flip();
+        return db;
     }
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        if (isNativeCompatible(a) && isNativeCompatible(b)) {
+        if (AVAILABLE) {
             int rows = a.rows();
             int cols = a.cols();
             double[] ad = toDoubleArray(a);
@@ -522,13 +543,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
             return RealDoubleMatrix.of(rd, rows, cols);
         }
-        // No fallback during tests
-        throw new UnsupportedOperationException(getName() + ": Matrix add() not available for these types");
+        throw new UnsupportedOperationException(getName() + ": Matrix add() not available");
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        if (isNativeCompatible(a) && isNativeCompatible(b)) {
+        if (AVAILABLE) {
             int rows = a.rows();
             int cols = a.cols();
             double[] ad = toDoubleArray(a);
@@ -537,12 +557,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
             return RealDoubleMatrix.of(rd, rows, cols);
         }
-        throw new UnsupportedOperationException(getName() + ": Matrix subtract() not available for these types");
+        throw new UnsupportedOperationException(getName() + ": Matrix subtract() not available");
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        if (isNativeCompatible(a)) {
+        if (AVAILABLE) {
             int rows = a.rows();
             int cols = a.cols();
             double s = scalar.doubleValue();
@@ -551,7 +571,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
             return RealDoubleMatrix.of(rd, rows, cols);
         }
-        throw new UnsupportedOperationException(getName() + ": scale() not available for these types");
+        throw new UnsupportedOperationException(getName() + ": scale() not available");
     }
 
     @Override
@@ -562,13 +582,15 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             int k = a.cols();
             int n = b.cols();
             
-            // Optimization for RealDoubleMatrix if possible
-            double[] aData = toDoubleArray(a);
-            double[] bData = toDoubleArray(b);
+            DoubleBuffer aBuf = ensureDirect(a);
+            DoubleBuffer bBuf = ensureDirect(b);
             double[] cData = new double[m * n];
+            DoubleBuffer cBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
             
-            dgemm(m, n, k, DoubleBuffer.wrap(aData), k, DoubleBuffer.wrap(bData), n, DoubleBuffer.wrap(cData), n, 1.0, 0.0);
-            return fromDoubleArray(cData, m, n);
+            dgemm(m, n, k, aBuf, k, bBuf, n, cBuf, n, 1.0, 0.0);
+            cBuf.get(cData);
+            return RealDoubleMatrix.of(cData, m, n);
         }
         return GenericSolver.multiply(a, b, a.getScalarRing(), this);
     }
