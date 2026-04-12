@@ -65,7 +65,10 @@ public class EpistemeLinearAlgebraBackend implements SparseLinearAlgebraProvider
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return denseProvider.isCompatible(ring);
+        if (ring == null) return false;
+        String name = ring.getClass().getName();
+        // Unified backend currently only supports Real delegation correctly
+        return name.contains("Reals") || (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real);
     }
 
     @Override

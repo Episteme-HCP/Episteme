@@ -1,0 +1,60 @@
+﻿mvn : WARNING: A restricted method in java.lang.System has 
+been called
+Au caractère Ligne:1 : 1
++ mvn spring-boot:run 
+-Dspring-boot.run.jvmArguments="--add-modules jdk ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: A rest.. 
+   .has been called:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: java.lang.System::load has been called by 
+org.fusesource.jansi.internal.JansiLoader in an unnamed module 
+(file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/j
+ansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a 
+warning for callers in this module
+WARNING: Restricted methods will be blocked in a future 
+release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has 
+been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by 
+com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHe
+lper (file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/
+lib/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of 
+class com.google.common.util.concurrent.AbstractFuture$UnsafeAt
+omicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in 
+a future release
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --------------------< org.episteme:episteme-server >--------------------
+[INFO] Building Episteme Server 1.0.0-beta1
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.327 s
+[INFO] Finished at: 2026-03-16T01:40:32+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Unknown lifecycle phase ".run.jvmArguments=--add-modules jdk.incubator.vector --enable-preview". You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: pre-clean, clean, post-clean, validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy, pre-site, site, post-site, site-deploy. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/LifecyclePhaseNotFoundException

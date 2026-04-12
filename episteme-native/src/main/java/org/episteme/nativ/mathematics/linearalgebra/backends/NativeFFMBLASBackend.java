@@ -1298,22 +1298,37 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         }
         try (Arena arena = Arena.ofConfined()) {
             int len = m * n;
-            MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, len);
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
-                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
-                ZAXPY.invokeExact(m * n, alpha, segX, 1, segY, 1);
-                double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
-                return fromInterlacedDoubleArray(resData, m, n);
-            } catch (Throwable t) { throw new RuntimeException("ZAXPY failed", t); }
-        }
-        try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-            try { DAXPY.invokeExact(m * n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
-            double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
-            return fromDoubleArray(resData, m, n);
+            try { DAXPY.invokeExact(len, -1.0, segY, 1, segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
+            return createDenseMatrix(resData, m, n, a);
         }
+    }
+
+    @Override
+    public Matrix<E> transpose(Matrix<E> a) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": transpose() not available");
+        int m = a.rows(), n = a.cols();
+        if (isComplex(a)) {
+            double[] data = toInterlacedDoubleArray(a);
+            double[] res = new double[data.length];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    res[(j * m + i) * 2] = data[(i * n + j) * 2];
+                    res[(j * m + i) * 2 + 1] = data[(i * n + j) * 2 + 1];
+                }
+            }
+            return fromInterlacedDoubleArray(res, n, m);
+        }
+        double[] data = toDoubleArray(a);
+        double[] res = new double[data.length];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                res[j * m + i] = data[i * n + j];
+            }
+        }
+        return fromDoubleArray(res, n, m);
     }
 
     @Override

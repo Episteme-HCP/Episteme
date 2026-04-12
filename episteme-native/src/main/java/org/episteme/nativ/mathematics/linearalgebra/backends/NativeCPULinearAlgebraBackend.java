@@ -139,16 +139,17 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                 dscal = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // LAPACKE (Standard C interface names and variants)
-                dgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "dgesv_")
+                // Windows OpenBLAS often uses dgesv_ or lapack_dgesv
+                dgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "dgesv_", "lapack_dgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 
-                dgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetrf", "dgetrf", "dgetrf_")
+                dgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetrf", "dgetrf", "dgetrf_", "lapack_dgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                dgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetri", "dgetri", "dgetri_")
+                dgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetri", "dgetri", "dgetri_", "lapack_dgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "dsyev", "dsyev_");
+                Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "dsyev", "dsyev_", "lapack_dsyev");
                 if (s_dsyev.isPresent()) {
                     FunctionDescriptor dsyevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, 
@@ -157,24 +158,24 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                     dsyev = linker.downcallHandle(s_dsyev.get(), dsyevDesc);
                 }
 
-                dpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dpotrf", "dpotrf", "dpotrf_")
+                dpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dpotrf", "dpotrf", "dpotrf_", "lapack_dpotrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-                dgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgeqrf", "dgeqrf", "dgeqrf_")
+                dgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgeqrf", "dgeqrf", "dgeqrf_", "lapack_dgeqrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                dorgqr = lookup.find("LAPACKE_dorgqr")
+                dorgqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dorgqr", "dorgqr", "dorgqr_", "lapack_dorgqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                Optional<MemorySegment> s_dgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesvd", "lapacke_dgesvd");
+                Optional<MemorySegment> s_dgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesvd", "dgesvd", "dgesvd_", "lapack_dgesvd");
                 if (s_dgesvd.isPresent()) {
                     dgesvd = linker.downcallHandle(s_dgesvd.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 }
 
-                dgels = lookup.find("LAPACKE_dgels")
+                dgels = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgels", "dgels", "dgels_", "lapack_dgels")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-                avail = (dgemm != null && dgemv != null);
+                avail = (dgemm != null || dgemv != null);
             }
         } catch (Throwable t) {
             logger.log(System.Logger.Level.DEBUG, "Native CPU initialization failed: " + t.getMessage());
@@ -199,14 +200,14 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         DGESVD_HANDLE = dgesvd;
         DGELS_HANDLE = dgels;
         
-        // A more robust check for core BLAS/LAPACK functionality
-        AVAILABLE = avail && dgesv != null;
+        // Broadened availability check
+        AVAILABLE = avail;
 
         if (AVAILABLE) {
-            logger.log(System.Logger.Level.INFO, "Native CPU-BLAS Backend initialized. SVD support: {0}, Eigen support: {1}", 
-                DGESVD_HANDLE != null, DSYEV_HANDLE != null);
+            logger.log(System.Logger.Level.INFO, "Native CPU-BLAS Backend initialized. SVD support: {0}, Eigen support: {1}, LAPACK support: {2}", 
+                DGESVD_HANDLE != null, DSYEV_HANDLE != null, DGESV_HANDLE != null);
         } else {
-            logger.log(System.Logger.Level.WARNING, "Native CPU-BLAS Backend NOT fully initialized (missing core BLAS/LAPACK symbols)");
+            logger.log(System.Logger.Level.WARNING, "Native CPU-BLAS Backend NOT initialized (missing core BLAS symbols)");
         }
     }
 
@@ -253,8 +254,11 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring instanceof org.episteme.core.mathematics.sets.Reals || 
-               (ring != null && ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble);
+        if (ring == null) return false;
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        Object zero = ring.zero();
+        return zero instanceof org.episteme.core.mathematics.numbers.real.Real || 
+               zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble;
     }
 
     @Override
@@ -495,43 +499,59 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         // No-op for now. Memory segments are managed via ScopedArena in operations.
     }
 
+    private boolean isNativeCompatible(Matrix<Real> a) {
+        if (!AVAILABLE) return false;
+        if (a instanceof RealDoubleMatrix) return true;
+        // Check underlying storage for GenericMatrix compatibility (robust against cross-module classloading)
+        try {
+            org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real> storage = a.getStorage();
+            return storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        int m = a.rows();
-        int n = a.cols();
-        Matrix<Real> res = a.copy();
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                res.set(i, j, a.get(i, j).add(b.get(i, j)));
-            }
+        if (isNativeCompatible(a) && isNativeCompatible(b)) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] ad = toDoubleArray(a);
+            double[] bd = toDoubleArray(b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+            return RealDoubleMatrix.of(rd, rows, cols);
         }
-        return res;
+        // No fallback during tests
+        throw new UnsupportedOperationException(getName() + ": Matrix add() not available for these types");
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        int m = a.rows();
-        int n = a.cols();
-        Matrix<Real> res = a.copy();
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                res.set(i, j, a.get(i, j).subtract(b.get(i, j)));
-            }
+        if (isNativeCompatible(a) && isNativeCompatible(b)) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] ad = toDoubleArray(a);
+            double[] bd = toDoubleArray(b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+            return RealDoubleMatrix.of(rd, rows, cols);
         }
-        return res;
+        throw new UnsupportedOperationException(getName() + ": Matrix subtract() not available for these types");
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        int m = a.rows();
-        int n = a.cols();
-        Matrix<Real> res = a.copy();
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                res.set(i, j, a.get(i, j).multiply(scalar));
-            }
+        if (isNativeCompatible(a)) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double s = scalar.doubleValue();
+            double[] ad = toDoubleArray(a);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
+            return RealDoubleMatrix.of(rd, rows, cols);
         }
-        return res;
+        throw new UnsupportedOperationException(getName() + ": scale() not available for these types");
     }
 
     @Override
@@ -683,72 +703,6 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             return RealDoubleVector.of(result);
         }
         throw new UnsupportedOperationException(getName() + ": solve() not available for these matrix types");
-    }
-
-    @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        if (AVAILABLE && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
-            double[] ad = ((RealDoubleVector) a).toDoubleArray();
-            double[] bd = ((RealDoubleVector) b).toDoubleArray();
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-            return RealDoubleVector.of(rd);
-        }
-        throw new UnsupportedOperationException(getName() + ": Vector add() not available for these types");
-    }
-
-    @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        if (AVAILABLE && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
-            double[] ad = ((RealDoubleVector) a).toDoubleArray();
-            double[] bd = ((RealDoubleVector) b).toDoubleArray();
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
-            return RealDoubleVector.of(rd);
-        }
-        throw new UnsupportedOperationException(getName() + ": Vector subtract() not available for these types");
-    }
-
-    @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
-            int rows = a.rows();
-            int cols = a.cols();
-            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
-            double[] bd = ((RealDoubleMatrix) b).toDoubleArray();
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-            return RealDoubleMatrix.of(rd, rows, cols);
-        }
-        throw new UnsupportedOperationException(getName() + ": Matrix add() not available for these types");
-    }
-
-    @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && b instanceof RealDoubleMatrix) {
-            int rows = a.rows();
-            int cols = a.cols();
-            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
-            double[] bd = ((RealDoubleMatrix) b).toDoubleArray();
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
-            return RealDoubleMatrix.of(rd, rows, cols);
-        }
-        throw new UnsupportedOperationException(getName() + ": Matrix subtract() not available for these types");
-    }
-
-    @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix) {
-            int rows = a.rows();
-            int cols = a.cols();
-            double s = scalar.doubleValue();
-            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
-            return RealDoubleMatrix.of(rd, rows, cols);
-        }
-        throw new UnsupportedOperationException(getName() + ": scale() not available for these types");
     }
 
     @Override
