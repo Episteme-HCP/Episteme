@@ -529,8 +529,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             }
         } else {
             // Complex transpose (conjugate transpose if needed by caller, but interface says transpose)
-            // For now, simple transpose via ZOMATCOPY if available, or fallback
-            return a.transpose(); // Fallback to pure java for now if ZOMATCOPY not linked
+            // For now, avoid recursion by throwing UOE if we don't have a native impl
+            throw new UnsupportedOperationException(getName() + ": Complex transpose() not yet implemented natively");
         }
     }
     

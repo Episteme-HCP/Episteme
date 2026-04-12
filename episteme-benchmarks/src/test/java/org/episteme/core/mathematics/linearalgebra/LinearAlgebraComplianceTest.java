@@ -30,6 +30,9 @@ public class LinearAlgebraComplianceTest {
         Map<String, String> status = new LinkedHashMap<>();
     }
 
+    private LinearAlgebraProvider<Real> realGroundTruth;
+    private LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex> complexGroundTruth;
+
     @Test
     public void generateComplianceReport() {
         List<LinearAlgebraProvider<?>> rawProviders = new ArrayList<>();
@@ -133,6 +136,23 @@ public class LinearAlgebraComplianceTest {
             }
         }
 
+        // Discover Ground Truths
+        for (LinearAlgebraProvider<?> p : providers) {
+            String name = p.getName();
+            if (p.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+                if (name.contains("EJML") && realGroundTruth == null) {
+                    realGroundTruth = (LinearAlgebraProvider<Real>) p;
+                    System.out.println("[ComplianceTest] Selected Real Ground Truth: " + name);
+                }
+            }
+            if (p.isCompatible(org.episteme.core.mathematics.sets.Complexes.getInstance())) {
+                if ((name.contains("MPFR") || name.contains("BigMath")) && complexGroundTruth == null) {
+                    complexGroundTruth = (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>) p;
+                    System.out.println("[ComplianceTest] Selected Complex Ground Truth: " + name);
+                }
+            }
+        }
+
         List<ComplianceResult> results = new ArrayList<>();
 
         for (LinearAlgebraProvider<?> provider : providers) {
@@ -151,14 +171,14 @@ public class LinearAlgebraComplianceTest {
             if (provider.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                 @SuppressWarnings("unchecked")
                 LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) provider;
-                runSuite(res, typed, rawProviders, "Real");
+                runSuite(res, typed, rawProviders, "Real", realGroundTruth);
             }
             
             // Run Complex Suite
             if (provider.isCompatible(org.episteme.core.mathematics.sets.Complexes.getInstance())) {
                 @SuppressWarnings("unchecked")
                 LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex> typed = (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>) provider;
-                runSuite(res, typed, rawProviders, "Complex");
+                runSuite(res, typed, rawProviders, "Complex", complexGroundTruth);
             }
 
             results.add(res);
@@ -166,10 +186,12 @@ public class LinearAlgebraComplianceTest {
         printMarkdownReport(results);
     }
 
-    private <E> void runSuite(ComplianceResult res, LinearAlgebraProvider<E> provider, List<LinearAlgebraProvider<?>> rawProviders, String typeLabel) {
+    private <E> void runSuite(ComplianceResult res, LinearAlgebraProvider<E> provider, List<LinearAlgebraProvider<?>> rawProviders, String typeLabel, LinearAlgebraProvider<E> groundTruth) {
         // Strictly isolate the provider under test, but allow delegation for decorators
         List<AlgorithmProvider> allowed = new ArrayList<>();
         allowed.add(provider);
+        if (groundTruth != null) allowed.add(groundTruth);
+
         if (provider instanceof org.episteme.core.mathematics.linearalgebra.providers.DistributedLinearAlgebraProvider || 
             provider.getName().contains("Remote")) {
             for (LinearAlgebraProvider<?> p : rawProviders) {
@@ -184,6 +206,33 @@ public class LinearAlgebraComplianceTest {
             boolean isComplex = typeLabel.equals("Complex");
             @SuppressWarnings("unchecked")
             org.episteme.core.mathematics.structures.rings.Ring<E> ring = (org.episteme.core.mathematics.structures.rings.Ring<E>) (isComplex ? org.episteme.core.mathematics.sets.Complexes.getInstance() : org.episteme.core.mathematics.sets.Reals.getInstance());
+
+            testOperation(res, "Add" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring);
+                Matrix<E> result = provider.add(a, b);
+                if (groundTruth != null) verifyMatrix(groundTruth.add(a, b), result, 1e-10, ring);
+                else verifyMatrix(a.add(b), result, 1e-10, ring);
+            });
+
+            testOperation(res, "Sub" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring);
+                Matrix<E> result = provider.subtract(a, b);
+                if (groundTruth != null) verifyMatrix(groundTruth.subtract(a, b), result, 1e-10, ring);
+                else verifyMatrix(a.subtract(b), result, 1e-10, ring);
+            });
+
+            testOperation(res, "Scale" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                E s = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(2.5, 0.5) : (E)Real.of(2.5);
+                Matrix<E> result = provider.scale(s, a);
+                if (groundTruth != null) verifyMatrix(groundTruth.scale(s, a), result, 1e-10, ring);
+                else verifyMatrix(a.scale(s), result, 1e-10, ring);
+            });
 
             testOperation(res, "Transpose" + suffix, () -> {
                 Random rand = new Random(42);
@@ -202,17 +251,24 @@ public class LinearAlgebraComplianceTest {
 
             testOperation(res, "Inverse" + suffix, () -> {
                 Random rand = new Random(42);
-                Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
-                // Ensure non-singular by adding to diagonal
-                @SuppressWarnings("unchecked")
-                E ten = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(10) : (E)Real.of(10);
-                @SuppressWarnings("unchecked")
-                E[][] diagData = (E[][]) new Object[SIZE][SIZE];
-                for(int i=0; i<SIZE; i++) for(int j=0; j<SIZE; j++) diagData[i][j] = (i==j) ? ten : ring.zero();
-                a = a.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
-                
+                Matrix<E> a = randomInvertibleMatrix(SIZE, rand, ring);
                 Matrix<E> result = provider.inverse(a);
                 verifyInverse(a, result, ring);
+            });
+
+            testOperation(res, "Determinant" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomMatrix(8, 8, rand, ring);
+                E result = provider.determinant(a);
+                if (groundTruth != null) assertScalarEquals(groundTruth.determinant(a), result, 1e-6, ring);
+            });
+
+            testOperation(res, "Solve" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomInvertibleMatrix(SIZE, rand, ring);
+                Vector<E> b = randomVector(SIZE, rand, ring);
+                Vector<E> x = provider.solve(a, b);
+                verifyVector(b, a.multiply(x), 1e-6, ring);
             });
 
             testOperation(res, "LU" + suffix, () -> {
@@ -234,6 +290,20 @@ public class LinearAlgebraComplianceTest {
                 Matrix<E> a = randomMatrix(20, 15, rand, ring);
                 SVDResult<E> result = provider.svd(a);
                 verifySVD(a, result, ring);
+            });
+
+            testOperation(res, "Cholesky" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomSPDMatrix(SIZE, rand, ring);
+                CholeskyResult<E> result = provider.cholesky(a);
+                verifyCholesky(a, result, ring);
+            });
+
+            testOperation(res, "Eigen" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomSPDMatrix(SIZE, rand, ring);
+                EigenResult<E> result = provider.eigen(a);
+                verifyEigen(a, result, ring);
             });
 
             testOperation(res, "Dot" + suffix, () -> {
@@ -264,7 +334,34 @@ public class LinearAlgebraComplianceTest {
                 }
                 assertRelativeEquals(Math.sqrt(sumSq), absValueDouble(normVal, ring), TOLERANCE);
             });
-            
+
+            testOperation(res, "Transpose (Rect)" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomMatrix(25, 10, rand, ring);
+                Matrix<E> result = provider.transpose(a);
+                verifyTranspose(a, result, ring);
+            });
+
+            testOperation(res, "Multiply (Rect)" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomMatrix(20, 15, rand, ring);
+                Matrix<E> b = randomMatrix(15, 25, rand, ring);
+                Matrix<E> result = provider.multiply(a, b);
+                verifyMultiply(a, b, result, ring);
+            });
+
+            testOperation(res, "Solve (Rect)" + suffix, () -> {
+                Random rand = new Random(42);
+                Matrix<E> a = randomMatrix(30, 10, rand, ring);
+                Vector<E> b = randomVector(30, rand, ring);
+                Vector<E> x = provider.solve(a, b);
+                // verify least squares fit
+                // A^T * A * x = A^T * b
+                Vector<E> lhs = provider.transpose(a).multiply(a.multiply(x));
+                Vector<E> rhs = provider.transpose(a).multiply(b);
+                verifyVector(rhs, lhs, 10e-2, ring);
+            });
+
             if (provider instanceof SparseLinearAlgebraProvider<E> sparseProvider) {
                 @SuppressWarnings("unchecked")
                 E eps = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(1e-8) : (E)Real.of(1e-8);
@@ -302,6 +399,17 @@ public class LinearAlgebraComplianceTest {
                     Vector<E> ax = provider.multiply(a, x);
                     verifyVector(b, ax, 1e-4, ring);
                 });
+
+                testOperation(res, "ConjGrad" + suffix, () -> {
+                    Random rand = new Random(42);
+                    int n = 30;
+                    Matrix<E> a = randomSPDMatrix(n, rand, ring);
+                    Vector<E> b = randomVector(n, rand, ring);
+                    Vector<E> x0 = Vector.of(new ArrayList<>(Collections.nCopies(n, ring.zero())), ring);
+                    Vector<E> x = sparseProvider.conjugateGradient(a, b, x0, eps, 2000);
+                    Vector<E> ax = provider.multiply(a, x);
+                    verifyVector(b, ax, 1e-4, ring);
+                });
             }
 
         } finally {
@@ -327,6 +435,31 @@ public class LinearAlgebraComplianceTest {
             }
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(data, ring);
+    }
+
+    private <E> Matrix<E> randomInvertibleMatrix(int n, Random rand, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        Matrix<E> a = randomMatrix(n, n, rand, ring);
+        // Ensure non-singular by adding to diagonal
+        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
+        @SuppressWarnings("unchecked")
+        E ten = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(10, 0) : (E)Real.of(10);
+        @SuppressWarnings("unchecked")
+        E[][] diagData = (E[][]) new Object[n][n];
+        for(int r=0; r<n; r++) for(int c=0; c<n; c++) diagData[r][c] = (r==c) ? ten : ring.zero();
+        return a.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
+    }
+
+    private <E> Matrix<E> randomSPDMatrix(int n, Random rand, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        Matrix<E> a = randomMatrix(n, n, rand, ring);
+        // Symmetric Positive Definite: A = B * B^T + n*I
+        Matrix<E> result = a.multiply(a.transpose());
+        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
+        @SuppressWarnings("unchecked")
+        E big = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(n * 2.0, 0) : (E)Real.of(n * 2.0);
+        @SuppressWarnings("unchecked")
+        E[][] diagData = (E[][]) new Object[n][n];
+        for(int r=0; r<n; r++) for(int c=0; c<n; c++) diagData[r][c] = (r==c) ? big : ring.zero();
+        return result.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
     }
 
     private <E> Vector<E> randomVector(int n, Random rand, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
@@ -381,8 +514,21 @@ public class LinearAlgebraComplianceTest {
         int n = a.rows();
         for(int i=0; i<n; i++) {
             E pVal = res.P().get(i);
-            int pivot = (pVal instanceof Number nptr) ? nptr.intValue() : (int)Double.parseDouble(pVal.toString());
+            int pivot = scalarToInt(pVal);
             for(int j=0; j<n; j++) assertScalarEquals(a.get(pivot, j), recon.get(i, j), 1e-7, ring);
+        }
+    }
+
+    private <E> int scalarToInt(E element) {
+        if (element instanceof Number nptr) return nptr.intValue();
+        if (element instanceof org.episteme.core.mathematics.numbers.real.Real r) return (int) r.doubleValue();
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return (int) c.real();
+        try {
+            String s = element.toString();
+            if (s.contains("+")) s = s.substring(0, s.indexOf("+")).trim();
+            return (int) Double.parseDouble(s);
+        } catch (Exception e) {
+            return 0;
         }
     }
 
@@ -440,6 +586,39 @@ public class LinearAlgebraComplianceTest {
             assertRelativeEquals(e.real(), a.real(), tol, "Real part mismatch");
             assertRelativeEquals(e.imaginary(), a.imaginary(), tol, "Imag part mismatch");
         }
+    }
+
+    private <E> void verifyCholesky(Matrix<E> a, CholeskyResult<E> res, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        Matrix<E> recon = res.L().multiply(res.L().transpose());
+        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+             // For complex, it is L * L^H
+             Matrix<E> LH = res.L().transpose();
+             @SuppressWarnings("unchecked")
+             E[][] lhData = (E[][]) new Object[LH.rows()][LH.cols()];
+             for(int i=0; i<LH.rows(); i++) {
+                 for(int j=0; j<LH.cols(); j++) {
+                     @SuppressWarnings("unchecked")
+                     E conj = (E) ((org.episteme.core.mathematics.numbers.complex.Complex)LH.get(i, j)).conjugate();
+                     lhData[i][j] = conj;
+                 }
+             }
+             LH = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(lhData, ring);
+             recon = res.L().multiply(LH);
+        }
+        verifyMatrix(a, recon, 1e-7, ring);
+    }
+
+    private <E> void verifyEigen(Matrix<E> a, EigenResult<E> res, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        // A * V = V * D
+        int n = res.D().dimension();
+        @SuppressWarnings("unchecked")
+        E[][] dData = (E[][]) new Object[n][n];
+        for(int i=0; i<n; i++) for(int j=0; j<n; j++) dData[i][j] = (i==j) ? (E)res.D().get(i) : ring.zero();
+        Matrix<E> D = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(dData, ring);
+        
+        Matrix<E> AV = a.multiply(res.V());
+        Matrix<E> VD = res.V().multiply(D);
+        verifyMatrix(AV, VD, 1e-3, ring); // Relaxed for Eigen
     }
 
     private void assertRelativeEquals(double expected, double actual, double tol) {

@@ -1318,7 +1318,8 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
                 int swaps = 0;
                 for (int i = 0; i < n; i++) if (h_Ipiv[i] != (i + 1)) swaps++;
                 if (swaps % 2 != 0) det = det.negate();
-
+                
+                // Return as E if E is Complex, otherwise this should not have been called for real-only backend
                 return (Real) (Object) det;
             } finally {
                 if (!segA.equals(MemorySegment.NULL)) checkCuda((int) CUDA_FREE.invokeExact(segA));
@@ -1407,7 +1408,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
                 Real[] P = new Real[n];
                 for (int i = 0; i < n; i++) P[i] = Real.of(h_Ipiv[i]);
 
-                return new LUResult<>(
+                return new LUResult<Real>(
                     Matrix.of(L, Reals.getInstance()),
                     Matrix.of(U, Reals.getInstance()),
                     Vector.of(P, Reals.getInstance())

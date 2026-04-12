@@ -30,10 +30,23 @@ public class GenericCholesky {
             E val = field.subtract(matrix.get(j, j), sum);
             
             // Stability check: if val is too small, matrix is not positive definite or is singular
-            if (val instanceof Real && ((Real)val).doubleValue() <= 1e-30) {
+            boolean tooSmall = false;
+            if (val instanceof Real) {
+                Real r = (Real) val;
+                if (r.isNaN()) tooSmall = true;
+                else if (r instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
+                    // For high precision, use a much tighter threshold (e.g., 1e-100) or check against zero
+                    // since RealBig.sqrt() already handles its own clamping for numerical noise.
+                    tooSmall = r.bigDecimalValue().signum() <= 0; 
+                } else {
+                    tooSmall = r.doubleValue() <= 1e-30;
+                }
+            } else if (val instanceof Complex) {
+                tooSmall = ((Complex)val).abs().doubleValue() <= 1e-30;
+            }
+
+            if (tooSmall) {
                 throw new ArithmeticException("Cholesky decomposition failed: matrix is singular or not positive-definite at index " + j + " (val=" + val + ")");
-            } else if (val instanceof Complex && ((Complex)val).abs().doubleValue() <= 1e-30) {
-                 throw new ArithmeticException("Cholesky decomposition failed: matrix is singular or not positive-definite at index " + j + " (abs(val)=" + ((Complex)val).abs() + ")");
             }
 
             lData[j][j] = sqrt(val, field);

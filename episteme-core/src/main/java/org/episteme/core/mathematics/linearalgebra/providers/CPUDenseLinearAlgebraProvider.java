@@ -332,7 +332,14 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             for (int i = 0; i < dim; i++) {
                 sum += aData[i] * bData[i];
             }
-            return (E) (Object) Real.of(sum);
+            Object res = Real.of(sum);
+            // If E is not Real, we must not return Real. 
+            // However, isReal(a) usually implies E is Real or compatible.
+            // Check if E is actually Real to avoid ClassCastException.
+            if (field.zero() instanceof Real) {
+                return (E) res;
+            }
+            // Fallback to generic path if types don't match
         }
 
         final Ring<E> r = a.getScalarRing();
@@ -365,7 +372,10 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 double val = aData[i];
                 sumSq += val * val;
             }
-            return (E) (Object) Real.of(Math.sqrt(sumSq));
+            Object res = Real.of(Math.sqrt(sumSq));
+            if (field.zero() instanceof Real) {
+                return (E) res;
+            }
         }
 
         E dotProduct = dot(a, a);
