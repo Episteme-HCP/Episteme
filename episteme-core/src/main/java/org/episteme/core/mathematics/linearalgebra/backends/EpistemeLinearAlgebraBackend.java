@@ -104,100 +104,120 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
 
     // --- Delegation Logic ---
 
-    @SuppressWarnings("unchecked")
-    private LinearAlgebraProvider<E> getProvider(Matrix<E> a) {
-        return (a instanceof SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
+    private LinearAlgebraProvider<E> getBestProvider(Matrix<E> a) {
+        Class<? extends LinearAlgebraProvider> providerClass = (a instanceof SparseMatrix) ? SparseLinearAlgebraProvider.class : LinearAlgebraProvider.class;
+        try {
+            LinearAlgebraProvider<E> best = (LinearAlgebraProvider<E>) AlgorithmManager.getProvider(providerClass);
+            if (best == this || best.getClass().equals(this.getClass())) {
+                return (LinearAlgebraProvider<E>) AlgorithmManager.getNextProvider(providerClass, this);
+            }
+            return best;
+        } catch (Exception e) {
+            // Fallback to internal foundation components
+            return (a instanceof SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
+        }
     }
+
+    private <T> T executeComplexOperation(java.util.function.Function<LinearAlgebraProvider<E>, T> operation) {
+        try {
+            return operation.apply((LinearAlgebraProvider<E>) AlgorithmManager.getProvider(LinearAlgebraProvider.class));
+        } catch (ClassCastException | UnsupportedOperationException e) {
+            return operation.apply(denseProvider);
+        }
+    }
+
+
 
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        return denseProvider.add(a, b);
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).add(a, b));
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        return denseProvider.subtract(a, b);
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).subtract(a, b));
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        return denseProvider.multiply(vector, scalar);
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).multiply(vector, scalar));
     }
 
     @Override
     public E dot(Vector<E> a, Vector<E> b) {
-        return denseProvider.dot(a, b);
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).dot(a, b));
     }
 
     @Override
     public E norm(Vector<E> a) {
-        return denseProvider.norm(a);
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).norm(a));
     }
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        return getProvider(a).add(a, b);
+        return getBestProvider(a).add(a, b);
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
-        return getProvider(a).subtract(a, b);
+        return getBestProvider(a).subtract(a, b);
     }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
-        return getProvider(a).multiply(a, b);
+        return getBestProvider(a).multiply(a, b);
     }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        return getProvider(a).multiply(a, b);
+        return getBestProvider(a).multiply(a, b);
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
-        return getProvider(a).transpose(a);
+        return getBestProvider(a).transpose(a);
     }
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
-        return getProvider(a).scale(scalar, a);
+        return getBestProvider(a).scale(scalar, a);
     }
 
     @Override
     public E determinant(Matrix<E> a) {
-        return denseProvider.determinant(a);
+        return getBestProvider(a).determinant(a);
     }
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
-        return denseProvider.inverse(a);
+        return getBestProvider(a).inverse(a);
     }
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return getProvider(a).solve(a, b);
+        return getBestProvider(a).solve(a, b);
     }
 
     @Override
     public LUResult<E> lu(Matrix<E> a) {
-        return denseProvider.lu(a);
+        return getBestProvider(a).lu(a);
     }
 
     @Override
     public QRResult<E> qr(Matrix<E> a) {
-        return denseProvider.qr(a);
+        return getBestProvider(a).qr(a);
     }
 
     @Override
     public SVDResult<E> svd(Matrix<E> a) {
-        return denseProvider.svd(a);
+        return getBestProvider(a).svd(a);
     }
 
     @Override
     public CholeskyResult<E> cholesky(Matrix<E> a) {
-        return denseProvider.cholesky(a);
+        return getBestProvider(a).cholesky(a);
     }
+
 
     @Override
     public EigenResult<E> eigen(Matrix<E> a) {

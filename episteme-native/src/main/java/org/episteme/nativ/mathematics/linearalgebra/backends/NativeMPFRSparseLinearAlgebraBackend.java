@@ -1498,29 +1498,4 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) { return GenericSVD.decompose(a, (Field<E>) a.getScalarRing(), this); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) { return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing(), this); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { return GenericEigen.decompose(a, (Field<E>) a.getScalarRing(), this); }
-
-    @Override
-    public Matrix<E> transpose(Matrix<E> a) {
-        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
-        int m = sa.rows();
-        int n = sa.cols();
-        org.episteme.core.mathematics.structures.rings.Ring<E> ring = (org.episteme.core.mathematics.structures.rings.Ring<E>) sa.getScalarRing();
-        E zero = ring.zero();
-
-        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
-            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(n, m, zero);
-
-        int[] rowPtr = sa.getRowPointers();
-        int[] colIdx = sa.getColIndices();
-        Object[] vals = sa.getValues();
-
-        for (int i = 0; i < m; i++) {
-            for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
-                int col = colIdx[k];
-                storage.set(col, i, (E) vals[k]);
-            }
-        }
-
-        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, ring);
-    }
 }

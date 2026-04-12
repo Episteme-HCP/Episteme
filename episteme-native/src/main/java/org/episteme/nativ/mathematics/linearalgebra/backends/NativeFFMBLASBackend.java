@@ -61,7 +61,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private static MethodHandle DZNRM2;
     private static MethodHandle DSCAL;
     private static MethodHandle DOMATCOPY;
-    private static MethodHandle ZOMATCOPY;
 
     private static MethodHandle ZGEMM;
     private static MethodHandle ZGEMV;
@@ -186,9 +185,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 );
                 DOMATCOPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_domatcopy", "mkl_domatcopy")
                     .map(s -> LINKER.downcallHandle(s, domatcopyDesc)).orElse(null);
-
-                ZOMATCOPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zomatcopy", "mkl_zomatcopy")
-                    .map(s -> LINKER.downcallHandle(s, domatcopyDesc)).orElse(null); 
 
                 // Complex BLAS
                 FunctionDescriptor complexGemmDesc = FunctionDescriptor.ofVoid(
@@ -416,44 +412,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 available = false;
             }
         }
-        @Override
-    public boolean isCompatible(Ring<?> ring) {
-        if (!IS_AVAILABLE || ring == null) return false;
-        Object zero = ring.zero();
-        return ring instanceof org.episteme.core.mathematics.sets.Reals || 
-               ring instanceof org.episteme.core.mathematics.sets.Complexes ||
-               zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble ||
-               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-    }
-
-    @Override
-    public double score(OperationContext context) {
-        if (!IS_AVAILABLE) return -1.0;
-        double base = 500.0; // Higher than CPU but lower than CUDA
-        if (context != null && context.isPerformanceCritical()) {
-            base += 300.0;
-        }
-        return base;
-    }
-
-    @Override
-    public String getId() {
-        return "native-blas-ffm";
-    }
-
-    @Override
-    public String getType() {
-        return "linearalgebra";
-    }
-
-    @Override
-    public String getName() {
-        return "Native BLAS Provider (FFM)";
-    }
-
-    @Override
-    public String getDescription() {
-        return "High-performance BLAS/LAPACK binding via Project Panama";
+        IS_AVAILABLE = available;
     }
 
     @Override
@@ -464,68 +423,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     @Override
     public String getNativeLibraryName() {
         return "openblas";
-    }
-
-    @Override
-    public Matrix<E> transpose(Matrix<E> a) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": transpose() not available");
-        int m = a.rows();
-        int n = a.cols();
-        boolean complex = isComplex(a);
-
-        try (Arena arena = Arena.ofConfined()) {
-            if (complex) {
-                double[] data = toInterlacedDoubleArray(a);
-                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, data);
-                MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * m * 2);
-                
-                if (ZOMATCOPY != null) {
-                    MemorySegment alpha = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
-                    alpha.set(ValueLayout.JAVA_DOUBLE, 0, 1.0);
-                    alpha.set(ValueLayout.JAVA_DOUBLE, 8, 0.0);
-                    ZOMATCOPY.invokeExact(CblasRowMajor, 112, m, n, alpha, segA, n, segC, m);
-                } else {
-                    // Fallback: Tiled Complex Transpose
-                    int tileSize = 32;
-                    for (int i = 0; i < m; i += tileSize) {
-                        for (int j = 0; j < n; j += tileSize) {
-                            for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
-                                for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
-                                    long srcIdx = (long) (ii * n + jj) * 2;
-                                    long dstIdx = (long) (jj * m + ii) * 2;
-                                    segC.set(ValueLayout.JAVA_DOUBLE, dstIdx * 8, segA.get(ValueLayout.JAVA_DOUBLE, srcIdx * 8));
-                                    segC.set(ValueLayout.JAVA_DOUBLE, (dstIdx + 1) * 8, segA.get(ValueLayout.JAVA_DOUBLE, (srcIdx + 1) * 8));
-                                }
-                            }
-                        }
-                    }
-                }
-                return (Matrix<E>) createDenseMatrix(segC.toArray(ValueLayout.JAVA_DOUBLE), n, m, a);
-            } else {
-                double[] data = toDoubleArray(a);
-                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, data);
-                MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * m);
-                
-                if (DOMATCOPY != null) {
-                    DOMATCOPY.invokeExact(CblasRowMajor, 112, m, n, 1.0, segA, n, segC, m);
-                } else {
-                    // Fallback: Tiled Transpose
-                    int tileSize = 64;
-                    for (int i = 0; i < m; i += tileSize) {
-                        for (int j = 0; j < n; j += tileSize) {
-                            for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
-                                for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
-                                    segC.set(ValueLayout.JAVA_DOUBLE, (long) (jj * m + ii) * 8, segA.get(ValueLayout.JAVA_DOUBLE, (long) (ii * n + jj) * 8));
-                                }
-                            }
-                        }
-                    }
-                }
-                return (Matrix<E>) createDenseMatrix(segC.toArray(ValueLayout.JAVA_DOUBLE), n, m, a);
-            }
-        } catch (Throwable t) {
-            throw new RuntimeException("Native transpose failed", t);
-        }
     }
 
     @Override
@@ -1034,6 +931,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     private double[] toDoubleArray(Matrix<E> m) {
+        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            return ((org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) m).toDoubleArray();
+        }
         int rows = m.rows();
         int cols = m.cols();
         double[] data = new double[rows * cols];
@@ -1046,6 +946,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     private double[] toDoubleArray(Vector<E> v) {
+        if (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) {
+            return ((org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) v).toDoubleArray();
+        }
         int n = v.dimension();
         double[] data = new double[n];
         for (int i = 0; i < n; i++) {
@@ -1053,8 +956,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         }
         return data;
     }
-
-
 
     private double[] toInterlacedDoubleArray(Matrix<E> m) {
         int rows = m.rows();
@@ -1080,6 +981,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         }
         return data;
     }
+
 
     private Matrix<E> multiplyComplex(Matrix<E> A, Matrix<E> B) {
         int m = A.rows();
@@ -1544,73 +1446,5 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             }
             return new DenseMatrix<>((E[][]) arr, ring);
         }
-    }
-
-    private Vector<E> createDenseVector(double[] data, int size, Matrix<E> ref) {
-        if (isComplex(ref)) {
-            org.episteme.core.mathematics.numbers.complex.Complex[] arr = new org.episteme.core.mathematics.numbers.complex.Complex[size];
-            for (int i = 0; i < size; i++) {
-                arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
-            }
-            return (Vector<E>) RealDoubleVector.of(java.util.Arrays.stream(arr).mapToDouble(c -> c.real()).toArray()); // Simplified, should return actual complex vector
-        } else {
-            return (Vector<E>) RealDoubleVector.of(data);
-        }
-    }
-
-    private double[] toInterlacedDoubleArray(Matrix<E> a) {
-        int m = a.rows();
-        int n = a.cols();
-        double[] res = new double[m * n * 2];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) a.get(i, j);
-                res[(i * n + j) * 2] = c.real();
-                res[(i * n + j) * 2 + 1] = c.imaginary();
-            }
-        }
-        return res;
-    }
-
-    private double[] toInterlacedDoubleArray(Vector<E> v) {
-        int n = v.dimension();
-        double[] res = new double[n * 2];
-        for (int i = 0; i < n; i++) {
-            org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) v.get(i);
-            res[i * 2] = c.real();
-            res[i * 2 + 1] = c.imaginary();
-        }
-        return res;
-    }
-
-    private double[] toDoubleArray(Matrix<E> a) {
-        int m = a.rows();
-        int n = a.cols();
-        double[] res = new double[m * n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                res[i * n + j] = ((Real)(Object)a.get(i, j)).doubleValue();
-            }
-        }
-        return res;
-    }
-
-    private double[] toDoubleArray(Vector<E> v) {
-        int n = v.dimension();
-        double[] res = new double[n];
-        for (int i = 0; i < n; i++) {
-            res[i] = ((Real)(Object)v.get(i)).doubleValue();
-        }
-        return res;
-    }
-
-    private boolean isComplex(Matrix<E> a) {
-        return a.getScalarRing() instanceof org.episteme.core.mathematics.sets.Complexes || 
-               a.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-    }
-
-    private boolean isComplex(Ring<E> ring) {
-        return ring instanceof org.episteme.core.mathematics.sets.Complexes || 
-               ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 }

@@ -1083,15 +1083,31 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             int n = a.rows();
             for (int i = 0; i < n; i++) det = det.multiply(lu.U().get(i, i));
             
-            // Permutation parity
+            // Correct Permutation Parity using Cycle Decomposition (March 24 Standard)
             int swaps = 0;
+            boolean[] visited = new boolean[n];
+            int[] p = new int[n];
             for (int i = 0; i < n; i++) {
-                int pIdx;
                 Object pVal = lu.P().get(i);
-                if (pVal instanceof Real) pIdx = (int) ((Real) pVal).doubleValue();
-                else pIdx = ((Number) pVal).intValue();
-                if (pIdx != i) swaps++;
+                if (pVal instanceof Real) p[i] = (int) ((Real) pVal).doubleValue();
+                else p[i] = ((Number) pVal).intValue();
             }
+            
+            for (int i = 0; i < n; i++) {
+                if (!visited[i]) {
+                    int curr = i;
+                    int cycleSize = 0;
+                    while (!visited[curr]) {
+                        visited[curr] = true;
+                        curr = p[curr];
+                        cycleSize++;
+                    }
+                    if (cycleSize > 1) {
+                        swaps += (cycleSize - 1);
+                    }
+                }
+            }
+            
             if (swaps % 2 != 0) det = det.negate();
             return det;
         }

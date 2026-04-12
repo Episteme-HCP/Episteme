@@ -143,10 +143,21 @@ public class GenericLU {
         for (int i = 0; i < n; i++) det = field.multiply(det, lu.U().get(i, i));
         
         int swaps = 0;
+        boolean[] visited = new boolean[n];
         for (int i = 0; i < n; i++) {
-            if (toInt(lu.P().get(i)) != i) swaps++;
+            if (!visited[i]) {
+                int count = 0;
+                int j = i;
+                while (!visited[j]) {
+                    visited[j] = true;
+                    j = toInt(lu.P().get(j));
+                    count++;
+                }
+                if (count > 0) swaps += (count - 1);
+            }
         }
         if (swaps % 2 != 0) det = field.negate(det);
+
         return det;
     }
 

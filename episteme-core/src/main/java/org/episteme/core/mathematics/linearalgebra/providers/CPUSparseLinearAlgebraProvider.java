@@ -154,10 +154,37 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         LUResult<E> lu = lu(a);
         Ring<E> r = a.getScalarRing();
-        E det = ((Field<E>)r).one();
-        for (int i = 0; i < a.rows(); i++) det = ((Field<E>)r).multiply(det, lu.U().get(i, i));
+        Field<E> f = (Field<E>) r;
+        E det = f.one();
+        for (int i = 0; i < a.rows(); i++) det = f.multiply(det, lu.U().get(i, i));
+        
+        // Account for permutation parity (swaps)
+        Vector<E> P = lu.P();
+        int n = P.dimension();
+        boolean[] visited = new boolean[n];
+        int swaps = 0;
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                int count = 0;
+                int j = i;
+                while (!visited[j]) {
+                    visited[j] = true;
+                    Object pVal = P.get(j);
+                    int pIdx;
+                    if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
+                    else if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+                    else pIdx = i; // Fallback
+                    j = pIdx;
+                    count++;
+                }
+                if (count > 0) swaps += (count - 1);
+            }
+        }
+        if (swaps % 2 != 0) det = f.negate(det);
+        
         return det;
     }
+
 
     @Override
     @SuppressWarnings("unchecked")

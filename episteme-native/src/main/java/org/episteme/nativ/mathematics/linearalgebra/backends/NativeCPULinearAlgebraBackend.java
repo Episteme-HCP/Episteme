@@ -234,92 +234,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public String getType() {
-        return "linearalgebra";
-    }
-
-    @Override
-    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        if (!AVAILABLE || ring == null) return false;
-        Object zero = ring.zero();
-        return ring instanceof org.episteme.core.mathematics.sets.Reals || 
-               zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble;
-    }
-
-    @Override
-    public double score(OperationContext context) {
-        if (!AVAILABLE) return -1.0;
-        double base = 100.0; // Lower than BLAS provider
-        if (context != null && context.isPerformanceCritical()) {
-            base += 50.0;
-        }
-        return base;
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.DeterminantResult<Real> determinant(Matrix<Real> a) {
-        if (AVAILABLE && DGETRF_HANDLE != null && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
-            int n = a.rows();
-            RealDoubleMatrix lu = (RealDoubleMatrix) a.copy();
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
-                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-            
-            int info = dgetrf(n, n, lu.getBuffer(), n, ipiv);
-            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-            
-            double det = 1.0;
-            double[] data = lu.toDoubleArray();
-            for (int i = 0; i < n; i++) {
-                det *= data[i * n + i];
-                if (ipiv.get(i) != (i + 1)) {
-                    det = -det;
-                }
-            }
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.DeterminantResult<>(Real.of(det));
-        }
-        throw new UnsupportedOperationException(getName() + ": determinant() not available for these types");
-    }
-
-    @Override
-    public Matrix<Real> inverse(Matrix<Real> a) {
-        if (AVAILABLE && DGETRF_HANDLE != null && DGETRI_HANDLE != null && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
-            int n = a.rows();
-            RealDoubleMatrix inv = (RealDoubleMatrix) a.copy();
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
-                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-            
-            int info = dgetrf(n, n, inv.getBuffer(), n, ipiv);
-            if (info != 0) throw new ArithmeticException("Matrix is singular");
-            
-            info = dgetri(n, inv.getBuffer(), n, ipiv);
-            if (info != 0) throw new ArithmeticException("Matrix inversion failed: " + info);
-            
-            return inv;
-        }
-        throw new UnsupportedOperationException(getName() + ": inverse() not available for these types");
-    }
-
-    @Override
-    public Matrix<Real> transpose(Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix) {
-            int m = a.rows();
-            int n = a.cols();
-            double[] data = ((RealDoubleMatrix) a).toDoubleArray();
-            double[] res = new double[n * m];
-            
-            // Tiled Transpose for better cache locality
-            int tileSize = 64;
-            for (int i = 0; i < m; i += tileSize) {
-                for (int j = 0; j < n; j += tileSize) {
-                    for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
-                        for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
-                            res[jj * m + ii] = data[ii * n + jj];
-                        }
-                    }
-                }
-            }
-            return RealDoubleMatrix.of(res, n, m);
-        }
-        throw new UnsupportedOperationException(getName() + ": transpose() not available for these types");
+        return "math";
     }
 
     @Override
@@ -690,12 +605,11 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         if (m != n) {
              return pseudoInverse(a);
         }
-        if (a instanceof RealDoubleMatrix && m == n) {
-            n = a.rows();
+        if (m == n) {
+            double[] data = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
             RealDoubleMatrix res = RealDoubleMatrix.direct(n, n);
-            RealDoubleMatrix src = (RealDoubleMatrix) a;
             
-            res.getBuffer().put(src.toDoubleArray());
+            res.getBuffer().put(data);
             res.getBuffer().position(0);
             
             java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
@@ -766,17 +680,19 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     // Other methods default to UnsupportedOperationException
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols() && b.dimension() == a.rows()) {
+        if (AVAILABLE && a.rows() == a.cols() && b.dimension() == a.rows()) {
             int n = a.rows();
-            RealDoubleMatrix adm = (RealDoubleMatrix) a;
+            double[] aData = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
+            double[] bData = (b instanceof RealDoubleVector) ? ((RealDoubleVector)b).toDoubleArray() : b.doubleStream().toArray();
             
             // Result vector initialized with b
             RealDoubleMatrix x = RealDoubleMatrix.direct(n, 1);
-            for(int i=0; i<n; i++) x.set(i, 0, b.get(i));
+            x.getBuffer().put(bData);
+            x.getBuffer().position(0);
             
             // Intermediate matrix for decomposition (A will be overwritten by DGESV)
             RealDoubleMatrix aDecomp = RealDoubleMatrix.direct(n, n);
-            aDecomp.getBuffer().put(adm.toDoubleArray());
+            aDecomp.getBuffer().put(aData);
             aDecomp.getBuffer().position(0);
             
             java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
@@ -790,17 +706,20 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             x.getBuffer().position(0);
             x.getBuffer().get(result);
             return RealDoubleVector.of(result);
-        } else if (AVAILABLE && a instanceof RealDoubleMatrix && b.dimension() == a.rows()) {
+        } else if (AVAILABLE && b.dimension() == a.rows()) {
             // Rectangular solve (Least Squares)
             int m = a.rows();
             int n = a.cols();
             int maxDim = Math.max(m, n);
+            double[] aData = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
+            double[] bData = (b instanceof RealDoubleVector) ? ((RealDoubleVector)b).toDoubleArray() : b.doubleStream().toArray();
             
             RealDoubleMatrix x = RealDoubleMatrix.direct(maxDim, 1);
-            for(int i=0; i<m; i++) x.set(i, 0, b.get(i));
+            x.getBuffer().put(bData);
+            x.getBuffer().position(0);
             
             RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
-            aCopy.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            aCopy.getBuffer().put(aData);
             aCopy.getBuffer().position(0);
             
             int info = dgels('N', m, n, 1, aCopy.getBuffer(), n, x.getBuffer(), 1);
@@ -816,27 +735,36 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix) {
-            int rows = a.rows();
-            int cols = a.cols();
-            double[] ad = ((RealDoubleMatrix) a).toDoubleArray();
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    rd[j * rows + i] = ad[i * cols + j];
+        if (AVAILABLE) {
+            int m = a.rows();
+            int n = a.cols();
+            double[] data = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
+            double[] res = new double[n * m];
+            
+            // Tiled Transpose for better cache locality (March 24 Optimization)
+            int tileSize = 64;
+            for (int i = 0; i < m; i += tileSize) {
+                for (int j = 0; j < n; j += tileSize) {
+                    for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
+                        for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
+                            res[jj * m + ii] = data[ii * n + jj];
+                        }
+                    }
                 }
             }
-            return RealDoubleMatrix.of(rd, cols, rows);
+            return RealDoubleMatrix.of(res, n, m);
         }
         throw new UnsupportedOperationException(getName() + ": transpose() not available for these types");
     }
 
+
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+        if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
+            double[] data = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
             RealDoubleMatrix copy = RealDoubleMatrix.direct(n, n);
-            copy.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            copy.getBuffer().put(data);
             copy.getBuffer().position(0);
 
             java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
@@ -847,13 +775,33 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             if (info > 0) return Real.ZERO; // Singular matrix
 
             double det = 1.0;
-            int swaps = 0;
             for (int i = 0; i < n; i++) {
                 det *= copy.get(i, i).doubleValue();
-                if (ipiv.get(i) != (i + 1)) {
-                    swaps++;
+            }
+
+            // Correct Permutation Parity using Cycle Decomposition (March 24 Standard)
+            int swaps = 0;
+            boolean[] visited = new boolean[n];
+            int[] p = new int[n];
+            for (int i = 0; i < n; i++) {
+                p[i] = ipiv.get(i) - 1; // 1-indexed to 0-indexed
+            }
+            
+            for (int i = 0; i < n; i++) {
+                if (!visited[i]) {
+                    int curr = i;
+                    int cycleSize = 0;
+                    while (!visited[curr]) {
+                        visited[curr] = true;
+                        curr = p[curr];
+                        cycleSize++;
+                    }
+                    if (cycleSize > 1) {
+                        swaps += (cycleSize - 1);
+                    }
                 }
             }
+
             if (swaps % 2 != 0) det = -det;
             return Real.of(det);
         }

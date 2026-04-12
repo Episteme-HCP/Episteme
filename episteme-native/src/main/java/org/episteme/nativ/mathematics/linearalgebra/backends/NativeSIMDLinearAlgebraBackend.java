@@ -61,9 +61,14 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
 
     @Override
     public boolean isAvailable() {
-        return jdk.incubator.vector.VectorSpecies.ofLargestShape(double.class).vectorBitSize() > 0 
-            && !isExplicitlyDisabled();
+        try {
+            return jdk.incubator.vector.VectorSpecies.ofLargestShape(double.class).vectorBitSize() > 0 
+                && !isExplicitlyDisabled();
+        } catch (NoClassDefFoundError | Exception e) {
+            return false;
+        }
     }
+
     
     @Override
     public boolean isLoaded() {
