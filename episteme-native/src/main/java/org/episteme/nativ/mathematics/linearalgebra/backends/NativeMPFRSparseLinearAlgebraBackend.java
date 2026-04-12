@@ -63,11 +63,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         if (ring == null) return false;
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
-        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
         Object zero = ring.zero();
-        return zero instanceof org.episteme.core.mathematics.numbers.real.Real || 
-               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isReal = ring instanceof org.episteme.core.mathematics.sets.Reals || 
+                         zero instanceof org.episteme.core.mathematics.numbers.real.Real;
+        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes || 
+                         zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        return isReal || isComplex;
     }
 
 

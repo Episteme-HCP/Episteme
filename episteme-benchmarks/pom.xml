@@ -110,6 +110,7 @@
             </exclusions>
         </dependency>
 
+
         <!-- Explicit logging stack: SLF4J + Logback + Log4j2-to-SLF4J bridge -->
         <dependency>
             <groupId>org.slf4j</groupId>

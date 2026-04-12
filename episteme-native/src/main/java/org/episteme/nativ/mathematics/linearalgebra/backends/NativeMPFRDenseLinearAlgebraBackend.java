@@ -70,11 +70,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         if (ring == null) return false;
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
-        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
         Object zero = ring.zero();
-        return zero instanceof org.episteme.core.mathematics.numbers.real.Real || 
-               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isReal = ring instanceof org.episteme.core.mathematics.sets.Reals || 
+                         zero instanceof org.episteme.core.mathematics.numbers.real.Real;
+        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes || 
+                         zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        return isReal || isComplex;
     }
 
     
@@ -1740,10 +1741,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         complexLog(resR, resI, aR, aI, prec, arena);
         MemorySegment log10 = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, log10, (int) prec);
-        NativeSafe.invoke(MPFR_SET_STR, log10, arena.allocateFrom("2.3025850929940456840179914546843642076011"), 10, 0); // ln(10) approx
+        MemorySegment ten = arena.allocate(MPFR_LAYOUT);
+        NativeSafe.invoke(MPFR_INIT2, ten, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, ten, 10L, 0);
+        NativeSafe.invoke(MPFR_LOG, log10, ten, 0); // ln(10) computed at full precision
+
         NativeSafe.invoke(MPFR_DIV, resR, resR, log10, 0);
         NativeSafe.invoke(MPFR_DIV, resI, resI, log10, 0);
+
         NativeSafe.invoke(MPFR_CLEAR, log10);
+        NativeSafe.invoke(MPFR_CLEAR, ten);
     }
 
     public static void complexSin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
@@ -1765,6 +1772,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             
             NativeSafe.invoke(MPFR_MUL, resR, sR, chI, 0);
             NativeSafe.invoke(MPFR_MUL, resI, cR, shI, 0);
+
+            NativeSafe.invoke(MPFR_CLEAR, sR);
+            NativeSafe.invoke(MPFR_CLEAR, cR);
+            NativeSafe.invoke(MPFR_CLEAR, shI);
+            NativeSafe.invoke(MPFR_CLEAR, chI);
         }
     }
 
@@ -1787,6 +1799,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             
             NativeSafe.invoke(MPFR_MUL, resR, cR, chI, 0);
             NativeSafe.invoke(MPFR_MUL, resI, sR, shI, 0);
+
+            NativeSafe.invoke(MPFR_CLEAR, sR);
+            NativeSafe.invoke(MPFR_CLEAR, cR);
+            NativeSafe.invoke(MPFR_CLEAR, shI);
+            NativeSafe.invoke(MPFR_CLEAR, chI);
             NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
         }
     }
@@ -1828,6 +1845,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             
             NativeSafe.invoke(MPFR_MUL, resR, shR, cI, 0);
             NativeSafe.invoke(MPFR_MUL, resI, chR, sI, 0);
+
+            NativeSafe.invoke(MPFR_CLEAR, shR);
+            NativeSafe.invoke(MPFR_CLEAR, chR);
+            NativeSafe.invoke(MPFR_CLEAR, sI);
+            NativeSafe.invoke(MPFR_CLEAR, cI);
         }
     }
 
@@ -1850,6 +1872,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             
             NativeSafe.invoke(MPFR_MUL, resR, chR, cI, 0);
             NativeSafe.invoke(MPFR_MUL, resI, shR, sI, 0);
+
+            NativeSafe.invoke(MPFR_CLEAR, shR);
+            NativeSafe.invoke(MPFR_CLEAR, chR);
+            NativeSafe.invoke(MPFR_CLEAR, sI);
+            NativeSafe.invoke(MPFR_CLEAR, cI);
         }
     }
 
@@ -1912,6 +1939,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             if ((int) NativeSafe.invoke(MPFR_CMP, aI, zero) < 0) { 
                  NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
             }
+
+            NativeSafe.invoke(MPFR_CLEAR, norm);
+            NativeSafe.invoke(MPFR_CLEAR, t1);
+            NativeSafe.invoke(MPFR_CLEAR, t2);
+            NativeSafe.invoke(MPFR_CLEAR, zero);
         }
     }
 
@@ -2193,6 +2225,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             complexMultiply(wLogR, wLogI, eR, eI, logR, logI, prec, arena);
             
             complexExp(resR, resI, wLogR, wLogI, prec, arena);
+
+            NativeSafe.invoke(MPFR_CLEAR, logR);
+            NativeSafe.invoke(MPFR_CLEAR, logI);
+            NativeSafe.invoke(MPFR_CLEAR, wLogR);
+            NativeSafe.invoke(MPFR_CLEAR, wLogI);
         }
     }
 

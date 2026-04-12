@@ -17,7 +17,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.mathematics.linearalgebra.GenericSolver;
+
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -256,10 +256,11 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         if (ring == null) return false;
+        // Native CPU backend is strictly for double-precision Real numbers.
+        // It does not support Complex numbers or Native high-precision types.
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
         Object zero = ring.zero();
-        return zero instanceof org.episteme.core.mathematics.numbers.real.Real || 
-               zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble;
+        return zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble;
     }
 
     @Override
@@ -500,11 +501,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         // No-op for now. Memory segments are managed via ScopedArena in operations.
     }
 
-    private boolean isNativeCompatible(Matrix<Real> a) {
-        if (!AVAILABLE) return false;
-        // Permissive: if we can extract it to a double array, it's compatible
-        return true; 
-    }
+
 
     private DoubleBuffer ensureDirect(Matrix<Real> a) {
         if (a instanceof RealDoubleMatrix) {
@@ -519,18 +516,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         return db;
     }
 
-    private DoubleBuffer ensureDirect(Vector<Real> v) {
-        if (v instanceof RealDoubleVector) {
-            RealDoubleVector rdv = (RealDoubleVector) v;
-            if (rdv.getBuffer().isDirect()) return rdv.getBuffer();
-        }
-        double[] data = toDoubleArray(v);
-        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
-            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        db.put(data);
-        db.flip();
-        return db;
-    }
+
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
@@ -592,7 +578,23 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             cBuf.get(cData);
             return RealDoubleMatrix.of(cData, m, n);
         }
-        return GenericSolver.multiply(a, b, a.getScalarRing(), this);
+        // Fallback manual multiplication
+        int m = a.rows();
+        int n = b.cols();
+        int k = a.cols();
+        double[] cData = new double[m * n];
+        double[] aData = toDoubleArray(a);
+        double[] bData = toDoubleArray(b);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                double sum = 0;
+                for (int l = 0; l < k; l++) {
+                    sum += aData[i * k + l] * bData[l * n + j];
+                }
+                cData[i * n + j] = sum;
+            }
+        }
+        return RealDoubleMatrix.of(cData, m, n);
     }
 
     @Override
