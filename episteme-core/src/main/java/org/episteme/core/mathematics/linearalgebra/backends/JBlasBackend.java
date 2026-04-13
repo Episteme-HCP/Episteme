@@ -302,12 +302,44 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
         @Override @SuppressWarnings("unchecked")
         public E determinant(Matrix<E> a) {
-            org.jblas.Decompose.LUDecomposition<org.jblas.DoubleMatrix> lu = org.jblas.Decompose.lu(toJBlasMatrix(a));
+            org.jblas.DoubleMatrix javaA = toJBlasMatrix(a);
+            org.jblas.Decompose.LUDecomposition<org.jblas.DoubleMatrix> lu = org.jblas.Decompose.lu(javaA);
             double det = 1.0;
             for (int i = 0; i < lu.u.rows; i++) det *= lu.u.get(i, i);
-            // In JBlas, the sign of the determinant from LU is not directly exposed as ipiv.
-            // For now, we return the product of diagonal elements of U.
-            // Note: This may be off by a sign if permutations occurred.
+            
+            // Account for permutation sign (parity)
+            // JBlas returns p such that a = p * l * u
+            // det(a) = det(p) * det(l) * det(u) = det(p) * 1 * det(u)
+            // Determinant of a permutation matrix is +1 or -1 based on parity.
+            int n = lu.p.rows;
+            int[] perm = new int[n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (lu.p.get(i, j) > 0.5) {
+                        perm[i] = j;
+                        break;
+                    }
+                }
+            }
+            
+            int swaps = 0;
+            boolean[] visited = new boolean[n];
+            for (int i = 0; i < n; i++) {
+                if (!visited[i]) {
+                    int j = i;
+                    int cycleSize = 0;
+                    while (!visited[j]) {
+                        visited[j] = true;
+                        j = perm[j];
+                        cycleSize++;
+                    }
+                    if (cycleSize > 1) {
+                        swaps += (cycleSize - 1);
+                    }
+                }
+            }
+            
+            if (swaps % 2 != 0) det = -det;
             return (E) Real.of(det);
         }
         @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {

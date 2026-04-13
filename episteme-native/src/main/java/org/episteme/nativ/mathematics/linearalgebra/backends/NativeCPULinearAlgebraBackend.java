@@ -28,6 +28,8 @@ import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 
 import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
@@ -525,44 +527,35 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        if (AVAILABLE) {
-            int rows = a.rows();
-            int cols = a.cols();
-            double[] ad = toDoubleArray(a);
-            double[] bd = toDoubleArray(b);
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-            return RealDoubleMatrix.of(rd, rows, cols);
-        }
-        throw new UnsupportedOperationException(getName() + ": Matrix add() not available");
+        int rows = a.rows();
+        int cols = a.cols();
+        double[] ad = toDoubleArray(a);
+        double[] bd = toDoubleArray(b);
+        double[] rd = new double[ad.length];
+        for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+        return RealDoubleMatrix.of(rd, rows, cols);
     }
 
     @Override
     public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        if (AVAILABLE) {
-            int rows = a.rows();
-            int cols = a.cols();
-            double[] ad = toDoubleArray(a);
-            double[] bd = toDoubleArray(b);
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
-            return RealDoubleMatrix.of(rd, rows, cols);
-        }
-        throw new UnsupportedOperationException(getName() + ": Matrix subtract() not available");
+        int rows = a.rows();
+        int cols = a.cols();
+        double[] ad = toDoubleArray(a);
+        double[] bd = toDoubleArray(b);
+        double[] rd = new double[ad.length];
+        for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+        return RealDoubleMatrix.of(rd, rows, cols);
     }
 
     @Override
     public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        if (AVAILABLE) {
-            int rows = a.rows();
-            int cols = a.cols();
-            double s = scalar.doubleValue();
-            double[] ad = toDoubleArray(a);
-            double[] rd = new double[ad.length];
-            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
-            return RealDoubleMatrix.of(rd, rows, cols);
-        }
-        throw new UnsupportedOperationException(getName() + ": scale() not available");
+        int rows = a.rows();
+        int cols = a.cols();
+        double s = scalar.doubleValue();
+        double[] ad = toDoubleArray(a);
+        double[] rd = new double[ad.length];
+        for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
+        return RealDoubleMatrix.of(rd, rows, cols);
     }
 
     @Override
@@ -674,62 +667,72 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     // Other methods default to UnsupportedOperationException
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (AVAILABLE) {
-            int m = a.rows();
-            int n = a.cols();
-            double[] aData = toDoubleArray(a);
-            double[] bData = toDoubleArray(b);
-            
-            RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
-            aCopy.getBuffer().put(aData); aCopy.getBuffer().flip();
-            
-            RealDoubleMatrix x = RealDoubleMatrix.direct(Math.max(m, n), 1);
-            x.getBuffer().put(bData); x.getBuffer().flip();
-            
-            int info = dgels('N', m, n, 1, aCopy.getBuffer(), m, x.getBuffer(), Math.max(m, n));
-            if (info != 0) throw new RuntimeException("dgels failed: " + info);
-            
-            double[] result = new double[n];
-            x.getBuffer().position(0); x.getBuffer().get(result);
-            return RealDoubleVector.of(result);
+        int m = a.rows();
+        int n = a.cols();
+        
+        if (AVAILABLE && DGELS_HANDLE != null) {
+            try {
+                double[] aData = toDoubleArray(a);
+                double[] bData = toDoubleArray(b);
+                
+                RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
+                aCopy.getBuffer().put(aData); aCopy.getBuffer().flip();
+                
+                RealDoubleMatrix x = RealDoubleMatrix.direct(Math.max(m, n), 1);
+                x.getBuffer().put(bData); x.getBuffer().flip();
+                
+                // Use 'N' for No Transpose
+                int info = dgels('N', m, n, 1, aCopy.getBuffer(), n, x.getBuffer(), 1);
+                if (info == 0) {
+                    double[] result = new double[n];
+                    x.getBuffer().position(0); x.getBuffer().get(result);
+                    return RealDoubleVector.of(result);
+                }
+            } catch (Throwable t) {
+                logger.log(System.Logger.Level.DEBUG, "Native dgels failed, falling back to Java: " + t.getMessage());
+            }
         }
-        throw new UnsupportedOperationException(getName() + ": solve() not available");
+        
+        // Fallback or Square Matrix Logic
+        if (m == n) {
+             return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.solve((Matrix<Real>) a, (Vector<Real>) b, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
+        }
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.solve(
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.decompose((Matrix<Real>) a, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this), (Vector<Real>) b, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
     }
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {
-        if (AVAILABLE) {
-            int m = a.rows();
-            int n = a.cols();
-            double[] data = toDoubleArray(a);
-            double[] res = new double[n * m];
-            
-            // Tiled Transpose for better cache locality (March 24 Optimization)
-            int tileSize = 64;
-            for (int i = 0; i < m; i += tileSize) {
-                for (int j = 0; j < n; j += tileSize) {
-                    for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
-                        for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
-                            res[jj * m + ii] = data[ii * n + jj];
-                        }
+        int m = a.rows();
+        int n = a.cols();
+        double[] data = toDoubleArray(a);
+        double[] res = new double[n * m];
+        
+        // Tiled Transpose for better cache locality (March 24 Optimization)
+        int tileSize = 64;
+        for (int i = 0; i < m; i += tileSize) {
+            for (int j = 0; j < n; j += tileSize) {
+                for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
+                    for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
+                        res[jj * m + ii] = data[ii * n + jj];
                     }
                 }
             }
-            return RealDoubleMatrix.of(res, n, m);
         }
-        throw new UnsupportedOperationException(getName() + ": transpose() not available");
+        return RealDoubleMatrix.of(res, n, m);
     }
 
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (AVAILABLE && a.rows() == a.cols()) {
+        if (AVAILABLE && DGESV_HANDLE != null && a.rows() == a.cols()) {
             int n = a.rows();
             double[] data = toDoubleArray(a);
             RealDoubleMatrix copy = RealDoubleMatrix.direct(n, n);
             copy.getBuffer().put(data); copy.getBuffer().flip();
 
             java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+            // dgetrf internally uses LAPACK_ROW_MAJOR
             int info = dgetrf(n, n, copy.getBuffer(), n, ipiv);
             if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
             if (info > 0) return Real.ZERO; // Singular matrix
@@ -740,7 +743,6 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             }
 
             // Correct LAPACK Permutation Parity: IPIV contains a sequence of transpositions.
-            // Parity is simply 1.0 if the number of swaps is even, -1.0 if odd.
             int swaps = 0;
             for (int i = 0; i < n; i++) {
                 if (ipiv.get(i) != (i + 1)) {
@@ -751,7 +753,9 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             
             return Real.of(det);
         }
-        throw new UnsupportedOperationException(getName() + ": determinant() not available for these types");
+        
+        // Fallback to java logic
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant((Matrix<Real>) a, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
     }
 
     @Override
@@ -897,40 +901,34 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (AVAILABLE) {
-            if (DDOT_HANDLE != null && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
-                RealDoubleVector av = (RealDoubleVector) a;
-                RealDoubleVector bv = (RealDoubleVector) b;
-                if (av.dimension() == bv.dimension()) {
-                    try {
-                        DoubleBuffer ab = ensureDirect(av);
-                        DoubleBuffer bb = ensureDirect(bv);
-                        return Real.of(ddot(av.dimension(), ab, 1, bb, 1));
-                    } catch (Throwable t) {
-                         // Fallback following failure
-                    }
+        if (AVAILABLE && DDOT_HANDLE != null && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
+            RealDoubleVector av = (RealDoubleVector) a;
+            RealDoubleVector bv = (RealDoubleVector) b;
+            if (av.dimension() == bv.dimension()) {
+                try {
+                    DoubleBuffer ab = ensureDirect(av);
+                    DoubleBuffer bb = ensureDirect(bv);
+                    return Real.of(ddot(av.dimension(), ab, 1, bb, 1));
+                } catch (Throwable t) {
+                     // Fallback following failure
                 }
             }
-            // Unified Generic Fallback
-            double[] ad = toDoubleArray(a);
-            double[] bd = toDoubleArray(b);
-            double sum = 0;
-            int n = Math.min(ad.length, bd.length);
-            for (int i = 0; i < n; i++) sum += ad[i] * bd[i];
-            return Real.of(sum);
         }
-        throw new UnsupportedOperationException(getName() + ": dot() not available");
+        // Unified Generic Fallback
+        double[] ad = toDoubleArray(a);
+        double[] bd = toDoubleArray(b);
+        double sum = 0;
+        int n = Math.min(ad.length, bd.length);
+        for (int i = 0; i < n; i++) sum += ad[i] * bd[i];
+        return Real.of(sum);
     }
 
     @Override
     public Real norm(Vector<Real> a) {
-        if (AVAILABLE) {
-            double[] ad = toDoubleArray(a);
-            double sumSq = 0.0;
-            for (double d : ad) sumSq += d * d;
-            return Real.of(Math.sqrt(sumSq));
-        }
-        throw new UnsupportedOperationException(getName() + ": norm() not available");
+        double[] ad = toDoubleArray(a);
+        double sumSq = 0.0;
+        for (double d : ad) sumSq += d * d;
+        return Real.of(Math.sqrt(sumSq));
     }
 
     @Override
@@ -948,7 +946,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix) {
+        if (AVAILABLE && DGEQRF_HANDLE != null && a instanceof RealDoubleMatrix) {
             int m = a.rows();
             int n = a.cols();
             int k = Math.min(m, n);
@@ -963,34 +961,35 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
             // 1. DGEQRF
             int info = dgeqrf(m, n, qMat.getBuffer(), n, tau);
-            if (info != 0) throw new RuntimeException("dgeqrf failed with info: " + info);
+            if (info == 0) {
+                // 2. Extract R
+                double[] rData = new double[k * n];
+                double[] aFactored = qMat.toDoubleArray();
+                for (int i = 0; i < k; i++) {
+                    for (int j = i; j < n; j++) {
+                        rData[i * n + j] = aFactored[i * n + j];
+                    }
+                }
+                Matrix<Real> R = RealDoubleMatrix.of(rData, k, n);
 
-            // 2. Extract R
-            double[] rData = new double[k * n];
-            double[] aFactored = qMat.toDoubleArray();
-            for (int i = 0; i < k; i++) {
-                for (int j = i; j < n; j++) {
-                    rData[i * n + j] = aFactored[i * n + j];
+                // 3. DORGQR (Economy Q: m x k)
+                info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
+                if (info == 0) {
+                    double[] qDataFull = qMat.toDoubleArray();
+                    double[] qDataEconomy = new double[m * k];
+                    for (int i = 0; i < m; i++) {
+                        for (int j = 0; j < k; j++) {
+                            qDataEconomy[i * k + j] = qDataFull[i * n + j];
+                        }
+                    }
+                    Matrix<Real> Q = RealDoubleMatrix.of(qDataEconomy, m, k);
+
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
                 }
             }
-            Matrix<Real> R = RealDoubleMatrix.of(rData, k, n);
-
-            // 3. DORGQR (Economy Q: m x k)
-            info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
-            if (info != 0) throw new RuntimeException("dorgqr failed with info: " + info);
-
-            double[] qDataFull = qMat.toDoubleArray();
-            double[] qDataEconomy = new double[m * k];
-            for (int i = 0; i < m; i++) {
-                for (int j = 0; j < k; j++) {
-                    qDataEconomy[i * k + j] = qDataFull[i * n + j];
-                }
-            }
-            Matrix<Real> Q = RealDoubleMatrix.of(qDataEconomy, m, k);
-
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
         }
-        throw new UnsupportedOperationException(getName() + ": qr() not available for these types");
+        // Fallback
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.decompose((Matrix<Real>) a, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
     }
 
     @Override
@@ -1037,6 +1036,21 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             );
         }
         throw new UnsupportedOperationException(getName() + ": svd() not available");
+    }
+
+    @Override
+    public Vector<Real> solve(LUResult<Real> lu, Vector<Real> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.solve(lu, b, (org.episteme.core.mathematics.structures.rings.Field<Real>)b.getScalarRing(), this);
+    }
+
+    @Override
+    public Vector<Real> solve(QRResult<Real> qr, Vector<Real> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.solve(qr, b, (org.episteme.core.mathematics.structures.rings.Field<Real>)b.getScalarRing(), this);
+    }
+
+    @Override
+    public Vector<Real> solve(CholeskyResult<Real> cholesky, Vector<Real> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericCholesky.solve(cholesky, b, (org.episteme.core.mathematics.structures.rings.Field<Real>)b.getScalarRing(), this);
     }
 
 }

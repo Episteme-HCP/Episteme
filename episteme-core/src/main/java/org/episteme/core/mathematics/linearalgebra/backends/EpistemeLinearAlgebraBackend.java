@@ -1,5 +1,6 @@
 package org.episteme.core.mathematics.linearalgebra.backends;
 
+import java.util.List;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -113,55 +114,56 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
         sparseProvider.shutdown();
     }
 
+    @Override
+    public String getSimdLevel() {
+        return "GENERIC";
+    }
+
+    @Override
+    public int getPreferredVectorWidth() {
+        return 32; // Default to 256-bit
+    }
+
     // --- Delegation Logic ---
 
+    @SuppressWarnings("unchecked")
     private LinearAlgebraProvider<E> getBestProvider(Matrix<E> a) {
-        Class<? extends LinearAlgebraProvider> providerClass = (a instanceof SparseMatrix) ? SparseLinearAlgebraProvider.class : LinearAlgebraProvider.class;
+        // Strict delegation: prioritize specialized backends, fallback to foundation
+        Class providerClass = (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) ? SparseLinearAlgebraProvider.class : LinearAlgebraProvider.class;
+        LinearAlgebraProvider<E> internal = (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
+
         try {
-            LinearAlgebraProvider<E> best = (LinearAlgebraProvider<E>) AlgorithmManager.getProvider(providerClass);
-            if (best == this || best.getClass().equals(this.getClass())) {
-                return (LinearAlgebraProvider<E>) AlgorithmManager.getNextProvider(providerClass, this);
+            List<LinearAlgebraProvider> available = AlgorithmManager.getProviders(providerClass);
+            LinearAlgebraProvider<E> best = (LinearAlgebraProvider<E>) available.stream()
+                .filter(p -> !p.getClass().equals(this.getClass()) && !(p instanceof EpistemeLinearAlgebraBackend))
+                .findFirst()
+                .orElse(null);
+
+            if (best == null || best == this || best.getClass().equals(this.getClass())) {
+                return internal;
             }
             return best;
         } catch (Exception e) {
-            // Fallback to internal foundation components
-            return (a instanceof SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
+            return internal;
         }
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T executeComplexOperation(java.util.function.Function<LinearAlgebraProvider<E>, T> operation) {
         try {
-            return operation.apply((LinearAlgebraProvider<E>) AlgorithmManager.getProvider(LinearAlgebraProvider.class));
-        } catch (ClassCastException | UnsupportedOperationException e) {
+            List<LinearAlgebraProvider> available = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
+            LinearAlgebraProvider<E> best = (LinearAlgebraProvider<E>) available.stream()
+                .filter(p -> !p.getClass().equals(this.getClass()) && !(p instanceof EpistemeLinearAlgebraBackend))
+                .findFirst()
+                .orElse(null);
+
+            if (best == null || best == this || best.getClass().equals(this.getClass())) {
+                return operation.apply(denseProvider);
+            }
+            return operation.apply(best);
+        } catch (Exception e) {
             return operation.apply(denseProvider);
         }
-    }
-
-
-
-    @Override
-    public Vector<E> add(Vector<E> a, Vector<E> b) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).add(a, b));
-    }
-
-    @Override
-    public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).subtract(a, b));
-    }
-
-    @Override
-    public Vector<E> multiply(Vector<E> vector, E scalar) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).multiply(vector, scalar));
-    }
-
-    @Override
-    public E dot(Vector<E> a, Vector<E> b) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).dot(a, b));
-    }
-
-    @Override
-    public E norm(Vector<E> a) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).norm(a));
     }
 
     @Override
@@ -180,18 +182,24 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
-    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        return getBestProvider(a).multiply(a, b);
+    public Vector<E> multiply(Vector<E> vector, E scalar) {
+        // Vectors don't have sparse variants in current SPI, route to dense
+        return denseProvider.multiply(vector, scalar);
+    }
+
+    @Override
+    public E dot(Vector<E> a, Vector<E> b) {
+        return denseProvider.dot(a, b);
+    }
+
+    @Override
+    public E norm(Vector<E> a) {
+        return denseProvider.norm(a);
     }
 
     @Override
     public Matrix<E> transpose(Matrix<E> a) {
         return getBestProvider(a).transpose(a);
-    }
-
-    @Override
-    public Matrix<E> scale(E scalar, Matrix<E> a) {
-        return getBestProvider(a).scale(scalar, a);
     }
 
     @Override
@@ -205,11 +213,6 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
-    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        return getBestProvider(a).solve(a, b);
-    }
-
-    @Override
     public LUResult<E> lu(Matrix<E> a) {
         return getBestProvider(a).lu(a);
     }
@@ -220,60 +223,42 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        return getBestProvider(a).cholesky(a);
+    }
+
+    @Override
+    public EigenResult<E> eigen(Matrix<E> a) {
+        return getBestProvider(a).eigen(a);
+    }
+
+    @Override
     public SVDResult<E> svd(Matrix<E> a) {
         return getBestProvider(a).svd(a);
     }
 
     @Override
-    public CholeskyResult<E> cholesky(Matrix<E> a) {
-        return getBestProvider(a).cholesky(a);
-    }
-
-
-    @Override
-    public EigenResult<E> eigen(Matrix<E> a) {
-        return denseProvider.eigen(a);
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        return getBestProvider(a).solve(a, b);
     }
 
     @Override
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        return denseProvider.solve(lu, b);
+        return executeComplexOperation(p -> p.solve(lu, b));
     }
 
     @Override
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
-        return denseProvider.solve(qr, b);
+        return executeComplexOperation(p -> p.solve(qr, b));
     }
 
     @Override
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
-        return denseProvider.solve(cholesky, b);
+        return executeComplexOperation(p -> p.solve(cholesky, b));
     }
 
     @Override
-    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        return sparseProvider.bicgstab(a, b, x0, tolerance, maxIterations);
-    }
-
-    @Override
-    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        return sparseProvider.conjugateGradient(a, b, x0, tolerance, maxIterations);
-    }
-
-    @Override
-    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
-        return sparseProvider.gmres(a, b, x0, tolerance, maxIterations, restarts);
-    }
-
-    // ---- SIMDBackend ---
-
-    @Override
-    public String getSimdLevel() {
-        return "GENERIC";
-    }
-
-    @Override
-    public int getPreferredVectorWidth() {
-        return 32;
+    public void close() {
+        shutdown();
     }
 }

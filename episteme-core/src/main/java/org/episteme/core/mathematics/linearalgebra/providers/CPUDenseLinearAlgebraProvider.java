@@ -244,30 +244,41 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
         if (a.dimension() != b.dimension()) {
             throw new IllegalArgumentException("Vector dimensions must match");
         }
+        if (isReal(a) && isReal(b)) {
+            double[] ad = toDoubleArray(a);
+            double[] bd = toDoubleArray(b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+            return (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(rd);
+        }
+
         final Ring<E> r = a.getScalarRing();
         if (a.dimension() < PARALLEL_THRESHOLD) {
-            List<E> result = new ArrayList<>(a.dimension());
+            List<E> result = new java.util.ArrayList<>(a.dimension());
             for (int i = 0; i < a.dimension(); i++) {
                 E negB = ((Field<E>) r).negate(b.get(i));
                 result.add(((Field<E>) r).add(a.get(i), negB));
             }
+            @SuppressWarnings("unchecked")
+            E[] arr = (E[]) result.toArray();
             return new GenericVector<>(
-                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
+                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this,
                     (Field<E>) r);
         } else {
-            return Episteme.computeParallel(() -> {
-                List<E> list = IntStream.range(0, a.dimension())
+            return org.episteme.core.Episteme.computeParallel(() -> {
+                List<E> list = java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
                         if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                         E negB = ((Field<E>) r).negate(b.get(i));
                         return ((Field<E>) r).add(a.get(i), negB);
                     })
-                    .collect(Collectors.toList());
+                    .collect(java.util.stream.Collectors.toList());
                 @SuppressWarnings("unchecked")
                 E[] arr = (E[]) list.toArray();
                 return new GenericVector<>(
@@ -281,31 +292,23 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     public Vector<E> multiply(Vector<E> vector, E scalar) {
         Ring<E> ring = vector.getScalarRing();
         if (vector.dimension() < PARALLEL_THRESHOLD) {
-            List<E> result = new ArrayList<>(vector.dimension());
+            List<E> result = new java.util.ArrayList<>(vector.dimension());
             for (int i = 0; i < vector.dimension(); i++) {
                 result.add(((Field<E>)ring).multiply(vector.get(i), scalar));
             }
-            // return new GenericVector(result.toArray(newFieldsElement[0]...), this,
-            // field);
-            // Handling array creation generically is hard without class token.
-            // DenseVector dealt with List. GenericVector takes Array.
-            // We can create Array from List if we have type?
-            // E is generic.
-            // We can convert List to Array if we cast.
-
             @SuppressWarnings("unchecked")
-            E[] arr = (E[]) result.toArray(); // Safe if result contains E
+            E[] arr = (E[]) result.toArray();
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, (Field<E>)ring);
         } else {
-            return IntStream.range(0, vector.dimension())
+            return java.util.stream.IntStream.range(0, vector.dimension())
                     .parallel()
                     .mapToObj(i -> {
                         if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                         return ((Field<E>)ring).multiply(vector.get(i), scalar);
                     })
-                    .collect(Collectors.collectingAndThen(
-                            Collectors.toList(),
+                    .collect(java.util.stream.Collectors.collectingAndThen(
+                            java.util.stream.Collectors.toList(),
                             list -> {
                                 @SuppressWarnings("unchecked")
                                 E[] arr = (E[]) list.toArray();
@@ -332,14 +335,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             for (int i = 0; i < dim; i++) {
                 sum += aData[i] * bData[i];
             }
-            Object res = Real.of(sum);
-            // If E is not Real, we must not return Real. 
-            // However, isReal(a) usually implies E is Real or compatible.
-            // Check if E is actually Real to avoid ClassCastException.
             if (field.zero() instanceof Real) {
-                return (E) res;
+                return (E) Real.of(sum);
             }
-            // Fallback to generic path if types don't match
         }
 
         final Ring<E> r = a.getScalarRing();
@@ -351,7 +349,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
             return sum;
         } else {
-            return Episteme.computeParallel(() -> IntStream.range(0, a.dimension())
+            return org.episteme.core.Episteme.computeParallel(() -> java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
                         if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
@@ -372,9 +370,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 double val = aData[i];
                 sumSq += val * val;
             }
-            Object res = Real.of(Math.sqrt(sumSq));
             if (field.zero() instanceof Real) {
-                return (E) res;
+                return (E) Real.of(Math.sqrt(sumSq));
             }
         }
 
