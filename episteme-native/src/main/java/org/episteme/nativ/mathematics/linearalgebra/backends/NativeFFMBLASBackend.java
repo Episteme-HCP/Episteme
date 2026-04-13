@@ -20,6 +20,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -389,6 +390,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 ZHEEV = findLapackSymbol("LAPACKE_zheev")
                     .map(s -> LINKER.downcallHandle(s, zheevDesc)).orElse(null);
 
+                ZGELS = findLapackSymbol("LAPACKE_zgels")
+                    .map(s -> LINKER.downcallHandle(s, dgelsDescriptor)).orElse(null); // zgels has same signature as dgels (using double for complex interlaced)
+
                 available = (DGEMM != null && DGEMV != null && DDOT != null);
 
                 if (available) {
@@ -431,22 +435,22 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                      MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
                      MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                      MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-                     int info = (int) ZGESV.invokeExact(LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
+                     int info = (int) NativeSafe.invoke(ZGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                      if (info != 0) throw new ArithmeticException("ZGESV failed: " + info);
                      double[] resData = segB.toArray(ValueLayout.JAVA_DOUBLE);
                      return createDenseVector(resData, n, A);
-                 } catch (Throwable t) { throw new RuntimeException(t); }
+                 }
              }
              if (DGESV == null) throw new UnsupportedOperationException(getName() + ": DGESV not available");
              try (Arena arena = Arena.ofConfined()) {
                  MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
                  MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
                  MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-                 int info = (int) DGESV.invokeExact(LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
+                 int info = (int) NativeSafe.invoke(DGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                  if (info != 0) throw new ArithmeticException("DGESV failed: " + info);
                  double[] result = segB.toArray(ValueLayout.JAVA_DOUBLE);
                  return createDenseVector(result, n, A);
-             } catch (Throwable t) { throw new RuntimeException(t); }
+             }
         } else {
              // Least Squares
              if (complex) {
@@ -458,13 +462,13 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                      double[] bOrig = toInterlacedDoubleArray(b);
                      System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
                      MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bPad);
-                     int info = (int) ZGELS.invokeExact(LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, segA, n, segB, 1);
+                     int info = (int) NativeSafe.invoke(ZGELS, LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, segA, n, segB, 1);
                      if (info != 0) throw new RuntimeException("ZGELS failed: " + info);
                      double[] resFull = segB.toArray(ValueLayout.JAVA_DOUBLE);
                      double[] resData = new double[n * 2];
                      System.arraycopy(resFull, 0, resData, 0, n * 2);
                      return createDenseVector(resData, n, A);
-                 } catch (Throwable t) { throw new RuntimeException(t); }
+                 }
              }
              if (DGELS == null) throw new UnsupportedOperationException(getName() + ": DGELS not available");
              try (Arena arena = Arena.ofConfined()) {
@@ -474,12 +478,12 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                  double[] bOrig = toDoubleArray(b);
                  System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
                  MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bPad);
-                 int info = (int) DGELS.invokeExact(LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, segA, n, segB, 1);
+                 int info = (int) NativeSafe.invoke(DGELS, LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, segA, n, segB, 1);
                  if (info != 0) throw new RuntimeException("DGELS failed: " + info);
                  double[] result = new double[n];
                  MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
                  return createDenseVector(result, n, A);
-             } catch (Throwable t) { throw new RuntimeException(t); }
+             }
         }
     }
 
@@ -521,22 +525,12 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 double[] arrA = toDoubleArray(a);
                 MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
                 MemorySegment segC = MemorySegment.ofBuffer(res.getBuffer());
-                DOMATCOPY.invokeExact(CblasRowMajor, 112, m, n, 1.0, segA, n, segC, m);
+                NativeSafe.invoke(DOMATCOPY, CblasRowMajor, 112, m, n, 1.0, segA, n, segC, m);
                 return (Matrix<E>) (Matrix<?>) res;
-            } catch (Throwable t) {
-                logger.error("FFM BLAS Transpose failed: {}", t.getMessage());
             }
         }
 
-        // Fallback or if DOMATCOPY fails
-        double[] data = toDoubleArray(a);
-        double[] res = new double[data.length];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                res[j * m + i] = data[i * n + j];
-            }
-        }
-        return (Matrix<E>) createDenseMatrix(res, n, m, a);
+        throw new UnsupportedOperationException(getName() + ": transpose() failed or not available");
     }
     
     @Override
@@ -552,26 +546,26 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
              try (Arena arena = Arena.ofConfined()) {
                  MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
                  MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-                 int info = (int) ZGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                 int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                  if (info != 0) throw new ArithmeticException("ZGETRF failed: " + info);
-                 info = (int) ZGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
+                 info = (int) NativeSafe.invoke(ZGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
                  if (info != 0) throw new ArithmeticException("ZGETRI failed: " + info);
                  double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
                  return createDenseMatrix(result, n, n, A);
-             } catch (Throwable t) { throw new RuntimeException(t); }
+             }
          }
          
          if (DGETRF == null || DGETRI == null) throw new UnsupportedOperationException(getName() + ": inverse() not available");
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-             int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+             int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
              if (info != 0) throw new ArithmeticException("DGETRF failed: " + info);
-             info = (int) DGETRI.invokeExact(LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
+             info = (int) NativeSafe.invoke(DGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
              if (info != 0) throw new ArithmeticException("DGETRI failed: " + info);
              double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
              return createDenseMatrix(result, n, n, A);
-         } catch (Throwable t) { throw new RuntimeException(t); }
+         }
     }
 
     private Matrix<E> pseudoInverse(Matrix<E> a) {

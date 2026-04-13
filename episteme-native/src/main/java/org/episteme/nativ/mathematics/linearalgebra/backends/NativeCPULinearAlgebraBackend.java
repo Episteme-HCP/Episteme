@@ -35,6 +35,7 @@ import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 /**
  * Standalone Native Linear Algebra backend using bundled episteme_native library.
@@ -303,150 +304,74 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                      DoubleBuffer B, int ldb,
                      DoubleBuffer C, int ldc,
                      double alpha, double beta) {
-        if (!AVAILABLE) throw new UnsupportedOperationException("BLAS native library not found");
-
-        try {
-            DGEMM_HANDLE.invoke(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
+        if (!AVAILABLE || DGEMM_HANDLE == null) throw new UnsupportedOperationException("BLAS native library not found");
+        NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
                 alpha, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb, beta, MemorySegment.ofBuffer(C), ldc);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("CBLAS dgemm failed", t);
-        }
     }
 
     public void dgemv(int m, int n, double alpha, DoubleBuffer A, int lda, DoubleBuffer x, int incx, double beta, DoubleBuffer y, int incy) {
         if (!AVAILABLE || DGEMV_HANDLE == null) throw new UnsupportedOperationException("CBLAS dgemv not available");
-        try {
-            DGEMV_HANDLE.invoke(CblasRowMajor, CblasNoTrans, m, n, alpha, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(x), incx, beta, MemorySegment.ofBuffer(y), incy);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("CBLAS dgemv failed", t);
-        }
+        NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, alpha, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(x), incx, beta, MemorySegment.ofBuffer(y), incy);
     }
 
     public double ddot(int n, DoubleBuffer x, int incx, DoubleBuffer y, int incy) {
         if (!AVAILABLE || DDOT_HANDLE == null) throw new UnsupportedOperationException("CBLAS ddot not available");
-        try {
-            return (double) DDOT_HANDLE.invoke(n, MemorySegment.ofBuffer(x), incx, MemorySegment.ofBuffer(y), incy);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("CBLAS ddot failed", t);
-        }
+        return (double) NativeSafe.invoke(DDOT_HANDLE, n, MemorySegment.ofBuffer(x), incx, MemorySegment.ofBuffer(y), incy);
     }
 
     public double dnrm2(int n, DoubleBuffer x, int incx) {
         if (!AVAILABLE || DNRM2_HANDLE == null) throw new UnsupportedOperationException("CBLAS dnrm2 not available");
-        try {
-            return (double) DNRM2_HANDLE.invoke(n, MemorySegment.ofBuffer(x), incx);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("CBLAS dnrm2 failed", t);
-        }
+        return (double) NativeSafe.invoke(DNRM2_HANDLE, n, MemorySegment.ofBuffer(x), incx);
     }
 
     public void dscal(int n, double alpha, DoubleBuffer x, int incx) {
         if (!AVAILABLE || DSCAL_HANDLE == null) throw new UnsupportedOperationException("CBLAS dscal not available");
-        try {
-            DSCAL_HANDLE.invoke(n, alpha, MemorySegment.ofBuffer(x), incx);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("CBLAS dscal failed", t);
-        }
+        NativeSafe.invoke(DSCAL_HANDLE, n, alpha, MemorySegment.ofBuffer(x), incx);
     }
 
     public int dgetrf(int m, int n, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv) {
         if (!AVAILABLE || DGETRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgetrf not available");
-        try {
-            MemorySegment aSeg = MemorySegment.ofBuffer(A);
-            MemorySegment ipivSeg = MemorySegment.ofBuffer(ipiv);
-            return (int) DGETRF_HANDLE.invoke(LAPACK_ROW_MAJOR, m, n, aSeg, lda, ipivSeg);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dgetrf failed", t);
-        }
+        return (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
     }
 
     public int dgetri(int n, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv) {
         if (!AVAILABLE || DGETRI_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgetri not available");
-        try {
-            return (int) DGETRI_HANDLE.invoke(LAPACK_ROW_MAJOR, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dgetri failed", t);
-        }
+        return (int) NativeSafe.invoke(DGETRI_HANDLE, LAPACK_ROW_MAJOR, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
     }
 
     public int dgesv(int n, int nrhs, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv, DoubleBuffer B, int ldb) {
         if (!AVAILABLE || DGESV_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesv not available");
-        try {
-            return (int) DGESV_HANDLE.invoke(LAPACK_ROW_MAJOR, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv), MemorySegment.ofBuffer(B), ldb);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dgesv failed", t);
-        }
+        return (int) NativeSafe.invoke(DGESV_HANDLE, LAPACK_ROW_MAJOR, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv), MemorySegment.ofBuffer(B), ldb);
     }
 
     public int dsyev(int n, DoubleBuffer A, int lda, DoubleBuffer W) {
         if (!AVAILABLE || DSYEV_HANDLE == null) throw new UnsupportedOperationException("LAPACK dsyev not available");
-        try {
-            MemorySegment aSeg = MemorySegment.ofBuffer(A);
-            MemorySegment wSeg = MemorySegment.ofBuffer(W);
-            return (int) DSYEV_HANDLE.invokeExact(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
-        } catch (Throwable t) {
-            throw new RuntimeException("LAPACK dsyev failed", t);
-        }
+        return (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, MemorySegment.ofBuffer(A), n, MemorySegment.ofBuffer(W));
     }
 
     public int dpotrf(int n, DoubleBuffer A, int lda) {
         if (!AVAILABLE || DPOTRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dpotrf not available");
-        try {
-            return (int) DPOTRF_HANDLE.invoke(LAPACK_ROW_MAJOR, (byte) 'L', n, MemorySegment.ofBuffer(A), lda);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dpotrf failed", t);
-        }
+        return (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, MemorySegment.ofBuffer(A), lda);
     }
 
     public int dgeqrf(int m, int n, DoubleBuffer A, int lda, DoubleBuffer tau) {
         if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgeqrf not available");
-        try {
-            MemorySegment aSeg = MemorySegment.ofBuffer(A);
-            MemorySegment tauSeg = MemorySegment.ofBuffer(tau);
-            return (int) DGEQRF_HANDLE.invoke(LAPACK_ROW_MAJOR, m, n, aSeg, n, tauSeg);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dgeqrf failed", t);
-        }
+        return (int) NativeSafe.invoke(DGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), n, MemorySegment.ofBuffer(tau));
     }
 
     public int dorgqr(int m, int n, int k, DoubleBuffer A, int lda, DoubleBuffer tau) {
         if (!AVAILABLE || DORGQR_HANDLE == null) throw new UnsupportedOperationException("LAPACK dorgqr not available");
-        try {
-            return (int) DORGQR_HANDLE.invoke(LAPACK_ROW_MAJOR, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dorgqr failed", t);
-        }
+        return (int) NativeSafe.invoke(DORGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
     }
 
     public int dgesvd(byte jobu, byte jobvt, int m, int n, DoubleBuffer A, int lda, DoubleBuffer S, DoubleBuffer U, int ldu, DoubleBuffer VT, int ldvt, DoubleBuffer superb) {
         if (!AVAILABLE || DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesvd not available");
-        try {
-            return (int) DGESVD_HANDLE.invoke(LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dgesvd failed", t);
-        }
+        return (int) NativeSafe.invoke(DGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
     }
 
     public int dgels(char trans, int m, int n, int nrhs, DoubleBuffer A, int lda, DoubleBuffer B, int ldb) {
         if (!AVAILABLE || DGELS_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgels not available");
-        try {
-            return (int) DGELS_HANDLE.invoke(LAPACK_ROW_MAJOR, (byte) trans, m, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RuntimeException("LAPACK dgels failed", t);
-        }
+        return (int) NativeSafe.invoke(DGELS_HANDLE, LAPACK_ROW_MAJOR, (byte) trans, m, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb);
     }
 
     @Override
@@ -462,12 +387,15 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             int m = adm.rows();
             int n = adm.cols();
             
-            double[] result = new double[m];
             DoubleBuffer aBuf = ensureDirect(adm);
             DoubleBuffer bBuf = ensureDirect(bdv);
-            DoubleBuffer rBuf = DoubleBuffer.wrap(result);
+            DoubleBuffer rBuf = java.nio.ByteBuffer.allocateDirect(m * 8)
+                    .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
             
             dgemv(m, n, 1.0, aBuf, n, bBuf, 1, 0.0, rBuf, 1);
+            
+            double[] result = new double[m];
+            rBuf.get(result);
             return RealDoubleVector.of(result);
         }
         // Fallback for non-RealDouble types or if not available
@@ -510,18 +438,6 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
 
 
-    private DoubleBuffer ensureDirect(Matrix<Real> a) {
-        if (a instanceof RealDoubleMatrix) {
-            RealDoubleMatrix rdm = (RealDoubleMatrix) a;
-            if (rdm.getBuffer().isDirect()) return rdm.getBuffer();
-        }
-        double[] data = toDoubleArray(a);
-        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
-            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        db.put(data);
-        db.flip();
-        return db;
-    }
 
 
 
@@ -561,38 +477,18 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     @Override
     public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (a.cols() != b.rows()) throw new IllegalArgumentException("Incompatible dimensions: " + a.cols() + " != " + b.rows());
-        if (AVAILABLE && DGEMM_HANDLE != null) {
-            int m = a.rows();
-            int k = a.cols();
-            int n = b.cols();
-            
-            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * k * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            aBuf.put(toDoubleArray(a)); aBuf.flip();
-            DoubleBuffer bBuf = java.nio.ByteBuffer.allocateDirect(k * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            bBuf.put(toDoubleArray(b)); bBuf.flip();
-            
-            DoubleBuffer cBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            dgemm(m, n, k, aBuf, k, bBuf, n, cBuf, n, 1.0, 0.0);
-            double[] cData = new double[m * n];
-            cBuf.get(cData);
-            return RealDoubleMatrix.of(cData, m, n);
-        }
-        // Fallback manual multiplication
+        if (!AVAILABLE || DGEMM_HANDLE == null) throw new UnsupportedOperationException(getName() + ": DGEMM not available");
+        
         int m = a.rows();
-        int n = b.cols();
         int k = a.cols();
+        int n = b.cols();
+        
+        DoubleBuffer aBuf = ensureDirect(a);
+        DoubleBuffer bBuf = ensureDirect(b);
+        DoubleBuffer cBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        dgemm(m, n, k, aBuf, k, bBuf, n, cBuf, n, 1.0, 0.0);
         double[] cData = new double[m * n];
-        double[] aData = toDoubleArray(a);
-        double[] bData = toDoubleArray(b);
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                double sum = 0;
-                for (int l = 0; l < k; l++) {
-                    sum += aData[i * k + l] * bData[l * n + j];
-                }
-                cData[i * n + j] = sum;
-            }
-        }
+        cBuf.get(cData);
         return RealDoubleMatrix.of(cData, m, n);
     }
 
@@ -654,15 +550,41 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         return direct;
     }
 
-
-    private DoubleBuffer ensureDirect(RealDoubleVector v) {
-        if (v.getBuffer().isDirect()) return v.getBuffer().duplicate().position(0);
-        DoubleBuffer direct = java.nio.ByteBuffer.allocateDirect(v.dimension() * 8)
-            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        direct.put(v.toDoubleArray());
-        direct.flip();
-        return direct;
+    private DoubleBuffer ensureDirect(Matrix<Real> m) {
+        if (m instanceof RealDoubleMatrix rdm && rdm.isDirect()) {
+            return rdm.getBuffer().duplicate().position(0);
+        }
+        double[] data = toDoubleArray(m);
+        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        db.put(data);
+        db.flip();
+        return db;
     }
+
+    private DoubleBuffer ensureDirect(Vector<Real> v) {
+        if (v instanceof RealDoubleVector rdv && rdv.getBuffer().isDirect()) {
+            return rdv.getBuffer().duplicate().position(0);
+        }
+        double[] data = toDoubleArray(v);
+        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        db.put(data);
+        db.flip();
+        return db;
+    }
+
+    private DoubleBuffer ensureDirect(org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage s) {
+        if (s.getBuffer().isDirect()) return s.getBuffer().duplicate().position(0);
+        double[] data = s.toDoubleArray();
+        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        db.put(data);
+        db.flip();
+        return db;
+    }
+
+
 
     // Other methods default to UnsupportedOperationException
     @Override
@@ -670,35 +592,25 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         int m = a.rows();
         int n = a.cols();
         
-        if (AVAILABLE && DGELS_HANDLE != null) {
-            try {
-                double[] aData = toDoubleArray(a);
-                double[] bData = toDoubleArray(b);
-                
-                RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
-                aCopy.getBuffer().put(aData); aCopy.getBuffer().flip();
-                
-                RealDoubleMatrix x = RealDoubleMatrix.direct(Math.max(m, n), 1);
-                x.getBuffer().put(bData); x.getBuffer().flip();
-                
-                // Use 'N' for No Transpose
-                int info = dgels('N', m, n, 1, aCopy.getBuffer(), n, x.getBuffer(), 1);
-                if (info == 0) {
-                    double[] result = new double[n];
-                    x.getBuffer().position(0); x.getBuffer().get(result);
-                    return RealDoubleVector.of(result);
-                }
-            } catch (Throwable t) {
-                logger.log(System.Logger.Level.DEBUG, "Native dgels failed, falling back to Java: " + t.getMessage());
-            }
-        }
+        if (!AVAILABLE || DGELS_HANDLE == null) throw new UnsupportedOperationException(getName() + ": DGELS not available");
+
+        double[] aData = toDoubleArray(a);
+        double[] bData = toDoubleArray(b);
         
-        // Fallback or Square Matrix Logic
-        if (m == n) {
-             return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.solve((Matrix<Real>) a, (Vector<Real>) b, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
+        RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
+        aCopy.getBuffer().put(aData); aCopy.getBuffer().flip();
+        
+        RealDoubleMatrix x = RealDoubleMatrix.direct(Math.max(m, n), 1);
+        x.getBuffer().put(bData); x.getBuffer().flip();
+        
+        // Use 'N' for No Transpose
+        int info = dgels('N', m, n, 1, aCopy.getBuffer(), n, x.getBuffer(), 1);
+        if (info == 0) {
+            double[] result = new double[n];
+            x.getBuffer().position(0); x.getBuffer().get(result);
+            return RealDoubleVector.of(result);
         }
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.solve(
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.decompose((Matrix<Real>) a, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this), (Vector<Real>) b, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
+        throw new ArithmeticException("Native dgels failed with info: " + info);
     }
 
     @Override
@@ -725,37 +637,34 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (AVAILABLE && DGESV_HANDLE != null && a.rows() == a.cols()) {
-            int n = a.rows();
-            double[] data = toDoubleArray(a);
-            RealDoubleMatrix copy = RealDoubleMatrix.direct(n, n);
-            copy.getBuffer().put(data); copy.getBuffer().flip();
+        if (!AVAILABLE || DGESV_HANDLE == null || a.rows() != a.cols()) throw new UnsupportedOperationException(getName() + ": determinant not available");
 
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-            // dgetrf internally uses LAPACK_ROW_MAJOR
-            int info = dgetrf(n, n, copy.getBuffer(), n, ipiv);
-            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-            if (info > 0) return Real.ZERO; // Singular matrix
+        int n = a.rows();
+        double[] data = toDoubleArray(a);
+        RealDoubleMatrix copy = RealDoubleMatrix.direct(n, n);
+        copy.getBuffer().put(data); copy.getBuffer().flip();
 
-            double det = 1.0;
-            for (int i = 0; i < n; i++) {
-                det *= copy.get(i, i).doubleValue();
-            }
+        java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
+        // dgetrf internally uses LAPACK_ROW_MAJOR
+        int info = dgetrf(n, n, copy.getBuffer(), n, ipiv);
+        if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+        if (info > 0) return Real.ZERO; // Singular matrix
 
-            // Correct LAPACK Permutation Parity: IPIV contains a sequence of transpositions.
-            int swaps = 0;
-            for (int i = 0; i < n; i++) {
-                if (ipiv.get(i) != (i + 1)) {
-                    swaps++;
-                }
-            }
-            if (swaps % 2 != 0) det = -det;
-            
-            return Real.of(det);
+        double det = 1.0;
+        for (int i = 0; i < n; i++) {
+            det *= copy.get(i, i).doubleValue();
         }
+
+        // Correct LAPACK Permutation Parity: IPIV contains a sequence of transpositions.
+        int swaps = 0;
+        for (int i = 0; i < n; i++) {
+            if (ipiv.get(i) != (i + 1)) {
+                swaps++;
+            }
+        }
+        if (swaps % 2 != 0) det = -det;
         
-        // Fallback to java logic
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant((Matrix<Real>) a, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
+        return Real.of(det);
     }
 
     @Override
@@ -901,26 +810,13 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (AVAILABLE && DDOT_HANDLE != null && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
-            RealDoubleVector av = (RealDoubleVector) a;
-            RealDoubleVector bv = (RealDoubleVector) b;
-            if (av.dimension() == bv.dimension()) {
-                try {
-                    DoubleBuffer ab = ensureDirect(av);
-                    DoubleBuffer bb = ensureDirect(bv);
-                    return Real.of(ddot(av.dimension(), ab, 1, bb, 1));
-                } catch (Throwable t) {
-                     // Fallback following failure
-                }
-            }
-        }
-        // Unified Generic Fallback
-        double[] ad = toDoubleArray(a);
-        double[] bd = toDoubleArray(b);
-        double sum = 0;
-        int n = Math.min(ad.length, bd.length);
-        for (int i = 0; i < n; i++) sum += ad[i] * bd[i];
-        return Real.of(sum);
+        if (!AVAILABLE || DDOT_HANDLE == null || !(a instanceof RealDoubleVector) || !(b instanceof RealDoubleVector)) throw new UnsupportedOperationException(getName() + ": dot not available");
+        RealDoubleVector av = (RealDoubleVector) a;
+        RealDoubleVector bv = (RealDoubleVector) b;
+        if (av.dimension() != bv.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        DoubleBuffer ab = ensureDirect(av);
+        DoubleBuffer bb = ensureDirect(bv);
+        return Real.of(ddot(av.dimension(), ab, 1, bb, 1));
     }
 
     @Override
@@ -946,50 +842,48 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        if (AVAILABLE && DGEQRF_HANDLE != null && a instanceof RealDoubleMatrix) {
-            int m = a.rows();
-            int n = a.cols();
-            int k = Math.min(m, n);
+        if (!AVAILABLE || DGEQRF_HANDLE == null || !(a instanceof RealDoubleMatrix)) throw new UnsupportedOperationException(getName() + ": QR not available");
+        int m = a.rows();
+        int n = a.cols();
+        int k = Math.min(m, n);
 
-            RealDoubleMatrix A = (RealDoubleMatrix) a;
-            RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); // Used temporarily to hold A
-            qMat.getBuffer().put(A.toDoubleArray());
-            qMat.getBuffer().position(0);
+        RealDoubleMatrix A = (RealDoubleMatrix) a;
+        RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); // Used temporarily to hold A
+        qMat.getBuffer().put(A.toDoubleArray());
+        qMat.getBuffer().position(0);
 
-            DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+        DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 8)
+            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
 
-            // 1. DGEQRF
-            int info = dgeqrf(m, n, qMat.getBuffer(), n, tau);
-            if (info == 0) {
-                // 2. Extract R
-                double[] rData = new double[k * n];
-                double[] aFactored = qMat.toDoubleArray();
-                for (int i = 0; i < k; i++) {
-                    for (int j = i; j < n; j++) {
-                        rData[i * n + j] = aFactored[i * n + j];
-                    }
-                }
-                Matrix<Real> R = RealDoubleMatrix.of(rData, k, n);
-
-                // 3. DORGQR (Economy Q: m x k)
-                info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
-                if (info == 0) {
-                    double[] qDataFull = qMat.toDoubleArray();
-                    double[] qDataEconomy = new double[m * k];
-                    for (int i = 0; i < m; i++) {
-                        for (int j = 0; j < k; j++) {
-                            qDataEconomy[i * k + j] = qDataFull[i * n + j];
-                        }
-                    }
-                    Matrix<Real> Q = RealDoubleMatrix.of(qDataEconomy, m, k);
-
-                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
+        // 1. DGEQRF
+        int info = dgeqrf(m, n, qMat.getBuffer(), n, tau);
+        if (info == 0) {
+            // 2. Extract R
+            double[] rData = new double[k * n];
+            double[] aFactored = qMat.toDoubleArray();
+            for (int i = 0; i < k; i++) {
+                for (int j = i; j < n; j++) {
+                    rData[i * n + j] = aFactored[i * n + j];
                 }
             }
+            Matrix<Real> R = RealDoubleMatrix.of(rData, k, n);
+
+            // 3. DORGQR (Economy Q: m x k)
+            info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
+            if (info == 0) {
+                double[] qDataFull = qMat.toDoubleArray();
+                double[] qDataEconomy = new double[m * k];
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j < k; j++) {
+                        qDataEconomy[i * k + j] = qDataFull[i * n + j];
+                    }
+                }
+                Matrix<Real> Q = RealDoubleMatrix.of(qDataEconomy, m, k);
+
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
+            }
         }
-        // Fallback
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.decompose((Matrix<Real>) a, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), this);
+        throw new ArithmeticException("Native QR failed with info: " + info);
     }
 
     @Override

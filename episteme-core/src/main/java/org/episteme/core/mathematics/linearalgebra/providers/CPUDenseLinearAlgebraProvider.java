@@ -219,10 +219,11 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Vector dimensions must match");
         }
 
-        final Ring<E> r = a.getScalarRing();
+        @SuppressWarnings("unchecked")
+        final Field<E> r = (Field<E>) a.getScalarRing();
         if (a.dimension() < PARALLEL_THRESHOLD) {
             @SuppressWarnings("unchecked")
-            E[] data = (E[]) new Object[a.dimension()];
+            E[] data = (E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), a.dimension());
             for (int i = 0; i < a.dimension(); i++) {
                 data[i] = ((Field<E>) r).add(a.get(i), b.get(i));
             }
@@ -235,7 +236,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     .mapToObj(i -> ((Field<E>) r).add(a.get(i), b.get(i)))
                     .collect(Collectors.toList());
                 @SuppressWarnings("unchecked")
-                E[] arr = (E[]) list.toArray();
+                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), list.size()));
                 return new GenericVector<>(
                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),
                         this, (Field<E>) r);
@@ -265,7 +266,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 result.add(((Field<E>) r).add(a.get(i), negB));
             }
             @SuppressWarnings("unchecked")
-            E[] arr = (E[]) result.toArray();
+            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), result.size()));
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this,
                     (Field<E>) r);
@@ -280,7 +281,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     })
                     .collect(java.util.stream.Collectors.toList());
                 @SuppressWarnings("unchecked")
-                E[] arr = (E[]) list.toArray();
+                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), list.size()));
                 return new GenericVector<>(
                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),
                         this, (Field<E>) r);
@@ -297,7 +298,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 result.add(((Field<E>)ring).multiply(vector.get(i), scalar));
             }
             @SuppressWarnings("unchecked")
-            E[] arr = (E[]) result.toArray();
+            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), result.size()));
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, (Field<E>)ring);
         } else {
@@ -311,7 +312,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                             java.util.stream.Collectors.toList(),
                             list -> {
                                 @SuppressWarnings("unchecked")
-                                E[] arr = (E[]) list.toArray();
+                                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), list.size()));
                                 return new GenericVector<>(
                                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
