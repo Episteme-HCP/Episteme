@@ -42,6 +42,13 @@ public class NativeDoubleVectorStorage implements RealDoubleVectorStorage, AutoC
         data.fill((byte) 0);
     }
 
+    public NativeDoubleVectorStorage(MemorySegment data, int dimension, Arena arena) {
+        this.data = data;
+        this.dimension = dimension;
+        this.arena = arena;
+        this.ownsArena = false;
+    }
+
     public MemorySegment segment() {
         return data;
     }

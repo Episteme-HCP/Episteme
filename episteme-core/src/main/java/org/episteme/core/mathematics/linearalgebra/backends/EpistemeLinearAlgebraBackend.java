@@ -275,11 +275,6 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
-    public Matrix<E> solve(Matrix<E> a, Matrix<E> b) {
-        return getBestProvider(a).solve(a, b);
-    }
-
-    @Override
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
         return executeComplexOperation(p -> p.solve(lu, b));
     }

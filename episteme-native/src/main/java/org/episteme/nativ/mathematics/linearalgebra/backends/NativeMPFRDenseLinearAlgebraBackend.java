@@ -793,6 +793,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
 
 
+
+
     @Override public Matrix<E> exp(Matrix<E> a) { return applyTranscendental(a, "exp"); }
     @Override public Matrix<E> log(Matrix<E> a) { return applyTranscendental(a, "log"); }
     @Override public Matrix<E> log10(Matrix<E> a) { return applyTranscendental(a, "log10"); }

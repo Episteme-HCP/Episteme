@@ -189,8 +189,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         MemorySegment sumR = res.asSlice(0, MPFR_LAYOUT.byteSize());
         MemorySegment sumI = isComplex ? res.asSlice(MPFR_LAYOUT.byteSize(), MPFR_LAYOUT.byteSize()) : null;
         
-        NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
-        if (isComplex) NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, 0);
+        NativeSafe.invoke(MPFR_SET_D, sumR, 0.0, 0);
+        if (isComplex) NativeSafe.invoke(MPFR_SET_D, sumI, 0.0, 0);
 
         MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
         MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
@@ -445,8 +445,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
 
         for (int i = 0; i < sa.rows(); i++) {
-            NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
-            if (isComplex) NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, 0);
+            NativeSafe.invoke(MPFR_SET_D, sumR, 0.0, 0);
+            if (isComplex) NativeSafe.invoke(MPFR_SET_D, sumI, 0.0, 0);
             
             for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
                 int col = colIdx[k];
@@ -528,7 +528,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                             NativeSafe.invoke(MPFR_SET_STR, valI, arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                         } else {
                             NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(((Real)val).bigDecimalValue().toPlainString()), 10, 0);
-                            NativeSafe.invoke(MPFR_SET_UI, valI, 0L, 0);
+                            NativeSafe.invoke(MPFR_SET_D, valI, 0.0, 0);
                         }
                         
                         // (valR + i*valI)*(sR + i*sI) = (valR*sR - valI*sI) + i(valR*sI + valI*sR)
