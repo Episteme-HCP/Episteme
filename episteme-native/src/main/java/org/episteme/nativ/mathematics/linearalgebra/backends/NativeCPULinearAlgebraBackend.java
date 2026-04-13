@@ -669,10 +669,10 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+        if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
             RealDoubleMatrix luMat = RealDoubleMatrix.direct(n, n);
-            luMat.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            luMat.getBuffer().put(toDoubleArray(a));
             luMat.getBuffer().position(0);
 
             java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
@@ -785,10 +785,10 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && a.rows() == a.cols()) {
+        if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
             RealDoubleMatrix lMat = RealDoubleMatrix.direct(n, n);
-            lMat.getBuffer().put(((RealDoubleMatrix) a).toDoubleArray());
+            lMat.getBuffer().put(toDoubleArray(a));
             lMat.getBuffer().position(0);
 
             int info = dpotrf(n, lMat.getBuffer(), n);
@@ -810,13 +810,11 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (!AVAILABLE || DDOT_HANDLE == null || !(a instanceof RealDoubleVector) || !(b instanceof RealDoubleVector)) throw new UnsupportedOperationException(getName() + ": dot not available");
-        RealDoubleVector av = (RealDoubleVector) a;
-        RealDoubleVector bv = (RealDoubleVector) b;
-        if (av.dimension() != bv.dimension()) throw new IllegalArgumentException("Dimension mismatch");
-        DoubleBuffer ab = ensureDirect(av);
-        DoubleBuffer bb = ensureDirect(bv);
-        return Real.of(ddot(av.dimension(), ab, 1, bb, 1));
+        if (!AVAILABLE || DDOT_HANDLE == null) throw new UnsupportedOperationException(getName() + ": dot not available");
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+        DoubleBuffer ab = ensureDirect(a);
+        DoubleBuffer bb = ensureDirect(b);
+        return Real.of(ddot(a.dimension(), ab, 1, bb, 1));
     }
 
     @Override
@@ -829,12 +827,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        if (AVAILABLE && vector instanceof RealDoubleVector) {
-            RealDoubleVector v = (RealDoubleVector) vector;
-            RealDoubleVector res = RealDoubleVector.direct(v.dimension());
-            res.getBuffer().put(v.toDoubleArray());
+        if (AVAILABLE) {
+            int dim = vector.dimension();
+            RealDoubleVector res = RealDoubleVector.direct(dim);
+            res.getBuffer().put(toDoubleArray(vector));
             res.getBuffer().flip();
-            dscal(v.dimension(), scalar.doubleValue(), res.getBuffer(), 1);
+            dscal(dim, scalar.doubleValue(), res.getBuffer(), 1);
             return res;
         }
         throw new UnsupportedOperationException(getName() + ": Vector multiply(scalar) not available for these types");
@@ -842,14 +840,13 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        if (!AVAILABLE || DGEQRF_HANDLE == null || !(a instanceof RealDoubleMatrix)) throw new UnsupportedOperationException(getName() + ": QR not available");
+        if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException(getName() + ": QR not available");
         int m = a.rows();
         int n = a.cols();
         int k = Math.min(m, n);
 
-        RealDoubleMatrix A = (RealDoubleMatrix) a;
         RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); // Used temporarily to hold A
-        qMat.getBuffer().put(A.toDoubleArray());
+        qMat.getBuffer().put(toDoubleArray(a));
         qMat.getBuffer().position(0);
 
         DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 8)

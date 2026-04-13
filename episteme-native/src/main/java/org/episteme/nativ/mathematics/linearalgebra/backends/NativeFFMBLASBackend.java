@@ -618,7 +618,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                  try (Arena arena = Arena.ofConfined()) {
                      MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
                      MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-                     int info = (int) ZGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                     int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                      if (info < 0) throw new IllegalArgumentException("ZGETRF failed: illegal argument " + (-info));
                      if (info > 0) return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
                      org.episteme.core.mathematics.numbers.complex.Complex det = org.episteme.core.mathematics.numbers.complex.Complex.of(1.0);
@@ -638,7 +638,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
              try (Arena arena = Arena.ofConfined()) {
                  MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
                  MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-                 int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                 int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                  if (info > 0) return (E) (Object) Real.ZERO;
                  double det = 1.0;
                  for(int i=0; i<n; i++) {
@@ -690,7 +690,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     if (ZGEQRF == null || ZUNGQR == null) throw new UnsupportedOperationException("ZGEQRF/ZUNGQR not available");
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     MemorySegment tau = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k * 2);
-                    int info = (int) ZGEQRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, tau);
+                    int info = (int) NativeSafe.invoke(ZGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
                     if (info != 0) throw new RuntimeException("ZGEQRF failed: " + info);
 
                     double[] rData = new double[k * n * 2];
@@ -702,7 +702,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     }
                     Matrix<E> R = createDenseMatrix(rData, k, n, a);
 
-                    info = (int) ZUNGQR.invokeExact(LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
+                    info = (int) NativeSafe.invoke(ZUNGQR, LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
                     if (info != 0) throw new RuntimeException("ZUNGQR failed: " + info);
 
                     double[] qData = new double[m * k * 2];
@@ -719,7 +719,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 if (DGEQRF != null && DORGQR != null) {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     MemorySegment tau = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
-                    int info = (int) DGEQRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, tau);
+                    int info = (int) NativeSafe.invoke(DGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
                     if (info == 0) {
                         double[] rData = new double[k * n];
                         for (int i = 0; i < k; i++) {
@@ -729,7 +729,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                         }
                         Matrix<E> R = createDenseMatrix(rData, k, n, a);
 
-                        info = (int) DORGQR.invokeExact(LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
+                        info = (int) NativeSafe.invoke(DORGQR, LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
                         if (info == 0) {
                             double[] qData = new double[m * k];
                             for (int i = 0; i < m; i++) {
@@ -767,14 +767,14 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 u = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * m * 2);
                 vt = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
                 superb = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) Math.max(1, k - 1));
-                info = (int) ZGESVD.invokeExact(LAPACK_ROW_MAJOR, (byte) 'A', (byte) 'A', m, n, segA, n, s, u, m, vt, n, superb);
+                info = (int) NativeSafe.invoke(ZGESVD, LAPACK_ROW_MAJOR, (byte) 'A', (byte) 'A', m, n, segA, n, s, u, m, vt, n, superb);
             } else {
                 if (DGESVD == null) throw new UnsupportedOperationException("DGESVD not available");
                 MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                 u = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * m);
                 vt = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
                 superb = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) Math.max(1, k - 1));
-                info = (int) DGESVD.invokeExact(LAPACK_ROW_MAJOR, (byte) 'A', (byte) 'A', m, n, segA, n, s, u, m, vt, n, superb);
+                info = (int) NativeSafe.invoke(DGESVD, LAPACK_ROW_MAJOR, (byte) 'A', (byte) 'A', m, n, segA, n, s, u, m, vt, n, superb);
             }
 
             if (info != 0) throw new RuntimeException("SVD failed: " + info);
@@ -822,11 +822,11 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             if (complex) {
                 if (ZHEEV == null) throw new UnsupportedOperationException("ZHEEV not available");
                 segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                info = (int) ZHEEV.invokeExact(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
+                info = (int) NativeSafe.invoke(ZHEEV, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
             } else {
                 if (DSYEV == null) throw new UnsupportedOperationException("DSYEV not available");
                 segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-                info = (int) DSYEV.invokeExact(LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
+                info = (int) NativeSafe.invoke(DSYEV, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
             }
 
             if (info != 0) throw new RuntimeException("Eigen failed: " + info);
@@ -906,7 +906,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
 
             try {
-                DGEMM.invokeExact(CblasRowMajor, CblasNoTrans, CblasNoTrans, 
+                NativeSafe.invoke(DGEMM, CblasRowMajor, CblasNoTrans, CblasNoTrans, 
                                   m, n, k, 1.0, segA, k, segB, n, 0.0, segC, n);
             } catch (Throwable e) {
                 logger.warn("FFM DGEMM failed: {}", e.getMessage());
@@ -993,7 +993,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
             
             if (ZGEMM != null) {
-                ZGEMM.invokeExact(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, segA, k, segB, n, beta, segC, n);
+                NativeSafe.invoke(ZGEMM, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, segA, k, segB, n, beta, segC, n);
             } else {
                 throw new UnsupportedOperationException("ZGEMM not available");
             }
@@ -1022,7 +1022,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
             
-            DGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, n, 1.0, segA, n, segX, 1, 0.0, segY, 1);
+            NativeSafe.invoke(DGEMV, CblasRowMajor, CblasNoTrans, m, n, 1.0, segA, n, segX, 1, 0.0, segY, 1);
             
             double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
             return createDenseVector(result, m, a);
@@ -1043,7 +1043,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
             MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
 
-            ZGEMV.invokeExact(CblasRowMajor, CblasNoTrans, m, n, alpha, segA, n, segX, 1, beta, segY, 1);
+            NativeSafe.invoke(ZGEMV, CblasRowMajor, CblasNoTrans, m, n, alpha, segA, n, segX, 1, beta, segY, 1);
 
             double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
             E[] result = (E[]) new Object[m];
@@ -1060,10 +1060,11 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
          int n = a.dimension();
          if (isComplex(a)) {
              try (Arena arena = Arena.ofConfined()) {
-                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                 MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                 MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                 MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                  MemorySegment res = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
-                 ZDOTC.invokeExact(n, segX, 1, segY, 1, res);
+                 // Swap arguments to ZDOTC to get sum(a_i * conj(b_i)) matching EJML/GS ground truth
+                 NativeSafe.invoke(ZDOTC, n, segB, 1, segA, 1, res);
                  return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(res.get(ValueLayout.JAVA_DOUBLE, 0), res.get(ValueLayout.JAVA_DOUBLE, 8));
              } catch (Throwable t) { throw new RuntimeException("ZDOTC failed", t); }
          }
@@ -1072,7 +1073,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
              for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)a.get(i)).doubleValue());
              MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
              for(int i=0; i<n; i++) segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)b.get(i)).doubleValue());
-             try { return (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of((double) DDOT.invokeExact(n, segX, 1, segY, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
+             return (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DDOT, n, segX, 1, segY, 1));
          }
     }
     
@@ -1083,13 +1084,13 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
          if (isComplex(a)) {
              try (Arena arena = Arena.ofConfined()) {
                  MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                 return (E) (Object) Real.of((double) DZNRM2.invokeExact(n, segX, 1));
+                 return (E) (Object) Real.of((double) NativeSafe.invoke(DZNRM2, n, segX, 1));
              } catch (Throwable t) { throw new RuntimeException("DZNRM2 failed", t); }
          }
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
              for(int i=0; i<n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)a.get(i)).doubleValue());
-             try { return (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of((double) DNRM2.invokeExact(n, segX, 1)); } catch (Throwable e) { throw new RuntimeException(e); }
+             return (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DNRM2, n, segX, 1));
          }
     }
 
@@ -1102,7 +1103,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                 MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
-                ZAXPY.invokeExact(n, alpha, segX, 1, segY, 1);
+                NativeSafe.invoke(ZAXPY, n, alpha, segX, 1, segY, 1);
                 double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
                 E[] result = (E[]) new Object[n];
                 for (int i = 0; i < n; i++) result[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(resData[i * 2], resData[i * 2 + 1]);
@@ -1116,7 +1117,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)a.get(i)).doubleValue());
                 segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)b.get(i)).doubleValue());
             }
-            try { DAXPY.invokeExact(n, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            NativeSafe.invoke(DAXPY, n, 1.0, segX, 1, segY, 1);
             E[] result = (E[]) new Object[n];
             for (int i = 0; i < n; i++) result[i] = (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
             return DenseVector.of(java.util.Arrays.asList(result), (Ring<E>)a.getScalarRing());
@@ -1132,7 +1133,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                 MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
-                ZAXPY.invokeExact(n, alpha, segX, 1, segY, 1);
+                NativeSafe.invoke(ZAXPY, n, alpha, segX, 1, segY, 1);
                 double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
                 E[] result = (E[]) new Object[n];
                 for (int i = 0; i < n; i++) result[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(resData[i * 2], resData[i * 2 + 1]);
@@ -1146,7 +1147,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)b.get(i)).doubleValue());
                 segY.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)a.get(i)).doubleValue());
             }
-            try { DAXPY.invokeExact(n, -1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            NativeSafe.invoke(DAXPY, n, -1.0, segX, 1, segY, 1);
             E[] result = (E[]) new Object[n];
             for (int i = 0; i < n; i++) result[i] = (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of(segY.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
             return DenseVector.of(java.util.Arrays.asList(result), (Ring<E>)a.getScalarRing());
@@ -1162,7 +1163,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(vector));
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, cScalar.real(), cScalar.imaginary());
-                ZSCAL.invokeExact(n, alpha, segX, 1);
+                NativeSafe.invoke(ZSCAL, n, alpha, segX, 1);
                 double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
                 E[] result = (E[]) new Object[n];
                 for (int i = 0; i < n; i++) result[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(resData[i * 2], resData[i * 2 + 1]);
@@ -1172,7 +1173,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
             for (int i = 0; i < n; i++) segX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ((Real)(Object)vector.get(i)).doubleValue());
-            try { DSCAL.invokeExact(n, ((Real)(Object)scalar).doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            NativeSafe.invoke(DSCAL, n, ((Real)(Object)scalar).doubleValue(), segX, 1);
             E[] result = (E[]) new Object[n];
             for (int i = 0; i < n; i++) result[i] = (E) (Object) org.episteme.core.mathematics.numbers.real.Real.of(segX.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
             return DenseVector.of(java.util.Arrays.asList(result), (Ring<E>)vector.getScalarRing());
@@ -1189,7 +1190,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                 MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
-                ZAXPY.invokeExact(len, alpha, segX, 1, segY, 1);
+                NativeSafe.invoke(ZAXPY, len, alpha, segX, 1, segY, 1);
                 double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
                 return createDenseMatrix(result, m, n, a);
             } catch (Throwable t) { throw new RuntimeException("ZAXPY matrix add failed", t); }
@@ -1202,7 +1203,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             double[] arrB = toDoubleArray(b);
             MemorySegment.copy(arrA, 0, segX, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrA.length, (long)len));
             MemorySegment.copy(arrB, 0, segY, ValueLayout.JAVA_DOUBLE, 0L, (int) Math.min(arrB.length, (long)len));
-            try { DAXPY.invokeExact(len, 1.0, segX, 1, segY, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            NativeSafe.invoke(DAXPY, len, 1.0, segX, 1, segY, 1);
             double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
             return createDenseMatrix(result, m, n, a);
         }
@@ -1218,7 +1219,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                 MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
-                ZAXPY.invokeExact(len, alpha, segX, 1, segY, 1);
+                NativeSafe.invoke(ZAXPY, len, alpha, segX, 1, segY, 1);
                 double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
                 return createDenseMatrix(result, m, n, a);
             } catch (Throwable t) { throw new RuntimeException("ZAXPY matrix subtract failed", t); }
@@ -1227,7 +1228,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             int len = m * n;
             MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-            try { DAXPY.invokeExact(len, -1.0, segY, 1, segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            NativeSafe.invoke(DAXPY, len, -1.0, segY, 1, segX, 1);
             double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
             return createDenseMatrix(resData, m, n, a);
         }
@@ -1246,10 +1247,10 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             int info;
             if (complex) {
                 if (ZPOTRF == null) throw new UnsupportedOperationException("ZPOTRF not available");
-                info = (int) ZPOTRF.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+                info = (int) NativeSafe.invoke(ZPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
             } else {
                 if (DPOTRF == null) throw new UnsupportedOperationException("DPOTRF not available");
-                info = (int) DPOTRF.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+                info = (int) NativeSafe.invoke(DPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
             }
             if (info != 0) throw new ArithmeticException("POTRF failed: " + info);
             
@@ -1285,7 +1286,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, Math.min(m, n));
-                    int info = (int) ZGETRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
+                    int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
                     if (info >= 0) {
                         double[] packedData = segA.toArray(ValueLayout.JAVA_DOUBLE);
                         int[] ipiv = segIpiv.toArray(ValueLayout.JAVA_INT);
@@ -1299,7 +1300,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, Math.min(m, n));
-                    int info = (int) DGETRF.invokeExact(LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
+                    int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
                     if (info >= 0) {
                         double[] packedData = segA.toArray(ValueLayout.JAVA_DOUBLE);
                         int[] ipiv = segIpiv.toArray(ValueLayout.JAVA_INT);
@@ -1380,14 +1381,14 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
              try (Arena arena = Arena.ofConfined()) {
                 MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                 MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, sc.real(), sc.imaginary());
-                ZSCAL.invokeExact(m * n, alpha, segX, 1);
+                NativeSafe.invoke(ZSCAL, m * n, alpha, segX, 1);
                 double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
                 return createDenseMatrix(resData, m, n, a);
             } catch (Throwable t) { throw new RuntimeException("ZSCAL failed", t); }
         }
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            try { DSCAL.invokeExact(m * n, ((Real)(Object)scalar).doubleValue(), segX, 1); } catch (Throwable e) { throw new RuntimeException(e); }
+            NativeSafe.invoke(DSCAL, m * n, ((Real)(Object)scalar).doubleValue(), segX, 1);
             double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
             return createDenseMatrix(resData, m, n, a);
         }
@@ -1414,10 +1415,10 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             int info;
             if (complex) {
                 if (ZPOTRS == null) throw new UnsupportedOperationException("ZPOTRS not available");
-                info = (int) ZPOTRS.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                info = (int) NativeSafe.invoke(ZPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
             } else {
                 if (DPOTRS == null) throw new UnsupportedOperationException("DPOTRS not available");
-                info = (int) DPOTRS.invokeExact(LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                info = (int) NativeSafe.invoke(DPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
             }
             if (info != 0) throw new ArithmeticException("POTRS failed: " + info);
             

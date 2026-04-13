@@ -182,6 +182,11 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        return getBestProvider(a).scale(scalar, a);
+    }
+
+    @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
         // Vectors don't have sparse variants in current SPI, route to dense
         return denseProvider.multiply(vector, scalar);
