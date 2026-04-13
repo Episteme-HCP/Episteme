@@ -2,6 +2,7 @@ package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraBackend;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeFFMBLASBackend;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRSparseLinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ public class IsolatedComplianceTest {
         List<LinearAlgebraProvider<Real>> providers = new ArrayList<>();
         
         // Explicitly test our target backends
-        providers.add(new NativeMPFRDenseLinearAlgebraBackend<Real>());
+        providers.add(new NativeFFMBLASBackend<Real>());
         providers.add(new NativeMPFRDenseLinearAlgebraBackend<Real>());
         providers.add(new NativeMPFRSparseLinearAlgebraBackend<Real>());
 
@@ -70,9 +71,19 @@ public class IsolatedComplianceTest {
             });
 
             testOperation(res, "SVD", () -> {
-                double[][] aData = randomData(50, 40);
+                double[][] aData = randomData(SIZE, SIZE);
                 RealDoubleMatrix a = RealDoubleMatrix.of(aData);
                 provider.svd(a);
+            });
+
+            testOperation(res, "Eigen", () -> {
+                double[][] aData = randomData(SIZE, SIZE);
+                // Make symmetric for SYEV/HEEV
+                for (int i = 0; i < SIZE; i++)
+                    for (int j = i+1; j < SIZE; j++)
+                        aData[j][i] = aData[i][j];
+                RealDoubleMatrix a = RealDoubleMatrix.of(aData);
+                provider.eigen(a);
             });
 
             testOperation(res, "Solve", () -> {

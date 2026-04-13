@@ -969,8 +969,15 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     for (float v : sArr) sList.add((E) (Object) Real.of((double)v));
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_FLOAT), m, m, a);
-                    Matrix<E> VT = createDenseMatrix(vt.toArray(ValueLayout.JAVA_FLOAT), n, n, a);
-                    return new SVDResult<>(U, S, VT.transpose());
+                    float[] vtArr = vt.toArray(ValueLayout.JAVA_FLOAT);
+                    float[] vArr = new float[n * n * 2];
+                    for (int i = 0; i < n; i++)
+                        for (int j = 0; j < n; j++) {
+                            vArr[(j * n + i) * 2] = vtArr[(i * n + j) * 2];
+                            vArr[(j * n + i) * 2 + 1] = vtArr[(i * n + j) * 2 + 1];
+                        }
+                    Matrix<E> V = createDenseMatrix(vArr, n, n, a);
+                    return new SVDResult<>(U, S, V);
                 } else {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     MemorySegment s = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
@@ -985,8 +992,15 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     for (double v : sArr) sList.add((E) (Object) Real.of(v));
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_DOUBLE), m, m, a);
-                    Matrix<E> VT = createDenseMatrix(vt.toArray(ValueLayout.JAVA_DOUBLE), n, n, a);
-                    return new SVDResult<>(U, S, VT.transpose());
+                    double[] vtArr = vt.toArray(ValueLayout.JAVA_DOUBLE);
+                    double[] vArr = new double[n * n * 2];
+                    for (int i = 0; i < n; i++)
+                        for (int j = 0; j < n; j++) {
+                            vArr[(j * n + i) * 2] = vtArr[(i * n + j) * 2];
+                            vArr[(j * n + i) * 2 + 1] = vtArr[(i * n + j) * 2 + 1];
+                        }
+                    Matrix<E> V = createDenseMatrix(vArr, n, n, a);
+                    return new SVDResult<>(U, S, V);
                 }
             } else {
                 if (single) {
@@ -1003,8 +1017,13 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     for (float v : sArr) sList.add((E) (Object) Real.of((double)v));
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_FLOAT), m, m, a);
-                    Matrix<E> VT = createDenseMatrix(vt.toArray(ValueLayout.JAVA_FLOAT), n, n, a);
-                    return new SVDResult<>(U, S, VT.transpose());
+                    float[] vtArr = vt.toArray(ValueLayout.JAVA_FLOAT);
+                    float[] vArr = new float[n * n];
+                    for (int i = 0; i < n; i++)
+                        for (int j = 0; j < n; j++)
+                            vArr[j * n + i] = vtArr[i * n + j];
+                    Matrix<E> V = createDenseMatrix(vArr, n, n, a);
+                    return new SVDResult<>(U, S, V);
                 } else {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     MemorySegment s = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
@@ -1019,8 +1038,13 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     for (double v : sArr) sList.add((E) (Object) Real.of(v));
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_DOUBLE), m, m, a);
-                    Matrix<E> VT = createDenseMatrix(vt.toArray(ValueLayout.JAVA_DOUBLE), n, n, a);
-                    return new SVDResult<>(U, S, VT.transpose());
+                    double[] vtArr = vt.toArray(ValueLayout.JAVA_DOUBLE);
+                    double[] vArr = new double[n * n];
+                    for (int i = 0; i < n; i++)
+                        for (int j = 0; j < n; j++)
+                            vArr[j * n + i] = vtArr[i * n + j];
+                    Matrix<E> V = createDenseMatrix(vArr, n, n, a);
+                    return new SVDResult<>(U, S, V);
                 }
             }
         } catch (Throwable t) { 

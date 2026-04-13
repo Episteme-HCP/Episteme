@@ -18,13 +18,15 @@ public class GenericSVD {
         int m = matrix.rows();
         int n = matrix.cols();
         
+        Matrix<E> matT = provider.transpose(matrix);
+        
         // A*A^T for U and Sigma^2
-        Matrix<E> selfAdjU = matrix.multiply(matrix.transpose()); 
+        Matrix<E> selfAdjU = provider.multiply(matrix, matT); 
         EigenResult<E> eigenU = GenericEigen.decompose(selfAdjU, field, provider);
         Matrix<E> U = eigenU.V();
 
         // A^T*A for V and Sigma^2 (more stable for V)
-        Matrix<E> selfAdjV = matrix.transpose().multiply(matrix); 
+        Matrix<E> selfAdjV = provider.multiply(matT, matrix); 
         EigenResult<E> eigenV = GenericEigen.decompose(selfAdjV, field, provider);
         Matrix<E> V = eigenV.V();
         
