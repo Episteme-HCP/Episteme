@@ -1,20 +1,26 @@
 package org.episteme.core.mathematics.linearalgebra.backends;
 
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ExecutionContext;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.core.technical.backend.cpu.CPUExecutionContext;
 import org.episteme.core.technical.backend.simd.SIMDBackend;
-import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import com.google.auto.service.AutoService;
+import org.episteme.core.mathematics.structures.rings.Ring;
 
 /**
  * Unified CPU backend for Episteme linear algebra.
@@ -27,8 +33,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, Backend.class})
-public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, SIMDBackend {
+@AutoService(Backend.class)
+public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, SIMDBackend, CPUBackend {
 
     private final CPUDenseLinearAlgebraProvider<E> denseProvider;
     private final CPUSparseLinearAlgebraProvider<E> sparseProvider;
@@ -51,7 +57,17 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
 
     @Override
     public String getName() {
-        return "Episteme CPU (Unified)";
+        return "Episteme CPU Foundation";
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
+        return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
+    }
+
+    @Override
+    public String getType() {
+        return "cpu-simd";
     }
 
     @Override
@@ -91,11 +107,6 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
-    public String getType() {
-        return "math";
-    }
-
-    @Override
     public void shutdown() {
         // Resolve conflict between AlgorithmProvider and Backend
         denseProvider.shutdown();
@@ -130,27 +141,27 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
 
     @Override
     public Vector<E> add(Vector<E> a, Vector<E> b) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).add(a, b));
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).add(a, b));
     }
 
     @Override
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).subtract(a, b));
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).subtract(a, b));
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).multiply(vector, scalar));
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).multiply(vector, scalar));
     }
 
     @Override
     public E dot(Vector<E> a, Vector<E> b) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).dot(a, b));
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).dot(a, b));
     }
 
     @Override
     public E norm(Vector<E> a) {
-        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>)p).norm(a));
+        return AlgorithmManager.executeWithFallback(LinearAlgebraProvider.class, p -> ((LinearAlgebraProvider<E>) p).norm(a));
     }
 
     @Override

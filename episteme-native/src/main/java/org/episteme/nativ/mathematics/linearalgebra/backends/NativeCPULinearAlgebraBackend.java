@@ -17,14 +17,19 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericSVD;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 
+import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
@@ -568,13 +573,14 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             int k = a.cols();
             int n = b.cols();
             
-            DoubleBuffer aBuf = ensureDirect(a);
-            DoubleBuffer bBuf = ensureDirect(b);
-            double[] cData = new double[m * n];
-            DoubleBuffer cBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * k * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            aBuf.put(toDoubleArray(a)); aBuf.flip();
+            DoubleBuffer bBuf = java.nio.ByteBuffer.allocateDirect(k * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            bBuf.put(toDoubleArray(b)); bBuf.flip();
             
+            DoubleBuffer cBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
             dgemm(m, n, k, aBuf, k, bBuf, n, cBuf, n, 1.0, 0.0);
+            double[] cData = new double[m * n];
             cBuf.get(cData);
             return RealDoubleMatrix.of(cData, m, n);
         }
@@ -606,34 +612,22 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
              return pseudoInverse(a);
         }
         if (m == n) {
-            double[] data = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
+            double[] data = toDoubleArray(a);
             RealDoubleMatrix res = RealDoubleMatrix.direct(n, n);
+            res.getBuffer().put(data); res.getBuffer().flip();
             
-            res.getBuffer().put(data);
-            res.getBuffer().position(0);
-            
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
-                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-            
+            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
             int info = dgetrf(n, n, res.getBuffer(), n, ipiv);
-            if (info < 0) {
-                throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-            }
-            if (info > 0) {
-                throw new ArithmeticException("Matrix is singular");
-            }
+            if (info != 0) throw new ArithmeticException("Matrix is singular or dgetrf failed: " + info);
             
             info = dgetri(n, res.getBuffer(), n, ipiv);
-            if (info < 0) {
-                throw new IllegalArgumentException("Illegal argument to dgetri: " + info);
-            }
-            if (info > 0) {
-                throw new ArithmeticException("Matrix is singular");
-            }
+            if (info != 0) throw new ArithmeticException("dgetri failed: " + info);
             
-            return res;
+            double[] invData = new double[n * n];
+            res.getBuffer().position(0); res.getBuffer().get(invData);
+            return RealDoubleMatrix.of(invData, n, n);
         }
-        throw new UnsupportedOperationException(getName() + ": inverse() not available for these matrix types");
+        throw new UnsupportedOperationException(getName() + ": inverse() failed");
     }
 
     private Matrix<Real> pseudoInverse(Matrix<Real> a) {
@@ -680,57 +674,26 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     // Other methods default to UnsupportedOperationException
     @Override
     public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if (AVAILABLE && a.rows() == a.cols() && b.dimension() == a.rows()) {
-            int n = a.rows();
-            double[] aData = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
-            double[] bData = (b instanceof RealDoubleVector) ? ((RealDoubleVector)b).toDoubleArray() : b.doubleStream().toArray();
-            
-            // Result vector initialized with b
-            RealDoubleMatrix x = RealDoubleMatrix.direct(n, 1);
-            x.getBuffer().put(bData);
-            x.getBuffer().position(0);
-            
-            // Intermediate matrix for decomposition (A will be overwritten by DGESV)
-            RealDoubleMatrix aDecomp = RealDoubleMatrix.direct(n, n);
-            aDecomp.getBuffer().put(aData);
-            aDecomp.getBuffer().position(0);
-            
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
-                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-            
-            int info = dgesv(n, 1, aDecomp.getBuffer(), n, ipiv, x.getBuffer(), 1);
-            if (info != 0) throw new ArithmeticException("dgesv failed: " + info);
-            
-            // Extract vector from result matrix
-            double[] result = new double[n];
-            x.getBuffer().position(0);
-            x.getBuffer().get(result);
-            return RealDoubleVector.of(result);
-        } else if (AVAILABLE && b.dimension() == a.rows()) {
-            // Rectangular solve (Least Squares)
+        if (AVAILABLE) {
             int m = a.rows();
             int n = a.cols();
-            int maxDim = Math.max(m, n);
-            double[] aData = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
-            double[] bData = (b instanceof RealDoubleVector) ? ((RealDoubleVector)b).toDoubleArray() : b.doubleStream().toArray();
-            
-            RealDoubleMatrix x = RealDoubleMatrix.direct(maxDim, 1);
-            x.getBuffer().put(bData);
-            x.getBuffer().position(0);
+            double[] aData = toDoubleArray(a);
+            double[] bData = toDoubleArray(b);
             
             RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
-            aCopy.getBuffer().put(aData);
-            aCopy.getBuffer().position(0);
+            aCopy.getBuffer().put(aData); aCopy.getBuffer().flip();
             
-            int info = dgels('N', m, n, 1, aCopy.getBuffer(), n, x.getBuffer(), 1);
+            RealDoubleMatrix x = RealDoubleMatrix.direct(Math.max(m, n), 1);
+            x.getBuffer().put(bData); x.getBuffer().flip();
+            
+            int info = dgels('N', m, n, 1, aCopy.getBuffer(), m, x.getBuffer(), Math.max(m, n));
             if (info != 0) throw new RuntimeException("dgels failed: " + info);
             
             double[] result = new double[n];
-            x.getBuffer().position(0);
-            x.getBuffer().get(result);
+            x.getBuffer().position(0); x.getBuffer().get(result);
             return RealDoubleVector.of(result);
         }
-        throw new UnsupportedOperationException(getName() + ": solve() not available for these matrix types");
+        throw new UnsupportedOperationException(getName() + ": solve() not available");
     }
 
     @Override
@@ -738,7 +701,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         if (AVAILABLE) {
             int m = a.rows();
             int n = a.cols();
-            double[] data = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
+            double[] data = toDoubleArray(a);
             double[] res = new double[n * m];
             
             // Tiled Transpose for better cache locality (March 24 Optimization)
@@ -754,7 +717,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             }
             return RealDoubleMatrix.of(res, n, m);
         }
-        throw new UnsupportedOperationException(getName() + ": transpose() not available for these types");
+        throw new UnsupportedOperationException(getName() + ": transpose() not available");
     }
 
 
@@ -762,14 +725,11 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     public Real determinant(Matrix<Real> a) {
         if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
-            double[] data = (a instanceof RealDoubleMatrix) ? ((RealDoubleMatrix)a).toDoubleArray() : a.toVectorArray().doubleStream().toArray();
+            double[] data = toDoubleArray(a);
             RealDoubleMatrix copy = RealDoubleMatrix.direct(n, n);
-            copy.getBuffer().put(data);
-            copy.getBuffer().position(0);
+            copy.getBuffer().put(data); copy.getBuffer().flip();
 
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
-                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-            
+            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
             int info = dgetrf(n, n, copy.getBuffer(), n, ipiv);
             if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
             if (info > 0) return Real.ZERO; // Singular matrix
@@ -779,30 +739,16 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                 det *= copy.get(i, i).doubleValue();
             }
 
-            // Correct Permutation Parity using Cycle Decomposition (March 24 Standard)
+            // Correct LAPACK Permutation Parity: IPIV contains a sequence of transpositions.
+            // Parity is simply 1.0 if the number of swaps is even, -1.0 if odd.
             int swaps = 0;
-            boolean[] visited = new boolean[n];
-            int[] p = new int[n];
             for (int i = 0; i < n; i++) {
-                p[i] = ipiv.get(i) - 1; // 1-indexed to 0-indexed
-            }
-            
-            for (int i = 0; i < n; i++) {
-                if (!visited[i]) {
-                    int curr = i;
-                    int cycleSize = 0;
-                    while (!visited[curr]) {
-                        visited[curr] = true;
-                        curr = p[curr];
-                        cycleSize++;
-                    }
-                    if (cycleSize > 1) {
-                        swaps += (cycleSize - 1);
-                    }
+                if (ipiv.get(i) != (i + 1)) {
+                    swaps++;
                 }
             }
-
             if (swaps % 2 != 0) det = -det;
+            
             return Real.of(det);
         }
         throw new UnsupportedOperationException(getName() + ": determinant() not available for these types");
@@ -951,49 +897,40 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
     @Override
     public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (AVAILABLE && DDOT_HANDLE != null && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
-            RealDoubleVector av = (RealDoubleVector) a;
-            RealDoubleVector bv = (RealDoubleVector) b;
-            if (av.dimension() != bv.dimension()) throw new IllegalArgumentException("Dimension mismatch");
-            try {
-                // Ensure direct buffers for addressable segments
-                DoubleBuffer ab = ensureDirect(av);
-                DoubleBuffer bb = ensureDirect(bv);
-                return Real.of(ddot(av.dimension(), ab, 1, bb, 1));
-            } catch (Throwable t) {
-                // Fallback to Java if native fails
-                System.err.println("Note: Native ddot failed, using Java fallback: " + t.getMessage());
+        if (AVAILABLE) {
+            if (DDOT_HANDLE != null && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
+                RealDoubleVector av = (RealDoubleVector) a;
+                RealDoubleVector bv = (RealDoubleVector) b;
+                if (av.dimension() == bv.dimension()) {
+                    try {
+                        DoubleBuffer ab = ensureDirect(av);
+                        DoubleBuffer bb = ensureDirect(bv);
+                        return Real.of(ddot(av.dimension(), ab, 1, bb, 1));
+                    } catch (Throwable t) {
+                         // Fallback following failure
+                    }
+                }
             }
-        }
-        if (AVAILABLE && a instanceof RealDoubleVector && b instanceof RealDoubleVector) {
-            double[] ad = ((RealDoubleVector) a).toDoubleArray();
-            double[] bd = ((RealDoubleVector) b).toDoubleArray();
-            if (ad.length != bd.length) throw new IllegalArgumentException("Dimension mismatch");
-            double sum = 0.0;
-            for (int i = 0; i < ad.length; i++) sum += ad[i] * bd[i];
+            // Unified Generic Fallback
+            double[] ad = toDoubleArray(a);
+            double[] bd = toDoubleArray(b);
+            double sum = 0;
+            int n = Math.min(ad.length, bd.length);
+            for (int i = 0; i < n; i++) sum += ad[i] * bd[i];
             return Real.of(sum);
         }
-        throw new UnsupportedOperationException(getName() + ": dot() not available for these types");
+        throw new UnsupportedOperationException(getName() + ": dot() not available");
     }
 
     @Override
     public Real norm(Vector<Real> a) {
-        if (AVAILABLE && DNRM2_HANDLE != null && a instanceof RealDoubleVector) {
-            RealDoubleVector av = (RealDoubleVector) a;
-            try {
-                DoubleBuffer ab = ensureDirect(av);
-                return Real.of(dnrm2(av.dimension(), ab, 1));
-            } catch (Throwable t) {
-                System.err.println("Note: Native dnrm2 failed, using Java fallback: " + t.getMessage());
-            }
-        }
-        if (AVAILABLE && a instanceof RealDoubleVector) {
-            double[] ad = ((RealDoubleVector) a).toDoubleArray();
+        if (AVAILABLE) {
+            double[] ad = toDoubleArray(a);
             double sumSq = 0.0;
             for (double d : ad) sumSq += d * d;
             return Real.of(Math.sqrt(sumSq));
         }
-        throw new UnsupportedOperationException(getName() + ": norm() not available for these types");
+        throw new UnsupportedOperationException(getName() + ": norm() not available");
     }
 
     @Override
@@ -1058,45 +995,30 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        logger.log(System.Logger.Level.INFO, "Entering svd() with matrix: {0}x{1}, type: {2}", a.rows(), a.cols(), a.getClass().getName());
-        org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage storage = extractStorage(a);
-        
-        if (AVAILABLE && storage != null) {
+        if (AVAILABLE) {
             int m = a.rows();
             int n = a.cols();
-            if (DGESVD_HANDLE == null) {
-                logger.log(System.Logger.Level.INFO, "DGESVD_HANDLE is null in svd()");
-                throw new UnsupportedOperationException("LAPACKE dgesvd not available");
-            }
-            if (m < n) {
-                logger.log(System.Logger.Level.INFO, "m < n ({0} < {1}) not supported yet in native SVD", m, n);
-                throw new UnsupportedOperationException("SVD for m < n not yet implemented");
-            }
+            if (DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACKE dgesvd not available");
+            if (m < n) throw new UnsupportedOperationException("SVD for m < n not yet implemented");
+
             int k = Math.min(m, n);
+            double[] aData = toDoubleArray(a);
 
-            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            aBuf.put(storage.toDoubleArray());
-            aBuf.flip();
+            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            aBuf.put(aData); aBuf.flip();
 
-            DoubleBuffer sBuf = java.nio.ByteBuffer.allocateDirect(k * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            DoubleBuffer uBuf = java.nio.ByteBuffer.allocateDirect(m * m * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            DoubleBuffer vtBuf = java.nio.ByteBuffer.allocateDirect(n * n * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            DoubleBuffer superb = java.nio.ByteBuffer.allocateDirect(Math.max(1, k - 1) * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer sBuf = java.nio.ByteBuffer.allocateDirect(k * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer uBuf = java.nio.ByteBuffer.allocateDirect(m * m * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer vtBuf = java.nio.ByteBuffer.allocateDirect(n * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer superb = java.nio.ByteBuffer.allocateDirect(Math.max(1, k - 1) * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
 
             int info = dgesvd((byte)'A', (byte)'A', m, n, aBuf, n, sBuf, uBuf, m, vtBuf, n, superb);
             if (info != 0) throw new RuntimeException("dgesvd failed with info: " + info);
 
             double[] sArr = new double[k];
             sBuf.get(sArr);
-            
             double[] uArr = new double[m * m];
             uBuf.get(uArr);
-            
             double[] vtArr = new double[n * n];
             vtBuf.get(vtArr);
             
@@ -1114,8 +1036,8 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                 RealDoubleMatrix.of(vArr, n, n)
             );
         }
-        logger.log(System.Logger.Level.INFO, "svd() falling through to UOE. AVAILABLE: {0}, storageFound: {1}", AVAILABLE, (storage != null));
-        throw new UnsupportedOperationException(getName() + ": svd() not available for these types");
+        throw new UnsupportedOperationException(getName() + ": svd() not available");
     }
 
 }
+
