@@ -389,15 +389,28 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         for (int i = 0; i < dim; i++) {
             Object val = v.get(i);
             if (isComplex) {
-                org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) val;
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, true), arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 1, true), arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                Real re = getRealPart(val);
+                Real im = getImagPart(val);
+                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, true), arena.allocateFrom(re.bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 1, true), arena.allocateFrom(im.bigDecimalValue().toPlainString()), 10, 0);
             } else {
-                Real rv = (Real) val;
+                Real rv = getRealPart(val);
                 NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
             }
         }
         return vec;
+    }
+
+    private Real getRealPart(Object val) {
+        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return c.getReal();
+        if (val instanceof Real r) return r;
+        if (val instanceof Number n) return Real.of(n.doubleValue());
+        return Real.of(val.toString());
+    }
+
+    private Real getImagPart(Object val) {
+        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return c.getImaginary();
+        return Real.ZERO;
     }
 
     private static MemorySegment getMPFRVector(MemorySegment vec, int idx, int component, boolean isComplex) {
@@ -562,11 +575,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             for (int j = 0; j < cols; j++) {
                 Object val = storage.get(i, j);
                 if (isComplex) {
-                    org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) val;
-                    setMPFR(getMPFR(mat, i, j, cols, 0, true), cv.getReal(), arena, 0);
-                    setMPFR(getMPFR(mat, i, j, cols, 1, true), cv.getImaginary(), arena, 0);
+                    Real re = getRealPart(val);
+                    Real im = getImagPart(val);
+                    setMPFR(getMPFR(mat, i, j, cols, 0, true), re, arena, 0);
+                    setMPFR(getMPFR(mat, i, j, cols, 1, true), im, arena, 0);
                 } else {
-                    setMPFR(getMPFR(mat, i, j, cols, 0, false), (Real) val, arena, 0);
+                    setMPFR(getMPFR(mat, i, j, cols, 0, false), getRealPart(val), arena, 0);
                 }
             }
         }

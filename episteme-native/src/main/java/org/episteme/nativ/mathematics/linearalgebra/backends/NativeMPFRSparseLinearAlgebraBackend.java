@@ -107,10 +107,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private Real readMPFR(MemorySegment val, Arena arena) {
         return NativeRealBig.copyFrom(val, getPrecision());
     }
-    
-    private Real readMPFR_internal(MemorySegment val, MemorySegment expPtr, Arena arena) throws Throwable {
-        return NativeRealBig.copyFrom(val, getPrecision());
-    }
+
 
     private void setMPFR(MemorySegment dest, E value, Arena arena) throws Throwable {
         if (value instanceof NativeRealBig nrb) {
@@ -146,12 +143,14 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             for (int i = 0; i < sa.rows(); i++) {
                 for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
                     int pos = i * sa.cols() + colIdx[k];
+                    Object val = vals[k];
                     if (isComplex) {
-                        org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) vals[k];
-                        setMPFR(h_v.asSlice(pos * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) cv.getReal(), arena);
-                        setMPFR(h_v.asSlice((pos * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) cv.getImaginary(), arena);
+                        Real re = getRealPart(val);
+                        Real im = getImagPart(val);
+                        setMPFR(h_v.asSlice(pos * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) re, arena);
+                        setMPFR(h_v.asSlice((pos * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) im, arena);
                     } else {
-                        setMPFR(h_v.asSlice(pos * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) vals[k], arena);
+                        setMPFR(h_v.asSlice(pos * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) val, arena);
                     }
                 }
             }
@@ -159,17 +158,31 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             for (int i = 0; i < a.rows(); i++) {
                 for (int j = 0; j < a.cols(); j++) {
                     int pos = i * a.cols() + j;
+                    Object val = a.get(i, j);
                     if (isComplex) {
-                        org.episteme.core.mathematics.numbers.complex.Complex cv = (org.episteme.core.mathematics.numbers.complex.Complex) a.get(i, j);
-                        setMPFR(h_v.asSlice(pos * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) cv.getReal(), arena);
-                        setMPFR(h_v.asSlice((pos * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) cv.getImaginary(), arena);
+                        Real re = getRealPart(val);
+                        Real im = getImagPart(val);
+                        setMPFR(h_v.asSlice(pos * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) re, arena);
+                        setMPFR(h_v.asSlice((pos * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) im, arena);
                     } else {
-                        setMPFR(h_v.asSlice(pos * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) a.get(i, j), arena);
+                        setMPFR(h_v.asSlice(pos * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), (E) val, arena);
                     }
                 }
             }
         }
         return h_v;
+    }
+
+    private Real getRealPart(Object val) {
+        if (val instanceof Complex c) return c.getReal();
+        if (val instanceof Real r) return r;
+        if (val instanceof Number n) return Real.of(n.doubleValue());
+        return Real.of(val.toString());
+    }
+
+    private Real getImagPart(Object val) {
+        if (val instanceof Complex c) return c.getImaginary();
+        return Real.ZERO;
     }
 
     private void dotProduct(MemorySegment v1, MemorySegment v2, int n, MemorySegment res, long prec, Arena arena, boolean isComplex) throws Throwable {
@@ -224,14 +237,14 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             spmv_internal(sa, h_b, res, (int) prec, arena, isComplex);
             
             Object[] resultArr = new Object[sa.rows()];
-            MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
+
             for (int i = 0; i < sa.rows(); i++) {
                 if (isComplex) {
-                    Real re = readMPFR_internal(res.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
-                    Real im = readMPFR_internal(res.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                    Real re = readMPFR(res.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
+                    Real im = readMPFR(res.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
                     resultArr[i] = (E) (Object) Complex.of(re, im);
                 } else {
-                    resultArr[i] = (E) (Object) readMPFR_internal(res.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                    resultArr[i] = (E) (Object) readMPFR(res.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
                 }
             }
             return Vector.of((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(resultArr), sa.getScalarRing());
@@ -405,15 +418,14 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             if (isComplex) {
                 MemorySegment vI = nativeVals.asSlice((i * stride + 1) * layoutSize, MPFR_LAYOUT);
                 NativeSafe.invoke(MPFR_INIT2, vI, (int) prec);
-                if (v instanceof Complex cv) {
-                    NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, vI, arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
-                } else if (v instanceof Real rv) {
-                    NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_UI, vI, 0L, 0);
-                }
+                
+                Real re = getRealPart(v);
+                Real im = getImagPart(v);
+                NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(re.bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, vI, arena.allocateFrom(im.bigDecimalValue().toPlainString()), 10, 0);
             } else {
-                NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(((Real)v).bigDecimalValue().toPlainString()), 10, 0);
+                Real rv = getRealPart(v);
+                NativeSafe.invoke(MPFR_SET_STR, vR, arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
             }
         }
         return nativeVals;
@@ -1347,15 +1359,14 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     private Vector<E> backToVector(MemorySegment h_x, int n, boolean isComplex, Ring<E> ring, Arena arena) throws Throwable {
         E[] resultArr = (E[]) new Object[n];
-        MemorySegment expPtr = arena.allocate(IS_WINDOWS ? java.lang.foreign.ValueLayout.JAVA_INT : java.lang.foreign.ValueLayout.JAVA_LONG);
         boolean useRealDouble = !isComplex && ring instanceof org.episteme.core.mathematics.sets.Reals;
         for (int i = 0; i < n; i++) {
             if (isComplex) {
-                Real re = readMPFR_internal(h_x.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
-                Real im = readMPFR_internal(h_x.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                Real re = readMPFR(h_x.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
+                Real im = readMPFR(h_x.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
                 resultArr[i] = (E) (Object) Complex.of(re, im);
             } else {
-                NativeRealBig res = (NativeRealBig) readMPFR_internal(h_x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), expPtr, arena);
+                Real res = readMPFR(h_x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
                 if (useRealDouble) {
                     resultArr[i] = (E) (Object) org.episteme.core.mathematics.numbers.real.RealDouble.create(res.doubleValue());
                 } else {
@@ -1365,6 +1376,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         }
         return Vector.of(java.util.Arrays.asList(resultArr), ring);
     }
+
+
 
     private org.episteme.core.mathematics.numbers.complex.Complex complexTranscendental(org.episteme.core.mathematics.numbers.complex.Complex z, String op, int prec, Arena arena, Object... args) {
          try {
@@ -1376,29 +1389,29 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
              NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(z.getReal().bigDecimalValue().toPlainString()), 10, 0);
              NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(z.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
              
-             NativeMPFRDenseLinearAlgebraBackend<E> dense = (NativeMPFRDenseLinearAlgebraBackend<E>) (Object) SHARED_DENSE;
+             
              switch (op.toLowerCase()) {
-                 case "exp" -> dense.complexExp(resR, resI, aR, aI, prec, arena);
-                 case "log" -> dense.complexLog(resR, resI, aR, aI, prec, arena);
-                 case "log10" -> dense.complexLog10(resR, resI, aR, aI, prec, arena);
-                 case "sin" -> dense.complexSin(resR, resI, aR, aI, prec, arena);
-                 case "cos" -> dense.complexCos(resR, resI, aR, aI, prec, arena);
-                 case "tan" -> dense.complexTan(resR, resI, aR, aI, prec, arena);
-                 case "asin" -> dense.complexAsin(resR, resI, aR, aI, prec, arena);
-                 case "acos" -> dense.complexAcos(resR, resI, aR, aI, prec, arena);
-                 case "atan" -> dense.complexAtan(resR, resI, aR, aI, prec, arena);
-                 case "sinh" -> dense.complexSinh(resR, resI, aR, aI, prec, arena);
-                 case "cosh" -> dense.complexCosh(resR, resI, aR, aI, prec, arena);
-                 case "tanh" -> dense.complexTanh(resR, resI, aR, aI, prec, arena);
-                 case "sqrt" -> dense.complexSqrt(resR, resI, aR, aI, prec, arena);
-                 case "cbrt" -> dense.complexCbrt(resR, resI, aR, aI, prec, arena);
+                 case "exp" -> NativeMPFRDenseLinearAlgebraBackend.complexExp(resR, resI, aR, aI, prec, arena);
+                 case "log" -> NativeMPFRDenseLinearAlgebraBackend.complexLog(resR, resI, aR, aI, prec, arena);
+                 case "log10" -> NativeMPFRDenseLinearAlgebraBackend.complexLog10(resR, resI, aR, aI, prec, arena);
+                 case "sin" -> NativeMPFRDenseLinearAlgebraBackend.complexSin(resR, resI, aR, aI, prec, arena);
+                 case "cos" -> NativeMPFRDenseLinearAlgebraBackend.complexCos(resR, resI, aR, aI, prec, arena);
+                 case "tan" -> NativeMPFRDenseLinearAlgebraBackend.complexTan(resR, resI, aR, aI, prec, arena);
+                 case "asin" -> NativeMPFRDenseLinearAlgebraBackend.complexAsin(resR, resI, aR, aI, prec, arena);
+                 case "acos" -> NativeMPFRDenseLinearAlgebraBackend.complexAcos(resR, resI, aR, aI, prec, arena);
+                 case "atan" -> NativeMPFRDenseLinearAlgebraBackend.complexAtan(resR, resI, aR, aI, prec, arena);
+                 case "sinh" -> NativeMPFRDenseLinearAlgebraBackend.complexSinh(resR, resI, aR, aI, prec, arena);
+                 case "cosh" -> NativeMPFRDenseLinearAlgebraBackend.complexCosh(resR, resI, aR, aI, prec, arena);
+                 case "tanh" -> NativeMPFRDenseLinearAlgebraBackend.complexTanh(resR, resI, aR, aI, prec, arena);
+                 case "sqrt" -> NativeMPFRDenseLinearAlgebraBackend.complexSqrt(resR, resI, aR, aI, prec, arena);
+                 case "cbrt" -> NativeMPFRDenseLinearAlgebraBackend.complexCbrt(resR, resI, aR, aI, prec, arena);
                  case "pow" -> {
                      if (args.length > 0 && args[0] instanceof org.episteme.core.mathematics.numbers.complex.Complex exp) {
                          MemorySegment eR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, eR, prec);
                          MemorySegment eI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, eI, prec);
                          NativeSafe.invoke(MPFR_SET_STR, eR, arena.allocateFrom(exp.getReal().bigDecimalValue().toPlainString()), 10, 0);
                          NativeSafe.invoke(MPFR_SET_STR, eI, arena.allocateFrom(exp.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
-                         dense.complexPow(resR, resI, aR, aI, eR, eI, prec, arena);
+                         NativeMPFRDenseLinearAlgebraBackend.complexPow(resR, resI, aR, aI, eR, eI, prec, arena);
                      }
                  }
                  default -> throw new UnsupportedOperationException("Op " + op + " not implemented for complex sparse");

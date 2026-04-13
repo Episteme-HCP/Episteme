@@ -35,6 +35,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
  * @since 1.2
  */
 @AutoService(Backend.class)
+@SuppressWarnings("rawtypes")
 public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, SIMDBackend, CPUBackend {
 
     private final CPUDenseLinearAlgebraProvider<E> denseProvider;
@@ -149,6 +150,28 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @SuppressWarnings("unchecked")
+    private LinearAlgebraProvider<E> getBestVectorProvider(Vector<E> v) {
+        LinearAlgebraProvider<E> internal = (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.SparseVector) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
+        try {
+            // Treat even vector operations as part of the general provider lookup
+            Class providerClass = (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.SparseVector) ? 
+                                                                    SparseLinearAlgebraProvider.class : LinearAlgebraProvider.class;
+            List available = AlgorithmManager.getProviders(providerClass);
+            LinearAlgebraProvider<E> best = (LinearAlgebraProvider<E>) available.stream()
+                .filter(p -> !p.getClass().equals(this.getClass()) && !(p instanceof EpistemeLinearAlgebraBackend))
+                .findFirst()
+                .orElse(null);
+
+            if (best == null || best == this || best.getClass().equals(this.getClass())) {
+                return internal;
+            }
+            return best;
+        } catch (Exception e) {
+            return internal;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     private <T> T executeComplexOperation(java.util.function.Function<LinearAlgebraProvider<E>, T> operation) {
         try {
             List<LinearAlgebraProvider> available = AlgorithmManager.getProviders(LinearAlgebraProvider.class);
@@ -182,24 +205,28 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        return getBestProvider(a).multiply(a, b);
+    }
+
+    @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         return getBestProvider(a).scale(scalar, a);
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        // Vectors don't have sparse variants in current SPI, route to dense
-        return denseProvider.multiply(vector, scalar);
+        return getBestVectorProvider(vector).multiply(vector, scalar);
     }
 
     @Override
     public E dot(Vector<E> a, Vector<E> b) {
-        return denseProvider.dot(a, b);
+        return getBestVectorProvider(a).dot(a, b);
     }
 
     @Override
     public E norm(Vector<E> a) {
-        return denseProvider.norm(a);
+        return getBestVectorProvider(a).norm(a);
     }
 
     @Override
@@ -244,6 +271,11 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        return getBestProvider(a).solve(a, b);
+    }
+
+    @Override
+    public Matrix<E> solve(Matrix<E> a, Matrix<E> b) {
         return getBestProvider(a).solve(a, b);
     }
 

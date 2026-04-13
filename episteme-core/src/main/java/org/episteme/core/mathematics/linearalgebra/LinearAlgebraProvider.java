@@ -100,6 +100,24 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
     default Vector<E> solve(Matrix<E> a, Vector<E> b) {
         throw new UnsupportedOperationException(getName() + " does not support solve()");
     }
+    default Matrix<E> solve(Matrix<E> a, Matrix<E> b) {
+        int m = a.cols(); // Assuming a is mxm or at least we get m variables
+        int n = b.cols();
+        java.util.List<Vector<E>> cols = new java.util.ArrayList<>(n);
+        for (int j = 0; j < n; j++) {
+            cols.add(solve(a, b.getColumn(j)));
+        }
+        org.episteme.core.mathematics.structures.rings.Ring<E> ring = a.getScalarRing();
+        @SuppressWarnings("unchecked")
+        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m, n);
+        for (int j = 0; j < n; j++) {
+            Vector<E> col = cols.get(j);
+            for (int i = 0; i < m; i++) {
+                data[i][j] = col.get(i);
+            }
+        }
+        return org.episteme.core.mathematics.linearalgebra.Matrix.of(data, ring);
+    }
     default Matrix<E> transpose(Matrix<E> a) {
         throw new UnsupportedOperationException(getName() + " does not support transpose()");
     }
@@ -277,22 +295,22 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
     /**
      * Solves Ax = b using a previously computed LU decomposition.
      */
-    default Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        throw new UnsupportedOperationException(getName() + " does not support solve(LUResult, Vector)");
+    default Vector<E> solve(org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu, Vector<E> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.solve(lu, b, (org.episteme.core.mathematics.structures.rings.Field<E>) b.getScalarRing(), this);
     }
 
     /**
      * Solves Ax = b using a previously computed QR decomposition.
      */
-    default Vector<E> solve(QRResult<E> qr, Vector<E> b) {
-        throw new UnsupportedOperationException(getName() + " does not support solve(QRResult, Vector)");
+    default Vector<E> solve(org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr, Vector<E> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.solve(qr, b, (org.episteme.core.mathematics.structures.rings.Field<E>) b.getScalarRing(), this);
     }
 
     /**
      * Solves Ax = b using a previously computed Cholesky decomposition.
      */
-    default Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
-        throw new UnsupportedOperationException(getName() + " does not support solve(CholeskyResult, Vector)");
+    default Vector<E> solve(org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky, Vector<E> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericCholesky.solve(cholesky, b, (org.episteme.core.mathematics.structures.rings.Field<E>) b.getScalarRing(), this);
     }
 
     @Override

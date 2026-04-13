@@ -196,6 +196,14 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
         return new Complex(real.divide(denominator), imaginary.negate().divide(denominator));
     }
 
+    /**
+     * Alias for inverse() to satisfy certain matrix operation requirements.
+     * @return 1/this
+     */
+    public Complex reciprocal() {
+        return inverse();
+    }
+
     public Complex divide(Complex a, Complex b) {
         return a.divide(b);
     }
