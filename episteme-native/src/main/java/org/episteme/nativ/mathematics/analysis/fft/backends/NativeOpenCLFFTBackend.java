@@ -12,6 +12,8 @@ import org.episteme.core.mathematics.analysis.fft.FFTProvider;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
+import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 import static org.jocl.CL.*;
 import org.jocl.*;
@@ -76,7 +78,7 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         if (initialized) return;
         if (!backend.isAvailable()) throw new IllegalStateException("OpenCL not available");
 
-        try {
+        try (ResourceTracker tracker = new ResourceTracker()) {
             OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
             if (ctx == null) {
                 logger.error("OpenCL context could not be created during FFT initialization.");
@@ -86,14 +88,20 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
 
             // Create Program
             program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE}, null, null);
+            tracker.track(program, CL::clReleaseProgram);
             clBuildProgram(program, 0, null, null, null, null);
 
             // Create Kernel
             kernel = clCreateKernel(program, "dft_naive", null);
+            // If we reach here, we want to KEEP the program and kernel. 
+            // The tracker will close them if we throw an exception before setting initialized = true.
 
             initialized = true;
         } catch (Exception e) {
             logger.error("Failed to initialize OpenCL FFT: {}", e.getMessage());
+            // Cleanup happens via tracker.close() if an exception is thrown
+            program = null;
+            kernel = null;
             throw new RuntimeException("OpenCL initialization error", e);
         }
     }
@@ -195,24 +203,19 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
         if (ctx == null) {
             logger.warn("OpenCL context not available for FFT execution.");
-            return null; // Or throw, but returning null follows the trend of failing gracefully if hardware is missing
+            return null;
         }
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
         
         if (context == null || queue == null) return null;
 
-        cl_mem memReal = null;
-        cl_mem memImag = null;
-        cl_mem memOutReal = null;
-        cl_mem memOutImag = null;
-
-        try {
+        try (ResourceTracker tracker = new ResourceTracker()) {
             // Allocate Input/Output
-            memReal = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(real), null);
-            memImag = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(imag), null);
-            memOutReal = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
-            memOutImag = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
+            cl_mem memReal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(real), null), CL::clReleaseMemObject);
+            cl_mem memImag = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(imag), null), CL::clReleaseMemObject);
+            cl_mem memOutReal = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
+            cl_mem memOutImag = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
 
             // Set Arguments
             clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memReal));
@@ -233,13 +236,9 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
             clEnqueueReadBuffer(queue, memOutImag, CL_TRUE, 0, Sizeof.cl_double * n, Pointer.to(outImag), 0, null, null);
             
             return new double[][]{outReal, outImag};
-
-        } finally {
-            // Cleanup with null-checks for safety
-            if (memReal != null) clReleaseMemObject(memReal);
-            if (memImag != null) clReleaseMemObject(memImag);
-            if (memOutReal != null) clReleaseMemObject(memOutReal);
-            if (memOutImag != null) clReleaseMemObject(memOutImag);
+        } catch (Exception e) {
+            logger.error("OpenCL FFT execution failed: {}", e.getMessage());
+            throw new RuntimeException("GPU FFT error", e);
         }
     }
 
