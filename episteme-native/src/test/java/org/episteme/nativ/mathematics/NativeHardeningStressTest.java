@@ -135,6 +135,7 @@ public class NativeHardeningStressTest {
             }
             logger.info("OpenCL GMRES Stress Test completed successfully.");
         }
+    }
 
     private Vector<Real> createVector(double[] data) {
         int n = data.length;

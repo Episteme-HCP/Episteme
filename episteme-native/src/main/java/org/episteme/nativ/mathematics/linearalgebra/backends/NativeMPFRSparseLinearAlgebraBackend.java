@@ -32,7 +32,7 @@ import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNum
  * Optimized for CSR storage.
  */
 @com.google.auto.service.AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class})
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);
     private static final NativeMPFRDenseLinearAlgebraBackend<?> SHARED_DENSE = new NativeMPFRDenseLinearAlgebraBackend<>();
@@ -1414,11 +1414,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     copy_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), r, n, isComplex);
                     scale_internal(V.asSlice(0, n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize()), invBeta, n, prec, arena, isComplex);
                     
-                // Create H with explicit interface type to avoid ArrayStoreException when storing NativeRealBig
-                E[][] H = (E[][]) java.lang.reflect.Array.newInstance(Object.class, m + 1, m);
-                for (int i = 0; i <= m; i++) {
-                    H[i] = (E[]) java.lang.reflect.Array.newInstance(Object.class, m);
-                }
+                    // Create H with explicit interface type to avoid ArrayStoreException when storing NativeRealBig
+                    Class<?> eClass = ring.zero().getClass();
+                    E[][] H = (E[][]) java.lang.reflect.Array.newInstance(eClass, m + 1, m);
+                    for (int i = 0; i <= m; i++) {
+                        H[i] = (E[]) java.lang.reflect.Array.newInstance(eClass, m);
+                    }
                     for (int i = 0; i <= m; i++) {
                         java.util.Arrays.fill(H[i], ring.zero());
                     }
@@ -1474,7 +1475,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private void solveSmallAndCheck(E[][] H, E beta, MemorySegment V, MemorySegment h_x, int n, int k, boolean isComplex, Ring<E> ring, int prec, Arena arena) throws Throwable {
         Matrix<E> hMat = Matrix.of(java.util.Arrays.stream(H).limit(k + 1).map(row -> java.util.Arrays.asList(row).subList(0, k)).collect(java.util.stream.Collectors.toList()), ring);
         
-        E[] e1Data = (E[]) java.lang.reflect.Array.newInstance(Object.class, k + 1);
+        E[] e1Data = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), k + 1);
         java.util.Arrays.fill(e1Data, ring.zero());
         e1Data[0] = beta;
         Vector<E> e1 = Vector.of(e1Data, ring);

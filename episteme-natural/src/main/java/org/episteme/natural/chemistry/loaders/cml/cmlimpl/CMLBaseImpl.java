@@ -70,7 +70,6 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
      * create a Node WITHOUT tagName OR document
      * Use with care
      */
-// awful, but there seems to be no no-arg constructor
     public CMLBaseImpl() {
     }
 
@@ -94,11 +93,6 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
     // communal functionality
     protected void init() {
         ownerDocument = (AbstractCMLDocument) this.getOwnerDocument();
-        try {
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("CMLBaseImpl: BUG: " + e);
-        }
     }
 
     public AbstractCMLDocument getCMLDocument() {
@@ -222,8 +216,8 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
      * @param value the content
      * @throws CMLException thrown by subclasses
      */
-    public void setContentValue(String value) /*throws CMLException*/ {
-        this.addTextChild(value);
+    public void setContentValue(String value) {
+        this.setTextChild(value);
     }
 
     /**
@@ -345,7 +339,7 @@ public class CMLBaseImpl extends PMRElementImpl implements AbstractBase {
      * if existing non-Text children, no action
      *
      * @param value to add
-     * @deprecated use setTextChild instead
+     * @see #setTextChild(String)
      */
     public void addTextChild(String value) {
         setTextChild(value);

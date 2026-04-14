@@ -57,9 +57,9 @@ public class GenericQR {
         }
         
         @SuppressWarnings("unchecked")
-        E[] qFlat = (E[]) new Object[m * n];
+        E[] qFlat = (E[]) java.lang.reflect.Array.newInstance(componentType(field), m * n);
         @SuppressWarnings("unchecked")
-        E[] rFlat = (E[]) new Object[n * n];
+        E[] rFlat = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n * n);
         for (int i = 0; i < m; i++) for (int k = 0; k < n; k++) qFlat[i * n + k] = qData[i][k];
         for (int i = 0; i < n; i++) for (int k = 0; k < n; k++) rFlat[i * n + k] = rData[i][k];
         

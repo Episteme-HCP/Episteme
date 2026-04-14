@@ -46,14 +46,24 @@ public class HighPrecisionComplianceTest {
             System.out.println("Skipping Episteme Server startup (episteme.test.skip-server-startup=true)");
             return;
         }
+
+        // Port hardening: check if 50051 is occupied
+        try (java.net.ServerSocket ss = new java.net.ServerSocket(50051)) {
+            // Port is free
+        } catch (IOException e) {
+            System.err.println("CRITICAL: Port 50051 is BUSY. Attempting to start regardless, but likely to fail if it's not a legacy Episteme instance.");
+        }
         
         org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
         try {
             serverContext = GrpcTestApplication.start();
             System.out.println("Episteme Server started successfully for compliance tests.");
-            Thread.sleep(5000);
+            Thread.sleep(5000); // Give it time to bind
         } catch (Exception e) {
-            System.err.println("Failed to start Episteme Server (it might be already running): " + e.getMessage());
+            System.err.println("Failed to start Episteme Server: " + e.getMessage());
+            if (e.getMessage().contains("Address already in use")) {
+                System.err.println("DIAGNOSTIC: A server is already running on port 50051. Testing against the existing instance.");
+            }
         }
     }
 
