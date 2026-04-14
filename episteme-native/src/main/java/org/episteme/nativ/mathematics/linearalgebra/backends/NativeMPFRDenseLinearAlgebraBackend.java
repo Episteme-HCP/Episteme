@@ -34,9 +34,9 @@ import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, CPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 @SuppressWarnings("unchecked")
-public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
+public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");
     private static final boolean AVAILABLE = NativeMPFRNumbers.AVAILABLE;
@@ -920,21 +920,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     @Override
     public SVDResult<E> svd(Matrix<E> a) {
         return GenericSVD.decompose(a, (Field<E>) a.getScalarRing(), this);
-    }
-
-    @Override
-    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        throw new UnsupportedOperationException("Not sparse");
-    }
-
-    @Override
-    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
-        throw new UnsupportedOperationException("Not sparse");
-    }
-
-    @Override
-    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
-        throw new UnsupportedOperationException("Not sparse");
     }
 
     @Override
