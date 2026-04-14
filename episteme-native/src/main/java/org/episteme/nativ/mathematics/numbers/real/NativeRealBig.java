@@ -30,6 +30,7 @@ public final class NativeRealBig extends Real {
     private final Arena arena;
     private final long precision;
 
+    @SuppressWarnings("unused")
     private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
 
     /**

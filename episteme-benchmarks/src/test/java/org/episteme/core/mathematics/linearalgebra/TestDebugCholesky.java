@@ -18,7 +18,7 @@ public class TestDebugCholesky {
             System.out.println("A["+i+"]["+j+"] doubleValue: " + data[i][j].abs().doubleValue());
             System.out.println("A["+i+"]["+j+"] bigDecimalValue: " + data[i][j].abs().bigDecimalValue());
         }
-        Matrix<Complex> A = Matrix.of(data, (Ring<Complex>) (Object) Complex.of(0, 0).getScalarRing());
+        Matrix<Complex> A = Matrix.of(data, Complex.of(0, 0).getScalarRing());
         System.out.println("A[0][0] doubleValue from matrix: " + A.get(0,0).abs().doubleValue());
         System.out.println("Test Complete!");
     }

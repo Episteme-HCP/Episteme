@@ -35,7 +35,7 @@ import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
  * Binds directly to MPFR via Project Panama (FFM).
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");

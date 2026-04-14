@@ -38,7 +38,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     
     private static final Logger logger = LoggerFactory.getLogger(NativeFFMBLASBackend.class);

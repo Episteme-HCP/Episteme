@@ -36,6 +36,7 @@ import static jdk.incubator.vector.VectorOperators.*;
  * @since 1.2
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend, SIMDBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSIMDLinearAlgebraBackend.class);

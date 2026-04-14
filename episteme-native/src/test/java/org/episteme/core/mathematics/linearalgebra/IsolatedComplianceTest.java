@@ -8,7 +8,6 @@ import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRSparseLin
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
-import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.io.IOException;
@@ -116,6 +115,7 @@ public class IsolatedComplianceTest {
 
             testOperation(res, "CG", () -> {
                 if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException();
+                @SuppressWarnings("unchecked")
                 SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
                 double[][] aData = randomData(SIZE, SIZE);
                 // Symmetric positive definite for CG
@@ -135,6 +135,7 @@ public class IsolatedComplianceTest {
 
             testOperation(res, "BiCGSTAB", () -> {
                 if (!(provider instanceof SparseLinearAlgebraProvider)) throw new UnsupportedOperationException();
+                @SuppressWarnings("unchecked")
                 SparseLinearAlgebraProvider<Real> sparseProvider = (SparseLinearAlgebraProvider<Real>) provider;
                 double[][] aData = randomData(SIZE, SIZE);
                 for(int i=0; i<SIZE; i++) aData[i][i] = 10.0;

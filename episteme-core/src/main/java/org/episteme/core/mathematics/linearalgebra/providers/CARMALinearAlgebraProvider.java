@@ -21,6 +21,7 @@ import org.episteme.core.mathematics.linearalgebra.Vector;
  * Intended for benchmarking and comparison purposes.
  */
 @AutoService({LinearAlgebraProvider.class})
+@SuppressWarnings("rawtypes")
 public class CARMALinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 
     public CARMALinearAlgebraProvider() {

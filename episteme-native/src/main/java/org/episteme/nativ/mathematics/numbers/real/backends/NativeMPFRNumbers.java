@@ -262,13 +262,13 @@ public final class NativeMPFRNumbers {
         
         try {
             if ("pi".equals(name)) {
-                int ignored = (int) MPFR_CONST_PI.invokeExact(res.getPtr(), 0); // 0 = RNDN
+                MPFR_CONST_PI.invokeExact(res.getPtr(), 0); // 0 = RNDN
                 return res;
             }
             if ("e".equals(name)) {
                 // e = exp(1)
                 org.episteme.nativ.mathematics.numbers.real.NativeRealBig one = org.episteme.nativ.mathematics.numbers.real.NativeRealBig.of("1.0", precision);
-                int ignored = (int) MPFR_EXP.invokeExact(res.getPtr(), one.getPtr(), 0);
+                MPFR_EXP.invokeExact(res.getPtr(), one.getPtr(), 0);
                 return res;
             }
         } catch (Throwable t) {

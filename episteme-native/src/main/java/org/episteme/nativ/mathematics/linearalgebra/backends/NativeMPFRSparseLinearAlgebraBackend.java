@@ -102,6 +102,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(storage, (Ring<E>)a.getScalarRing());
     }
 
+    @SuppressWarnings("unused")
     private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
 
     private Real readMPFR(MemorySegment val, Arena arena) {

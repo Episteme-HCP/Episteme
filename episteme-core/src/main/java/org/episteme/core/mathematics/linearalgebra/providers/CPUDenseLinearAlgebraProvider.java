@@ -54,6 +54,7 @@ import com.google.auto.service.AutoService;
  * @since 1.0
  */
 @AutoService({LinearAlgebraProvider.class, Backend.class, CPUBackend.class})
+@SuppressWarnings("rawtypes")
 public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E>, CPUBackend {
 
     protected final Field<E> field;

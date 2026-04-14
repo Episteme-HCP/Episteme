@@ -37,7 +37,7 @@ public class LinearAlgebraComplianceTest {
     public void generateComplianceReport() {
         List<LinearAlgebraProvider<?>> rawProviders = new ArrayList<>();
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        ServiceLoader<LinearAlgebraProvider<?>> loader = ServiceLoader.load((Class) LinearAlgebraProvider.class);
+        ServiceLoader<LinearAlgebraProvider<?>> loader = ServiceLoader.load((Class) (Object) LinearAlgebraProvider.class);
         Iterator<LinearAlgebraProvider<?>> it = loader.iterator();
         while(true) {
             try {
