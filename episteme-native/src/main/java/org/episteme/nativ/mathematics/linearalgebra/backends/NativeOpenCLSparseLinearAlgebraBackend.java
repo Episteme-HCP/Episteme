@@ -11,7 +11,6 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
-import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import java.util.function.Function;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
@@ -41,8 +40,8 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 @SuppressWarnings("rawtypes")
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, SparseLinearAlgebraProvider<Real>, GPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLSparseLinearAlgebraBackend.class);
@@ -1031,15 +1030,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         }
     }
 
-    private double gpuDot(cl_mem a, cl_mem b, int n) {
-        cl_mem mTemp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_kernel kDot = clCreateKernel(denseProgram, "dot_partial", null);
-        try {
-            return gpuDot_internal(kDot, a, b, mTemp, n);
-        } finally {
-            clReleaseKernel(kDot); clReleaseMemObject(mTemp);
-        }
-    }
 
     private double gpuDot_internal(cl_kernel kDot, cl_mem a, cl_mem b, cl_mem mTemp, int n) {
         clSetKernelArg(kDot, 0, Sizeof.cl_mem, Pointer.to(a));
@@ -1054,14 +1044,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return sum;
     }
 
-    private void gpuScale(cl_mem a, double s, int n) {
-        cl_kernel k = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
-        try {
-            gpuScale_internal(k, a, s, n);
-        } finally {
-            clReleaseKernel(k);
-        }
-    }
 
     private void gpuScale_internal(cl_kernel k, cl_mem a, double s, int n) {
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(a));
@@ -1071,14 +1053,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
     }
 
-    private void gpuAdd(cl_mem x, cl_mem y, int n) {
-        cl_kernel k = clCreateKernel(denseProgram, "vectorAdd", null);
-        try {
-            gpuAdd_internal(k, x, y, n);
-        } finally {
-            clReleaseKernel(k);
-        }
-    }
 
     private void gpuAdd_internal(cl_kernel k, cl_mem x, cl_mem y, int n) {
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(x));
@@ -1129,52 +1103,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         return solver.solve((SparseMatrix<Real>) A, b, x0, tol.doubleValue(), maxIter, restarts);
     }
 
-    private double[] solveHessenbergSystem_internal(double[][] H, double beta, int size) {
-        // Small dense system solver for GMRES on host
-        double[] g = new double[size + 1];
-        g[0] = beta;
-        double[] cs = new double[size];
-        double[] sn = new double[size];
-
-        for (int i = 0; i < size; i++) {
-            for (int k = 0; k < i; k++) {
-                double h1 = H[k][i];
-                double h2 = H[k+1][i];
-                H[k][i] = cs[k] * h1 + sn[k] * h2;
-                H[k+1][i] = -sn[k] * h1 + cs[k] * h2;
-            }
-
-            double h1 = H[i][i];
-            double h2 = H[i+1][i];
-            if (h2 == 0) {
-                cs[i] = 1.0; sn[i] = 0.0;
-            } else if (Math.abs(h2) > Math.abs(h1)) {
-                double t = h1 / h2;
-                sn[i] = 1.0 / Math.sqrt(1.0 + t * t);
-                cs[i] = sn[i] * t;
-            } else {
-                double t = h2 / h1;
-                cs[i] = 1.0 / Math.sqrt(1.0 + t * t);
-                sn[i] = cs[i] * t;
-            }
-
-            H[i][i] = cs[i] * h1 + sn[i] * h2;
-            H[i+1][i] = 0.0;
-            double g1 = g[i];
-            g[i] = cs[i] * g1;
-            g[i+1] = -sn[i] * g1;
-        }
-
-        double[] y = new double[size];
-        for (int i = size - 1; i >= 0; i--) {
-            double sum = 0;
-            for (int j = i + 1; j < size; j++) {
-                sum += H[i][j] * y[j];
-            }
-            y[i] = (g[i] - sum) / H[i][i];
-        }
-        return y;
-    }
 
     private static class NativeOpenCLGMRESSolver {
         private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLGMRESSolver.class);

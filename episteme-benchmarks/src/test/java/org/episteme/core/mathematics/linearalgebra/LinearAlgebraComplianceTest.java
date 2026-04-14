@@ -142,7 +142,9 @@ public class LinearAlgebraComplianceTest {
             }
             if (p.isCompatible(org.episteme.core.mathematics.sets.Complexes.getInstance())) {
                 if ((name.contains("MPFR") || name.contains("BigMath")) && complexGroundTruth == null) {
-                    complexGroundTruth = (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>) p;
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex> typed = (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>) p;
+                    complexGroundTruth = typed;
                     System.out.println("[ComplianceTest] Selected Complex Ground Truth: " + name);
                 }
             }
@@ -223,6 +225,7 @@ public class LinearAlgebraComplianceTest {
             testOperation(res, "Scale" + suffix, () -> {
                 Random rand = new Random(42);
                 Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                @SuppressWarnings("unchecked")
                 E s = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(2.5, 0.5) : (E)Real.of(2.5);
                 Matrix<E> result = provider.scale(s, a);
                 if (groundTruth != null) verifyMatrix(groundTruth.scale(s, a), result, 1e-6, ring);

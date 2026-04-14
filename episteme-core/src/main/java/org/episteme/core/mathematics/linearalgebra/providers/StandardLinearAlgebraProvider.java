@@ -15,7 +15,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.technical.algorithm.AlgorithmManager;

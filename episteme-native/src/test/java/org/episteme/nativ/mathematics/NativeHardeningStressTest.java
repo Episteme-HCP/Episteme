@@ -5,7 +5,6 @@
 
 package org.episteme.nativ.mathematics;
 
-import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Extreme stress test (1,000+ iterations) for Native Math Stack to detect memory leaks
@@ -85,58 +83,58 @@ public class NativeHardeningStressTest {
     @Test
     public void testOpenCLGMRESStress() {
         logger.info("Starting OpenCL GMRES Stress Test ({} iterations)...", ITERATIONS);
-        NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
-        if (!backend.isAvailable()) {
-            logger.warn("OpenCL Sparse Backend not available, skipping stress test.");
-            return;
-        }
+        try (NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend()) {
+            if (!backend.isAvailable()) {
+                logger.warn("OpenCL Sparse Backend not available, skipping stress test.");
+                return;
+            }
 
-        // Create a simple diagonally dominant sparse matrix for stability
-        int n = 100;
-        int nnz = n + (n - 1) * 2;
-        int[] rowPtr = new int[n + 1];
-        int[] colIdx = new int[nnz];
-        double[] values = new double[nnz];
-        
-        int ptr = 0;
-        for (int i = 0; i < n; i++) {
-            rowPtr[i] = ptr;
-            if (i > 0) {
-                colIdx[ptr] = i - 1;
-                values[ptr] = -1.0;
+            // Create a simple diagonally dominant sparse matrix for stability
+            int n = 100;
+            int nnz = n + (n - 1) * 2;
+            int[] rowPtr = new int[n + 1];
+            int[] colIdx = new int[nnz];
+            double[] values = new double[nnz];
+            
+            int ptr = 0;
+            for (int i = 0; i < n; i++) {
+                rowPtr[i] = ptr;
+                if (i > 0) {
+                    colIdx[ptr] = i - 1;
+                    values[ptr] = -1.0;
+                    ptr++;
+                }
+                colIdx[ptr] = i;
+                values[ptr] = 4.0;
                 ptr++;
+                if (i < n - 1) {
+                    colIdx[ptr] = i + 1;
+                    values[ptr] = -1.0;
+                    ptr++;
+                }
             }
-            colIdx[ptr] = i;
-            values[ptr] = 4.0;
-            ptr++;
-            if (i < n - 1) {
-                colIdx[ptr] = i + 1;
-                values[ptr] = -1.0;
-                ptr++;
-            }
-        }
-        rowPtr[n] = ptr;
+            rowPtr[n] = ptr;
 
-        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
-            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(n, n, Real.ZERO);
-        for (int i = 0; i < n; i++) {
-            for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
-                storage.set(i, colIdx[k], Real.of(values[k]));
+            org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
+                new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(n, n, Real.ZERO);
+            for (int i = 0; i < n; i++) {
+                for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
+                    storage.set(i, colIdx[k], Real.of(values[k]));
+                }
             }
-        }
-        SparseMatrix<Real> A = new SparseMatrix<>(storage, Reals.getInstance());
-        
-        double[] bData = new double[n];
-        for (int i = 0; i < n; i++) bData[i] = 1.0;
-        Vector<Real> b = createVector(bData);
+            SparseMatrix<Real> A = new SparseMatrix<>(storage, Reals.getInstance());
+            
+            double[] bData = new double[n];
+            for (int i = 0; i < n; i++) bData[i] = 1.0;
+            Vector<Real> b = createVector(bData);
 
-        for (int i = 0; i < ITERATIONS; i++) {
-            if (i % 100 == 0) logger.info("GMRES Iteration {}...", i);
-            Vector<Real> x = backend.gmres(A, b, null, Real.of(1e-10), 100, 30);
-            assertNotNull(x);
+            for (int i = 0; i < ITERATIONS; i++) {
+                if (i % 100 == 0) logger.info("GMRES Iteration {}...", i);
+                Vector<Real> x = backend.gmres(A, b, null, Real.of(1e-10), 100, 30);
+                assertNotNull(x);
+            }
+            logger.info("OpenCL GMRES Stress Test completed successfully.");
         }
-        logger.info("OpenCL GMRES Stress Test completed successfully.");
-    }
 
     private Vector<Real> createVector(double[] data) {
         int n = data.length;

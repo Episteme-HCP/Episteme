@@ -57,6 +57,7 @@ import java.lang.reflect.Constructor;
  * @since 1.0
  */
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
+@SuppressWarnings("rawtypes")
 public class ColtBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static final Logger logger = LoggerFactory.getLogger(ColtBackend.class);

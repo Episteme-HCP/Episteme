@@ -53,6 +53,7 @@ import java.lang.reflect.Constructor;
  * @since 1.0
  */
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
+@SuppressWarnings("rawtypes")
 public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static boolean commonsAvailable = false;

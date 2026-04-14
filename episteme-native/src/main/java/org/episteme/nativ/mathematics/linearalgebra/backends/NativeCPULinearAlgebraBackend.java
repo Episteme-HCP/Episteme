@@ -5,7 +5,6 @@
 
 package org.episteme.nativ.mathematics.linearalgebra.backends;
 
-import java.lang.foreign.AddressLayout;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
@@ -19,8 +18,6 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericSVD;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -29,11 +26,8 @@ import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 
-import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
@@ -50,6 +44,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeSafe;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
+@SuppressWarnings("rawtypes")
 @com.google.auto.service.AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
 
@@ -543,50 +538,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         return multiply(vSInv, uT);
     }
 
-    private DoubleBuffer ensureDirect(RealDoubleMatrix m) {
-        if (m.getStorage() instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.DirectRealDoubleMatrixStorage) {
-            return ((org.episteme.core.mathematics.linearalgebra.matrices.storage.DirectRealDoubleMatrixStorage) m.getStorage()).getBuffer().duplicate().position(0);
-        }
-        DoubleBuffer direct = java.nio.ByteBuffer.allocateDirect(m.rows() * m.cols() * 8)
-            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        direct.put(m.toDoubleArray());
-        direct.flip();
-        return direct;
-    }
 
-    private DoubleBuffer ensureDirect(Matrix<Real> m) {
-        if (m instanceof RealDoubleMatrix rdm && rdm.isDirect()) {
-            return rdm.getBuffer().duplicate().position(0);
-        }
-        double[] data = toDoubleArray(m);
-        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        db.put(data);
-        db.flip();
-        return db;
-    }
-
-    private DoubleBuffer ensureDirect(Vector<Real> v) {
-        if (v instanceof RealDoubleVector rdv && rdv.getBuffer().isDirect()) {
-            return rdv.getBuffer().duplicate().position(0);
-        }
-        double[] data = toDoubleArray(v);
-        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        db.put(data);
-        db.flip();
-        return db;
-    }
-
-    private DoubleBuffer ensureDirect(org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage s) {
-        if (s.getBuffer().isDirect()) return s.getBuffer().duplicate().position(0);
-        double[] data = s.toDoubleArray();
-        DoubleBuffer db = java.nio.ByteBuffer.allocateDirect(data.length * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        db.put(data);
-        db.flip();
-        return db;
-    }
 
 
 
@@ -598,8 +550,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         
         if (!AVAILABLE || DGELS_HANDLE == null) throw new UnsupportedOperationException(getName() + ": DGELS not available");
 
-        double[] aData = toDoubleArray(a);
-        double[] bData = toDoubleArray(b);
+
         
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
@@ -749,21 +700,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         throw new UnsupportedOperationException(getName() + ": eigen() not available for these types");
     }
 
-    private org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage extractStorage(Matrix<Real> a) {
-        if (a instanceof RealDoubleMatrix) {
-            return (org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) ((RealDoubleMatrix) a).getStorage();
-        } else if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix) {
-            org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<Real> storage = ((org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<Real>) a).getStorage();
-            if (storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) {
-                return (org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) storage;
-            } else {
-                logger.log(System.Logger.Level.INFO, "extractStorage: GenericMatrix had incompatible storage type: {0}", storage != null ? storage.getClass().getName() : "null");
-            }
-        } else {
-            logger.log(System.Logger.Level.INFO, "extractStorage: Matrix was not RealDoubleMatrix or GenericMatrix: {0}", a.getClass().getName());
-        }
-        return null;
-    }
+
 
 
 

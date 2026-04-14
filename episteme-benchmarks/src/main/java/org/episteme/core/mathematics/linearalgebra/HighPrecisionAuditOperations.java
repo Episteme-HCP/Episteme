@@ -506,7 +506,7 @@ public class HighPrecisionAuditOperations {
                 }
             }
         }
-        return Matrix.of(data, (Ring<T>) v.getScalarRing());
+        return (Matrix<T>) Matrix.of(data, (Ring<T>) v.getScalarRing());
     }
 
     private static void assertVectorClose(Vector<RealBig> actual, Vector<RealBig> expected, BigDecimal tol, String msg) {
@@ -582,7 +582,7 @@ public class HighPrecisionAuditOperations {
     private static Vector<RealBig> createRealBigVector(RealBig val, int n, LinearAlgebraProvider<RealBig> p) {
         RealBig[] data = new RealBig[n];
         for (int i = 0; i < n; i++) data[i] = RealBig.create(val.bigDecimalValue().add(new BigDecimal(i)));
-        return Vector.of(data, org.episteme.core.mathematics.numbers.real.RealBig.ZERO.getScalarRing());
+        return Vector.of(data, (Ring<RealBig>) org.episteme.core.mathematics.numbers.real.RealBig.ZERO.getScalarRing());
     }
 
     @SuppressWarnings("unchecked")

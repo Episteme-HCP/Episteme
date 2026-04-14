@@ -25,7 +25,6 @@ package org.episteme.core.mathematics.linearalgebra.providers;
 
 import org.episteme.core.Episteme;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -220,7 +219,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Vector dimensions must match");
         }
 
-        @SuppressWarnings("unchecked")
         final Field<E> r = (Field<E>) a.getScalarRing();
         if (a.dimension() < PARALLEL_THRESHOLD) {
             @SuppressWarnings("unchecked")
@@ -266,7 +264,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 E negB = ((Field<E>) r).negate(b.get(i));
                 result.add(((Field<E>) r).add(a.get(i), negB));
             }
-            @SuppressWarnings("unchecked")
             E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), result.size()));
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this,

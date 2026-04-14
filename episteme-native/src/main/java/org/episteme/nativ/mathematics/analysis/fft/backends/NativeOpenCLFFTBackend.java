@@ -13,7 +13,6 @@ import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
-import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 import static org.jocl.CL.*;
 import org.jocl.*;

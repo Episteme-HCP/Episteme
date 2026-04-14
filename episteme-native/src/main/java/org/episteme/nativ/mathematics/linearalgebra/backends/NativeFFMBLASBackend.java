@@ -8,7 +8,6 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
@@ -37,8 +36,8 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * Binds to OpenBLAS/MKL for Matrix Operations.
  * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     
     private static final Logger logger = LoggerFactory.getLogger(NativeFFMBLASBackend.class);
@@ -84,9 +83,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private static MethodHandle CSCAL;
     private static MethodHandle ZSCAL;
 
-    private static MethodHandle SOMATCOPY;
     private static MethodHandle DOMATCOPY;
-    private static MethodHandle COMATCOPY;
     
     // LAPACK Method Handles
     private static MethodHandle SGESV;
@@ -104,9 +101,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private static MethodHandle CGETRI;
     private static MethodHandle ZGETRI;
 
-    private static MethodHandle SGETRS;
     private static MethodHandle DGETRS;
-    private static MethodHandle CGETRS;
     private static MethodHandle ZGETRS;
 
     private static MethodHandle SGEQRF;
@@ -129,9 +124,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private static MethodHandle CPOTRF;
     private static MethodHandle ZPOTRF;
 
-    private static MethodHandle SPOTRS;
     private static MethodHandle DPOTRS;
-    private static MethodHandle CPOTRS;
     private static MethodHandle ZPOTRS;
 
     private static MethodHandle SSYEV;
@@ -226,13 +219,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 SSCAL = NativeFFMLoader.findSymbol(LOOKUP, "cblas_sscal")
                     .map(s -> LINKER.downcallHandle(s, sscalDesc)).orElse(null);
 
-                FunctionDescriptor somatcopyDesc = FunctionDescriptor.ofVoid(
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                        ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
-                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
-                );
-                SOMATCOPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_somatcopy", "mkl_somatcopy")
-                    .map(s -> LINKER.downcallHandle(s, somatcopyDesc)).orElse(null);
 
                 // --- DOUBLE PRECISION (Standard) ---
                 FunctionDescriptor dgemmDesc = FunctionDescriptor.ofVoid(
@@ -351,13 +337,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 ZSCAL = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zscal")
                     .map(s -> LINKER.downcallHandle(s, cscalDesc)).orElse(null);
 
-                FunctionDescriptor comatcopyDesc = FunctionDescriptor.ofVoid(
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                        AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
-                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
-                );
-                COMATCOPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_comatcopy", "mkl_comatcopy")
-                    .map(s -> LINKER.downcallHandle(s, comatcopyDesc)).orElse(null);
 
                 // LAPACK
                 FunctionDescriptor gesvDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
@@ -392,9 +371,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                SGETRS = findLapackSymbol("LAPACKE_sgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
                 DGETRS = findLapackSymbol("LAPACKE_dgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
-                CGETRS = findLapackSymbol("LAPACKE_cgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
                 ZGETRS = findLapackSymbol("LAPACKE_zgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
 
                 // QR Decomposition
@@ -443,9 +420,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
-                SPOTRS = findLapackSymbol("LAPACKE_spotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
                 DPOTRS = findLapackSymbol("LAPACKE_dpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
-                CPOTRS = findLapackSymbol("LAPACKE_cpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
                 ZPOTRS = findLapackSymbol("LAPACKE_zpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
 
                 // Eigen

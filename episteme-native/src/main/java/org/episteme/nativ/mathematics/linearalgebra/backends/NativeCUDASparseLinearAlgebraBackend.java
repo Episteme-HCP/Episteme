@@ -41,6 +41,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
     

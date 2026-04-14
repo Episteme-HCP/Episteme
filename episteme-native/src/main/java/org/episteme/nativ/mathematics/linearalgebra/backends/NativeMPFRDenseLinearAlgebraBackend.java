@@ -12,7 +12,6 @@ import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNum
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
@@ -34,8 +33,8 @@ import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");

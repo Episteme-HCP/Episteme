@@ -4,7 +4,6 @@ import java.util.List;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
-import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
@@ -14,7 +13,6 @@ import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgeb
 import org.episteme.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.technical.algorithm.AlgorithmManager;
-import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ExecutionContext;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -41,7 +39,6 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     private final CPUDenseLinearAlgebraProvider<E> denseProvider;
     private final CPUSparseLinearAlgebraProvider<E> sparseProvider;
 
-    @SuppressWarnings("unchecked")
     public EpistemeLinearAlgebraBackend() {
         this.denseProvider = new CPUDenseLinearAlgebraProvider<>(null);
         this.sparseProvider = new CPUSparseLinearAlgebraProvider<>(null);
