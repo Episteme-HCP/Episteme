@@ -334,12 +334,13 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] srcData = toDoubleArray(a);
         double[] dstData = new double[rows * cols];
 
+        cl_mem memA = null, memB = null;
         try {
             Pointer pSrc = Pointer.to(srcData);
             Pointer pDst = Pointer.to(dstData);
 
-            cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * rows * cols, pSrc, null);
-            cl_mem memB = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * rows * cols, null, null);
+            memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * rows * cols, pSrc, null);
+            memB = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * rows * cols, null, null);
 
             clSetKernelArg(transposeKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
             clSetKernelArg(transposeKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
@@ -348,14 +349,14 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
             long[] globalWorkSize = new long[]{cols, rows};
             clEnqueueNDRangeKernel(commandQueue, transposeKernel, 2, null, globalWorkSize, null, 0, null, null);
-            clEnqueueReadBuffer(commandQueue, memB, CL_TRUE, 0, rows * cols * Sizeof.cl_double, pDst, 0, null, null);
-
-            if (memA != null) clReleaseMemObject(memA);
-            if (memB != null) clReleaseMemObject(memB);
+            clEnqueueReadBuffer(commandQueue, memB, CL_TRUE, 0, (long)rows * cols * Sizeof.cl_double, pDst, 0, null, null);
 
             return fromDoubleArray(dstData, cols, rows, a);
         } catch (Exception e) {
             throw new UnsupportedOperationException(getName() + ": OpenCL transpose failed", e);
+        } finally {
+            if (memA != null) clReleaseMemObject(memA);
+            if (memB != null) clReleaseMemObject(memB);
         }
     }
 
@@ -375,43 +376,42 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] h_B = toDoubleArray(b);
         double[] h_C = new double[m * n];
 
+        cl_mem memA = null, memB = null, memC = null;
         try {
             logger.debug("Creating memA...");
-            cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * k, Pointer.to(h_A), null);
+            memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * k, Pointer.to(h_A), null);
             logger.debug("Creating memB...");
-            cl_mem memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * k * n, Pointer.to(h_B), null);
+            memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * k * n, Pointer.to(h_B), null);
             logger.debug("Creating memC...");
-            cl_mem memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * m * n, null, null);
+            memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * m * n, null, null);
 
-            try {
-                logger.debug("Setting kernel args...");
-                clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
-                clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
-                clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
-                clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+            logger.debug("Setting kernel args...");
+            clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+            clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
 
-                long[] globalWorkSize = new long[]{n, m};
-                logger.debug("Enqueuing NDRangeKernel...");
-                clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
-                
-                logger.debug("Enqueuing ReadBuffer...");
-                clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(h_C), 0, null, null);
-                
-                logger.debug("Creating result matrix from array...");
-                Matrix<Real> result = fromDoubleArray(h_C, m, n, a);
-                org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/OpenCL", System.nanoTime() - start);
-                logger.debug("OpenCL multiply finished successfully.");
-                return result;
-            } finally {
-                if (memA != null) { logger.debug("Releasing memA..."); clReleaseMemObject(memA); }
-                if (memB != null) { logger.debug("Releasing memB..."); clReleaseMemObject(memB); }
-                if (memC != null) { logger.debug("Releasing memC..."); clReleaseMemObject(memC); }
-            }
+            long[] globalWorkSize = new long[]{n, m};
+            logger.debug("Enqueuing NDRangeKernel...");
+            clEnqueueNDRangeKernel(commandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
+            
+            logger.debug("Enqueuing ReadBuffer...");
+            clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(h_C), 0, null, null);
+            
+            logger.debug("Creating result matrix from array...");
+            Matrix<Real> result = fromDoubleArray(h_C, m, n, a);
+            org.episteme.core.util.PerformanceLogger.log("MatrixMultiply", "Dense/OpenCL", System.nanoTime() - start);
+            logger.debug("OpenCL multiply finished successfully.");
+            return result;
         } catch (Exception e) {
             logger.error("OpenCL multiply operation failed: {}", e.getMessage(), e);
             throw new RuntimeException("OpenCL Multiply failed", e);
+        } finally {
+            if (memA != null) { logger.debug("Releasing memA..."); clReleaseMemObject(memA); }
+            if (memB != null) { logger.debug("Releasing memB..."); clReleaseMemObject(memB); }
+            if (memC != null) { logger.debug("Releasing memC..."); clReleaseMemObject(memC); }
         }
     }
 
@@ -453,10 +453,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] h_B = toDoubleVec(b);
         double[] pivotCol = new double[n];
 
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
-        cl_mem memB = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(h_B), null);
-
+        cl_mem memA = null, memB = null;
         try {
+            memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+            memB = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(h_B), null);
+
             for (int k = 0; k < n; k++) {
                 // Read back ONLY the pivot column
                 for (int i = k; i < n; i++) {
@@ -537,10 +538,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
         double[] pivotCol = new double[n];
 
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
-        cl_mem memInv = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(inv), null);
-        
+        cl_mem memA = null, memInv = null;
         try {
+            memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+            memInv = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(inv), null);
+            
             for (int k = 0; k < n; k++) {
                 // Read back only pivot column
                 for (int i = k; i < n; i++) {
@@ -589,12 +591,12 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     @Override
     public Real determinant(Matrix<Real> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for determinant()");
         int n = a.rows();
         double[] h_A = toDoubleArray(a);
         double det = 1.0;
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        cl_mem memA = null;
         try {
+            memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
             for (int k = 0; k < n; k++) {
                 // Read back full matrix for correct pivoting on CPU
                 clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)n * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
@@ -609,17 +611,19 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                     det = -det;
                 }
                 det *= h_A[max * n + k]; // Pivot element (originally at max) in h_A
-            clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-            clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
-            clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
-            if (n - k - 1 > 0) {
-                clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+                clSetKernelArg(gaussElimPhase1Kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussElimPhase1Kernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussElimPhase1Kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                if (n - k - 1 > 0) {
+                    clEnqueueNDRangeKernel(commandQueue, gaussElimPhase1Kernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+                }
+                clFinish(commandQueue); // Synchronize loop
             }
-            clFinish(commandQueue); // Synchronize loop
+            return Real.of(det);
+        } finally { 
+            if (memA != null) clReleaseMemObject(memA); 
         }
-        return Real.of(det);
-    } finally { if (memA != null) clReleaseMemObject(memA); }
-}
+    }
 
     private static boolean verifyExtensions(cl_device_id device) {
         long[] size = new long[1];
@@ -732,9 +736,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] pData = new double[n];
         for (int i = 0; i < n; i++) pData[i] = i;
 
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
-        
+        cl_mem memA = null;
         try {
+            memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+            
             for (int k = 0; k < n; k++) {
                 // Pivoting on CPU
                 clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
@@ -800,19 +805,19 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] qData = new double[m * m];
         for (int i = 0; i < m; i++) qData[i * m + i] = 1.0;
         
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * n, Pointer.to(h_A), null);
-        cl_mem memQ = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * m, Pointer.to(qData), null);
-        
+        cl_mem memA = null, memQ = null;
         try {
+            memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * n, Pointer.to(h_A), null);
+            memQ = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * m, Pointer.to(qData), null);
+            
             for (int k = 0; k < Math.min(m, n); k++) {
                 // Read sub-column for Householder vector calculation on CPU
                 double[] col = new double[m - k];
-                // Correct read: need to read element by element if row-major
                 for (int i = k; i < m; i++) {
                     clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, (long)(i * n + k) * Sizeof.cl_double, (long)Sizeof.cl_double, Pointer.to(col).withByteOffset((long)(i - k) * Sizeof.cl_double), 0, null, null);
                 }
 
-                double norm = 0; for (double v : col) norm += v * v; norm = Math.sqrt(norm);
+                double norm = 0; for (double v_val : col) norm += v_val * v_val; norm = Math.sqrt(norm);
                 double alpha = (col[0] > 0) ? -norm : norm;
                 double[] v = new double[m];
                 v[k] = col[0] - alpha;
@@ -820,28 +825,31 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 double vNorm = 0; for (int i = k; i < m; i++) vNorm += v[i] * v[i]; vNorm = Math.sqrt(vNorm);
                 if (vNorm > 1e-15) for (int i = k; i < m; i++) v[i] /= vNorm;
 
-                cl_mem memV = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m, Pointer.to(v), null);
-                
-                // Apply Householder to A (becomes R)
-                clSetKernelArg(qrHouseholderApplyKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(qrHouseholderApplyKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{m}));
-                clSetKernelArg(qrHouseholderApplyKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(qrHouseholderApplyKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                clSetKernelArg(qrHouseholderApplyKernel, 4, Sizeof.cl_mem, Pointer.to(memV));
-                clEnqueueNDRangeKernel(commandQueue, qrHouseholderApplyKernel, 2, null, new long[]{n - k, m - k}, null, 0, null, null);
+                cl_mem memV = null;
+                try {
+                    memV = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m, Pointer.to(v), null);
+                    
+                    // Apply Householder to A (becomes R)
+                    clSetKernelArg(qrHouseholderApplyKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                    clSetKernelArg(qrHouseholderApplyKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                    clSetKernelArg(qrHouseholderApplyKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                    clSetKernelArg(qrHouseholderApplyKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                    clSetKernelArg(qrHouseholderApplyKernel, 4, Sizeof.cl_mem, Pointer.to(memV));
+                    clEnqueueNDRangeKernel(commandQueue, qrHouseholderApplyKernel, 2, null, new long[]{n - k, m - k}, null, 0, null, null);
 
-                // Apply Householder to Q
-                clSetKernelArg(qrHouseholderApplyKernel, 0, Sizeof.cl_mem, Pointer.to(memQ));
-                clSetKernelArg(qrHouseholderApplyKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{m}));
-                clSetKernelArg(qrHouseholderApplyKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
-                clEnqueueNDRangeKernel(commandQueue, qrHouseholderApplyKernel, 2, null, new long[]{m - k, m - k}, null, 0, null, null);
-                
-                clReleaseMemObject(memV);
+                    // Apply Householder to Q
+                    clSetKernelArg(qrHouseholderApplyKernel, 0, Sizeof.cl_mem, Pointer.to(memQ));
+                    clSetKernelArg(qrHouseholderApplyKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                    clSetKernelArg(qrHouseholderApplyKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                    clEnqueueNDRangeKernel(commandQueue, qrHouseholderApplyKernel, 2, null, new long[]{m - k, m - k}, null, 0, null, null);
+                    clFinish(commandQueue);
+                } finally {
+                    if (memV != null) clReleaseMemObject(memV);
+                }
             }
             clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)m * n * Sizeof.cl_double, Pointer.to(h_A), 0, null, null);
             clEnqueueReadBuffer(commandQueue, memQ, CL_TRUE, 0, (long)m * m * Sizeof.cl_double, Pointer.to(qData), 0, null, null);
             
-            // h_A is now R (upper triangular)
             return new QRResult<Real>(
                 fromDoubleArray(qData, m, m, a),
                 fromDoubleArray(h_A, m, n, a)
@@ -898,9 +906,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": OpenCL not available for Cholesky");
         int n = a.rows();
         double[] h_A = toDoubleArray(a);
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+        cl_mem memA = null;
         
         try {
+            memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
             for (int k = 0; k < n; k++) {
                 // Calculate diagonal element on CPU
                 clEnqueueReadBuffer(commandQueue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), 0, null, null);
@@ -950,10 +959,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] vData = new double[n * n];
         for (int i = 0; i < n; i++) vData[i * n + i] = 1.0;
 
-        cl_mem memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
-        cl_mem memV = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(vData), null);
-
+        cl_mem memA = null, memV = null;
         try {
+            memA = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(h_A), null);
+            memV = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(vData), null);
+
             int maxIters = 50 * n * n;
             for (int iter = 0; iter < maxIters; iter++) {
                 // Find element with max absolute value in upper triangular part
@@ -974,25 +984,25 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
                 double aqq = h_A[q * n + q];
                 double apq = h_A[p * n + q];
                 double phi = 0.5 * Math.atan2(2.0 * apq, aqq - app);
-                double cos = Math.cos(phi);
-                double sin = Math.sin(phi);
+                double cos_val = Math.cos(phi);
+                double sin_val = Math.sin(phi);
 
                 // Update A and V (could be GPU kernels if n is large)
                 for (int i = 0; i < n; i++) {
                     double api = h_A[p * n + i];
                     double aqi = h_A[q * n + i];
-                    h_A[p * n + i] = cos * api - sin * aqi;
-                    h_A[q * n + i] = sin * api + cos * aqi;
+                    h_A[p * n + i] = cos_val * api - sin_val * aqi;
+                    h_A[q * n + i] = sin_val * api + cos_val * aqi;
                     h_A[i * n + p] = h_A[p * n + i];
                     h_A[i * n + q] = h_A[q * n + i];
 
                     double vpi = vData[p * n + i];
                     double vqi = vData[q * n + i];
-                    vData[p * n + i] = cos * vpi - sin * vqi;
-                    vData[q * n + i] = sin * vpi + cos * vqi;
+                    vData[p * n + i] = cos_val * vpi - sin_val * vqi;
+                    vData[q * n + i] = sin_val * vpi + cos_val * vqi;
                 }
-                h_A[p * n + p] = cos * cos * app - 2.0 * sin * cos * apq + sin * sin * aqq;
-                h_A[q * n + q] = sin * sin * app + 2.0 * sin * cos * apq + cos * cos * aqq;
+                h_A[p * n + p] = cos_val * cos_val * app - 2.0 * sin_val * cos_val * apq + sin_val * sin_val * aqq;
+                h_A[q * n + q] = sin_val * sin_val * app + 2.0 * sin_val * cos_val * apq + cos_val * cos_val * aqq;
                 h_A[p * n + q] = 0.0;
                 h_A[q * n + p] = 0.0;
 
@@ -1040,41 +1050,45 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private double[] vecOp(double[] a, double[] b, cl_kernel k) {
         int n = a.length;
         double[] result = new double[n];
-        cl_mem mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
-        cl_mem mB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(b), null);
-        cl_mem mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+        cl_mem mA = null, mB = null, mC = null;
         try {
+            mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+            mB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(b), null);
+            mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+
             clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mA));
             clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(mB));
             clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mC));
             clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(commandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+            return result;
         } finally { 
             if (mA != null) clReleaseMemObject(mA); 
             if (mB != null) clReleaseMemObject(mB); 
             if (mC != null) clReleaseMemObject(mC); 
         }
-        return result;
     }
 
     private double[] scaleVec(double[] a, double s) {
         int n = a.length;
         double[] result = new double[n];
-        cl_mem mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
-        cl_mem mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+        cl_mem mA = null, mC = null;
         try {
+            mA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+            mC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+
             clSetKernelArg(vecScaleKernel, 0, Sizeof.cl_mem, Pointer.to(mA));
             clSetKernelArg(vecScaleKernel, 1, Sizeof.cl_double, Pointer.to(new double[]{s}));
             clSetKernelArg(vecScaleKernel, 2, Sizeof.cl_mem, Pointer.to(mC));
             clSetKernelArg(vecScaleKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(commandQueue, vecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(commandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+            return result;
         } finally { 
             if (mA != null) clReleaseMemObject(mA); 
             if (mC != null) clReleaseMemObject(mC); 
         }
-        return result;
     }
 
     private double[] scaleVecElementWise(double[] a, double[] b) {
@@ -1090,31 +1104,28 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         double[] h_B = toComplexDoubleArray(b);
         double[] h_C = new double[m * n * 2];
 
+        cl_mem memA = null, memB = null, memC = null;
         try {
-            cl_mem memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * m * k, Pointer.to(h_A), null);
-            cl_mem memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * k * n, Pointer.to(h_B), null);
-            cl_mem memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * 2 * m * n, null, null);
+            memA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * m * k, Pointer.to(h_A), null);
+            memB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * k * n, Pointer.to(h_B), null);
+            memC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * 2 * m * n, null, null);
 
-            try {
-                clSetKernelArg(complexMatMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                clSetKernelArg(complexMatMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
-                clSetKernelArg(complexMatMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
-                clSetKernelArg(complexMatMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
-                clSetKernelArg(complexMatMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                clSetKernelArg(complexMatMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+            clSetKernelArg(complexMatMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(complexMatMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(complexMatMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(complexMatMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+            clSetKernelArg(complexMatMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clSetKernelArg(complexMatMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
 
-                long[] globalWorkSize = new long[]{n, m};
-                clEnqueueNDRangeKernel(commandQueue, complexMatMulKernel, 2, null, globalWorkSize, null, 0, null, null);
-                clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * 2 * m * n, Pointer.to(h_C), 0, null, null);
-                
-                return fromComplexDoubleArray(h_C, m, n, a);
-            } finally {
-                if (memA != null) clReleaseMemObject(memA);
-                if (memB != null) clReleaseMemObject(memB);
-                if (memC != null) clReleaseMemObject(memC);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("OpenCL Complex Multiply failed", e);
+            long[] globalWorkSize = new long[]{n, m};
+            clEnqueueNDRangeKernel(commandQueue, complexMatMulKernel, 2, null, globalWorkSize, null, 0, null, null);
+            clEnqueueReadBuffer(commandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * 2 * m * n, Pointer.to(h_C), 0, null, null);
+            
+            return fromComplexDoubleArray(h_C, m, n, a);
+        } finally {
+            if (memA != null) clReleaseMemObject(memA);
+            if (memB != null) clReleaseMemObject(memB);
+            if (memC != null) clReleaseMemObject(memC);
         }
     }
 

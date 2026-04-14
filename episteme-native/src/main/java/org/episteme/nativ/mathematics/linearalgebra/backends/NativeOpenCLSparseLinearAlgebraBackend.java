@@ -367,11 +367,12 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         double[] dataB = new double[k * n]; B.get(dataB); B.rewind();
         double[] dataC = new double[m * n];
 
-        cl_mem memA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * m * k, Pointer.to(dataA), null);
-        cl_mem memB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * k * n, Pointer.to(dataB), null);
-        cl_mem memC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, Sizeof.cl_double * m * n, null, null);
-
+        cl_mem memA = null, memB = null, memC = null;
         try {
+            memA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * k, Pointer.to(dataA), null);
+            memB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * k * n, Pointer.to(dataB), null);
+            memC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * m * n, null, null);
+
             clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
             clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
             clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
@@ -381,12 +382,12 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
             long[] globalWorkSize = new long[]{n, m};
             clEnqueueNDRangeKernel(staticCommandQueue, matMulKernel, 2, null, globalWorkSize, null, 0, null, null);
-            clEnqueueReadBuffer(staticCommandQueue, memC, CL_TRUE, 0, Sizeof.cl_double * m * n, Pointer.to(dataC), 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(dataC), 0, null, null);
             C.put(dataC); C.rewind();
         } finally {
-            clReleaseMemObject(memA);
-            clReleaseMemObject(memB);
-            clReleaseMemObject(memC);
+            if (memA != null) clReleaseMemObject(memA);
+            if (memB != null) clReleaseMemObject(memB);
+            if (memC != null) clReleaseMemObject(memC);
         }
     }
 
@@ -506,20 +507,26 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         double[] src = toDoubleArray(a);
         double[] dst = new double[rows * cols];
         
-        cl_mem memA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * src.length, Pointer.to(src), null);
-        cl_mem memB = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, Sizeof.cl_double * src.length, null, null);
-        cl_kernel k = clCreateKernel(denseProgram, "transpose", null);
+        cl_mem memA = null, memB = null;
+        cl_kernel k = null;
         try {
+            memA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * src.length, Pointer.to(src), null);
+            memB = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * src.length, null, null);
+            k = clCreateKernel(denseProgram, "transpose", null);
+
             clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(memA));
             clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(memB));
             clSetKernelArg(k, 2, Sizeof.cl_int, Pointer.to(new int[]{rows}));
             clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{cols}));
             clEnqueueNDRangeKernel(staticCommandQueue, k, 2, null, new long[]{cols, rows}, null, 0, null, null);
-            clEnqueueReadBuffer(staticCommandQueue, memB, CL_TRUE, 0, Sizeof.cl_double * src.length, Pointer.to(dst), 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, memB, CL_TRUE, 0, (long)Sizeof.cl_double * src.length, Pointer.to(dst), 0, null, null);
+
+            return fromDoubleArray(dst, cols, rows);
         } finally {
-            clReleaseKernel(k); clReleaseMemObject(memA); clReleaseMemObject(memB);
+            if (k != null) clReleaseKernel(k);
+            if (memA != null) clReleaseMemObject(memA);
+            if (memB != null) clReleaseMemObject(memB);
         }
-        return fromDoubleArray(dst, cols, rows);
     }
 
     @Override
@@ -578,14 +585,17 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         double[] xData = toDoubleVec(x);
         double[] yData = new double[rows];
 
-        cl_mem memPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null);
-        cl_mem memInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * nnz, Pointer.to(colIndices), null);
-        cl_mem memVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * nnz, Pointer.to(values), null);
-        cl_mem memX = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * cols, Pointer.to(xData), null);
-        cl_mem memY = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, Sizeof.cl_double * rows, null, null);
+        cl_mem memPtr = null, memInd = null, memVal = null, memX = null, memY = null;
+        cl_kernel spmvKernel = null;
 
-        cl_kernel spmvKernel = clCreateKernel(sparseProgram, "spmv_csr", null);
         try {
+            memPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null);
+            memInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIndices), null);
+            memVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null);
+            memX = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * cols, Pointer.to(xData), null);
+            memY = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * rows, null, null);
+
+            spmvKernel = clCreateKernel(sparseProgram, "spmv_csr", null);
             clSetKernelArg(spmvKernel, 0, Sizeof.cl_int, Pointer.to(new int[]{rows}));
             clSetKernelArg(spmvKernel, 1, Sizeof.cl_mem, Pointer.to(memPtr));
             clSetKernelArg(spmvKernel, 2, Sizeof.cl_mem, Pointer.to(memInd));
@@ -595,17 +605,17 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
 
             long[] globalWorkSize = new long[]{rows};
             clEnqueueNDRangeKernel(staticCommandQueue, spmvKernel, 1, null, globalWorkSize, null, 0, null, null);
-            clEnqueueReadBuffer(staticCommandQueue, memY, CL_TRUE, 0, Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
+            clEnqueueReadBuffer(staticCommandQueue, memY, CL_TRUE, 0, (long)Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
+            
+            return toSparseVector(yData);
         } finally {
-            clReleaseKernel(spmvKernel);
-            clReleaseMemObject(memPtr);
-            clReleaseMemObject(memInd);
-            clReleaseMemObject(memVal);
-            clReleaseMemObject(memX);
-            clReleaseMemObject(memY);
+            if (spmvKernel != null) clReleaseKernel(spmvKernel);
+            if (memPtr != null) clReleaseMemObject(memPtr);
+            if (memInd != null) clReleaseMemObject(memInd);
+            if (memVal != null) clReleaseMemObject(memVal);
+            if (memX != null) clReleaseMemObject(memX);
+            if (memY != null) clReleaseMemObject(memY);
         }
-
-        return toSparseVector(yData);
     }
 
     @Override
@@ -661,40 +671,51 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     private double[] vecOp(double[] a, double[] b, String kernelName) {
         int n = a.length;
         double[] result = new double[n];
-        cl_mem mA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
-        cl_mem mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(b), null);
-        cl_mem mC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
-        cl_kernel k = clCreateKernel(denseProgram, kernelName, null);
+        cl_mem mA = null, mB = null, mC = null;
+        cl_kernel k = null;
         try {
+            mA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+            mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(b), null);
+            mC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+            k = clCreateKernel(denseProgram, kernelName, null);
+
             clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mA));
             clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(mB));
             clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mC));
             clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(staticCommandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+            return result;
         } finally {
-            clReleaseKernel(k); clReleaseMemObject(mA); clReleaseMemObject(mB); clReleaseMemObject(mC);
+            if (k != null) clReleaseKernel(k);
+            if (mA != null) clReleaseMemObject(mA);
+            if (mB != null) clReleaseMemObject(mB);
+            if (mC != null) clReleaseMemObject(mC);
         }
-        return result;
     }
 
     private double[] scaleVec(double[] a, double s) {
         int n = a.length;
         double[] result = new double[n];
-        cl_mem mA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
-        cl_mem mC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
-        cl_kernel k = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
+        cl_mem mA = null, mC = null;
+        cl_kernel k = null;
         try {
+            mA = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(a), null);
+            mC = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n, null, null);
+            k = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
+
             clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mA));
             clSetKernelArg(k, 1, Sizeof.cl_double, Pointer.to(new double[]{s}));
             clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mC));
             clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(staticCommandQueue, mC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(result), 0, null, null);
+            return result;
         } finally {
-            clReleaseKernel(k); clReleaseMemObject(mA); clReleaseMemObject(mC);
+            if (k != null) clReleaseKernel(k);
+            if (mA != null) clReleaseMemObject(mA);
+            if (mC != null) clReleaseMemObject(mC);
         }
-        return result;
     }
 
     private double[] toDoubleArray(Matrix<Real> m) {
@@ -784,28 +805,34 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         double[] bData = toDoubleVec(b);
         
         // GPU Buffers
-        cl_mem mPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null);
-        cl_mem mInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null);
-        cl_mem mVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null);
-        cl_mem mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(bData), null);
-        
-        cl_mem mX = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mR = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mP = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mAp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mTemp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-
-        // r = b - A*x (assume x=0 initially, so r=b, p=r)
-        clEnqueueCopyBuffer(staticCommandQueue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-        clEnqueueCopyBuffer(staticCommandQueue, mR, mP, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-        
-        double rsOld = gpuDot(mR, mR, n);
-        
-        cl_kernel kSpmv = clCreateKernel(sparseProgram, "spmv_csr", null);
-        cl_kernel kSaxpy = clCreateKernel(denseProgram, "saxpy", null);
-        cl_kernel kDot = clCreateKernel(denseProgram, "dot_partial", null);
+        cl_mem mPtr = null, mInd = null, mVal = null, mB = null;
+        cl_mem mX = null, mR = null, mP = null, mAp = null, mTemp = null;
+        cl_kernel kSpmv = null, kSaxpy = null, kDot = null, kScale = null, kAdd = null;
 
         try {
+            mPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null);
+            mInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null);
+            mVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null);
+            mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(bData), null);
+            
+            mX = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mR = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mP = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mAp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mTemp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+
+            // r = b - A*x (assume x=0 initially, so r=b, p=r)
+            clEnqueueCopyBuffer(staticCommandQueue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+            clEnqueueCopyBuffer(staticCommandQueue, mR, mP, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+            
+            kSpmv = clCreateKernel(sparseProgram, "spmv_csr", null);
+            kSaxpy = clCreateKernel(denseProgram, "saxpy", null);
+            kDot = clCreateKernel(denseProgram, "dot_partial", null);
+            kScale = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
+            kAdd = clCreateKernel(denseProgram, "vectorAdd", null);
+
+            double rsOld = gpuDot_internal(kDot, mR, mR, mTemp, n);
+
             for (int i = 0; i < maxIter; i++) {
                 // Ap = A * p
                 clSetKernelArg(kSpmv, 0, Sizeof.cl_int, Pointer.to(new int[]{n}));
@@ -817,7 +844,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 clEnqueueNDRangeKernel(staticCommandQueue, kSpmv, 1, null, new long[]{n}, null, 0, null, null);
 
                 // alpha = rsOld / (p * Ap)
-                double pAp = gpuDot(mP, mAp, n);
+                double pAp = gpuDot_internal(kDot, mP, mAp, mTemp, n);
                 double alpha = rsOld / pAp;
 
                 // x = x + alpha * p
@@ -834,17 +861,12 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 clSetKernelArg(kSaxpy, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
                 clEnqueueNDRangeKernel(staticCommandQueue, kSaxpy, 1, null, new long[]{n}, null, 0, null, null);
 
-                double rsNew = gpuDot(mR, mR, n);
+                double rsNew = gpuDot_internal(kDot, mR, mR, mTemp, n);
                 if (Math.sqrt(rsNew) < tol) break;
 
-                // p = r + (rsNew / rsOld) * p
-                // We need p = r + beta*p. Saxpy does y = alpha*x + y.
-                // So we first scale p by beta, then add r.
-                // Or: p = r + (rsNew/rsOld)*p.
-                // Let's use a simpler way: scale p by beta, then add r to p.
                 double beta = rsNew / rsOld;
-                gpuScale(mP, beta, n);
-                gpuAdd(mR, mP, n); // p = r + p
+                gpuScale_internal(kScale, mP, beta, n);
+                gpuAdd_internal(kAdd, mR, mP, n); // p = r + p
 
                 rsOld = rsNew;
             }
@@ -853,10 +875,20 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             clEnqueueReadBuffer(staticCommandQueue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(xRes), 0, null, null);
             return toRealVector(xRes);
         } finally {
-            clReleaseKernel(kSpmv); clReleaseKernel(kSaxpy); clReleaseKernel(kDot);
-            clReleaseMemObject(mPtr); clReleaseMemObject(mInd); clReleaseMemObject(mVal);
-            clReleaseMemObject(mB); clReleaseMemObject(mX); clReleaseMemObject(mR);
-            clReleaseMemObject(mP); clReleaseMemObject(mAp); clReleaseMemObject(mTemp);
+            if (kSpmv != null) clReleaseKernel(kSpmv); 
+            if (kSaxpy != null) clReleaseKernel(kSaxpy); 
+            if (kDot != null) clReleaseKernel(kDot);
+            if (kScale != null) clReleaseKernel(kScale);
+            if (kAdd != null) clReleaseKernel(kAdd);
+            if (mPtr != null) clReleaseMemObject(mPtr); 
+            if (mInd != null) clReleaseMemObject(mInd); 
+            if (mVal != null) clReleaseMemObject(mVal);
+            if (mB != null) clReleaseMemObject(mB); 
+            if (mX != null) clReleaseMemObject(mX); 
+            if (mR != null) clReleaseMemObject(mR);
+            if (mP != null) clReleaseMemObject(mP); 
+            if (mAp != null) clReleaseMemObject(mAp); 
+            if (mTemp != null) clReleaseMemObject(mTemp);
         }
     }
 
@@ -873,35 +905,42 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         double[] bData = toDoubleVec(b);
         
         // GPU Buffers
-        cl_mem mPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null);
-        cl_mem mInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null);
-        cl_mem mVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null);
-        cl_mem mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(bData), null);
-        
-        cl_mem mX = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null); // Initially 0
-        cl_mem mR = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mR0 = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mP = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mV = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mS = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-        cl_mem mT = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
-
-        // r = b - Ax (assume x=0, so r=b)
-        clEnqueueCopyBuffer(staticCommandQueue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-        clEnqueueCopyBuffer(staticCommandQueue, mR, mR0, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-        
-        double rho = 1, alpha = 1, omega = 1;
-
-        cl_kernel kSpmv = clCreateKernel(sparseProgram, "spmv_csr", null);
-        cl_kernel kSaxpy = clCreateKernel(denseProgram, "saxpy", null);
+        cl_mem mPtr = null, mInd = null, mVal = null, mB = null;
+        cl_mem mX = null, mR = null, mR0 = null, mP = null, mV = null, mS = null, mT = null, mTemp = null;
+        cl_kernel kSpmv = null, kSaxpy = null, kDot = null, kScale = null, kAdd = null;
 
         try {
+            mPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null);
+            mInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null);
+            mVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null);
+            mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(bData), null);
+            
+            mX = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null); // Initially 0
+            mR = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mR0 = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mP = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mV = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mS = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mT = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mTemp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+
+            // r = b - Ax (assume x=0, so r=b)
+            clEnqueueCopyBuffer(staticCommandQueue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+            clEnqueueCopyBuffer(staticCommandQueue, mR, mR0, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+            
+            double rho = 1, alpha = 1, omega = 1;
+
+            kSpmv = clCreateKernel(sparseProgram, "spmv_csr", null);
+            kSaxpy = clCreateKernel(denseProgram, "saxpy", null);
+            kDot = clCreateKernel(denseProgram, "dot_partial", null);
+            kScale = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
+            kAdd = clCreateKernel(denseProgram, "vectorAdd", null);
+
             for (int i = 0; i < maxIter; i++) {
-                double rhoNext = gpuDot(mR0, mR, n);
+                double rhoNext = gpuDot_internal(kDot, mR0, mR, mTemp, n);
                 double beta = (rhoNext / rho) * (alpha / omega);
                 rho = rhoNext;
 
-                // p = r + beta * (p - omega * v)
                 // p = p - omega * v
                 clSetKernelArg(kSaxpy, 0, Sizeof.cl_mem, Pointer.to(mV));
                 clSetKernelArg(kSaxpy, 1, Sizeof.cl_mem, Pointer.to(mP));
@@ -909,9 +948,9 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 clSetKernelArg(kSaxpy, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
                 clEnqueueNDRangeKernel(staticCommandQueue, kSaxpy, 1, null, new long[]{n}, null, 0, null, null);
                 // p = beta * p
-                gpuScale(mP, beta, n);
+                gpuScale_internal(kScale, mP, beta, n);
                 // p = r + p
-                gpuAdd(mR, mP, n);
+                gpuAdd_internal(kAdd, mR, mP, n);
 
                 // v = Ap
                 clSetKernelArg(kSpmv, 0, Sizeof.cl_int, Pointer.to(new int[]{n}));
@@ -922,7 +961,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 clSetKernelArg(kSpmv, 5, Sizeof.cl_mem, Pointer.to(mV));
                 clEnqueueNDRangeKernel(staticCommandQueue, kSpmv, 1, null, new long[]{n}, null, 0, null, null);
 
-                alpha = rho / gpuDot(mR0, mV, n);
+                alpha = rho / gpuDot_internal(kDot, mR0, mV, mTemp, n);
 
                 // s = r - alpha * v
                 clEnqueueCopyBuffer(staticCommandQueue, mR, mS, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
@@ -932,7 +971,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 clSetKernelArg(kSaxpy, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
                 clEnqueueNDRangeKernel(staticCommandQueue, kSaxpy, 1, null, new long[]{n}, null, 0, null, null);
 
-                if (Math.sqrt(gpuDot(mS, mS, n)) < tol) {
+                if (Math.sqrt(gpuDot_internal(kDot, mS, mS, mTemp, n)) < tol) {
                     // x = x + alpha * p
                     clSetKernelArg(kSaxpy, 0, Sizeof.cl_mem, Pointer.to(mP));
                     clSetKernelArg(kSaxpy, 1, Sizeof.cl_mem, Pointer.to(mX));
@@ -951,7 +990,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 clSetKernelArg(kSpmv, 5, Sizeof.cl_mem, Pointer.to(mT));
                 clEnqueueNDRangeKernel(staticCommandQueue, kSpmv, 1, null, new long[]{n}, null, 0, null, null);
 
-                omega = gpuDot(mS, mT, n) / gpuDot(mT, mT, n);
+                omega = gpuDot_internal(kDot, mS, mT, mTemp, n) / gpuDot_internal(kDot, mT, mT, mTemp, n);
 
                 // x = x + alpha * p + omega * s
                 clSetKernelArg(kSaxpy, 0, Sizeof.cl_mem, Pointer.to(mP));
@@ -974,17 +1013,30 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
                 clSetKernelArg(kSaxpy, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
                 clEnqueueNDRangeKernel(staticCommandQueue, kSaxpy, 1, null, new long[]{n}, null, 0, null, null);
 
-                if (Math.sqrt(gpuDot(mR, mR, n)) < tol) break;
+                if (Math.sqrt(gpuDot_internal(kDot, mR, mR, mTemp, n)) < tol) break;
             }
 
             double[] xRes = new double[n];
             clEnqueueReadBuffer(staticCommandQueue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(xRes), 0, null, null);
             return toRealVector(xRes);
         } finally {
-            clReleaseKernel(kSpmv); clReleaseKernel(kSaxpy);
-            clReleaseMemObject(mPtr); clReleaseMemObject(mInd); clReleaseMemObject(mVal);
-            clReleaseMemObject(mB); clReleaseMemObject(mX); clReleaseMemObject(mR); clReleaseMemObject(mR0);
-            clReleaseMemObject(mP); clReleaseMemObject(mV); clReleaseMemObject(mS); clReleaseMemObject(mT);
+            if (kSpmv != null) clReleaseKernel(kSpmv); 
+            if (kSaxpy != null) clReleaseKernel(kSaxpy);
+            if (kDot != null) clReleaseKernel(kDot);
+            if (kScale != null) clReleaseKernel(kScale);
+            if (kAdd != null) clReleaseKernel(kAdd);
+            if (mPtr != null) clReleaseMemObject(mPtr); 
+            if (mInd != null) clReleaseMemObject(mInd); 
+            if (mVal != null) clReleaseMemObject(mVal);
+            if (mB != null) clReleaseMemObject(mB); 
+            if (mX != null) clReleaseMemObject(mX); 
+            if (mR != null) clReleaseMemObject(mR); 
+            if (mR0 != null) clReleaseMemObject(mR0);
+            if (mP != null) clReleaseMemObject(mP); 
+            if (mV != null) clReleaseMemObject(mV); 
+            if (mS != null) clReleaseMemObject(mS); 
+            if (mT != null) clReleaseMemObject(mT);
+            if (mTemp != null) clReleaseMemObject(mTemp);
         }
     }
 
@@ -992,45 +1044,57 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         cl_mem mTemp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
         cl_kernel kDot = clCreateKernel(denseProgram, "dot_partial", null);
         try {
-            clSetKernelArg(kDot, 0, Sizeof.cl_mem, Pointer.to(a));
-            clSetKernelArg(kDot, 1, Sizeof.cl_mem, Pointer.to(b));
-            clSetKernelArg(kDot, 2, Sizeof.cl_mem, Pointer.to(mTemp));
-            clSetKernelArg(kDot, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
-            clEnqueueNDRangeKernel(staticCommandQueue, kDot, 1, null, new long[]{n}, null, 0, null, null);
-            
-            double[] partial = new double[n];
-            clEnqueueReadBuffer(staticCommandQueue, mTemp, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(partial), 0, null, null);
-            double sum = 0; for(double d : partial) sum += d;
-            return sum;
+            return gpuDot_internal(kDot, a, b, mTemp, n);
         } finally {
             clReleaseKernel(kDot); clReleaseMemObject(mTemp);
         }
     }
 
+    private double gpuDot_internal(cl_kernel kDot, cl_mem a, cl_mem b, cl_mem mTemp, int n) {
+        clSetKernelArg(kDot, 0, Sizeof.cl_mem, Pointer.to(a));
+        clSetKernelArg(kDot, 1, Sizeof.cl_mem, Pointer.to(b));
+        clSetKernelArg(kDot, 2, Sizeof.cl_mem, Pointer.to(mTemp));
+        clSetKernelArg(kDot, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+        clEnqueueNDRangeKernel(staticCommandQueue, kDot, 1, null, new long[]{n}, null, 0, null, null);
+        
+        double[] partial = new double[n];
+        clEnqueueReadBuffer(staticCommandQueue, mTemp, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(partial), 0, null, null);
+        double sum = 0; for(double d : partial) sum += d;
+        return sum;
+    }
+
     private void gpuScale(cl_mem a, double s, int n) {
         cl_kernel k = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
         try {
-            clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(a));
-            clSetKernelArg(k, 1, Sizeof.cl_double, Pointer.to(new double[]{s}));
-            clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(a)); // In-place
-            clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
-            clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
+            gpuScale_internal(k, a, s, n);
         } finally {
             clReleaseKernel(k);
         }
     }
 
+    private void gpuScale_internal(cl_kernel k, cl_mem a, double s, int n) {
+        clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(a));
+        clSetKernelArg(k, 1, Sizeof.cl_double, Pointer.to(new double[]{s}));
+        clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(a)); // In-place
+        clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+        clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
+    }
+
     private void gpuAdd(cl_mem x, cl_mem y, int n) {
         cl_kernel k = clCreateKernel(denseProgram, "vectorAdd", null);
         try {
-            clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(x));
-            clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(y));
-            clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(y)); // In-place
-            clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
-            clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
+            gpuAdd_internal(k, x, y, n);
         } finally {
             clReleaseKernel(k);
         }
+    }
+
+    private void gpuAdd_internal(cl_kernel k, cl_mem x, cl_mem y, int n) {
+        clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(x));
+        clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(y));
+        clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(y)); // In-place (p = r + p)
+        clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+        clEnqueueNDRangeKernel(staticCommandQueue, k, 1, null, new long[]{n}, null, 0, null, null);
     }
 
     @Override
@@ -1058,9 +1122,184 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     }
 
     @Override
-    public Vector<Real> gmres(Matrix<Real> a, Vector<Real> b, Vector<Real> x0, Real tolerance, int maxIterations, int restarts) {
-        // Placeholder or basic implementation using CG/BiCGSTAB for now if appropriate, 
-        // or just throw UOE if not implemented.
-        throw new UnsupportedOperationException("OpenCL GMRES not yet implemented");
+    public Vector<Real> gmres(Matrix<Real> A, Vector<Real> b, Vector<Real> x0, Real tol, int maxIter, int restarts) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Sparse Backend not available");
+        int n = b.dimension();
+        if (!(A instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
+            throw new IllegalArgumentException("A must be a SparseMatrix");
+        }
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> A_sparse = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) A;
+
+        int[] rowPtr = A_sparse.getRowPointers();
+        int[] colIdx = A_sparse.getColIndices();
+        double[] vals = new double[A_sparse.getNnz()];
+        Object[] valsObj = A_sparse.getValues();
+        for (int i = 0; i < vals.length; i++) vals[i] = ((Real) valsObj[i]).doubleValue();
+
+        double[] bArr = new double[n];
+        for (int i = 0; i < n; i++) bArr[i] = b.get(i).doubleValue();
+
+        cl_mem mPtr = null, mInd = null, mVal = null, mB = null, mX = null;
+        cl_mem[] mV = new cl_mem[maxIter + 1];
+        cl_mem mR = null, mTemp = null, mAx = null;
+        cl_kernel kSpmv = null, kSaxpy = null, kDot = null, kScale = null;
+
+        try {
+            mPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null);
+            mInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * vals.length, Pointer.to(colIdx), null);
+            mVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * vals.length, Pointer.to(vals), null);
+            mB = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(bArr), null);
+            mX = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            
+            if (x0 != null) {
+                double[] x0Arr = new double[n];
+                for (int i = 0; i < n; i++) x0Arr[i] = x0.get(i).doubleValue();
+                clEnqueueWriteBuffer(staticCommandQueue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(x0Arr), 0, null, null);
+            } else {
+                double[] zeros = new double[n];
+                clEnqueueWriteBuffer(staticCommandQueue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(zeros), 0, null, null);
+            }
+
+            mR = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mAx = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            mTemp = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+            for (int i = 0; i < mV.length; i++) mV[i] = clCreateBuffer(staticContext, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null);
+
+            kSpmv = clCreateKernel(sparseProgram, "spmv_csr", null);
+            kSaxpy = clCreateKernel(denseProgram, "saxpy", null);
+            kDot = clCreateKernel(denseProgram, "dot_partial", null);
+            kScale = clCreateKernel(denseProgram, "vectorScalarMultiply", null);
+
+            double tolVal = tol.doubleValue();
+
+            for (int restart = 0; restart < restarts; restart++) {
+                // r = b - Ax
+                clSetKernelArg(kSpmv, 0, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(kSpmv, 1, Sizeof.cl_mem, Pointer.to(mPtr));
+                clSetKernelArg(kSpmv, 2, Sizeof.cl_mem, Pointer.to(mInd));
+                clSetKernelArg(kSpmv, 3, Sizeof.cl_mem, Pointer.to(mVal));
+                clSetKernelArg(kSpmv, 4, Sizeof.cl_mem, Pointer.to(mX));
+                clSetKernelArg(kSpmv, 5, Sizeof.cl_mem, Pointer.to(mAx));
+                clEnqueueNDRangeKernel(staticCommandQueue, kSpmv, 1, null, new long[]{n}, null, 0, null, null);
+
+                clEnqueueCopyBuffer(staticCommandQueue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+                clSetKernelArg(kSaxpy, 0, Sizeof.cl_mem, Pointer.to(mAx));
+                clSetKernelArg(kSaxpy, 1, Sizeof.cl_mem, Pointer.to(mR));
+                clSetKernelArg(kSaxpy, 2, Sizeof.cl_double, Pointer.to(new double[]{-1.0}));
+                clSetKernelArg(kSaxpy, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clEnqueueNDRangeKernel(staticCommandQueue, kSaxpy, 1, null, new long[]{n}, null, 0, null, null);
+
+                double beta = Math.sqrt(gpuDot_internal(kDot, mR, mR, mTemp, n));
+                if (beta < tolVal) break;
+
+                gpuScale_internal(kScale, mR, 1.0 / beta, n);
+                clEnqueueCopyBuffer(staticCommandQueue, mR, mV[0], 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+
+                double[][] H = new double[maxIter + 1][maxIter];
+                int j = 0;
+                for (j = 0; j < maxIter; j++) {
+                    // w = A * V[j]
+                    clSetKernelArg(kSpmv, 0, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                    clSetKernelArg(kSpmv, 1, Sizeof.cl_mem, Pointer.to(mPtr));
+                    clSetKernelArg(kSpmv, 2, Sizeof.cl_mem, Pointer.to(mInd));
+                    clSetKernelArg(kSpmv, 3, Sizeof.cl_mem, Pointer.to(mVal));
+                    clSetKernelArg(kSpmv, 4, Sizeof.cl_mem, Pointer.to(mV[j]));
+                    clSetKernelArg(kSpmv, 5, Sizeof.cl_mem, Pointer.to(mV[j+1]));
+                    clEnqueueNDRangeKernel(staticCommandQueue, kSpmv, 1, null, new long[]{n}, null, 0, null, null);
+
+                    for (int i = 0; i <= j; i++) {
+                        H[i][j] = gpuDot_internal(kDot, mV[i], mV[j+1], mTemp, n);
+                        clSetKernelArg(kSaxpy, 0, Sizeof.cl_mem, Pointer.to(mV[i]));
+                        clSetKernelArg(kSaxpy, 1, Sizeof.cl_mem, Pointer.to(mV[j+1]));
+                        clSetKernelArg(kSaxpy, 2, Sizeof.cl_double, Pointer.to(new double[]{-H[i][j]}));
+                        clSetKernelArg(kSaxpy, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                        clEnqueueNDRangeKernel(staticCommandQueue, kSaxpy, 1, null, new long[]{n}, null, 0, null, null);
+                    }
+                    H[j+1][j] = Math.sqrt(gpuDot_internal(kDot, mV[j+1], mV[j+1], mTemp, n));
+                    if (H[j+1][j] < 1e-15) break; 
+                    gpuScale_internal(kScale, mV[j+1], 1.0 / H[j+1][j], n);
+                }
+
+                double[] y = solveHessenbergSystem_internal(H, beta, j);
+                for (int i = 0; i < y.length; i++) {
+                    clSetKernelArg(kSaxpy, 0, Sizeof.cl_mem, Pointer.to(mV[i]));
+                    clSetKernelArg(kSaxpy, 1, Sizeof.cl_mem, Pointer.to(mX));
+                    clSetKernelArg(kSaxpy, 2, Sizeof.cl_double, Pointer.to(new double[]{y[i]}));
+                    clSetKernelArg(kSaxpy, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                    clEnqueueNDRangeKernel(staticCommandQueue, kSaxpy, 1, null, new long[]{n}, null, 0, null, null);
+                }
+            }
+
+            double[] xRes = new double[n];
+            clEnqueueReadBuffer(staticCommandQueue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(xRes), 0, null, null);
+            return toRealVector(xRes);
+
+        } catch (Exception e) {
+            throw new RuntimeException("OpenCL GMRES failed", e);
+        } finally {
+            if (kSpmv != null) clReleaseKernel(kSpmv);
+            if (kSaxpy != null) clReleaseKernel(kSaxpy);
+            if (kDot != null) clReleaseKernel(kDot);
+            if (kScale != null) clReleaseKernel(kScale);
+
+            if (mPtr != null) clReleaseMemObject(mPtr);
+            if (mInd != null) clReleaseMemObject(mInd);
+            if (mVal != null) clReleaseMemObject(mVal);
+            if (mB != null) clReleaseMemObject(mB);
+            if (mX != null) clReleaseMemObject(mX);
+            if (mR != null) clReleaseMemObject(mR);
+            if (mAx != null) clReleaseMemObject(mAx);
+            if (mTemp != null) clReleaseMemObject(mTemp);
+            for (int i = 0; i < mV.length; i++) {
+                if (mV[i] != null) clReleaseMemObject(mV[i]);
+            }
+        }
+    }
+
+    private double[] solveHessenbergSystem_internal(double[][] H, double beta, int size) {
+        // Small dense system solver for GMRES on host
+        double[] g = new double[size + 1];
+        g[0] = beta;
+        double[] cs = new double[size];
+        double[] sn = new double[size];
+
+        for (int i = 0; i < size; i++) {
+            for (int k = 0; k < i; k++) {
+                double h1 = H[k][i];
+                double h2 = H[k+1][i];
+                H[k][i] = cs[k] * h1 + sn[k] * h2;
+                H[k+1][i] = -sn[k] * h1 + cs[k] * h2;
+            }
+
+            double h1 = H[i][i];
+            double h2 = H[i+1][i];
+            if (h2 == 0) {
+                cs[i] = 1.0; sn[i] = 0.0;
+            } else if (Math.abs(h2) > Math.abs(h1)) {
+                double t = h1 / h2;
+                sn[i] = 1.0 / Math.sqrt(1.0 + t * t);
+                cs[i] = sn[i] * t;
+            } else {
+                double t = h2 / h1;
+                cs[i] = 1.0 / Math.sqrt(1.0 + t * t);
+                sn[i] = cs[i] * t;
+            }
+
+            H[i][i] = cs[i] * h1 + sn[i] * h2;
+            H[i+1][i] = 0.0;
+            double g1 = g[i];
+            g[i] = cs[i] * g1;
+            g[i+1] = -sn[i] * g1;
+        }
+
+        double[] y = new double[size];
+        for (int i = size - 1; i >= 0; i--) {
+            double sum = 0;
+            for (int j = i + 1; j < size; j++) {
+                sum += H[i][j] * y[j];
+            }
+            y[i] = (g[i] - sum) / H[i][i];
+        }
+        return y;
     }
 }

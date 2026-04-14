@@ -275,6 +275,23 @@ public final class MathContext {
     }
 
     /**
+     * Returns the precision in bits (binary digits).
+     * <p>
+     * Calculated as ceil(digits * log2(10)).
+     * </p>
+     * 
+     * @return the number of bits required for the current decimal precision
+     */
+    public long getPrecisionBits() {
+        if (realPrecision == RealPrecision.FAST) return 24; // float
+        if (realPrecision == RealPrecision.NORMAL) return 53; // double
+        
+        int digits = javaMathContext.getPrecision();
+        if (digits == 0) return 3322; // Default for 'unlimited' if we must choose
+        return (long) Math.ceil(digits * 3.32192809489);
+    }
+
+    /**
      * Returns a new context with the specified real precision.
      */
     public MathContext withRealPrecision(RealPrecision realPrecision) {

@@ -38,4 +38,11 @@ public class NativeRealProvider implements RealProvider {
     public Real of(String value) {
         return NativeRealBig.of(value);
     }
+
+    @Override
+    public Real getConstant(String name) {
+        if (!isAvailable()) return null;
+        long precision = org.episteme.core.mathematics.context.MathContext.getCurrent().getPrecisionBits();
+        return NativeMPFRNumbers.getConstant(name, precision);
+    }
 }

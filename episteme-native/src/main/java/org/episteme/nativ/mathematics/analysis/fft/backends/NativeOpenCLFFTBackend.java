@@ -202,13 +202,18 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         
         if (context == null || queue == null) return null;
 
-        // Allocate Input/Output
-        cl_mem memReal = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(real), null);
-        cl_mem memImag = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(imag), null);
-        cl_mem memOutReal = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
-        cl_mem memOutImag = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
+        cl_mem memReal = null;
+        cl_mem memImag = null;
+        cl_mem memOutReal = null;
+        cl_mem memOutImag = null;
 
         try {
+            // Allocate Input/Output
+            memReal = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(real), null);
+            memImag = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(imag), null);
+            memOutReal = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
+            memOutImag = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
+
             // Set Arguments
             clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memReal));
             clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memImag));
@@ -230,11 +235,11 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
             return new double[][]{outReal, outImag};
 
         } finally {
-            // Cleanup
-            clReleaseMemObject(memReal);
-            clReleaseMemObject(memImag);
-            clReleaseMemObject(memOutReal);
-            clReleaseMemObject(memOutImag);
+            // Cleanup with null-checks for safety
+            if (memReal != null) clReleaseMemObject(memReal);
+            if (memImag != null) clReleaseMemObject(memImag);
+            if (memOutReal != null) clReleaseMemObject(memOutReal);
+            if (memOutImag != null) clReleaseMemObject(memOutImag);
         }
     }
 

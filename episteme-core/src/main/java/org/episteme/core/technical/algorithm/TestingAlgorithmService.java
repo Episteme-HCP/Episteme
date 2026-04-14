@@ -39,17 +39,24 @@ public class TestingAlgorithmService implements AlgorithmService {
 
     @Override
     public <P extends AlgorithmProvider> P getProvider(Class<P> providerClass) {
-        return getProviders(providerClass).stream()
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("No allowed provider found for: " + providerClass.getSimpleName()));
+        List<P> providers = getProviders(providerClass);
+        if (providers.isEmpty()) {
+            throw new NoSuchElementException("No allowed provider found for: " + providerClass.getSimpleName());
+        }
+        return providers.get(0);
     }
 
     @Override
     public <P extends AlgorithmProvider> List<P> getProviders(Class<P> providerClass) {
-        return allowedProviders.stream()
+        List<P> result = allowedProviders.stream()
                 .filter(providerClass::isInstance)
                 .map(providerClass::cast)
                 .collect(Collectors.toList());
+        
+        if (result.isEmpty() && fallbackAllowed) {
+            return delegate.getProviders(providerClass);
+        }
+        return result;
     }
 
     @Override

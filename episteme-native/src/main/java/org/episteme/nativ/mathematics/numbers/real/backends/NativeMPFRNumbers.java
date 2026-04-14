@@ -247,5 +247,35 @@ public final class NativeMPFRNumbers {
         }
     }
 
+    /**
+     * Returns a native constant by name at the specified precision.
+     */
+    public static org.episteme.nativ.mathematics.numbers.real.NativeRealBig getConstant(String name, long precision) {
+        if (!AVAILABLE) return null;
+        
+        // This is a circular dependency back to NativeRealBig.
+        // We use reflection or a helper to avoid it if NativeRealBig is in same package.
+        // But here it is in parent package. 
+        // We'll use the constructor directly.
+        
+        org.episteme.nativ.mathematics.numbers.real.NativeRealBig res = org.episteme.nativ.mathematics.numbers.real.NativeRealBig.createEmpty(precision);
+        
+        try {
+            if ("pi".equals(name)) {
+                int ignored = (int) MPFR_CONST_PI.invokeExact(res.getPtr(), 0); // 0 = RNDN
+                return res;
+            }
+            if ("e".equals(name)) {
+                // e = exp(1)
+                org.episteme.nativ.mathematics.numbers.real.NativeRealBig one = org.episteme.nativ.mathematics.numbers.real.NativeRealBig.of("1.0", precision);
+                int ignored = (int) MPFR_EXP.invokeExact(res.getPtr(), one.getPtr(), 0);
+                return res;
+            }
+        } catch (Throwable t) {
+            logger.error("Failed to get native constant {}: {}", name, t.getMessage());
+        }
+        return null;
+    }
+
     private NativeMPFRNumbers() {}
 }

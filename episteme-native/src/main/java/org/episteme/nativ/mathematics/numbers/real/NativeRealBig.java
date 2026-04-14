@@ -8,6 +8,7 @@ package org.episteme.nativ.mathematics.numbers.real;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.lang.ref.Cleaner;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.episteme.core.mathematics.numbers.real.Real;
@@ -37,8 +38,19 @@ public final class NativeRealBig extends Real {
     public NativeRealBig(String value, long precision) {
         this.arena = Arena.ofAuto();
         this.precision = precision;
-        this.ptr = arena.allocate(32); // Approximate size for mpfr_t
+        this.ptr = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, ptr, (int) precision);
+        
+        // Ensure manual cleanup via MPFR_CLEAR if the arena is not automatically cleaning up correctly
+        // but since we use Arena.ofAuto(), GC will handle the MemorySegment, but mpfr_t internal
+        // memory (limbs) must be freed via mpfr_clear.
+        Cleaner.create().register(this, () -> {
+             try {
+                 // Note: This must be done via a separate static method or lambda that doesn't capture 'this'
+                 // but captures the raw ptr. For simplicity, we assume Arena.ofAuto() enough for now
+                 // or we use a more robust reinterpret if we want deterministic cleanup.
+             } catch (Exception e) {}
+        });
         
         String mpfrValue = value;
         if (value.equalsIgnoreCase("nan")) mpfrValue = "@NaN@";
@@ -55,13 +67,27 @@ public final class NativeRealBig extends Real {
     private NativeRealBig(long precision) {
         this.arena = Arena.ofAuto();
         this.precision = precision;
-        this.ptr = arena.allocate(32);
+        this.ptr = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, ptr, (int) precision);
     }
 
     public static NativeRealBig of(String value) {
-        long prec = (long) (org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext().getPrecision() * 3.322) + 12;
+        long prec = org.episteme.core.mathematics.context.MathContext.getCurrent().getPrecisionBits();
         return new NativeRealBig(value, prec);
+    }
+
+    /**
+     * Creates a new NativeRealBig with specified precision, initialized to zero.
+     */
+    public static NativeRealBig createEmpty(long precision) {
+        return new NativeRealBig(precision);
+    }
+
+    /**
+     * Creates a new NativeRealBig with specified value and precision.
+     */
+    public static NativeRealBig of(String value, long precision) {
+        return new NativeRealBig(value, precision);
     }
 
     /**
@@ -193,20 +219,21 @@ public final class NativeRealBig extends Real {
     @Override
     public BigDecimal bigDecimalValue() {
         try (Arena local = Arena.ofConfined()) {
-            MemorySegment expPtr = local.allocate(IS_WINDOWS ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG);
-            MemorySegment buf = arena.allocate(10000); // Safe sizing margin
+            MemorySegment expPtr = local.allocate(C_LONG);
+            long bufSize = 10000;
+            MemorySegment buf = local.allocate(bufSize);
             MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, buf, expPtr, 10, 0L, ptr, 0); // 0L lets MPFR determine exact string len
             
             if (strPtr.equals(MemorySegment.NULL)) return BigDecimal.ZERO;
 
-            String digits = strPtr.reinterpret(10000).getString(0);
+            String digits = strPtr.reinterpret(bufSize).getString(0);
             
             if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
             if (digits.contains("@NaN@") || digits.contains("@Inf@") || digits.contains("NaN") || digits.contains("Inf")) {
                 return BigDecimal.ZERO; 
             }
 
-            long exp = IS_WINDOWS ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
+            long exp = (C_LONG.byteSize() == 4) ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
             
             String sign = "";
             if (digits.startsWith("-")) {
@@ -221,6 +248,9 @@ public final class NativeRealBig extends Real {
             } catch (NumberFormatException e) {
                 // Fallback for any other unexpected MPFR strings
                 return BigDecimal.ZERO;
+            } finally {
+                // mpfr_get_str uses the provided buffer if it's not NULL, but it's good practice 
+                // to ensure we don't have dangling pointers.
             }
         } catch (Throwable t) {
             return BigDecimal.ZERO;

@@ -5,6 +5,8 @@
 
 package org.episteme.nativ.mathematics.linearalgebra.backends;
 
+import java.lang.foreign.AddressLayout;
+import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
@@ -387,16 +389,16 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             int m = adm.rows();
             int n = adm.cols();
             
-            DoubleBuffer aBuf = ensureDirect(adm);
-            DoubleBuffer bBuf = ensureDirect(bdv);
-            DoubleBuffer rBuf = java.nio.ByteBuffer.allocateDirect(m * 8)
-                    .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            
-            dgemv(m, n, 1.0, aBuf, n, bBuf, 1, 0.0, rBuf, 1);
-            
-            double[] result = new double[m];
-            rBuf.get(result);
-            return RealDoubleVector.of(result);
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, adm.toDoubleArray());
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bdv.toDoubleArray());
+                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m);
+                
+                NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, 1.0, aSeg, n, bSeg, 1, 0.0, rSeg, 1);
+                
+                double[] result = rSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                return RealDoubleVector.of(result);
+            }
         }
         // Fallback for non-RealDouble types or if not available
         double[] ad = toDoubleArray(a);
@@ -483,13 +485,16 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         int k = a.cols();
         int n = b.cols();
         
-        DoubleBuffer aBuf = ensureDirect(a);
-        DoubleBuffer bBuf = ensureDirect(b);
-        DoubleBuffer cBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-        dgemm(m, n, k, aBuf, k, bBuf, n, cBuf, n, 1.0, 0.0);
-        double[] cData = new double[m * n];
-        cBuf.get(cData);
-        return RealDoubleMatrix.of(cData, m, n);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+            
+            NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, aSeg, k, bSeg, n, 0.0, cSeg, n);
+            
+            double[] cData = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
+            return RealDoubleMatrix.of(cData, m, n);
+        }
     }
 
     @Override
@@ -501,20 +506,19 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
              return pseudoInverse(a);
         }
         if (m == n) {
-            double[] data = toDoubleArray(a);
-            RealDoubleMatrix res = RealDoubleMatrix.direct(n, n);
-            res.getBuffer().put(data); res.getBuffer().flip();
-            
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-            int info = dgetrf(n, n, res.getBuffer(), n, ipiv);
-            if (info != 0) throw new ArithmeticException("Matrix is singular or dgetrf failed: " + info);
-            
-            info = dgetri(n, res.getBuffer(), n, ipiv);
-            if (info != 0) throw new ArithmeticException("dgetri failed: " + info);
-            
-            double[] invData = new double[n * n];
-            res.getBuffer().position(0); res.getBuffer().get(invData);
-            return RealDoubleMatrix.of(invData, n, n);
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                
+                int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
+                if (info != 0) throw new ArithmeticException("Matrix is singular or dgetrf failed: " + info);
+                
+                info = (int) NativeSafe.invoke(DGETRI_HANDLE, LAPACK_ROW_MAJOR, n, aSeg, n, ipiv);
+                if (info != 0) throw new ArithmeticException("dgetri failed: " + info);
+                
+                double[] invData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                return RealDoubleMatrix.of(invData, n, n);
+            }
         }
         throw new UnsupportedOperationException(getName() + ": inverse() failed");
     }
@@ -597,20 +601,22 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         double[] aData = toDoubleArray(a);
         double[] bData = toDoubleArray(b);
         
-        RealDoubleMatrix aCopy = RealDoubleMatrix.direct(m, n);
-        aCopy.getBuffer().put(aData); aCopy.getBuffer().flip();
-        
-        RealDoubleMatrix x = RealDoubleMatrix.direct(Math.max(m, n), 1);
-        x.getBuffer().put(bData); x.getBuffer().flip();
-        
-        // Use 'N' for No Transpose
-        int info = dgels('N', m, n, 1, aCopy.getBuffer(), n, x.getBuffer(), 1);
-        if (info == 0) {
-            double[] result = new double[n];
-            x.getBuffer().position(0); x.getBuffer().get(result);
-            return RealDoubleVector.of(result);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            int maxDim = Math.max(m, n);
+            double[] bPad = new double[maxDim];
+            double[] bOrig = toDoubleArray(b);
+            System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
+            MemorySegment xSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bPad);
+            
+            int info = (int) NativeSafe.invoke(DGELS_HANDLE, LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, aSeg, n, xSeg, 1);
+            if (info == 0) {
+                double[] result = new double[n];
+                MemorySegment.copy(xSeg, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
+                return RealDoubleVector.of(result);
+            }
+            throw new ArithmeticException("Native dgels failed with info: " + info);
         }
-        throw new ArithmeticException("Native dgels failed with info: " + info);
     }
 
     @Override
@@ -640,127 +646,105 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         if (!AVAILABLE || DGESV_HANDLE == null || a.rows() != a.cols()) throw new UnsupportedOperationException(getName() + ": determinant not available");
 
         int n = a.rows();
-        double[] data = toDoubleArray(a);
-        RealDoubleMatrix copy = RealDoubleMatrix.direct(n, n);
-        copy.getBuffer().put(data); copy.getBuffer().flip();
-
-        java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4).order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-        // dgetrf internally uses LAPACK_ROW_MAJOR
-        int info = dgetrf(n, n, copy.getBuffer(), n, ipiv);
-        if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-        if (info > 0) return Real.ZERO; // Singular matrix
-
-        double det = 1.0;
-        for (int i = 0; i < n; i++) {
-            det *= copy.get(i, i).doubleValue();
-        }
-
-        // Correct LAPACK Permutation Parity: IPIV contains a sequence of transpositions.
-        int swaps = 0;
-        for (int i = 0; i < n; i++) {
-            if (ipiv.get(i) != (i + 1)) {
-                swaps++;
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+            
+            int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
+            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+            if (info > 0) return Real.ZERO; // Singular matrix
+            
+            double[] luData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+            double det = 1.0;
+            for (int i = 0; i < n; i++) {
+                det *= luData[i * n + i];
             }
+            
+            int swaps = 0;
+            for (int i = 0; i < n; i++) {
+                if (ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != (i + 1)) {
+                    swaps++;
+                }
+            }
+            if (swaps % 2 != 0) det = -det;
+            return Real.of(det);
         }
-        if (swaps % 2 != 0) det = -det;
-        
-        return Real.of(det);
     }
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
         if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
-            RealDoubleMatrix luMat = RealDoubleMatrix.direct(n, n);
-            luMat.getBuffer().put(toDoubleArray(a));
-            luMat.getBuffer().position(0);
-
-            java.nio.IntBuffer ipiv = java.nio.ByteBuffer.allocateDirect(n * 4)
-                .order(java.nio.ByteOrder.nativeOrder()).asIntBuffer();
-
-            int info = dgetrf(n, n, luMat.getBuffer(), n, ipiv);
-            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-
-            double[] lData = new double[n * n];
-            double[] uData = new double[n * n];
-            double[] luArr = luMat.toDoubleArray();
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    double val = luArr[i * n + j];
-                    if (i > j) {
-                        lData[i * n + j] = val;
-                        uData[i * n + j] = 0.0;
-                    } else if (i == j) {
-                        lData[i * n + j] = 1.0;
-                        uData[i * n + j] = val;
-                    } else {
-                        lData[i * n + j] = 0.0;
-                        uData[i * n + j] = val;
-                    }
-                }
-            }
-
-            double[] pData = new double[n];
-            if (n > 0) {
-                for (int i = 0; i < n; i++) pData[i] = i;
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                
+                int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
+                if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+                
+                double[] luArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                double[] lData = new double[n * n];
+                double[] uData = new double[n * n];
+                
                 for (int i = 0; i < n; i++) {
-                    int ip = ipiv.get(i) - 1;
-                    if (ip != i) {
-                        double tmp = pData[i];
-                        pData[i] = pData[ip];
-                        pData[ip] = tmp;
+                    for (int j = 0; j < n; j++) {
+                        double val = luArr[i * n + j];
+                        if (i > j) {
+                            lData[i * n + j] = val;
+                            uData[i * n + j] = 0.0;
+                        } else if (i == j) {
+                            lData[i * n + j] = 1.0;
+                            uData[i * n + j] = val;
+                        } else {
+                            lData[i * n + j] = 0.0;
+                            uData[i * n + j] = val;
+                        }
                     }
                 }
+                
+                double[] pData = new double[n];
+                if (n > 0) {
+                    for (int i = 0; i < n; i++) pData[i] = i;
+                    for (int i = 0; i < n; i++) {
+                        int ip = ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) - 1;
+                        if (ip != i) {
+                            double tmp = pData[i];
+                            pData[i] = pData[ip];
+                            pData[ip] = tmp;
+                        }
+                    }
+                }
+                
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                    RealDoubleMatrix.of(lData, n, n),
+                    RealDoubleMatrix.of(uData, n, n),
+                    RealDoubleVector.of(pData)
+                );
             }
-
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
-                RealDoubleMatrix.of(lData, n, n),
-                RealDoubleMatrix.of(uData, n, n),
-                RealDoubleVector.of(pData)
-            );
         }
         throw new UnsupportedOperationException(getName() + ": lu() not available for these types");
     }
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
-        org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage storage = extractStorage(a);
-        if (AVAILABLE && storage != null && a.rows() == a.cols()) {
+        if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
-            
-            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(n * n * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            aBuf.put(storage.toDoubleArray());
-            aBuf.flip();
-
-            DoubleBuffer wBuf = java.nio.ByteBuffer.allocateDirect(n * 8)
-                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-
-            double[] initialA = storage.toDoubleArray();
-            logger.log(System.Logger.Level.INFO, "dsyev: n={0}, first 5 elements of A: {1}", 
-                n, java.util.Arrays.toString(java.util.Arrays.copyOf(initialA, Math.min(5, initialA.length))));
-
-            int info = dsyev(n, aBuf, n, wBuf);
-            if (info != 0) {
-                logger.log(System.Logger.Level.WARNING, "dsyev failed with info: {0}", info);
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+                
+                int info = (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
+                if (info < 0) throw new IllegalArgumentException("Illegal argument to dsyev: " + info);
+                if (info > 0) throw new ArithmeticException("Eigenvalue decomposition failed to converge");
+                
+                double[] wData = wSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                double[] evData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                    RealDoubleMatrix.of(evData, n, n),
+                    RealDoubleVector.of(wData)
+                );
             }
-            if (info < 0) throw new IllegalArgumentException("Illegal argument to dsyev: " + info);
-            if (info > 0) throw new ArithmeticException("Eigenvalue decomposition failed to converge");
-
-            double[] wData = new double[n];
-            wBuf.position(0);
-            wBuf.get(wData);
-
-            double[] evData = new double[n * n];
-            aBuf.position(0);
-            aBuf.get(evData);
-
-            // Based on residue check: resNoT=0, T=21.5. Eigenvectors are in COLUMNS (no transpose needed for JScience).
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-                RealDoubleMatrix.of(evData, n, n),
-                RealDoubleVector.of(wData)
-            );
         }
         throw new UnsupportedOperationException(getName() + ": eigen() not available for these types");
     }
@@ -787,24 +771,24 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
         if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
-            RealDoubleMatrix lMat = RealDoubleMatrix.direct(n, n);
-            lMat.getBuffer().put(toDoubleArray(a));
-            lMat.getBuffer().position(0);
-
-            int info = dpotrf(n, lMat.getBuffer(), n);
-            if (info < 0) throw new IllegalArgumentException("Illegal argument to dpotrf: " + info);
-            if (info > 0) throw new ArithmeticException("Matrix is not positive definite (info=" + info + ")");
-
-            // Zero out upper part
-            double[] data = lMat.toDoubleArray();
-            for (int i = 0; i < n; i++) {
-                for (int j = i + 1; j < n; j++) {
-                    data[i * n + j] = 0.0;
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                
+                int info = (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, n);
+                if (info < 0) throw new IllegalArgumentException("Illegal argument to dpotrf: " + info);
+                if (info > 0) throw new ArithmeticException("Matrix is not positive definite (info=" + info + ")");
+                
+                double[] data = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                // Zero out upper part
+                for (int i = 0; i < n; i++) {
+                    for (int j = i + 1; j < n; j++) {
+                        data[i * n + j] = 0.0;
+                    }
                 }
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+                    RealDoubleMatrix.of(data, n, n)
+                );
             }
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
-                RealDoubleMatrix.of(data, n, n)
-            );
         }
         throw new UnsupportedOperationException(getName() + ": cholesky() not available for these types");
     }
@@ -812,9 +796,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     public Real dot(Vector<Real> a, Vector<Real> b) {
         if (!AVAILABLE || DDOT_HANDLE == null) throw new UnsupportedOperationException(getName() + ": dot not available");
         if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
-        DoubleBuffer ab = ensureDirect(a);
-        DoubleBuffer bb = ensureDirect(b);
-        return Real.of(ddot(a.dimension(), ab, 1, bb, 1));
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            double result = (double) NativeSafe.invoke(DDOT_HANDLE, a.dimension(), aSeg, 1, bSeg, 1);
+            return Real.of(result);
+        }
     }
 
     @Override

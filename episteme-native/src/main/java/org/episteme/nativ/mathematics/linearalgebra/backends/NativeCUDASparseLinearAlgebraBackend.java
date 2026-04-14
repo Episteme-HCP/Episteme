@@ -403,6 +403,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         int k = a.cols();
         int nnz = a.getNnz();
 
+        long d_csrRowPtr = 0, d_csrColIdx = 0, d_csrVal = 0, d_x = 0, d_y = 0;
         try (Arena arena = Arena.ofConfined()) {
             int[] rowPtrHost = a.getRowPointers();
             int[] colIdxHost = a.getColIndices();
@@ -410,11 +411,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             Object[] valsObj = a.getValues();
             for (int i = 0; i < nnz; i++) valsHost[i] = ((Real) valsObj[i]).doubleValue();
 
-            long d_csrRowPtr = allocateGPUMemory((long)(m + 1) * 4);
-            long d_csrColIdx = allocateGPUMemory((long)nnz * 4);
-            long d_csrVal = allocateGPUMemory((long)nnz * 8);
-            long d_x = allocateGPUMemory((long)k * 8);
-            long d_y = allocateGPUMemory((long)m * 8);
+            d_csrRowPtr = allocateGPUMemory((long)(m + 1) * 4);
+            d_csrColIdx = allocateGPUMemory((long)nnz * 4);
+            d_csrVal = allocateGPUMemory((long)nnz * 8);
+            d_x = allocateGPUMemory((long)k * 8);
+            d_y = allocateGPUMemory((long)m * 8);
 
             MemorySegment h_csrRowPtr = arena.allocateFrom(ValueLayout.JAVA_INT, rowPtrHost);
             MemorySegment h_csrColIdx = arena.allocateFrom(ValueLayout.JAVA_INT, colIdxHost);
@@ -431,15 +432,15 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] yHost = new double[m];
             copyFromGPU(d_y, DoubleBuffer.wrap(yHost), m);
 
+            return toRealVector(yHost);
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA Sparse-Vector multiply failed", t);
+        } finally {
             freeGPUMemory(d_csrRowPtr);
             freeGPUMemory(d_csrColIdx);
             freeGPUMemory(d_csrVal);
             freeGPUMemory(d_x);
             freeGPUMemory(d_y);
-
-            return toRealVector(yHost);
-        } catch (Throwable t) {
-            throw new RuntimeException("CUDA Sparse-Vector multiply failed", t);
         }
     }
 
@@ -449,12 +450,13 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         int n = b.cols();
         int nnz = a.getNnz();
 
+        long d_csrRowPtr = 0, d_csrColIdx = 0, d_csrVal = 0, d_B = 0, d_C = 0;
         try (Arena arena = Arena.ofConfined()) {
-            long d_csrRowPtr = allocateGPUMemory((long)(m + 1) * 4);
-            long d_csrColIdx = allocateGPUMemory((long)nnz * 4);
-            long d_csrVal = allocateGPUMemory((long)nnz * 8);
-            long d_B = allocateGPUMemory((long)k * n * 8);
-            long d_C = allocateGPUMemory((long)m * n * 8);
+            d_csrRowPtr = allocateGPUMemory((long)(m + 1) * 4);
+            d_csrColIdx = allocateGPUMemory((long)nnz * 4);
+            d_csrVal = allocateGPUMemory((long)nnz * 8);
+            d_B = allocateGPUMemory((long)k * n * 8);
+            d_C = allocateGPUMemory((long)m * n * 8);
 
             MemorySegment h_rowPtr = arena.allocateFrom(ValueLayout.JAVA_INT, a.getRowPointers());
             MemorySegment h_colIdx = arena.allocateFrom(ValueLayout.JAVA_INT, a.getColIndices());
@@ -477,15 +479,15 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] cData = new double[m * n];
             copyFromGPU(d_C, DoubleBuffer.wrap(cData), m * n);
 
+            return toRealMatrix(cData, m, n);
+        } catch (Throwable t) {
+            throw new RuntimeException("CUDA Sparse-Dense multiply failed", t);
+        } finally {
             freeGPUMemory(d_csrRowPtr);
             freeGPUMemory(d_csrColIdx);
             freeGPUMemory(d_csrVal);
             freeGPUMemory(d_B);
             freeGPUMemory(d_C);
-
-            return toRealMatrix(cData, m, n);
-        } catch (Throwable t) {
-            throw new RuntimeException("CUDA Sparse-Dense multiply failed", t);
         }
     }
 
@@ -520,17 +522,20 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         NativeSafe.invoke(CUSPARSE_CREATE_DN_VEC, vechYPtr, (long)m, MemorySegment.ofAddress(d_y), CUDA_R_64F);
         MemorySegment vecY = vechYPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
 
-        MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
-        MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
-        MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
+        long d_buffer = 0;
+        try {
+            MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
+            MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
+            MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
 
-        NativeSafe.invoke(CUSPARSE_SPMV_BUFFER_SIZE, CUSPARSE_HANDLE, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr);
-        long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
-        long d_buffer = allocateGPUMemory(bufferSize);
+            NativeSafe.invoke(CUSPARSE_SPMV_BUFFER_SIZE, CUSPARSE_HANDLE, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr);
+            long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
+            d_buffer = allocateGPUMemory(bufferSize);
 
-        NativeSafe.invoke(CUSPARSE_SPMV, CUSPARSE_HANDLE, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer));
-
-        freeGPUMemory(d_buffer);
+            NativeSafe.invoke(CUSPARSE_SPMV, CUSPARSE_HANDLE, 0, alpha, matA, vecX, beta, vecY, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer));
+        } finally {
+            freeGPUMemory(d_buffer);
+        }
     }
 
     private void spmm_internal(int m, int n, int k, int nnz, long d_rowPtr, long d_colIdx, long d_val, long d_B, long d_C, Arena arena) throws Throwable {
@@ -547,51 +552,52 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         NativeSafe.invoke(CUSPARSE_CREATE_DN_MAT, matCPtr, (long)m, (long)n, (long)n, MemorySegment.ofAddress(d_C), CUDA_R_64F, CUSPARSE_ORDER_ROW);
         MemorySegment matC = matCPtr.get(ValueLayout.ADDRESS, 0).reinterpret(0);
 
-        MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
-        MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
-        MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
+        long d_buffer = 0;
+        try {
+            MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
+            MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
+            MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
 
-        NativeSafe.invoke(CUSPARSE_SPMM_BUFFER_SIZE, CUSPARSE_HANDLE, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr);
-        long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
-        long d_buffer = allocateGPUMemory(bufferSize);
+            NativeSafe.invoke(CUSPARSE_SPMM_BUFFER_SIZE, CUSPARSE_HANDLE, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, bufferSizePtr);
+            long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
+            d_buffer = allocateGPUMemory(bufferSize);
 
-        NativeSafe.invoke(CUSPARSE_SPMM, CUSPARSE_HANDLE, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer));
-
-        freeGPUMemory(d_buffer);
+            NativeSafe.invoke(CUSPARSE_SPMM, CUSPARSE_HANDLE, 0, 0, alpha, matA, matB, beta, matC, CUDA_R_64F, CUSPARSE_SPMM_ALG_DEFAULT, MemorySegment.ofAddress(d_buffer));
+        } finally {
+            freeGPUMemory(d_buffer);
+        }
     }
 
     @Override
     public Vector<Real> bicgstab(Matrix<Real> A, Vector<Real> b, Vector<Real> x0, Real tol, int maxIter) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA Sparse Backend not available");
         int n = b.dimension();
         if (!(A instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
              throw new IllegalArgumentException("A must be a SparseMatrix");
         }
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> A_sparse = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) A;
 
+        long d_r = 0, d_r_hat = 0, d_p = 0, d_v = 0, d_s = 0, d_t = 0, d_x = 0, d_b = 0;
+        long d_csrRowPtr = 0, d_csrColIdx = 0, d_csrVal = 0;
+
         try (Arena arena = Arena.ofConfined()) {
             double tol_val = tol.doubleValue();
             
-            // Allocate GPU memory for vectors
-            long d_r = allocateGPUMemory((long) n * 8);
-            long d_r_hat = allocateGPUMemory((long) n * 8);
-            long d_p = allocateGPUMemory((long) n * 8);
-            long d_v = allocateGPUMemory((long) n * 8);
-            long d_s = allocateGPUMemory((long) n * 8);
-            long d_t = allocateGPUMemory((long) n * 8);
-            long d_x = allocateGPUMemory((long) n * 8);
-            long d_b = allocateGPUMemory((long) n * 8);
+            d_r = allocateGPUMemory((long) n * 8);
+            d_r_hat = allocateGPUMemory((long) n * 8);
+            d_p = allocateGPUMemory((long) n * 8);
+            d_v = allocateGPUMemory((long) n * 8);
+            d_s = allocateGPUMemory((long) n * 8);
+            d_t = allocateGPUMemory((long) n * 8);
+            d_x = allocateGPUMemory((long) n * 8);
+            d_b = allocateGPUMemory((long) n * 8);
 
-            // Matrix CSR data
             int nnz_val = A_sparse.getNnz();
-            long d_csrRowPtr = allocateGPUMemory((long) (n + 1) * 4);
-            long d_csrColIdx = allocateGPUMemory((long) nnz_val * 4);
-            long d_csrVal = allocateGPUMemory((long) nnz_val * 8);
+            d_csrRowPtr = allocateGPUMemory((long) (n + 1) * 4);
+            d_csrColIdx = allocateGPUMemory((long) nnz_val * 4);
+            d_csrVal = allocateGPUMemory((long) nnz_val * 8);
 
-            // Copy data to GPU
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_b), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b)), (long) n * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
             if (x0 != null) NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_x), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(x0)), (long) n * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
-            else NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_x), MemorySegment.NULL, (long) n * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE); 
 
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrRowPtr), arena.allocateFrom(ValueLayout.JAVA_INT, A_sparse.getRowPointers()), (long) (n + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE);
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrColIdx), arena.allocateFrom(ValueLayout.JAVA_INT, A_sparse.getColIndices()), (long) nnz_val * 4, CUDA_MEMCPY_HOST_TO_DEVICE);
@@ -600,10 +606,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             for (int i = 0; i < nnz_val; i++) vals[i] = ((Real) valsObj[i]).doubleValue();
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrVal), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, vals), (long) nnz_val * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
 
-            // BiCGSTAB initialization
-            // r = b - Ax
             spmv_internal(n, n, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, d_x, d_r, arena);
-            daxpy_internal(n, -1.0, d_r, d_b); // r = b - r (r was Ax)
+            daxpy_internal(n, -1.0, d_r, d_b);
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_r_hat), MemorySegment.ofAddress(d_r), (long) n * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
 
             double rho = 1.0, alpha = 1.0, omega = 1.0;
@@ -618,20 +622,17 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                     NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_p), MemorySegment.ofAddress(d_r), (long) n * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
                 } else {
                     beta = (rho / rho_prev) * (alpha / omega);
-                    // p = r + beta * (p - omega * v)
-                    daxpy_internal(n, -omega, d_v, d_p); // p = p - omega*v
-                    dscal_internal(n, beta, d_p);        // p = beta*p
-                    daxpy_internal(n, 1.0, d_r, d_p);    // p = r + p
+                    daxpy_internal(n, -omega, d_v, d_p);
+                    dscal_internal(n, beta, d_p);
+                    daxpy_internal(n, 1.0, d_r, d_p);
                 }
 
                 spmv_internal(n, n, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, d_p, d_v, arena);
                 alpha = rho / ddot_internal(n, d_r_hat, d_v);
 
-                // s = r - alpha * v
                 NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_s), MemorySegment.ofAddress(d_r), (long) n * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
                 daxpy_internal(n, -alpha, d_v, d_s);
 
-                // Check norm of s
                 double s_norm = Math.sqrt(ddot_internal(n, d_s, d_s));
                 if (s_norm < tol_val) {
                     daxpy_internal(n, alpha, d_p, d_x);
@@ -641,11 +642,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
                 spmv_internal(n, n, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, d_s, d_t, arena);
                 omega = ddot_internal(n, d_t, d_s) / ddot_internal(n, d_t, d_t);
 
-                // x = x + alpha * p + omega * s
                 daxpy_internal(n, alpha, d_p, d_x);
                 daxpy_internal(n, omega, d_s, d_x);
 
-                // r = s - omega * t
                 NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_r), MemorySegment.ofAddress(d_s), (long) n * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
                 daxpy_internal(n, -omega, d_t, d_r);
 
@@ -655,42 +654,42 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] xHost = new double[n];
             copyFromGPU(d_x, DoubleBuffer.wrap(xHost), n);
 
-            // Cleanup
-            freeGPUMemory(d_r); freeGPUMemory(d_r_hat); freeGPUMemory(d_p); freeGPUMemory(d_v);
-            freeGPUMemory(d_s); freeGPUMemory(d_t); freeGPUMemory(d_x); freeGPUMemory(d_b);
-            freeGPUMemory(d_csrRowPtr); freeGPUMemory(d_csrColIdx); freeGPUMemory(d_csrVal);
-
             return toRealVector(xHost);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA BiCGSTAB failed", t);
+        } finally {
+            freeGPUMemory(d_r); freeGPUMemory(d_r_hat); freeGPUMemory(d_p); freeGPUMemory(d_v);
+            freeGPUMemory(d_s); freeGPUMemory(d_t); freeGPUMemory(d_x); freeGPUMemory(d_b);
+            freeGPUMemory(d_csrRowPtr); freeGPUMemory(d_csrColIdx); freeGPUMemory(d_csrVal);
         }
     }
 
     @Override
     public Vector<Real> conjugateGradient(Matrix<Real> A, Vector<Real> b, Vector<Real> x0, Real tol, int maxIter) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA Sparse Backend not available");
         int n = b.dimension();
         if (!(A instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
             throw new IllegalArgumentException("A must be a SparseMatrix");
         }
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> A_sparse = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) A;
 
+        long d_x = 0, d_r = 0, d_p = 0, d_Ap = 0, d_b = 0;
+        long d_csrRowPtr = 0, d_csrColIdx = 0, d_csrVal = 0;
+
         try (Arena arena = Arena.ofConfined()) {
             double tol_val = tol.doubleValue();
-            long d_x = allocateGPUMemory((long) n * 8);
-            long d_r = allocateGPUMemory((long) n * 8);
-            long d_p = allocateGPUMemory((long) n * 8);
-            long d_Ap = allocateGPUMemory((long) n * 8);
-            long d_b = allocateGPUMemory((long) n * 8);
+            d_x = allocateGPUMemory((long) n * 8);
+            d_r = allocateGPUMemory((long) n * 8);
+            d_p = allocateGPUMemory((long) n * 8);
+            d_Ap = allocateGPUMemory((long) n * 8);
+            d_b = allocateGPUMemory((long) n * 8);
 
             int nnz_val = A_sparse.getNnz();
-            long d_csrRowPtr = allocateGPUMemory((long) (n + 1) * 4);
-            long d_csrColIdx = allocateGPUMemory((long) nnz_val * 4);
-            long d_csrVal = allocateGPUMemory((long) nnz_val * 8);
+            d_csrRowPtr = allocateGPUMemory((long) (n + 1) * 4);
+            d_csrColIdx = allocateGPUMemory((long) nnz_val * 4);
+            d_csrVal = allocateGPUMemory((long) nnz_val * 8);
 
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_b), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b)), (long) n * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
             if (x0 != null) NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_x), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(x0)), (long) n * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
-            else NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_x), MemorySegment.NULL, (long) n * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
 
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrRowPtr), arena.allocateFrom(ValueLayout.JAVA_INT, A_sparse.getRowPointers()), (long) (n + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE);
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrColIdx), arena.allocateFrom(ValueLayout.JAVA_INT, A_sparse.getColIndices()), (long) nnz_val * 4, CUDA_MEMCPY_HOST_TO_DEVICE);
@@ -699,9 +698,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             for (int i = 0; i < nnz_val; i++) valsArr[i] = ((Real) valsObj[i]).doubleValue();
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrVal), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, valsArr), (long) nnz_val * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
 
-            // r = b - Ax
             spmv_internal(n, n, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, d_x, d_r, arena);
-            daxpy_internal(n, -1.0, d_r, d_b); // r = b - r
+            daxpy_internal(n, -1.0, d_r, d_b);
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_p), MemorySegment.ofAddress(d_r), (long) n * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
 
             double rsold = ddot_internal(n, d_r, d_r);
@@ -722,12 +720,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             double[] xHost = new double[n];
             copyFromGPU(d_x, DoubleBuffer.wrap(xHost), n);
 
-            freeGPUMemory(d_x); freeGPUMemory(d_r); freeGPUMemory(d_p); freeGPUMemory(d_Ap); freeGPUMemory(d_b);
-            freeGPUMemory(d_csrRowPtr); freeGPUMemory(d_csrColIdx); freeGPUMemory(d_csrVal);
-
             return toRealVector(xHost);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA Conjugate Gradient failed", t);
+        } finally {
+            freeGPUMemory(d_x); freeGPUMemory(d_r); freeGPUMemory(d_p); freeGPUMemory(d_Ap); freeGPUMemory(d_b);
+            freeGPUMemory(d_csrRowPtr); freeGPUMemory(d_csrColIdx); freeGPUMemory(d_csrVal);
         }
     }
 
@@ -741,15 +739,18 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         }
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> A_sparse = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) A;
 
+        long d_x = 0, d_csrRowPtr = 0, d_csrColIdx = 0, d_csrVal = 0;
+        long[] V = new long[maxIter + 1];
+
         try (Arena arena = Arena.ofConfined()) {
             double tol_val = tol.doubleValue();
-            long d_x = allocateGPUMemory((long) m_rows * 8);
+            d_x = allocateGPUMemory((long) m_rows * 8);
             if (x0 != null) NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_x), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(x0)), (long) m_rows * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
             
             int nnz_val = A_sparse.getNnz();
-            long d_csrRowPtr = allocateGPUMemory((long) (m_rows + 1) * 4);
-            long d_csrColIdx = allocateGPUMemory((long) nnz_val * 4);
-            long d_csrVal = allocateGPUMemory((long) nnz_val * 8);
+            d_csrRowPtr = allocateGPUMemory((long) (m_rows + 1) * 4);
+            d_csrColIdx = allocateGPUMemory((long) nnz_val * 4);
+            d_csrVal = allocateGPUMemory((long) nnz_val * 8);
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrRowPtr), arena.allocateFrom(ValueLayout.JAVA_INT, A_sparse.getRowPointers()), (long) (m_rows + 1) * 4, CUDA_MEMCPY_HOST_TO_DEVICE);
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrColIdx), arena.allocateFrom(ValueLayout.JAVA_INT, A_sparse.getColIndices()), (long) nnz_val * 4, CUDA_MEMCPY_HOST_TO_DEVICE);
             double[] valsArr = new double[nnz_val];
@@ -758,60 +759,89 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
             NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_csrVal), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, valsArr), (long) nnz_val * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
 
             for (int restart = 0; restart < restarts; restart++) {
-                // r = b - Ax
-                long d_r = allocateGPUMemory((long) m_rows * 8);
-                spmv_internal(m_rows, k_cols, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, d_x, d_r, arena);
-                double[] bArr = toDoubleArray(b);
-                long d_b = allocateGPUMemory((long) m_rows * 8);
-                NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_b), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bArr), (long) m_rows * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
-                daxpy_internal(m_rows, -1.0, d_r, d_b);
-                NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_r), MemorySegment.ofAddress(d_b), (long) m_rows * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
+                long d_r = 0, d_b = 0;
+                try {
+                    // r = b - Ax
+                    d_r = allocateGPUMemory((long) m_rows * 8);
+                    spmv_internal(m_rows, k_cols, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, d_x, d_r, arena);
+                    double[] bArr = toDoubleArray(b);
+                    d_b = allocateGPUMemory((long) m_rows * 8);
+                    NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_b), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bArr), (long) m_rows * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
+                    daxpy_internal(m_rows, -1.0, d_r, d_b);
+                    NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_r), MemorySegment.ofAddress(d_b), (long) m_rows * 8, CUDA_MEMCPY_DEVICE_TO_DEVICE);
 
-                double beta = Math.sqrt(ddot_internal(m_rows, d_r, d_r));
-                if (beta < tol_val) {
-                    freeGPUMemory(d_r); freeGPUMemory(d_b);
-                    break;
-                }
+                    double beta = Math.sqrt(ddot_internal(m_rows, d_r, d_r));
+                    if (beta < tol_val) break;
 
-                dscal_internal(m_rows, 1.0 / beta, d_r);
-                
-                long[] V = new long[maxIter + 1];
-                V[0] = d_r;
-                double[][] H = new double[maxIter + 1][maxIter];
+                    dscal_internal(m_rows, 1.0 / beta, d_r);
+                    
+                    for (int i = 0; i < V.length; i++) V[i] = 0;
+                    V[0] = d_r;
+                    d_r = 0; // Hand over ownership to V[0]
 
-                int j = 0;
-                for (j = 0; j < maxIter; j++) {
-                    V[j+1] = allocateGPUMemory((long) m_rows * 8);
-                    spmv_internal(m_rows, k_cols, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, V[j], V[j+1], arena);
+                    double[][] H = new double[maxIter + 1][maxIter];
 
-                    for (int i = 0; i <= j; i++) {
-                        H[i][j] = ddot_internal(m_rows, V[i], V[j+1]);
-                        daxpy_internal(m_rows, -H[i][j], V[i], V[j+1]);
+                    int j = 0;
+                    for (j = 0; j < maxIter; j++) {
+                        V[j+1] = allocateGPUMemory((long) m_rows * 8);
+                        spmv_internal(m_rows, k_cols, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, V[j], V[j+1], arena);
+
+                        for (int i = 0; i <= j; i++) {
+                            H[i][j] = ddot_internal(m_rows, V[i], V[j+1]);
+                            daxpy_internal(m_rows, -H[i][j], V[i], V[j+1]);
+                        }
+                        H[j+1][j] = Math.sqrt(ddot_internal(m_rows, V[j+1], V[j+1]));
+                        if (H[j+1][j] < 1e-15) break; 
+                        dscal_internal(m_rows, 1.0 / H[j+1][j], V[j+1]);
                     }
-                    H[j+1][j] = Math.sqrt(ddot_internal(m_rows, V[j+1], V[j+1]));
-                    if (H[j+1][j] < 1e-15) break; 
-                    dscal_internal(m_rows, 1.0 / H[j+1][j], V[j+1]);
-                }
 
-                // Solve the small Hessenberg system on CPU
-                double[] y = solveHessenbergSystem_internal(H, beta, j);
-                for (int i = 0; i < y.length; i++) {
-                    daxpy_internal(m_rows, y[i], V[i], d_x);
+                    // Solve the small Hessenberg system on CPU
+                    double[] y = solveHessenbergSystem_internal(H, beta, j);
+                    for (int i = 0; i < y.length; i++) {
+                        daxpy_internal(m_rows, y[i], V[i], d_x);
+                    }
+                } finally {
+                    if (d_r != 0) freeGPUMemory(d_r);
+                    if (d_b != 0) freeGPUMemory(d_b);
+                    for (int i = 0; i < V.length; i++) {
+                        if (V[i] != 0) {
+                            freeGPUMemory(V[i]);
+                            V[i] = 0;
+                        }
+                    }
                 }
-
-                // Free V vectors and d_b
-                for (int i = 0; i <= j; i++) if (V[i] != 0) freeGPUMemory(V[i]);
-                freeGPUMemory(d_b);
+                
+                // Final check for overall residual
+                long d_final_r = 0;
+                try {
+                    d_final_r = allocateGPUMemory((long) m_rows * 8);
+                    spmv_internal(m_rows, k_cols, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, d_x, d_final_r, arena); // Ax
+                    double[] bArr = toDoubleArray(b);
+                    long d_final_b = 0;
+                    try {
+                        d_final_b = allocateGPUMemory((long) m_rows * 8);
+                        NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_final_b), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bArr), (long) m_rows * 8, CUDA_MEMCPY_HOST_TO_DEVICE);
+                        daxpy_internal(m_rows, -1.0, d_final_r, d_final_b); // b - Ax
+                        if (Math.sqrt(ddot_internal(m_rows, d_final_b, d_final_b)) < tol_val) break;
+                    } finally {
+                        if (d_final_b != 0) freeGPUMemory(d_final_b);
+                    }
+                } finally {
+                    if (d_final_r != 0) freeGPUMemory(d_final_r);
+                }
             }
 
             double[] xHost = new double[m_rows];
             copyFromGPU(d_x, DoubleBuffer.wrap(xHost), m_rows);
-            freeGPUMemory(d_x);
-            freeGPUMemory(d_csrRowPtr); freeGPUMemory(d_csrColIdx); freeGPUMemory(d_csrVal);
-
             return toRealVector(xHost);
+
         } catch (Throwable t) {
             throw new RuntimeException("CUDA GMRES failed", t);
+        } finally {
+            if (d_x != 0) freeGPUMemory(d_x);
+            if (d_csrRowPtr != 0) freeGPUMemory(d_csrRowPtr);
+            if (d_csrColIdx != 0) freeGPUMemory(d_csrColIdx);
+            if (d_csrVal != 0) freeGPUMemory(d_csrVal);
         }
     }
 

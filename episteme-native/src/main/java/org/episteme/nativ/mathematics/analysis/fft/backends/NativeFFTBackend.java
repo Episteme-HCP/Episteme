@@ -144,9 +144,15 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             // Output for r2c is (n/2+1) complex numbers
             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, (n / 2 + 1) * 2);
 
-            MemorySegment plan = (MemorySegment) DPLAN_R2C_1D.invokeExact(n, in, out, 1 << 6); // FFTW_ESTIMATE
-            DEXECUTE.invokeExact(plan);
-            DDESTROY_PLAN.invokeExact(plan);
+            MemorySegment plan = MemorySegment.NULL;
+            try {
+                plan = (MemorySegment) DPLAN_R2C_1D.invokeExact(n, in, out, 1 << 6); // FFTW_ESTIMATE
+                DEXECUTE.invokeExact(plan);
+            } finally {
+                if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                    DDESTROY_PLAN.invokeExact(plan);
+                }
+            }
 
             double[] re = new double[n / 2 + 1];
             double[] im = new double[n / 2 + 1];
@@ -175,9 +181,15 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             }
             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, outN);
 
-            MemorySegment plan = (MemorySegment) DPLAN_C2R_1D.invokeExact(outN, in, out, 1 << 6);
-            DEXECUTE.invokeExact(plan);
-            DDESTROY_PLAN.invokeExact(plan);
+            MemorySegment plan = MemorySegment.NULL;
+            try {
+                plan = (MemorySegment) DPLAN_C2R_1D.invokeExact(outN, in, out, 1 << 6);
+                DEXECUTE.invokeExact(plan);
+            } finally {
+                if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                    DDESTROY_PLAN.invokeExact(plan);
+                }
+            }
 
             double[] resultReal = new double[outN];
             for (int i = 0; i < outN; i++)
@@ -232,10 +244,16 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             }
             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, n * 2);
 
-            // -1 for Forward transform
-            MemorySegment plan = (MemorySegment) DPLAN_DFT_1D.invokeExact(n, in, out, -1, 1 << 6); 
-            DEXECUTE.invokeExact(plan);
-            DDESTROY_PLAN.invokeExact(plan);
+            MemorySegment plan = MemorySegment.NULL;
+            try {
+                // -1 for Forward transform
+                plan = (MemorySegment) DPLAN_DFT_1D.invokeExact(n, in, out, -1, 1 << 6); 
+                DEXECUTE.invokeExact(plan);
+            } finally {
+                if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                    DDESTROY_PLAN.invokeExact(plan);
+                }
+            }
 
             Complex[] result = new Complex[n];
             for (int i = 0; i < n; i++) {
@@ -263,10 +281,16 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             }
             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, n * 2);
 
-            // 1 for Backward transform
-            MemorySegment plan = (MemorySegment) DPLAN_DFT_1D.invokeExact(n, in, out, 1, 1 << 6); 
-            DEXECUTE.invokeExact(plan);
-            DDESTROY_PLAN.invokeExact(plan);
+            MemorySegment plan = MemorySegment.NULL;
+            try {
+                // 1 for Backward transform
+                plan = (MemorySegment) DPLAN_DFT_1D.invokeExact(n, in, out, 1, 1 << 6); 
+                DEXECUTE.invokeExact(plan);
+            } finally {
+                if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                    DDESTROY_PLAN.invokeExact(plan);
+                }
+            }
 
             Complex[] result = new Complex[n];
             for (int i = 0; i < n; i++) {
@@ -301,10 +325,16 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             
             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
             
-            // -1 for Forward
-            MemorySegment plan = (MemorySegment) DPLAN_DFT_2D.invokeExact(n0, n1, in, out, -1, 1 << 6); // FFTW_ESTIMATE
-            DEXECUTE.invokeExact(plan);
-            DDESTROY_PLAN.invokeExact(plan);
+            MemorySegment plan = MemorySegment.NULL;
+            try {
+                // -1 for Forward
+                plan = (MemorySegment) DPLAN_DFT_2D.invokeExact(n0, n1, in, out, -1, 1 << 6); // FFTW_ESTIMATE
+                DEXECUTE.invokeExact(plan);
+            } finally {
+                if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                    DDESTROY_PLAN.invokeExact(plan);
+                }
+            }
             
             double[][][] result = new double[2][n0][n1];
             for(int i=0; i<n0; i++) {
@@ -341,10 +371,16 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
              
              MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
              
-             // 1 for Backward
-             MemorySegment plan = (MemorySegment) DPLAN_DFT_2D.invokeExact(n0, n1, in, out, 1, 1 << 6);
-             DEXECUTE.invokeExact(plan);
-             DDESTROY_PLAN.invokeExact(plan);
+             MemorySegment plan = MemorySegment.NULL;
+             try {
+                 // 1 for Backward
+                 plan = (MemorySegment) DPLAN_DFT_2D.invokeExact(n0, n1, in, out, 1, 1 << 6);
+                 DEXECUTE.invokeExact(plan);
+             } finally {
+                 if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                     DDESTROY_PLAN.invokeExact(plan);
+                 }
+             }
              
              double[][][] result = new double[2][n0][n1];
              double norm = (double) totalElements;
@@ -385,10 +421,16 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             
             MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
             
-            // -1 for Forward
-            MemorySegment plan = (MemorySegment) DPLAN_DFT_3D.invokeExact(n0, n1, n2, in, out, -1, 1 << 6);
-            DEXECUTE.invokeExact(plan);
-            DDESTROY_PLAN.invokeExact(plan);
+            MemorySegment plan = MemorySegment.NULL;
+            try {
+                // -1 for Forward
+                plan = (MemorySegment) DPLAN_DFT_3D.invokeExact(n0, n1, n2, in, out, -1, 1 << 6);
+                DEXECUTE.invokeExact(plan);
+            } finally {
+                if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                    DDESTROY_PLAN.invokeExact(plan);
+                }
+            }
             
             double[][][][] result = new double[2][n0][n1][n2];
             for(int i=0; i<n0; i++) {
@@ -430,10 +472,16 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
              
              MemorySegment out = arena.allocate(ValueLayout.JAVA_DOUBLE, totalElements * 2);
              
-             // 1 for Backward
-             MemorySegment plan = (MemorySegment) DPLAN_DFT_3D.invokeExact(n0, n1, n2, in, out, 1, 1 << 6);
-             DEXECUTE.invokeExact(plan);
-             DDESTROY_PLAN.invokeExact(plan);
+             MemorySegment plan = MemorySegment.NULL;
+             try {
+                 // 1 for Backward
+                 plan = (MemorySegment) DPLAN_DFT_3D.invokeExact(n0, n1, n2, in, out, 1, 1 << 6);
+                 DEXECUTE.invokeExact(plan);
+             } finally {
+                 if (plan != null && !plan.equals(MemorySegment.NULL)) {
+                     DDESTROY_PLAN.invokeExact(plan);
+                 }
+             }
              
              double[][][][] result = new double[2][n0][n1][n2];
              double norm = (double) totalElements;

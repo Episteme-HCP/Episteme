@@ -25,6 +25,14 @@ public interface RealProvider extends AlgorithmProvider {
      */
     Real of(String value);
 
+    /**
+     * Returns a mathematical constant by name (e.g., "pi", "e").
+     * Implementations should return a Real with at least the requested precision.
+     */
+    default Real getConstant(String name) {
+        return null;
+    }
+
     @Override
     default String getAlgorithmType() {
         return "Numbers/Real";

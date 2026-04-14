@@ -82,15 +82,23 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     /** The real number PI */
     public static Real piE() { 
-        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
-            RealConstants.BIG_PI : RealConstants.PI; 
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            Real res = AlgorithmManager.getProvider(RealProvider.class).getConstant("pi");
+            if (res != null) return res;
+            return RealConstants.BIG_PI;
+        }
+        return RealConstants.PI; 
     }
     public static final Real PI = RealConstants.PI;
 
     /** The real number E */
     public static Real eE() { 
-        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
-            RealConstants.BIG_E : RealConstants.E; 
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            Real res = AlgorithmManager.getProvider(RealProvider.class).getConstant("e");
+            if (res != null) return res;
+            return RealConstants.BIG_E;
+        }
+        return RealConstants.E;
     }
     public static final Real E = RealConstants.E;
 

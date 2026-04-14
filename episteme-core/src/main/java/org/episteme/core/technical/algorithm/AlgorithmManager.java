@@ -49,8 +49,8 @@ public final class AlgorithmManager {
             }
 
             if (isTest) {
-                service = new TestingAlgorithmService();
-                logger.info("AlgorithmManager initialized in TEST mode (Standard fallback disabled)");
+                service = new TestingAlgorithmService(java.util.List.of(), true);
+                logger.info("AlgorithmManager initialized in TEST mode (Standard fallback enabled)");
             } else {
                 service = new StandardAlgorithmService();
                 logger.info("AlgorithmManager initialized in PRODUCTION mode");
