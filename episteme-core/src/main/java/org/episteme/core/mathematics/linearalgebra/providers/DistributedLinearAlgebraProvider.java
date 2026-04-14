@@ -76,7 +76,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             LinearAlgebraProvider.class, 
             builder.build(), 
             p -> {
-                if (p == this || (ring != null && !p.isCompatible(ring))) {
+                if (this.getClass().isInstance(p) || (ring != null && !p.isCompatible(ring))) {
                     throw new UnsupportedOperationException("Not suitable");
                 }
                 org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected local provider: {} for operation", p.getName());
@@ -355,7 +355,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             SparseLinearAlgebraProvider.class, 
             builder.build(), 
             p -> {
-                if (p == this) throw new UnsupportedOperationException("Not suitable");
+                if (this.getClass().isInstance(p)) throw new UnsupportedOperationException("Not suitable");
                 if (ring != null && !p.isCompatible(ring)) throw new UnsupportedOperationException("Not suitable");
                 org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected sparse local provider: {} for operation", p.getName());
                 R res = operation.apply((SparseLinearAlgebraProvider<E>) (Object) p);

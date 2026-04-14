@@ -192,18 +192,15 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
      * Shuts down the gRPC channel gracefully.
      */
     @Override
-    public void close() {
-        shutdown();
-    }
-
-    /**
-     * Shuts down the gRPC channel gracefully.
-     */
     public void shutdown() {
         if (channel != null) {
             try {
-                channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+                channel.shutdown().awaitTermination(2, TimeUnit.SECONDS);
+                if (!channel.isTerminated()) {
+                    channel.shutdownNow();
+                }
             } catch (InterruptedException e) {
+                channel.shutdownNow();
                 Thread.currentThread().interrupt();
             }
         }

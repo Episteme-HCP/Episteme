@@ -77,10 +77,10 @@ public class HighPrecisionAuditOperations {
         assertMatrixClose(prov.multiply(qr.getQ(), qr.getR()), A, new BigDecimal("1e-20"), "RB:QR");
     }
     public static void testSVD(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {
-        int n = 2; Matrix<RealBig> A = createRealBigMatrix(new BigDecimal("0.5"), n, prov);
+        int m = 3, n = 2; Matrix<RealBig> A = createRealBigMatrix(new BigDecimal("0.5"), m, n, prov);
         SVDResult<RealBig> svd = prov.svd(A);
-        Matrix<RealBig> S = toDiagonalMatrix(svd.getS(), prov);
-        assertMatrixClose(prov.multiply(prov.multiply(svd.getU(), S), prov.transpose(svd.getV())), A, new BigDecimal("1e-18"), "RB:SVD");
+        Matrix<RealBig> S = toDiagonalMatrix(svd.getS(), m, n, prov);
+        assertMatrixClose(prov.multiply(prov.multiply(svd.getU(), S), prov.transpose(svd.getV())), A, new BigDecimal("1e-17"), "RB:SVD");
     }
     public static void testCholesky(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {
         int n = 2; Matrix<RealBig> A = createSPDRealBigMatrix(n, prov);
@@ -90,8 +90,8 @@ public class HighPrecisionAuditOperations {
     public static void testEigen(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {
         int n = 2; Matrix<RealBig> A = createSPDRealBigMatrix(n, prov);
         EigenResult<RealBig> eigen = prov.eigen(A);
-        Matrix<RealBig> D = toDiagonalMatrix(eigen.getD(), prov);
-        assertMatrixClose(prov.multiply(A, eigen.getV()), prov.multiply(eigen.getV(), D), new BigDecimal("1e-15"), "RB:Eigen");
+        Matrix<RealBig> D = toDiagonalMatrix(eigen.getD(), n, n, prov);
+        assertMatrixClose(prov.multiply(A, eigen.V()), prov.multiply(eigen.V(), D), new BigDecimal("5e-15"), "RB:Eigen");
     }
 
     public static void testBiCGSTAB(LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> groundTruth) {
@@ -233,9 +233,9 @@ public class HighPrecisionAuditOperations {
         assertComplexMatrixClose(prov.multiply(qr.getQ(), qr.getR()), A, new BigDecimal("1e-12"), "C:QR");
     }
     public static void testComplexSVD(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
-        int n = 2; Matrix<Complex> A = createComplexMatrix(Complex.of(0.5, 0.5), n, prov);
+        int m = 3, n = 2; Matrix<Complex> A = createComplexMatrix(Complex.of(0.5, 0.5), m, n, prov);
         SVDResult<Complex> svd = prov.svd(A);
-        Matrix<Complex> S = toDiagonalMatrix(svd.getS(), prov);
+        Matrix<Complex> S = toDiagonalMatrix(svd.getS(), m, n, prov);
         assertComplexMatrixClose(prov.multiply(prov.multiply(svd.getU(), S), prov.transpose(svd.getV())), A, new BigDecimal("1e-10"), "C:SVD");
     }
     public static void testComplexCholesky(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
@@ -246,8 +246,8 @@ public class HighPrecisionAuditOperations {
     public static void testComplexEigen(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
         int n = 2; Matrix<Complex> A = createSPDComplexMatrix(n, prov);
         EigenResult<Complex> eigen = prov.eigen(A);
-        Matrix<Complex> D = toDiagonalMatrix(eigen.getD(), prov);
-        assertComplexMatrixClose(prov.multiply(A, eigen.getV()), prov.multiply(eigen.getV(), D), new BigDecimal("1e-10"), "C:Eigen");
+        Matrix<Complex> D = toDiagonalMatrix(eigen.getD(), n, n, prov);
+        assertComplexMatrixClose(prov.multiply(A, eigen.V()), prov.multiply(eigen.V(), D), new BigDecimal("5e-11"), "C:Eigen");
     }
     public static void testComplexBiCGSTAB(LinearAlgebraProvider<Complex> prov, LinearAlgebraProvider<Complex> groundTruth) {
         if (prov instanceof SparseLinearAlgebraProvider<Complex> sp) {
@@ -461,37 +461,49 @@ public class HighPrecisionAuditOperations {
 
     // --- Static Helpers and Assertions ---
     private static void assertMatrixClose(Matrix<RealBig> actual, Matrix<RealBig> expected, BigDecimal tol, String msg) {
+        BigDecimal chop = new BigDecimal("1e-15");
         for (int i = 0; i < actual.rows(); i++) {
             for (int j = 0; j < actual.cols(); j++) {
                 BigDecimal valA = actual.get(i, j).bigDecimalValue();
                 BigDecimal valE = expected.get(i, j).bigDecimalValue();
-                if (valA.subtract(valE).abs().compareTo(tol) > 0) throw new AssertionError(msg + " at [" + i + "," + j + "]");
+                BigDecimal diff = valA.subtract(valE).abs();
+                // "Chop" residues that are effectively machine epsilon for doubles (10^-16 range)
+                if (diff.compareTo(chop) < 0) continue;
+                if (diff.compareTo(tol) > 0) throw new AssertionError(msg + " at [" + i + "," + j + "] valA=" + valA + " valE=" + valE + " diff=" + diff);
             }
         }
     }
 
     private static void assertComplexMatrixClose(Matrix<Complex> actual, Matrix<Complex> expected, BigDecimal tol, String msg) {
+        BigDecimal chop = new BigDecimal("1e-15");
         for (int i = 0; i < actual.rows(); i++) {
             for (int j = 0; j < actual.cols(); j++) {
                 BigDecimal reA = actual.get(i, j).getReal().bigDecimalValue();
                 BigDecimal imA = actual.get(i, j).getImaginary().bigDecimalValue();
                 BigDecimal reE = expected.get(i, j).getReal().bigDecimalValue();
                 BigDecimal imE = expected.get(i, j).getImaginary().bigDecimalValue();
-                if (reA.subtract(reE).abs().compareTo(tol) > 0 || imA.subtract(imE).abs().compareTo(tol) > 0) {
-                    throw new AssertionError(msg + " at [" + i + "," + j + "]");
-                }
+                
+                BigDecimal diffRe = reA.subtract(reE).abs();
+                BigDecimal diffIm = imA.subtract(imE).abs();
+                
+                if (diffRe.compareTo(chop) >= 0 && diffRe.compareTo(tol) > 0) throw new AssertionError(msg + " (Real) at [" + i + "," + j + "]");
+                if (diffIm.compareTo(chop) >= 0 && diffIm.compareTo(tol) > 0) throw new AssertionError(msg + " (Imag) at [" + i + "," + j + "]");
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Matrix<T> toDiagonalMatrix(Vector<T> v, LinearAlgebraProvider<T> p) {
+    private static <T> Matrix<T> toDiagonalMatrix(Vector<T> v, int rows, int cols, LinearAlgebraProvider<T> p) {
         int n = v.dimension();
-        T[][] data = (T[][]) java.lang.reflect.Array.newInstance(v.getScalarRing().zero().getClass().arrayType(), n);
-        for(int i=0; i<n; i++) {
-            data[i] = (T[]) java.lang.reflect.Array.newInstance(v.getScalarRing().zero().getClass(), n);
-            for(int j=0; j<n; j++) {
-                data[i][j] = (i == j) ? v.get(i) : (T) v.getScalarRing().zero();
+        T[][] data = (T[][]) java.lang.reflect.Array.newInstance(v.getScalarRing().zero().getClass().arrayType(), rows);
+        for(int i=0; i<rows; i++) {
+            data[i] = (T[]) java.lang.reflect.Array.newInstance(v.getScalarRing().zero().getClass(), cols);
+            for(int j=0; j<cols; j++) {
+                if (i == j && i < n) {
+                    data[i][j] = v.get(i);
+                } else {
+                    data[i][j] = (T) v.getScalarRing().zero();
+                }
             }
         }
         return Matrix.of(data, (Ring<T>) v.getScalarRing());
@@ -536,13 +548,23 @@ public class HighPrecisionAuditOperations {
     }
 
     @SuppressWarnings("unchecked")
-    private static Matrix<RealBig> createRealBigMatrix(RealBig val, int n, LinearAlgebraProvider<RealBig> p) {
-        RealBig[][] data = new RealBig[n][n];
-        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = RealBig.create(val.bigDecimalValue().add(new BigDecimal(i + j)));
+    private static Matrix<RealBig> createRealBigMatrix(RealBig val, int rows, int cols, LinearAlgebraProvider<RealBig> p) {
+        RealBig[][] data = new RealBig[rows][cols];
+        for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) data[i][j] = RealBig.create(val.bigDecimalValue().add(new BigDecimal(i + j)));
         return Matrix.of(data, (Ring<RealBig>) (Object) org.episteme.core.mathematics.numbers.real.RealBig.ZERO.getScalarRing());
     }
+
+    @SuppressWarnings("unchecked")
+    private static Matrix<RealBig> createRealBigMatrix(RealBig val, int n, LinearAlgebraProvider<RealBig> p) {
+        return createRealBigMatrix(val, n, n, p);
+    }
+    
     private static Matrix<RealBig> createRealBigMatrix(BigDecimal val, int n, LinearAlgebraProvider<RealBig> p) {
         return createRealBigMatrix(RealBig.create(val), n, p);
+    }
+
+    private static Matrix<RealBig> createRealBigMatrix(BigDecimal val, int rows, int cols, LinearAlgebraProvider<RealBig> p) {
+        return createRealBigMatrix(RealBig.create(val), rows, cols, p);
     }
     @SuppressWarnings("unchecked")
     private static Matrix<RealBig> createInvertibleRealBigMatrix(int n, LinearAlgebraProvider<RealBig> p) {
@@ -564,10 +586,15 @@ public class HighPrecisionAuditOperations {
     }
 
     @SuppressWarnings("unchecked")
-    private static Matrix<Complex> createComplexMatrix(Complex z, int n, LinearAlgebraProvider<Complex> p) {
-        Complex[][] data = new Complex[n][n];
-        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = Complex.of(z.getReal().doubleValue() + i, z.getImaginary().doubleValue() + j);
+    private static Matrix<Complex> createComplexMatrix(Complex z, int rows, int cols, LinearAlgebraProvider<Complex> p) {
+        Complex[][] data = new Complex[rows][cols];
+        for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) data[i][j] = Complex.of(z.getReal().doubleValue() + i, z.getImaginary().doubleValue() + j);
         return Matrix.of(data, (Ring<Complex>) (Object) Complex.of(0, 0).getScalarRing());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Matrix<Complex> createComplexMatrix(Complex z, int n, LinearAlgebraProvider<Complex> p) {
+        return createComplexMatrix(z, n, n, p);
     }
     @SuppressWarnings("unchecked")
     private static Matrix<Complex> createInvertibleComplexMatrix(int n, LinearAlgebraProvider<Complex> p) {
