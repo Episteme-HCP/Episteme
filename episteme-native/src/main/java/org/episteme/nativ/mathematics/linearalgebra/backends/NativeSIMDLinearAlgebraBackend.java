@@ -35,7 +35,6 @@ import static jdk.incubator.vector.VectorOperators.*;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class})
 public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend, SIMDBackend {
 

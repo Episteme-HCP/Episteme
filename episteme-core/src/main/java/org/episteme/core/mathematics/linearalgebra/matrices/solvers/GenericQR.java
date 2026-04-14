@@ -113,10 +113,7 @@ public class GenericQR {
     }
 
     private static Class<?> componentType(Field<?> field) {
-        Class<?> c = field.zero().getClass();
-        if (Real.class.isAssignableFrom(c)) return Real.class;
-        if (Complex.class.isAssignableFrom(c)) return Complex.class;
-        return c;
+        return field.zero().getClass();
     }
 
     @SuppressWarnings("unchecked")

@@ -44,7 +44,6 @@ import org.episteme.nativ.technical.backend.nativ.NativeSafe;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@SuppressWarnings("rawtypes")
 @com.google.auto.service.AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
 

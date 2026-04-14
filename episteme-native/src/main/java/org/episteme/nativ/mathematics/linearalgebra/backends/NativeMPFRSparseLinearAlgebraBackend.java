@@ -32,7 +32,6 @@ import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNum
  * Optimized for CSR storage.
  */
 @com.google.auto.service.AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class})
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);
     private static final NativeMPFRDenseLinearAlgebraBackend<?> SHARED_DENSE = new NativeMPFRDenseLinearAlgebraBackend<>();
@@ -1328,6 +1327,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 
                 for (int i = 0; i < maxIterations; i++) {
                     E rhoNew = dot_internal(r0hat, r, n, prec, arena, isComplex, ring);
+                    if (compare(rhoNew, tolerance) < 0 || compare(rho, tolerance) < 0 || compare(omega, tolerance) < 0) break;
                     E beta = multiply(isComplex, divide(isComplex, rhoNew, rho), divide(isComplex, alpha, omega));
                     
                     axpy_internal(p, negate(isComplex, omega), v, n, prec, arena, isComplex);
@@ -1335,7 +1335,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     axpy_internal(p, (E)(Object)(isComplex?Complex.of(Real.ONE,Real.ZERO):Real.ONE), r, n, prec, arena, isComplex);
                     
                     spmv_internal(sa, h_vals, p, v, prec, arena, isComplex);
-                    alpha = divide(isComplex, rhoNew, dot_internal(r0hat, v, n, prec, arena, isComplex, ring));
+                    E v_dot_r0 = dot_internal(r0hat, v, n, prec, arena, isComplex, ring);
+                    if (compare(v_dot_r0, tolerance) < 0) break;
+                    alpha = divide(isComplex, rhoNew, v_dot_r0);
                     
                     copy_internal(s, r, n, isComplex);
                     axpy_internal(s, negate(isComplex, alpha), v, n, prec, arena, isComplex);
@@ -1346,7 +1348,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     }
                     
                     spmv_internal(sa, h_vals, s, t, prec, arena, isComplex);
-                    omega = divide(isComplex, dot_internal(t, s, n, prec, arena, isComplex, ring), dot_internal(t, t, n, prec, arena, isComplex, ring));
+                    E t_dot_t = dot_internal(t, t, n, prec, arena, isComplex, ring);
+                    if (compare(t_dot_t, tolerance) < 0) break;
+                    omega = divide(isComplex, dot_internal(t, s, n, prec, arena, isComplex, ring), t_dot_t);
                     
                     axpy_internal(h_x, alpha, p, n, prec, arena, isComplex);
                     axpy_internal(h_x, omega, s, n, prec, arena, isComplex);
@@ -1442,6 +1446,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                             return backToVector(h_x, n, isComplex, ring, arena);
                         }
                         
+                        // Safety check for invH to avoid NaN in vkplus1
+                        if (compare(H[k + 1][k], tolerance) < 0) break;
                         E invH = divide(isComplex, (E)(Object)(isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE), H[k + 1][k]);
                         MemorySegment vkplus1 = V.asSlice((k + 1) * n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize());
                         copy_internal(vkplus1, w, n, isComplex);

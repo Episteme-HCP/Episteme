@@ -33,7 +33,6 @@ import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 

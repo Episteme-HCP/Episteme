@@ -55,7 +55,6 @@ import com.google.auto.service.AutoService;
  * </p>
  */
 @AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, Backend.class})
-@SuppressWarnings("rawtypes")
 public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E>, SparseLinearAlgebraProvider<E>, CPUBackend {
 
     protected final Ring<E> ring;

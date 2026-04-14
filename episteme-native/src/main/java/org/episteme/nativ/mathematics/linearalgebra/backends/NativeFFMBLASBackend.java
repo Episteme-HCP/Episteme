@@ -36,7 +36,6 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * Binds to OpenBLAS/MKL for Matrix Operations.
  * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     
@@ -101,7 +100,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private static MethodHandle CGETRI;
     private static MethodHandle ZGETRI;
 
+    private static MethodHandle SGETRS;
     private static MethodHandle DGETRS;
+    private static MethodHandle CGETRS;
     private static MethodHandle ZGETRS;
 
     private static MethodHandle SGEQRF;
@@ -124,7 +125,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private static MethodHandle CPOTRF;
     private static MethodHandle ZPOTRF;
 
+    private static MethodHandle SPOTRS;
     private static MethodHandle DPOTRS;
+    private static MethodHandle CPOTRS;
     private static MethodHandle ZPOTRS;
 
     private static MethodHandle SSYEV;
@@ -371,7 +374,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
+                SGETRS = findLapackSymbol("LAPACKE_sgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
                 DGETRS = findLapackSymbol("LAPACKE_dgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
+                CGETRS = findLapackSymbol("LAPACKE_cgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
                 ZGETRS = findLapackSymbol("LAPACKE_zgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
 
                 // QR Decomposition
@@ -420,7 +425,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
                 );
+                SPOTRS = findLapackSymbol("LAPACKE_spotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
                 DPOTRS = findLapackSymbol("LAPACKE_dpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
+                CPOTRS = findLapackSymbol("LAPACKE_cpotrf").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
                 ZPOTRS = findLapackSymbol("LAPACKE_zpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
 
                 // Eigen
@@ -2079,45 +2086,98 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         }
 
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segLU = arena.allocate(ValueLayout.JAVA_DOUBLE, complex ? (long) n * n * 2 : (long) n * n);
+            boolean single = isFloat(lu.L());
+            int typeSize = single ? 4 : 8;
+            MemorySegment segLU = arena.allocate(single ? ValueLayout.JAVA_FLOAT : ValueLayout.JAVA_DOUBLE, complex ? (long) n * n * 2 : (long) n * n);
+            
             if (complex) {
-                double[] lData = toInterlacedDoubleArray(lu.L());
-                double[] uData = toInterlacedDoubleArray(lu.U());
-                for (int i = 0; i < n; i++) {
-                    for (int j = 0; j < n; j++) {
-                        if (i <= j) {
-                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, uData[(i * n + j) * 2]);
-                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, uData[(i * n + j) * 2 + 1]);
-                        } else {
-                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, lData[(i * n + j) * 2]);
-                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, lData[(i * n + j) * 2 + 1]);
+                if (single) {
+                    float[] lData = toInterlacedFloatArray(lu.L());
+                    float[] uData = toInterlacedFloatArray(lu.U());
+                    for (int i = 0; i < n; i++) {
+                        for (int j = 0; j < n; j++) {
+                            if (i <= j) {
+                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2, uData[(i * n + j) * 2]);
+                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2 + 1, uData[(i * n + j) * 2 + 1]);
+                            } else {
+                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2, lData[(i * n + j) * 2]);
+                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2 + 1, lData[(i * n + j) * 2 + 1]);
+                            }
+                        }
+                    }
+                } else {
+                    double[] lData = toInterlacedDoubleArray(lu.L());
+                    double[] uData = toInterlacedDoubleArray(lu.U());
+                    for (int i = 0; i < n; i++) {
+                        for (int j = 0; j < n; j++) {
+                            if (i <= j) {
+                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, uData[(i * n + j) * 2]);
+                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, uData[(i * n + j) * 2 + 1]);
+                            } else {
+                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, lData[(i * n + j) * 2]);
+                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, lData[(i * n + j) * 2 + 1]);
+                            }
                         }
                     }
                 }
             } else {
-                double[] lData = toDoubleArray(lu.L());
-                double[] uData = toDoubleArray(lu.U());
-                for (int i = 0; i < n; i++) {
-                    for (int j = 0; j < n; j++) {
-                        if (i <= j) segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, uData[i * n + j]);
-                        else segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, lData[i * n + j]);
+                if (single) {
+                    float[] lData = toFloatArray(lu.L());
+                    float[] uData = toFloatArray(lu.U());
+                    for (int i = 0; i < n; i++) {
+                        for (int j = 0; j < n; j++) {
+                            if (i <= j) segLU.setAtIndex(ValueLayout.JAVA_FLOAT, i * n + j, uData[i * n + j]);
+                            else segLU.setAtIndex(ValueLayout.JAVA_FLOAT, i * n + j, lData[i * n + j]);
+                        }
+                    }
+                } else {
+                    double[] lData = toDoubleArray(lu.L());
+                    double[] uData = toDoubleArray(lu.U());
+                    for (int i = 0; i < n; i++) {
+                        for (int j = 0; j < n; j++) {
+                            if (i <= j) segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, uData[i * n + j]);
+                            else segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, lData[i * n + j]);
+                        }
                     }
                 }
             }
             MemorySegment segIpiv = arena.allocateFrom(ValueLayout.JAVA_INT, ipiv);
-            MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, complex ? toInterlacedDoubleArray(b) : toDoubleArray(b));
+            MemorySegment segB;
+            if (complex) {
+                if (single) segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                else segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+            } else {
+                if (single) segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                else segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            }
             
             int info;
             if (complex) {
-                if (ZGETRS == null) throw new UnsupportedOperationException("ZGETRS not available");
-                info = (int) NativeSafe.invoke(ZGETRS, LAPACK_ROW_MAJOR, (byte) 'N', n, 1, segLU, n, segIpiv, segB, 1);
+                if (single) {
+                    if (CGETRS == null) throw new UnsupportedOperationException("CGETRS not available");
+                    info = (int) NativeSafe.invoke(CGETRS, LAPACK_ROW_MAJOR, (byte) 'N', n, 1, segLU, n, segIpiv, segB, 1);
+                } else {
+                    if (ZGETRS == null) throw new UnsupportedOperationException("ZGETRS not available");
+                    info = (int) NativeSafe.invoke(ZGETRS, LAPACK_ROW_MAJOR, (byte) 'N', n, 1, segLU, n, segIpiv, segB, 1);
+                }
             } else {
-                info = (int) NativeSafe.invoke(DGETRS, LAPACK_ROW_MAJOR, (byte) 'N', n, 1, segLU, n, segIpiv, segB, 1);
+                if (single) {
+                    if (SGETRS == null) throw new UnsupportedOperationException("SGETRS not available");
+                    info = (int) NativeSafe.invoke(SGETRS, LAPACK_ROW_MAJOR, (byte) 'N', n, 1, segLU, n, segIpiv, segB, 1);
+                } else {
+                    if (DGETRS == null) throw new UnsupportedOperationException("DGETRS not available");
+                    info = (int) NativeSafe.invoke(DGETRS, LAPACK_ROW_MAJOR, (byte) 'N', n, 1, segLU, n, segIpiv, segB, 1);
+                }
             }
             if (info != 0) throw new ArithmeticException("GETRS failed: " + info);
             
-            double[] resultArr = segB.toArray(ValueLayout.JAVA_DOUBLE);
-            return createDenseVector(resultArr, n, lu.L());
+            if (single) {
+                float[] resultArr = segB.toArray(ValueLayout.JAVA_FLOAT);
+                return createDenseVector(resultArr, n, lu.L());
+            } else {
+                double[] resultArr = segB.toArray(ValueLayout.JAVA_DOUBLE);
+                return createDenseVector(resultArr, n, lu.L());
+            }
         } catch (Throwable t) { throw new RuntimeException(t); }
     }
     
@@ -2128,21 +2188,55 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         boolean complex = isComplex(cholesky.L());
 
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segL = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, complex ? toInterlacedDoubleArray(cholesky.L()) : toDoubleArray(cholesky.L()));
-            MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, complex ? toInterlacedDoubleArray(b) : toDoubleArray(b));
+            boolean single = isFloat(cholesky.L());
+            MemorySegment segL;
+            MemorySegment segB;
+            
+            if (complex) {
+                if (single) {
+                    segL = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(cholesky.L()));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                } else {
+                    segL = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(cholesky.L()));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                }
+            } else {
+                if (single) {
+                    segL = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(cholesky.L()));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                } else {
+                    segL = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(cholesky.L()));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+                }
+            }
             
             int info;
             if (complex) {
-                if (ZPOTRS == null) throw new UnsupportedOperationException("ZPOTRS not available");
-                info = (int) NativeSafe.invoke(ZPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                if (single) {
+                    if (CPOTRS == null) throw new UnsupportedOperationException("CPOTRS not available");
+                    info = (int) NativeSafe.invoke(CPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                } else {
+                    if (ZPOTRS == null) throw new UnsupportedOperationException("ZPOTRS not available");
+                    info = (int) NativeSafe.invoke(ZPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                }
             } else {
-                if (DPOTRS == null) throw new UnsupportedOperationException("DPOTRS not available");
-                info = (int) NativeSafe.invoke(DPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                if (single) {
+                    if (SPOTRS == null) throw new UnsupportedOperationException("SPOTRS not available");
+                    info = (int) NativeSafe.invoke(SPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                } else {
+                    if (DPOTRS == null) throw new UnsupportedOperationException("DPOTRS not available");
+                    info = (int) NativeSafe.invoke(DPOTRS, LAPACK_ROW_MAJOR, (byte) 'L', n, 1, segL, n, segB, 1);
+                }
             }
             if (info != 0) throw new ArithmeticException("POTRS failed: " + info);
             
-            double[] resultArr = segB.toArray(ValueLayout.JAVA_DOUBLE);
-            return createDenseVector(resultArr, n, cholesky.L());
+            if (single) {
+                float[] resultArr = segB.toArray(ValueLayout.JAVA_FLOAT);
+                return createDenseVector(resultArr, n, cholesky.L());
+            } else {
+                double[] resultArr = segB.toArray(ValueLayout.JAVA_DOUBLE);
+                return createDenseVector(resultArr, n, cholesky.L());
+            }
         } catch (Throwable t) { throw new RuntimeException(t); }
     }
 

@@ -56,7 +56,6 @@ import java.lang.reflect.Constructor;
  * @since 1.0
  */
 @AutoService({Backend.class, CPUBackend.class, LinearAlgebraProvider.class})
-@SuppressWarnings("rawtypes")
 public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
 
     private static boolean ejmlAvailable = false;

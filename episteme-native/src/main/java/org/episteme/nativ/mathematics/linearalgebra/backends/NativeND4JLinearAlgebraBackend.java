@@ -37,7 +37,6 @@ import org.nd4j.linalg.inverse.InvertMatrix;
  * @since 1.0
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-@SuppressWarnings("rawtypes")
 public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeND4JLinearAlgebraBackend.class);
 

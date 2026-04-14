@@ -53,7 +53,6 @@ import com.google.auto.service.AutoService;
  * @since 1.0
  */
 @AutoService({LinearAlgebraProvider.class, Backend.class, CPUBackend.class})
-@SuppressWarnings("rawtypes")
 public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E>, CPUBackend {
 
     protected final Field<E> field;
@@ -278,7 +277,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                         return ((Field<E>) r).add(a.get(i), negB);
                     })
                     .collect(java.util.stream.Collectors.toList());
-                @SuppressWarnings("unchecked")
                 E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), list.size()));
                 return new GenericVector<>(
                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),
