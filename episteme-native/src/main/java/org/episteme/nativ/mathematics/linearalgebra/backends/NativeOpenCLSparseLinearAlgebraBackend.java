@@ -59,7 +59,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
     // Kernels
     private static final String KERNEL_SPMV = 
         "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
-        "__kernel void spmv_csr(int num_rows, __global int* ptr, __global int* indices, __global double* values, __global double* x, __global double* y) {\n" +
+        "__kernel void spmv_csr(int num_rows, __global const int* ptr, __global const int* indices, __global const double* values, __global const double* x, __global double* y) {\n" +
         "    int row = get_global_id(0);\n" +
         "    if (row < num_rows) {\n" +
         "        double dot = 0;\n" +
@@ -69,6 +69,13 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         "            dot += values[j] * x[indices[j]];\n" +
         "        }\n" +
         "        y[row] = dot;\n" +
+        "    }\n" +
+        "}\n\n" +
+        "__kernel void csr_transpose_count(int num_rows, int num_cols, __global const int* col_indices, __global int* col_counts) {\n" +
+        "    int row = get_global_id(0);\n" +
+        "    if (row < num_rows) {\n" +
+        "        // This kernel is simple, but we need to handle atomic increments if we do it this way\n" +
+        "        // Alternatively, we use a more parallel-friendly sparse transpose.\n" +
         "    }\n" +
         "}\n";
 
@@ -545,8 +552,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
         }
         logger.debug("Entering OpenCL Sparse multiplyCSR: [{}x{}] * [{}]", a.rows(), a.cols(), x.dimension());
 
-        // Extract CSR data from SparseMatrixStorage
-        // Simplified for now: assuming a is already sparse or converting it
         int rows = a.rows();
         int cols = a.cols();
         
@@ -564,43 +569,21 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             Object[] valsObj = sa.getValues();
             for (int i = 0; i < nnz; i++) values[i] = ((Real) valsObj[i]).doubleValue();
         } else {
-            // Expensive fallback conversion to CSR
-            java.util.List<Integer> rowPtrList = new java.util.ArrayList<>();
-            java.util.List<Integer> colIdxList = new java.util.ArrayList<>();
-            java.util.List<Double> valList = new java.util.ArrayList<>();
-            rowPtrList.add(0);
-            for (int i = 0; i < rows; i++) {
-                int count = 0;
-                for (int j = 0; j < cols; j++) {
-                    Real val = a.get(i, j);
-                    if (val.doubleValue() != 0.0) {
-                        colIdxList.add(j);
-                        valList.add(val.doubleValue());
-                        count++;
-                    }
-                }
-                rowPtrList.add(rowPtrList.get(i) + count);
-            }
-            rowPtr = rowPtrList.stream().mapToInt(i -> i).toArray();
-            colIndices = colIdxList.stream().mapToInt(i -> i).toArray();
-            values = valList.stream().mapToDouble(d -> d).toArray();
-            nnz = values.length;
+            // Conversion to sparse is necessary if it's not already
+            return toSparseVector(toDoubleVec(multiply(a, x))); // Fallback to dense multiply if absolutely needed, but we should avoid this
         }
 
         double[] xData = toDoubleVec(x);
         double[] yData = new double[rows];
 
-        cl_mem memPtr = null, memInd = null, memVal = null, memX = null, memY = null;
-        cl_kernel spmvKernel = null;
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_mem memPtr = tracker.track(clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null), CL::clReleaseMemObject);
+            cl_mem memInd = tracker.track(clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIndices), null), CL::clReleaseMemObject);
+            cl_mem memVal = tracker.track(clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
+            cl_mem memX = tracker.track(clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * cols, Pointer.to(xData), null), CL::clReleaseMemObject);
+            cl_mem memY = tracker.track(clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * rows, null, null), CL::clReleaseMemObject);
 
-        try {
-            memPtr = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null);
-            memInd = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIndices), null);
-            memVal = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null);
-            memX = clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * cols, Pointer.to(xData), null);
-            memY = clCreateBuffer(staticContext, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * rows, null, null);
-
-            spmvKernel = clCreateKernel(sparseProgram, "spmv_csr", null);
+            cl_kernel spmvKernel = tracker.track(clCreateKernel(sparseProgram, "spmv_csr", null), CL::clReleaseKernel);
             clSetKernelArg(spmvKernel, 0, Sizeof.cl_int, Pointer.to(new int[]{rows}));
             clSetKernelArg(spmvKernel, 1, Sizeof.cl_mem, Pointer.to(memPtr));
             clSetKernelArg(spmvKernel, 2, Sizeof.cl_mem, Pointer.to(memInd));
@@ -613,13 +596,6 @@ public class NativeOpenCLSparseLinearAlgebraBackend implements NativeBackend, Sp
             clEnqueueReadBuffer(staticCommandQueue, memY, CL_TRUE, 0, (long)Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
             
             return toSparseVector(yData);
-        } finally {
-            if (spmvKernel != null) clReleaseKernel(spmvKernel);
-            if (memPtr != null) clReleaseMemObject(memPtr);
-            if (memInd != null) clReleaseMemObject(memInd);
-            if (memVal != null) clReleaseMemObject(memVal);
-            if (memX != null) clReleaseMemObject(memX);
-            if (memY != null) clReleaseMemObject(memY);
         }
     }
 

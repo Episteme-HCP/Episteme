@@ -110,6 +110,18 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
     public static RealDoubleMatrix of(RealDoubleMatrixStorage storage) {
         return new RealDoubleMatrix(storage);
     }
+    
+    /**
+     * Creates a diagonal RealDoubleMatrix from a double array.
+     */
+    public static RealDoubleMatrix diagonal(double[] data) {
+        int n = data.length;
+        RealDoubleMatrix m = direct(n, n);
+        for (int i = 0; i < n; i++) {
+            m.set(i, i, data[i]);
+        }
+        return m;
+    }
 
     public Field<Real> getField() {
         return org.episteme.core.mathematics.sets.Reals.getInstance();

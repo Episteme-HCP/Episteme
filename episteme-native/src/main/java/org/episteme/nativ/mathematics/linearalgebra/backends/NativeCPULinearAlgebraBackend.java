@@ -812,10 +812,17 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             int m = a.rows();
             int n = a.cols();
             if (DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACKE dgesvd not available");
-            if (m < n) throw new UnsupportedOperationException("SVD for m < n not yet implemented");
+            
+            boolean transposed = false;
+            Matrix<Real> workA = a;
+            if (m < n) {
+                transposed = true;
+                workA = a.transpose();
+                int tmp = m; m = n; n = tmp;
+            }
 
             int k = Math.min(m, n);
-            double[] aData = toDoubleArray(a);
+            double[] aData = toDoubleArray(workA);
 
             DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
             aBuf.put(aData); aBuf.flip();
@@ -843,11 +850,14 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                 }
             }
 
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
-                RealDoubleMatrix.of(uArr, m, m),
-                RealDoubleVector.of(sArr),
-                RealDoubleMatrix.of(vArr, n, n)
-            );
+            Matrix<Real> U = RealDoubleMatrix.of(uArr, m, m);
+            Vector<Real> S = RealDoubleVector.of(sArr);
+            Matrix<Real> V = RealDoubleMatrix.of(vArr, n, n);
+
+            if (transposed) {
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(V, S, U);
+            }
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
         }
         throw new UnsupportedOperationException(getName() + ": svd() not available");
     }

@@ -180,12 +180,42 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         if (m == n) {
             if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
         } else {
-            // Rectangular solve (Least Squares) via Normal Equations: A^T A x = A^T b
-            logger.debug("Rectangular SIMD solve via Normal Equations: [{}x{}]", m, n);
-            Matrix<Real> at = transpose(a);
-            Matrix<Real> ata = at.multiply(simdA);
-            Vector<Real> atb = at.multiply(b);
-            return solve(ata, atb); // ata is square
+            // Rectangular solve (Least Squares) via QR: A = Q R => R x = Q^T b
+            logger.debug("Rectangular SIMD solve via QR Decomposition: [{}x{}]", m, n);
+            var qr = qr(a);
+            Matrix<Real> Q = qr.Q();
+            Matrix<Real> R = qr.R();
+            
+            // QtB = Q^T * b
+            Vector<Real> QtB = Q.transpose().multiply(b);
+            
+            // Solve R x = QtB via back-substitution (R is economy upper triangular n x n)
+            double[] rData = toMatrixDoubleArray(R);
+            double[] bData = new double[n];
+            for (int i = 0; i < n; i++) bData[i] = QtB.get(i).doubleValue();
+            
+            double[] x = new double[n];
+            var species = getSpecies();
+            for (int i = n - 1; i >= 0; i--) {
+                double sum = 0.0;
+                int j = i + 1;
+                var vSum = DoubleVector.zero(species);
+                for (; j + species.length() <= n; j += species.length()) {
+                    var vA = DoubleVector.fromArray(species, rData, i * n + j);
+                    var vX = DoubleVector.fromArray(species, x, j);
+                    vSum = vSum.add(vA.mul(vX));
+                }
+                sum = vSum.reduceLanes(ADD);
+                for (; j < n; j++) {
+                    sum += rData[i * n + j] * x[j];
+                }
+                if (Math.abs(rData[i * n + i]) < 1e-15) {
+                    x[i] = 0.0; // Rank deficient
+                } else {
+                    x[i] = (bData[i] - sum) / rData[i * n + i];
+                }
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
         }
         
         double[] x = new double[n];
@@ -351,21 +381,30 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         int m = a.rows();
         int n = a.cols();
         if (m != n) {
-             // Rectangular inverse (Pseudo-inverse) via Normal Equations
-             logger.debug("Rectangular SIMD pseudo-inverse via Normal Equations: [{}x{}]", m, n);
-             if (m > n) {
-                 // A+ = (A^T A)^-1 * A^T
-                 SIMDRealDoubleMatrix simdA = asSIMD(a);
-                 Matrix<Real> at = transpose(simdA);
-                 Matrix<Real> ata = at.multiply(simdA);
-                 return inverse(ata).multiply(at);
-             } else {
-                 // A+ = A^T * (A A^T)^-1
-                 SIMDRealDoubleMatrix simdA = asSIMD(a);
-                 Matrix<Real> at = transpose(simdA);
-                 Matrix<Real> aat = simdA.multiply(at);
-                 return at.multiply(inverse(aat));
-             }
+            // Rectangular inverse (Pseudo-inverse) via SVD: A = U S V^T => A+ = V S+ U^T
+            logger.debug("Rectangular SIMD pseudo-inverse via SVD: [{}x{}]", m, n);
+            var svd = svd(a);
+            var U = svd.U();
+            var S = svd.S();
+            var V = svd.V();
+            
+            int k = Math.min(m, n);
+            double[] sData = new double[k];
+            for (int i = 0; i < k; i++) {
+                double val = S.get(i).doubleValue();
+                if (val > 1e-12) {
+                    sData[i] = 1.0 / val;
+                } else {
+                    sData[i] = 0.0;
+                }
+            }
+            
+            // Sinv is diagonal n x m (or m x n depending on A+)
+            // But we can just multiply V * diag(sInv) * U^T
+            // V is n x k, Sdiag is k x k, Ut is k x m
+            
+            Matrix<Real> V_Sinv = V.multiply(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.diagonal(sData));
+            return V_Sinv.multiply(U.transpose());
         }
         
         // Solve AX = I using Gaussian elimination with partial pivoting
@@ -477,9 +516,6 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         return Real.of(det);
     }
 
-    private SIMDRealDoubleMatrix asSIMD(Matrix<Real> m) {
-        return SIMDRealDoubleMatrix.from(m);
-    }
 
     private double[] toMatrixDoubleArray(Matrix<Real> m) {
         int r = m.rows(), c = m.cols();
@@ -579,41 +615,147 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
 
     @Override
     public SVDResult<Real> svd(Matrix<Real> a) {
-        // Economy SVD via Eigen decomposition of A^T A (for m >= n)
-        // A = U S V^T  => A^T A = V S^2 V^T
         int m = a.rows();
         int n = a.cols();
+        boolean transposed = false;
+        Matrix<Real> workA = a;
         
-        logger.debug("Entering SIMD SVD (Economy via A^T A): [{}x{}]", m, n);
-        SIMDRealDoubleMatrix simdA = asSIMD(a);
-        Matrix<Real> at = transpose(simdA);
-        Matrix<Real> ata = at.multiply(simdA);
-        EigenResult<Real> eigen = eigen(ata);
-        
-        Matrix<Real> V = eigen.V();
-        Vector<Real> D = eigen.D();
-        
-        double[] sData = new double[n];
-        for (int i = 0; i < n; i++) {
-            sData[i] = Math.sqrt(Math.max(0, D.get(i).doubleValue()));
+        if (m < n) {
+            transposed = true;
+            workA = a.transpose();
+            int tmp = m; m = n; n = tmp;
         }
-        Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sData);
+
+        logger.debug("Entering SIMD SVD (Hestenes One-Sided Jacobi): [{}x{}]", m, n);
         
-        // U = A * V * inv(S)
-        Matrix<Real> AV = simdA.multiply(V);
-        double[] avData = toMatrixDoubleArray(AV);
+        // Column-major storage for rotations
+        double[][] columns = new double[n][m];
         for (int j = 0; j < n; j++) {
-            double sVal = sData[j];
-            if (sVal > 1e-12) {
-                double invS = 1.0 / sVal;
-                for (int i = 0; i < m; i++) avData[i * n + j] *= invS;
-            } else {
-                for (int i = 0; i < m; i++) avData[i * n + j] = 0.0;
+            for (int i = 0; i < m; i++) {
+                columns[j][i] = workA.get(i, j).doubleValue();
             }
         }
-        Matrix<Real> U = fromDoubleArray(avData, m, n);
         
-        return new SVDResult<Real>(U, S, V);
+        // V starts as Identity
+        double[][] vCols = new double[n][n];
+        for (int i = 0; i < n; i++) vCols[i][i] = 1.0;
+        
+        int maxSweeps = 50;
+        double eps = 1e-15;
+        var species = getSpecies();
+        
+        for (int sweep = 0; sweep < maxSweeps; sweep++) {
+            boolean changed = false;
+            for (int j1 = 0; j1 < n - 1; j1++) {
+                for (int j2 = j1 + 1; j2 < n; j2++) {
+                    double alpha = 0, beta = 0, gamma = 0;
+                    
+                    // Vectorized dot products
+                    int i = 0;
+                    int loopBound = species.loopBound(m);
+                    DoubleVector vAlpha = DoubleVector.zero(species);
+                    DoubleVector vBeta = DoubleVector.zero(species);
+                    DoubleVector vGamma = DoubleVector.zero(species);
+                    
+                    for (; i < loopBound; i += species.length()) {
+                        DoubleVector v1 = DoubleVector.fromArray(species, columns[j1], i);
+                        DoubleVector v2 = DoubleVector.fromArray(species, columns[j2], i);
+                        vAlpha = vAlpha.add(v1.mul(v1));
+                        vBeta = vBeta.add(v2.mul(v2));
+                        vGamma = vGamma.add(v1.mul(v2));
+                    }
+                    alpha = vAlpha.reduceLanes(ADD);
+                    beta = vBeta.reduceLanes(ADD);
+                    gamma = vGamma.reduceLanes(ADD);
+                    
+                    for (; i < m; i++) {
+                        double d1 = columns[j1][i];
+                        double d2 = columns[j2][i];
+                        alpha += d1 * d1;
+                        beta += d2 * d2;
+                        gamma += d1 * d2;
+                    }
+                    
+                    // Convergence check for this pair
+                    if (Math.abs(gamma) < eps * Math.sqrt(alpha * beta)) continue;
+                    
+                    changed = true;
+                    double zeta = (beta - alpha) / (2.0 * gamma);
+                    double t = (zeta >= 0) ? 1.0 / (zeta + Math.sqrt(1.0 + zeta * zeta)) 
+                                         : 1.0 / (zeta - Math.sqrt(1.0 + zeta * zeta));
+                    double c = 1.0 / Math.sqrt(1.0 + t * t);
+                    double s = t * c;
+                    
+                    // Rotate columns of A
+                    i = 0;
+                    for (; i < loopBound; i += species.length()) {
+                        DoubleVector v1 = DoubleVector.fromArray(species, columns[j1], i);
+                        DoubleVector v2 = DoubleVector.fromArray(species, columns[j2], i);
+                        v1.mul(c).sub(v2.mul(s)).intoArray(columns[j1], i);
+                        v1.mul(s).add(v2.mul(c)).intoArray(columns[j2], i);
+                    }
+                    for (; i < m; i++) {
+                        double d1 = columns[j1][i];
+                        double d2 = columns[j2][i];
+                        columns[j1][i] = c * d1 - s * d2;
+                        columns[j2][i] = s * d1 + c * d2;
+                    }
+                    
+                    // Rotate columns of V
+                    int k = 0;
+                    int vLoopBound = species.loopBound(n);
+                    for (; k < vLoopBound; k += species.length()) {
+                        DoubleVector vV1 = DoubleVector.fromArray(species, vCols[j1], k);
+                        DoubleVector vV2 = DoubleVector.fromArray(species, vCols[j2], k);
+                        vV1.mul(c).sub(vV2.mul(s)).intoArray(vCols[j1], k);
+                        vV1.mul(s).add(vV2.mul(c)).intoArray(vCols[j2], k);
+                    }
+                    for (; k < n; k++) {
+                        double dV1 = vCols[j1][k];
+                        double dV2 = vCols[j2][k];
+                        vCols[j1][k] = c * dV1 - s * dV2;
+                        vCols[j2][k] = s * dV1 + c * dV2;
+                    }
+                }
+            }
+            if (!changed) break;
+        }
+        
+        // Singular values and U normalization
+        double[] sValues = new double[n];
+        for (int j = 0; j < n; j++) {
+            double normSq = 0;
+            for (int i = 0; i < m; i++) normSq += columns[j][i] * columns[j][i];
+            sValues[j] = Math.sqrt(normSq);
+            if (sValues[j] > eps) {
+                for (int i = 0; i < m; i++) columns[j][i] /= sValues[j];
+            }
+        }
+        
+        // Sorting
+        Integer[] idx = new Integer[n];
+        for (int i = 0; i < n; i++) idx[i] = i;
+        java.util.Arrays.sort(idx, (i1, i2) -> Double.compare(sValues[i2], sValues[i1]));
+        
+        double[] sortedS = new double[n];
+        double[] uData = new double[m * n];
+        double[] vData = new double[n * n];
+        
+        for (int j = 0; j < n; j++) {
+            int old = idx[j];
+            sortedS[j] = sValues[old];
+            for (int i = 0; i < m; i++) uData[i * n + j] = columns[old][i];
+            for (int i = 0; i < n; i++) vData[i * n + j] = vCols[old][i];
+        }
+        
+        Matrix<Real> U = fromDoubleArray(uData, m, n);
+        Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sortedS);
+        Matrix<Real> V = fromDoubleArray(vData, n, n);
+        
+        if (transposed) {
+            return new SVDResult<>(V, S, U);
+        }
+        return new SVDResult<>(U, S, V);
     }
 
     @Override
@@ -740,9 +882,24 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
             }
         }
 
+        // Sort eigenvalues and eigenvectors in descending order
+        Integer[] index = new Integer[n];
+        for (int i = 0; i < n; i++) index[i] = i;
+        java.util.Arrays.sort(index, (i1, i2) -> Double.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
+
+        double[] sortedEigenvalues = new double[n];
+        double[] sortedVDataCol = new double[n * n];
+        for (int i = 0; i < n; i++) {
+            int oldIdx = index[i];
+            sortedEigenvalues[i] = eigenvalues[oldIdx];
+            for (int j = 0; j < n; j++) {
+                sortedVDataCol[j * n + i] = vDataCol[j * n + oldIdx];
+            }
+        }
+
         return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-            fromDoubleArray(vDataCol, n, n),
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues)
+            fromDoubleArray(sortedVDataCol, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sortedEigenvalues)
         );
     }
 }

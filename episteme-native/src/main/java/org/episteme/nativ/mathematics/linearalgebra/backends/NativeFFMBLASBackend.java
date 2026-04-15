@@ -427,7 +427,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 );
                 SPOTRS = findLapackSymbol("LAPACKE_spotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
                 DPOTRS = findLapackSymbol("LAPACKE_dpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
-                CPOTRS = findLapackSymbol("LAPACKE_cpotrf").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
+                CPOTRS = findLapackSymbol("LAPACKE_cpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
                 ZPOTRS = findLapackSymbol("LAPACKE_zpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
 
                 // Eigen
@@ -1054,10 +1054,26 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     if (info != 0) throw new RuntimeException("CHEEV failed: " + info);
                     float[] eigenvalues = w.toArray(ValueLayout.JAVA_FLOAT);
                     float[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_FLOAT);
+                    
+                    // Sort descending by magnitude
+                    Integer[] idx = new Integer[n];
+                    for (int i = 0; i < n; i++) idx[i] = i;
+                    java.util.Arrays.sort(idx, (i1, i2) -> Float.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
+                    
+                    float[] sortedW = new float[n];
+                    float[] sortedV = new float[n * n * 2];
+                    for (int i = 0; i < n; i++) {
+                        sortedW[i] = eigenvalues[idx[i]];
+                        for (int j = 0; j < n; j++) {
+                            sortedV[(j * n + i) * 2] = eigenvectorsVec[(j * n + idx[i]) * 2];
+                            sortedV[(j * n + i) * 2 + 1] = eigenvectorsVec[(j * n + idx[i]) * 2 + 1];
+                        }
+                    }
+                    
                     E[] evData = (E[]) new Object[n];
-                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of((double)eigenvalues[i]);
+                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of((double)sortedW[i]);
                     Vector<E> vW = Vector.of(java.util.Arrays.asList(evData), (Ring<E>) a.getScalarRing());
-                    return new EigenResult<E>(createDenseMatrix(eigenvectorsVec, n, n, a), vW);
+                    return new EigenResult<E>(createDenseMatrix(sortedV, n, n, a), vW);
                 } else {
                     w = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
                     segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
@@ -1065,10 +1081,26 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     if (info != 0) throw new RuntimeException("ZHEEV failed: " + info);
                     double[] eigenvalues = w.toArray(ValueLayout.JAVA_DOUBLE);
                     double[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_DOUBLE);
+                    
+                    // Sort descending by magnitude
+                    Integer[] idx = new Integer[n];
+                    for (int i = 0; i < n; i++) idx[i] = i;
+                    java.util.Arrays.sort(idx, (i1, i2) -> Double.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
+                    
+                    double[] sortedW = new double[n];
+                    double[] sortedV = new double[n * n * 2];
+                    for (int i = 0; i < n; i++) {
+                        sortedW[i] = eigenvalues[idx[i]];
+                        for (int j = 0; j < n; j++) {
+                            sortedV[(j * n + i) * 2] = eigenvectorsVec[(j * n + idx[i]) * 2];
+                            sortedV[(j * n + i) * 2 + 1] = eigenvectorsVec[(j * n + idx[i]) * 2 + 1];
+                        }
+                    }
+                    
                     E[] evData = (E[]) new Object[n];
-                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of(eigenvalues[i]);
+                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of(sortedW[i]);
                     Vector<E> vW = Vector.of(java.util.Arrays.asList(evData), (Ring<E>) a.getScalarRing());
-                    return new EigenResult<E>(createDenseMatrix(eigenvectorsVec, n, n, a), vW);
+                    return new EigenResult<E>(createDenseMatrix(sortedV, n, n, a), vW);
                 }
             } else {
                 if (single) {
@@ -1078,10 +1110,25 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     if (info != 0) throw new RuntimeException("SSYEV failed: " + info);
                     float[] eigenvalues = w.toArray(ValueLayout.JAVA_FLOAT);
                     float[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_FLOAT);
+                    
+                    // Sort descending by magnitude
+                    Integer[] idx = new Integer[n];
+                    for (int i = 0; i < n; i++) idx[i] = i;
+                    java.util.Arrays.sort(idx, (i1, i2) -> Float.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
+                    
+                    float[] sortedW = new float[n];
+                    float[] sortedV = new float[n * n];
+                    for (int i = 0; i < n; i++) {
+                        sortedW[i] = eigenvalues[idx[i]];
+                        for (int j = 0; j < n; j++) {
+                            sortedV[j * n + i] = eigenvectorsVec[j * n + idx[i]];
+                        }
+                    }
+                    
                     E[] evData = (E[]) new Object[n];
-                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of((double)eigenvalues[i]);
+                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of((double)sortedW[i]);
                     Vector<E> vW = Vector.of(java.util.Arrays.asList(evData), (Ring<E>) a.getScalarRing());
-                    return new EigenResult<E>(createDenseMatrix(eigenvectorsVec, n, n, a), vW);
+                    return new EigenResult<E>(createDenseMatrix(sortedV, n, n, a), vW);
                 } else {
                     w = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
                     segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
@@ -1089,10 +1136,25 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     if (info != 0) throw new RuntimeException("DSYEV failed: " + info);
                     double[] eigenvalues = w.toArray(ValueLayout.JAVA_DOUBLE);
                     double[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_DOUBLE);
+                    
+                    // Sort descending by magnitude
+                    Integer[] idx = new Integer[n];
+                    for (int i = 0; i < n; i++) idx[i] = i;
+                    java.util.Arrays.sort(idx, (i1, i2) -> Double.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
+                    
+                    double[] sortedW = new double[n];
+                    double[] sortedV = new double[n * n];
+                    for (int i = 0; i < n; i++) {
+                        sortedW[i] = eigenvalues[idx[i]];
+                        for (int j = 0; j < n; j++) {
+                            sortedV[j * n + i] = eigenvectorsVec[j * n + idx[i]];
+                        }
+                    }
+                    
                     E[] evData = (E[]) new Object[n];
-                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of(eigenvalues[i]);
+                    for (int i = 0; i < n; i++) evData[i] = (E) (Object) Real.of(sortedW[i]);
                     Vector<E> vW = Vector.of(java.util.Arrays.asList(evData), (Ring<E>) a.getScalarRing());
-                    return new EigenResult<E>(createDenseMatrix(eigenvectorsVec, n, n, a), vW);
+                    return new EigenResult<E>(createDenseMatrix(sortedV, n, n, a), vW);
                 }
             }
         } catch (Throwable t) { 
