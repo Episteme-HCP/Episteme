@@ -32,6 +32,7 @@ public class IsolatedComplianceTest {
         providers.add(new NativeFFMBLASBackend<Real>());
         providers.add(new NativeMPFRDenseLinearAlgebraBackend<Real>());
         providers.add(new NativeMPFRSparseLinearAlgebraBackend<Real>());
+        providers.add(new org.episteme.nativ.mathematics.linearalgebra.backends.NativeCUDADenseLinearAlgebraBackend());
 
         List<ComplianceResult> results = new ArrayList<>();
 

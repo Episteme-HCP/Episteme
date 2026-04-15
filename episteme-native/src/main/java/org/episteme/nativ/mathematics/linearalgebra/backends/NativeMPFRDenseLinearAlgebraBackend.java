@@ -660,6 +660,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public LUResult<E> lu(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = a.rows();
@@ -933,6 +934,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         return solveSquare(a, b);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<E> solveSquare(Matrix<E> a, Vector<E> b) {
         if (a.rows() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         int n = a.rows();
@@ -1187,6 +1189,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = a.rows();

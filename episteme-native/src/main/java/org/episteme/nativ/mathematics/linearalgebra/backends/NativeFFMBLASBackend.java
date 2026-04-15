@@ -20,6 +20,7 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
+import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -525,7 +526,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                  }
              } else {
                  if (single) {
-                     try (Arena arena = Arena.ofConfined()) {
+                     try (ResourceTracker tracker = new ResourceTracker()) {
+                         Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
                          MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
                          MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
                          MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
@@ -535,7 +537,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                          return createDenseVector(resData, n, A);
                      }
                  } else {
-                     try (Arena arena = Arena.ofConfined()) {
+                     try (ResourceTracker tracker = new ResourceTracker()) {
+                         Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
                          MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
                          MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
                          MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
@@ -682,7 +685,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
          }
          
          if (single) {
-             try (Arena arena = Arena.ofConfined()) {
+             try (ResourceTracker tracker = new ResourceTracker()) {
+                 Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
                  MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
                  MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
                  int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
@@ -693,8 +697,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                  return createDenseMatrix(result, n, n, A);
              }
          }
-
-         try (Arena arena = Arena.ofConfined()) {
+ 
+         try (ResourceTracker tracker = new ResourceTracker()) {
+             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
              MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
              int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, m, segA, n, segIpiv);
@@ -753,7 +758,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
          
          if (complex) {
              if (ZGETRF != null) {
-                 try (Arena arena = Arena.ofConfined()) {
+                 try (ResourceTracker tracker = new ResourceTracker()) {
+                     Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
                      MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
                      MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
                      int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
@@ -823,7 +829,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         boolean complex = isComplex(a);
         boolean single = isFloat(a);
 
-        try (Arena arena = Arena.ofConfined()) {
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             if (complex) {
                 if (single) {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
@@ -831,21 +838,17 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     int info = (int) NativeSafe.invoke(CGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
                     if (info != 0) throw new RuntimeException("CGEQRF failed: " + info);
                     float[] rData = new float[k * n * 2];
-                    for (int i = 0; i < k; i++) {
-                        for (int j = i; j < n; j++) {
-                            rData[(i * n + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2);
-                            rData[(i * n + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2 + 1);
-                        }
+                    for (int i = 0; i < k; i++) for (int j = i; j < n; j++) {
+                        rData[(i * n + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2);
+                        rData[(i * n + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2 + 1);
                     }
                     Matrix<E> R = createDenseMatrix(rData, k, n, a);
                     info = (int) NativeSafe.invoke(CUNGQR, LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
                     if (info != 0) throw new RuntimeException("CUNGQR failed: " + info);
                     float[] qData = new float[m * k * 2];
-                    for (int i = 0; i < m; i++) {
-                        for (int j = 0; j < k; j++) {
-                            qData[(i * k + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2);
-                            qData[(i * k + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2 + 1);
-                        }
+                    for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) {
+                        qData[(i * k + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2);
+                        qData[(i * k + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) (i * n + j) * 2 + 1);
                     }
                     return new QRResult<E>(createDenseMatrix(qData, m, k, a), R);
                 } else {
@@ -854,21 +857,17 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     int info = (int) NativeSafe.invoke(ZGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
                     if (info != 0) throw new RuntimeException("ZGEQRF failed: " + info);
                     double[] rData = new double[k * n * 2];
-                    for (int i = 0; i < k; i++) {
-                        for (int j = i; j < n; j++) {
-                            rData[(i * n + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2);
-                            rData[(i * n + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2 + 1);
-                        }
+                    for (int i = 0; i < k; i++) for (int j = i; j < n; j++) {
+                        rData[(i * n + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2);
+                        rData[(i * n + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2 + 1);
                     }
                     Matrix<E> R = createDenseMatrix(rData, k, n, a);
                     info = (int) NativeSafe.invoke(ZUNGQR, LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
                     if (info != 0) throw new RuntimeException("ZUNGQR failed: " + info);
                     double[] qData = new double[m * k * 2];
-                    for (int i = 0; i < m; i++) {
-                        for (int j = 0; j < k; j++) {
-                            qData[(i * k + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2);
-                            qData[(i * k + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2 + 1);
-                        }
+                    for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) {
+                        qData[(i * k + j) * 2] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2);
+                        qData[(i * k + j) * 2 + 1] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) (i * n + j) * 2 + 1);
                     }
                     return new QRResult<E>(createDenseMatrix(qData, m, k, a), R);
                 }
@@ -879,20 +878,12 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     int info = (int) NativeSafe.invoke(SGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
                     if (info != 0) throw new RuntimeException("SGEQRF failed: " + info);
                     float[] rData = new float[k * n];
-                    for (int i = 0; i < k; i++) {
-                        for (int j = i; j < n; j++) {
-                            rData[i * n + j] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) i * n + j);
-                        }
-                    }
+                    for (int i = 0; i < k; i++) for (int j = i; j < n; j++) rData[i * n + j] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) i * n + j);
                     Matrix<E> R = createDenseMatrix(rData, k, n, a);
                     info = (int) NativeSafe.invoke(SORGQR, LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
                     if (info != 0) throw new RuntimeException("SORGQR failed: " + info);
                     float[] qData = new float[m * k];
-                    for (int i = 0; i < m; i++) {
-                        for (int j = 0; j < k; j++) {
-                            qData[i * k + j] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) i * n + j);
-                        }
-                    }
+                    for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) qData[i * k + j] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) i * n + j);
                     return new QRResult<E>(createDenseMatrix(qData, m, k, a), R);
                 } else {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
@@ -900,20 +891,12 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     int info = (int) NativeSafe.invoke(DGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
                     if (info != 0) throw new RuntimeException("DGEQRF failed: " + info);
                     double[] rData = new double[k * n];
-                    for (int i = 0; i < k; i++) {
-                        for (int j = i; j < n; j++) {
-                            rData[i * n + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
-                        }
-                    }
+                    for (int i = 0; i < k; i++) for (int j = i; j < n; j++) rData[i * n + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
                     Matrix<E> R = createDenseMatrix(rData, k, n, a);
                     info = (int) NativeSafe.invoke(DORGQR, LAPACK_ROW_MAJOR, m, k, k, segA, n, tau);
                     if (info != 0) throw new RuntimeException("DORGQR failed: " + info);
                     double[] qData = new double[m * k];
-                    for (int i = 0; i < m; i++) {
-                        for (int j = 0; j < k; j++) {
-                            qData[i * k + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
-                        }
-                    }
+                    for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) qData[i * k + j] = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + j);
                     return new QRResult<E>(createDenseMatrix(qData, m, k, a), R);
                 }
             }
@@ -932,7 +915,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         boolean complex = isComplex(a);
         boolean single = isFloat(a);
 
-        try (Arena arena = Arena.ofConfined()) {
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment u, vt, superb;
             int info;
 
@@ -953,11 +937,10 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_FLOAT), m, m, a);
                     float[] vtArr = vt.toArray(ValueLayout.JAVA_FLOAT);
                     float[] vArr = new float[n * n * 2];
-                    for (int i = 0; i < n; i++)
-                        for (int j = 0; j < n; j++) {
-                            vArr[(j * n + i) * 2] = vtArr[(i * n + j) * 2];
-                            vArr[(j * n + i) * 2 + 1] = vtArr[(i * n + j) * 2 + 1];
-                        }
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) {
+                        vArr[(j * n + i) * 2] = vtArr[(i * n + j) * 2];
+                        vArr[(j * n + i) * 2 + 1] = vtArr[(i * n + j) * 2 + 1];
+                    }
                     Matrix<E> V = createDenseMatrix(vArr, n, n, a);
                     return new SVDResult<>(U, S, V);
                 } else {
@@ -976,11 +959,10 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_DOUBLE), m, m, a);
                     double[] vtArr = vt.toArray(ValueLayout.JAVA_DOUBLE);
                     double[] vArr = new double[n * n * 2];
-                    for (int i = 0; i < n; i++)
-                        for (int j = 0; j < n; j++) {
-                            vArr[(j * n + i) * 2] = vtArr[(i * n + j) * 2];
-                            vArr[(j * n + i) * 2 + 1] = vtArr[(i * n + j) * 2 + 1];
-                        }
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) {
+                        vArr[(j * n + i) * 2] = vtArr[(i * n + j) * 2];
+                        vArr[(j * n + i) * 2 + 1] = vtArr[(i * n + j) * 2 + 1];
+                    }
                     Matrix<E> V = createDenseMatrix(vArr, n, n, a);
                     return new SVDResult<>(U, S, V);
                 }
@@ -1001,9 +983,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_FLOAT), m, m, a);
                     float[] vtArr = vt.toArray(ValueLayout.JAVA_FLOAT);
                     float[] vArr = new float[n * n];
-                    for (int i = 0; i < n; i++)
-                        for (int j = 0; j < n; j++)
-                            vArr[j * n + i] = vtArr[i * n + j];
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) vArr[j * n + i] = vtArr[i * n + j];
                     Matrix<E> V = createDenseMatrix(vArr, n, n, a);
                     return new SVDResult<>(U, S, V);
                 } else {
@@ -1022,9 +1002,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_DOUBLE), m, m, a);
                     double[] vtArr = vt.toArray(ValueLayout.JAVA_DOUBLE);
                     double[] vArr = new double[n * n];
-                    for (int i = 0; i < n; i++)
-                        for (int j = 0; j < n; j++)
-                            vArr[j * n + i] = vtArr[i * n + j];
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) vArr[j * n + i] = vtArr[i * n + j];
                     Matrix<E> V = createDenseMatrix(vArr, n, n, a);
                     return new SVDResult<>(U, S, V);
                 }
@@ -1042,7 +1020,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         boolean complex = isComplex(a);
         boolean single = isFloat(a);
 
-        try (Arena arena = Arena.ofConfined()) {
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment w, segA;
             int info;
 
@@ -1055,7 +1034,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     float[] eigenvalues = w.toArray(ValueLayout.JAVA_FLOAT);
                     float[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_FLOAT);
                     
-                    // Sort descending by magnitude
                     Integer[] idx = new Integer[n];
                     for (int i = 0; i < n; i++) idx[i] = i;
                     java.util.Arrays.sort(idx, (i1, i2) -> Float.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
@@ -1082,7 +1060,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     double[] eigenvalues = w.toArray(ValueLayout.JAVA_DOUBLE);
                     double[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_DOUBLE);
                     
-                    // Sort descending by magnitude
                     Integer[] idx = new Integer[n];
                     for (int i = 0; i < n; i++) idx[i] = i;
                     java.util.Arrays.sort(idx, (i1, i2) -> Double.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
@@ -1111,7 +1088,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     float[] eigenvalues = w.toArray(ValueLayout.JAVA_FLOAT);
                     float[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_FLOAT);
                     
-                    // Sort descending by magnitude
                     Integer[] idx = new Integer[n];
                     for (int i = 0; i < n; i++) idx[i] = i;
                     java.util.Arrays.sort(idx, (i1, i2) -> Float.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
@@ -1120,9 +1096,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     float[] sortedV = new float[n * n];
                     for (int i = 0; i < n; i++) {
                         sortedW[i] = eigenvalues[idx[i]];
-                        for (int j = 0; j < n; j++) {
-                            sortedV[j * n + i] = eigenvectorsVec[j * n + idx[i]];
-                        }
+                        for (int j = 0; j < n; j++) sortedV[j * n + i] = eigenvectorsVec[j * n + idx[i]];
                     }
                     
                     E[] evData = (E[]) new Object[n];
@@ -1137,7 +1111,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     double[] eigenvalues = w.toArray(ValueLayout.JAVA_DOUBLE);
                     double[] eigenvectorsVec = segA.toArray(ValueLayout.JAVA_DOUBLE);
                     
-                    // Sort descending by magnitude
                     Integer[] idx = new Integer[n];
                     for (int i = 0; i < n; i++) idx[i] = i;
                     java.util.Arrays.sort(idx, (i1, i2) -> Double.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
@@ -1146,9 +1119,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     double[] sortedV = new double[n * n];
                     for (int i = 0; i < n; i++) {
                         sortedW[i] = eigenvalues[idx[i]];
-                        for (int j = 0; j < n; j++) {
-                            sortedV[j * n + i] = eigenvectorsVec[j * n + idx[i]];
-                        }
+                        for (int j = 0; j < n; j++) sortedV[j * n + i] = eigenvectorsVec[j * n + idx[i]];
                     }
                     
                     E[] evData = (E[]) new Object[n];
@@ -1159,13 +1130,10 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             }
         } catch (Throwable t) { 
             logger.debug("Native Eigen failed, falling back: {}", t.getMessage());
-            try {
-                return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericEigen.decompose(a, (org.episteme.core.mathematics.structures.rings.Field<E>)a.getScalarRing(), this);
-            } catch (Throwable t2) {
-                throw new RuntimeException("Native Eigen and Generic Eigen both failed", t2);
-            }
+            return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericEigen.decompose(a, (org.episteme.core.mathematics.structures.rings.Field<E>)a.getScalarRing(), this);
         }
     }
+
 
 
 
@@ -1847,64 +1815,43 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         boolean complex = isComplex(a);
         boolean single = isFloat(a);
 
-        if (complex) {
-            if (single) {
-                try (Arena arena = Arena.ofConfined()) {
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            if (complex) {
+                if (single) {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     int info = (int) NativeSafe.invoke(CPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new ArithmeticException("CPOTRF failed: " + info);
                     float[] resData = segA.toArray(ValueLayout.JAVA_FLOAT);
-                    for (int i = 0; i < n; i++) {
-                        for (int j = i + 1; j < n; j++) {
-                            resData[(i * n + j) * 2] = 0;
-                            resData[(i * n + j) * 2 + 1] = 0;
-                        }
-                    }
+                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[(i * n + j) * 2] = 0; resData[(i * n + j) * 2 + 1] = 0; }
                     return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                } catch (Throwable t) { throw new RuntimeException(t); }
-            } else {
-                try (Arena arena = Arena.ofConfined()) {
+                } else {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     int info = (int) NativeSafe.invoke(ZPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new ArithmeticException("ZPOTRF failed: " + info);
                     double[] resData = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                    for (int i = 0; i < n; i++) {
-                        for (int j = i + 1; j < n; j++) {
-                            resData[(i * n + j) * 2] = 0;
-                            resData[(i * n + j) * 2 + 1] = 0;
-                        }
-                    }
+                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[(i * n + j) * 2] = 0; resData[(i * n + j) * 2 + 1] = 0; }
                     return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                } catch (Throwable t) { throw new RuntimeException(t); }
-            }
-        } else {
-            if (single) {
-                try (Arena arena = Arena.ofConfined()) {
+                }
+            } else {
+                if (single) {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
                     int info = (int) NativeSafe.invoke(SPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new ArithmeticException("SPOTRF failed: " + info);
                     float[] resData = segA.toArray(ValueLayout.JAVA_FLOAT);
-                    for (int i = 0; i < n; i++) {
-                        for (int j = i + 1; j < n; j++) {
-                            resData[i * n + j] = 0;
-                        }
-                    }
+                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[i * n + j] = 0; }
                     return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                } catch (Throwable t) { throw new RuntimeException(t); }
-            } else {
-                try (Arena arena = Arena.ofConfined()) {
+                } else {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     int info = (int) NativeSafe.invoke(DPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new ArithmeticException("DPOTRF failed: " + info);
                     double[] resData = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                    for (int i = 0; i < n; i++) {
-                        for (int j = i + 1; j < n; j++) {
-                            resData[i * n + j] = 0;
-                        }
-                    }
+                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[i * n + j] = 0; }
                     return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                } catch (Throwable t) { throw new RuntimeException(t); }
+                }
             }
+        } catch (Throwable t) {
+            throw new RuntimeException("FFM BLAS Cholesky failed", t);
         }
     }
 
@@ -1915,56 +1862,46 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         boolean complex = isComplex(a);
         boolean single = isFloat(a);
 
-        if (complex) {
-            if (single) {
-                try (Arena arena = Arena.ofConfined()) {
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment pFace = arena.allocate(ValueLayout.JAVA_INT, Math.min(m, n));
+            
+            if (complex) {
+                if (single) {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(m, n));
-                    int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
-                    if (info >= 0) {
-                        float[] packedData = segA.toArray(ValueLayout.JAVA_FLOAT);
-                        int[] ipiv = segIpiv.toArray(ValueLayout.JAVA_INT);
-                        return reconstructLU(packedData, ipiv, m, n, a, true);
-                    }
-                } catch (Throwable t) { logger.debug("Native Single Complex LU failed, falling back: {}", t.getMessage()); }
-            } else {
-                try (Arena arena = Arena.ofConfined()) {
+                    int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
+                    if (info < 0) throw new ArithmeticException("CGETRF failed: " + info);
+                    float[] resA = segA.toArray(ValueLayout.JAVA_FLOAT);
+                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    return reconstructLU(resA, ipiv, m, n, a, true);
+                } else {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(m, n));
-                    int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
-                    if (info >= 0) {
-                        double[] packedData = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                        int[] ipiv = segIpiv.toArray(ValueLayout.JAVA_INT);
-                        return reconstructLU(packedData, ipiv, m, n, a, true);
-                    }
-                } catch (Throwable t) { logger.debug("Native Complex LU failed, falling back: {}", t.getMessage()); }
-            }
-            return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.decompose(a, (org.episteme.core.mathematics.structures.rings.Field<E>)a.getScalarRing(), this);
-        } else {
-            if (single) {
-                try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
-                    MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(m, n));
-                    int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
-                    if (info >= 0) {
-                        float[] packedData = segA.toArray(ValueLayout.JAVA_FLOAT);
-                        int[] ipiv = segIpiv.toArray(ValueLayout.JAVA_INT);
-                        return reconstructLU(packedData, ipiv, m, n, a, false);
-                    }
-                } catch (Throwable t) { logger.debug("Native Single Real LU failed, falling back: {}", t.getMessage()); }
+                    int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
+                    if (info < 0) throw new ArithmeticException("ZGETRF failed: " + info);
+                    double[] resA = segA.toArray(ValueLayout.JAVA_DOUBLE);
+                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    return reconstructLU(resA, ipiv, m, n, a, true);
+                }
             } else {
-                try (Arena arena = Arena.ofConfined()) {
+                if (single) {
+                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                    int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
+                    if (info < 0) throw new ArithmeticException("SGETRF failed: " + info);
+                    float[] resA = segA.toArray(ValueLayout.JAVA_FLOAT);
+                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    return reconstructLU(resA, ipiv, m, n, a, false);
+                } else {
                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-                    MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(m, n));
-                    int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, segIpiv);
-                    if (info >= 0) {
-                        double[] packedData = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                        int[] ipiv = segIpiv.toArray(ValueLayout.JAVA_INT);
-                        return reconstructLU(packedData, ipiv, m, n, a, false);
-                    }
-                } catch (Throwable t) { logger.debug("Native Real LU failed, falling back: {}", t.getMessage()); }
+                    int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
+                    if (info < 0) throw new ArithmeticException("DGETRF failed: " + info);
+                    double[] resA = segA.toArray(ValueLayout.JAVA_DOUBLE);
+                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    return reconstructLU(resA, ipiv, m, n, a, false);
+                }
             }
-            return (LUResult<E>) (Object) org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.decompose((Matrix<Real>) a, (org.episteme.core.mathematics.structures.rings.Field<Real>)a.getScalarRing(), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>)(Object)this);
+        } catch (Throwable t) {
+            logger.debug("Native LU failed, falling back: {}", t.getMessage());
+            return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.decompose(a, (org.episteme.core.mathematics.structures.rings.Field<E>)a.getScalarRing(), this);
         }
     }
 
@@ -2129,56 +2066,44 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         for(int i=0; i<n; i++) currentP[i] = i;
         for(int i=0; i<n; i++) {
             int target;
-            if (complex) {
-                target = (int) ((org.episteme.core.mathematics.numbers.complex.Complex)(Object)lu.P().get(i)).real();
-            } else {
-                target = (int) ((Real)(Object)lu.P().get(i)).doubleValue();
-            }
+            if (complex) target = (int) ((org.episteme.core.mathematics.numbers.complex.Complex)(Object)lu.P().get(i)).real();
+            else target = (int) ((Real)(Object)lu.P().get(i)).doubleValue();
             int swapIdx = i;
-            for(int j=i; j<n; j++) {
-                if(currentP[j] == target) {
-                    swapIdx = j;
-                    break;
-                }
-            }
+            for(int j=i; j<n; j++) if(currentP[j] == target) { swapIdx = j; break; }
             ipiv[i] = swapIdx + 1;
             int tmp = currentP[i];
             currentP[i] = currentP[swapIdx];
             currentP[swapIdx] = tmp;
         }
 
-        try (Arena arena = Arena.ofConfined()) {
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             boolean single = isFloat(lu.L());
-            int typeSize = single ? 4 : 8;
             MemorySegment segLU = arena.allocate(single ? ValueLayout.JAVA_FLOAT : ValueLayout.JAVA_DOUBLE, complex ? (long) n * n * 2 : (long) n * n);
             
             if (complex) {
                 if (single) {
                     float[] lData = toInterlacedFloatArray(lu.L());
                     float[] uData = toInterlacedFloatArray(lu.U());
-                    for (int i = 0; i < n; i++) {
-                        for (int j = 0; j < n; j++) {
-                            if (i <= j) {
-                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2, uData[(i * n + j) * 2]);
-                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2 + 1, uData[(i * n + j) * 2 + 1]);
-                            } else {
-                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2, lData[(i * n + j) * 2]);
-                                segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2 + 1, lData[(i * n + j) * 2 + 1]);
-                            }
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) {
+                        if (i <= j) {
+                            segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2, uData[(i * n + j) * 2]);
+                            segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2 + 1, uData[(i * n + j) * 2 + 1]);
+                        } else {
+                            segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2, lData[(i * n + j) * 2]);
+                            segLU.setAtIndex(ValueLayout.JAVA_FLOAT, (i * n + j) * 2 + 1, lData[(i * n + j) * 2 + 1]);
                         }
                     }
                 } else {
                     double[] lData = toInterlacedDoubleArray(lu.L());
                     double[] uData = toInterlacedDoubleArray(lu.U());
-                    for (int i = 0; i < n; i++) {
-                        for (int j = 0; j < n; j++) {
-                            if (i <= j) {
-                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, uData[(i * n + j) * 2]);
-                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, uData[(i * n + j) * 2 + 1]);
-                            } else {
-                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, lData[(i * n + j) * 2]);
-                                segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, lData[(i * n + j) * 2 + 1]);
-                            }
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) {
+                        if (i <= j) {
+                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, uData[(i * n + j) * 2]);
+                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, uData[(i * n + j) * 2 + 1]);
+                        } else {
+                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2, lData[(i * n + j) * 2]);
+                            segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, (i * n + j) * 2 + 1, lData[(i * n + j) * 2 + 1]);
                         }
                     }
                 }
@@ -2186,20 +2111,16 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 if (single) {
                     float[] lData = toFloatArray(lu.L());
                     float[] uData = toFloatArray(lu.U());
-                    for (int i = 0; i < n; i++) {
-                        for (int j = 0; j < n; j++) {
-                            if (i <= j) segLU.setAtIndex(ValueLayout.JAVA_FLOAT, i * n + j, uData[i * n + j]);
-                            else segLU.setAtIndex(ValueLayout.JAVA_FLOAT, i * n + j, lData[i * n + j]);
-                        }
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) {
+                        if (i <= j) segLU.setAtIndex(ValueLayout.JAVA_FLOAT, i * n + j, uData[i * n + j]);
+                        else segLU.setAtIndex(ValueLayout.JAVA_FLOAT, i * n + j, lData[i * n + j]);
                     }
                 } else {
                     double[] lData = toDoubleArray(lu.L());
                     double[] uData = toDoubleArray(lu.U());
-                    for (int i = 0; i < n; i++) {
-                        for (int j = 0; j < n; j++) {
-                            if (i <= j) segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, uData[i * n + j]);
-                            else segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, lData[i * n + j]);
-                        }
+                    for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) {
+                        if (i <= j) segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, uData[i * n + j]);
+                        else segLU.setAtIndex(ValueLayout.JAVA_DOUBLE, i * n + j, lData[i * n + j]);
                     }
                 }
             }
@@ -2233,14 +2154,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             }
             if (info != 0) throw new ArithmeticException("GETRS failed: " + info);
             
-            if (single) {
-                float[] resultArr = segB.toArray(ValueLayout.JAVA_FLOAT);
-                return createDenseVector(resultArr, n, lu.L());
-            } else {
-                double[] resultArr = segB.toArray(ValueLayout.JAVA_DOUBLE);
-                return createDenseVector(resultArr, n, lu.L());
-            }
-        } catch (Throwable t) { throw new RuntimeException(t); }
+            if (single) return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, lu.L());
+            else return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, lu.L());
+        } catch (Throwable t) { throw new RuntimeException("FFM BLAS LU solve failed", t); }
     }
     
     @Override
@@ -2249,7 +2165,8 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         int n = b.dimension();
         boolean complex = isComplex(cholesky.L());
 
-        try (Arena arena = Arena.ofConfined()) {
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             boolean single = isFloat(cholesky.L());
             MemorySegment segL;
             MemorySegment segB;
@@ -2292,14 +2209,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
             }
             if (info != 0) throw new ArithmeticException("POTRS failed: " + info);
             
-            if (single) {
-                float[] resultArr = segB.toArray(ValueLayout.JAVA_FLOAT);
-                return createDenseVector(resultArr, n, cholesky.L());
-            } else {
-                double[] resultArr = segB.toArray(ValueLayout.JAVA_DOUBLE);
-                return createDenseVector(resultArr, n, cholesky.L());
-            }
-        } catch (Throwable t) { throw new RuntimeException(t); }
+            if (single) return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, cholesky.L());
+            else return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, cholesky.L());
+        } catch (Throwable t) { throw new RuntimeException("FFM BLAS Cholesky solve failed", t); }
     }
 
     @Override
