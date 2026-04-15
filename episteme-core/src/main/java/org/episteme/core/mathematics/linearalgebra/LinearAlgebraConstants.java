@@ -14,23 +14,35 @@ package org.episteme.core.mathematics.linearalgebra;
  */
 public final class LinearAlgebraConstants {
 
-    /** Default tolerance for double-precision comparisons (1e-12). */
-    public static final double EPSILON_DOUBLE = 1e-12;
+    /** Default tolerance for double-precision comparisons. */
+    public static double getEpsilonDouble() {
+        return org.episteme.core.Episteme.getNumericalConfiguration().getEpsilonDouble();
+    }
 
-    /** Default tolerance for single-precision comparisons (1e-7). */
-    public static final float EPSILON_FLOAT = 1e-7f;
+    /** Default tolerance for single-precision comparisons. */
+    public static float getEpsilonFloat() {
+        return org.episteme.core.Episteme.getNumericalConfiguration().getEpsilonFloat();
+    }
 
     /** Stability threshold for near-singular matrices. */
-    public static final double STABILITY_THRESHOLD = 1e-15;
+    public static double getStabilityThreshold() {
+        return org.episteme.core.Episteme.getNumericalConfiguration().getStabilityThreshold();
+    }
 
     /** Default maximum iterations for iterative solvers (BiCGSTAB, GMRES). */
-    public static final int MAX_ITERATIONS = 1000;
+    public static int getMaxIterations() {
+        return org.episteme.core.Episteme.getNumericalConfiguration().getMaxIterations();
+    }
 
     /** Default restart parameter for GMRES. */
-    public static final int GMRES_RESTART = 30;
+    public static int getGmresRestart() {
+        return org.episteme.core.Episteme.getNumericalConfiguration().getGmresRestart();
+    }
 
-    /** Precision in bits for high-precision real numbers (standardized to 256 bits). */
-    public static final int DEFAULT_PRECISION_BITS = 256;
+    /** Precision in bits for high-precision real numbers. */
+    public static int getDefaultPrecisionBits() {
+        return org.episteme.core.Episteme.getNumericalConfiguration().getPrecisionBits();
+    }
 
     private LinearAlgebraConstants() {
         // Prevent instantiation

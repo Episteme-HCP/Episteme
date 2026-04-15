@@ -41,6 +41,14 @@ public class NumericalConfiguration {
     private int parallelThreshold = Integer.parseInt(Episteme.getProperty("compute.parallel.threshold", "50000"));
     private int maxThreads = Integer.parseInt(Episteme.getProperty("compute.parallel.max_threads", String.valueOf(Runtime.getRuntime().availableProcessors())));
 
+    // Linear Algebra Constants
+    private double epsilonDouble = Double.parseDouble(Episteme.getProperty("math.linearalgebra.epsilon.double", "1e-12"));
+    private float epsilonFloat = Float.parseFloat(Episteme.getProperty("math.linearalgebra.epsilon.float", "1e-7"));
+    private double stabilityThreshold = Double.parseDouble(Episteme.getProperty("math.linearalgebra.stability.threshold", "1e-15"));
+    private int maxIterations = Integer.parseInt(Episteme.getProperty("math.linearalgebra.max_iterations", "1000"));
+    private int gmresRestart = Integer.parseInt(Episteme.getProperty("math.linearalgebra.gmres.restart", "30"));
+    private int precisionBits = Integer.parseInt(Episteme.getProperty("math.linearalgebra.precision.bits", "256"));
+
     public NumericalConfiguration() {
     }
 
@@ -131,6 +139,60 @@ public class NumericalConfiguration {
 
     public NumericalConfiguration setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
+        return this;
+    }
+
+    public double getEpsilonDouble() {
+        return epsilonDouble;
+    }
+
+    public NumericalConfiguration setEpsilonDouble(double epsilonDouble) {
+        this.epsilonDouble = epsilonDouble;
+        return this;
+    }
+
+    public float getEpsilonFloat() {
+        return epsilonFloat;
+    }
+
+    public NumericalConfiguration setEpsilonFloat(float epsilonFloat) {
+        this.epsilonFloat = epsilonFloat;
+        return this;
+    }
+
+    public double getStabilityThreshold() {
+        return stabilityThreshold;
+    }
+
+    public NumericalConfiguration setStabilityThreshold(double stabilityThreshold) {
+        this.stabilityThreshold = stabilityThreshold;
+        return this;
+    }
+
+    public int getMaxIterations() {
+        return maxIterations;
+    }
+
+    public NumericalConfiguration setMaxIterations(int maxIterations) {
+        this.maxIterations = maxIterations;
+        return this;
+    }
+
+    public int getGmresRestart() {
+        return gmresRestart;
+    }
+
+    public NumericalConfiguration setGmresRestart(int gmresRestart) {
+        this.gmresRestart = gmresRestart;
+        return this;
+    }
+
+    public int getPrecisionBits() {
+        return precisionBits;
+    }
+
+    public NumericalConfiguration setPrecisionBits(int precisionBits) {
+        this.precisionBits = precisionBits;
         return this;
     }
 
