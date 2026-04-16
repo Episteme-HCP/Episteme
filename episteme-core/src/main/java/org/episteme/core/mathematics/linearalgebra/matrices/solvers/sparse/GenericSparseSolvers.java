@@ -31,35 +31,48 @@ public class GenericSparseSolvers {
         for (int iter = 0; iter < maxIterations; iter++) {
             E rhoOld = rho;
             rho = provider.dot(r0, r);
-            if (isSmaller(rho, 1e-31, f) && isSmaller(rhoOld, 1e-31, f)) break;
+            
+            // Check for breakdown
+            if (isSmaller(rho, 1e-45, f)) {
+                 // Try to recover by resetting r0 if possible, or just break
+                 break; 
+            }
 
             if (iter == 0) p = r;
             else {
-                if (isSmaller(omega, 1e-31, f) || isSmaller(rhoOld, 1e-31, f)) break;
+                if (isSmaller(omega, 1e-45, f) || isSmaller(rhoOld, 1e-45, f)) break;
                 E beta = f.multiply(f.divide(rho, rhoOld), f.divide(alpha, omega));
                 p = provider.add(r, provider.multiply(provider.subtract(p, provider.multiply(v, omega)), beta));
             }
 
             v = A.multiply(p);
             E vDotR0 = provider.dot(r0, v);
-            if (isSmaller(vDotR0, 1e-30, f)) break;
+            if (isSmaller(vDotR0, 1e-45, f)) break;
             alpha = f.divide(rho, vDotR0);
 
             Vector<E> s = provider.subtract(r, provider.multiply(v, alpha));
+            // Check intermediate convergence
             if (isSmaller(provider.norm(s), tolerance, f)) {
                 x = provider.add(x, provider.multiply(p, alpha));
+                r = s; // Final residual
                 break;
             }
 
             Vector<E> t = A.multiply(s);
             E tDotT = provider.dot(t, t);
-            if (isSmaller(tDotT, 1e-30, f)) break;
+            
+            if (isSmaller(tDotT, 1e-45, f)) {
+                // Omega would be undefined, but we can still update x with alpha step
+                x = provider.add(x, provider.multiply(p, alpha));
+                r = s;
+                break;
+            }
+            
             omega = f.divide(provider.dot(t, s), tDotT);
             x = provider.add(provider.add(x, provider.multiply(p, alpha)), provider.multiply(s, omega));
             r = provider.subtract(s, provider.multiply(t, omega));
             
             if (isSmaller(provider.norm(r), tolerance, f)) break;
-            if (isSmaller(omega, 1e-30, f)) break;
         }
         return x;
     }

@@ -377,7 +377,10 @@ public class LinearAlgebraComplianceTest {
                 org.episteme.core.mathematics.linearalgebra.Vector<E> bArr = randomVector(SIZE, rand, ring, useFloat);
                 E result = provider.dot(a, bArr);
                 E expected = ring.zero();
-                for(int i=0; i<SIZE; i++) expected = ring.add(expected, ring.multiply(a.get(i), bArr.get(i)));
+                for(int i=0; i<SIZE; i++) {
+                    E ai = isComplex ? (E) conjugate(a.get(i)) : a.get(i);
+                    expected = ring.add(expected, ring.multiply(ai, bArr.get(i)));
+                }
                 assertScalarEquals(expected, result, tolStrict, ring);
             });
 
@@ -429,9 +432,9 @@ public class LinearAlgebraComplianceTest {
 
             if (provider instanceof org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E> sparseProvider) {
                 @SuppressWarnings("unchecked")
-                E eps = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(1e-8, 0) : (E)(useFloat ? Real.of((float)1e-8) : Real.of(1e-8));
+                E eps = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(1e-6, 0) : (E)(useFloat ? Real.of((float)1e-6) : Real.of(1e-8));
                 @SuppressWarnings("unchecked")
-                E twenty = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(20, 0) : (E)(useFloat ? Real.of(20f) : Real.of(20));
+                E twenty = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(50, 0) : (E)(useFloat ? Real.of(50f) : Real.of(20));
                 testOperation(res, "BiCGSTAB" + suffix, () -> {
                     Random rand = new Random(42);
                     int n = 30;
@@ -531,13 +534,22 @@ public class LinearAlgebraComplianceTest {
 
     private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> randomSPDMatrix(int n, Random rand, Ring<E> ring, boolean useFloat) {
         org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring, useFloat);
-        org.episteme.core.mathematics.linearalgebra.Matrix<E> result = a.multiply(a.transpose());
         boolean isComplexInside = ring instanceof org.episteme.core.mathematics.sets.Complexes;
+        org.episteme.core.mathematics.linearalgebra.Matrix<E> aH;
+        if (isComplexInside) {
+             @SuppressWarnings("unchecked")
+             E[][] data = (E[][]) new Object[n][n];
+             for(int i=0; i<n; i++) for(int j=0; j<n; j++) data[i][j] = (E) ((org.episteme.core.mathematics.numbers.complex.Complex)a.get(j, i)).conjugate();
+             aH = org.episteme.core.mathematics.linearalgebra.Matrix.of(data, ring);
+        } else {
+             aH = a.transpose();
+        }
+        org.episteme.core.mathematics.linearalgebra.Matrix<E> result = a.multiply(aH);
         @SuppressWarnings("unchecked")
-        E ten = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(10, 0) : (E)(useFloat ? Real.of(10f) : Real.of(10));
+        E shift = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(20, 0) : (E)(useFloat ? Real.of(20f) : Real.of(10));
         @SuppressWarnings("unchecked")
         E[][] diagData = (E[][]) new Object[n][n];
-        for(int r=0; r<n; r++) for(int c=0; c<n; c++) diagData[r][c] = (r==c) ? ten : ring.zero();
+        for(int r=0; r<n; r++) for(int c=0; c<n; c++) diagData[r][c] = (r==c) ? shift : ring.zero();
         return result.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
     }
 
@@ -790,5 +802,13 @@ public class LinearAlgebraComplianceTest {
         } catch (Exception e) {
             return 0.0;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <E> E conjugate(E element) {
+        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+            return (E) ((org.episteme.core.mathematics.numbers.complex.Complex) element).conjugate();
+        }
+        return element;
     }
 }

@@ -32,7 +32,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(Backend.class)
+@AutoService({Backend.class, LinearAlgebraProvider.class})
 @SuppressWarnings("rawtypes")
 public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, SIMDBackend, CPUBackend {
 
@@ -284,6 +284,21 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     @Override
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
         return executeComplexOperation(p -> p.solve(cholesky, b));
+    }
+
+    @Override
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        return sparseProvider.bicgstab(a, b, x0, tolerance, maxIterations);
+    }
+
+    @Override
+    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
+        return sparseProvider.gmres(a, b, x0, tolerance, maxIterations, restarts);
+    }
+
+    @Override
+    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        return sparseProvider.conjugateGradient(a, b, x0, tolerance, maxIterations);
     }
 
     @Override
