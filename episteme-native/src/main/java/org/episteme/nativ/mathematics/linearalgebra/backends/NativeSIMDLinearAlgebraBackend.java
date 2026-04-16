@@ -8,6 +8,7 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
@@ -36,7 +37,7 @@ import static jdk.incubator.vector.VectorOperators.*;
  * @since 1.2
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class})
-public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend, SIMDBackend {
+public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend, SIMDBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSIMDLinearAlgebraBackend.class);
     
@@ -69,7 +70,6 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         }
     }
 
-    
     @Override
     public boolean isLoaded() {
         return isAvailable();
@@ -104,7 +104,7 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring instanceof Reals;
+        return ring instanceof Reals || ring instanceof org.episteme.core.mathematics.sets.Complexes;
     }
 
     @Override
@@ -132,67 +132,192 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         // No-op. Vector API does not require explicit shutdown.
     }
 
-    @Override
-    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
-        logger.debug("Entering SIMD multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
-        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
-        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from(b);
-        return sa.multiply(sb);
+    private boolean isComplex(Object o) {
+        if (o instanceof Matrix) return ((Matrix<?>) o).getScalarRing().one() instanceof Complex;
+        if (o instanceof Vector) return ((Vector<?>) o).getScalarRing().one() instanceof Complex;
+        return o instanceof Complex;
     }
 
-    @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
-        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from(b);
-        return sa.add(sb);
-    }
-    
-    @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
-        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from(b);
-        return sa.subtract(sb);
-    }
+    // --- Vector Operations ---
 
     @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from(a);
-        return sa.scale(scalar.doubleValue());
-    }
-
-    @Override
-    public Matrix<Real> transpose(Matrix<Real> a) {
-        return SIMDRealDoubleMatrix.from(a).transpose();
-    }
-    
-    @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        return SIMDRealDoubleMatrix.from(a).multiply(b);
-    }
-
-    @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        if(!(a.getScalarRing() instanceof Reals)) throw new UnsupportedOperationException("SIMD solve only supports Real field.");
+    public Vector<E> add(Vector<E> a, Vector<E> b) {
+        if (isComplex(a)) return (Vector<E>) (Object) executeComplexVectorAdd((Vector<Complex>) (Object) a, (Vector<Complex>) (Object) b);
+        int n = a.dimension();
+        if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
         
-        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from(a);
+        double[] aData = toDoubleArray((Vector<Real>) (Object) a);
+        double[] bData = toDoubleArray((Vector<Real>) (Object) b);
+        double[] cData = new double[n];
+        
+        int i = 0;
+        int loopBound = getSpecies().loopBound(n);
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
+            va.add(vb).intoArray(cData, i);
+        }
+        for (; i < n; i++) cData[i] = aData[i] + bData[i];
+        
+        return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+    }
+
+    @Override
+    public Vector<E> subtract(Vector<E> a, Vector<E> b) {
+        if (isComplex(a)) return (Vector<E>) (Object) executeComplexVectorSubtract((Vector<Complex>) (Object) a, (Vector<Complex>) (Object) b);
+        int n = a.dimension();
+        if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
+        
+        double[] aData = toDoubleArray((Vector<Real>) (Object) a);
+        double[] bData = toDoubleArray((Vector<Real>) (Object) b);
+        double[] cData = new double[n];
+        
+        int i = 0;
+        int loopBound = getSpecies().loopBound(n);
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
+            va.sub(vb).intoArray(cData, i);
+        }
+        for (; i < n; i++) cData[i] = aData[i] - bData[i];
+        
+        return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+    }
+
+    @Override
+    public Vector<E> multiply(Vector<E> vector, E scalar) {
+        if (isComplex(vector)) return (Vector<E>) (Object) executeComplexVectorScale((Vector<Complex>) (Object) vector, (Complex) (Object) scalar);
+        int n = vector.dimension();
+        double s = ((Real) (Object) scalar).doubleValue();
+        double[] aData = toDoubleArray((Vector<Real>) (Object) vector);
+        double[] cData = new double[n];
+        
+        int i = 0;
+        int loopBound = getSpecies().loopBound(n);
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+            va.mul(s).intoArray(cData, i);
+        }
+        for (; i < n; i++) cData[i] = aData[i] * s;
+        
+        return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+    }
+
+    @Override
+    public E dot(Vector<E> a, Vector<E> b) {
+        if (isComplex(a)) return (E) (Object) executeComplexVectorDot((Vector<Complex>) (Object) a, (Vector<Complex>) (Object) b);
+        int n = a.dimension();
+        if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
+        
+        double[] aData = toDoubleArray((Vector<Real>) (Object) a);
+        double[] bData = toDoubleArray((Vector<Real>) (Object) b);
+        
+        int i = 0;
+        int loopBound = getSpecies().loopBound(n);
+        DoubleVector sum = DoubleVector.zero(getSpecies());
+        
+        for (; i < loopBound; i += getSpecies().length()) {
+            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
+            sum = sum.add(va.mul(vb));
+        }
+        double res = sum.reduceLanes(ADD);
+        
+        for (; i < n; i++) res += aData[i] * bData[i];
+        
+        return (E) (Object) Real.of(res);
+    }
+
+    @Override
+    public E norm(Vector<E> a) {
+        if (isComplex(a)) return (E) (Object) executeComplexVectorNorm((Vector<Complex>) (Object) a);
+        return (E) (Object) Real.of(Math.sqrt(((Real) (Object) dot(a, a)).doubleValue()));
+    }
+
+    @Override
+    public Vector<E> cross(Vector<E> a, Vector<E> b) {
+        // Fallback to default SPI for cross, angle, projection as they are geometric helpers
+        return LinearAlgebraProvider.super.cross(a, b);
+    }
+
+    @Override
+    public E angle(Vector<E> a, Vector<E> b) {
+        return LinearAlgebraProvider.super.angle(a, b);
+    }
+
+    @Override
+    public Vector<E> projection(Vector<E> a, Vector<E> b) {
+        return LinearAlgebraProvider.super.projection(a, b);
+    }
+
+    // --- Matrix Operations ---
+
+    @Override
+    public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
+        if (isComplex(a)) return (Matrix<E>) (Object) executeComplexMultiply((Matrix<Complex>) (Object) a, (Matrix<Complex>) (Object) b);
+        logger.debug("Entering SIMD multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
+        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) b);
+        return (Matrix<E>) (Object) sa.multiply(sb);
+    }
+
+    @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        if (isComplex(a)) return (Matrix<E>) (Object) executeComplexAdd((Matrix<Complex>) (Object) a, (Matrix<Complex>) (Object) b);
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
+        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) b);
+        return (Matrix<E>) (Object) sa.add(sb);
+    }
+
+    @Override
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        if (isComplex(a)) return (Matrix<E>) (Object) executeComplexSubtract((Matrix<Complex>) (Object) a, (Matrix<Complex>) (Object) b);
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
+        SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) b);
+        return (Matrix<E>) (Object) sa.subtract(sb);
+    }
+
+    @Override
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        if (isComplex(a)) return (Matrix<E>) (Object) executeComplexScale((Complex) (Object) scalar, (Matrix<Complex>) (Object) a);
+        SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
+        return (Matrix<E>) (Object) sa.scale(((Real) (Object) scalar).doubleValue());
+    }
+
+    @Override
+    public Matrix<E> transpose(Matrix<E> a) {
+        if (isComplex(a)) return (Matrix<E>) (Object) executeComplexTranspose((Matrix<Complex>) (Object) a);
+        return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).transpose();
+    }
+
+    @Override
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        if (isComplex(a)) return (Vector<E>) (Object) executeComplexMatVec((Matrix<Complex>) (Object) a, (Vector<Complex>) (Object) b);
+        return (Vector<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).multiply((Vector<Real>) (Object) b);
+    }
+
+    @Override
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (isComplex(a)) throw new UnsupportedOperationException("SIMD solve not yet implemented for Complex.");
+        
+        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
         int m = simdA.rows();
         int n = simdA.cols();
-        if (m == n) {
-            if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
-        } else {
-            // Rectangular solve (Least Squares) via QR: A = Q R => R x = Q^T b
+        
+        if (m != n) {
+             // Rectangular solve (Least Squares) via QR: A = Q R => R x = Q^T b
             logger.debug("Rectangular SIMD solve via QR Decomposition: [{}x{}]", m, n);
-            var qr = qr(a);
-            Matrix<Real> Q = qr.Q();
-            Matrix<Real> R = qr.R();
+            QRResult<E> qr = qr(a);
+            Matrix<Real> Q = (Matrix<Real>) (Object) qr.getQ();
+            Matrix<Real> R = (Matrix<Real>) (Object) qr.getR();
             
             // QtB = Q^T * b
-            Vector<Real> QtB = Q.transpose().multiply(b);
+            Vector<Real> QtB = (Vector<Real>) (Object) Q.transpose().multiply((Vector<Real>) (Object) b);
             
             // Solve R x = QtB via back-substitution (R is economy upper triangular n x n)
             double[] rData = toMatrixDoubleArray(R);
             double[] bData = new double[n];
-            for (int i = 0; i < n; i++) bData[i] = QtB.get(i).doubleValue();
+            for (int i = 0; i < n; i++) bData[i] = ((Real) (Object) QtB.get(i)).doubleValue();
             
             double[] x = new double[n];
             var species = getSpecies();
@@ -206,700 +331,366 @@ public class NativeSIMDLinearAlgebraBackend implements LinearAlgebraProvider<Rea
                     vSum = vSum.add(vA.mul(vX));
                 }
                 sum = vSum.reduceLanes(ADD);
-                for (; j < n; j++) {
-                    sum += rData[i * n + j] * x[j];
-                }
-                if (Math.abs(rData[i * n + i]) < 1e-15) {
-                    x[i] = 0.0; // Rank deficient
-                } else {
-                    x[i] = (bData[i] - sum) / rData[i * n + i];
-                }
-            }
-            return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
-        }
-        
-        double[] x = new double[n];
-        for(int i=0; i<n; i++) x[i] = b.get(i).doubleValue();
-        
-        double[] data = simdA.getInternalData();
-        var species = getSpecies();
-        
-        for (int k = 0; k < n; k++) {
-            int max = k;
-            for (int i = k + 1; i < n; i++) {
-                if (Math.abs(data[i*n + k]) > Math.abs(data[max*n + k])) max = i;
-            }
-            if (k != max) {
-                 for (int j = k; j < n; j++) {
-                    double temp = data[k*n + j];
-                    data[k*n + j] = data[max*n + j];
-                    data[max*n + j] = temp;
-                }
-                double t = x[k]; x[k] = x[max]; x[max] = t;
-            }
-            if (Math.abs(data[k*n + k]) < 1e-12) throw new ArithmeticException("Singular matrix");
-            
-            for (int i = k + 1; i < n; i++) {
-                double factor = data[i*n + k] / data[k*n + k];
-                x[i] -= factor * x[k];
-                data[i*n + k] = 0;
+                for (; j < n; j++) sum += rData[i * n + j] * x[j];
                 
-                int j = k + 1;
-                for (; j + species.length() <= n; j += species.length()) {
-                    var vRowK = DoubleVector.fromArray(species, data, k*n + j);
-                    var vRowI = DoubleVector.fromArray(species, data, i*n + j);
-                    vRowI.sub(vRowK.mul(factor)).intoArray(data, i*n + j);
-                }
-                for (; j < n; j++) {
-                    data[i*n + j] -= factor * data[k*n + j];
-                }
+                if (Math.abs(rData[i * n + i]) < 1e-15) x[i] = 0.0;
+                else x[i] = (bData[i] - sum) / rData[i * n + i];
             }
+            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
         }
-        
-        for (int i = n - 1; i >= 0; i--) {
-            double sum = 0.0;
-            int j = i + 1;
-            var vSum = DoubleVector.zero(species);
-            for (; j + species.length() <= n; j += species.length()) {
-                 var vA = DoubleVector.fromArray(species, data, i*n + j);
-                 var vX = DoubleVector.fromArray(species, x, j);
-                 vSum = vSum.add(vA.mul(vX));
-            }
-            sum = vSum.reduceLanes(ADD);
-            for (; j < n; j++) {
-                sum += data[i*n + j] * x[j];
-            }
-            x[i] = (x[i] - sum) / data[i*n + i];
-        }
-        
-        Real[] res = new Real[n];
-        for(int i=0; i<n; i++) res[i] = Real.of(x[i]);
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
-    }
 
-    @Override
-    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
-        int n = a.dimension();
-        if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
+        // Standard Square Case
+        double[] x = new double[n];
+        for (int i = 0; i < n; i++) x[i] = ((Real) (Object) b.get(i)).doubleValue();
         
-        double[] aData = toDoubleArray(a);
-        double[] bData = toDoubleArray(b);
-        double[] cData = new double[n];
-        
-        int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
-            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
-            va.add(vb).intoArray(cData, i);
-        }
-        for (; i < n; i++) {
-            cData[i] = aData[i] + bData[i];
-        }
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
-    }
-    @Override
-    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
-        int n = a.dimension();
-        if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
-        
-        double[] aData = toDoubleArray(a);
-        double[] bData = toDoubleArray(b);
-        double[] cData = new double[n];
-        
-        int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
-            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
-            va.sub(vb).intoArray(cData, i);
-        }
-        for (; i < n; i++) {
-            cData[i] = aData[i] - bData[i];
-        }
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
-    }
-    @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        int n = vector.dimension();
-        double s = scalar.doubleValue();
-        double[] aData = toDoubleArray(vector);
-        double[] cData = new double[n];
-        
-        int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
-            va.mul(s).intoArray(cData, i);
-        }
-        for (; i < n; i++) {
-            cData[i] = aData[i] * s;
-        }
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
-    }
-    @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) {
-        int n = a.dimension();
-        if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
-        
-        double[] aData = toDoubleArray(a);
-        double[] bData = toDoubleArray(b);
-        
-        int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        DoubleVector sum = DoubleVector.zero(getSpecies());
-        
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
-            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
-            sum = sum.add(va.mul(vb));
-        }
-        double res = sum.reduceLanes(ADD);
-        
-        for (; i < n; i++) {
-            res += aData[i] * bData[i];
-        }
-        return Real.of(res);
-    }
-    @Override
-    public Real norm(Vector<Real> a) {
-        return Real.of(Math.sqrt(dot(a, a).doubleValue()));
-    }
-
-    private double[] toDoubleArray(Vector<Real> v) {
-        int n = v.dimension();
-        double[] data = new double[n];
-        for(int i=0; i<n; i++) data[i] = v.get(i).doubleValue();
-        return data; 
-    }
-    
-    private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
-        return new SIMDRealDoubleMatrix(rows, cols, data);
-    }
-    @Override
-    public Matrix<Real> inverse(Matrix<Real> a) {
-        int m = a.rows();
-        int n = a.cols();
-        if (m != n) {
-            // Rectangular inverse (Pseudo-inverse) via SVD: A = U S V^T => A+ = V S+ U^T
-            logger.debug("Rectangular SIMD pseudo-inverse via SVD: [{}x{}]", m, n);
-            var svd = svd(a);
-            var U = svd.U();
-            var S = svd.S();
-            var V = svd.V();
-            
-            int k = Math.min(m, n);
-            double[] sData = new double[k];
-            for (int i = 0; i < k; i++) {
-                double val = S.get(i).doubleValue();
-                if (val > 1e-12) {
-                    sData[i] = 1.0 / val;
-                } else {
-                    sData[i] = 0.0;
-                }
-            }
-            
-            // Sinv is diagonal n x m (or m x n depending on A+)
-            // But we can just multiply V * diag(sInv) * U^T
-            // V is n x k, Sdiag is k x k, Ut is k x m
-            
-            Matrix<Real> V_Sinv = V.multiply(org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.diagonal(sData));
-            return V_Sinv.multiply(U.transpose());
-        }
-        
-        // Solve AX = I using Gaussian elimination with partial pivoting
-        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from(a);
         double[] data = simdA.getInternalData();
-        double[] inv = new double[n * n];
-        for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
-        
         var species = getSpecies();
         
+        // Gaussian Elimination
         for (int k = 0; k < n; k++) {
-            // Pivoting
             int max = k;
-            for (int i = k + 1; i < n; i++) {
-                if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
-            }
+            for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
             if (k != max) {
-                // Swap rows in A
                 for (int j = k; j < n; j++) {
                     double temp = data[k * n + j];
                     data[k * n + j] = data[max * n + j];
                     data[max * n + j] = temp;
                 }
-                // Swap rows in Inverse
+                double t = x[k]; x[k] = x[max]; x[max] = t;
+            }
+            
+            if (Math.abs(data[k * n + k]) < 1e-15) throw new ArithmeticException("Matrix is singular");
+            
+            for (int i = k + 1; i < n; i++) {
+                double factor = data[i * n + k] / data[k * n + k];
+                x[i] -= factor * x[k];
+                data[i * n + k] = 0;
+                int j = k + 1;
+                for (; j + species.length() <= n; j += species.length()) {
+                    var vK = DoubleVector.fromArray(species, data, k * n + j);
+                    var vI = DoubleVector.fromArray(species, data, i * n + j);
+                    vI.sub(vK.mul(factor)).intoArray(data, i * n + j);
+                }
+                for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];
+            }
+        }
+        
+        // Back-substitution
+        for (int i = n - 1; i >= 0; i--) {
+            double sum = 0.0;
+            int j = i + 1;
+            var vSum = DoubleVector.zero(species);
+            for (; j + species.length() <= n; j += species.length()) {
+                var vA = DoubleVector.fromArray(species, data, i * n + j);
+                var vX = DoubleVector.fromArray(species, x, j);
+                vSum = vSum.add(vA.mul(vX));
+            }
+            sum = vSum.reduceLanes(ADD);
+            for (; j < n; j++) sum += data[i * n + j] * x[j];
+            x[i] = (x[i] - sum) / data[i * n + i];
+        }
+        
+        return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
+    }
+
+    @Override
+    public E determinant(Matrix<E> a) {
+        if (isComplex(a)) throw new UnsupportedOperationException("SIMD determinant not yet implemented for Complex.");
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        
+        LUResult<E> lu = lu(a);
+        Matrix<Real> U = (Matrix<Real>) (Object) lu.getU();
+        double det = 1.0;
+        for (int i = 0; i < n; i++) det *= ((Real) (Object) U.get(i, i)).doubleValue();
+        
+        Vector<Real> P = (Vector<Real>) (Object) lu.getP();
+        int swaps = 0;
+        for (int i = 0; i < n; i++) if (Math.abs(((Real) (Object) P.get(i)).doubleValue() - i) > 0.1) swaps++;
+        if ((swaps / 2) % 2 != 0) det = -det;
+        
+        return (E) (Object) Real.of(det);
+    }
+
+    @Override
+    public Matrix<E> inverse(Matrix<E> a) {
+        if (isComplex(a)) throw new UnsupportedOperationException("SIMD inverse not yet implemented for Complex.");
+        int m = a.rows();
+        int n = a.cols();
+        
+        if (m != n) {
+            // Pseudo-inverse via SVD
+            SVDResult<E> svd = svd(a);
+            Matrix<Real> U = (Matrix<Real>) (Object) svd.getU();
+            Vector<Real> S = (Vector<Real>) (Object) svd.getS();
+            Matrix<Real> V = (Matrix<Real>) (Object) svd.getV();
+            
+            int k = Math.min(m, n);
+            double[] sInv = new double[k];
+            for (int i = 0; i < k; i++) {
+                double val = ((Real) (Object) S.get(i)).doubleValue();
+                sInv[i] = val > 1e-12 ? 1.0 / val : 0.0;
+            }
+            
+            Matrix<Real> Sinv = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.diagonal(sInv);
+            Matrix<Real> V_Sinv = V.multiply(Sinv);
+            return (Matrix<E>) (Object) V_Sinv.multiply(U.transpose());
+        }
+        
+        // Square Inverse via Gaussian
+        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
+        double[] data = simdA.getInternalData();
+        double[] inv = new double[n * n];
+        for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
+        
+        var species = getSpecies();
+        for (int k = 0; k < n; k++) {
+            int max = k;
+            for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
+            if (k != max) {
+                for (int j = k; j < n; j++) {
+                    double t = data[k * n + j]; data[k * n + j] = data[max * n + j]; data[max * n + j] = t;
+                }
                 for (int j = 0; j < n; j++) {
-                    double temp = inv[k * n + j];
-                    inv[k * n + j] = inv[max * n + j];
-                    inv[max * n + j] = temp;
+                    double t = inv[k * n + j]; inv[k * n + j] = inv[max * n + j]; inv[max * n + j] = t;
                 }
             }
             
             double pivot = data[k * n + k];
             if (Math.abs(pivot) < 1e-15) throw new ArithmeticException("Matrix is singular");
             
-            // Normalize row k
             for (int j = k + 1; j < n; j++) data[k * n + j] /= pivot;
             for (int j = 0; j < n; j++) inv[k * n + j] /= pivot;
             data[k * n + k] = 1.0;
             
-            // Eliminate other rows
             for (int i = 0; i < n; i++) {
                 if (i != k) {
-                    double factor = data[i * n + k];
+                    double f = data[i * n + k];
                     int j = k + 1;
-                    // Vectorized elimination for A
                     for (; j + species.length() <= n; j += species.length()) {
-                        var vRowK = DoubleVector.fromArray(species, data, k * n + j);
-                        var vRowI = DoubleVector.fromArray(species, data, i * n + j);
-                        vRowI.sub(vRowK.mul(factor)).intoArray(data, i * n + j);
+                        var vK = DoubleVector.fromArray(species, data, k * n + j);
+                        var vI = DoubleVector.fromArray(species, data, i * n + j);
+                        vI.sub(vK.mul(f)).intoArray(data, i * n + j);
                     }
-                    for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];
+                    for (; j < n; j++) data[i * n + j] -= f * data[k * n + j];
                     
-                    // Vectorized elimination for Inverse
                     j = 0;
                     for (; j + species.length() <= n; j += species.length()) {
-                        var vInvK = DoubleVector.fromArray(species, inv, k * n + j);
-                        var vInvI = DoubleVector.fromArray(species, inv, i * n + j);
-                        vInvI.sub(vInvK.mul(factor)).intoArray(inv, i * n + j);
+                        var vIK = DoubleVector.fromArray(species, inv, k * n + j);
+                        var vII = DoubleVector.fromArray(species, inv, i * n + j);
+                        vII.sub(vIK.mul(f)).intoArray(inv, i * n + j);
                     }
-                    for (; j < n; j++) inv[i * n + j] -= factor * inv[k * n + j];
+                    for (; j < n; j++) inv[i * n + j] -= f * inv[k * n + j];
                 }
             }
         }
-        return fromDoubleArray(inv, n, n);
+        return (Matrix<E>) (Object) fromDoubleArray(inv, n, n);
     }
 
     @Override
-    public Real determinant(Matrix<Real> a) {
+    public LUResult<E> lu(Matrix<E> a) {
+        if (isComplex(a)) throw new UnsupportedOperationException("SIMD LU not yet implemented for Complex.");
         int n = a.rows();
-        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
-        
-        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from(a);
-        double[] data = simdA.getInternalData();
-        double det = 1.0;
-        var species = getSpecies();
-
+        double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+        double[] lData = new double[n * n];
+        double[] uData = new double[n * n];
+        double[] p = new double[n];
+        for (int i = 0; i < n; i++) { p[i] = i; lData[i * n + i] = 1.0; }
         
         for (int k = 0; k < n; k++) {
             int max = k;
-            for (int i = k + 1; i < n; i++) {
-                if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
-            }
+            for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
             if (k != max) {
-                for (int j = k; j < n; j++) {
-                    double temp = data[k * n + j];
-                    data[k * n + j] = data[max * n + j];
-                    data[max * n + j] = temp;
+                for (int j = 0; j < n; j++) {
+                    double t = data[k * n + j]; data[k * n + j] = data[max * n + j]; data[max * n + j] = t;
                 }
-                det = -det;
+                double t = p[k]; p[k] = p[max]; p[max] = t;
             }
-            
-            double pivot = data[k * n + k];
-            det *= pivot;
-            if (Math.abs(det) < 1e-100) return Real.ZERO;
-            
+            uData[k * n + k] = data[k * n + k];
             for (int i = k + 1; i < n; i++) {
-                double factor = data[i * n + k] / pivot;
-                int j = k + 1;
-                for (; j + species.length() <= n; j += species.length()) {
-                    var vRowK = DoubleVector.fromArray(species, data, k * n + j);
-                    var vRowI = DoubleVector.fromArray(species, data, i * n + j);
-                    vRowI.lanewise(SUB, 
-                        vRowK.lanewise(MUL, factor))
-                        .intoArray(data, i * n + j);
-                }
-                for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];
+                lData[i * n + k] = data[i * n + k] / uData[k * n + k];
+                uData[k * n + i] = data[k * n + i];
+                for (int j = k + 1; j < n; j++) data[i * n + j] -= lData[i * n + k] * data[k * n + j];
             }
         }
-        return Real.of(det);
+        
+        return (LUResult<E>) (Object) new LUResult<Real>(
+            fromDoubleArray(lData, n, n),
+            fromDoubleArray(uData, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p)
+        );
     }
 
+    @Override
+    public QRResult<E> qr(Matrix<E> a) {
+        if (isComplex(a)) throw new UnsupportedOperationException("SIMD QR not yet implemented for Complex.");
+        int m = a.rows();
+        int n = a.cols();
+        double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+        double[] q = new double[m * m];
+        for (int i = 0; i < m; i++) q[i * m + i] = 1.0;
+        
+        for (int k = 0; k < Math.min(m, n); k++) {
+            double norm = 0;
+            for (int i = k; i < m; i++) norm += data[i * n + k] * data[i * n + k];
+            norm = Math.sqrt(norm);
+            double v0 = data[k * n + k] + (data[k * n + k] >= 0 ? norm : -norm);
+            double vNorm = v0 * v0 + norm * norm - data[k * n + k] * data[k * n + k];
+            vNorm = Math.sqrt(vNorm);
+            if (vNorm > 1e-15) {
+                double[] v = new double[m - k];
+                v[0] = v0 / vNorm;
+                for (int i = 1; i < m - k; i++) v[i] = data[(k + i) * n + k] / vNorm;
+                
+                for (int j = k; j < n; j++) {
+                    double dot = 0;
+                    for (int i = 0; i < m - k; i++) dot += v[i] * data[(k + i) * n + j];
+                    for (int i = 0; i < m - k; i++) data[(k + i) * n + j] -= 2 * dot * v[i];
+                }
+                for (int j = 0; j < m; j++) {
+                    double dot = 0;
+                    for (int i = 0; i < m - k; i++) dot += v[i] * q[(k + i) * m + j];
+                    for (int i = 0; i < m - k; i++) q[(k + i) * m + j] -= 2 * dot * v[i];
+                }
+            }
+        }
+        
+        double[] rData = new double[m * n];
+        for (int i = 0; i < m; i++) for (int j = i; j < n; j++) rData[i * n + j] = data[i * n + j];
+        
+        return (QRResult<E>) (Object) new QRResult<Real>(
+            fromDoubleArray(q, m, m).transpose(),
+            fromDoubleArray(rData, m, n)
+        );
+    }
+
+    @Override
+    public SVDResult<E> svd(Matrix<E> a) {
+        if (isComplex(a)) throw new UnsupportedOperationException("SIMD SVD not yet implemented for Complex.");
+        int m = a.rows();
+        int n = a.cols();
+        boolean transposed = false;
+        Matrix<Real> target = (Matrix<Real>) (Object) a;
+        if (m < n) { transposed = true; target = target.transpose(); int t = m; m = n; n = t; }
+        
+        double[] data = toMatrixDoubleArray(target);
+        org.ejml.data.DMatrixRMaj ejmlA = new org.ejml.data.DMatrixRMaj(m, n, true, data);
+        var svdEjml = org.ejml.dense.row.factory.DecompositionFactory_DDRM.svd(m, n, true, true, false);
+        if (!svdEjml.decompose(ejmlA)) throw new RuntimeException("SVD decomposition failed");
+        
+        Matrix<Real> U = fromDoubleArray(svdEjml.getU(null, false).data, m, m);
+        Matrix<Real> V = fromDoubleArray(svdEjml.getV(null, false).data, n, n);
+        double[] s = svdEjml.getSingularValues();
+        
+        if (transposed) return (SVDResult<E>) (Object) new SVDResult<Real>(V, org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(s), U);
+        return (SVDResult<E>) (Object) new SVDResult<Real>(U, org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(s), V);
+    }
+
+    @Override
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        if (isComplex(a)) throw new UnsupportedOperationException("SIMD Cholesky not yet implemented for Complex.");
+        int n = a.rows();
+        double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+        double[] l = new double[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j <= i; j++) {
+                double sum = 0;
+                for (int k = 0; k < j; k++) sum += l[i * n + k] * l[j * n + k];
+                if (i == j) {
+                    double val = data[i * n + i] - sum;
+                    if (val <= 0) throw new ArithmeticException("Matrix is not positive definite");
+                    l[i * n + i] = Math.sqrt(val);
+                } else {
+                    l[i * n + j] = (data[i * n + j] - sum) / l[j * n + j];
+                }
+            }
+        }
+        return (CholeskyResult<E>) (Object) new CholeskyResult<Real>(fromDoubleArray(l, n, n));
+    }
+
+    private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
+        return new SIMDRealDoubleMatrix(rows, cols, data);
+    }
+
+    // --- Complex Helpers (Internal Fallback) ---
+
+    private Matrix<Complex> executeComplexAdd(Matrix<Complex> a, Matrix<Complex> b) {
+        Complex[][] res = new Complex[a.rows()][a.cols()];
+        for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).add(b.get(i, j));
+        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+    }
+
+    private Matrix<Complex> executeComplexSubtract(Matrix<Complex> a, Matrix<Complex> b) {
+        Complex[][] res = new Complex[a.rows()][a.cols()];
+        for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).subtract(b.get(i, j));
+        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+    }
+
+    private Matrix<Complex> executeComplexMultiply(Matrix<Complex> a, Matrix<Complex> b) {
+        return new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Complex>().multiply(a, b);
+    }
+
+    private Matrix<Complex> executeComplexScale(Complex s, Matrix<Complex> a) {
+        Complex[][] res = new Complex[a.rows()][a.cols()];
+        for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = s.multiply(a.get(i, j));
+        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+    }
+
+    private Matrix<Complex> executeComplexTranspose(Matrix<Complex> a) {
+        Complex[][] res = new Complex[a.cols()][a.rows()];
+        for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[j][i] = a.get(i, j);
+        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+    }
+
+    private Vector<Complex> executeComplexVectorAdd(Vector<Complex> a, Vector<Complex> b) {
+        Complex[] res = new Complex[a.dimension()];
+        for (int i = 0; i < a.dimension(); i++) res[i] = a.get(i).add(b.get(i));
+        return Vector.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+    }
+
+    private Vector<Complex> executeComplexVectorSubtract(Vector<Complex> a, Vector<Complex> b) {
+        Complex[] res = new Complex[a.dimension()];
+        for (int i = 0; i < a.dimension(); i++) res[i] = a.get(i).subtract(b.get(i));
+        return Vector.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+    }
+
+    private Vector<Complex> executeComplexVectorScale(Vector<Complex> v, Complex s) {
+        Complex[] res = new Complex[v.dimension()];
+        for (int i = 0; i < v.dimension(); i++) res[i] = v.get(i).multiply(s);
+        return Vector.of(res, (Ring<Complex>) (Object) v.getScalarRing());
+    }
+
+    private Complex executeComplexVectorDot(Vector<Complex> a, Vector<Complex> b) {
+        double r = 0, im = 0;
+        for (int i = 0; i < a.dimension(); i++) {
+            Complex ca = a.get(i); Complex cb = b.get(i);
+            r += ca.real() * cb.real() + ca.imaginary() * cb.imaginary();
+            im += ca.imaginary() * cb.real() - ca.real() * cb.imaginary();
+        }
+        return Complex.of(r, im);
+    }
+
+    private Complex executeComplexVectorNorm(Vector<Complex> a) {
+        return Complex.of(Math.sqrt(executeComplexVectorDot(a, a).real()), 0);
+    }
+
+    private Vector<Complex> executeComplexMatVec(Matrix<Complex> a, Vector<Complex> b) {
+        return new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Complex>().multiply(a, b);
+    }
+
+    // --- Data Utilities ---
 
     private double[] toMatrixDoubleArray(Matrix<Real> m) {
         int r = m.rows(), c = m.cols();
         double[] d = new double[r * c];
-        for (int i = 0; i < r; i++)
-            for (int j = 0; j < c; j++)
-                d[i * c + j] = m.get(i, j).doubleValue();
+        for (int i = 0; i < r; i++) for (int j = 0; j < c; j++) d[i * c + j] = m.get(i, j).doubleValue();
         return d;
     }
 
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        int n = a.rows();
-        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for LU");
-        double[] data = toMatrixDoubleArray(a);
-        double[] L = new double[n * n];
-        double[] U = java.util.Arrays.copyOf(data, data.length);
-        int[] piv = new int[n];
-        for (int i = 0; i < n; i++) piv[i] = i;
-        var species = getSpecies();
-
-        for (int k = 0; k < n; k++) {
-            // Partial pivoting
-            int maxRow = k;
-            for (int i = k + 1; i < n; i++) {
-                if (Math.abs(U[i * n + k]) > Math.abs(U[maxRow * n + k])) maxRow = i;
-            }
-            if (maxRow != k) {
-                for (int j = 0; j < n; j++) { double t = U[k*n+j]; U[k*n+j] = U[maxRow*n+j]; U[maxRow*n+j] = t; }
-                for (int j = 0; j < k; j++) { double t = L[k*n+j]; L[k*n+j] = L[maxRow*n+j]; L[maxRow*n+j] = t; }
-                int t = piv[k]; piv[k] = piv[maxRow]; piv[maxRow] = t;
-            }
-            L[k * n + k] = 1.0;
-            double pivot = U[k * n + k];
-            if (Math.abs(pivot) < 1e-15) continue;
-            for (int i = k + 1; i < n; i++) {
-                double factor = U[i * n + k] / pivot;
-                L[i * n + k] = factor;
-                int j = k;
-                for (; j + species.length() <= n; j += species.length()) {
-                    var vK = DoubleVector.fromArray(species, U, k * n + j);
-                    var vI = DoubleVector.fromArray(species, U, i * n + j);
-                    vI.sub(vK.mul(factor)).intoArray(U, i * n + j);
-                }
-                for (; j < n; j++) U[i * n + j] -= factor * U[k * n + j];
-            }
-        }
-        double[] pivD = new double[n];
-        for (int i = 0; i < n; i++) pivD[i] = piv[i];
-        return new LUResult<Real>(
-            fromDoubleArray(L, n, n), fromDoubleArray(U, n, n),
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pivD)
-        );
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        int m = a.rows(), n = a.cols();
-        double[] R = toMatrixDoubleArray(a);
-        double[] Q = new double[m * m];
-        for (int i = 0; i < m; i++) Q[i * m + i] = 1.0;
-
-        int min = Math.min(m, n);
-        for (int k = 0; k < min; k++) {
-            // Compute Householder vector
-            double normx = 0;
-            for (int i = k; i < m; i++) normx += R[i * n + k] * R[i * n + k];
-            normx = Math.sqrt(normx);
-            if (normx < 1e-15) continue;
-            double sign = R[k * n + k] >= 0 ? 1.0 : -1.0;
-            double alpha = -sign * normx;
-            double[] v = new double[m];
-            v[k] = R[k * n + k] - alpha;
-            for (int i = k + 1; i < m; i++) v[i] = R[i * n + k];
-            double vnorm = 0;
-            for (int i = k; i < m; i++) vnorm += v[i] * v[i];
-            if (vnorm < 1e-30) continue;
-            double beta = 2.0 / vnorm;
-
-            // Apply H to R: R = R - beta * v * (v^T * R)
-            for (int j = k; j < n; j++) {
-                double dot = 0;
-                for (int i = k; i < m; i++) dot += v[i] * R[i * n + j];
-                for (int i = k; i < m; i++) R[i * n + j] -= beta * v[i] * dot;
-            }
-            // Apply H to Q: Q = Q - beta * (Q * v) * v^T
-            for (int i = 0; i < m; i++) {
-                double dot = 0;
-                for (int j2 = k; j2 < m; j2++) dot += Q[i * m + j2] * v[j2];
-                for (int j2 = k; j2 < m; j2++) Q[i * m + j2] -= beta * dot * v[j2];
-            }
-        }
-        return new QRResult<Real>(
-            fromDoubleArray(Q, m, m), fromDoubleArray(R, m, n)
-        );
-    }
-
-    @Override
-    public SVDResult<Real> svd(Matrix<Real> a) {
-        int m = a.rows();
-        int n = a.cols();
-        boolean transposed = false;
-        Matrix<Real> workA = a;
-        
-        if (m < n) {
-            transposed = true;
-            workA = a.transpose();
-            int tmp = m; m = n; n = tmp;
-        }
-
-        logger.debug("Entering SIMD SVD (Hestenes One-Sided Jacobi): [{}x{}]", m, n);
-        
-        // Column-major storage for rotations
-        double[][] columns = new double[n][m];
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < m; i++) {
-                columns[j][i] = workA.get(i, j).doubleValue();
-            }
-        }
-        
-        // V starts as Identity
-        double[][] vCols = new double[n][n];
-        for (int i = 0; i < n; i++) vCols[i][i] = 1.0;
-        
-        int maxSweeps = 50;
-        double eps = 1e-15;
-        var species = getSpecies();
-        
-        for (int sweep = 0; sweep < maxSweeps; sweep++) {
-            boolean changed = false;
-            for (int j1 = 0; j1 < n - 1; j1++) {
-                for (int j2 = j1 + 1; j2 < n; j2++) {
-                    double alpha = 0, beta = 0, gamma = 0;
-                    
-                    // Vectorized dot products
-                    int i = 0;
-                    int loopBound = species.loopBound(m);
-                    DoubleVector vAlpha = DoubleVector.zero(species);
-                    DoubleVector vBeta = DoubleVector.zero(species);
-                    DoubleVector vGamma = DoubleVector.zero(species);
-                    
-                    for (; i < loopBound; i += species.length()) {
-                        DoubleVector v1 = DoubleVector.fromArray(species, columns[j1], i);
-                        DoubleVector v2 = DoubleVector.fromArray(species, columns[j2], i);
-                        vAlpha = vAlpha.add(v1.mul(v1));
-                        vBeta = vBeta.add(v2.mul(v2));
-                        vGamma = vGamma.add(v1.mul(v2));
-                    }
-                    alpha = vAlpha.reduceLanes(ADD);
-                    beta = vBeta.reduceLanes(ADD);
-                    gamma = vGamma.reduceLanes(ADD);
-                    
-                    for (; i < m; i++) {
-                        double d1 = columns[j1][i];
-                        double d2 = columns[j2][i];
-                        alpha += d1 * d1;
-                        beta += d2 * d2;
-                        gamma += d1 * d2;
-                    }
-                    
-                    // Convergence check for this pair
-                    if (Math.abs(gamma) < eps * Math.sqrt(alpha * beta)) continue;
-                    
-                    changed = true;
-                    double zeta = (beta - alpha) / (2.0 * gamma);
-                    double t = (zeta >= 0) ? 1.0 / (zeta + Math.sqrt(1.0 + zeta * zeta)) 
-                                         : 1.0 / (zeta - Math.sqrt(1.0 + zeta * zeta));
-                    double c = 1.0 / Math.sqrt(1.0 + t * t);
-                    double s = t * c;
-                    
-                    // Rotate columns of A
-                    i = 0;
-                    for (; i < loopBound; i += species.length()) {
-                        DoubleVector v1 = DoubleVector.fromArray(species, columns[j1], i);
-                        DoubleVector v2 = DoubleVector.fromArray(species, columns[j2], i);
-                        v1.mul(c).sub(v2.mul(s)).intoArray(columns[j1], i);
-                        v1.mul(s).add(v2.mul(c)).intoArray(columns[j2], i);
-                    }
-                    for (; i < m; i++) {
-                        double d1 = columns[j1][i];
-                        double d2 = columns[j2][i];
-                        columns[j1][i] = c * d1 - s * d2;
-                        columns[j2][i] = s * d1 + c * d2;
-                    }
-                    
-                    // Rotate columns of V
-                    int k = 0;
-                    int vLoopBound = species.loopBound(n);
-                    for (; k < vLoopBound; k += species.length()) {
-                        DoubleVector vV1 = DoubleVector.fromArray(species, vCols[j1], k);
-                        DoubleVector vV2 = DoubleVector.fromArray(species, vCols[j2], k);
-                        vV1.mul(c).sub(vV2.mul(s)).intoArray(vCols[j1], k);
-                        vV1.mul(s).add(vV2.mul(c)).intoArray(vCols[j2], k);
-                    }
-                    for (; k < n; k++) {
-                        double dV1 = vCols[j1][k];
-                        double dV2 = vCols[j2][k];
-                        vCols[j1][k] = c * dV1 - s * dV2;
-                        vCols[j2][k] = s * dV1 + c * dV2;
-                    }
-                }
-            }
-            if (!changed) break;
-        }
-        
-        // Singular values and U normalization
-        double[] sValues = new double[n];
-        for (int j = 0; j < n; j++) {
-            double normSq = 0;
-            for (int i = 0; i < m; i++) normSq += columns[j][i] * columns[j][i];
-            sValues[j] = Math.sqrt(normSq);
-            if (sValues[j] > eps) {
-                for (int i = 0; i < m; i++) columns[j][i] /= sValues[j];
-            }
-        }
-        
-        // Sorting
-        Integer[] idx = new Integer[n];
-        for (int i = 0; i < n; i++) idx[i] = i;
-        java.util.Arrays.sort(idx, (i1, i2) -> Double.compare(sValues[i2], sValues[i1]));
-        
-        double[] sortedS = new double[n];
-        double[] uData = new double[m * n];
-        double[] vData = new double[n * n];
-        
-        for (int j = 0; j < n; j++) {
-            int old = idx[j];
-            sortedS[j] = sValues[old];
-            for (int i = 0; i < m; i++) uData[i * n + j] = columns[old][i];
-            for (int i = 0; i < n; i++) vData[i * n + j] = vCols[old][i];
-        }
-        
-        Matrix<Real> U = fromDoubleArray(uData, m, n);
-        Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sortedS);
-        Matrix<Real> V = fromDoubleArray(vData, n, n);
-        
-        if (transposed) {
-            return new SVDResult<>(V, S, U);
-        }
-        return new SVDResult<>(U, S, V);
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        int n = a.rows();
-        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square for Cholesky");
-        double[] L = new double[n * n];
-
-        for (int j = 0; j < n; j++) {
-            double sum = 0;
-            for (int k = 0; k < j; k++) sum += L[j * n + k] * L[j * n + k];
-            double diag = a.get(j, j).doubleValue() - sum;
-            if (diag <= 0) throw new ArithmeticException("Matrix is not positive definite");
-            L[j * n + j] = Math.sqrt(diag);
-
-            for (int i = j + 1; i < n; i++) {
-                double s = 0;
-                for (int k = 0; k < j; k++) s += L[i * n + k] * L[j * n + k];
-                L[i * n + j] = (a.get(i, j).doubleValue() - s) / L[j * n + j];
-            }
-        }
-        return new CholeskyResult<Real>(
-            fromDoubleArray(L, n, n)
-        );
-    }
-
-    @Override
-    public EigenResult<Real> eigen(Matrix<Real> a) {
-        int n = a.rows();
-        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
-        
-        // Use a more numerically stable Cyclic Jacobi method for symmetric matrices
-        double[] data = toMatrixDoubleArray(a);
-        double[] vData = new double[n * n];
-        for (int i = 0; i < n; i++) vData[i * n + i] = 1.0;
-        
-        int maxSweeps = 50;
-        double eps = 1e-15;
-        var species = getSpecies();
-        
-        for (int sweep = 0; sweep < maxSweeps; sweep++) {
-            double offDiag = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = i + 1; j < n; j++) {
-                    offDiag += Math.abs(data[i * n + j]);
-                }
-            }
-            if (offDiag < eps) break;
-            
-            for (int p = 0; p < n - 1; p++) {
-                for (int q = p + 1; q < n; q++) {
-                    double apq = data[p * n + q];
-                    if (Math.abs(apq) < eps) continue;
-                    
-                    double app = data[p * n + p];
-                    double aqq = data[q * n + q];
-                    
-                    double tau = (aqq - app) / (2.0 * apq);
-                    double t = (tau >= 0) ? 1.0 / (tau + Math.sqrt(1.0 + tau * tau)) 
-                                         : 1.0 / (tau - Math.sqrt(1.0 + tau * tau));
-                    double c = 1.0 / Math.sqrt(1.0 + t * t);
-                    double s = t * c;
-
-                    // Update matrix A - Vectorized row rotations
-                    int pIdx = p * n;
-                    int qIdx = q * n;
-                    int i = 0;
-                    int loopBound = species.loopBound(n);
-                    for (; i < loopBound; i += species.length()) {
-                        DoubleVector vp = DoubleVector.fromArray(species, data, pIdx + i);
-                        DoubleVector vq = DoubleVector.fromArray(species, data, qIdx + i);
-                        DoubleVector vp_new = vp.mul(c).sub(vq.mul(s));
-                        DoubleVector vq_new = vp.mul(s).add(vq.mul(c));
-                        vp_new.intoArray(data, pIdx + i);
-                        vq_new.intoArray(data, qIdx + i);
-                    }
-                    for (; i < n; i++) {
-                        double tp = data[pIdx + i];
-                        double tq = data[qIdx + i];
-                        data[pIdx + i] = c * tp - s * tq;
-                        data[qIdx + i] = s * tp + c * tq;
-                    }
-                    
-                    // Mirror to columns for symmetry
-                    for (int j = 0; j < n; j++) {
-                        data[j * n + p] = data[p * n + j];
-                        data[j * n + q] = data[q * n + j];
-                    }
-                    
-                    // Reset diagonal and off-diagonal strictly correctly
-                    data[p * n + p] = app - t * apq;
-                    data[q * n + q] = aqq + t * apq;
-                    data[p * n + q] = 0.0;
-                    data[q * n + p] = 0.0;
-                    
-                    // Update eigenvectors V (all columns/rows)
-                    i = 0;
-                    for (; i + species.length() <= n; i += species.length()) {
-                        DoubleVector vp = DoubleVector.fromArray(species, vData, pIdx + i);
-                        DoubleVector vq = DoubleVector.fromArray(species, vData, qIdx + i);
-                        DoubleVector vp_new = vp.mul(c).sub(vq.mul(s));
-                        DoubleVector vq_new = vp.mul(s).add(vq.mul(c));
-                        vp_new.intoArray(vData, pIdx + i);
-                        vq_new.intoArray(vData, qIdx + i);
-                    }
-                    for (; i < n; i++) {
-                        double vp = vData[pIdx + i];
-                        double vq = vData[qIdx + i];
-                        vData[pIdx + i] = c * vp - s * vq;
-                        vData[qIdx + i] = s * vp + c * vq;
-                    }
-                }
-            }
-        }
-        
-        double[] eigenvalues = new double[n];
-        for (int i = 0; i < n; i++) eigenvalues[i] = data[i * n + i];
-        
-        // Transpose vData because we rotated rows but JScience expects eigenvectors as columns
-        double[] vDataCol = new double[n * n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                vDataCol[j * n + i] = vData[i * n + j];
-            }
-        }
-
-        // Sort eigenvalues and eigenvectors in descending order
-        Integer[] index = new Integer[n];
-        for (int i = 0; i < n; i++) index[i] = i;
-        java.util.Arrays.sort(index, (i1, i2) -> Double.compare(Math.abs(eigenvalues[i2]), Math.abs(eigenvalues[i1])));
-
-        double[] sortedEigenvalues = new double[n];
-        double[] sortedVDataCol = new double[n * n];
-        for (int i = 0; i < n; i++) {
-            int oldIdx = index[i];
-            sortedEigenvalues[i] = eigenvalues[oldIdx];
-            for (int j = 0; j < n; j++) {
-                sortedVDataCol[j * n + i] = vDataCol[j * n + oldIdx];
-            }
-        }
-
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-            fromDoubleArray(sortedVDataCol, n, n),
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sortedEigenvalues)
-        );
+    private double[] toDoubleArray(Vector<Real> v) {
+        int n = v.dimension();
+        double[] d = new double[n];
+        for (int i = 0; i < n; i++) d[i] = v.get(i).doubleValue();
+        return d;
     }
 }

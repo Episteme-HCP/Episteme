@@ -371,7 +371,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {
         if (!IS_AVAILABLE) return;
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             long d_A = tracker.track(allocateGPUMemory((long) m * k * 8), this::freeGPUMemory);
             long d_B = tracker.track(allocateGPUMemory((long) k * n * 8), this::freeGPUMemory);
             long d_C = tracker.track(allocateGPUMemory((long) m * n * 8), this::freeGPUMemory);
@@ -512,7 +512,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         int n = b.cols();
         int nnz = a.getNnz();
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             long d_csrRowPtr = tracker.track(allocateGPUMemory((long)(m + 1) * 4), this::freeGPUMemory);
             long d_csrColIdx = tracker.track(allocateGPUMemory((long)nnz * 4), this::freeGPUMemory);
             long d_csrVal = tracker.track(allocateGPUMemory((long)nnz * 8), this::freeGPUMemory);
@@ -627,7 +627,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         }
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> A_sparse = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) A;
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             double tol_val = tol.doubleValue();
             
             long d_r = tracker.track(allocateGPUMemory((long) n * 8), this::freeGPUMemory);
@@ -719,7 +719,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         }
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> A_sparse = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) A;
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             double tol_val = tol.doubleValue();
             long d_x = tracker.track(allocateGPUMemory((long) n * 8), this::freeGPUMemory);
             long d_r = tracker.track(allocateGPUMemory((long) n * 8), this::freeGPUMemory);
@@ -783,7 +783,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         }
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> A_sparse = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) A;
 
-        try (ResourceTracker globalTracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker globalTracker = new ResourceTracker()) {
             double tol_val = tol.doubleValue();
             long d_x = globalTracker.track(allocateGPUMemory((long) m_rows * 8), this::freeGPUMemory);
             if (x0 != null) NativeSafe.invoke(CUDA_MEMCPY, MemorySegment.ofAddress(d_x), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(x0)), (long) m_rows * 8, CUDA_MEMCPY_HOST_TO_DEVICE);

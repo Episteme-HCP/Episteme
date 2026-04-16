@@ -266,7 +266,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         int prec = (int) getPrecision();
         boolean isComplex = isComplex(sa.getScalarRing());
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_b = initVector(b.toMatrix(), arena, tracker, prec, isComplex);
             MemorySegment res = arena.allocate(MPFR_LAYOUT, sa.rows() * (isComplex ? 2 : 1));
             
@@ -566,7 +566,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         int[] colIdx = sa.getColIndices();
         Object[] vals = sa.getValues();
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment sR = arena.allocate(MPFR_LAYOUT); track(tracker, sR);
             MemorySegment sI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) track(tracker, sI);
@@ -712,7 +712,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(sa.rows(), sa.cols(), (E) sa.getScalarRing().zero());
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment t1R = arena.allocate(MPFR_LAYOUT); track(tracker, t1R);
             MemorySegment t1I = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) track(tracker, t1I);
@@ -782,7 +782,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         long prec = getPrecision();
         boolean isComplex = isComplex(v1.getScalarRing());
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment t1R = arena.allocate(MPFR_LAYOUT); track(tracker, t1R);
             MemorySegment t1I = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) track(tracker, t1I);
@@ -835,7 +835,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         int n = v1.dimension();
         E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(Object.class, n);
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment t1R = arena.allocate(MPFR_LAYOUT); track(tracker, t1R);
             MemorySegment t1I = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) track(tracker, t1I);
@@ -892,7 +892,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(sa.rows(), sa.cols(), (E) sa.getScalarRing().zero());
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment t1R = arena.allocate(MPFR_LAYOUT); track(tracker, t1R);
             MemorySegment t1I = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) track(tracker, t1I);
@@ -980,7 +980,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(sa.rows(), sb.cols(), (E) sa.getScalarRing().zero());
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment t1R = arena.allocate(MPFR_LAYOUT); track(tracker, t1R);
             MemorySegment t1I = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
             if (isComplex) track(tracker, t1I);
@@ -1090,7 +1090,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " is not available.");
         
         int prec = (int) getPrecision();
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             boolean isComplex = isComplex(v1.getScalarRing());
             MemorySegment h_v1 = initVector(v1.toMatrix(), arena, tracker, prec, isComplex);
             MemorySegment h_v2 = initVector(v2.toMatrix(), arena, tracker, prec, isComplex);
@@ -1222,7 +1222,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (maxIterations <= 0) maxIterations = config.getMaxIterations();
         Ring<E> ring = sa.getScalarRing();
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, tracker, isComplex);
             MemorySegment h_b = initVector(b.toMatrix(), arena, tracker, prec, isComplex);
             MemorySegment h_x = initVector(x0.toMatrix(), arena, tracker, prec, isComplex);
@@ -1281,7 +1281,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (maxIterations <= 0) maxIterations = config.getMaxIterations();
         Ring<E> ring = sa.getScalarRing();
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, tracker, isComplex);
             MemorySegment h_b = initVector(b.toMatrix(), arena, tracker, prec, isComplex);
             MemorySegment h_x = initVector(x0.toMatrix(), arena, tracker, prec, isComplex);
@@ -1371,7 +1371,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (maxIterations <= 0) maxIterations = config.getMaxIterations();
         Ring<E> ring = sa.getScalarRing();
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, tracker, isComplex);
             MemorySegment h_x = initVector(x0.toMatrix(), arena, tracker, prec, isComplex);
             MemorySegment h_b = initVector(b.toMatrix(), arena, tracker, prec, isComplex);

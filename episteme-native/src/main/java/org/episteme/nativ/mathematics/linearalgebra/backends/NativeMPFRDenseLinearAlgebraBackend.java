@@ -16,6 +16,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -102,6 +103,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         };
     }
 
+
     @Override public void shutdown() {}
 
     @Override
@@ -130,7 +132,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     public E dot(Vector<E> a, Vector<E> b) {
         checkDimensionsDot(a, b);
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             long prec = getPrecision();
             MemorySegment h_A = initVector(a, arena, tracker, prec, isComplex);
             MemorySegment h_B = initVector(b, arena, tracker, prec, isComplex);
@@ -193,7 +195,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     public E norm(Vector<E> a) {
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initVector(a, arena, tracker, prec, isComplex);
             MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
@@ -245,7 +247,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         long prec = getPrecision();
         int rnd = 0; 
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_B = initMatrix(b, arena, tracker, prec, isComplex);
             MemorySegment h_C = allocateMatrix(m, n, arena, tracker, prec, isComplex);
@@ -314,7 +316,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         int rnd = 0; // MPFR_RNDN
         long prec = getPrecision();
         
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_X = initVector(b, arena, tracker, prec, isComplex);
             MemorySegment h_Y = allocateVector(m, arena, tracker, prec, isComplex);
@@ -448,7 +450,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_B = initMatrix(b, arena, tracker, prec, isComplex);
             MemorySegment h_C = allocateMatrix(m, n, arena, tracker, prec, isComplex);
@@ -474,7 +476,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision(); // MPFR_RNDN
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_B = initMatrix(b, arena, tracker, prec, isComplex);
             MemorySegment h_C = allocateMatrix(m, n, arena, tracker, prec, isComplex);
@@ -499,7 +501,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
     
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_C = allocateMatrix(m, n, arena, tracker, prec, isComplex);
     
@@ -596,7 +598,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         int n = a.cols();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_C = allocateMatrix(n, m, arena, tracker, prec, isComplex);
             for (int i = 0; i < m; i++) {
@@ -668,7 +670,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         long prec = getPrecision();
         int rnd = 0;
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             int[] perm = new int[n];
             for (int i = 0; i < n; i++) perm[i] = i;
@@ -804,7 +806,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         long prec = getPrecision();
         int rnd = 0;
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_Res = allocateMatrix(rows, cols, arena, tracker, prec, isComplex);
             MethodHandle handle = getHandle(op);
@@ -837,7 +839,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         long prec = getPrecision();
         int rnd = 0;
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_Res = allocateMatrix(rows, cols, arena, tracker, prec, isComplex);
             
@@ -942,7 +944,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         long prec = getPrecision();
         int rnd = 0; // MPFR_RNDN
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_B = initVector(b, arena, tracker, prec, isComplex);
             
@@ -1075,7 +1077,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         long prec = getPrecision();
         int rnd = 0;
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_Inv = allocateMatrix(n, n, arena, tracker, prec, isComplex);
             
@@ -1196,7 +1198,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision(); // MPFR_RNDN
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment detR = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, detR, (int) prec); tracker.track(detR, s -> NativeSafe.invoke(MPFR_CLEAR, s));
@@ -1285,7 +1287,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
 
-        try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
             MemorySegment h_L = allocateMatrix(n, n, arena, tracker, prec, isComplex);
             

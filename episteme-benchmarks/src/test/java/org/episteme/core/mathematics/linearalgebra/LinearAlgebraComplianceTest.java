@@ -57,11 +57,14 @@ public class LinearAlgebraComplianceTest {
         };
 
         configureForMode();
-        System.out.println("[AuditEngine] Starting Universal Exhaustive Audit in mode: " + mode);
-
         List<LinearAlgebraProvider<?>> providers = discoverAllProviders();
-        // Sort providers alphabetically by name for systematic reporting
-        providers.sort(Comparator.comparing(LinearAlgebraProvider::getName));
+        LinearAlgebraProvider<?> referenceProvider = providers.stream()
+            .filter(p -> p.getName().contains("Standard"))
+            .findFirst()
+            .orElse(providers.get(0));
+
+        System.out.println("[AuditEngine] Starting Linear Algebra Audit (Mode: " + mode + ")");
+        System.out.println("[AuditEngine] Ground Truth Reference: " + referenceProvider.getName());
         
         List<ComplianceResult> results = new ArrayList<>();
 
@@ -71,27 +74,18 @@ public class LinearAlgebraComplianceTest {
             res.environment = prov.getEnvironmentInfo();
             res.available = prov.isAvailable();
             
-            if (!res.available) {
-                System.out.println("[AuditEngine] Provider " + prov.getName() + " is DISABLED (Hardware/Config missing).");
-                results.add(res);
-                continue;
-            }
-            
-            AlgorithmService oldService = AlgorithmManager.getService();
-            AlgorithmManager.setService(new TestingAlgorithmService(prov));
-            
-            try {
-                if (mode == PrecisionMode.EXACT) {
-                    runExactAudit(res, (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider) prov);
-                } else {
-                    runStandardAudit(res, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) prov);
+            if (prov.isAvailable()) {
+                try {
+                    if (mode == PrecisionMode.EXACT) {
+                        runExactAudit(res, (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider) referenceProvider);
+                    } else {
+                        runStandardAudit(res, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) referenceProvider);
+                    }
+                } catch (Throwable t) {
+                    System.err.println("Audit failed for " + prov.getName() + ": " + t.getMessage());
                 }
-            } catch (Throwable t) {
-                System.err.println("Audit failed for " + prov.getName() + ": " + t.getMessage());
-            } finally {
-                results.add(res);
-                AlgorithmManager.setService(oldService);
             }
+            results.add(res);
         }
 
         printMarkdownReport(results);
@@ -105,23 +99,25 @@ public class LinearAlgebraComplianceTest {
         }
     }
 
-    private void runExactAudit(ComplianceResult res, LinearAlgebraProvider<RealBig> prov) {
+    private void runExactAudit(ComplianceResult res, LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> ref) {
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
-        LinearAlgebraAuditSuite.runFullAudit(prov, matrixSize, (op, test) -> auditOp(res, op, test), rbRing, "RB:");
+        double tolerance = 1e-30; // High precision tolerance
+        LinearAlgebraAuditSuite.runFullAudit(prov, ref, matrixSize, (op, test) -> auditOp(res, op, test), rbRing, "RB:", tolerance);
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
         if (prov.isCompatible(complexRing)) {
-            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:");
+            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) ref, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
         }
     }
 
-    private void runStandardAudit(ComplianceResult res, LinearAlgebraProvider<Real> prov) {
+    private void runStandardAudit(ComplianceResult res, LinearAlgebraProvider<Real> prov, LinearAlgebraProvider<Real> ref) {
         Ring<Real> realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
-        LinearAlgebraAuditSuite.runFullAudit(prov, matrixSize, (op, test) -> auditOp(res, op, test), realRing, "R:");
+        double tolerance = (mode == PrecisionMode.FAST) ? 1e-7 : 1e-14;
+        LinearAlgebraAuditSuite.runFullAudit(prov, ref, matrixSize, (op, test) -> auditOp(res, op, test), realRing, "R:", tolerance);
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
         if (prov.isCompatible(complexRing)) {
-            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:");
+            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) ref, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
         }
     }
 
