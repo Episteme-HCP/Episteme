@@ -26,8 +26,11 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.technical.backend.Operation;
 
 import jdk.incubator.vector.DoubleVector;
+import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorSpecies;
 import static jdk.incubator.vector.VectorOperators.*;
+import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.mathematics.context.PrecisionMode;
 
 /**
  * SIMD-accelerated Linear Algebra Backend for Real numbers using JDK Vector API.
@@ -41,8 +44,16 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSIMDLinearAlgebraBackend.class);
     
-    private static VectorSpecies<Double> getSpecies() {
+    private static VectorSpecies<Double> getDoubleSpecies() {
         return DoubleVector.SPECIES_PREFERRED;
+    }
+    
+    private static VectorSpecies<Float> getFloatSpecies() {
+        return FloatVector.SPECIES_PREFERRED;
+    }
+
+    private boolean isFastPrecision() {
+        return MathContext.get().getPrecisionMode() == PrecisionMode.FAST;
     }
 
     @Override
@@ -119,12 +130,12 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
 
     @Override
     public String getSimdLevel() {
-        return getSpecies().toString();
+        return isFastPrecision() ? getFloatSpecies().toString() : getDoubleSpecies().toString();
     }
 
     @Override
     public int getPreferredVectorWidth() {
-        return getSpecies().vectorBitSize();
+        return isFastPrecision() ? getFloatSpecies().vectorBitSize() : getDoubleSpecies().vectorBitSize();
     }
 
     @Override
@@ -146,15 +157,33 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         int n = a.dimension();
         if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
         
+        if (isFastPrecision()) {
+            float[] aData = toFloatArray((Vector<Real>) (Object) a);
+            float[] bData = toFloatArray((Vector<Real>) (Object) b);
+            float[] cData = new float[n];
+            
+            int i = 0;
+            var species = getFloatSpecies();
+            int loopBound = species.loopBound(n);
+            for (; i < loopBound; i += species.length()) {
+                FloatVector va = FloatVector.fromArray(species, aData, i);
+                FloatVector vb = FloatVector.fromArray(species, bData, i);
+                va.add(vb).intoArray(cData, i);
+            }
+            for (; i < n; i++) cData[i] = aData[i] + bData[i];
+            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+        }
+
         double[] aData = toDoubleArray((Vector<Real>) (Object) a);
         double[] bData = toDoubleArray((Vector<Real>) (Object) b);
         double[] cData = new double[n];
         
         int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
-            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
+        var species = getDoubleSpecies();
+        int loopBound = species.loopBound(n);
+        for (; i < loopBound; i += species.length()) {
+            DoubleVector va = DoubleVector.fromArray(species, aData, i);
+            DoubleVector vb = DoubleVector.fromArray(species, bData, i);
             va.add(vb).intoArray(cData, i);
         }
         for (; i < n; i++) cData[i] = aData[i] + bData[i];
@@ -168,15 +197,33 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         int n = a.dimension();
         if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
         
+        if (isFastPrecision()) {
+            float[] aData = toFloatArray((Vector<Real>) (Object) a);
+            float[] bData = toFloatArray((Vector<Real>) (Object) b);
+            float[] cData = new float[n];
+            
+            int i = 0;
+            var species = getFloatSpecies();
+            int loopBound = species.loopBound(n);
+            for (; i < loopBound; i += species.length()) {
+                FloatVector va = FloatVector.fromArray(species, aData, i);
+                FloatVector vb = FloatVector.fromArray(species, bData, i);
+                va.sub(vb).intoArray(cData, i);
+            }
+            for (; i < n; i++) cData[i] = aData[i] - bData[i];
+            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+        }
+
         double[] aData = toDoubleArray((Vector<Real>) (Object) a);
         double[] bData = toDoubleArray((Vector<Real>) (Object) b);
         double[] cData = new double[n];
         
         int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
-            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
+        var species = getDoubleSpecies();
+        int loopBound = species.loopBound(n);
+        for (; i < loopBound; i += species.length()) {
+            DoubleVector va = DoubleVector.fromArray(species, aData, i);
+            DoubleVector vb = DoubleVector.fromArray(species, bData, i);
             va.sub(vb).intoArray(cData, i);
         }
         for (; i < n; i++) cData[i] = aData[i] - bData[i];
@@ -189,13 +236,31 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         if (isComplex(vector)) return (Vector<E>) (Object) executeComplexVectorScale((Vector<Complex>) (Object) vector, (Complex) (Object) scalar);
         int n = vector.dimension();
         double s = ((Real) (Object) scalar).doubleValue();
+        
+        if (isFastPrecision()) {
+            float sf = (float) s;
+            float[] aData = toFloatArray((Vector<Real>) (Object) vector);
+            float[] cData = new float[n];
+            
+            int i = 0;
+            var species = getFloatSpecies();
+            int loopBound = species.loopBound(n);
+            for (; i < loopBound; i += species.length()) {
+                FloatVector va = FloatVector.fromArray(species, aData, i);
+                va.mul(sf).intoArray(cData, i);
+            }
+            for (; i < n; i++) cData[i] = aData[i] * sf;
+            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+        }
+
         double[] aData = toDoubleArray((Vector<Real>) (Object) vector);
         double[] cData = new double[n];
         
         int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
+        var species = getDoubleSpecies();
+        int loopBound = species.loopBound(n);
+        for (; i < loopBound; i += species.length()) {
+            DoubleVector va = DoubleVector.fromArray(species, aData, i);
             va.mul(s).intoArray(cData, i);
         }
         for (; i < n; i++) cData[i] = aData[i] * s;
@@ -209,16 +274,35 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         int n = a.dimension();
         if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
         
+        if (isFastPrecision()) {
+            float[] aData = toFloatArray((Vector<Real>) (Object) a);
+            float[] bData = toFloatArray((Vector<Real>) (Object) b);
+            
+            int i = 0;
+            var species = getFloatSpecies();
+            int loopBound = species.loopBound(n);
+            FloatVector sum = FloatVector.zero(species);
+            for (; i < loopBound; i += species.length()) {
+                FloatVector va = FloatVector.fromArray(species, aData, i);
+                FloatVector vb = FloatVector.fromArray(species, bData, i);
+                sum = sum.add(va.mul(vb));
+            }
+            float res = sum.reduceLanes(ADD);
+            for (; i < n; i++) res += aData[i] * bData[i];
+            return (E) (Object) Real.of(res);
+        }
+
         double[] aData = toDoubleArray((Vector<Real>) (Object) a);
         double[] bData = toDoubleArray((Vector<Real>) (Object) b);
         
         int i = 0;
-        int loopBound = getSpecies().loopBound(n);
-        DoubleVector sum = DoubleVector.zero(getSpecies());
+        var species = getDoubleSpecies();
+        int loopBound = species.loopBound(n);
+        DoubleVector sum = DoubleVector.zero(species);
         
-        for (; i < loopBound; i += getSpecies().length()) {
-            DoubleVector va = DoubleVector.fromArray(getSpecies(), aData, i);
-            DoubleVector vb = DoubleVector.fromArray(getSpecies(), bData, i);
+        for (; i < loopBound; i += species.length()) {
+            DoubleVector va = DoubleVector.fromArray(species, aData, i);
+            DoubleVector vb = DoubleVector.fromArray(species, bData, i);
             sum = sum.add(va.mul(vb));
         }
         double res = sum.reduceLanes(ADD);
@@ -684,6 +768,13 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         int r = m.rows(), c = m.cols();
         double[] d = new double[r * c];
         for (int i = 0; i < r; i++) for (int j = 0; j < c; j++) d[i * c + j] = m.get(i, j).doubleValue();
+        return d;
+    }
+
+    private float[] toFloatArray(Vector<Real> v) {
+        int n = v.dimension();
+        float[] d = new float[n];
+        for (int i = 0; i < n; i++) d[i] = v.get(i).floatValue();
         return d;
     }
 

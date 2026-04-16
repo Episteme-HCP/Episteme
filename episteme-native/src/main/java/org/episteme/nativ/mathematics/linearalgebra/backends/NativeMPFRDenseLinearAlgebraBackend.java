@@ -119,6 +119,33 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         logger.debug("[MPFR-DIAG] {}", msg);
     }
 
+    private static void track(ResourceTracker tracker, MemorySegment p) {
+        if (p != null && !p.equals(MemorySegment.NULL)) {
+            tracker.track(p, s -> {
+                try {
+                    NativeSafe.invoke(MPFR_CLEAR, s);
+                } catch (Throwable t) {
+                    // ResourceTracker handles robustness
+                }
+            });
+        }
+    }
+
+    private static void trackArray(ResourceTracker tracker, MemorySegment p, int n) {
+        if (p != null && !p.equals(MemorySegment.NULL)) {
+            tracker.track(p, s -> {
+                for (int i = 0; i < n; i++) {
+                    try {
+                        MemorySegment slice = s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                        NativeSafe.invoke(MPFR_CLEAR, slice);
+                    } catch (Throwable t) {
+                        // Ignore
+                    }
+                }
+            });
+        }
+    }
+
     private static long getPrecision() {
         org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
         int digits = ctx.getJavaMathContext().getPrecision();
@@ -522,7 +549,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     MemorySegment aI = h_A.asSlice((long) (i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment cR = h_C.asSlice((long) i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment cI = h_C.asSlice((long) (i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                    complexMultiply(cR, cI, aR, aI, sR, sI, (int) prec, arena);
+                    complexMultiply(cR, cI, aR, aI, sR, sI, (int) prec, arena, tracker);
                 }
             } else {
                 String valStr = (scalar instanceof Real rs) ? rs.bigDecimalValue().toPlainString() : scalar.toString();
@@ -688,14 +715,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 int pivotRow = k;
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
-                        if (compareComplexMagnitude(h_A, i, pivotRow, k, n, arena, (int) prec)) pivotRow = i;
+                        if (compareComplexMagnitude(h_A, i, pivotRow, k, n, arena, tracker, (int) prec)) pivotRow = i;
                     } else {
                         if ((int) NativeSafe.invoke(MPFR_CMP_ABS, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, pivotRow, k, n, 0, false)) > 0) pivotRow = i;
                     }
                 }
 
                 if (pivotRow != k) {
-                    swapRows(h_A, k, pivotRow, n, isComplex, arena, (int) prec);
+                    swapRows(h_A, k, pivotRow, n, isComplex, arena, tracker, (int) prec);
                     int tmpP = perm[k];
                     perm[k] = perm[pivotRow];
                     perm[pivotRow] = tmpP;
@@ -705,21 +732,21 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     if (isComplex) {
                         complexDivide(factorR, factorI, 
                             getMPFR(h_A, i, k, n, 0, true), getMPFR(h_A, i, k, n, 1, true),
-                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
+                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena, tracker);
                         
                         // Store factor in L part
                         NativeSafe.invoke(MPFR_SET, getMPFR(h_A, i, k, n, 0, true), factorR, rnd);
                         NativeSafe.invoke(MPFR_SET, getMPFR(h_A, i, k, n, 1, true), factorI, rnd);
 
                         for (int j = k + 1; j < n; j++) {
-                            complexSubtractMul(h_A, i, j, factorR, factorI, h_A, k, j, n, arena, (int) prec);
+                            complexSubtractMul(h_A, i, j, factorR, factorI, h_A, k, j, n, arena, tracker, (int) prec);
                         }
                     } else {
                         NativeSafe.invoke(MPFR_DIV, factorR, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
                         NativeSafe.invoke(MPFR_SET, getMPFR(h_A, i, k, n, 0, false), factorR, rnd);
                         
                         for (int j = k + 1; j < n; j++) {
-                            subtractMulReal(h_A, i, j, factorR, h_A, k, j, n, arena, (int) prec);
+                            subtractMulReal(h_A, i, j, factorR, h_A, k, j, n, arena, tracker, (int) prec);
                         }
                     }
                 }
@@ -817,7 +844,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         MemorySegment resI = getMPFR(h_Res, i, j, cols, 1, true);
                         MemorySegment aR = getMPFR(h_A, i, j, cols, 0, true);
                         MemorySegment aI = getMPFR(h_A, i, j, cols, 1, true);
-                        invokeComplexOp(op, resR, resI, aR, aI, (int) prec, arena);
+                        invokeComplexOp(op, resR, resI, aR, aI, (int) prec, arena, tracker);
                     } else if (handle != null) {
                         NativeSafe.invoke(handle, getMPFR(h_Res, i, j, cols, 0, false), getMPFR(h_A, i, j, cols, 0, false), rnd);
                     } else {
@@ -868,16 +895,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         MemorySegment aR = getMPFR(h_A, i, j, cols, 0, true);
                         MemorySegment aI = getMPFR(h_A, i, j, cols, 1, true);
                         
-                        MemorySegment logAR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAR, (int) prec);
-                        MemorySegment logAI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAI, (int) prec);
+                        MemorySegment logAR = arena.allocate(MPFR_LAYOUT); tracker.track(logAR, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, logAR, (int) prec);
+                        MemorySegment logAI = arena.allocate(MPFR_LAYOUT); tracker.track(logAI, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, logAI, (int) prec);
                         try {
-                            complexLog(logAR, logAI, aR, aI, (int) prec, arena);
+                            complexLog(logAR, logAI, aR, aI, (int) prec, arena, tracker);
                             
-                            MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
-                            MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
+                            MemorySegment prodR = arena.allocate(MPFR_LAYOUT); tracker.track(prodR, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
+                            MemorySegment prodI = arena.allocate(MPFR_LAYOUT); tracker.track(prodI, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
                             try {
-                                complexMultiply(prodR, prodI, h_ExponentR, h_ExponentI, logAR, logAI, (int) prec, arena);
-                                complexExp(resR, resI, prodR, prodI, (int) prec, arena);
+                                complexMultiply(prodR, prodI, h_ExponentR, h_ExponentI, logAR, logAI, (int) prec, arena, tracker);
+                                complexExp(resR, resI, prodR, prodI, (int) prec, arena, tracker);
                             } finally {
                                 NativeSafe.invoke(MPFR_CLEAR, prodR); NativeSafe.invoke(MPFR_CLEAR, prodI);
                             }
@@ -971,49 +998,47 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 int pivot = k;
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
-                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, (int) prec)) pivot = i;
+                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, tracker, (int) prec)) pivot = i;
                     } else {
                         if ((int) NativeSafe.invoke(MPFR_CMP_ABS, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, pivot, k, n, 0, false)) > 0) pivot = i;
                     }
                 }
                 
                 if (pivot != k) {
-                    swapRows(h_A, k, pivot, n, isComplex, arena, (int) prec);
-                    swapRowsVector(h_B, k, pivot, isComplex, arena, (int) prec);
+                    swapRows(h_A, k, pivot, n, isComplex, arena, tracker, (int) prec);
+                    swapRowsVector(h_B, k, pivot, isComplex, arena, tracker, (int) prec);
                 }
                 
                 // Gaussian Elimination with stability check
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
-                        MemorySegment absK = arena.allocate(MPFR_LAYOUT); 
+                        MemorySegment absK = arena.allocate(MPFR_LAYOUT); tracker.track(absK, s -> NativeSafe.invoke(MPFR_CLEAR, s));
                         NativeSafe.invoke(MPFR_INIT2, absK, (int) prec);
-                        tracker.track(absK, s -> NativeSafe.invoke(MPFR_CLEAR, s));
-                        complexMagnitude(absK, getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
+                        complexMagnitude(absK, getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena, tracker);
                         double dVal = (double) NativeSafe.invoke(MPFR_GET_D, absK, 0);
                         if (dVal <= 1e-60) throw new ArithmeticException("Singular matrix during elimination (pivot below epsilon)");
 
                         complexDivide(tempFactorR, tempFactorI, 
                             getMPFR(h_A, i, k, n, 0, true), getMPFR(h_A, i, k, n, 1, true),
                             getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true),
-                            (int) prec, arena);
+                            (int) prec, arena, tracker);
                         
                         for (int j = k; j < n; j++) {
-                            complexSubtractMul(h_A, i, j, tempFactorR, tempFactorI, h_A, k, j, n, arena, (int) prec);
+                            complexSubtractMul(h_A, i, j, tempFactorR, tempFactorI, h_A, k, j, n, arena, tracker, (int) prec);
                         }
-                        complexSubtractMulVector(h_B, i, tempFactorR, tempFactorI, h_B, k, arena, (int) prec);
+                        complexSubtractMulVector(h_B, i, tempFactorR, tempFactorI, h_B, k, arena, tracker, (int) prec);
                     } else {
-                        MemorySegment absK = arena.allocate(MPFR_LAYOUT); 
+                        MemorySegment absK = arena.allocate(MPFR_LAYOUT); tracker.track(absK, s -> NativeSafe.invoke(MPFR_CLEAR, s));
                         NativeSafe.invoke(MPFR_INIT2, absK, (int) prec);
-                        tracker.track(absK, s -> NativeSafe.invoke(MPFR_CLEAR, s));
                         NativeSafe.invoke(MPFR_ABS, absK, getMPFR(h_A, k, k, n, 0, false), 0);
                         double dVal = (double) NativeSafe.invoke(MPFR_GET_D, absK, 0);
                         if (dVal <= 1e-60) throw new ArithmeticException("Singular matrix during elimination (pivot below epsilon)");
 
                         NativeSafe.invoke(MPFR_DIV, tempFactor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), rnd);
                         for (int j = k; j < n; j++) {
-                            subtractMulReal(h_A, i, j, tempFactor, h_A, k, j, n, arena, (int) prec);
+                            subtractMulReal(h_A, i, j, tempFactor, h_A, k, j, n, arena, tracker, (int) prec);
                         }
-                        subtractMulVectorReal(h_B, i, tempFactor, h_B, k, arena, (int) prec);
+                        subtractMulVectorReal(h_B, i, tempFactor, h_B, k, arena, tracker, (int) prec);
                     }
                 }
             }
@@ -1029,7 +1054,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         complexAddMul(sumR, sumI, 
                             getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true),
                             getMPFRVector(h_X, j, 0, true), getMPFRVector(h_X, j, 1, true),
-                            (int) prec, arena);
+                            (int) prec, arena, tracker);
                     }
                     
                     MemorySegment xiR = getMPFRVector(h_X, i, 0, true);
@@ -1039,7 +1064,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     
                     complexDivide(xiR, xiI, xiR, xiI, 
                         getMPFR(h_A, i, i, n, 0, true), getMPFR(h_A, i, i, n, 1, true),
-                        (int) prec, arena);
+                        (int) prec, arena, tracker);
                 } else {
                     NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, 0);
                     
@@ -1097,7 +1122,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 int pivot = k;
                 if (isComplex) {
                     for (int i = k + 1; i < n; i++) {
-                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, (int) prec)) pivot = i;
+                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, tracker, (int) prec)) pivot = i;
                     }
                 } else {
                     for (int i = k + 1; i < n; i++) {
@@ -1106,17 +1131,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 }
 
                 if (pivot != k) {
-                    swapRows(h_A, k, pivot, n, isComplex, arena, (int) prec);
-                    swapRows(h_Inv, k, pivot, n, isComplex, arena, (int) prec);
+                    swapRows(h_A, k, pivot, n, isComplex, arena, tracker, (int) prec);
+                    swapRows(h_Inv, k, pivot, n, isComplex, arena, tracker, (int) prec);
                 }
                 
                 // Check for singular matrix with magnitude-based epsilon
-                MemorySegment absK = arena.allocate(MPFR_LAYOUT);
+                MemorySegment absK = arena.allocate(MPFR_LAYOUT); tracker.track(absK, s -> NativeSafe.invoke(MPFR_CLEAR, s));
                 NativeSafe.invoke(MPFR_INIT2, absK, (int) prec);
-                tracker.track(absK, s -> NativeSafe.invoke(MPFR_CLEAR, s));
 
                 if (isComplex) {
-                    complexMagnitude(absK, getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
+                    complexMagnitude(absK, getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena, tracker);
                 } else {
                     NativeSafe.invoke(MPFR_ABS, absK, getMPFR(h_A, k, k, n, 0, false), 0);
                 }
@@ -1125,10 +1149,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
                 // Normalize pivot row
                 if (isComplex) {
-                    MemorySegment pR = arena.allocate(MPFR_LAYOUT);
-                    MemorySegment pI = arena.allocate(MPFR_LAYOUT);
-                    NativeSafe.invoke(MPFR_INIT2, pR, (int) prec); tracker.track(pR, s -> NativeSafe.invoke(MPFR_CLEAR, s));
-                    NativeSafe.invoke(MPFR_INIT2, pI, (int) prec); tracker.track(pI, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                    MemorySegment pR = arena.allocate(MPFR_LAYOUT); tracker.track(pR, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                    MemorySegment pI = arena.allocate(MPFR_LAYOUT); tracker.track(pI, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                    NativeSafe.invoke(MPFR_INIT2, pR, (int) prec);
+                    NativeSafe.invoke(MPFR_INIT2, pI, (int) prec);
                     
                     NativeSafe.invoke(MPFR_SET, pR, getMPFR(h_A, k, k, n, 0, true), rnd);
                     NativeSafe.invoke(MPFR_SET, pI, getMPFR(h_A, k, k, n, 1, true), rnd);
@@ -1136,17 +1160,17 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     for (int j = 0; j < n; j++) {
                         complexDivide(getMPFR(h_A, k, j, n, 0, true), getMPFR(h_A, k, j, n, 1, true),
                             getMPFR(h_A, k, j, n, 0, true), getMPFR(h_A, k, j, n, 1, true),
-                            pR, pI, (int) prec, arena);
+                            pR, pI, (int) prec, arena, tracker);
                         complexDivide(getMPFR(h_Inv, k, j, n, 0, true), getMPFR(h_Inv, k, j, n, 1, true),
                             getMPFR(h_Inv, k, j, n, 0, true), getMPFR(h_Inv, k, j, n, 1, true),
-                            pR, pI, (int) prec, arena);
+                            pR, pI, (int) prec, arena, tracker);
                     }
                     // Set A[k][k] to 1+0i explicitly for stability
                     NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_A, k, k, n, 0, true), 1L, rnd);
                     NativeSafe.invoke(MPFR_SET_UI, getMPFR(h_A, k, k, n, 1, true), 0L, rnd);
                 } else {
-                    MemorySegment pivotVal = arena.allocate(MPFR_LAYOUT);
-                    NativeSafe.invoke(MPFR_INIT2, pivotVal, (int) prec); tracker.track(pivotVal, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                    MemorySegment pivotVal = arena.allocate(MPFR_LAYOUT); tracker.track(pivotVal, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                    NativeSafe.invoke(MPFR_INIT2, pivotVal, (int) prec);
                     NativeSafe.invoke(MPFR_SET, pivotVal, getMPFR(h_A, k, k, n, 0, false), rnd);
                     
                     for (int j = 0; j < n; j++) {
@@ -1160,25 +1184,25 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 for (int i = 0; i < n; i++) {
                     if (i == k) continue;
                     if (isComplex) {
-                        MemorySegment fR = arena.allocate(MPFR_LAYOUT);
-                        MemorySegment fI = arena.allocate(MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_INIT2, fR, (int) prec); tracker.track(fR, s -> NativeSafe.invoke(MPFR_CLEAR, s));
-                        NativeSafe.invoke(MPFR_INIT2, fI, (int) prec); tracker.track(fI, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                        MemorySegment fR = arena.allocate(MPFR_LAYOUT); tracker.track(fR, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                        MemorySegment fI = arena.allocate(MPFR_LAYOUT); tracker.track(fI, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                        NativeSafe.invoke(MPFR_INIT2, fR, (int) prec);
+                        NativeSafe.invoke(MPFR_INIT2, fI, (int) prec);
                         NativeSafe.invoke(MPFR_SET, fR, getMPFR(h_A, i, k, n, 0, true), 0);
                         NativeSafe.invoke(MPFR_SET, fI, getMPFR(h_A, i, k, n, 1, true), 0);
                         
                         for (int j = 0; j < n; j++) {
-                            complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, (int) prec);
-                            complexSubtractMul(h_Inv, i, j, fR, fI, h_Inv, k, j, n, arena, (int) prec);
+                            complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, tracker, (int) prec);
+                            complexSubtractMul(h_Inv, i, j, fR, fI, h_Inv, k, j, n, arena, tracker, (int) prec);
                         }
                     } else {
-                        MemorySegment factor = arena.allocate(MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_INIT2, factor, (int) prec); tracker.track(factor, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                        MemorySegment factor = arena.allocate(MPFR_LAYOUT); tracker.track(factor, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                        NativeSafe.invoke(MPFR_INIT2, factor, (int) prec);
                         NativeSafe.invoke(MPFR_SET, factor, getMPFR(h_A, i, k, n, 0, false), 0);
                         
                         for (int j = 0; j < n; j++) {
-                            subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, (int) prec);
-                            subtractMulReal(h_Inv, i, j, factor, h_Inv, k, j, n, arena, (int) prec);
+                            subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, tracker, (int) prec);
+                            subtractMulReal(h_Inv, i, j, factor, h_Inv, k, j, n, arena, tracker, (int) prec);
                         }
                     }
                 }
@@ -1213,14 +1237,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 int pivot = k;
                 for (int i = k + 1; i < n; i++) {
                     if (isComplex) {
-                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, (int) prec)) pivot = i;
+                        if (compareComplexMagnitude(h_A, i, pivot, k, n, arena, tracker, (int) prec)) pivot = i;
                     } else {
                         if ((int) NativeSafe.invoke(MPFR_CMP_ABS, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, pivot, k, n, 0, false)) > 0) pivot = i;
                     }
                 }
                 
                 if (pivot != k) {
-                    swapRows(h_A, k, pivot, n, isComplex, arena, (int) prec);
+                    swapRows(h_A, k, pivot, n, isComplex, arena, tracker, (int) prec);
                     NativeSafe.invoke(MPFR_NEG, detR, detR, 0); // Flip sign of determinant
                     if (isComplex) NativeSafe.invoke(MPFR_NEG, detI, detI, 0);
                 }
@@ -1228,7 +1252,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 // Multiply determinant by A[k][k]
                 if (isComplex) {
                     complexMultiply(detR, detI, detR, detI, 
-                        getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
+                        getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena, tracker);
                 } else {
                     NativeSafe.invoke(MPFR_MUL, detR, detR, getMPFR(h_A, k, k, n, 0, false), 0);
                 }
@@ -1253,13 +1277,13 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         NativeSafe.invoke(MPFR_INIT2, fR, (int) prec); tracker.track(fR, s -> NativeSafe.invoke(MPFR_CLEAR, s));
                         NativeSafe.invoke(MPFR_INIT2, fI, (int) prec); tracker.track(fI, s -> NativeSafe.invoke(MPFR_CLEAR, s));
                         complexDivide(fR, fI, getMPFR(h_A, i, k, n, 0, true), getMPFR(h_A, i, k, n, 1, true),
-                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena);
-                        for (int j = k; j < n; j++) complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, (int) prec);
+                            getMPFR(h_A, k, k, n, 0, true), getMPFR(h_A, k, k, n, 1, true), (int) prec, arena, tracker);
+                        for (int j = k; j < n; j++) complexSubtractMul(h_A, i, j, fR, fI, h_A, k, j, n, arena, tracker, (int) prec);
                     } else {
                         MemorySegment factor = arena.allocate(MPFR_LAYOUT);
                         NativeSafe.invoke(MPFR_INIT2, factor, (int) prec); tracker.track(factor, s -> NativeSafe.invoke(MPFR_CLEAR, s));
                         NativeSafe.invoke(MPFR_DIV, factor, getMPFR(h_A, i, k, n, 0, false), getMPFR(h_A, k, k, n, 0, false), 0);
-                        for (int j = k; j < n; j++) subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, (int) prec);
+                        for (int j = k; j < n; j++) subtractMulReal(h_A, i, j, factor, h_A, k, j, n, arena, tracker, (int) prec);
                     }
                 }
             }
@@ -1398,867 +1422,663 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
 
 
-    private static void subtractMulReal(MemorySegment h_Mat, int r, int c, MemorySegment factor, MemorySegment h_Source, int rs, int cs, int cols, Arena arena, int prec) {
+    private static void subtractMulReal(MemorySegment h_Mat, int r, int c, MemorySegment factor, MemorySegment h_Source, int rs, int cs, int cols, Arena arena, ResourceTracker tracker, int prec) {
         MemorySegment dst = getMPFR(h_Mat, r, c, cols, 0, false);
         MemorySegment src = getMPFR(h_Source, rs, cs, cols, 0, false);
-        MemorySegment term = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, term, prec);
-            NativeSafe.invoke(MPFR_MUL, term, factor, src, 0);
-            NativeSafe.invoke(MPFR_SUB, dst, dst, term, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, term);
-        }
+        MemorySegment term = arena.allocate(MPFR_LAYOUT); track(tracker, term);
+        NativeSafe.invoke(MPFR_INIT2, term, prec);
+        NativeSafe.invoke(MPFR_MUL, term, factor, src, 0);
+        NativeSafe.invoke(MPFR_SUB, dst, dst, term, 0);
     }
 
-    private static void subtractMulVectorReal(MemorySegment h_Vec, int r, MemorySegment factor, MemorySegment h_Source, int rs, Arena arena, int prec) {
+    private static void subtractMulVectorReal(MemorySegment h_Vec, int r, MemorySegment factor, MemorySegment h_Source, int rs, Arena arena, ResourceTracker tracker, int prec) {
         MemorySegment dst = getMPFRVector(h_Vec, r, 0, false);
         MemorySegment src = getMPFRVector(h_Source, rs, 0, false);
-        MemorySegment term = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, term, prec);
-            NativeSafe.invoke(MPFR_MUL, term, factor, src, 0);
-            NativeSafe.invoke(MPFR_SUB, dst, dst, term, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, term);
-        }
+        MemorySegment term = arena.allocate(MPFR_LAYOUT); track(tracker, term);
+        NativeSafe.invoke(MPFR_INIT2, term, prec);
+        NativeSafe.invoke(MPFR_MUL, term, factor, src, 0);
+        NativeSafe.invoke(MPFR_SUB, dst, dst, term, 0);
     }
 
-    private boolean compareComplexMagnitude(MemorySegment h_Mat, int r1, int r2, int col, int n, Arena arena, int prec) throws Throwable {
-        MemorySegment mag1 = arena.allocate(MPFR_LAYOUT);
-        MemorySegment mag2 = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, mag1, prec);
-            NativeSafe.invoke(MPFR_INIT2, mag2, prec);
-            
-            complexMagnitudeSquared(mag1, getMPFR(h_Mat, r1, col, n, 0, true), getMPFR(h_Mat, r1, col, n, 1, true), prec, arena);
-            complexMagnitudeSquared(mag2, getMPFR(h_Mat, r2, col, n, 0, true), getMPFR(h_Mat, r2, col, n, 1, true), prec, arena);
-            
-            return (int) NativeSafe.invoke(MPFR_CMP, mag1, mag2) > 0;
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, mag1);
-            NativeSafe.invoke(MPFR_CLEAR, mag2);
-        }
+    private boolean compareComplexMagnitude(MemorySegment h_Mat, int r1, int r2, int col, int n, Arena arena, ResourceTracker tracker, int prec) throws Throwable {
+        MemorySegment mag1 = arena.allocate(MPFR_LAYOUT); track(tracker, mag1);
+        MemorySegment mag2 = arena.allocate(MPFR_LAYOUT); track(tracker, mag2);
+        NativeSafe.invoke(MPFR_INIT2, mag1, prec);
+        NativeSafe.invoke(MPFR_INIT2, mag2, prec);
+        
+        complexMagnitudeSquared(mag1, getMPFR(h_Mat, r1, col, n, 0, true), getMPFR(h_Mat, r1, col, n, 1, true), prec, arena, tracker);
+        complexMagnitudeSquared(mag2, getMPFR(h_Mat, r2, col, n, 0, true), getMPFR(h_Mat, r2, col, n, 1, true), prec, arena, tracker);
+        
+        return (int) NativeSafe.invoke(MPFR_CMP, mag1, mag2) > 0;
     }
 
-    private void complexMagnitudeSquared(MemorySegment res, MemorySegment r, MemorySegment i, int prec, Arena arena) {
-        MemorySegment t = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, t, prec);
-            NativeSafe.invoke(MPFR_MUL, res, r, r, 0);
-            NativeSafe.invoke(MPFR_MUL, t, i, i, 0);
-            NativeSafe.invoke(MPFR_ADD, res, res, t, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, t);
-        }
+    private static void complexMagnitudeSquared(MemorySegment res, MemorySegment r, MemorySegment i, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment t = arena.allocate(MPFR_LAYOUT); track(tracker, t);
+        NativeSafe.invoke(MPFR_INIT2, t, prec);
+        NativeSafe.invoke(MPFR_MUL, res, r, r, 0);
+        NativeSafe.invoke(MPFR_MUL, t, i, i, 0);
+        NativeSafe.invoke(MPFR_ADD, res, res, t, 0);
     }
 
-    private static void complexDivide(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena) {
-        MemorySegment denom = arena.allocate(MPFR_LAYOUT);
-        MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
-        MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
-        MemorySegment outR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment outI = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, denom, prec);
-            NativeSafe.invoke(MPFR_INIT2, t1, prec);
-            NativeSafe.invoke(MPFR_INIT2, t2, prec);
-            NativeSafe.invoke(MPFR_INIT2, outR, prec);
-            NativeSafe.invoke(MPFR_INIT2, outI, prec);
-            
-            // denom = bR^2 + bI^2
-            NativeSafe.invoke(MPFR_MUL, denom, bR, bR, 0);
-            NativeSafe.invoke(MPFR_MUL, t1, bI, bI, 0);
-            NativeSafe.invoke(MPFR_ADD, denom, denom, t1, 0);
-            
-            // outR = (aR*bR + aI*bI) / denom
-            NativeSafe.invoke(MPFR_MUL, t1, aR, bR, 0);
-            NativeSafe.invoke(MPFR_MUL, t2, aI, bI, 0);
-            NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
-            NativeSafe.invoke(MPFR_DIV, outR, t1, denom, 0);
-            
-            // outI = (aI*bR - aR*bI) / denom
-            NativeSafe.invoke(MPFR_MUL, t1, aI, bR, 0);
-            NativeSafe.invoke(MPFR_MUL, t2, aR, bI, 0);
-            NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
-            NativeSafe.invoke(MPFR_DIV, outI, t1, denom, 0);
+    private static void complexDivide(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment denom = arena.allocate(MPFR_LAYOUT); track(tracker, denom);
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
+        MemorySegment outR = arena.allocate(MPFR_LAYOUT); track(tracker, outR);
+        MemorySegment outI = arena.allocate(MPFR_LAYOUT); track(tracker, outI);
 
-            NativeSafe.invoke(MPFR_SET, resR, outR, 0);
-            NativeSafe.invoke(MPFR_SET, resI, outI, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, denom);
-            NativeSafe.invoke(MPFR_CLEAR, t1);
-            NativeSafe.invoke(MPFR_CLEAR, t2);
-            NativeSafe.invoke(MPFR_CLEAR, outR);
-            NativeSafe.invoke(MPFR_CLEAR, outI);
-        }
+        NativeSafe.invoke(MPFR_INIT2, denom, prec);
+        NativeSafe.invoke(MPFR_INIT2, t1, prec);
+        NativeSafe.invoke(MPFR_INIT2, t2, prec);
+        NativeSafe.invoke(MPFR_INIT2, outR, prec);
+        NativeSafe.invoke(MPFR_INIT2, outI, prec);
+        
+        NativeSafe.invoke(MPFR_MUL, denom, bR, bR, 0);
+        NativeSafe.invoke(MPFR_MUL, t1, bI, bI, 0);
+        NativeSafe.invoke(MPFR_ADD, denom, denom, t1, 0);
+        
+        NativeSafe.invoke(MPFR_MUL, t1, aR, bR, 0);
+        NativeSafe.invoke(MPFR_MUL, t2, aI, bI, 0);
+        NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+        NativeSafe.invoke(MPFR_DIV, outR, t1, denom, 0);
+        
+        NativeSafe.invoke(MPFR_MUL, t1, aI, bR, 0);
+        NativeSafe.invoke(MPFR_MUL, t2, aR, bI, 0);
+        NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+        NativeSafe.invoke(MPFR_DIV, outI, t1, denom, 0);
+
+        NativeSafe.invoke(MPFR_SET, resR, outR, 0);
+        NativeSafe.invoke(MPFR_SET, resI, outI, 0);
     }
 
-    private static void complexSubtractMul(MemorySegment h_Mat, int r, int c, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, int cs, int n, Arena arena, int prec) {
+    private static void complexSubtractMul(MemorySegment h_Mat, int r, int c, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, int cs, int n, Arena arena, ResourceTracker tracker, int prec) {
         MemorySegment dstR = getMPFR(h_Mat, r, c, n, 0, true);
         MemorySegment dstI = getMPFR(h_Mat, r, c, n, 1, true);
         MemorySegment srcR = getMPFR(h_Src, rs, cs, n, 0, true);
         MemorySegment srcI = getMPFR(h_Src, rs, cs, n, 1, true);
         
-        MemorySegment tR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, tI, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
-            
-            // t = f * src
-            NativeSafe.invoke(MPFR_MUL, tR, fR, srcR, 0);
-            NativeSafe.invoke(MPFR_MUL, tI, fI, srcI, 0);
-            NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0); // tR = fR*srcR - fI*srcI
-            
-            NativeSafe.invoke(MPFR_MUL, tI, fR, srcI, 0);
-            NativeSafe.invoke(MPFR_MUL, tEmp, fI, srcR, 0);
-            NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0); // tI = fR*srcI + fI*srcR
-            
-            // dst = dst - t
-            NativeSafe.invoke(MPFR_SUB, dstR, dstR, tR, 0);
-            NativeSafe.invoke(MPFR_SUB, dstI, dstI, tI, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, tR);
-            NativeSafe.invoke(MPFR_CLEAR, tI);
-            NativeSafe.invoke(MPFR_CLEAR, tEmp);
-        }
+        MemorySegment tR = arena.allocate(MPFR_LAYOUT); track(tracker, tR);
+        MemorySegment tI = arena.allocate(MPFR_LAYOUT); track(tracker, tI);
+        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); track(tracker, tEmp);
+
+        NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, tI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
+        
+        NativeSafe.invoke(MPFR_MUL, tR, fR, srcR, 0);
+        NativeSafe.invoke(MPFR_MUL, tI, fI, srcI, 0);
+        NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0);
+        
+        NativeSafe.invoke(MPFR_MUL, tI, fR, srcI, 0);
+        NativeSafe.invoke(MPFR_MUL, tEmp, fI, srcR, 0);
+        NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
+        
+        NativeSafe.invoke(MPFR_SUB, dstR, dstR, tR, 0);
+        NativeSafe.invoke(MPFR_SUB, dstI, dstI, tI, 0);
     }
 
-    private static void complexSubtractMulVector(MemorySegment h_Vec, int r, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, Arena arena, int prec) {
+    private static void complexSubtractMulVector(MemorySegment h_Vec, int r, MemorySegment fR, MemorySegment fI, MemorySegment h_Src, int rs, Arena arena, ResourceTracker tracker, int prec) {
         MemorySegment dstR = getMPFRVector(h_Vec, r, 0, true);
         MemorySegment dstI = getMPFRVector(h_Vec, r, 1, true);
         MemorySegment srcR = getMPFRVector(h_Src, rs, 0, true);
         MemorySegment srcI = getMPFRVector(h_Src, rs, 1, true);
         
-        MemorySegment tR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, tR, prec);
-            NativeSafe.invoke(MPFR_INIT2, tI, prec);
-            NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
-            
-            NativeSafe.invoke(MPFR_MUL, tR, fR, srcR, 0);
-            NativeSafe.invoke(MPFR_MUL, tI, fI, srcI, 0);
-            NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0);
-            
-            NativeSafe.invoke(MPFR_MUL, tI, fR, srcI, 0);
-            NativeSafe.invoke(MPFR_MUL, tEmp, fI, srcR, 0);
-            NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
-            
-            NativeSafe.invoke(MPFR_SUB, dstR, dstR, tR, 0);
-            NativeSafe.invoke(MPFR_SUB, dstI, dstI, tI, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, tR);
-            NativeSafe.invoke(MPFR_CLEAR, tI);
-            NativeSafe.invoke(MPFR_CLEAR, tEmp);
-        }
+        MemorySegment tR = arena.allocate(MPFR_LAYOUT); track(tracker, tR);
+        MemorySegment tI = arena.allocate(MPFR_LAYOUT); track(tracker, tI);
+        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); track(tracker, tEmp);
+
+        NativeSafe.invoke(MPFR_INIT2, tR, prec);
+        NativeSafe.invoke(MPFR_INIT2, tI, prec);
+        NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
+        
+        NativeSafe.invoke(MPFR_MUL, tR, fR, srcR, 0);
+        NativeSafe.invoke(MPFR_MUL, tI, fI, srcI, 0);
+        NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0);
+        
+        NativeSafe.invoke(MPFR_MUL, tI, fR, srcI, 0);
+        NativeSafe.invoke(MPFR_MUL, tEmp, fI, srcR, 0);
+        NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
+        
+        NativeSafe.invoke(MPFR_SUB, dstR, dstR, tR, 0);
+        NativeSafe.invoke(MPFR_SUB, dstI, dstI, tI, 0);
     }
 
-    private static void complexMultiply(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena) {
-        MemorySegment tR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); 
-        try {
-            NativeSafe.invoke(MPFR_INIT2, tR, prec);
-            NativeSafe.invoke(MPFR_INIT2, tI, prec);
-            NativeSafe.invoke(MPFR_INIT2, tEmp, prec);
-            
-            // tR = aR*bR - aI*bI
-            NativeSafe.invoke(MPFR_MUL, tR, aR, bR, 0);
-            NativeSafe.invoke(MPFR_MUL, tEmp, aI, bI, 0);
-            NativeSafe.invoke(MPFR_SUB, tR, tR, tEmp, 0);
-            
-            // tI = aR*bI + aI*bR
-            NativeSafe.invoke(MPFR_MUL, tI, aR, bI, 0);
-            NativeSafe.invoke(MPFR_MUL, tEmp, aI, bR, 0);
-            NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
-            
-            NativeSafe.invoke(MPFR_SET, resR, tR, 0);
-            NativeSafe.invoke(MPFR_SET, resI, tI, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, tR);
-            NativeSafe.invoke(MPFR_CLEAR, tI);
-            NativeSafe.invoke(MPFR_CLEAR, tEmp);
-        }
+    private static void complexMultiply(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment tR = arena.allocate(MPFR_LAYOUT); track(tracker, tR);
+        MemorySegment tI = arena.allocate(MPFR_LAYOUT); track(tracker, tI);
+        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); track(tracker, tEmp);
+
+        NativeSafe.invoke(MPFR_INIT2, tR, prec);
+        NativeSafe.invoke(MPFR_INIT2, tI, prec);
+        NativeSafe.invoke(MPFR_INIT2, tEmp, prec);
+        
+        NativeSafe.invoke(MPFR_MUL, tR, aR, bR, 0);
+        NativeSafe.invoke(MPFR_MUL, tEmp, aI, bI, 0);
+        NativeSafe.invoke(MPFR_SUB, tR, tR, tEmp, 0);
+        
+        NativeSafe.invoke(MPFR_MUL, tI, aR, bI, 0);
+        NativeSafe.invoke(MPFR_MUL, tEmp, aI, bR, 0);
+        NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
+        
+        NativeSafe.invoke(MPFR_SET, resR, tR, 0);
+        NativeSafe.invoke(MPFR_SET, resI, tI, 0);
     }
 
-    private static void complexAddMul(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena) {
-        MemorySegment tR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); 
-        try {
-            NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, tI, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
-            
-            // t = a * b
-            NativeSafe.invoke(MPFR_MUL, tR, aR, bR, 0);
-            NativeSafe.invoke(MPFR_MUL, tI, aI, bI, 0);
-            NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0);
-            
-            NativeSafe.invoke(MPFR_MUL, tI, aR, bI, 0);
-            NativeSafe.invoke(MPFR_MUL, tEmp, aI, bR, 0);
-            NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
-            
-            // res = res + t
-            NativeSafe.invoke(MPFR_ADD, resR, resR, tR, 0);
-            NativeSafe.invoke(MPFR_ADD, resI, resI, tI, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, tR);
-            NativeSafe.invoke(MPFR_CLEAR, tI);
-            NativeSafe.invoke(MPFR_CLEAR, tEmp);
-        }
+    private static void complexAddMul(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment tR = arena.allocate(MPFR_LAYOUT); track(tracker, tR);
+        MemorySegment tI = arena.allocate(MPFR_LAYOUT); track(tracker, tI);
+        MemorySegment tEmp = arena.allocate(MPFR_LAYOUT); track(tracker, tEmp);
+
+        NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, tI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, tEmp, (int) prec);
+        
+        NativeSafe.invoke(MPFR_MUL, tR, aR, bR, 0);
+        NativeSafe.invoke(MPFR_MUL, tI, aI, bI, 0);
+        NativeSafe.invoke(MPFR_SUB, tR, tR, tI, 0);
+        
+        NativeSafe.invoke(MPFR_MUL, tI, aR, bI, 0);
+        NativeSafe.invoke(MPFR_MUL, tEmp, aI, bR, 0);
+        NativeSafe.invoke(MPFR_ADD, tI, tI, tEmp, 0);
+        
+        NativeSafe.invoke(MPFR_ADD, resR, resR, tR, 0);
+        NativeSafe.invoke(MPFR_ADD, resI, resI, tI, 0);
     }
 
-    private static void swapRows(MemorySegment h_Mat, int r1, int r2, int n, boolean isComplex, Arena arena, int prec) {
+    private static void swapRows(MemorySegment h_Mat, int r1, int r2, int cols, boolean isComplex, Arena arena, ResourceTracker tracker, int prec) {
         int multiplier = isComplex ? 2 : 1;
-        MemorySegment tmp = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, tmp, prec);
-            for (int j = 0; j < n * multiplier; j++) {
-                MemorySegment m1 = h_Mat.asSlice(((long)r1 * n * multiplier + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                MemorySegment m2 = h_Mat.asSlice(((long)r2 * n * multiplier + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                NativeSafe.invoke(MPFR_SET, tmp, m1, 0);
-                NativeSafe.invoke(MPFR_SET, m1, m2, 0);
-                NativeSafe.invoke(MPFR_SET, m2, tmp, 0);
-            }
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, tmp);
+        MemorySegment tmp = arena.allocate(MPFR_LAYOUT); track(tracker, tmp);
+        NativeSafe.invoke(MPFR_INIT2, tmp, prec);
+        for (int j = 0; j < cols * multiplier; j++) {
+            MemorySegment m1 = h_Mat.asSlice((long)(r1 * cols * multiplier + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            MemorySegment m2 = h_Mat.asSlice((long)(r2 * cols * multiplier + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            NativeSafe.invoke(MPFR_SET, tmp, m1, 0);
+            NativeSafe.invoke(MPFR_SET, m1, m2, 0);
+            NativeSafe.invoke(MPFR_SET, m2, tmp, 0);
         }
     }
 
-    private static void swapRowsVector(MemorySegment h_Vec, int r1, int r2, boolean isComplex, Arena arena, int prec) {
+    private static void swapRowsVector(MemorySegment h_Vec, int r1, int r2, boolean isComplex, Arena arena, ResourceTracker tracker, int prec) {
         int multiplier = isComplex ? 2 : 1;
-        MemorySegment tmp = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, tmp, prec);
-            for (int j = 0; j < multiplier; j++) {
-                MemorySegment m1 = getMPFRVector(h_Vec, r1, j, isComplex);
-                MemorySegment m2 = getMPFRVector(h_Vec, r2, j, isComplex);
-                NativeSafe.invoke(MPFR_SET, tmp, m1, 0);
-                NativeSafe.invoke(MPFR_SET, m1, m2, 0);
-                NativeSafe.invoke(MPFR_SET, m2, tmp, 0);
-            }
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, tmp);
+        MemorySegment tmp = arena.allocate(MPFR_LAYOUT); track(tracker, tmp);
+        NativeSafe.invoke(MPFR_INIT2, tmp, prec);
+        for (int j = 0; j < multiplier; j++) {
+            MemorySegment m1 = getMPFRVector(h_Vec, r1, j, isComplex);
+            MemorySegment m2 = getMPFRVector(h_Vec, r2, j, isComplex);
+            NativeSafe.invoke(MPFR_SET, tmp, m1, 0);
+            NativeSafe.invoke(MPFR_SET, m1, m2, 0);
+            NativeSafe.invoke(MPFR_SET, m2, tmp, 0);
         }
     }
 
     // --- Complex Transcendental Arithmetic ---
     
-    private static void complexMagnitude(MemorySegment rop, MemorySegment opR, MemorySegment opI, int prec, Arena arena) {
+    private static void complexMagnitude(MemorySegment rop, MemorySegment opR, MemorySegment opI, int prec, Arena arena, ResourceTracker tracker) {
         if (MPFR_HYPOT != null) {
             NativeSafe.invoke(MPFR_HYPOT, rop, opR, opI, 0);
         } else {
-            MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
-            MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
+            MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
+            MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
             NativeSafe.invoke(MPFR_INIT2, t1, prec);
             NativeSafe.invoke(MPFR_INIT2, t2, prec);
             NativeSafe.invoke(MPFR_MUL, t1, opR, opR, 0);
             NativeSafe.invoke(MPFR_MUL, t2, opI, opI, 0);
             NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
             NativeSafe.invoke(MPFR_SQRT, rop, t1, 0);
-            NativeSafe.invoke(MPFR_CLEAR, t1);
-            NativeSafe.invoke(MPFR_CLEAR, t2);
         }
     }
 
-    public static void complexExp(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        MemorySegment expR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment cosI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment sinI = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, expR, prec);
-            NativeSafe.invoke(MPFR_EXP, expR, aR, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, cosI, prec);
-            NativeSafe.invoke(MPFR_INIT2, sinI, prec);
-            NativeSafe.invoke(MPFR_COS, cosI, aI, 0);
-            NativeSafe.invoke(MPFR_SIN, sinI, aI, 0);
-            
-            NativeSafe.invoke(MPFR_MUL, resR, expR, cosI, 0);
-            NativeSafe.invoke(MPFR_MUL, resI, expR, sinI, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, expR);
-            NativeSafe.invoke(MPFR_CLEAR, cosI);
-            NativeSafe.invoke(MPFR_CLEAR, sinI);
-        }
+    public static void complexExp(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment expR = arena.allocate(MPFR_LAYOUT); track(tracker, expR);
+        MemorySegment cosI = arena.allocate(MPFR_LAYOUT); track(tracker, cosI);
+        MemorySegment sinI = arena.allocate(MPFR_LAYOUT); track(tracker, sinI);
+
+        NativeSafe.invoke(MPFR_INIT2, expR, prec);
+        NativeSafe.invoke(MPFR_EXP, expR, aR, 0);
+        NativeSafe.invoke(MPFR_INIT2, cosI, prec);
+        NativeSafe.invoke(MPFR_INIT2, sinI, prec);
+        NativeSafe.invoke(MPFR_COS, cosI, aI, 0);
+        NativeSafe.invoke(MPFR_SIN, sinI, aI, 0);
+        
+        NativeSafe.invoke(MPFR_MUL, resR, expR, cosI, 0);
+        NativeSafe.invoke(MPFR_MUL, resI, expR, sinI, 0);
     }
 
-    public static void complexLog(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // Handle NaN/Inf
+    public static void complexLog(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
         if (((Number) NativeSafe.invoke(MPFR_NAN_P, aR)).intValue() != 0 || ((Number) NativeSafe.invoke(MPFR_NAN_P, aI)).intValue() != 0) {
             NativeSafe.invoke(MPFR_SET_NAN, resR);
             NativeSafe.invoke(MPFR_SET_NAN, resI);
             return;
         }
 
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment t1 = local.allocate(MPFR_LAYOUT);
-            MemorySegment t2 = local.allocate(MPFR_LAYOUT);
-            MemorySegment pi = local.allocate(MPFR_LAYOUT);
-            MemorySegment zero = local.allocate(MPFR_LAYOUT);
-            
-            try {
-                NativeSafe.invoke(MPFR_INIT2, t1, prec);
-                NativeSafe.invoke(MPFR_INIT2, t2, prec);
-                NativeSafe.invoke(MPFR_INIT2, pi, prec);
-                NativeSafe.invoke(MPFR_INIT2, zero, (int) prec);
-            
-                NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
-                NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
-                NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
+        MemorySegment pi = arena.allocate(MPFR_LAYOUT); track(tracker, pi);
+        MemorySegment zero = arena.allocate(MPFR_LAYOUT); track(tracker, zero);
+        
+        NativeSafe.invoke(MPFR_INIT2, t1, prec);
+        NativeSafe.invoke(MPFR_INIT2, t2, prec);
+        NativeSafe.invoke(MPFR_INIT2, pi, prec);
+        NativeSafe.invoke(MPFR_INIT2, zero, (int) prec);
+    
+        NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
+        NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
+        NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
 
-                // Guard against log(0)
-                boolean isZero = ((Number) NativeSafe.invoke(MPFR_ZERO_P, t1)).intValue() != 0;
-                if (!isZero) {
-                    NativeSafe.invoke(MPFR_LOG, t1, t1, 0);
-                    NativeSafe.invoke(MPFR_SET_D, t2, 0.5, 0);
-                    NativeSafe.invoke(MPFR_MUL, resR, t1, t2, 0);
-                } else {
-                    // log(0) = -Inf
-                    NativeSafe.invoke(MPFR_SET_INF, resR, -1);
-                }
-                
-                // resI = atan2(aI, aR)
-                if (MPFR_ATAN2 != null) {
-                    NativeSafe.invoke(MPFR_ATAN2, resI, aI, aR, 0);
-                } else {
-                    // High-precision manual atan2 fallback
-                    NativeSafe.invoke(MPFR_CONST_PI, pi, 0);
-                    NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
-                    
-                    int cmpX = (int) NativeSafe.invoke(MPFR_CMP, aR, zero);
-                    int cmpY = (int) NativeSafe.invoke(MPFR_CMP, aI, zero);
-                    
-                    if (cmpX > 0) {
-                        NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
-                        NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
-                    } else if (cmpX < 0) {
-                        NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
-                        NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
-                        if (cmpY >= 0) NativeSafe.invoke(MPFR_ADD, resI, resI, pi, 0);
-                        else NativeSafe.invoke(MPFR_SUB, resI, resI, pi, 0);
-                    } else {
-                        if (cmpY > 0) {
-                            NativeSafe.invoke(MPFR_SET_UI, resI, 2L, 0);
-                            NativeSafe.invoke(MPFR_DIV, resI, pi, resI, 0);
-                        } else if (cmpY < 0) {
-                            NativeSafe.invoke(MPFR_SET_UI, resI, 2L, 0);
-                            NativeSafe.invoke(MPFR_DIV, resI, pi, resI, 0);
-                            NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
-                        } else {
-                            NativeSafe.invoke(MPFR_SET_UI, resI, 0L, 0);
-                        }
-                    }
-                }
-            } finally {
-                NativeSafe.invoke(MPFR_CLEAR, t1);
-                NativeSafe.invoke(MPFR_CLEAR, t2);
-                NativeSafe.invoke(MPFR_CLEAR, pi);
-                NativeSafe.invoke(MPFR_CLEAR, zero);
-            }
-        }
-    }
-
-    public static void complexLog10(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        complexLog(resR, resI, aR, aI, prec, arena);
-        MemorySegment log10 = arena.allocate(MPFR_LAYOUT);
-        MemorySegment ten = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, log10, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, ten, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, ten, 10L, 0);
-            NativeSafe.invoke(MPFR_LOG, log10, ten, 0); // ln(10) computed at full precision
-
-            NativeSafe.invoke(MPFR_DIV, resR, resR, log10, 0);
-            NativeSafe.invoke(MPFR_DIV, resI, resI, log10, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, log10);
-            NativeSafe.invoke(MPFR_CLEAR, ten);
-        }
-    }
-
-    public static void complexSin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // sin(x + iy) = sin(x)cosh(y) + i cos(x)sinh(y)
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment sR = local.allocate(MPFR_LAYOUT);
-            MemorySegment cR = local.allocate(MPFR_LAYOUT);
-            MemorySegment shI = local.allocate(MPFR_LAYOUT);
-            MemorySegment chI = local.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, cR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, shI, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, chI, (int) prec);
-            
-            NativeSafe.invoke(MPFR_SIN, sR, aR, 0);
-            NativeSafe.invoke(MPFR_COS, cR, aR, 0);
-            NativeSafe.invoke(MPFR_SINH, shI, aI, 0);
-            NativeSafe.invoke(MPFR_COSH, chI, aI, 0);
-            
-            NativeSafe.invoke(MPFR_MUL, resR, sR, chI, 0);
-            NativeSafe.invoke(MPFR_MUL, resI, cR, shI, 0);
-
-            NativeSafe.invoke(MPFR_CLEAR, sR);
-            NativeSafe.invoke(MPFR_CLEAR, cR);
-            NativeSafe.invoke(MPFR_CLEAR, shI);
-            NativeSafe.invoke(MPFR_CLEAR, chI);
-        }
-    }
-
-    public static void complexCos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // cos(x + iy) = cos(x)cosh(y) - i sin(x)sinh(y)
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment sR = local.allocate(MPFR_LAYOUT);
-            MemorySegment cR = local.allocate(MPFR_LAYOUT);
-            MemorySegment shI = local.allocate(MPFR_LAYOUT);
-            MemorySegment chI = local.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, cR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, shI, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, chI, (int) prec);
-            
-            NativeSafe.invoke(MPFR_SIN, sR, aR, 0);
-            NativeSafe.invoke(MPFR_COS, cR, aR, 0);
-            NativeSafe.invoke(MPFR_SINH, shI, aI, 0);
-            NativeSafe.invoke(MPFR_COSH, chI, aI, 0);
-            
-            NativeSafe.invoke(MPFR_MUL, resR, cR, chI, 0);
-            NativeSafe.invoke(MPFR_MUL, resI, sR, shI, 0);
-
-            NativeSafe.invoke(MPFR_CLEAR, sR);
-            NativeSafe.invoke(MPFR_CLEAR, cR);
-            NativeSafe.invoke(MPFR_CLEAR, shI);
-            NativeSafe.invoke(MPFR_CLEAR, chI);
-            NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
-        }
-    }
-
-    public static void complexTan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // tan(z) = sin(z) / cos(z)
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment sR = local.allocate(MPFR_LAYOUT);
-            MemorySegment sI = local.allocate(MPFR_LAYOUT);
-            MemorySegment cR = local.allocate(MPFR_LAYOUT);
-            MemorySegment cI = local.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, sR, prec);
-            NativeSafe.invoke(MPFR_INIT2, sI, prec);
-            NativeSafe.invoke(MPFR_INIT2, cR, prec);
-            NativeSafe.invoke(MPFR_INIT2, cI, prec);
-            
-            complexSin(sR, sI, aR, aI, prec, arena);
-            complexCos(cR, cI, aR, aI, prec, arena);
-            complexDivide(resR, resI, sR, sI, cR, cI, prec, arena);
-        }
-    }
-
-    public static void complexSinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // sinh(x + iy) = sinh(x)cos(y) + i cosh(x)sin(y)
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment shR = local.allocate(MPFR_LAYOUT);
-            MemorySegment chR = local.allocate(MPFR_LAYOUT);
-            MemorySegment sI = local.allocate(MPFR_LAYOUT);
-            MemorySegment cI = local.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, shR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, chR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, cI, (int) prec);
-            
-            NativeSafe.invoke(MPFR_SINH, shR, aR, 0);
-            NativeSafe.invoke(MPFR_COSH, chR, aR, 0);
-            NativeSafe.invoke(MPFR_SIN, sI, aI, 0);
-            NativeSafe.invoke(MPFR_COS, cI, aI, 0);
-            
-            NativeSafe.invoke(MPFR_MUL, resR, shR, cI, 0);
-            NativeSafe.invoke(MPFR_MUL, resI, chR, sI, 0);
-
-            NativeSafe.invoke(MPFR_CLEAR, shR);
-            NativeSafe.invoke(MPFR_CLEAR, chR);
-            NativeSafe.invoke(MPFR_CLEAR, sI);
-            NativeSafe.invoke(MPFR_CLEAR, cI);
-        }
-    }
-
-    public static void complexCosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // cosh(x + iy) = cosh(x)cos(y) + i sinh(x)sin(y)
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment shR = local.allocate(MPFR_LAYOUT);
-            MemorySegment chR = local.allocate(MPFR_LAYOUT);
-            MemorySegment sI = local.allocate(MPFR_LAYOUT);
-            MemorySegment cI = local.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, shR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, chR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, cI, (int) prec);
-            
-            NativeSafe.invoke(MPFR_SINH, shR, aR, 0);
-            NativeSafe.invoke(MPFR_COSH, chR, aR, 0);
-            NativeSafe.invoke(MPFR_SIN, sI, aI, 0);
-            NativeSafe.invoke(MPFR_COS, cI, aI, 0);
-            
-            NativeSafe.invoke(MPFR_MUL, resR, chR, cI, 0);
-            NativeSafe.invoke(MPFR_MUL, resI, shR, sI, 0);
-
-            NativeSafe.invoke(MPFR_CLEAR, shR);
-            NativeSafe.invoke(MPFR_CLEAR, chR);
-            NativeSafe.invoke(MPFR_CLEAR, sI);
-            NativeSafe.invoke(MPFR_CLEAR, cI);
-        }
-    }
-
-    public static void complexTanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // tanh(z) = sinh(z) / cosh(z)
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment sR = local.allocate(MPFR_LAYOUT);
-            MemorySegment sI = local.allocate(MPFR_LAYOUT);
-            MemorySegment cR = local.allocate(MPFR_LAYOUT);
-            MemorySegment cI = local.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, sR, prec);
-            NativeSafe.invoke(MPFR_INIT2, sI, prec);
-            NativeSafe.invoke(MPFR_INIT2, cR, prec);
-            NativeSafe.invoke(MPFR_INIT2, cI, prec);
-            
-            complexSinh(sR, sI, aR, aI, prec, arena);
-            complexCosh(cR, cI, aR, aI, prec, arena);
-            complexDivide(resR, resI, sR, sI, cR, cI, prec, arena);
-        }
-    }
-
-    public static void complexSqrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // sqrt(x + iy) = sqrt((|z| + x)/2) + i sign(y)sqrt((|z| - x)/2)
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment norm = local.allocate(MPFR_LAYOUT);
-            MemorySegment t1 = local.allocate(MPFR_LAYOUT);
-            MemorySegment t2 = local.allocate(MPFR_LAYOUT);
-            MemorySegment zero = local.allocate(MPFR_LAYOUT);
-            NativeSafe.invoke(MPFR_INIT2, norm, prec);
-            NativeSafe.invoke(MPFR_INIT2, t1, prec);
-            NativeSafe.invoke(MPFR_INIT2, t2, prec);
-            NativeSafe.invoke(MPFR_INIT2, zero, prec);
-            NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
-            
-            // norm = hypot(x, y) = sqrt(x^2 + y^2) - more robust
-            if (MPFR_HYPOT != null) {
-                NativeSafe.invoke(MPFR_HYPOT, norm, aR, aI, 0);
-            } else {
-                NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
-                NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
-                NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
-                NativeSafe.invoke(MPFR_SQRT, norm, t1, 0);
-            }
-            
-            // resR = sqrt((norm + x)/2)
-            NativeSafe.invoke(MPFR_ADD, t1, norm, aR, 0);
+        if (((Number) NativeSafe.invoke(MPFR_ZERO_P, t1)).intValue() != 0) {
+            NativeSafe.invoke(MPFR_SET_INF, resR, -1);
+        } else {
+            NativeSafe.invoke(MPFR_LOG, t1, t1, 0);
             NativeSafe.invoke(MPFR_SET_D, t2, 0.5, 0);
-            NativeSafe.invoke(MPFR_MUL, t1, t1, t2, 0);
+            NativeSafe.invoke(MPFR_MUL, resR, t1, t2, 0);
+        }
+        
+        if (MPFR_ATAN2 != null) {
+            NativeSafe.invoke(MPFR_ATAN2, resI, aI, aR, 0);
+        } else {
+            NativeSafe.invoke(MPFR_CONST_PI, pi, 0);
+            NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
+            int cmpX = (int) NativeSafe.invoke(MPFR_CMP, aR, zero);
+            int cmpY = (int) NativeSafe.invoke(MPFR_CMP, aI, zero);
             
-            // Domain guard: Ensure t1 >= 0 due to precision noise
-            if ((int) NativeSafe.invoke(MPFR_CMP, t1, zero) < 0) NativeSafe.invoke(MPFR_SET, t1, zero, 0);
-            NativeSafe.invoke(MPFR_SQRT, resR, t1, 0);
-            
-            // resI = sign(y) * sqrt((norm - x)/2)
-            NativeSafe.invoke(MPFR_SUB, t1, norm, aR, 0);
-            NativeSafe.invoke(MPFR_MUL, t1, t1, t2, 0);
-            if ((int) NativeSafe.invoke(MPFR_CMP, t1, zero) < 0) NativeSafe.invoke(MPFR_SET, t1, zero, 0);
-            NativeSafe.invoke(MPFR_SQRT, resI, t1, 0);
-            
-            if ((int) NativeSafe.invoke(MPFR_CMP, aI, zero) < 0) { 
-                 NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
+            if (cmpX > 0) {
+                NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
+                NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
+            } else if (cmpX < 0) {
+                NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
+                NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
+                if (cmpY >= 0) NativeSafe.invoke(MPFR_ADD, resI, resI, pi, 0);
+                else NativeSafe.invoke(MPFR_SUB, resI, resI, pi, 0);
+            } else {
+                if (cmpY > 0) {
+                    MemorySegment two = arena.allocate(MPFR_LAYOUT); track(tracker, two);
+                    NativeSafe.invoke(MPFR_INIT2, two, prec);
+                    NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
+                    NativeSafe.invoke(MPFR_DIV, resI, pi, two, 0);
+                } else if (cmpY < 0) {
+                    MemorySegment two = arena.allocate(MPFR_LAYOUT); track(tracker, two);
+                    NativeSafe.invoke(MPFR_INIT2, two, prec);
+                    NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
+                    NativeSafe.invoke(MPFR_DIV, resI, pi, two, 0);
+                    NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
+                } else {
+                    NativeSafe.invoke(MPFR_SET_UI, resI, 0L, 0);
+                }
             }
-
-            NativeSafe.invoke(MPFR_CLEAR, norm);
-            NativeSafe.invoke(MPFR_CLEAR, t1);
-            NativeSafe.invoke(MPFR_CLEAR, t2);
-            NativeSafe.invoke(MPFR_CLEAR, zero);
         }
     }
 
-    
-    public static void complexAsin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // asin(z) = -i log(iz + sqrt(1 - z^2))
-        MemorySegment izR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment izI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment z2R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment z2I = arena.allocate(MPFR_LAYOUT);
-        MemorySegment oneMinusZ2R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment oneMinusZ2I = arena.allocate(MPFR_LAYOUT);
-        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment sumI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment logR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment logI = arena.allocate(MPFR_LAYOUT);
-        
-        try {
-            NativeSafe.invoke(MPFR_INIT2, izR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, izI, (int) prec);
-            // iz = (0 + i)*(aR + i*aI) = -aI + i*aR
-            NativeSafe.invoke(MPFR_NEG, izR, aI, 0);
-            NativeSafe.invoke(MPFR_SET, izI, aR, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, z2R, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, z2I, (int) prec);
-            complexMultiply(z2R, z2I, aR, aI, aR, aI, prec, arena);
-            
-            NativeSafe.invoke(MPFR_INIT2, oneMinusZ2R, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, oneMinusZ2I, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, oneMinusZ2R, 1L, 0);
-            NativeSafe.invoke(MPFR_SET_UI, oneMinusZ2I, 0L, 0);
-            NativeSafe.invoke(MPFR_SUB, oneMinusZ2R, oneMinusZ2R, z2R, 0);
-            NativeSafe.invoke(MPFR_SUB, oneMinusZ2I, oneMinusZ2I, z2I, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, sqrtR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, sqrtI, (int) prec);
-            complexSqrt(sqrtR, sqrtI, oneMinusZ2R, oneMinusZ2I, prec, arena);
-            
-            NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
-            NativeSafe.invoke(MPFR_ADD, sumR, izR, sqrtR, 0);
-            NativeSafe.invoke(MPFR_ADD, sumI, izI, sqrtI, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
-            complexLog(logR, logI, sumR, sumI, prec, arena);
-            
-            // res = -i * log = -i * (logR + i*logI) = logI - i*logR
-            NativeSafe.invoke(MPFR_SET, resR, logI, 0);
-            NativeSafe.invoke(MPFR_NEG, resI, logR, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, izR); NativeSafe.invoke(MPFR_CLEAR, izI);
-            NativeSafe.invoke(MPFR_CLEAR, z2R); NativeSafe.invoke(MPFR_CLEAR, z2I);
-            NativeSafe.invoke(MPFR_CLEAR, oneMinusZ2R); NativeSafe.invoke(MPFR_CLEAR, oneMinusZ2I);
-            NativeSafe.invoke(MPFR_CLEAR, sqrtR); NativeSafe.invoke(MPFR_CLEAR, sqrtI);
-            NativeSafe.invoke(MPFR_CLEAR, sumR); NativeSafe.invoke(MPFR_CLEAR, sumI);
-            NativeSafe.invoke(MPFR_CLEAR, logR); NativeSafe.invoke(MPFR_CLEAR, logI);
-        }
-    }
-    
-    public static void complexAcos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // acos(z) = pi/2 - asin(z)
-        MemorySegment asinR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment asinI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment piHalf = arena.allocate(MPFR_LAYOUT);
-        MemorySegment two = arena.allocate(MPFR_LAYOUT);
-        
-        try {
-            NativeSafe.invoke(MPFR_INIT2, asinR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, asinI, (int) prec);
-            complexAsin(asinR, asinI, aR, aI, prec, arena);
-            
-            NativeSafe.invoke(MPFR_INIT2, piHalf, (int) prec);
-            NativeSafe.invoke(MPFR_CONST_PI, piHalf, 0);
-            NativeSafe.invoke(MPFR_INIT2, two, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
-            NativeSafe.invoke(MPFR_DIV, piHalf, piHalf, two, 0);
-            
-            NativeSafe.invoke(MPFR_SUB, resR, piHalf, asinR, 0);
-            NativeSafe.invoke(MPFR_NEG, resI, asinI, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, asinR);
-            NativeSafe.invoke(MPFR_CLEAR, asinI);
-            NativeSafe.invoke(MPFR_CLEAR, piHalf);
-            NativeSafe.invoke(MPFR_CLEAR, two);
-        }
-    }
-    
-    public static void complexAtan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // atan(z) = i/2 log((1-iz)/(1+iz))
-        // iz = -aI + i*aR
-        MemorySegment izR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment izI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment numR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment numI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment denR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment denI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment divR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment divI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment logR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment logI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment check = arena.allocate(MPFR_LAYOUT);
-        
-        try {
-            NativeSafe.invoke(MPFR_INIT2, izR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, izI, (int) prec);
-            NativeSafe.invoke(MPFR_NEG, izR, aI, 0);
-            NativeSafe.invoke(MPFR_SET, izI, aR, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, numR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, numI, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, numR, 1L, 0);
-            NativeSafe.invoke(MPFR_SET_UI, numI, 0L, 0);
-            NativeSafe.invoke(MPFR_SUB, numR, numR, izR, 0);
-            NativeSafe.invoke(MPFR_SUB, numI, numI, izI, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, denR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, denI, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, denR, 1L, 0);
-            NativeSafe.invoke(MPFR_SET_UI, denI, 0L, 0);
-            NativeSafe.invoke(MPFR_ADD, denR, denR, izR, 0);
-            NativeSafe.invoke(MPFR_ADD, denI, denI, izI, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, divR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, divI, (int) prec);
-            complexDivide(divR, divI, numR, numI, denR, denI, prec, arena);
-            
-            NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
-            complexLog(logR, logI, divR, divI, prec, arena);
-            
-            // res = i/2 * log = i/2 * (logR + i*logI) = -logI/2 + i*logR/2
-            NativeSafe.invoke(MPFR_SET, resR, logI, 0);
-            NativeSafe.invoke(MPFR_NEG, resR, resR, 0);
-            NativeSafe.invoke(MPFR_INIT2, check, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, check, 2L, 0);
-            NativeSafe.invoke(MPFR_DIV, resR, resR, check, 0);
-            
-            NativeSafe.invoke(MPFR_SET, resI, logR, 0);
-            NativeSafe.invoke(MPFR_DIV, resI, resI, check, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, izR); NativeSafe.invoke(MPFR_CLEAR, izI);
-            NativeSafe.invoke(MPFR_CLEAR, numR); NativeSafe.invoke(MPFR_CLEAR, numI);
-            NativeSafe.invoke(MPFR_CLEAR, denR); NativeSafe.invoke(MPFR_CLEAR, denI);
-            NativeSafe.invoke(MPFR_CLEAR, divR); NativeSafe.invoke(MPFR_CLEAR, divI);
-            NativeSafe.invoke(MPFR_CLEAR, logR); NativeSafe.invoke(MPFR_CLEAR, logI);
-            NativeSafe.invoke(MPFR_CLEAR, check);
-        }
+    public static void complexLog10(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        complexLog(resR, resI, aR, aI, prec, arena, tracker);
+        MemorySegment log10 = arena.allocate(MPFR_LAYOUT); track(tracker, log10);
+        MemorySegment ten = arena.allocate(MPFR_LAYOUT); track(tracker, ten);
+        NativeSafe.invoke(MPFR_INIT2, log10, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, ten, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, ten, 10L, 0);
+        NativeSafe.invoke(MPFR_LOG, log10, ten, 0);
+        NativeSafe.invoke(MPFR_DIV, resR, resR, log10, 0);
+        NativeSafe.invoke(MPFR_DIV, resI, resI, log10, 0);
     }
 
-    public static void complexAsinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // asinh(z) = log(z + sqrt(z^2 + 1))
-        MemorySegment z2R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment z2I = arena.allocate(MPFR_LAYOUT);
-        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT);
-        
-        try {
-            NativeSafe.invoke(MPFR_INIT2, z2R, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, z2I, (int) prec);
-            complexMultiply(z2R, z2I, aR, aI, aR, aI, prec, arena);
-            
-            NativeSafe.invoke(MPFR_SET_UI, resR, 1L, 0);
-            NativeSafe.invoke(MPFR_ADD, z2R, z2R, resR, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, sqrtR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, sqrtI, (int) prec);
-            complexSqrt(sqrtR, sqrtI, z2R, z2I, prec, arena);
-            
-            NativeSafe.invoke(MPFR_ADD, z2R, aR, sqrtR, 0);
-            NativeSafe.invoke(MPFR_ADD, z2I, aI, sqrtI, 0);
-            
-            complexLog(resR, resI, z2R, z2I, (int) prec, arena);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, z2R); NativeSafe.invoke(MPFR_CLEAR, z2I);
-            NativeSafe.invoke(MPFR_CLEAR, sqrtR); NativeSafe.invoke(MPFR_CLEAR, sqrtI);
-        }
-    }
-    
-    public static void complexAcosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // acosh(z) = log(z + sqrt(z + 1)sqrt(z - 1))
-        MemorySegment zp1R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment zm1R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment s1R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment s1I = arena.allocate(MPFR_LAYOUT);
-        MemorySegment s2R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment s2I = arena.allocate(MPFR_LAYOUT);
-        MemorySegment prodR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment prodI = arena.allocate(MPFR_LAYOUT);
-        
-        try {
-            NativeSafe.invoke(MPFR_INIT2, zp1R, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, zm1R, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, zp1R, 1L, 0);
-            NativeSafe.invoke(MPFR_ADD, zp1R, aR, zp1R, 0);
-            NativeSafe.invoke(MPFR_SET_UI, zm1R, 1L, 0);
-            NativeSafe.invoke(MPFR_SUB, zm1R, aR, zm1R, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, s1R, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, s1I, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, s2R, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, s2I, (int) prec);
-            complexSqrt(s1R, s1I, zp1R, aI, prec, arena);
-            complexSqrt(s2R, s2I, zm1R, aI, prec, arena);
-            
-            NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
-            complexMultiply(prodR, prodI, s1R, s1I, s2R, s2I, (int) prec, arena);
-            
-            NativeSafe.invoke(MPFR_ADD, prodR, aR, prodR, 0);
-            NativeSafe.invoke(MPFR_ADD, prodI, aI, prodI, 0);
-            
-            complexLog(resR, resI, prodR, prodI, (int) prec, arena);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, zp1R); NativeSafe.invoke(MPFR_CLEAR, zm1R);
-            NativeSafe.invoke(MPFR_CLEAR, s1R); NativeSafe.invoke(MPFR_CLEAR, s1I);
-            NativeSafe.invoke(MPFR_CLEAR, s2R); NativeSafe.invoke(MPFR_CLEAR, s2I);
-            NativeSafe.invoke(MPFR_CLEAR, prodR); NativeSafe.invoke(MPFR_CLEAR, prodI);
-        }
-    }
-    
-    public static void complexAtanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // atanh(z) = 0.5 log((1+z)/(1-z))
-        MemorySegment p1R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment m1R = arena.allocate(MPFR_LAYOUT);
-        MemorySegment m1I = arena.allocate(MPFR_LAYOUT);
-        MemorySegment divR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment divI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment half = arena.allocate(MPFR_LAYOUT);
-        
-        try {
-            NativeSafe.invoke(MPFR_INIT2, p1R, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, m1R, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, p1R, 1L, 0);
-            NativeSafe.invoke(MPFR_ADD, p1R, p1R, aR, 0);
-            NativeSafe.invoke(MPFR_SET_UI, m1R, 1L, 0);
-            NativeSafe.invoke(MPFR_SUB, m1R, m1R, aR, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, m1I, (int) prec);
-            NativeSafe.invoke(MPFR_NEG, m1I, aI, 0);
-            
-            NativeSafe.invoke(MPFR_INIT2, divR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, divI, (int) prec);
-            complexDivide(divR, divI, p1R, aI, m1R, m1I, (int) prec, arena);
-            
-            complexLog(resR, resI, divR, divI, (int) prec, arena);
-            
-            NativeSafe.invoke(MPFR_INIT2, half, (int) prec);
-            NativeSafe.invoke(MPFR_SET_D, half, 0.5, 0);
-            NativeSafe.invoke(MPFR_MUL, resR, resR, half, 0);
-            NativeSafe.invoke(MPFR_MUL, resI, resI, half, 0);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, p1R); NativeSafe.invoke(MPFR_CLEAR, m1R);
-            NativeSafe.invoke(MPFR_CLEAR, m1I); NativeSafe.invoke(MPFR_CLEAR, divR);
-            NativeSafe.invoke(MPFR_CLEAR, divI); NativeSafe.invoke(MPFR_CLEAR, half);
-        }
-    }
-    
-    public static void complexCbrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena) {
-        // cbrt(z) = exp(1/3 * log(z))
-        MemorySegment logR = arena.allocate(MPFR_LAYOUT);
-        MemorySegment logI = arena.allocate(MPFR_LAYOUT);
-        MemorySegment three = arena.allocate(MPFR_LAYOUT);
-        try {
-            NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
-            NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
-            complexLog(logR, logI, aR, aI, prec, arena);
-            
-            NativeSafe.invoke(MPFR_INIT2, three, (int) prec);
-            NativeSafe.invoke(MPFR_SET_UI, three, 3L, 0);
-            
-            NativeSafe.invoke(MPFR_DIV, logR, logR, three, 0);
-            NativeSafe.invoke(MPFR_DIV, logI, logI, three, 0);
-            
-            complexExp(resR, resI, logR, logI, prec, arena);
-        } finally {
-            NativeSafe.invoke(MPFR_CLEAR, logR);
-            NativeSafe.invoke(MPFR_CLEAR, logI);
-            NativeSafe.invoke(MPFR_CLEAR, three);
-        }
+    public static void complexSin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment sR = arena.allocate(MPFR_LAYOUT); track(tracker, sR);
+        MemorySegment cR = arena.allocate(MPFR_LAYOUT); track(tracker, cR);
+        MemorySegment shI = arena.allocate(MPFR_LAYOUT); track(tracker, shI);
+        MemorySegment chI = arena.allocate(MPFR_LAYOUT); track(tracker, chI);
+        NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, shI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chI, (int) prec);
+        NativeSafe.invoke(MPFR_SIN, sR, aR, 0);
+        NativeSafe.invoke(MPFR_COS, cR, aR, 0);
+        NativeSafe.invoke(MPFR_SINH, shI, aI, 0);
+        NativeSafe.invoke(MPFR_COSH, chI, aI, 0);
+        NativeSafe.invoke(MPFR_MUL, resR, sR, chI, 0);
+        NativeSafe.invoke(MPFR_MUL, resI, cR, shI, 0);
     }
 
+    public static void complexCos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment sR = arena.allocate(MPFR_LAYOUT); track(tracker, sR);
+        MemorySegment cR = arena.allocate(MPFR_LAYOUT); track(tracker, cR);
+        MemorySegment shI = arena.allocate(MPFR_LAYOUT); track(tracker, shI);
+        MemorySegment chI = arena.allocate(MPFR_LAYOUT); track(tracker, chI);
+        NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, shI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chI, (int) prec);
+        NativeSafe.invoke(MPFR_SIN, sR, aR, 0);
+        NativeSafe.invoke(MPFR_COS, cR, aR, 0);
+        NativeSafe.invoke(MPFR_SINH, shI, aI, 0);
+        NativeSafe.invoke(MPFR_COSH, chI, aI, 0);
+        NativeSafe.invoke(MPFR_MUL, resR, cR, chI, 0);
+        NativeSafe.invoke(MPFR_MUL, resI, sR, shI, 0);
+        NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
+    }
+
+    public static void complexTan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment sR = arena.allocate(MPFR_LAYOUT); track(tracker, sR);
+        MemorySegment sI = arena.allocate(MPFR_LAYOUT); track(tracker, sI);
+        MemorySegment cR = arena.allocate(MPFR_LAYOUT); track(tracker, cR);
+        MemorySegment cI = arena.allocate(MPFR_LAYOUT); track(tracker, cI);
+        NativeSafe.invoke(MPFR_INIT2, sR, prec);
+        NativeSafe.invoke(MPFR_INIT2, sI, prec);
+        NativeSafe.invoke(MPFR_INIT2, cR, prec);
+        NativeSafe.invoke(MPFR_INIT2, cI, prec);
+        complexSin(sR, sI, aR, aI, prec, arena, tracker);
+        complexCos(cR, cI, aR, aI, prec, arena, tracker);
+        complexDivide(resR, resI, sR, sI, cR, cI, prec, arena, tracker);
+    }
+
+    public static void complexSinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment shR = arena.allocate(MPFR_LAYOUT); track(tracker, shR);
+        MemorySegment chR = arena.allocate(MPFR_LAYOUT); track(tracker, chR);
+        MemorySegment sI = arena.allocate(MPFR_LAYOUT); track(tracker, sI);
+        MemorySegment cI = arena.allocate(MPFR_LAYOUT); track(tracker, cI);
+        NativeSafe.invoke(MPFR_INIT2, shR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cI, (int) prec);
+        NativeSafe.invoke(MPFR_SINH, shR, aR, 0);
+        NativeSafe.invoke(MPFR_COSH, chR, aR, 0);
+        NativeSafe.invoke(MPFR_SIN, sI, aI, 0);
+        NativeSafe.invoke(MPFR_COS, cI, aI, 0);
+        NativeSafe.invoke(MPFR_MUL, resR, shR, cI, 0);
+        NativeSafe.invoke(MPFR_MUL, resI, chR, sI, 0);
+    }
+
+    public static void complexCosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment shR = arena.allocate(MPFR_LAYOUT); track(tracker, shR);
+        MemorySegment chR = arena.allocate(MPFR_LAYOUT); track(tracker, chR);
+        MemorySegment sI = arena.allocate(MPFR_LAYOUT); track(tracker, sI);
+        MemorySegment cI = arena.allocate(MPFR_LAYOUT); track(tracker, cI);
+        NativeSafe.invoke(MPFR_INIT2, shR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, chR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, cI, (int) prec);
+        NativeSafe.invoke(MPFR_SINH, shR, aR, 0);
+        NativeSafe.invoke(MPFR_COSH, chR, aR, 0);
+        NativeSafe.invoke(MPFR_SIN, sI, aI, 0);
+        NativeSafe.invoke(MPFR_COS, cI, aI, 0);
+        NativeSafe.invoke(MPFR_MUL, resR, chR, cI, 0);
+        NativeSafe.invoke(MPFR_MUL, resI, shR, sI, 0);
+    }
+
+    public static void complexTanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment sR = arena.allocate(MPFR_LAYOUT); track(tracker, sR);
+        MemorySegment sI = arena.allocate(MPFR_LAYOUT); track(tracker, sI);
+        MemorySegment cR = arena.allocate(MPFR_LAYOUT); track(tracker, cR);
+        MemorySegment cI = arena.allocate(MPFR_LAYOUT); track(tracker, cI);
+        NativeSafe.invoke(MPFR_INIT2, sR, prec);
+        NativeSafe.invoke(MPFR_INIT2, sI, prec);
+        NativeSafe.invoke(MPFR_INIT2, cR, prec);
+        NativeSafe.invoke(MPFR_INIT2, cI, prec);
+        complexSinh(sR, sI, aR, aI, prec, arena, tracker);
+        complexCosh(cR, cI, aR, aI, prec, arena, tracker);
+        complexDivide(resR, resI, sR, sI, cR, cI, prec, arena, tracker);
+    }
+
+    public static void complexSqrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment norm = arena.allocate(MPFR_LAYOUT); track(tracker, norm);
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
+        MemorySegment zero = arena.allocate(MPFR_LAYOUT); track(tracker, zero);
+        NativeSafe.invoke(MPFR_INIT2, norm, prec);
+        NativeSafe.invoke(MPFR_INIT2, t1, prec);
+        NativeSafe.invoke(MPFR_INIT2, t2, prec);
+        NativeSafe.invoke(MPFR_INIT2, zero, prec);
+        NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
+        
+        if (MPFR_HYPOT != null) {
+            NativeSafe.invoke(MPFR_HYPOT, norm, aR, aI, 0);
+        } else {
+            NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
+            NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
+            NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+            NativeSafe.invoke(MPFR_SQRT, norm, t1, 0);
+        }
+        
+        NativeSafe.invoke(MPFR_ADD, t1, norm, aR, 0);
+        NativeSafe.invoke(MPFR_SET_D, t2, 0.5, 0);
+        NativeSafe.invoke(MPFR_MUL, t1, t1, t2, 0);
+        if ((int) NativeSafe.invoke(MPFR_CMP, t1, zero) < 0) NativeSafe.invoke(MPFR_SET, t1, zero, 0);
+        NativeSafe.invoke(MPFR_SQRT, resR, t1, 0);
+        
+        NativeSafe.invoke(MPFR_SUB, t1, norm, aR, 0);
+        NativeSafe.invoke(MPFR_MUL, t1, t1, t2, 0);
+        if ((int) NativeSafe.invoke(MPFR_CMP, t1, zero) < 0) NativeSafe.invoke(MPFR_SET, t1, zero, 0);
+        NativeSafe.invoke(MPFR_SQRT, resI, t1, 0);
+        if ((int) NativeSafe.invoke(MPFR_CMP, aI, zero) < 0) NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
+    }
+
+    public static void complexAsin(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment izR = arena.allocate(MPFR_LAYOUT); track(tracker, izR);
+        MemorySegment izI = arena.allocate(MPFR_LAYOUT); track(tracker, izI);
+        MemorySegment z2R = arena.allocate(MPFR_LAYOUT); track(tracker, z2R);
+        MemorySegment z2I = arena.allocate(MPFR_LAYOUT); track(tracker, z2I);
+        MemorySegment oneMinusZ2R = arena.allocate(MPFR_LAYOUT); track(tracker, oneMinusZ2R);
+        MemorySegment oneMinusZ2I = arena.allocate(MPFR_LAYOUT); track(tracker, oneMinusZ2I);
+        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT); track(tracker, sqrtR);
+        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT); track(tracker, sqrtI);
+        MemorySegment sumR = arena.allocate(MPFR_LAYOUT); track(tracker, sumR);
+        MemorySegment sumI = arena.allocate(MPFR_LAYOUT); track(tracker, sumI);
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); track(tracker, logR);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); track(tracker, logI);
+        
+        NativeSafe.invoke(MPFR_INIT2, izR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, izI, (int) prec);
+        NativeSafe.invoke(MPFR_NEG, izR, aI, 0);
+        NativeSafe.invoke(MPFR_SET, izI, aR, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, z2R, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, z2I, (int) prec);
+        complexMultiply(z2R, z2I, aR, aI, aR, aI, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_INIT2, oneMinusZ2R, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, oneMinusZ2I, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, oneMinusZ2R, 1L, 0);
+        NativeSafe.invoke(MPFR_SET_UI, oneMinusZ2I, 0L, 0);
+        NativeSafe.invoke(MPFR_SUB, oneMinusZ2R, oneMinusZ2R, z2R, 0);
+        NativeSafe.invoke(MPFR_SUB, oneMinusZ2I, oneMinusZ2I, z2I, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, sqrtR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, sqrtI, (int) prec);
+        complexSqrt(sqrtR, sqrtI, oneMinusZ2R, oneMinusZ2I, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
+        NativeSafe.invoke(MPFR_ADD, sumR, izR, sqrtR, 0);
+        NativeSafe.invoke(MPFR_ADD, sumI, izI, sqrtI, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
+        complexLog(logR, logI, sumR, sumI, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_SET, resR, logI, 0);
+        NativeSafe.invoke(MPFR_NEG, resI, logR, 0);
+    }
+
+    public static void complexAcos(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment asinR = arena.allocate(MPFR_LAYOUT); track(tracker, asinR);
+        MemorySegment asinI = arena.allocate(MPFR_LAYOUT); track(tracker, asinI);
+        MemorySegment piHalf = arena.allocate(MPFR_LAYOUT); track(tracker, piHalf);
+        MemorySegment two = arena.allocate(MPFR_LAYOUT); track(tracker, two);
+        
+        NativeSafe.invoke(MPFR_INIT2, asinR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, asinI, (int) prec);
+        complexAsin(asinR, asinI, aR, aI, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_INIT2, piHalf, (int) prec);
+        NativeSafe.invoke(MPFR_CONST_PI, piHalf, 0);
+        NativeSafe.invoke(MPFR_INIT2, two, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
+        NativeSafe.invoke(MPFR_DIV, piHalf, piHalf, two, 0);
+        
+        NativeSafe.invoke(MPFR_SUB, resR, piHalf, asinR, 0);
+        NativeSafe.invoke(MPFR_NEG, resI, asinI, 0);
+    }
+
+    public static void complexAtan(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment izR = arena.allocate(MPFR_LAYOUT); track(tracker, izR);
+        MemorySegment izI = arena.allocate(MPFR_LAYOUT); track(tracker, izI);
+        MemorySegment numR = arena.allocate(MPFR_LAYOUT); track(tracker, numR);
+        MemorySegment numI = arena.allocate(MPFR_LAYOUT); track(tracker, numI);
+        MemorySegment denR = arena.allocate(MPFR_LAYOUT); track(tracker, denR);
+        MemorySegment denI = arena.allocate(MPFR_LAYOUT); track(tracker, denI);
+        MemorySegment divR = arena.allocate(MPFR_LAYOUT); track(tracker, divR);
+        MemorySegment divI = arena.allocate(MPFR_LAYOUT); track(tracker, divI);
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); track(tracker, logR);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); track(tracker, logI);
+        MemorySegment check = arena.allocate(MPFR_LAYOUT); track(tracker, check);
+        
+        NativeSafe.invoke(MPFR_INIT2, izR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, izI, (int) prec);
+        NativeSafe.invoke(MPFR_NEG, izR, aI, 0);
+        NativeSafe.invoke(MPFR_SET, izI, aR, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, numR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, numI, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, numR, 1L, 0);
+        NativeSafe.invoke(MPFR_SET_UI, numI, 0L, 0);
+        NativeSafe.invoke(MPFR_SUB, numR, numR, izR, 0);
+        NativeSafe.invoke(MPFR_SUB, numI, numI, izI, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, denR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, denI, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, denR, 1L, 0);
+        NativeSafe.invoke(MPFR_SET_UI, denI, 0L, 0);
+        NativeSafe.invoke(MPFR_ADD, denR, denR, izR, 0);
+        NativeSafe.invoke(MPFR_ADD, denI, denI, izI, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, divR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, divI, (int) prec);
+        complexDivide(divR, divI, numR, numI, denR, denI, prec, arena, tracker);
+        complexLog(logR, logI, divR, divI, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_SET, resR, logI, 0);
+        NativeSafe.invoke(MPFR_NEG, resR, resR, 0);
+        NativeSafe.invoke(MPFR_INIT2, check, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, check, 2L, 0);
+        NativeSafe.invoke(MPFR_DIV, resR, resR, check, 0);
+        NativeSafe.invoke(MPFR_SET, resI, logR, 0);
+        NativeSafe.invoke(MPFR_DIV, resI, resI, check, 0);
+    }
+
+    public static void complexAsinh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment z2R = arena.allocate(MPFR_LAYOUT); track(tracker, z2R);
+        MemorySegment z2I = arena.allocate(MPFR_LAYOUT); track(tracker, z2I);
+        MemorySegment sqrtR = arena.allocate(MPFR_LAYOUT); track(tracker, sqrtR);
+        MemorySegment sqrtI = arena.allocate(MPFR_LAYOUT); track(tracker, sqrtI);
+        
+        NativeSafe.invoke(MPFR_INIT2, z2R, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, z2I, (int) prec);
+        complexMultiply(z2R, z2I, aR, aI, aR, aI, prec, arena, tracker);
+        
+        MemorySegment one = arena.allocate(MPFR_LAYOUT); track(tracker, one);
+        NativeSafe.invoke(MPFR_INIT2, one, prec);
+        NativeSafe.invoke(MPFR_SET_UI, one, 1L, 0);
+        NativeSafe.invoke(MPFR_ADD, z2R, z2R, one, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, sqrtR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, sqrtI, (int) prec);
+        complexSqrt(sqrtR, sqrtI, z2R, z2I, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_ADD, z2R, aR, sqrtR, 0);
+        NativeSafe.invoke(MPFR_ADD, z2I, aI, sqrtI, 0);
+        complexLog(resR, resI, z2R, z2I, (int) prec, arena, tracker);
+    }
+
+    public static void complexAcosh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment zp1R = arena.allocate(MPFR_LAYOUT); track(tracker, zp1R);
+        MemorySegment zm1R = arena.allocate(MPFR_LAYOUT); track(tracker, zm1R);
+        MemorySegment s1R = arena.allocate(MPFR_LAYOUT); track(tracker, s1R);
+        MemorySegment s1I = arena.allocate(MPFR_LAYOUT); track(tracker, s1I);
+        MemorySegment s2R = arena.allocate(MPFR_LAYOUT); track(tracker, s2R);
+        MemorySegment s2I = arena.allocate(MPFR_LAYOUT); track(tracker, s2I);
+        MemorySegment prodR = arena.allocate(MPFR_LAYOUT); track(tracker, prodR);
+        MemorySegment prodI = arena.allocate(MPFR_LAYOUT); track(tracker, prodI);
+        
+        NativeSafe.invoke(MPFR_INIT2, zp1R, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, zm1R, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, zp1R, 1L, 0);
+        NativeSafe.invoke(MPFR_ADD, zp1R, aR, zp1R, 0);
+        NativeSafe.invoke(MPFR_SET_UI, zm1R, 1L, 0);
+        NativeSafe.invoke(MPFR_SUB, zm1R, aR, zm1R, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, s1R, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, s1I, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, s2R, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, s2I, (int) prec);
+        complexSqrt(s1R, s1I, zp1R, aI, prec, arena, tracker);
+        complexSqrt(s2R, s2I, zm1R, aI, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
+        complexMultiply(prodR, prodI, s1R, s1I, s2R, s2I, (int) prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_ADD, prodR, aR, prodR, 0);
+        NativeSafe.invoke(MPFR_ADD, aI, aI, prodI, 0); // Corrected sum: aI + prodI
+        complexLog(resR, resI, prodR, prodI, (int) prec, arena, tracker);
+    }
+
+    public static void complexAtanh(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment p1R = arena.allocate(MPFR_LAYOUT); track(tracker, p1R);
+        MemorySegment m1R = arena.allocate(MPFR_LAYOUT); track(tracker, m1R);
+        MemorySegment m1I = arena.allocate(MPFR_LAYOUT); track(tracker, m1I);
+        MemorySegment divR = arena.allocate(MPFR_LAYOUT); track(tracker, divR);
+        MemorySegment divI = arena.allocate(MPFR_LAYOUT); track(tracker, divI);
+        MemorySegment half = arena.allocate(MPFR_LAYOUT); track(tracker, half);
+        
+        NativeSafe.invoke(MPFR_INIT2, p1R, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, m1R, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, p1R, 1L, 0);
+        NativeSafe.invoke(MPFR_ADD, p1R, p1R, aR, 0);
+        NativeSafe.invoke(MPFR_SET_UI, m1R, 1L, 0);
+        NativeSafe.invoke(MPFR_SUB, m1R, m1R, aR, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, m1I, (int) prec);
+        NativeSafe.invoke(MPFR_NEG, m1I, aI, 0);
+        
+        NativeSafe.invoke(MPFR_INIT2, divR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, divI, (int) prec);
+        complexDivide(divR, divI, p1R, aI, m1R, m1I, (int) prec, arena, tracker);
+        complexLog(resR, resI, divR, divI, (int) prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_INIT2, half, (int) prec);
+        NativeSafe.invoke(MPFR_SET_D, half, 0.5, 0);
+        NativeSafe.invoke(MPFR_MUL, resR, resR, half, 0);
+        NativeSafe.invoke(MPFR_MUL, resI, resI, half, 0);
+    }
+
+    public static void complexCbrt(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); track(tracker, logR);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); track(tracker, logI);
+        MemorySegment three = arena.allocate(MPFR_LAYOUT); track(tracker, three);
+        NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
+        complexLog(logR, logI, aR, aI, prec, arena, tracker);
+        
+        NativeSafe.invoke(MPFR_INIT2, three, (int) prec);
+        NativeSafe.invoke(MPFR_SET_UI, three, 3L, 0);
+        NativeSafe.invoke(MPFR_DIV, logR, logR, three, 0);
+        NativeSafe.invoke(MPFR_DIV, logI, logI, three, 0);
+        complexExp(resR, resI, logR, logI, prec, arena, tracker);
+    }
+
+    public static void complexPow(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment eR, MemorySegment eI, int prec, Arena arena, ResourceTracker tracker) {
+        MemorySegment logR = arena.allocate(MPFR_LAYOUT); track(tracker, logR);
+        MemorySegment logI = arena.allocate(MPFR_LAYOUT); track(tracker, logI);
+        NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
+        complexLog(logR, logI, aR, aI, prec, arena, tracker);
+        
+        MemorySegment wLogR = arena.allocate(MPFR_LAYOUT); track(tracker, wLogR);
+        MemorySegment wLogI = arena.allocate(MPFR_LAYOUT); track(tracker, wLogI);
+        NativeSafe.invoke(MPFR_INIT2, wLogR, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, wLogI, (int) prec);
+        complexMultiply(wLogR, wLogI, eR, eI, logR, logI, prec, arena, tracker);
+        
+        complexExp(resR, resI, wLogR, wLogI, prec, arena, tracker);
+    }
     private void checkDimensionsAdd(Matrix<?> a, Matrix<?> b) {
         if (a.rows() != b.rows() || a.cols() != b.cols()) throw new IllegalArgumentException("Matrix dimensions do not match");
     }
@@ -2291,47 +2111,26 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         };
     }
 
-    public static void invokeComplexOp(String function, MemorySegment rcR, MemorySegment rcI, MemorySegment raR, MemorySegment raI, int prec, Arena arena) {
+    public static void invokeComplexOp(String function, MemorySegment rcR, MemorySegment rcI, MemorySegment raR, MemorySegment raI, int prec, Arena arena, ResourceTracker tracker) {
         switch (function.toLowerCase()) {
-            case "exp" -> complexExp(rcR, rcI, raR, raI, prec, arena);
-            case "log" -> complexLog(rcR, rcI, raR, raI, prec, arena);
-            case "log10" -> complexLog10(rcR, rcI, raR, raI, prec, arena);
-            case "sin" -> complexSin(rcR, rcI, raR, raI, prec, arena);
-            case "cos" -> complexCos(rcR, rcI, raR, raI, prec, arena);
-            case "tan" -> complexTan(rcR, rcI, raR, raI, prec, arena);
-            case "sinh" -> complexSinh(rcR, rcI, raR, raI, prec, arena);
-            case "cosh" -> complexCosh(rcR, rcI, raR, raI, prec, arena);
-            case "tanh" -> complexTanh(rcR, rcI, raR, raI, prec, arena);
-            case "sqrt" -> complexSqrt(rcR, rcI, raR, raI, prec, arena);
-            case "asin" -> complexAsin(rcR, rcI, raR, raI, prec, arena);
-            case "acos" -> complexAcos(rcR, rcI, raR, raI, prec, arena);
-            case "atan" -> complexAtan(rcR, rcI, raR, raI, prec, arena);
-            case "asinh" -> complexAsinh(rcR, rcI, raR, raI, prec, arena);
-            case "acosh" -> complexAcosh(rcR, rcI, raR, raI, prec, arena);
-            case "atanh" -> complexAtanh(rcR, rcI, raR, raI, prec, arena);
-            case "cbrt" -> complexCbrt(rcR, rcI, raR, raI, prec, arena);
+            case "exp" -> complexExp(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "log" -> complexLog(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "log10" -> complexLog10(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "sin" -> complexSin(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "cos" -> complexCos(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "tan" -> complexTan(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "sinh" -> complexSinh(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "cosh" -> complexCosh(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "tanh" -> complexTanh(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "sqrt" -> complexSqrt(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "asin" -> complexAsin(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "acos" -> complexAcos(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "atan" -> complexAtan(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "asinh" -> complexAsinh(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "acosh" -> complexAcosh(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "atanh" -> complexAtanh(rcR, rcI, raR, raI, prec, arena, tracker);
+            case "cbrt" -> complexCbrt(rcR, rcI, raR, raI, prec, arena, tracker);
             default -> throw new UnsupportedOperationException("Native complex op not implemented: " + function);
         }
     }
-
-    public static void complexPow(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, MemorySegment eR, MemorySegment eI, int prec, Arena arena) {
-        // z^w = exp(w * log(z))
-        try (Arena local = Arena.ofConfined()) {
-            MemorySegment logR = local.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logR, (int) prec);
-            MemorySegment logI = local.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logI, (int) prec);
-            complexLog(logR, logI, aR, aI, prec, arena);
-            
-            MemorySegment wLogR = local.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, wLogR, (int) prec);
-            MemorySegment wLogI = local.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, wLogI, (int) prec);
-            complexMultiply(wLogR, wLogI, eR, eI, logR, logI, prec, arena);
-            
-            complexExp(resR, resI, wLogR, wLogI, prec, arena);
-
-            NativeSafe.invoke(MPFR_CLEAR, logR);
-            NativeSafe.invoke(MPFR_CLEAR, logI);
-            NativeSafe.invoke(MPFR_CLEAR, wLogR);
-            NativeSafe.invoke(MPFR_CLEAR, wLogI);
-        }
-    }
-
 }

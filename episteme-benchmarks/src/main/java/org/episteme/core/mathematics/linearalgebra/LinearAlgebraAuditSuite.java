@@ -104,6 +104,7 @@ public class LinearAlgebraAuditSuite {
             Vector<E> x0 = randomVector(n, ref, ring, rand);
             action.run(prefix + "Sparse:BiCGSTAB", () -> verify(sp.bicgstab(invA, v, x0, ring.one(), 5), ref.solve(invA, v), tolerance * 100)); // Relaxed for iterative
             action.run(prefix + "Sparse:ConjGrad", () -> verify(sp.conjugateGradient(spdA, v, x0, ring.one(), 5), ref.solve(spdA, v), tolerance * 100));
+            action.run(prefix + "Sparse:GMRES", () -> verify(sp.gmres(invA, v, x0, ring.one(), 5, 2), ref.solve(invA, v), tolerance * 100));
         }
     }
 
@@ -126,8 +127,8 @@ public class LinearAlgebraAuditSuite {
 
     private static <E> E randomElement(Ring<E> ring, Random rand, boolean isComplex) {
         if (isComplex) return (E) Complex.of(rand.nextDouble(), rand.nextDouble());
-        if (ring.one() instanceof Real) return (E) Real.of(rand.nextDouble());
         if (ring.one() instanceof RealBig) return (E) RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
+        if (ring.one() instanceof Real) return (E) Real.of(rand.nextDouble());
         return ring.one();
     }
 

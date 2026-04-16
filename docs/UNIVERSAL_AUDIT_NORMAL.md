@@ -13,10 +13,10 @@ This report summarizes the compliance and feature support for all discovered Lin
 | Episteme (Standard) | CPU (Standard) | ⚠️ Partial | 28/40 | 40/40 |
 | Episteme (Strassen) | CPU (Strassen) | ⚠️ Partial | 25/40 | 40/40 |
 | Episteme CPU (Dense) | CPU (Standard JVM) | ⚠️ Partial | 28/40 | 40/40 |
-| Episteme CPU (Sparse) | Generic JVM | ⚠️ Partial | 23/42 | 42/42 |
-| Episteme CPU Foundation | Generic JVM | ⚠️ Partial | 21/42 | 36/42 |
-| Episteme Distributed Linear Algebra Provider (LocalDistributedContext) | Generic JVM | ⚠️ Partial | 23/42 | 38/42 |
-| Episteme gRPC Remote (localhost:50051) | Generic JVM | ⚠️ Partial | 2/42 | 13/42 |
+| Episteme CPU (Sparse) | Generic JVM | ⚠️ Partial | 23/43 | 43/43 |
+| Episteme CPU Foundation | Generic JVM | ⚠️ Partial | 21/43 | 37/43 |
+| Episteme Distributed Linear Algebra Provider (LocalDistributedContext) | Generic JVM | ⚠️ Partial | 23/43 | 39/43 |
+| Episteme gRPC Remote (localhost:50051) | Generic JVM | ⚠️ Partial | 2/43 | 13/43 |
 | JBlas (Optimized) | Generic JVM | ⚠️ Partial | 27/40 | N/A |
 | ND4J (Native Wrapper) | CPU (Native ND4J) | ⚠️ Partial | 26/40 | N/A |
 | Native CPU-BLAS Linear Algebra Backend | CPU (Native/Panama) | ⚠️ Partial | 25/40 | N/A |
@@ -24,7 +24,7 @@ This report summarizes the compliance and feature support for all discovered Lin
 | Native CUDA Sparse Linear Algebra Backend | N/A | 🔘 Disabled | N/A | N/A |
 | Native FFM BLAS Linear Algebra Backend | CPU (FFM-BLAS) | ⚠️ Partial | 26/40 | N/A |
 | Native MPFR Dense Linear Algebra Backend | CPU (Panama/MPFR) | ⚠️ Partial | 25/40 | 39/40 |
-| Native MPFR Sparse Linear Algebra Backend | Generic JVM | ⚠️ Partial | 21/42 | 35/42 |
+| Native MPFR Sparse Linear Algebra Backend | Generic JVM | ⚠️ Partial | 21/43 | 35/43 |
 | Native OpenCL Dense Linear Algebra Backend | Generic JVM | 🔘 Disabled | N/A | N/A |
 | Native OpenCL Sparse Linear Algebra Backend | Generic JVM | 🔘 Disabled | N/A | N/A |
 | Native SIMD Linear Algebra Backend | Generic JVM | ⚠️ Partial | 27/40 | N/A |
@@ -193,30 +193,30 @@ This report summarizes the compliance and feature support for all discovered Lin
 
 ### Category: Sparse
 
-| Provider | R:Sparse:BiCGSTAB | R:Sparse:ConjGrad | C:Sparse:BiCGSTAB | C:Sparse:ConjGrad |
-| :--- | :---: | :---: | :---: | :---: |
-| Apache Commons Math (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Colt (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| EJML (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Episteme (CARMA) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Episteme (Standard) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Episteme (Strassen) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Episteme CPU (Dense) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Episteme CPU (Sparse) | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS |
-| Episteme CPU Foundation | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS |
-| Episteme Distributed Linear Algebra Provider (LocalDistributedContext) | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS |
-| Episteme gRPC Remote (localhost:50051) | ❌ RuntimeException | ❌ RuntimeException | ❌ RuntimeException | ❌ RuntimeException |
-| JBlas (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| ND4J (Native Wrapper) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Native CPU-BLAS Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Native CUDA Dense Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
-| Native CUDA Sparse Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
-| Native FFM BLAS Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Native MPFR Dense Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
-| Native MPFR Sparse Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS |
-| Native OpenCL Dense Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
-| Native OpenCL Sparse Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
-| Native SIMD Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Provider | R:Sparse:BiCGSTAB | R:Sparse:ConjGrad | R:Sparse:GMRES | C:Sparse:BiCGSTAB | C:Sparse:ConjGrad | C:Sparse:GMRES |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| Apache Commons Math (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Colt (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| EJML (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Episteme (CARMA) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Episteme (Standard) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Episteme (Strassen) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Episteme CPU (Dense) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Episteme CPU (Sparse) | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS |
+| Episteme CPU Foundation | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS |
+| Episteme Distributed Linear Algebra Provider (LocalDistributedContext) | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS |
+| Episteme gRPC Remote (localhost:50051) | ❌ RuntimeException | ❌ RuntimeException | ❌ RuntimeException | ❌ RuntimeException | ❌ RuntimeException | ❌ RuntimeException |
+| JBlas (Optimized) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| ND4J (Native Wrapper) | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Native CPU-BLAS Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Native CUDA Dense Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
+| Native CUDA Sparse Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
+| Native FFM BLAS Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Native MPFR Dense Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
+| Native MPFR Sparse Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ RuntimeException | ❌ AssertionError | ✅ PASS | ❌ RuntimeException |
+| Native OpenCL Dense Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
+| Native OpenCL Sparse Linear Algebra Backend | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED | 🔘 DISABLED |
+| Native SIMD Linear Algebra Backend | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A | ➕ N/A |
 
 ---
-*Generated by Universal Audit Engine on Thu Apr 16 22:24:57 CEST 2026*
+*Generated by Universal Audit Engine on Fri Apr 17 00:40:19 CEST 2026*

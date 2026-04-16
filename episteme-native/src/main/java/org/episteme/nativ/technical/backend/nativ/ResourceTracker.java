@@ -69,8 +69,27 @@ public final class ResourceTracker implements AutoCloseable {
 
         private void release() {
             if (!released) {
-                cleaner.accept(handle);
-                released = true;
+                try {
+                    // Panama safety: check if segment is already closed before calling the cleaner
+                    if (handle instanceof MemorySegment seg) {
+                         if (!seg.scope().isAlive()) {
+                             released = true;
+                             return;
+                         }
+                    }
+                    cleaner.accept(handle);
+                } catch (IllegalStateException e) {
+                    if (e.getMessage() != null && e.getMessage().contains("already closed")) {
+                        // Segment was likely closed by its Arena before the tracker got to it.
+                        // This is fine in Panama context.
+                    } else {
+                        throw e;
+                    }
+                } catch (Throwable t) {
+                    logger.debug("Resource release produced an unexpected error: {}", t.getMessage());
+                } finally {
+                    released = true;
+                }
             }
         }
     }
