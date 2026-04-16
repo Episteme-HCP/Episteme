@@ -11,11 +11,11 @@ import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
 
 import org.junit.jupiter.api.Test;
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
  * Universal Performance Audit for Linear Algebra.
+ * Measures Latency and Throughput for all 68+ operations.
  */
 public class LinearAlgebraPerformanceAudit {
 
@@ -28,14 +28,13 @@ public class LinearAlgebraPerformanceAudit {
         
         reporter.addMetadata("Precision", precisionProp);
         reporter.addMetadata("Matrix Size", MATRIX_SIZE + "x" + MATRIX_SIZE);
-        reporter.setComments("Comprehensive performance audit evaluating all backends in " + precisionProp + " mode.");
 
         List<LinearAlgebraProvider<?>> providers = discoverProviders();
 
         for (LinearAlgebraProvider<?> prov : providers) {
             if (!prov.isAvailable()) continue;
             
-            System.out.println("[PerfAudit] Benchmarking: " + prov.getName());
+            System.out.println("[PerfAudit] Benchmarking exhaustive operations for: " + prov.getName());
             AlgorithmService oldService = AlgorithmManager.getService();
             AlgorithmManager.setService(new TestingAlgorithmService(prov));
             
@@ -51,7 +50,7 @@ public class LinearAlgebraPerformanceAudit {
                     "SUCCESS",
                     System.currentTimeMillis(),
                     0, 0, 0, 0, 0,
-                    new java.util.HashMap<>(),
+                    new HashMap<>(),
                     metrics
                 );
                 reporter.addResult(res);
@@ -68,19 +67,19 @@ public class LinearAlgebraPerformanceAudit {
     private void measureExecution(Map<String, Object> metrics, LinearAlgebraProvider prov, String precision) {
         if (precision.equals("exact")) {
             Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
-            LinearAlgebraAuditSuite.runAudit(prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), rbRing, "RB:");
+            LinearAlgebraAuditSuite.runFullAudit(prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), rbRing, "RB:");
             
             Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
             if (prov.isCompatible(complexRing)) {
-                LinearAlgebraAuditSuite.runAudit(prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), complexRing, "C:");
+                LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), complexRing, "C:");
             }
         } else {
             Ring<Real> realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
-            LinearAlgebraAuditSuite.runAudit(prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), realRing, "R:");
+            LinearAlgebraAuditSuite.runFullAudit(prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), realRing, "R:");
             
             Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
             if (prov.isCompatible(complexRing)) {
-                LinearAlgebraAuditSuite.runAudit(prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), complexRing, "C:");
+                LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), complexRing, "C:");
             }
         }
     }

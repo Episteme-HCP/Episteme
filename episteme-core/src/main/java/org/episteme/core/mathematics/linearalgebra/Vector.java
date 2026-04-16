@@ -218,34 +218,7 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      */
     @SuppressWarnings("unchecked")
     default Vector<E> cross(Vector<E> other) {
-        if (dimension() != 3 || other.dimension() != 3) {
-            throw new ArithmeticException("Cross product only defined for 3D vectors");
-        }
-        // Generic cross product: u2*v3 - u3*v2, etc.
-        E u1 = get(0);
-        E u2 = get(1);
-        E u3 = get(2);
-        E v1 = other.get(0);
-        E v2 = other.get(1);
-        E v3 = other.get(2);
-
-        // We need a Ring/Field to do multiply/subtract.
-        // Assuming E has multiply(), subtract().
-        // Since Vector extends Module<..., E>, E likely has these.
-        // But we need to CREATE a new Vector.
-
-        try {
-            java.lang.reflect.Method mult = u1.getClass().getMethod("multiply", u1.getClass());
-            java.lang.reflect.Method sub = u1.getClass().getMethod("subtract", u1.getClass());
-
-            E c1 = (E) sub.invoke(mult.invoke(u2, v3), mult.invoke(u3, v2)); // u2v3 - u3v2
-            E c2 = (E) sub.invoke(mult.invoke(u3, v1), mult.invoke(u1, v3)); // u3v1 - u1v3
-            E c3 = (E) sub.invoke(mult.invoke(u1, v2), mult.invoke(u2, v1)); // u1v2 - u2v1
-
-            return Vector.of(java.util.Arrays.asList(c1, c2, c3), getScalarRing());
-        } catch (Exception e) {
-            throw new UnsupportedOperationException("Cross product requires scalar arithmetic operations.", e);
-        }
+        return getProvider().cross(this, other);
     }
 
     /**
@@ -256,25 +229,7 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      */
     @SuppressWarnings("unchecked")
     default E angle(Vector<E> other) {
-        // acos( dot / (norm * other.norm) )
-        E d = dot(other);
-        E n1 = norm();
-        E n2 = other.norm();
-
-        try {
-            java.lang.reflect.Method mult = n1.getClass().getMethod("multiply", n1.getClass());
-            java.lang.reflect.Method div = d.getClass().getMethod("divide", d.getClass());
-            java.lang.reflect.Method acos = d.getClass().getMethod("acos"); // Only on Real?
-
-            E denom = (E) mult.invoke(n1, n2);
-            E ratio = (E) div.invoke(d, denom);
-
-            // If E is Real, acos exists. If Complex?
-            return (E) acos.invoke(ratio);
-
-        } catch (Exception e) {
-            throw new UnsupportedOperationException("Angle calculation requires Real-like scalars with acos()", e);
-        }
+        return getProvider().angle(this, other);
     }
 
     /**
@@ -285,18 +240,7 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      */
     @SuppressWarnings("unchecked")
     default Vector<E> projection(Vector<E> other) {
-        // (dot(other) / other.dot(other)) * other
-        try {
-            E dotVal = dot(other);
-            E dotOther = other.dot(other);
-
-            java.lang.reflect.Method div = dotVal.getClass().getMethod("divide", dotVal.getClass());
-            E scalar = (E) div.invoke(dotVal, dotOther);
-
-            return other.multiply(scalar);
-        } catch (Exception e) {
-            throw new UnsupportedOperationException("Projection requires division support on scalars", e);
-        }
+        return getProvider().projection(this, other);
     }
 
     /**

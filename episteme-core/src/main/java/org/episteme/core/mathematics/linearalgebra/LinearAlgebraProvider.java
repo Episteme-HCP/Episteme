@@ -78,6 +78,71 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
         throw new UnsupportedOperationException(getName() + " does not support norm()");
     }
 
+    /**
+     * Returns the normalized vector (unit vector).
+     */
+    default Vector<E> normalize(Vector<E> a) {
+        E n = norm(a);
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
+            E invNorm = field.inverse(n);
+            return multiply(a, invNorm);
+        }
+        throw new UnsupportedOperationException("Normalization requires a Field for inversion.");
+    }
+
+    /**
+     * Returns the cross product of two 3D vectors.
+     */
+    default Vector<E> cross(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != 3 || b.dimension() != 3) {
+            throw new ArithmeticException("Cross product is only defined for 3D vectors.");
+        }
+        Ring<E> ring = a.getScalarRing();
+        E u1 = a.get(0), u2 = a.get(1), u3 = a.get(2);
+        E v1 = b.get(0), v2 = b.get(1), v3 = b.get(2);
+        
+        E c1 = ring.subtract(ring.multiply(u2, v3), ring.multiply(u3, v2)); 
+        E c2 = ring.subtract(ring.multiply(u3, v1), ring.multiply(u1, v3)); 
+        E c3 = ring.subtract(ring.multiply(u1, v2), ring.multiply(u2, v1));
+        
+        return Vector.of(java.util.Arrays.asList(c1, c2, c3), ring);
+    }
+
+    /**
+     * Returns the angle between two vectors in radians.
+     */
+    default E angle(Vector<E> a, Vector<E> b) {
+        E dAB = dot(a, b);
+        E nA = norm(a);
+        E nB = norm(b);
+        Ring<E> ring = a.getScalarRing();
+        E denom = ring.multiply(nA, nB);
+        
+        if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
+            E cosTheta = field.divide(dAB, denom);
+            // Reuse matrix transcendental fallback for element-wise acos
+            @SuppressWarnings("unchecked")
+            E[][] data = (E[][]) new Object[][]{{cosTheta}};
+            return acos(Matrix.of(data, ring)).get(0, 0);
+        }
+        throw new UnsupportedOperationException("Angle calculation requires a Field for division.");
+    }
+
+    /**
+     * Returns the projection of vector a onto vector b.
+     */
+    default Vector<E> projection(Vector<E> a, Vector<E> b) {
+        E dAB = dot(a, b);
+        E dBB = dot(b, b);
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
+            E scalar = field.divide(dAB, dBB);
+            return b.multiply(scalar);
+        }
+        throw new UnsupportedOperationException("Projection requires a Field for division.");
+    }
+
     // --- Matrix Operations ---
     default Matrix<E> add(Matrix<E> a, Matrix<E> b) {
         throw new UnsupportedOperationException(getName() + " does not support Matrix add()");

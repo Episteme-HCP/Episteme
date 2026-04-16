@@ -12,27 +12,38 @@ import org.episteme.core.technical.backend.BackendDiscovery;
 
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.stream.Collectors;
 
 /**
  * Universal Linear Algebra Audit Engine.
+ * Verifies 68+ operations across Square, Rectangular, and Triangular matrices.
  */
 public class LinearAlgebraComplianceTest {
 
     public enum PrecisionMode { FAST, NORMAL, EXACT }
 
-    private static final String PROJECT_NAME = System.getProperty("org.episteme.project.name", "Episteme");
-    
     private PrecisionMode mode;
     private int matrixSize;
-    private String reportPath;
+    private String reportFileName;
+
+    private enum OpStatus {
+        PASS("✅ PASS"),
+        FAIL("❌ FAIL"),
+        DISABLED("🔘 DISABLED"),
+        UNSUPPORTED("➕ N/A");
+
+        private final String icon;
+        OpStatus(String icon) { this.icon = icon; }
+        public String toString() { return icon; }
+    }
 
     private static class ComplianceResult {
         String providerName;
         String environment;
+        boolean available;
         Map<String, String> status = new LinkedHashMap<>();
     }
 
@@ -46,31 +57,39 @@ public class LinearAlgebraComplianceTest {
         };
 
         configureForMode();
-        System.out.println("[AuditEngine] Starting Universal Audit in mode: " + mode);
+        System.out.println("[AuditEngine] Starting Universal Exhaustive Audit in mode: " + mode);
 
-        List<LinearAlgebraProvider<?>> providers = discoverAuditProviders();
+        List<LinearAlgebraProvider<?>> providers = discoverAllProviders();
+        // Sort providers alphabetically by name for systematic reporting
+        providers.sort(Comparator.comparing(LinearAlgebraProvider::getName));
+        
         List<ComplianceResult> results = new ArrayList<>();
 
         for (LinearAlgebraProvider<?> prov : providers) {
-            if (!prov.isAvailable()) continue;
-            
             ComplianceResult res = new ComplianceResult();
             res.providerName = prov.getName();
             res.environment = prov.getEnvironmentInfo();
+            res.available = prov.isAvailable();
+            
+            if (!res.available) {
+                System.out.println("[AuditEngine] Provider " + prov.getName() + " is DISABLED (Hardware/Config missing).");
+                results.add(res);
+                continue;
+            }
             
             AlgorithmService oldService = AlgorithmManager.getService();
             AlgorithmManager.setService(new TestingAlgorithmService(prov));
             
             try {
                 if (mode == PrecisionMode.EXACT) {
-                    runExactAudit(res, (LinearAlgebraProvider<RealBig>) prov);
+                    runExactAudit(res, (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider) prov);
                 } else {
-                    runStandardAudit(res, (LinearAlgebraProvider<Real>) prov);
+                    runStandardAudit(res, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) prov);
                 }
-                results.add(res);
             } catch (Throwable t) {
                 System.err.println("Audit failed for " + prov.getName() + ": " + t.getMessage());
             } finally {
+                results.add(res);
                 AlgorithmManager.setService(oldService);
             }
         }
@@ -80,74 +99,160 @@ public class LinearAlgebraComplianceTest {
 
     private void configureForMode() {
         switch (mode) {
-            case FAST -> { matrixSize = 8; reportPath = "../docs/FLOAT_ALGEBRA_COMPLIANCE_REPORT.md"; }
-            case EXACT -> { matrixSize = 4; reportPath = "../docs/HIGH_PRECISION_COMPLIANCE_REPORT.md"; }
-            default -> { matrixSize = 12; reportPath = "../docs/LINEAR_ALGEBRA_COMPLIANCE_REPORT.md"; }
+            case FAST -> { matrixSize = 8; reportFileName = "UNIVERSAL_AUDIT_FAST.md"; }
+            case EXACT -> { matrixSize = 4; reportFileName = "UNIVERSAL_AUDIT_EXACT.md"; }
+            default -> { matrixSize = 12; reportFileName = "UNIVERSAL_AUDIT_NORMAL.md"; }
         }
     }
 
     private void runExactAudit(ComplianceResult res, LinearAlgebraProvider<RealBig> prov) {
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
-        LinearAlgebraAuditSuite.runAudit(prov, matrixSize, (op, test) -> auditOp(res, op, test), rbRing, "RB:");
+        LinearAlgebraAuditSuite.runFullAudit(prov, matrixSize, (op, test) -> auditOp(res, op, test), rbRing, "RB:");
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
         if (prov.isCompatible(complexRing)) {
-            LinearAlgebraAuditSuite.runAudit((LinearAlgebraProvider<Complex>) prov, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:");
+            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:");
         }
     }
 
     private void runStandardAudit(ComplianceResult res, LinearAlgebraProvider<Real> prov) {
         Ring<Real> realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
-        LinearAlgebraAuditSuite.runAudit(prov, matrixSize, (op, test) -> auditOp(res, op, test), realRing, "R:");
+        LinearAlgebraAuditSuite.runFullAudit(prov, matrixSize, (op, test) -> auditOp(res, op, test), realRing, "R:");
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
         if (prov.isCompatible(complexRing)) {
-            LinearAlgebraAuditSuite.runAudit((LinearAlgebraProvider<Complex>) prov, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:");
+            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:");
         }
     }
 
-    private void auditOp(ComplianceResult res, String opName, Supplier<?> test) {
+    private void auditOp(ComplianceResult res, String opName, java.util.function.Supplier<?> test) {
         try {
             test.get();
-            res.status.put(opName, "✅ PASS");
+            res.status.put(opName, OpStatus.PASS.toString());
+        } catch (UnsupportedOperationException e) {
+            res.status.put(opName, OpStatus.UNSUPPORTED.toString());
         } catch (Throwable e) {
-            res.status.put(opName, "⚠️ FAIL (" + e.getClass().getSimpleName() + ")");
+            res.status.put(opName, "❌ " + e.getClass().getSimpleName());
         }
     }
 
-    private List<LinearAlgebraProvider<?>> discoverAuditProviders() {
-        Set<LinearAlgebraProvider<?>> providers = new LinkedHashSet<>();
+    private List<LinearAlgebraProvider<?>> discoverAllProviders() {
+        Map<String, LinearAlgebraProvider<?>> providers = new TreeMap<>();
+        
+        // 1. ServiceLoader discovery (Standard SPI)
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-        for (LinearAlgebraProvider<?> p : loader) providers.add(p);
+        for (LinearAlgebraProvider<?> p : loader) providers.put(p.getName(), p);
+        
+        // 2. Backend discovery (Including native/GPU backends even if hardware is missing)
         try {
             for (Backend b : BackendDiscovery.getInstance().getProviders()) {
-                for (var ap : b.getAlgorithmProviders()) {
-                    if (ap instanceof LinearAlgebraProvider<?> p) providers.add(p);
+                try {
+                    for (var ap : b.getAlgorithmProviders()) {
+                        if (ap instanceof LinearAlgebraProvider<?> p) {
+                            providers.put(p.getName(), p);
+                        }
+                    }
+                } catch (Throwable t) {
+                    System.err.println("[AuditEngine] Could not retrieve providers from backend: " + b.getName());
                 }
             }
         } catch (Throwable t) {}
-        return new ArrayList<>(providers);
+        
+        return new ArrayList<>(providers.values());
     }
 
     private void printMarkdownReport(List<ComplianceResult> results) {
         if (results.isEmpty()) return;
         StringBuilder sb = new StringBuilder();
-        sb.append("# ").append(PROJECT_NAME).append(" Linear Algebra Audit Report (").append(mode).append(")\n\n");
-        Set<String> ops = new TreeSet<>();
-        for (var r : results) ops.addAll(r.status.keySet());
+        sb.append("# Episteme Universal Linear Algebra Audit Report (").append(mode).append(")\n\n");
+        sb.append("This report summarizes the compliance and feature support for all discovered Linear Algebra backends. ");
+        sb.append("Status codes: ✅ PASS, ❌ FAIL, 🔘 DISABLED (Hardware missing), ➕ N/A (Unsupported).\n\n");
         
-        sb.append("| Provider | Environment |");
-        for (String op : ops) sb.append(" ").append(op).append(" |");
-        sb.append("\n| --- | --- |").append(" --- |".repeat(ops.size())).append("\n");
-
+        // --- Summary Table (Global Checklist) ---
+        sb.append("## Global Status Summary\n\n");
+        sb.append("| Provider | Environment | Status | Real Domain | Complex Domain |\n");
+        sb.append("| :--- | :--- | :--- | :---: | :---: |\n");
         for (var r : results) {
-            sb.append("| ").append(r.providerName).append(" | ").append(r.environment).append(" |");
-            for (String op : ops) sb.append(" ").append(r.status.getOrDefault(op, "N/A")).append(" |");
+            long passReal = r.status.entrySet().stream().filter(e -> (e.getKey().startsWith("R:") || e.getKey().startsWith("RB:")) && e.getValue().contains("PASS")).count();
+            long totalReal = r.status.keySet().stream().filter(k -> k.startsWith("R:") || k.startsWith("RB:")).count();
+            
+            long passComplex = r.status.entrySet().stream().filter(e -> e.getKey().startsWith("C:") && e.getValue().contains("PASS")).count();
+            long totalComplex = r.status.keySet().stream().filter(k -> k.startsWith("C:")).count();
+            
+            String statusReal = totalReal > 0 ? (passReal + "/" + totalReal) : "N/A";
+            String statusComplex = totalComplex > 0 ? (passComplex + "/" + totalComplex) : "N/A";
+            
+            String overallStatus = r.available ? (passReal > 0 ? "⚠️ Partial" : "❌ Fail") : "🔘 Disabled";
+            if (r.available && passReal == totalReal && passComplex == totalComplex && totalReal > 0) overallStatus = "✅ Ready";
+            
+            sb.append("| ").append(r.providerName).append(" | ").append(r.environment).append(" | ")
+              .append(overallStatus).append(" | ").append(statusReal).append(" | ").append(statusComplex).append(" |\n");
+        }
+        sb.append("\n");
+
+        // --- Detailed Category Tables ---
+        List<String> categories = Arrays.asList("Arithmetic", "Solvers", "Decompositions", "Rect:", "Tri:", "Vec:", "Func:", "Sparse:");
+        Map<String, Set<String>> catToOps = new LinkedHashMap<>();
+        for (String cat : categories) catToOps.put(cat, new TreeSet<>());
+
+        Set<String> allOps = new TreeSet<>();
+        for (var r : results) allOps.addAll(r.status.keySet());
+
+        for (String op : allOps) {
+            String cat = "Other";
+            for (String c : categories) {
+                if (op.contains(c)) { cat = c; break; }
+            }
+            if (cat.equals("Other")) {
+                if (op.contains("Add") || op.contains("Sub") || op.contains("Mul") || op.contains("Scale") || op.contains("Trans")) cat = "Arithmetic";
+                else if (op.contains("Inv") || op.contains("Det") || op.contains("Solve") || op.contains("Trace")) cat = "Solvers";
+            }
+            if (catToOps.containsKey(cat)) catToOps.get(cat).add(op.substring(op.indexOf(":") + 1));
+        }
+
+        for (var entry : catToOps.entrySet()) {
+            if (entry.getValue().isEmpty()) continue;
+            
+            String catName = entry.getKey().replace(":", "");
+            sb.append("### Category: ").append(catName).append("\n\n");
+            
+            List<String> baseOps = new ArrayList<>(entry.getValue());
+            String realPrefix = (mode == PrecisionMode.EXACT) ? "RB:" : "R:";
+            
+            // Build header: Reals then Complexes
+            sb.append("| Provider |");
+            for (String op : baseOps) sb.append(" ").append(realPrefix).append(op).append(" |");
+            for (String op : baseOps) sb.append(" C:").append(op).append(" |");
+            sb.append("\n| :--- |").append(" :---: |".repeat(baseOps.size() * 2)).append("\n");
+
+            for (var r : results) {
+                sb.append("| ").append(r.providerName).append(" |");
+                // Real domain
+                for (String op : baseOps) {
+                    String status = r.status.getOrDefault(realPrefix + op, r.available ? OpStatus.UNSUPPORTED.toString() : OpStatus.DISABLED.toString());
+                    sb.append(" ").append(status).append(" |");
+                }
+                // Complex domain
+                for (String op : baseOps) {
+                    String status = r.status.getOrDefault("C:" + op, r.available ? OpStatus.UNSUPPORTED.toString() : OpStatus.DISABLED.toString());
+                    sb.append(" ").append(status).append(" |");
+                }
+                sb.append("\n");
+            }
             sb.append("\n");
         }
-        sb.append("\n*Generated by LinearAlgebraComplianceTest on ").append(new java.util.Date()).append("*\n");
+
+        sb.append("---\n*Generated by Universal Audit Engine on ").append(new Date()).append("*\n");
+        
         try {
-            java.nio.file.Files.writeString(java.nio.file.Paths.get(reportPath), sb.toString());
-        } catch (IOException e) { e.printStackTrace(); }
+            Path docsPath = Paths.get(System.getProperty("user.dir")).resolve("docs").resolve(reportFileName);
+            if (!docsPath.getParent().toFile().exists()) {
+                docsPath = Paths.get(System.getProperty("user.dir")).getParent().resolve("docs").resolve(reportFileName);
+            }
+            java.nio.file.Files.writeString(docsPath, sb.toString());
+            System.out.println("[AuditEngine] Report generated at: " + docsPath.toAbsolutePath());
+        } catch (IOException e) { 
+            System.err.println("[AuditEngine] Failed to write report: " + e.getMessage());
+        }
     }
 }

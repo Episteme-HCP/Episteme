@@ -196,6 +196,34 @@ public class GenericVector<E> implements Vector<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> normalize() {
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).normalize(this));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> cross(Vector<E> other) {
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).cross(this, other));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public E angle(Vector<E> other) {
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).angle(this, other));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> projection(Vector<E> other) {
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, org.episteme.core.technical.algorithm.OperationContext.DEFAULT,
+            p -> ((LinearAlgebraProvider<E>) p).projection(this, other));
+    }
+
+    @Override
     public Ring<E> getScalarRing() {
         return ring;
     }
