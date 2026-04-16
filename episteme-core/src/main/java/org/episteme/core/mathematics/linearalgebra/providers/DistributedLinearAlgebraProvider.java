@@ -61,7 +61,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     public String getName() {
         DistributedContext ctx = DistributedCompute.getContext();
         String contextType = (ctx != null) ? ctx.getClass().getSimpleName() : "None";
-        return "Distributed Linear Algebra Provider (" + contextType + ")";
+        return "Episteme Distributed Linear Algebra Provider (" + contextType + ")";
     }
 
     @SuppressWarnings("unchecked")

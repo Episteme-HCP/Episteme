@@ -149,7 +149,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
 
     @Override
     public String getName() {
-        return "gRPC Remote (" + serverAddress + ")";
+        return "Episteme gRPC Remote (" + serverAddress + ")";
     }
 
     @Override

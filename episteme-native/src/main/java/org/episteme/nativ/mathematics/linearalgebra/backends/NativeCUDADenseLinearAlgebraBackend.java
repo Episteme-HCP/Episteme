@@ -384,7 +384,10 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         } catch (Throwable t) { throw new RuntimeException("cuSolver create failed", t); }
     }
 
-    @Override public String getName() { return "Native CUDA Dense Backend"; }
+    @Override
+    public String getName() {
+        return "Native CUDA Dense Linear Algebra Backend";
+    }
     @Override public int getPriority() { return 110; }
     @Override public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) { return ring instanceof org.episteme.core.mathematics.sets.Reals; }
 

@@ -58,7 +58,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public String getName() {
-        return "CUDA Sparse Linear Algebra Backend";
+        return "Native CUDA Sparse Linear Algebra Backend";
     }
 
     @Override

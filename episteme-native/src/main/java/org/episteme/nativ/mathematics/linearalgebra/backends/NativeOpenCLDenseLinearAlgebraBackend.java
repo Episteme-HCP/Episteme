@@ -368,7 +368,10 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
 
     @Override public boolean isAvailable() { if (!initAttempted) init(); return initialized; }
     @Override public boolean isLoaded() { return initialized; }
-    @Override public String getName() { return "Native OpenCL Dense Backend"; }
+    @Override
+    public String getName() {
+        return "Native OpenCL Dense Linear Algebra Backend";
+    }
     @Override public int getPriority() { return 105; }
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {

@@ -817,7 +817,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
 
     @Override
     public String getName() {
-        return "Native BLAS Provider FFM";
+        return "Native FFM BLAS Linear Algebra Backend";
     }
 
     @Override
