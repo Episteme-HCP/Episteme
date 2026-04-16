@@ -23,7 +23,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.nativ.mathematics.numbers.real.NativeRealBig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.episteme.nativ.mathematics.linearalgebra.LinearAlgebraConstants;
+import org.episteme.core.mathematics.context.NumericalConfiguration;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 
 import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
@@ -1217,8 +1217,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         int n = sa.rows();
         int prec = (int) getPrecision();
         boolean isComplex = isComplex(sa.getScalarRing());
-        if (tolerance == null) tolerance = (E) (isComplex ? LinearAlgebraConstants.toleranceComplex() : LinearAlgebraConstants.toleranceReal());
-        if (maxIterations <= 0) maxIterations = LinearAlgebraConstants.DEFAULT_MAX_ITERATIONS;
+        NumericalConfiguration config = org.episteme.core.Episteme.getNumericalConfiguration();
+        if (tolerance == null) tolerance = (E) (isComplex ? Complex.of(Real.of(config.getStabilityThreshold()), Real.ZERO) : Real.of(config.getStabilityThreshold()));
+        if (maxIterations <= 0) maxIterations = config.getMaxIterations();
         Ring<E> ring = sa.getScalarRing();
         
         try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
@@ -1275,8 +1276,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         int n = sa.rows();
         int prec = (int) getPrecision();
         boolean isComplex = isComplex(sa.getScalarRing());
-        if (tolerance == null) tolerance = (E) (isComplex ? LinearAlgebraConstants.toleranceComplex() : LinearAlgebraConstants.toleranceReal());
-        if (maxIterations <= 0) maxIterations = LinearAlgebraConstants.DEFAULT_MAX_ITERATIONS;
+        NumericalConfiguration config = org.episteme.core.Episteme.getNumericalConfiguration();
+        if (tolerance == null) tolerance = (E) (isComplex ? Complex.of(Real.of(config.getStabilityThreshold()), Real.ZERO) : Real.of(config.getStabilityThreshold()));
+        if (maxIterations <= 0) maxIterations = config.getMaxIterations();
         Ring<E> ring = sa.getScalarRing();
         
         try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {
@@ -1364,8 +1366,9 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         int m = restarts;
         int prec = (int) getPrecision();
         boolean isComplex = isComplex(sa.getScalarRing());
-        if (tolerance == null) tolerance = (E) (isComplex ? LinearAlgebraConstants.toleranceComplex() : LinearAlgebraConstants.toleranceReal());
-        if (maxIterations <= 0) maxIterations = LinearAlgebraConstants.DEFAULT_MAX_ITERATIONS;
+        NumericalConfiguration config = org.episteme.core.Episteme.getNumericalConfiguration();
+        if (tolerance == null) tolerance = (E) (isComplex ? Complex.of(Real.of(config.getStabilityThreshold()), Real.ZERO) : Real.of(config.getStabilityThreshold()));
+        if (maxIterations <= 0) maxIterations = config.getMaxIterations();
         Ring<E> ring = sa.getScalarRing();
         
         try (ResourceTracker tracker = new ResourceTracker(); Arena arena = Arena.ofConfined()) {

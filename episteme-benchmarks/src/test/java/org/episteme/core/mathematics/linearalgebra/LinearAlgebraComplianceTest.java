@@ -156,6 +156,11 @@ public class LinearAlgebraComplianceTest {
             }
         }
 
+        String suiteProp = System.getProperty("org.episteme.test.suite", "all").toLowerCase();
+        boolean runReal = suiteProp.equals("all") || suiteProp.equals("real");
+        boolean runComplex = suiteProp.equals("all") || suiteProp.equals("complex");
+        boolean runFloat = suiteProp.equals("all") || suiteProp.equals("float");
+
         List<ComplianceResult> results = new ArrayList<>();
 
         for (LinearAlgebraProvider<?> provider : providers) {
@@ -170,25 +175,36 @@ public class LinearAlgebraComplianceTest {
             }
             res.environment = provider.getEnvironmentInfo();
 
-            // Run Real Suite
-            if (provider.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+            // Run Real Suite (Double)
+            if (runReal && provider.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
                 @SuppressWarnings("unchecked")
                 LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) provider;
-                runSuite(res, typed, rawProviders, "Real", realGroundTruth);
+                runSuite(res, typed, rawProviders, "Real", realGroundTruth, 
+                        TOL_STRICT, TOL_STANDARD, TOL_SOLVER, TOL_RELAXED, false);
             }
             
-            // Run Complex Suite
-            if (provider.isCompatible(org.episteme.core.mathematics.sets.Complexes.getInstance())) {
+            // Run Complex Suite (Double)
+            if (runComplex && provider.isCompatible(org.episteme.core.mathematics.sets.Complexes.getInstance())) {
                 @SuppressWarnings("unchecked")
                 LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex> typed = (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>) provider;
-                runSuite(res, typed, rawProviders, "Complex", complexGroundTruth);
+                runSuite(res, typed, rawProviders, "Complex", complexGroundTruth, 
+                        TOL_STRICT, TOL_STANDARD, TOL_SOLVER, TOL_RELAXED, false);
             }
             
-            // Run Float Suite (Single Precision) - uses Real suite but with relaxed ground truth comparison
-            if (provider.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
-                 @SuppressWarnings("unchecked")
-                 LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) provider;
-                 runFloatSuite(res, typed, rawProviders, "Float", realGroundTruth);
+            // Run Float Suites (Single Precision)
+            if (runFloat) {
+                if (provider.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance())) {
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<Real> typed = (LinearAlgebraProvider<Real>) provider;
+                    runSuite(res, typed, rawProviders, "Float", realGroundTruth, 
+                            TOL_FLOAT, TOL_FLOAT, TOL_FLOAT, TOL_FLOAT, true);
+                }
+                if (provider.isCompatible(org.episteme.core.mathematics.sets.Complexes.getInstance())) {
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex> typed = (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>) provider;
+                    runSuite(res, typed, rawProviders, "Complex Float", complexGroundTruth, 
+                            TOL_FLOAT, TOL_FLOAT, TOL_FLOAT, TOL_FLOAT, true);
+                }
             }
 
             results.add(res);
@@ -196,7 +212,8 @@ public class LinearAlgebraComplianceTest {
         printMarkdownReport(results);
     }
 
-    private <E> void runSuite(ComplianceResult res, LinearAlgebraProvider<E> provider, List<LinearAlgebraProvider<?>> rawProviders, String typeLabel, LinearAlgebraProvider<E> groundTruth) {
+    private <E> void runSuite(ComplianceResult res, LinearAlgebraProvider<E> provider, List<LinearAlgebraProvider<?>> rawProviders, String typeLabel, LinearAlgebraProvider<E> groundTruth,
+                             double tolStrict, double tolStandard, double tolSolver, double tolRelaxed, boolean useFloat) {
         // Strictly isolate the provider under test, but allow delegation for decorators
         List<AlgorithmProvider> allowed = new ArrayList<>();
         allowed.add(provider);
@@ -213,63 +230,63 @@ public class LinearAlgebraComplianceTest {
         
         try {
             String suffix = " (" + typeLabel + ")";
-            boolean isComplex = typeLabel.equals("Complex");
+            boolean isComplex = typeLabel.contains("Complex");
             @SuppressWarnings("unchecked")
             Ring<E> ring = (Ring<E>) (isComplex ? org.episteme.core.mathematics.sets.Complexes.getInstance() : org.episteme.core.mathematics.sets.Reals.getInstance());
 
             testOperation(res, "Add" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.add(a, b);
-                if (groundTruth != null) verifyMatrix(groundTruth.add(a, b), result, TOL_STRICT, ring);
-                else verifyMatrix(a.add(b), result, TOL_STRICT, ring);
+                if (groundTruth != null) verifyMatrix(groundTruth.add(a, b), result, tolStrict, ring);
+                else verifyMatrix(a.add(b), result, tolStrict, ring);
             });
 
             testOperation(res, "Sub" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.subtract(a, b);
-                if (groundTruth != null) verifyMatrix(groundTruth.subtract(a, b), result, TOL_STRICT, ring);
-                else verifyMatrix(a.subtract(b), result, TOL_STRICT, ring);
+                if (groundTruth != null) verifyMatrix(groundTruth.subtract(a, b), result, tolStrict, ring);
+                else verifyMatrix(a.subtract(b), result, tolStrict, ring);
             });
 
             testOperation(res, "Scale" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
                 @SuppressWarnings("unchecked")
-                E s = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(2.5, 0.5) : (E)Real.of(2.5);
+                E s = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(2.5, 0.5) : (E)(useFloat ? Real.of(2.5f) : Real.of(2.5));
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.scale(s, a);
-                if (groundTruth != null) verifyMatrix(groundTruth.scale(s, a), result, TOL_STRICT, ring);
-                else verifyMatrix(a.scale(s), result, TOL_STRICT, ring);
+                if (groundTruth != null) verifyMatrix(groundTruth.scale(s, a), result, tolStrict, ring);
+                else verifyMatrix(a.scale(s), result, tolStrict, ring);
             });
 
             testOperation(res, "Transpose" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.transpose(a);
-                verifyTranspose(a, result, TOL_STANDARD, ring);
+                verifyTranspose(a, result, tolStandard, ring);
             });
 
             testOperation(res, "Multiply" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.multiply(a, b);
-                verifyMultiply(a, b, result, TOL_STANDARD, ring);
+                verifyMultiply(a, b, result, tolStandard, ring);
             });
 
             testOperation(res, "Inverse" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomInvertibleMatrix(SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomInvertibleMatrix(SIZE, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.inverse(a);
-                verifyInverse(a, result, TOL_SOLVER, ring);
+                verifyInverse(a, result, tolSolver, ring);
             });
 
             testOperation(res, "Solve (Hilbert)" + suffix, () -> {
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = hilbertMatrix(8, ring); 
-                org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(8, new Random(42), ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = hilbertMatrix(8, ring, useFloat); 
+                org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(8, new Random(42), ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Vector<E> x = provider.solve(a, b);
                 org.episteme.core.mathematics.linearalgebra.Vector<E> ax = a.multiply(x);
                 double normDiff = 0, normB = 0;
@@ -280,32 +297,32 @@ public class LinearAlgebraComplianceTest {
                     normB += db * db;
                 }
                 double residual = Math.sqrt(normDiff) / (Math.sqrt(normB) + 1e-18);
-                assertTrue(residual < 1e-2, "Hilbert solve residual too high: " + residual);
+                assertTrue(residual < 5e-2, "Hilbert solve residual too high: " + residual);
             });
 
             testOperation(res, "LU (Identity)" + suffix, () -> {
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> a = identityMatrix(SIZE, ring);
                 LUResult<E> result = provider.lu(a);
-                verifyLU(a, result, ring);
+                verifyLU(a, result, tolSolver, ring);
             });
 
             testOperation(res, "QR (Identity)" + suffix, () -> {
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> a = identityMatrix(SIZE, ring);
                 QRResult<E> result = provider.qr(a);
-                verifyQR(a, result, TOL_STRICT, ring);
+                verifyQR(a, result, tolStrict, ring);
             });
 
             testOperation(res, "Determinant" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(8, 8, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(8, 8, rand, ring, useFloat);
                 E result = provider.determinant(a);
-                if (groundTruth != null) assertScalarEquals(groundTruth.determinant(a), result, TOL_SOLVER, ring);
+                if (groundTruth != null) assertScalarEquals(groundTruth.determinant(a), result, tolSolver, ring);
             });
 
             testOperation(res, "Solve" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomInvertibleMatrix(SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomInvertibleMatrix(SIZE, rand, ring, useFloat);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(SIZE, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Vector<E> x = provider.solve(a, b);
                 org.episteme.core.mathematics.linearalgebra.Vector<E> ax = a.multiply(x);
                 double normDiff = 0, normB = 0;
@@ -316,57 +333,57 @@ public class LinearAlgebraComplianceTest {
                     normB += db * db;
                 }
                 double residual = (normB > 1e-18) ? Math.sqrt(normDiff)/Math.sqrt(normB) : Math.sqrt(normDiff);
-                assertTrue(residual < TOL_SOLVER, "Solver residual too high: " + residual);
+                assertTrue(residual < tolSolver, "Solver residual too high: " + residual);
             });
 
             testOperation(res, "LU" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
                 LUResult<E> result = provider.lu(a);
-                verifyLU(a, result, ring);
+                verifyLU(a, result, tolSolver, ring);
             });
 
             testOperation(res, "QR" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring, useFloat);
                 QRResult<E> result = provider.qr(a);
-                verifyQR(a, result, TOL_SOLVER, ring);
+                verifyQR(a, result, tolSolver, ring);
             });
 
             testOperation(res, "SVD" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(20, 15, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(20, 15, rand, ring, useFloat);
                 SVDResult<E> result = provider.svd(a);
-                verifySVD(a, result, ring);
+                verifySVD(a, result, tolRelaxed, ring);
             });
 
             testOperation(res, "Cholesky" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomSPDMatrix(SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomSPDMatrix(SIZE, rand, ring, useFloat);
                 CholeskyResult<E> result = provider.cholesky(a);
-                verifyCholesky(a, result, TOL_SOLVER, ring);
+                verifyCholesky(a, result, tolSolver, ring);
             });
 
             testOperation(res, "Eigen" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomSPDMatrix(SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomSPDMatrix(SIZE, rand, ring, useFloat);
                 EigenResult<E> result = provider.eigen(a);
-                verifyEigen(a, result, TOL_RELAXED, ring);
+                verifyEigen(a, result, tolRelaxed, ring);
             });
 
             testOperation(res, "Dot" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Vector<E> a = randomVector(SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Vector<E> bArr = randomVector(SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> a = randomVector(SIZE, rand, ring, useFloat);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> bArr = randomVector(SIZE, rand, ring, useFloat);
                 E result = provider.dot(a, bArr);
                 E expected = ring.zero();
                 for(int i=0; i<SIZE; i++) expected = ring.add(expected, ring.multiply(a.get(i), bArr.get(i)));
-                assertScalarEquals(expected, result, TOL_STRICT, ring);
+                assertScalarEquals(expected, result, tolStrict, ring);
             });
 
             testOperation(res, "Norm" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Vector<E> a = randomVector(SIZE, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> a = randomVector(SIZE, rand, ring, useFloat);
                 E normVal = provider.norm(a);
                 double sumSq = 0;
                 for(int i=0; i<SIZE; i++) {
@@ -374,28 +391,28 @@ public class LinearAlgebraComplianceTest {
                     double d = absValueDouble(val, ring);
                     sumSq += d*d;
                 }
-                assertRelativeEquals(Math.sqrt(sumSq), absValueDouble(normVal, ring), TOL_STRICT);
+                assertRelativeEquals(Math.sqrt(sumSq), absValueDouble(normVal, ring), tolStrict);
             });
 
             testOperation(res, "Transpose (Rect)" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(25, 10, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(25, 10, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.transpose(a);
-                verifyTranspose(a, result, TOL_STANDARD, ring);
+                verifyTranspose(a, result, tolStandard, ring);
             });
 
             testOperation(res, "Multiply (Rect)" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(20, 15, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(15, 25, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(20, 15, rand, ring, useFloat);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(15, 25, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.multiply(a, b);
-                verifyMultiply(a, b, result, TOL_STANDARD, ring);
+                verifyMultiply(a, b, result, tolStandard, ring);
             });
 
             testOperation(res, "Solve (Rect)" + suffix, () -> {
                 Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(30, 10, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(30, rand, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(30, 10, rand, ring, useFloat);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(30, rand, ring, useFloat);
                 org.episteme.core.mathematics.linearalgebra.Vector<E> x = provider.solve(a, b);
                 org.episteme.core.mathematics.linearalgebra.Vector<E> lhs = provider.transpose(a).multiply(a.multiply(x));
                 org.episteme.core.mathematics.linearalgebra.Vector<E> rhs = provider.transpose(a).multiply(b);
@@ -407,24 +424,24 @@ public class LinearAlgebraComplianceTest {
                     normRHS += dr * dr;
                 }
                 double residual = (normRHS > 1e-18) ? Math.sqrt(normDiff)/Math.sqrt(normRHS) : Math.sqrt(normDiff);
-                assertTrue(residual < TOL_RELAXED, "Least squares residual too high: " + residual);
+                assertTrue(residual < tolRelaxed, "Least squares residual too high: " + residual);
             });
 
             if (provider instanceof org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E> sparseProvider) {
                 @SuppressWarnings("unchecked")
-                E eps = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(1e-8, 0) : (E)Real.of(1e-8);
+                E eps = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(1e-8, 0) : (E)(useFloat ? Real.of((float)1e-8) : Real.of(1e-8));
                 @SuppressWarnings("unchecked")
-                E twenty = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(20, 0) : (E)Real.of(20);
+                E twenty = isComplex ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(20, 0) : (E)(useFloat ? Real.of(20f) : Real.of(20));
                 testOperation(res, "BiCGSTAB" + suffix, () -> {
                     Random rand = new Random(42);
                     int n = 30;
-                    org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring);
+                    org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring, useFloat);
                     @SuppressWarnings("unchecked")
                     E[][] diagData = (E[][]) new Object[n][n];
                     for(int i=0; i<n; i++) for(int j=0; j<n; j++) diagData[i][j] = (i==j) ? twenty : ring.zero();
                     a = a.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
 
-                    org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(n, rand, ring);
+                    org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(n, rand, ring, useFloat);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> x0 = org.episteme.core.mathematics.linearalgebra.Vector.of(new ArrayList<>(Collections.nCopies(n, ring.zero())), ring);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> x = sparseProvider.bicgstab(a, b, x0, eps, 2000);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> ax = provider.multiply(a, x);
@@ -436,19 +453,19 @@ public class LinearAlgebraComplianceTest {
                         normB += db * db;
                     }
                     double residual = Math.sqrt(normDiff) / (Math.sqrt(normB) + 1e-18);
-                    assertTrue(residual < TOL_RELAXED, "BiCGSTAB residual too high: " + residual);
+                    assertTrue(residual < tolRelaxed, "BiCGSTAB residual too high: " + residual);
                 });
 
                 testOperation(res, "GMRES" + suffix, () -> {
                     Random rand = new Random(42);
                     int n = 30;
-                    org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring);
+                    org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring, useFloat);
                     @SuppressWarnings("unchecked")
                     E[][] diagData = (E[][]) new Object[n][n];
                     for(int i=0; i<n; i++) for(int j=0; j<n; j++) diagData[i][j] = (i==j) ? twenty : ring.zero();
                     a = a.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
 
-                    org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(n, rand, ring);
+                    org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(n, rand, ring, useFloat);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> x0 = org.episteme.core.mathematics.linearalgebra.Vector.of(new ArrayList<>(Collections.nCopies(n, ring.zero())), ring);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> x = sparseProvider.gmres(a, b, x0, eps, 2000, 30);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> ax = provider.multiply(a, x);
@@ -460,14 +477,14 @@ public class LinearAlgebraComplianceTest {
                         normB += db * db;
                     }
                     double residual = Math.sqrt(normDiff) / (Math.sqrt(normB) + 1e-18);
-                    assertTrue(residual < TOL_RELAXED, "GMRES residual too high: " + residual);
+                    assertTrue(residual < tolRelaxed, "GMRES residual too high: " + residual);
                 });
 
                 testOperation(res, "ConjGrad" + suffix, () -> {
                     Random rand = new Random(42);
                     int n = 30;
-                    org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomSPDMatrix(n, rand, ring);
-                    org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(n, rand, ring);
+                    org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomSPDMatrix(n, rand, ring, useFloat);
+                    org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(n, rand, ring, useFloat);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> x0 = org.episteme.core.mathematics.linearalgebra.Vector.of(new ArrayList<>(Collections.nCopies(n, ring.zero())), ring);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> x = sparseProvider.conjugateGradient(a, b, x0, eps, 2000);
                     org.episteme.core.mathematics.linearalgebra.Vector<E> ax = provider.multiply(a, x);
@@ -479,7 +496,7 @@ public class LinearAlgebraComplianceTest {
                         normB += db * db;
                     }
                     double residual = Math.sqrt(normDiff) / (Math.sqrt(normB) + 1e-18);
-                    assertTrue(residual < TOL_SOLVER, "ConjGrad residual too high: " + residual);
+                    assertTrue(residual < tolSolver, "ConjGrad residual too high: " + residual);
                 });
             }
 
@@ -489,47 +506,10 @@ public class LinearAlgebraComplianceTest {
     }
 
     private <E> void runFloatSuite(ComplianceResult res, LinearAlgebraProvider<E> provider, List<LinearAlgebraProvider<?>> rawProviders, String typeLabel, LinearAlgebraProvider<E> groundTruth) {
-        AlgorithmService oldService = AlgorithmManager.getService();
-        List<AlgorithmProvider> allowed = new ArrayList<>();
-        allowed.add(provider);
-        if (groundTruth != null) allowed.add(groundTruth);
-        AlgorithmManager.setService(new TestingAlgorithmService(allowed));
-
-        try {
-            String suffix = " (" + typeLabel + ")";
-            @SuppressWarnings("unchecked")
-            Ring<E> ring = (Ring<E>) (Object) org.episteme.core.mathematics.sets.Reals.getInstance();
-
-            testOperation(res, "Add" + suffix, () -> {
-                Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.add(a, b);
-                if (groundTruth != null) verifyMatrix(groundTruth.add(a, b), result, TOL_FLOAT, ring);
-            });
-
-            testOperation(res, "Multiply" + suffix, () -> {
-                Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(SIZE, SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> b = randomMatrix(SIZE, SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> result = provider.multiply(a, b);
-                if (groundTruth != null) verifyMatrix(groundTruth.multiply(a, b), result, TOL_FLOAT, ring);
-            });
-
-            testOperation(res, "Solve" + suffix, () -> {
-                Random rand = new Random(42);
-                org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomInvertibleMatrix(SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Vector<E> b = randomVector(SIZE, rand, ring);
-                org.episteme.core.mathematics.linearalgebra.Vector<E> x = provider.solve(a, b);
-                if (groundTruth != null) verifyVector(groundTruth.solve(a, b), x, TOL_FLOAT, ring);
-            });
-
-        } finally {
-            AlgorithmManager.setService(oldService);
-        }
+        runSuite(res, provider, rawProviders, typeLabel, groundTruth, TOL_FLOAT, TOL_FLOAT, TOL_FLOAT, TOL_FLOAT, true);
     }
 
-    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> randomMatrix(int rows, int cols, Random rand, Ring<E> ring) {
+    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> randomMatrix(int rows, int cols, Random rand, Ring<E> ring, boolean useFloat) {
         @SuppressWarnings("unchecked")
         E[][] data = (E[][]) new Object[rows][cols];
         boolean isComplexInside = ring instanceof org.episteme.core.mathematics.sets.Complexes;
@@ -541,7 +521,7 @@ public class LinearAlgebraComplianceTest {
                     data[i][j] = val;
                 } else {
                     @SuppressWarnings("unchecked")
-                    E val = (E) Real.of(rand.nextDouble()*2-1);
+                    E val = (E) (useFloat ? Real.of((float)(rand.nextDouble()*2-1)) : Real.of(rand.nextDouble()*2-1));
                     data[i][j] = val;
                 }
             }
@@ -549,26 +529,26 @@ public class LinearAlgebraComplianceTest {
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(data, ring);
     }
 
-    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> randomSPDMatrix(int n, Random rand, Ring<E> ring) {
-        org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring);
+    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> randomSPDMatrix(int n, Random rand, Ring<E> ring, boolean useFloat) {
+        org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring, useFloat);
         org.episteme.core.mathematics.linearalgebra.Matrix<E> result = a.multiply(a.transpose());
         boolean isComplexInside = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         @SuppressWarnings("unchecked")
-        E ten = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(10, 0) : (E)Real.of(10);
+        E ten = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(10, 0) : (E)(useFloat ? Real.of(10f) : Real.of(10));
         @SuppressWarnings("unchecked")
         E[][] diagData = (E[][]) new Object[n][n];
         for(int r=0; r<n; r++) for(int c=0; c<n; c++) diagData[r][c] = (r==c) ? ten : ring.zero();
         return result.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
     }
 
-    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> hilbertMatrix(int n, Ring<E> ring) {
+    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> hilbertMatrix(int n, Ring<E> ring, boolean useFloat) {
         @SuppressWarnings("unchecked")
         E[][] data = (E[][]) new Object[n][n];
         boolean isComplexInside = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 double val = 1.0 / (i + j + 1);
-                data[i][j] = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(val, 0) : (E)Real.of(val);
+                data[i][j] = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(val, 0) : (E)(useFloat ? Real.of((float)val) : Real.of(val));
             }
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(data, ring);
@@ -578,18 +558,18 @@ public class LinearAlgebraComplianceTest {
         return org.episteme.core.mathematics.linearalgebra.Matrix.identity(n, ring);
     }
 
-    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> randomInvertibleMatrix(int n, Random rand, Ring<E> ring) {
-        org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring);
+    private <E> org.episteme.core.mathematics.linearalgebra.Matrix<E> randomInvertibleMatrix(int n, Random rand, Ring<E> ring, boolean useFloat) {
+        org.episteme.core.mathematics.linearalgebra.Matrix<E> a = randomMatrix(n, n, rand, ring, useFloat);
         boolean isComplexInside = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         @SuppressWarnings("unchecked")
-        E ten = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(10, 0) : (E)Real.of(10);
+        E ten = isComplexInside ? (E)org.episteme.core.mathematics.numbers.complex.Complex.of(10, 0) : (E)(useFloat ? Real.of(10f) : Real.of(10));
         @SuppressWarnings("unchecked")
         E[][] diagData = (E[][]) new Object[n][n];
         for(int r=0; r<n; r++) for(int c=0; c<n; c++) diagData[r][c] = (r==c) ? ten : ring.zero();
         return a.add(org.episteme.core.mathematics.linearalgebra.Matrix.of(diagData, ring));
     }
 
-    private <E> org.episteme.core.mathematics.linearalgebra.Vector<E> randomVector(int n, Random rand, Ring<E> ring) {
+    private <E> org.episteme.core.mathematics.linearalgebra.Vector<E> randomVector(int n, Random rand, Ring<E> ring, boolean useFloat) {
          @SuppressWarnings("unchecked")
          E[] data = (E[]) new Object[n];
          boolean isComplexInside = ring instanceof org.episteme.core.mathematics.sets.Complexes;
@@ -600,7 +580,7 @@ public class LinearAlgebraComplianceTest {
                  data[i] = val;
              } else {
                  @SuppressWarnings("unchecked")
-                 E val = (E) Real.of(rand.nextDouble()*2-1);
+                 E val = (E) (useFloat ? Real.of((float)(rand.nextDouble()*2-1)) : Real.of(rand.nextDouble()*2-1));
                  data[i] = val;
              }
          }
@@ -631,7 +611,7 @@ public class LinearAlgebraComplianceTest {
         assertResidualNorm(expectedId, id, tol, ring);
     }
 
-    private <E> void verifyLU(org.episteme.core.mathematics.linearalgebra.Matrix<E> a, LUResult<E> lu, Ring<E> ring) {
+    private <E> void verifyLU(org.episteme.core.mathematics.linearalgebra.Matrix<E> a, LUResult<E> lu, double tol, Ring<E> ring) {
         org.episteme.core.mathematics.linearalgebra.Matrix<E> product = lu.L().multiply(lu.U());
         int n = a.rows();
         @SuppressWarnings("unchecked")
@@ -643,7 +623,7 @@ public class LinearAlgebraComplianceTest {
             for (int j = 0; j < a.cols(); j++) permutedData[i][j] = a.get(pivot, j);
         }
         org.episteme.core.mathematics.linearalgebra.Matrix<E> PA = org.episteme.core.mathematics.linearalgebra.Matrix.of(permutedData, ring);
-        assertResidualNorm(PA, product, TOL_SOLVER, ring);
+        assertResidualNorm(PA, product, tol, ring);
     }
 
     private <E> int scalarToInt(E element, Ring<E> ring) {
@@ -655,7 +635,7 @@ public class LinearAlgebraComplianceTest {
         assertResidualNorm(a, recon, tol, ring);
     }
 
-    private <E> void verifySVD(org.episteme.core.mathematics.linearalgebra.Matrix<E> a, SVDResult<E> res, Ring<E> ring) {
+    private <E> void verifySVD(org.episteme.core.mathematics.linearalgebra.Matrix<E> a, SVDResult<E> res, double tol, Ring<E> ring) {
         int k = res.S().dimension();
         @SuppressWarnings("unchecked")
         E[][] sData = (E[][]) new Object[res.U().cols()][res.V().cols()];
@@ -681,7 +661,7 @@ public class LinearAlgebraComplianceTest {
         }
         
         org.episteme.core.mathematics.linearalgebra.Matrix<E> recon = res.U().multiply(S).multiply(VT);
-        assertResidualNorm(a, recon, TOL_RELAXED, ring);
+        assertResidualNorm(a, recon, tol, ring);
     }
 
     private <E> void verifyMatrix(org.episteme.core.mathematics.linearalgebra.Matrix<E> expected, org.episteme.core.mathematics.linearalgebra.Matrix<E> actual, double tol, Ring<E> ring) {

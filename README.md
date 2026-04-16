@@ -1,4 +1,4 @@
-# 🌌 Episteme™: The Unified Scientific Computing Framework
+# 🌌 Episteme: The Unified Scientific Computing Framework
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/silveremartin-dev/Episteme)
 [![Java Version](https://img.shields.io/badge/Java-21%2B%20%2F%2025-blue)](https://www.oracle.com/java/technologies/downloads/)

@@ -26,7 +26,7 @@ import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 
 import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.core.technical.backend.ExecutionContext;
-import org.episteme.nativ.mathematics.linearalgebra.LinearAlgebraConstants;
+import org.episteme.core.mathematics.context.NumericalConfiguration;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.MatrixSolver.Strategy;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
@@ -710,8 +710,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public Vector<Real> conjugateGradient(Matrix<Real> A, Vector<Real> b, Vector<Real> x0, Real tol, int maxIter) {
-        if (tol == null) tol = LinearAlgebraConstants.toleranceReal();
-        if (maxIter <= 0) maxIter = LinearAlgebraConstants.DEFAULT_MAX_ITERATIONS;
+        NumericalConfiguration config = org.episteme.core.Episteme.getNumericalConfiguration();
+        if (tol == null) tol = Real.of(config.getEpsilonDouble());
+        if (maxIter <= 0) maxIter = config.getMaxIterations();
         int n = b.dimension();
         if (!(A instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
             throw new IllegalArgumentException("A must be a SparseMatrix");
@@ -772,8 +773,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     @Override
     public Vector<Real> gmres(Matrix<Real> A, Vector<Real> b, Vector<Real> x0, Real tol, int maxIter, int restarts) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException("CUDA Sparse Backend not available");
-        if (tol == null) tol = LinearAlgebraConstants.toleranceReal();
-        if (maxIter <= 0) maxIter = LinearAlgebraConstants.DEFAULT_MAX_ITERATIONS;
+        NumericalConfiguration config = org.episteme.core.Episteme.getNumericalConfiguration();
+        if (tol == null) tol = Real.of(config.getEpsilonDouble());
+        if (maxIter <= 0) maxIter = config.getMaxIterations();
         int m_rows = A.rows();
         int k_cols = A.cols();
         if (!(A instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {

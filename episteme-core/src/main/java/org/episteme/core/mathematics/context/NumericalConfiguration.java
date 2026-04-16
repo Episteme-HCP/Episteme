@@ -48,6 +48,7 @@ public class NumericalConfiguration {
     private int maxIterations = Integer.parseInt(Episteme.getProperty("math.linearalgebra.max_iterations", "1000"));
     private int gmresRestart = Integer.parseInt(Episteme.getProperty("math.linearalgebra.gmres.restart", "30"));
     private int precisionBits = Integer.parseInt(Episteme.getProperty("math.linearalgebra.precision.bits", "256"));
+    private double pivotThreshold = Double.parseDouble(Episteme.getProperty("math.linearalgebra.pivot.threshold", "1e-3"));
 
     public NumericalConfiguration() {
     }
@@ -193,6 +194,15 @@ public class NumericalConfiguration {
 
     public NumericalConfiguration setPrecisionBits(int precisionBits) {
         this.precisionBits = precisionBits;
+        return this;
+    }
+
+    public double getPivotThreshold() {
+        return pivotThreshold;
+    }
+
+    public NumericalConfiguration setPivotThreshold(double pivotThreshold) {
+        this.pivotThreshold = pivotThreshold;
         return this;
     }
 
