@@ -107,10 +107,8 @@ public class MatrixMultiplicationPlanner {
                 if (isSquareGrid(p)) return DistributedFoxAlgorithm.multiply(A, B, leaf);
                 return DistributedSUMMAAlgorithm.multiply(A, B, leaf);
             case ALGORITHM_25D:
-                // Distributed 2.5D Algorithm not yet fully generic-ready or missing from classpath?
-                // For now fallback to SUMMA if needed, or assume it exists.
-                // return Distributed25DAlgorithm.multiply(A, B, cCount, leaf); 
-                return DistributedSUMMAAlgorithm.multiply(A, B, leaf);
+                int cCount = Integer.getInteger("org.episteme.multiply.25d.layers", 2);
+                return Distributed25DAlgorithm.multiply(A, B, cCount, leaf); 
             case CARMA:
                 return DistributedCARMAAlgorithm.multiply(A, B, leaf);
             case SUMMA:
@@ -123,6 +121,15 @@ public class MatrixMultiplicationPlanner {
      * Heuristic Selection Logic.
      */
     public static <E> Algorithm selectAlgorithm(TiledMatrix<E> A, TiledMatrix<E> B, int p) {
+        String forced = System.getProperty("org.episteme.multiply.algorithm");
+        if (forced != null) {
+            try {
+                return Algorithm.valueOf(forced.toUpperCase());
+            } catch (Exception e) {
+                logger.warn("Invalid forced algorithm: {}, falling back to heuristics", forced);
+            }
+        }
+        
         long m = A.rows();
         long n = B.cols();
         long k = A.cols();

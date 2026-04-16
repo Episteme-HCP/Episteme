@@ -33,21 +33,22 @@ public class GenericSparseSolvers {
             rho = provider.dot(r0, r);
             
             // Check for breakdown
-            if (isSmaller(rho, 1e-45, f)) {
+            double breakdownThreshold = getThreshold(f);
+            if (isSmaller(rho, breakdownThreshold, f)) {
                  // Try to recover by resetting r0 if possible, or just break
                  break; 
             }
 
             if (iter == 0) p = r;
             else {
-                if (isSmaller(omega, 1e-45, f) || isSmaller(rhoOld, 1e-45, f)) break;
+                if (isSmaller(omega, breakdownThreshold, f) || isSmaller(rhoOld, breakdownThreshold, f)) break;
                 E beta = f.multiply(f.divide(rho, rhoOld), f.divide(alpha, omega));
                 p = provider.add(r, provider.multiply(provider.subtract(p, provider.multiply(v, omega)), beta));
             }
 
             v = A.multiply(p);
             E vDotR0 = provider.dot(r0, v);
-            if (isSmaller(vDotR0, 1e-45, f)) break;
+            if (isSmaller(vDotR0, breakdownThreshold, f)) break;
             alpha = f.divide(rho, vDotR0);
 
             Vector<E> s = provider.subtract(r, provider.multiply(v, alpha));
@@ -61,7 +62,7 @@ public class GenericSparseSolvers {
             Vector<E> t = A.multiply(s);
             E tDotT = provider.dot(t, t);
             
-            if (isSmaller(tDotT, 1e-45, f)) {
+            if (isSmaller(tDotT, breakdownThreshold, f)) {
                 // Omega would be undefined, but we can still update x with alpha step
                 x = provider.add(x, provider.multiply(p, alpha));
                 r = s;
@@ -87,7 +88,7 @@ public class GenericSparseSolvers {
         for (int iter = 0; iter < maxIterations; iter++) {
             Vector<E> Ap = A.multiply(p);
             E pAp = provider.dot(p, Ap);
-            if (isSmaller(pAp, 1e-25, f)) break;
+            if (isSmaller(pAp, getThreshold(f), f)) break;
             
             E alpha = f.divide(rsold, pAp);
             x = provider.add(x, provider.multiply(p, alpha));
@@ -137,7 +138,7 @@ public class GenericSparseSolvers {
                     w = provider.subtract(w, provider.multiply(V[i], H[i][j]));
                 }
                 H[j+1][j] = provider.norm(w);
-                if (isSmaller(H[j+1][j], 1e-25, f)) {
+                if (isSmaller(H[j+1][j], getThreshold(f), f)) {
                     actual_m = j + 1;
                     break;
                 }
@@ -167,14 +168,15 @@ public class GenericSparseSolvers {
                 E h2 = H[i+1][i];
                 if (h1 == null || h2 == null) throw new NullPointerException("Hessenberg matrix entry is null at [" + i + "][" + i + "]");
                 
-                if (isSmaller(h2, 1e-31, f)) {
+                double hThreshold = getThreshold(f);
+                if (isSmaller(h2, hThreshold, f)) {
                     cs[i] = f.one();
                     sn[i] = f.zero();
                 } else {
                     E h1sq = getSquareNorm(h1, f);
                     E h2sq = getSquareNorm(h2, f);
                     E sumSq = f.add(h1sq, h2sq);
-                    if (isSmaller(sumSq, 1e-35, f)) {
+                    if (isSmaller(sumSq, hThreshold, f)) {
                          cs[i] = f.one(); sn[i] = f.zero();
                     } else {
                         E t = sqrt(sumSq, f);
@@ -204,7 +206,7 @@ public class GenericSparseSolvers {
                 for (int j = i + 1; j < actual_m; j++) {
                     y[i] = f.subtract(y[i], f.multiply(H[i][j], y[j]));
                 }
-                if (isSmaller(H[i][i], 1e-31, f)) {
+                if (isSmaller(H[i][i], getThreshold(f), f)) {
                     y[i] = f.zero();
                 } else {
                     y[i] = f.divide(y[i], H[i][i]);
@@ -219,6 +221,18 @@ public class GenericSparseSolvers {
             if (isSmaller(s_vec[actual_m], tolerance, f)) return x;
         }
         return x;
+    }
+
+    private static <E> double getThreshold(Field<E> f) {
+        Object zero = f.zero();
+        if (zero instanceof Complex) zero = ((Complex) zero).real();
+        if (zero instanceof RealBig) return 1e-100;
+        if (zero instanceof Real r) {
+            String s = r.toString();
+            if (s.contains("RealFloat")) return 1e-18;
+            return 1e-45;
+        }
+        return 1e-45;
     }
 
     private static boolean isSmaller(Object element, Object tolerance, Field<?> f) {

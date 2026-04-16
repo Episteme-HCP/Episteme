@@ -8,6 +8,7 @@ package org.episteme.core.mathematics.linearalgebra.matrices.solvers;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 
 /**
@@ -44,15 +45,16 @@ public class GenericEigen {
             }
 
             // Convergence check using maxOffDouble relative to diagonal or absolute
-            // For high-precision, we can aim for much smaller than 1e-35
-            if (maxOffDouble < 1e-60) break;
+            // Threshold depends on precision: 1e-60 for high-prec, 1e-15 for double, 1e-7 for float.
+            double threshold = getThreshold(field);
+            if (maxOffDouble < threshold) break;
 
             E app = A[p][p];
             E aqq = A[q][q];
             E apq = A[p][q];
 
             double absApq = absValueDouble(apq, field);
-            if (absApq < 1e-70) break;
+            if (absApq < threshold * 0.1) break;
 
             // Hermitian Jacobi rotation:
             // tau = (aqq - app) / (2 * |apq|)
@@ -82,21 +84,10 @@ public class GenericEigen {
             }
 
             // Update diagonals:
-            // A[p][p]' = c^2*app - 2*c*Re(s*apq) + |s|^2*aqq
-            // A[q][q]' = |s|^2*app + 2*c*Re(s*apq) + c^2*aqq
-            // sE * apq = (t*c/|apq|) * apq * apq? No, sE was (t*c/|apq|)*apq.
-            // sE * conj(apq) = (t*c/|apq|) * |apq|^2 = t*c*|apq|.
-            E s_apq_conj = field.multiply(sE, conjugate(apq));
-            E two_c_Re_s_apq_conj = field.add(field.multiply(cE, s_apq_conj), field.multiply(cE, s_apq_conj));
-            
-            E c2 = toComplex(c * c, field);
-            E s2 = toComplex(t * t * c * c, field); // |s|^2 = (t*c)^2
-            
-            E newApp = field.add(field.subtract(field.multiply(c2, app), two_c_Re_s_apq_conj), field.multiply(s2, aqq));
-            E newAqq = field.add(field.add(field.multiply(s2, app), two_c_Re_s_apq_conj), field.multiply(c2, aqq));
-            
-            A[p][p] = newApp;
-            A[q][q] = newAqq;
+            // Stable version: A[p][p]' = A[p][p] - t*|A[p][q]|, A[q][q]' = A[q][q] + t*|A[p][q]|
+            E tAbsApq = toComplex(t * absApq, field);
+            A[p][p] = field.subtract(app, tAbsApq);
+            A[q][q] = field.add(aqq, tAbsApq);
             A[p][q] = field.zero();
             A[q][p] = field.zero();
 
@@ -104,8 +95,9 @@ public class GenericEigen {
             for (int i = 0; i < n; i++) {
                 E vip = V[i][p];
                 E viq = V[i][q];
-                V[i][p] = field.subtract(field.multiply(cE, vip), field.multiply(sE, viq));
-                V[i][q] = field.add(field.multiply(sConj, vip), field.multiply(cE, viq));
+                // Column p: c*vip - sConj*viq, Column q: sE*vip + c*viq
+                V[i][p] = field.subtract(field.multiply(cE, vip), field.multiply(sConj, viq));
+                V[i][q] = field.add(field.multiply(sE, vip), field.multiply(cE, viq));
             }
         }
 
@@ -121,7 +113,7 @@ public class GenericEigen {
 
     private static <E> E[] flatten(E[][] data, int n, Field<E> field) {
         @SuppressWarnings("unchecked")
-        E[] flat = (E[]) new Object[n * n];
+        E[] flat = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n * n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 flat[i * n + j] = data[i][j];
@@ -193,11 +185,26 @@ public class GenericEigen {
                 res = element;
             }
         }
-        
         if (field.zero() instanceof Complex && res instanceof Real) {
             return (E) Complex.of((Real) res);
         }
         return (E) res;
+    }
+
+    private static double getThreshold(Field<?> field) {
+        Object zero = field.zero();
+        if (zero instanceof Complex) zero = ((Complex) zero).real();
+        
+        if (zero instanceof RealBig) return 1e-60;
+        if (zero instanceof Real) {
+             // Heuristic: check if double precision or single
+             String className = zero.getClass().getName();
+             if (className.contains("NativeRealBig")) return 1e-60;
+             if (className.contains("Double")) return 1e-15;
+             if (className.contains("Float")) return 1e-7;
+             return 1e-15;
+        }
+        return 1e-15;
     }
 }
 
