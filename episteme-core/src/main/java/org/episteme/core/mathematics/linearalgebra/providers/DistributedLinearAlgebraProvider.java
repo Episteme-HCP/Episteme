@@ -10,7 +10,11 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.technical.backend.Backend;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 import org.episteme.core.technical.algorithm.AlgorithmException;
 import com.google.auto.service.AutoService;
 
@@ -108,6 +112,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> add(Vector<E> a, Vector<E> b) {
         return wrap((Vector<E>) executeOnLocal(a.getScalarRing(), p -> p.add(a, b)));
     }
@@ -159,6 +164,7 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             }
         }
         
+        @SuppressWarnings("unchecked")
         Matrix<E> res = (Matrix<E>) (Object) executeOnLocal(a.getScalarRing(), p -> p.multiply(a, b));
         return wrap(res);
     }

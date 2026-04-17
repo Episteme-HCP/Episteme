@@ -2,11 +2,10 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
-import java.nio.DoubleBuffer;
-
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.nio.DoubleBuffer;
 
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.mathematics.sets.Reals;
@@ -123,11 +122,6 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUBLAS_DSCAL;
     private static MethodHandle CUBLAS_DGEAM;
  
-    private static MemorySegment CUBLAS_HANDLE = MemorySegment.NULL;
-    private static MemorySegment CUSPARSE_HANDLE = MemorySegment.NULL;
-    private static MemorySegment CUSOLVER_SP_HANDLE = MemorySegment.NULL;
-
-    // --- CUSOLVER SP METHODS ---
     private static MethodHandle CUSOLVER_SP_CREATE;
     private static MethodHandle CUSOLVER_SP_CREATE_CSRLU_INFO;
     private static MethodHandle CUSOLVER_SP_D_CSRLU_ANALYSIS;
@@ -136,6 +130,10 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUSPARSE_CREATE_MAT_DESCR;
     private static MethodHandle CUSPARSE_SET_MAT_TYPE;
     private static MethodHandle CUSPARSE_SET_MAT_INDEX_BASE;
+
+    private static MemorySegment CUBLAS_HANDLE = MemorySegment.NULL;
+    private static MemorySegment CUSPARSE_HANDLE = MemorySegment.NULL;
+    private static MemorySegment CUSOLVER_SP_HANDLE = MemorySegment.NULL;
 
     // Constants
     private static final int CUSPARSE_INDEX_32BIT = 0;
@@ -372,9 +370,9 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {
         if (!IS_AVAILABLE) return;
         try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
-            long d_A = tracker.track(allocateGPUMemory((long) m * k * 8), this::freeGPUMemory);
-            long d_B = tracker.track(allocateGPUMemory((long) k * n * 8), this::freeGPUMemory);
-            long d_C = tracker.track(allocateGPUMemory((long) m * n * 8), this::freeGPUMemory);
+            long d_A = tracker.track(allocateGPUMemory((long) m * k * 8), h -> freeGPUMemory(h));
+            long d_B = tracker.track(allocateGPUMemory((long) k * n * 8), h -> freeGPUMemory(h));
+            long d_C = tracker.track(allocateGPUMemory((long) m * n * 8), h -> freeGPUMemory(h));
 
             copyToGPU(d_A, A, (long) m * k * 8);
             copyToGPU(d_B, B, (long) k * n * 8);
@@ -430,24 +428,12 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         Real[][] data = new Real[n][n];
         for(int i=0; i<n; i++) for(int j=0; j<n; j++) data[i][j] = a.get(i, j);
         org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<Real> dense = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(data, org.episteme.core.mathematics.sets.Reals.getInstance());
-        NativeCUDADenseLinearAlgebraBackend denseBackend = new NativeCUDADenseLinearAlgebraBackend();
-        return denseBackend.determinant(dense);
+        try (NativeCUDADenseLinearAlgebraBackend denseBackend = new NativeCUDADenseLinearAlgebraBackend()) {
+            return denseBackend.determinant(dense);
+        }
     }
 
-    private org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real> toSparse(Matrix<Real> a) {
-        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) return (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<Real>) a;
-        int rows = a.rows();
-        int cols = a.cols();
-        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<Real> storage = 
-            new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(rows, cols, Real.ZERO);
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                Real val = a.get(i, j);
-                if (!val.isZero()) storage.set(i, j, val);
-            }
-        }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, Reals.getInstance());
-    }
+
 
     @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
@@ -513,11 +499,11 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
         int nnz = a.getNnz();
 
         try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
-            long d_csrRowPtr = tracker.track(allocateGPUMemory((long)(m + 1) * 4), this::freeGPUMemory);
-            long d_csrColIdx = tracker.track(allocateGPUMemory((long)nnz * 4), this::freeGPUMemory);
-            long d_csrVal = tracker.track(allocateGPUMemory((long)nnz * 8), this::freeGPUMemory);
-            long d_B = tracker.track(allocateGPUMemory((long)k * n * 8), this::freeGPUMemory);
-            long d_C = tracker.track(allocateGPUMemory((long)m * n * 8), this::freeGPUMemory);
+            long d_csrRowPtr = tracker.track(allocateGPUMemory((long)(m + 1) * 4), h -> freeGPUMemory(h));
+            long d_csrColIdx = tracker.track(allocateGPUMemory((long)nnz * 4), h -> freeGPUMemory(h));
+            long d_csrVal = tracker.track(allocateGPUMemory((long)nnz * 8), h -> freeGPUMemory(h));
+            long d_B = tracker.track(allocateGPUMemory((long)k * n * 8), h -> freeGPUMemory(h));
+            long d_C = tracker.track(allocateGPUMemory((long)m * n * 8), h -> freeGPUMemory(h));
 
             MemorySegment h_rowPtr = arena.allocateFrom(ValueLayout.JAVA_INT, a.getRowPointers());
             MemorySegment h_colIdx = arena.allocateFrom(ValueLayout.JAVA_INT, a.getColIndices());
@@ -824,7 +810,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
                     int j = 0;
                     for (j = 0; j < maxIter; j++) {
-                        V[j+1] = restartTracker.track(allocateGPUMemory((long) m_rows * 8), this::freeGPUMemory);
+                        V[j+1] = restartTracker.track(allocateGPUMemory((long) m_rows * 8), h -> freeGPUMemory(h));
                         spmv_internal(m_rows, k_cols, nnz_val, d_csrRowPtr, d_csrColIdx, d_csrVal, V[j], V[j+1], arena, restartTracker);
 
                         for (int i = 0; i <= j; i++) {

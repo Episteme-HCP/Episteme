@@ -69,8 +69,15 @@ public class CorrectnessVerifier {
     private static void verifyQR(QRResult<?> actual, QRResult<?> expected, double tolerance) {
         // QR is unique only up to sign flips in Q columns and R rows.
         // We verify the reconstructed product A = Q * R
-        Matrix<?> aActual = ((Matrix)actual.getQ()).multiply((Matrix)actual.getR());
-        Matrix<?> aExpected = ((Matrix)expected.getQ()).multiply((Matrix)expected.getR());
+        Matrix<?> qA = (Matrix<?>) actual.getQ();
+        Matrix<?> rA = (Matrix<?>) actual.getR();
+        Matrix<?> qE = (Matrix<?>) expected.getQ();
+        Matrix<?> rE = (Matrix<?>) expected.getR();
+
+        @SuppressWarnings("unchecked")
+        Matrix<?> aActual = ((Matrix<Object>)qA).multiply((Matrix<Object>)rA);
+        @SuppressWarnings("unchecked")
+        Matrix<?> aExpected = ((Matrix<Object>)qE).multiply((Matrix<Object>)rE);
         verifyMatrix(aActual, aExpected, tolerance);
     }
 
@@ -79,6 +86,20 @@ public class CorrectnessVerifier {
     }
 
     private static void verifyScalar(Object actual, Object expected, double tolerance) {
+        if (actual instanceof RealBig ab && expected instanceof RealBig eb) {
+            java.math.BigDecimal aVal = ab.bigDecimalValue();
+            java.math.BigDecimal eVal = eb.bigDecimalValue();
+            java.math.BigDecimal diff = aVal.subtract(eVal).abs();
+            java.math.BigDecimal norm = aVal.abs().max(eVal.abs()).max(java.math.BigDecimal.ONE);
+            java.math.BigDecimal relError = diff.divide(norm, new java.math.MathContext(64));
+            
+            if (relError.doubleValue() > tolerance) {
+                throw new AssertionError(String.format("Exact Accuracy failure: expected %s but got %s. Error: %s > %e", 
+                    expected, actual, relError, tolerance));
+            }
+            return;
+        }
+
         double a = toDouble(actual);
         double e = toDouble(expected);
         

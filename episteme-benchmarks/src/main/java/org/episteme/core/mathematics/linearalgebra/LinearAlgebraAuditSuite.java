@@ -2,7 +2,6 @@ package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
-import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
@@ -126,10 +125,11 @@ public class LinearAlgebraAuditSuite {
         return Matrix.of(data, ring);
     }
 
+    @SuppressWarnings("unchecked")
     private static <E> E randomElement(Ring<E> ring, Random rand, boolean isComplex) {
         E zero = ring.zero();
         boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) ||
-                         (isComplex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
+                         (isComplex && ((org.episteme.core.mathematics.numbers.complex.Complex)(Object)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
         
         if (isComplex) {
             if (isFloat) {
@@ -145,6 +145,9 @@ public class LinearAlgebraAuditSuite {
         return zero;
     }
 
+
+    // createTriangular - Currently unused but kept for future triangular audit expansion (Suppressed)
+    @SuppressWarnings("unused")
     private static <E> Matrix<E> createTriangular(int n, boolean upper, Ring<E> ring, Random rand) {
         @SuppressWarnings("unchecked")
         E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.one().getClass(), n, n);
@@ -167,11 +170,17 @@ public class LinearAlgebraAuditSuite {
         boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         E large;
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-            large = (E) org.episteme.core.mathematics.numbers.real.RealFloat.of(16.0f);
+            @SuppressWarnings("unchecked")
+            E casted = (E) org.episteme.core.mathematics.numbers.real.RealFloat.of(16.0f);
+            large = casted;
         } else if (ring.zero() instanceof RealBig) {
-             large = (E) RealBig.create(new java.math.BigDecimal("16.0"));
+            @SuppressWarnings("unchecked")
+            E casted = (E) RealBig.create(new java.math.BigDecimal("16.0"));
+            large = casted;
         } else {
-             large = (E) Real.of(16.0);
+            @SuppressWarnings("unchecked")
+            E casted = (E) Real.of(16.0);
+            large = casted;
         }
         
         for (int i = 0; i < n; i++) {

@@ -6,7 +6,6 @@
 package org.episteme.core.mathematics.linearalgebra.matrices.solvers;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.complex.Complex;
@@ -15,7 +14,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixS
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -110,9 +108,13 @@ public class GenericSVD {
         else if (element instanceof Complex) res = ((Complex) element).sqrt();
         
         if (field.zero() instanceof Complex && res instanceof Real) {
-            return (E) Complex.of((Real) res);
+            @SuppressWarnings("unchecked")
+            E casted = (E) Complex.of((Real) res);
+            return casted;
         }
-        return (E) res;
+        @SuppressWarnings("unchecked")
+        E casted = (E) res;
+        return casted;
     }
 
     private static double absValueDouble(Object element, Field<?> field) {

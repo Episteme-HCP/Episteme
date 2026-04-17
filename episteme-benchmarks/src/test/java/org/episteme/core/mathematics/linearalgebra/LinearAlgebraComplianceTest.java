@@ -4,9 +4,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.technical.algorithm.AlgorithmManager;
-import org.episteme.core.technical.algorithm.AlgorithmService;
-import org.episteme.core.technical.algorithm.TestingAlgorithmService;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 
@@ -15,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Universal Linear Algebra Audit Engine.
@@ -77,9 +73,17 @@ public class LinearAlgebraComplianceTest {
             if (prov.isAvailable()) {
                 try {
                     if (mode == PrecisionMode.EXACT) {
-                        runExactAudit(res, (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider) referenceProvider);
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<RealBig> castedProv = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) prov;
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<RealBig> castedRef = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) referenceProvider;
+                        runExactAudit(res, castedProv, castedRef);
                     } else {
-                        runStandardAudit(res, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) referenceProvider);
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<Real> castedProv = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) prov;
+                        @SuppressWarnings("unchecked")
+                        LinearAlgebraProvider<Real> castedRef = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) referenceProvider;
+                        runStandardAudit(res, castedProv, castedRef);
                     }
                 } catch (Throwable t) {
                     System.err.println("Audit failed for " + prov.getName() + ": " + t.getMessage());
@@ -100,13 +104,18 @@ public class LinearAlgebraComplianceTest {
     }
 
     private void runExactAudit(ComplianceResult res, LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> ref) {
+        @SuppressWarnings("unchecked")
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
         double tolerance = 1e-30; // High precision tolerance
         LinearAlgebraAuditSuite.runFullAudit(prov, ref, matrixSize, (op, test) -> auditOp(res, op, test), rbRing, "RB:", tolerance);
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
         if (prov.isCompatible(complexRing)) {
-            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) ref, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<Complex> complexProv = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) prov;
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<Complex> complexRef = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) ref;
+            LinearAlgebraAuditSuite.runFullAudit(complexProv, complexRef, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
         }
     }
 
@@ -120,7 +129,11 @@ public class LinearAlgebraComplianceTest {
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
         if (prov.isCompatible(complexRing)) {
-            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) ref, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<Complex> cProv = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) prov;
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<Complex> cRef = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) ref;
+            LinearAlgebraAuditSuite.runFullAudit(cProv, cRef, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
         }
     }
 
@@ -139,6 +152,7 @@ public class LinearAlgebraComplianceTest {
         Map<String, LinearAlgebraProvider<?>> providers = new TreeMap<>();
         
         // 1. ServiceLoader discovery (Standard SPI)
+        @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> p : loader) providers.put(p.getName(), p);
         
@@ -181,8 +195,12 @@ public class LinearAlgebraComplianceTest {
             String statusReal = totalReal > 0 ? (passReal + "/" + totalReal) : "N/A";
             String statusComplex = totalComplex > 0 ? (passComplex + "/" + totalComplex) : "N/A";
             
-            String overallStatus = r.available ? (passReal > 0 ? "⚠️ Partial" : "❌ Fail") : "🔘 Disabled";
-            if (r.available && passReal == totalReal && passComplex == totalComplex && totalReal > 0) overallStatus = "✅ Ready";
+            String overallStatus;
+            if (!r.available) overallStatus = "🔘 Disabled";
+            else if (totalReal == 0 && totalComplex == 0) overallStatus = "➕ N/A";
+            else if (passReal == totalReal && passComplex == totalComplex) overallStatus = "✅ Ready";
+            else if (passReal > 0 || passComplex > 0) overallStatus = "⚠️ Partial";
+            else overallStatus = "❌ Fail";
             
             sb.append("| ").append(r.providerName).append(" | ").append(r.environment).append(" | ")
               .append(overallStatus).append(" | ").append(statusReal).append(" | ").append(statusComplex).append(" |\n");

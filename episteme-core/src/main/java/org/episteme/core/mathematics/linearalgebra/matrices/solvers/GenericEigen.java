@@ -122,17 +122,7 @@ public class GenericEigen {
         return flat;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <E> E abs(E element, Field<E> field) {
-        Real res = null;
-        if (element instanceof Real) res = ((Real) element).abs();
-        else if (element instanceof Complex) res = ((Complex) element).abs();
-        
-        if (res != null && field.zero() instanceof Complex) {
-            return (E) Complex.of(res);
-        }
-        return (E) res;
-    }
+
 
     private static Class<?> componentType(Field<?> field) {
         Class<?> c = field.zero().getClass();
@@ -141,11 +131,7 @@ public class GenericEigen {
         return c;
     }
 
-    private static boolean isNegative(Object element, Field<?> field) {
-        if (element instanceof Real) return ((Real) element).doubleValue() < 0;
-        if (element instanceof Complex) return ((Complex) element).real() < 0;
-        return false;
-    }
+
 
     private static double absValueDouble(Object element, Field<?> field) {
         if (element instanceof Real) return ((Real) element).doubleValue();
@@ -173,23 +159,7 @@ public class GenericEigen {
         return element;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <E> E sqrt(E element, Field<E> field) {
-        Object res = null;
-        if (element instanceof Real) res = ((Real) element).sqrt();
-        else if (element instanceof Complex) res = ((Complex) element).sqrt();
-        else {
-            try {
-                res = element.getClass().getMethod("sqrt").invoke(element);
-            } catch (Exception e) {
-                res = element;
-            }
-        }
-        if (field.zero() instanceof Complex && res instanceof Real) {
-            return (E) Complex.of((Real) res);
-        }
-        return (E) res;
-    }
+
 
     private static double getThreshold(Field<?> field) {
         Object zero = field.zero();

@@ -11,13 +11,13 @@ import java.nio.DoubleBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import org.episteme.core.mathematics.context.MathContext;
 
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
@@ -101,14 +101,17 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     private static MethodHandle CUSOLVER_ZHEEVD;
     private static MethodHandle CUSOLVER_ZPOTRF_BUFFER_SIZE;
     private static MethodHandle CUSOLVER_ZPOTRF;
+    private static MethodHandle CUBLAS_SGEMM;
+    private static MethodHandle CUBLAS_SGEAM;
+    private static MethodHandle CUBLAS_SDOT;
+    private static MethodHandle CUBLAS_SNRM2;
     private static MethodHandle CUDA_GET_DEVICE_COUNT;
     private static MethodHandle CUDA_GET_ERROR_STRING;
-    private static MethodHandle CUBLAS_STATUS_GET_STRING;
     private static MethodHandle CU_CTX_GET_CURRENT;
     private static MethodHandle CU_CTX_GET_DEVICE;
+    private static MethodHandle CUBLAS_STATUS_GET_STRING;
 
     // Constants
-    private static final int CUBLAS_OP_N = 0;
     private static final int CUDA_MEMCPY_HOST_TO_DEVICE = 1;
     private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
 
@@ -155,7 +158,6 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             // Bind basic symbols
             CUDA_GET_DEVICE_COUNT = lookup(cudart, "cudaGetDeviceCount", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             CUDA_GET_ERROR_STRING = lookup(cudart, "cudaGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
-            CUBLAS_STATUS_GET_STRING = lookup(cublas_lookup, "cublasGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
             // Try loading CUDA driver
             Optional<SymbolLookup> cudaDrvOpt = NativeFFMLoader.loadLibrary("cuda", Arena.global());
@@ -220,8 +222,28 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             CUBLAS_DDOT = lookup(cublas_lookup, "cublasDdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUBLAS_DNRM2 = lookup(cublas_lookup, "cublasDnrm2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            CUBLAS_SGEMM = lookup(cublas_lookup, "cublasSgemm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+            ));
+
+            CUBLAS_SGEAM = lookup(cublas_lookup, "cublasSgeam_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                ValueLayout.JAVA_INT
+            ));
+
+            CUBLAS_SDOT = lookup(cublas_lookup, "cublasSdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUBLAS_SNRM2 = lookup(cublas_lookup, "cublasSnrm2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
 
             CUBLAS_ZGEMM = lookup(cublas_lookup, "cublasZgemm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -239,6 +261,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             ));
             CUBLAS_ZDOTU = lookup(cublas_lookup, "cublasZdotu_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+            CUBLAS_STATUS_GET_STRING = lookup(cublas_lookup, "cublasGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+            if (CUBLAS_STATUS_GET_STRING == null) CUBLAS_STATUS_GET_STRING = lookup(cublas_lookup, "cublasGetErrorString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
             // cuSolver Core
             CUSOLVER_CREATE = lookup(cusolver_lookup, "cusolverDnCreate", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
@@ -290,6 +315,9 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             CUSOLVER_ZORGQR = lookup(cusolver_lookup, "cusolverDnZungqr", FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
+            CUBLAS_SNRM2 = lookup(cublas_lookup, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
             CUSOLVER_ZGESVD_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnZgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             CUSOLVER_ZGESVD = lookup(cusolver_lookup, "cusolverDnZgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT,
@@ -305,6 +333,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             CUSOLVER_ZPOTRF = lookup(cusolver_lookup, "cusolverDnZpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
 
             IS_AVAILABLE = true;
             logger.info("Native CUDA/cuBLAS/cuSolver Backend initialized successfully.");
@@ -418,18 +447,34 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         if (k != b.rows()) throw new IllegalArgumentException("Dimension mismatch");
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-            MemorySegment d_A = malloc((long) m * k * 8, tracker);
-            MemorySegment d_B = malloc((long) k * n * 8, tracker);
-            MemorySegment d_C = malloc((long) m * n * 8, tracker);
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) m * k * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b)), (long) k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-            MemorySegment handle = createCublasHandle(tracker);
-            checkCublas((int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0), d_C, n));
-            double[] h_C = new double[m * n];
-            MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
-            checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C, (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
-            MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
-            return fromDoubleArray(h_C, m, n);
+            boolean isFloat = a.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat;
+            int elementSize = isFloat ? 4 : 8;
+            
+            MemorySegment d_A = malloc((long) m * k * elementSize, tracker);
+            MemorySegment d_B = malloc((long) k * n * elementSize, tracker);
+            MemorySegment d_C = malloc((long) m * n * elementSize, tracker);
+            
+            if (isFloat) {
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) m * k * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b)), (long) k * n * 4, CUDA_MEMCPY_HOST_TO_DEVICE));
+                MemorySegment handle = createCublasHandle(tracker);
+                checkCublas((int) CUBLAS_SGEMM.invokeExact(handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f), d_C, n));
+                float[] h_C = new float[m * n];
+                MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C, (long) m * n * 4, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, h_C, 0, m * n);
+                return fromFloatArray(h_C, m, n);
+            } else {
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) m * k * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b)), (long) k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+                MemorySegment handle = createCublasHandle(tracker);
+                checkCublas((int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0), d_C, n));
+                double[] h_C = new double[m * n];
+                MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+                checkCuda((int) CUDA_MEMCPY.invokeExact(segC, d_C, (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+                MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
+                return fromDoubleArray(h_C, m, n);
+            }
         } catch (Throwable t) { throw new RuntimeException("CUDA multiply failed", t); }
     }
 
@@ -885,7 +930,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     }
 
     private CholeskyResult<Real> choleskyComplex(Matrix<Real> a) {
-        int n = a.rows(); if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment handle = createCusolverHandle(tracker);
@@ -907,7 +952,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
                 if (r >= c) lMatrixData[r][c] = (Real)(Object)org.episteme.core.mathematics.numbers.complex.Complex.of(h_L[(c * n + r) * 2], h_L[(c * n + r) * 2 + 1]);
                 else lMatrixData[r][c] = (Real)(Object)org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
             }
-            return new CholeskyResult<>(Matrix.of(lMatrixData, Reals.getInstance()));
+            return new CholeskyResult<>(Matrix.of(lMatrixData, a.getScalarRing()));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex Cholesky failed", t); }
     }
 
@@ -1099,6 +1144,17 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             else { d[i * 2] = val.doubleValue(); d[i * 2 + 1] = 0.0; }
         }
         return d;
+    }
+
+    private float[] toFloatArray(Matrix<Real> m) {
+        int r = m.rows(); int c = m.cols(); float[] f = new float[r * c];
+        for (int i = 0; i < r; i++) for (int j = 0; j < c; j++) f[i * c + j] = m.get(i, j).floatValue();
+        return f;
+    }
+
+    private Matrix<Real> fromFloatArray(float[] data, int rows, int cols) {
+        Real[] reals = new Real[data.length]; for (int i = 0; i < data.length; i++) reals[i] = Real.of(data[i]);
+        return new DenseMatrix<>(reals, rows, cols, Reals.getInstance());
     }
 
 

@@ -133,9 +133,13 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
             
             Object zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float)theta);
+                @SuppressWarnings("unchecked")
+                E result = (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float)theta);
+                return result;
             }
-            return (E) org.episteme.core.mathematics.numbers.real.Real.of(theta);
+            @SuppressWarnings("unchecked")
+            E result = (E) org.episteme.core.mathematics.numbers.real.Real.of(theta);
+            return result;
         }
         
         // Complex angle or fallback

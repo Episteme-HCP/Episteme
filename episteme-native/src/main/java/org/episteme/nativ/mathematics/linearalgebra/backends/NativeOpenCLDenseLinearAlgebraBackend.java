@@ -76,6 +76,11 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel vecNormKernel;
     private static cl_kernel hestenesDotKernel;
     private static cl_kernel hestenesApplyKernel;
+    private static cl_kernel matMulFloatKernel;
+    private static cl_kernel vecAddFloatKernel;
+    private static cl_kernel vecSubFloatKernel;
+    private static cl_kernel vecScaleFloatKernel;
+    private static cl_kernel transposeFloatKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -128,6 +133,21 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
         "    }\n" +
         "}\n" +
         "__kernel void transpose(__global const double *a, __global double *b, const int rows, const int cols) {\n" +
+        "    int r = get_global_id(1); int c = get_global_id(0);\n" +
+        "    if (r < rows && c < cols) b[c * rows + r] = a[r * cols + c];\n" +
+        "}\n" +
+        "__kernel void matrixMultiplyFloat(__global const float *a, __global const float *b, __global float *c, const int m, const int n, const int k) {\n" +
+        "    int row = get_global_id(1); int col = get_global_id(0);\n" +
+        "    if (row < m && col < n) {\n" +
+        "        float sum = 0.0f;\n" +
+        "        for (int i = 0; i < k; i++) sum += a[row*k+i] * b[i*n+col];\n" +
+        "        c[row*n+col] = sum;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void vecAddFloat(__global const float *a, __global const float *b, __global float *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) c[i] = a[i] + b[i];\n" +
+        "}\n" +
+        "__kernel void transposeFloat(__global const float *a, __global float *b, const int rows, const int cols) {\n" +
         "    int r = get_global_id(1); int c = get_global_id(0);\n" +
         "    if (r < rows && c < cols) b[c * rows + r] = a[r * cols + c];\n" +
         "}\n" +
@@ -346,6 +366,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             complexVecDotPartialKernel = clCreateKernel(program, "complexVecDotPartial", null);
             hestenesDotKernel = clCreateKernel(program, "hestenes_jacobi_dot", null);
             hestenesApplyKernel = clCreateKernel(program, "hestenes_jacobi_apply", null);
+            matMulFloatKernel = clCreateKernel(program, "matrixMultiplyFloat", null);
+            vecAddFloatKernel = clCreateKernel(program, "vecAddFloat", null);
+            transposeFloatKernel = clCreateKernel(program, "transposeFloat", null);
 
             initialized = true;
             logger.info("Native OpenCL Dense Backend initialized successfully.");

@@ -216,7 +216,6 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      * @return this x other
      * @throws ArithmeticException if dimensions are not 3
      */
-    @SuppressWarnings("unchecked")
     default Vector<E> cross(Vector<E> other) {
         return getProvider().cross(this, other);
     }
@@ -227,7 +226,6 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      * @param other the other vector
      * @return the angle in radians (or appropriate unit)
      */
-    @SuppressWarnings("unchecked")
     default E angle(Vector<E> other) {
         return getProvider().angle(this, other);
     }
@@ -238,7 +236,6 @@ public interface Vector<E> extends Module<Vector<E>, E> {
      * @param other the vector to project onto
      * @return proj_other(this)
      */
-    @SuppressWarnings("unchecked")
     default Vector<E> projection(Vector<E> other) {
         return getProvider().projection(this, other);
     }

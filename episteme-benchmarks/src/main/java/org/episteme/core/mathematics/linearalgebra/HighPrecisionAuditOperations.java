@@ -551,10 +551,11 @@ public class HighPrecisionAuditOperations {
     private static Matrix<RealBig> createRealBigMatrix(RealBig val, int rows, int cols, LinearAlgebraProvider<RealBig> p) {
         RealBig[][] data = new RealBig[rows][cols];
         for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) data[i][j] = RealBig.create(val.bigDecimalValue().add(new BigDecimal(i + j)));
-        return Matrix.of(data, (Ring<RealBig>) (Ring) org.episteme.core.mathematics.numbers.real.RealBig.ZERO.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
+        return Matrix.of(data, rbRing);
     }
 
-    @SuppressWarnings("unchecked")
     private static Matrix<RealBig> createRealBigMatrix(RealBig val, int n, LinearAlgebraProvider<RealBig> p) {
         return createRealBigMatrix(val, n, n, p);
     }
@@ -570,45 +571,46 @@ public class HighPrecisionAuditOperations {
     private static Matrix<RealBig> createInvertibleRealBigMatrix(int n, LinearAlgebraProvider<RealBig> p) {
         RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = RealBig.create(i == j ? new BigDecimal(n + i) : new BigDecimal("0.1"));
-        return Matrix.of(data, (Ring<RealBig>) (Ring) org.episteme.core.mathematics.numbers.real.RealBig.ZERO.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
+        return Matrix.of(data, rbRing);
     }
     @SuppressWarnings("unchecked")
     private static Matrix<RealBig> createSPDRealBigMatrix(int n, LinearAlgebraProvider<RealBig> p) {
         RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = RealBig.create(new BigDecimal(i == j ? n * 3.0 : 0.1));
-        return Matrix.of(data, (Ring<RealBig>) (Ring) org.episteme.core.mathematics.numbers.real.RealBig.ZERO.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
+        return Matrix.of(data, rbRing);
     }
     @SuppressWarnings("unchecked")
     private static Vector<RealBig> createRealBigVector(RealBig val, int n, LinearAlgebraProvider<RealBig> p) {
         RealBig[] data = new RealBig[n];
         for (int i = 0; i < n; i++) data[i] = RealBig.create(val.bigDecimalValue().add(new BigDecimal(i)));
-        return Vector.of(data, (Ring<RealBig>) (Ring) org.episteme.core.mathematics.numbers.real.RealBig.ZERO.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
+        return Vector.of(data, rbRing);
     }
 
-    @SuppressWarnings("unchecked")
     private static Matrix<Complex> createComplexMatrix(Complex z, int rows, int cols, LinearAlgebraProvider<Complex> p) {
         Complex[][] data = new Complex[rows][cols];
         for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) data[i][j] = Complex.of(z.getReal().doubleValue() + i, z.getImaginary().doubleValue() + j);
         return Matrix.of(data, Complex.of(0, 0).getScalarRing());
     }
 
-    @SuppressWarnings("unchecked")
     private static Matrix<Complex> createComplexMatrix(Complex z, int n, LinearAlgebraProvider<Complex> p) {
         return createComplexMatrix(z, n, n, p);
     }
-    @SuppressWarnings("unchecked")
     private static Matrix<Complex> createInvertibleComplexMatrix(int n, LinearAlgebraProvider<Complex> p) {
         Complex[][] data = new Complex[n][n];
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = Complex.of(i == j ? n + i : 0.1, 0.1);
         return Matrix.of(data, Complex.of(0, 0).getScalarRing());
     }
-    @SuppressWarnings("unchecked")
     private static Matrix<Complex> createSPDComplexMatrix(int n, LinearAlgebraProvider<Complex> p) {
         Complex[][] data = new Complex[n][n];
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = Complex.of(i == j ? n * 3.0 : 0.1, 0);
         return Matrix.of(data, Complex.of(0, 0).getScalarRing());
     }
-    @SuppressWarnings("unchecked")
     private static Vector<Complex> createComplexVector(Complex z, int n, LinearAlgebraProvider<Complex> p) {
         Complex[] data = new Complex[n];
         for (int i = 0; i < n; i++) data[i] = Complex.of(z.getReal().doubleValue() + i, z.getImaginary().doubleValue());

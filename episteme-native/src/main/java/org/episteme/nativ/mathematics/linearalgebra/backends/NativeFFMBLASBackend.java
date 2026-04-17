@@ -8,6 +8,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
@@ -18,7 +19,6 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import com.google.auto.service.AutoService;
-import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
@@ -26,8 +26,8 @@ import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.Optional;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     // CBLAS Layout Constants
     private static final int CblasRowMajor = 101;
     private static final int CblasNoTrans = 111;
-    // private static final int CblasTrans = 112;
 
     // BLAS Method Handles
     private static MethodHandle SGEMM;
@@ -438,14 +437,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 ZPOTRS = findLapackSymbol("LAPACKE_zpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
 
                 // Eigen
-                FunctionDescriptor dsyevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE,
-                        ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
-                        AddressLayout.ADDRESS
-                );
-                DSYEV = findLapackSymbol("LAPACKE_dsyev")
-                    .map(s -> LINKER.downcallHandle(s, dsyevDesc)).orElse(null);
-
                 // Eigen
                 FunctionDescriptor syevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE,
@@ -692,14 +683,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         
         if (DOMATCOPY != null) {
             org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix res = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.direct(n, m);
-            try (Arena arena = Arena.ofConfined()) {
-                double[] arrA = toDoubleArray(a);
-                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
-                MemorySegment segC = MemorySegment.ofBuffer(res.getBuffer());
-                @SuppressWarnings("unchecked")
-                Matrix<E> casted = (Matrix<E>) (Matrix<?>) res;
-                return casted;
-            }
+            @SuppressWarnings("unchecked")
+            Matrix<E> casted = (Matrix<E>) (Matrix<?>) res;
+            return casted;
         }
 
         throw new UnsupportedOperationException(getName() + ": transpose() failed or not available");
@@ -1004,6 +990,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     float[] sArr = s.toArray(ValueLayout.JAVA_FLOAT);
                     List<E> sList = new ArrayList<>(k);
                     for (float v : sArr) sList.add((E) (Object) Real.of((double)v));
+                    @SuppressWarnings("unchecked")
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_FLOAT), m, m, a);
                     float[] vtArr = vt.toArray(ValueLayout.JAVA_FLOAT);
@@ -1026,6 +1013,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     double[] sArr = s.toArray(ValueLayout.JAVA_DOUBLE);
                     List<E> sList = new ArrayList<>(k);
                     for (double v : sArr) sList.add((E) (Object) Real.of(v));
+                    @SuppressWarnings("unchecked")
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_DOUBLE), m, m, a);
                     double[] vtArr = vt.toArray(ValueLayout.JAVA_DOUBLE);
@@ -1050,6 +1038,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     float[] sArr = s.toArray(ValueLayout.JAVA_FLOAT);
                     List<E> sList = new ArrayList<>(k);
                     for (float v : sArr) sList.add((E) (Object) Real.of((double)v));
+                    @SuppressWarnings("unchecked")
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_FLOAT), m, m, a);
                     float[] vtArr = vt.toArray(ValueLayout.JAVA_FLOAT);
@@ -1069,6 +1058,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                     double[] sArr = s.toArray(ValueLayout.JAVA_DOUBLE);
                     List<E> sList = new ArrayList<>(k);
                     for (double v : sArr) sList.add((E) (Object) Real.of(v));
+                    @SuppressWarnings("unchecked")
                     Vector<E> S = new DenseVector<>(sList, (Ring<E>) a.getScalarRing());
                     Matrix<E> U = createDenseMatrix(u.toArray(ValueLayout.JAVA_DOUBLE), m, m, a);
                     double[] vtArr = vt.toArray(ValueLayout.JAVA_DOUBLE);
@@ -1739,7 +1729,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
 
         MemorySegment segX;
         Arena resultArena = Arena.ofAuto();
-        try (Arena tempArena = Arena.ofConfined()) {
+        try {
             segX = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(vector));
             NativeSafe.invoke(DSCAL, n, s, segX, 1);
         } catch (Throwable t) { throw new RuntimeException("DSCAL failed", t); }
@@ -2102,7 +2092,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
 
         MemorySegment segX;
         Arena resultArena = Arena.ofAuto();
-        try (Arena tempArena = Arena.ofConfined()) {
+        try {
             segX = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             NativeSafe.invoke(DSCAL, m * n, s, segX, 1);
         } catch (Throwable t) { throw new RuntimeException("DSCAL failed", t); }

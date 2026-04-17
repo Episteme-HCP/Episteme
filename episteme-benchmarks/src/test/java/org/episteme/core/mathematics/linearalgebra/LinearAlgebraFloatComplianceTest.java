@@ -1,12 +1,8 @@
 package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.technical.algorithm.AlgorithmManager;
-import org.episteme.core.technical.algorithm.AlgorithmService;
-import org.episteme.core.technical.algorithm.TestingAlgorithmService;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 
@@ -15,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Universal Linear Algebra Float Audit Engine.
@@ -67,7 +62,11 @@ public class LinearAlgebraFloatComplianceTest {
             
             if (prov.isAvailable()) {
                 try {
-                    runFloatAuditInternal(res, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Real>) (LinearAlgebraProvider) referenceProvider, matrixSize);
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<Real> realProv = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) prov;
+                    @SuppressWarnings("unchecked")
+                    LinearAlgebraProvider<Real> realRef = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) referenceProvider;
+                    runFloatAuditInternal(res, realProv, realRef, matrixSize);
                 } catch (Throwable t) {
                     System.err.println("Audit failed for " + prov.getName() + ": " + t.getMessage());
                     t.printStackTrace();
@@ -87,7 +86,11 @@ public class LinearAlgebraFloatComplianceTest {
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
         if (prov.isCompatible(complexRing)) {
-            LinearAlgebraAuditSuite.runFullAudit((LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) prov, (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider) ref, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<Complex> complexProv = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) prov;
+            @SuppressWarnings("unchecked")
+            LinearAlgebraProvider<Complex> complexRef = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) ref;
+            LinearAlgebraAuditSuite.runFullAudit(complexProv, complexRef, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
         }
     }
 
@@ -104,6 +107,7 @@ public class LinearAlgebraFloatComplianceTest {
 
     private List<LinearAlgebraProvider<?>> discoverAllProviders() {
         Map<String, LinearAlgebraProvider<?>> providers = new TreeMap<>();
+        @SuppressWarnings("rawtypes")
         ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
         for (LinearAlgebraProvider<?> p : loader) providers.put(p.getName(), p);
         

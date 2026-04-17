@@ -798,7 +798,9 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                     float[] cData = cSeg.toArray(ValueLayout.JAVA_FLOAT);
                     org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(cData[i]);
-                    return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (E[])resData), this, ring);
+                    @SuppressWarnings("unchecked")
+                    E[] castedRes = (E[]) resData;
+                    return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, castedRes), this, ring);
                 }
             }
             if (!AVAILABLE || DGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
@@ -830,7 +832,9 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                     float[] result = cSeg.toArray(ValueLayout.JAVA_FLOAT);
                     org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i+1]));
-                    return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (E[])resData), this, ring);
+                    @SuppressWarnings("unchecked")
+                    E[] castedRes = (E[]) resData;
+                    return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, castedRes), this, ring);
                 }
             }
             if (!AVAILABLE || ZGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
@@ -847,7 +851,9 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                 double[] result = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                 for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(result[2*i], result[2*i+1]);
-                return (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (org.episteme.core.mathematics.numbers.complex.Complex[])resData), (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)org.episteme.core.mathematics.sets.Complexes.getInstance());
+                @SuppressWarnings("unchecked")
+                Matrix<E> typedRes = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (org.episteme.core.mathematics.numbers.complex.Complex[])resData), (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)org.episteme.core.mathematics.sets.Complexes.getInstance());
+                return typedRes;
             }
         }
         return LinearAlgebraProvider.super.multiply(a, b);
@@ -896,6 +902,7 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
             }
         }
         
+        @SuppressWarnings("unchecked")
         Matrix<E> vSInv = multiply(svd.V(), (Matrix<E>)(Object)sInv);
         Matrix<E> uT = transpose(svd.U());
         return multiply(vSInv, uT);

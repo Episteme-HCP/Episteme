@@ -143,11 +143,22 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     }
 
     private INDArray toINDArray(Matrix<Real> m) {
-        if (m instanceof RealDoubleMatrix) {
-            RealDoubleMatrix rdm = (RealDoubleMatrix) m;
-            // Use explicit 'c' ordering (row-major) to match RealDoubleMatrix.toDoubleArray()
+        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rdm = (org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) m;
             return Nd4j.create(rdm.toDoubleArray(), new int[]{m.rows(), m.cols()}, 'c');
         }
+        
+        // Float path optimization
+        if (m.toString().contains("Float") || (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat)) {
+             float[] data = new float[m.rows() * m.cols()];
+             for(int r=0; r<m.rows(); r++) {
+                 for(int c=0; c<m.cols(); c++) {
+                     data[r*m.cols() + c] = m.get(r,c).floatValue();
+                 }
+             }
+             return Nd4j.create(data, new int[]{m.rows(), m.cols()}, 'c');
+        }
+
         double[][] data = new double[m.rows()][m.cols()];
         for(int r=0; r<m.rows(); r++) {
             for(int c=0; c<m.cols(); c++) {

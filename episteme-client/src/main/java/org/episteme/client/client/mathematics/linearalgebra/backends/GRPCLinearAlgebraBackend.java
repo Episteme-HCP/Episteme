@@ -66,7 +66,6 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 @AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.class, org.episteme.core.technical.backend.ComputeBackend.class, Backend.class})
-@SuppressWarnings("rawtypes")
 public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E>, LinearAlgebraBackend<E> {
     
     private ManagedChannel channel;

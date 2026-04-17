@@ -6,15 +6,13 @@
 package org.episteme.core.mathematics.linearalgebra.matrices;
 
 import jdk.incubator.vector.FloatVector;
-import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
-import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
 
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealFloatMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
@@ -50,8 +48,13 @@ public class SIMDRealFloatMatrix extends GenericMatrix<Real> implements AutoClos
     }
     
     public SIMDRealFloatMatrix(int rows, int cols, float[] data) {
+        @SuppressWarnings("unchecked")
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider = 
+            (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>) 
+            AlgorithmManager.getProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class);
+            
         super(new HeapRealFloatMatrixStorage(data, rows, cols),
-              new CPUDenseLinearAlgebraProvider<>((org.episteme.core.mathematics.structures.rings.Field<Real>) Reals.getInstance()),
+              provider,
               Reals.getInstance());
         this.data = data;
     }
@@ -171,7 +174,7 @@ public class SIMDRealFloatMatrix extends GenericMatrix<Real> implements AutoClos
             res[i] = acc.reduceLanes(jdk.incubator.vector.VectorOperators.ADD);
             for (; j < storage.cols(); j++) res[i] += data[rowOffset + j] * bData[j];
         }
-        return (Vector<Real>)(Object) org.episteme.core.mathematics.linearalgebra.vectors.RealFloatVector.of(res);
+        return (Vector<Real>) org.episteme.core.mathematics.linearalgebra.vectors.RealFloatVector.of(res);
     }
     
     @Override public Matrix<Real> negate() { 
