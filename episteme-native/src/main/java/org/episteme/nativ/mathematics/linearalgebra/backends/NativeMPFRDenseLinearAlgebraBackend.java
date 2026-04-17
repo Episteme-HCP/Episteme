@@ -16,7 +16,6 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -133,23 +132,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         }
     }
 
-    private static void trackArray(ResourceTracker tracker, MemorySegment p, int n) {
-        if (p != null && !p.equals(MemorySegment.NULL)) {
-            tracker.track(p, s -> {
-                if (!s.scope().isAlive()) return;
-                for (int i = 0; i < n; i++) {
-                    try {
-                        if (s.scope().isAlive()) {
-                            MemorySegment slice = s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                            NativeSafe.invoke(MPFR_CLEAR, slice);
-                        }
-                    } catch (Throwable t) {
-                        // Ignore
-                    }
-                }
-            });
-        }
-    }
 
     private static long getPrecision() {
         org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
@@ -161,6 +143,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
         checkDimensionsDot(a, b);
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
@@ -224,6 +207,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
@@ -449,6 +433,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         return vec.asSlice(index * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<E> backToVector_internal(MemorySegment h_Vec, int n, Arena arena, org.episteme.core.mathematics.structures.rings.Ring<E> ring, boolean isComplex) throws Throwable {
         try {
             java.util.List<E> list = new java.util.ArrayList<E>(n);
@@ -650,6 +635,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<E> backToMatrix_internal(MemorySegment h_Mat, int rows, int cols, Arena arena, org.episteme.core.mathematics.structures.rings.Ring<E> ring, boolean isComplex) throws Throwable {
         org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(rows, cols, (E)ring.zero());
@@ -834,6 +820,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     @Override public Matrix<E> cbrt(Matrix<E> a) { return applyTranscendental(a, "cbrt"); }
     @Override public Matrix<E> pow(Matrix<E> a, E exponent) { return applyTranscendental(a, "pow", exponent); }
 
+    @SuppressWarnings("unchecked")
     public Matrix<E> applyTranscendental(Matrix<E> a, String op, Object... args) {
         if (op.equals("pow")) return executePow(a, (E) args[0]);
         int rows = a.rows();
@@ -972,7 +959,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         return solveSquare(a, b);
     }
 
-    @SuppressWarnings("unchecked")
     private Vector<E> solveSquare(Matrix<E> a, Vector<E> b) {
         if (a.rows() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         int n = a.rows();

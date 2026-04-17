@@ -76,11 +76,6 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
     private static cl_kernel vecNormKernel;
     private static cl_kernel hestenesDotKernel;
     private static cl_kernel hestenesApplyKernel;
-    private static cl_kernel matMulFloatKernel;
-    private static cl_kernel vecAddFloatKernel;
-    private static cl_kernel vecSubFloatKernel;
-    private static cl_kernel vecScaleFloatKernel;
-    private static cl_kernel transposeFloatKernel;
     private static cl_program program;
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
@@ -366,9 +361,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend implements LinearAlgebraProvi
             complexVecDotPartialKernel = clCreateKernel(program, "complexVecDotPartial", null);
             hestenesDotKernel = clCreateKernel(program, "hestenes_jacobi_dot", null);
             hestenesApplyKernel = clCreateKernel(program, "hestenes_jacobi_apply", null);
-            matMulFloatKernel = clCreateKernel(program, "matrixMultiplyFloat", null);
-            vecAddFloatKernel = clCreateKernel(program, "vecAddFloat", null);
-            transposeFloatKernel = clCreateKernel(program, "transposeFloat", null);
+
 
             initialized = true;
             logger.info("Native OpenCL Dense Backend initialized successfully.");

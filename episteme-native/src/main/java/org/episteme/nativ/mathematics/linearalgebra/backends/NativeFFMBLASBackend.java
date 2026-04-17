@@ -799,6 +799,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> A) {
          if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": determinant() not available");
          int n = A.rows();
@@ -964,6 +965,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public SVDResult<E> svd(Matrix<E> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": svd() not available");
         int m = a.rows();
@@ -1075,6 +1077,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public EigenResult<E> eigen(Matrix<E> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": eigen() not available");
         int n = a.rows();
@@ -1515,6 +1518,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": dot() not available");
         int n = a.dimension();
@@ -1558,6 +1562,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
     
     @Override
+    @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": norm() not available");
         int n = a.dimension();
@@ -1737,6 +1742,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
 
+    @SuppressWarnings("unchecked")
     public Vector<E> divide(Vector<E> v, E scalar) {
         if (isComplex(v)) {
             org.episteme.core.mathematics.numbers.complex.Complex sc = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) scalar;

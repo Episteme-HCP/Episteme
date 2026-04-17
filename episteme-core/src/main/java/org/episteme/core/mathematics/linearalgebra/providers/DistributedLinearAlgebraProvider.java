@@ -112,7 +112,6 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> add(Vector<E> a, Vector<E> b) {
         return wrap((Vector<E>) executeOnLocal(a.getScalarRing(), p -> p.add(a, b)));
     }
@@ -164,7 +163,6 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             }
         }
         
-        @SuppressWarnings("unchecked")
         Matrix<E> res = (Matrix<E>) (Object) executeOnLocal(a.getScalarRing(), p -> p.multiply(a, b));
         return wrap(res);
     }

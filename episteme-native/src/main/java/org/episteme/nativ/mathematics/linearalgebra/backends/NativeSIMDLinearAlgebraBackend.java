@@ -31,7 +31,6 @@ import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorSpecies;
 import static jdk.incubator.vector.VectorOperators.*;
 import org.episteme.core.mathematics.context.MathContext;
-import org.episteme.core.mathematics.context.MathContext.RealPrecision;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealFloatVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
@@ -693,29 +692,50 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     private Matrix<Complex> executeComplexAdd(Matrix<Complex> a, Matrix<Complex> b) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).add(b.get(i, j));
-        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
+        return Matrix.of(res, ring);
     }
 
     private Matrix<Complex> executeComplexSubtract(Matrix<Complex> a, Matrix<Complex> b) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).subtract(b.get(i, j));
-        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
+        return Matrix.of(res, ring);
     }
 
     private Matrix<Complex> executeComplexMultiply(Matrix<Complex> a, Matrix<Complex> b) {
-        return new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Complex>().multiply(a, b);
+        int rows = a.rows();
+        int cols = b.cols();
+        int kSize = a.cols();
+        Complex[][] res = new Complex[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Complex sum = Complex.ZERO;
+                for (int k = 0; k < kSize; k++) {
+                    sum = sum.add(a.get(i, k).multiply(b.get(i, k)));
+                }
+                res[i][j] = sum;
+            }
+        }
+        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
     }
 
     private Matrix<Complex> executeComplexScale(Complex s, Matrix<Complex> a) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = s.multiply(a.get(i, j));
-        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
+        return Matrix.of(res, ring);
     }
 
     private Matrix<Complex> executeComplexTranspose(Matrix<Complex> a) {
         Complex[][] res = new Complex[a.cols()][a.rows()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[j][i] = a.get(i, j);
-        return Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+        @SuppressWarnings("unchecked")
+        Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
+        return Matrix.of(res, ring);
     }
 
     private Vector<Complex> executeComplexVectorAdd(Vector<Complex> a, Vector<Complex> b) {

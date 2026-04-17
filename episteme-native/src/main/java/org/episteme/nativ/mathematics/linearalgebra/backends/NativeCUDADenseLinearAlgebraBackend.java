@@ -7,7 +7,6 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
-import java.nio.DoubleBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -33,7 +32,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResu
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
-import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.auto.service.AutoService;
@@ -102,9 +100,6 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
     private static MethodHandle CUSOLVER_ZPOTRF_BUFFER_SIZE;
     private static MethodHandle CUSOLVER_ZPOTRF;
     private static MethodHandle CUBLAS_SGEMM;
-    private static MethodHandle CUBLAS_SGEAM;
-    private static MethodHandle CUBLAS_SDOT;
-    private static MethodHandle CUBLAS_SNRM2;
     private static MethodHandle CUDA_GET_DEVICE_COUNT;
     private static MethodHandle CUDA_GET_ERROR_STRING;
     private static MethodHandle CU_CTX_GET_CURRENT;
@@ -230,20 +225,6 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT
             ));
 
-            CUBLAS_SGEAM = lookup(cublas_lookup, "cublasSgeam_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
-                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
-                ValueLayout.JAVA_INT
-            ));
-
-            CUBLAS_SDOT = lookup(cublas_lookup, "cublasSdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
-            CUBLAS_SNRM2 = lookup(cublas_lookup, "cublasSnrm2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-
 
             CUBLAS_ZGEMM = lookup(cublas_lookup, "cublasZgemm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -315,7 +296,7 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
             CUSOLVER_ZORGQR = lookup(cusolver_lookup, "cusolverDnZungqr", FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-            CUBLAS_SNRM2 = lookup(cublas_lookup, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            CUBLAS_DNRM2 = lookup(cublas_lookup, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
                 ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
             CUSOLVER_ZGESVD_BUFFER_SIZE = lookup(cusolver_lookup, "cusolverDnZgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT,
@@ -1227,14 +1208,13 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
 
     @Override
     public long allocateGPUMemory(long sizeBytes) {
-        try (ResourceTracker tracker = new ResourceTracker()) { // Dummy tracker, we return handle
-             // This is a bit awkward as GPUBackend returns long, but we usually track differently
-             // For compliance with GPUBackend, we'll return the raw address
-             try (Arena temp = Arena.ofConfined()) {
-                MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
-                checkCuda((int) CUDA_MALLOC.invokeExact(p, sizeBytes));
-                return p.get(ValueLayout.ADDRESS, 0).address();
-             } catch (Throwable t) { throw new RuntimeException(t); }
+        // We return address directly for GPUBackend compliance, no tracking
+        try (Arena temp = Arena.ofConfined()) {
+            MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) CUDA_MALLOC.invokeExact(p, sizeBytes));
+            return p.get(ValueLayout.ADDRESS, 0).address();
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         }
     }
 

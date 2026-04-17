@@ -551,7 +551,6 @@ public class HighPrecisionAuditOperations {
     private static Matrix<RealBig> createRealBigMatrix(RealBig val, int rows, int cols, LinearAlgebraProvider<RealBig> p) {
         RealBig[][] data = new RealBig[rows][cols];
         for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) data[i][j] = RealBig.create(val.bigDecimalValue().add(new BigDecimal(i + j)));
-        @SuppressWarnings("unchecked")
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
         return Matrix.of(data, rbRing);
     }
@@ -571,7 +570,6 @@ public class HighPrecisionAuditOperations {
     private static Matrix<RealBig> createInvertibleRealBigMatrix(int n, LinearAlgebraProvider<RealBig> p) {
         RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = RealBig.create(i == j ? new BigDecimal(n + i) : new BigDecimal("0.1"));
-        @SuppressWarnings("unchecked")
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
         return Matrix.of(data, rbRing);
     }
@@ -579,7 +577,6 @@ public class HighPrecisionAuditOperations {
     private static Matrix<RealBig> createSPDRealBigMatrix(int n, LinearAlgebraProvider<RealBig> p) {
         RealBig[][] data = new RealBig[n][n];
         for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = RealBig.create(new BigDecimal(i == j ? n * 3.0 : 0.1));
-        @SuppressWarnings("unchecked")
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
         return Matrix.of(data, rbRing);
     }
@@ -587,7 +584,6 @@ public class HighPrecisionAuditOperations {
     private static Vector<RealBig> createRealBigVector(RealBig val, int n, LinearAlgebraProvider<RealBig> p) {
         RealBig[] data = new RealBig[n];
         for (int i = 0; i < n; i++) data[i] = RealBig.create(val.bigDecimalValue().add(new BigDecimal(i)));
-        @SuppressWarnings("unchecked")
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
         return Vector.of(data, rbRing);
     }

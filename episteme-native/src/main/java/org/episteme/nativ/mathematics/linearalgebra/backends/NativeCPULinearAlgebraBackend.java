@@ -77,7 +77,6 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
     private static final MethodHandle SDOT_HANDLE;
     private static final MethodHandle SNRM2_HANDLE;
     private static final MethodHandle SSCAL_HANDLE;
-    private static final MethodHandle SGESV_HANDLE;
 
     // Complex Double (Z)
     private static final MethodHandle ZGEMM_HANDLE;
@@ -85,7 +84,6 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
     private static final MethodHandle ZDOTU_HANDLE;
     private static final MethodHandle ZNRM2_HANDLE;
     private static final MethodHandle ZSCAL_HANDLE;
-    private static final MethodHandle ZGESV_HANDLE;
 
     // Complex Float (C)
     private static final MethodHandle CGEMM_HANDLE;
@@ -93,7 +91,6 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
     private static final MethodHandle CDOTU_HANDLE;
     private static final MethodHandle CNRM2_HANDLE;
     private static final MethodHandle CSCAL_HANDLE;
-    private static final MethodHandle CGESV_HANDLE;
     
     private static final boolean AVAILABLE;
 
@@ -123,9 +120,9 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
         MethodHandle dgesvd = null;
         MethodHandle dgels = null;
 
-        MethodHandle sgemm = null, sgemv = null, sdot = null, snrm2 = null, sscal = null, sgesv = null;
-        MethodHandle zgemm = null, zgemv = null, zdotu = null, znrm2 = null, zscal = null, zgesv = null;
-        MethodHandle cgemm = null, cgemv = null, cdotu = null, cnrm2 = null, cscal = null, cgesv = null;
+        MethodHandle sgemm = null, sgemv = null, sdot = null, snrm2 = null, sscal = null;
+        MethodHandle zgemm = null, zgemv = null, zdotu = null, znrm2 = null, zscal = null;
+        MethodHandle cgemm = null, cgemv = null, cdotu = null, cnrm2 = null, cscal = null;
         
         boolean avail = false;
 
@@ -243,9 +240,9 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                 avail = (dgemm != null || dgemv != null);
                 
                 // LAPACKE S/Z/C variants
-                sgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "sgesv_", "lapack_sgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "zgesv_", "lapack_zgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "cgesv_", "lapack_cgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "sgesv_", "lapack_sgesv").ifPresent(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)));
+                NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "zgesv_", "lapack_zgesv").ifPresent(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)));
+                NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "cgesv_", "lapack_cgesv").ifPresent(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)));
             }
         } catch (Throwable t) {
             logger.log(System.Logger.Level.DEBUG, "Native CPU initialization failed: " + t.getMessage());
@@ -275,21 +272,18 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
         SDOT_HANDLE = sdot;
         SNRM2_HANDLE = snrm2;
         SSCAL_HANDLE = sscal;
-        SGESV_HANDLE = sgesv;
 
         ZGEMM_HANDLE = zgemm;
         ZGEMV_HANDLE = zgemv;
         ZDOTU_HANDLE = zdotu;
         ZNRM2_HANDLE = znrm2;
         ZSCAL_HANDLE = zscal;
-        ZGESV_HANDLE = zgesv;
 
         CGEMM_HANDLE = cgemm;
         CGEMV_HANDLE = cgemv;
         CDOTU_HANDLE = cdotu;
         CNRM2_HANDLE = cnrm2;
         CSCAL_HANDLE = cscal;
-        CGESV_HANDLE = cgesv;
         
         // Broadened availability check
         AVAILABLE = avail;
@@ -500,6 +494,7 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
         return LinearAlgebraProvider.super.multiply(a, b);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<org.episteme.core.mathematics.numbers.real.Real> multiplyRealFloat(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (AVAILABLE && SGEMV_HANDLE != null) {
             int m = a.rows();
@@ -515,9 +510,10 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                 return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Reals.getInstance());
             }
         }
-        return (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object) LinearAlgebraProvider.super.multiply((Matrix<E>)(Object)a, (Vector<E>)(Object)b);
+        return (Vector<org.episteme.core.mathematics.numbers.real.Real>) (Object) LinearAlgebraProvider.super.multiply((Matrix<E>) (Object) a, (Vector<E>) (Object) b);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<org.episteme.core.mathematics.numbers.complex.Complex> multiplyComplexFloat(Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         if (AVAILABLE && CGEMV_HANDLE != null) {
             int m = a.rows();
@@ -535,9 +531,10 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                 return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
             }
         }
-        return (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object) LinearAlgebraProvider.super.multiply((Matrix<E>)(Object)a, (Vector<E>)(Object)b);
+        return (Vector<org.episteme.core.mathematics.numbers.complex.Complex>) (Object) LinearAlgebraProvider.super.multiply((Matrix<E>) (Object) a, (Vector<E>) (Object) b);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<Real> multiplyReal(Matrix<Real> a, Vector<Real> b) {
         if (AVAILABLE && DGEMV_HANDLE != null) {
             int m = a.rows();
@@ -569,6 +566,7 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
         return (Vector<Real>)(Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(rd);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<Complex> multiplyComplex(Matrix<Complex> a, Vector<Complex> b) {
         if (AVAILABLE && ZGEMV_HANDLE != null) {
             int m = a.rows();
@@ -591,7 +589,7 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                 return Vector.of(java.util.Arrays.asList(complexRes), org.episteme.core.mathematics.sets.Complexes.getInstance());
             }
         }
-        return (Vector<Complex>)(Object) LinearAlgebraProvider.super.multiply((Matrix<E>)(Object)a, (Vector<E>)(Object)b);
+        return (Vector<Complex>) (Object) LinearAlgebraProvider.super.multiply((Matrix<E>) (Object) a, (Vector<E>) (Object) b);
     }
 
     private double[] toDoubleArray(Vector<Real> v) {
@@ -798,7 +796,6 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                     float[] cData = cSeg.toArray(ValueLayout.JAVA_FLOAT);
                     org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(cData[i]);
-                    @SuppressWarnings("unchecked")
                     E[] castedRes = (E[]) resData;
                     return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, castedRes), this, ring);
                 }
@@ -832,7 +829,6 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                     float[] result = cSeg.toArray(ValueLayout.JAVA_FLOAT);
                     org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i+1]));
-                    @SuppressWarnings("unchecked")
                     E[] castedRes = (E[]) resData;
                     return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, castedRes), this, ring);
                 }
@@ -851,7 +847,6 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
                 double[] result = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                 for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(result[2*i], result[2*i+1]);
-                @SuppressWarnings("unchecked")
                 Matrix<E> typedRes = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (org.episteme.core.mathematics.numbers.complex.Complex[])resData), (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)org.episteme.core.mathematics.sets.Complexes.getInstance());
                 return typedRes;
             }
@@ -902,7 +897,6 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
             }
         }
         
-        @SuppressWarnings("unchecked")
         Matrix<E> vSInv = multiply(svd.V(), (Matrix<E>)(Object)sInv);
         Matrix<E> uT = transpose(svd.U());
         return multiply(vSInv, uT);
@@ -1379,19 +1373,16 @@ public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
         return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.solve(lu, b, (Field<E>)b.getScalarRing(), this);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
         return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.solve(qr, b, (Field<E>)b.getScalarRing(), this);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
         return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericCholesky.solve(cholesky, b, (Field<E>)b.getScalarRing(), this);
     }

@@ -9,7 +9,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeSegmentProxy;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealFloatMatrixStorage;

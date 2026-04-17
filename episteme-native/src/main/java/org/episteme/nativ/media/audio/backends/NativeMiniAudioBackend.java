@@ -14,7 +14,6 @@ import org.episteme.core.technical.backend.Operation;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.media.audio.AudioAlgorithmProvider;
-import org.episteme.core.media.audio.AudioBuffer;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import java.lang.foreign.*;

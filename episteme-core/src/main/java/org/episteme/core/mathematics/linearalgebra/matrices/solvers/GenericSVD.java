@@ -32,7 +32,9 @@ public class GenericSVD {
         
         Matrix<E> matH = provider.transpose(matrix);
         if (field.zero() instanceof Complex) {
-            matH = matH.map(val -> (E) ((Complex) val).conjugate());
+            @SuppressWarnings("unchecked")
+            Matrix<E> conjugated = matH.map(val -> (E) (Object) ((Complex) val).conjugate());
+            matH = conjugated;
         }
         
         // A^H*A for V and Sigma^2
@@ -108,11 +110,9 @@ public class GenericSVD {
         else if (element instanceof Complex) res = ((Complex) element).sqrt();
         
         if (field.zero() instanceof Complex && res instanceof Real) {
-            @SuppressWarnings("unchecked")
             E casted = (E) Complex.of((Real) res);
             return casted;
         }
-        @SuppressWarnings("unchecked")
         E casted = (E) res;
         return casted;
     }

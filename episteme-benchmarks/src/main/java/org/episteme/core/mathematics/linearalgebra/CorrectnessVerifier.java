@@ -5,7 +5,6 @@ import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 
-import java.util.Objects;
 
 /**
  * Numerical correctness verifier for Linear Algebra operations.
