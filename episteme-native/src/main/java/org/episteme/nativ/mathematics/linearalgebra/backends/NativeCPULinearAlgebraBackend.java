@@ -14,6 +14,9 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.nio.DoubleBuffer;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -28,25 +31,26 @@ import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.structures.rings.Field;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 /**
  * Standalone Native Linear Algebra backend using bundled episteme_native library.
- * <p>
- * Provides a subset of BLAS operations without requiring external high-performance libraries.
- * For optimized performance using external BLAS/LAPACK, use {@link NativeFFMBLASBackend}.
- * </p>
- *
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@com.google.auto.service.AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Object>, NativeBackend, CPUBackend {
+@com.google.auto.service.AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class})
+public class NativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final System.Logger logger = System.getLogger(NativeCPULinearAlgebraBackend.class.getName());
 
@@ -127,12 +131,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
 
         try {
             Linker linker = NativeFFMLoader.getLinker();
-            java.util.List<SymbolLookup> lookups = new java.util.ArrayList<>();
+            List<SymbolLookup> lookups = new ArrayList<>();
             
             // Try common libraries
             String[] commonLibs = {"episteme-jni", "openblas", "lapacke", "lapack", "mkl_rt"};
             for (String lib : commonLibs) {
-                NativeFFMLoader.loadLibrary(lib, java.lang.foreign.Arena.global()).ifPresent(lookups::add);
+                NativeFFMLoader.loadLibrary(lib, Arena.global()).ifPresent(lookups::add);
             }
             
             // Add system lookup as fallback
@@ -314,6 +318,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
     }
 
     @Override
+    public boolean isExplicitlyDisabled() {
+        String id = getId();
+        return id != null && (Boolean.getBoolean("episteme.backend.disable." + id) || Boolean.getBoolean("episteme.linearalgebra.disable." + id));
+    }
+
+    @Override
     public String getId() {
         return "native-cpu";
     }
@@ -340,14 +350,23 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
     }
 
     @Override
-    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        if (ring == null) return false;
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
-        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
-        Object zero = ring.zero();
-        return zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble ||
-               zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat ||
-               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    public String getDescription() {
+        return "High-performance native CPU linear algebra implementation using Panama FFM API.";
+    }
+
+    @Override
+    public int getPriority() {
+        return 100;
+    }
+
+    @Override
+    public Object createBackend() {
+        return this;
+    }
+
+    @Override
+    public List<AlgorithmProvider> getAlgorithmProviders() {
+        return List.of(this);
     }
 
     @Override
@@ -357,8 +376,14 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
     }
 
     @Override
-    public int getPriority() {
-        return 100;
+    public boolean isCompatible(Ring<?> ring) {
+        if (ring == null) return false;
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
+        Object zero = ring.zero();
+        return zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble ||
+               zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat ||
+               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     @Override
@@ -454,22 +479,23 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
     }
 
     @Override
-    public Vector<Object> multiply(Matrix<Object> a, Vector<Object> b) {
+    @SuppressWarnings("unchecked")
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         if (!AVAILABLE) return LinearAlgebraProvider.super.multiply(a, b);
         
-        Ring<?> ring = a.getScalarRing();
+        Ring<E> ring = a.getScalarRing();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                return (Vector<Object>)(Object) multiplyRealFloat((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
+                return (Vector<E>) multiplyRealFloat((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
             }
-            return (Vector<Object>)(Object) multiplyReal((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
+            return (Vector<E>) (Object) multiplyReal((Matrix<Real>)(Object)a, (Vector<Real>)(Object)b);
         } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                return (Vector<Object>)(Object) multiplyComplexFloat((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
+                return (Vector<E>) multiplyComplexFloat((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
             }
-            return (Vector<Object>)(Object) multiplyComplex((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
+            return (Vector<E>) (Object) multiplyComplex((Matrix<Complex>)(Object)a, (Vector<Complex>)(Object)b);
         }
         return LinearAlgebraProvider.super.multiply(a, b);
     }
@@ -489,7 +515,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Reals.getInstance());
             }
         }
-        return LinearAlgebraProvider.super.multiply((Matrix<Object>)(Object)a, (Vector<Object>)(Object)b);
+        return (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object) LinearAlgebraProvider.super.multiply((Matrix<E>)(Object)a, (Vector<E>)(Object)b);
     }
 
     private Vector<org.episteme.core.mathematics.numbers.complex.Complex> multiplyComplexFloat(Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
@@ -509,7 +535,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
             }
         }
-        return LinearAlgebraProvider.super.multiply((Matrix<Object>)(Object)a, (Vector<Object>)(Object)b);
+        return (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object) LinearAlgebraProvider.super.multiply((Matrix<E>)(Object)a, (Vector<E>)(Object)b);
     }
 
     private Vector<Real> multiplyReal(Matrix<Real> a, Vector<Real> b) {
@@ -565,7 +591,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 return Vector.of(java.util.Arrays.asList(complexRes), org.episteme.core.mathematics.sets.Complexes.getInstance());
             }
         }
-        return LinearAlgebraProvider.super.multiply((Matrix<Object>)(Object)a, (Vector<Object>)(Object)b);
+        return (Vector<Complex>)(Object) LinearAlgebraProvider.super.multiply((Matrix<E>)(Object)a, (Vector<E>)(Object)b);
     }
 
     private double[] toDoubleArray(Vector<Real> v) {
@@ -628,8 +654,8 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
         float[] d = new float[2 * n];
         for (int i = 0; i < n; i++) {
             org.episteme.core.mathematics.numbers.complex.Complex c = v.get(i);
-            d[2 * i] = c.real().floatValue();
-            d[2 * i + 1] = c.imaginary().floatValue();
+            d[2 * i] = (float) c.real();
+            d[2 * i + 1] = (float) c.imaginary();
         }
         return d;
     }
@@ -641,8 +667,8 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
         for (int i = 0; i < r; i++) {
             for (int j = 0; j < c; j++) {
                 org.episteme.core.mathematics.numbers.complex.Complex val = m.get(i, j);
-                d[2 * (i * c + j)] = val.real().floatValue();
-                d[2 * (i * c + j) + 1] = val.imaginary().floatValue();
+                d[2 * (i * c + j)] = (float) val.real();
+                d[2 * (i * c + j) + 1] = (float) val.imaginary();
             }
         }
         return d;
@@ -662,10 +688,11 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
 
 
     @Override
-    public Matrix<Object> add(Matrix<Object> a, Matrix<Object> b) {
-        Ring<?> ring = a.getScalarRing();
+    @SuppressWarnings("unchecked")
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        Ring<E> ring = a.getScalarRing();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 float[] ad = toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
                 float[] bd = toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
@@ -673,15 +700,15 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
                 org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[a.rows() * a.cols()];
                 for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[i]);
-                return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Reals.getInstance());
+                return new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), (E[])resData), this, ring);
             }
             double[] ad = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
             double[] bd = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
             double[] rd = new double[ad.length];
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-            return (Matrix<Object>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
+            return (Matrix<E>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
         } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 float[] ad = toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a);
                 float[] bd = toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
@@ -689,7 +716,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
                 org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[a.rows() * a.cols()];
                 for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i+1]));
-                return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                return new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), (E[])resData), this, ring);
             }
             double[] ad = toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a);
             double[] bd = toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
@@ -697,27 +724,33 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
             org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[a.rows() * a.cols()];
             for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(rd[2*i], rd[2*i+1]);
-            return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Complexes.getInstance());
+            return new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), (E[])resData), this, ring);
         }
         return LinearAlgebraProvider.super.add(a, b);
     }
 
     @Override
-    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
-        int rows = a.rows();
-        int cols = a.cols();
-        double[] ad = toDoubleArray(a);
-        double[] bd = toDoubleArray(b);
-        double[] rd = new double[ad.length];
-        for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
-        return RealDoubleMatrix.of(rd, rows, cols);
+    @SuppressWarnings("unchecked")
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] ad = toDoubleArray((Matrix<Real>)(Object)a);
+            double[] bd = toDoubleArray((Matrix<Real>)(Object)b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+            return (Matrix<E>)(Object) RealDoubleMatrix.of(rd, rows, cols);
+        }
+        return LinearAlgebraProvider.super.subtract(a, b);
     }
 
     @Override
-    public Matrix<Object> scale(Object scalar, Matrix<Object> a) {
-        Ring<?> ring = a.getScalarRing();
+    @SuppressWarnings("unchecked")
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 float s = ((org.episteme.core.mathematics.numbers.real.Real)scalar).floatValue();
                 float[] ad = toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
@@ -725,34 +758,33 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
                 org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[a.rows() * a.cols()];
                 for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[i]);
-                return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Reals.getInstance());
+                return new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), (E[])resData), this, ring);
             }
             double s = ((org.episteme.core.mathematics.numbers.real.Real)scalar).doubleValue();
             double[] ad = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
             double[] rd = new double[ad.length];
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
-            return (Matrix<Object>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
+            return (Matrix<E>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
         } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
             org.episteme.core.mathematics.numbers.complex.Complex s = (org.episteme.core.mathematics.numbers.complex.Complex)scalar;
-            boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
             
             org.episteme.core.mathematics.numbers.complex.Complex[] res = new org.episteme.core.mathematics.numbers.complex.Complex[a.rows() * a.cols()];
             for (int i=0; i<a.rows(); i++) {
                 for (int j=0; j<a.cols(); j++) res[i*a.cols()+j] = s.multiply(((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a).get(i, j));
             }
-            return (Matrix<Object>)(Object) Matrix.of(res, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Complexes.getInstance());
+            return new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), (E[])res), this, ring);
         }
         return LinearAlgebraProvider.super.scale(scalar, a);
     }
 
     @Override
-    public Matrix<Object> multiply(Matrix<Object> a, Matrix<Object> b) {
+    @SuppressWarnings("unchecked")
+    public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (a.cols() != b.rows()) throw new IllegalArgumentException("Incompatible dimensions: " + a.cols() + " != " + b.rows());
         
-        Ring<?> ring = a.getScalarRing();
+        Ring<E> ring = a.getScalarRing();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (!AVAILABLE || SGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
                 int m = a.rows();
@@ -766,7 +798,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                     float[] cData = cSeg.toArray(ValueLayout.JAVA_FLOAT);
                     org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(cData[i]);
-                    return (Matrix<Object>)(Object) Matrix.of(resData, m, n, org.episteme.core.mathematics.sets.Reals.getInstance());
+                    return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (E[])resData), this, ring);
                 }
             }
             if (!AVAILABLE || DGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
@@ -779,10 +811,10 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
                 NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, aSeg, k, bSeg, n, 0.0, cSeg, n);
                 double[] cData = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                return (Matrix<Object>)(Object) RealDoubleMatrix.of(cData, m, n);
+                return (Matrix<E>)(Object) RealDoubleMatrix.of(cData, m, n);
             }
         } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (!AVAILABLE || CGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
                 int m = a.rows();
@@ -798,7 +830,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                     float[] result = cSeg.toArray(ValueLayout.JAVA_FLOAT);
                     org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i+1]));
-                    return (Matrix<Object>)(Object) Matrix.of(resData, m, n, org.episteme.core.mathematics.sets.Complexes.getInstance());
+                    return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (E[])resData), this, ring);
                 }
             }
             if (!AVAILABLE || ZGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
@@ -815,23 +847,25 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 double[] result = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                 for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(result[2*i], result[2*i+1]);
-                return (Matrix<Object>)(Object) Matrix.of(resData, m, n, org.episteme.core.mathematics.sets.Complexes.getInstance());
+                return (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (org.episteme.core.mathematics.numbers.complex.Complex[])resData), (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)org.episteme.core.mathematics.sets.Complexes.getInstance());
             }
         }
         return LinearAlgebraProvider.super.multiply(a, b);
     }
 
     @Override
-    public Matrix<Real> inverse(Matrix<Real> a) {
-        if (!AVAILABLE) throw new UnsupportedOperationException(getName() + ": inverse() not available");
-        int m = a.rows();
-        int n = a.cols();
-        if (m != n) {
-             return pseudoInverse(a);
-        }
-        if (m == n) {
+    @SuppressWarnings("unchecked")
+    public Matrix<E> inverse(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (!AVAILABLE) throw new UnsupportedOperationException(getName() + ": inverse() not available");
+            int m = a.rows();
+            int n = a.cols();
+            if (m != n) {
+                return pseudoInverse(a);
+            }
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
                 
                 int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
@@ -841,29 +875,29 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                 if (info != 0) throw new ArithmeticException("dgetri failed: " + info);
                 
                 double[] invData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                return RealDoubleMatrix.of(invData, n, n);
+                return (Matrix<E>)(Object) RealDoubleMatrix.of(invData, n, n);
             }
         }
-        throw new UnsupportedOperationException(getName() + ": inverse() failed");
+        return LinearAlgebraProvider.super.inverse(a);
     }
 
-    private Matrix<Real> pseudoInverse(Matrix<Real> a) {
-        org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd = svd(a);
+    @SuppressWarnings("unchecked")
+    private Matrix<E> pseudoInverse(Matrix<E> a) {
+        org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd = svd(a);
         int m = a.rows();
         int n = a.cols();
         int k = svd.S().dimension();
         
         RealDoubleMatrix sInv = RealDoubleMatrix.direct(n, m);
         for (int i = 0; i < k; i++) {
-            double sVal = svd.S().get(i).doubleValue();
+            double sVal = ((org.episteme.core.mathematics.numbers.real.Real)svd.S().get(i)).doubleValue();
             if (sVal > 1e-12) {
                 sInv.set(i, i, Real.of(1.0 / sVal));
             }
         }
         
-        // Use local multiply and transpose to maintain autonomy
-        Matrix<Real> vSInv = multiply(svd.V(), sInv);
-        Matrix<Real> uT = transpose(svd.U());
+        Matrix<E> vSInv = multiply(svd.V(), (Matrix<E>)(Object)sInv);
+        Matrix<E> uT = transpose(svd.U());
         return multiply(vSInv, uT);
     }
 
@@ -873,273 +907,271 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
 
     // Other methods default to UnsupportedOperationException
     @Override
-    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
-        int m = a.rows();
-        int n = a.cols();
-        
-        if (!AVAILABLE || DGELS_HANDLE == null) throw new UnsupportedOperationException(getName() + ": DGELS not available");
-
-
-        
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            int maxDim = Math.max(m, n);
-            double[] bPad = new double[maxDim];
-            double[] bOrig = toDoubleArray(b);
-            System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
-            MemorySegment xSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bPad);
+    @SuppressWarnings("unchecked")
+    public Matrix<E> transpose(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            int m = a.rows();
+            int n = a.cols();
+            double[] data = toDoubleArray((Matrix<Real>)(Object)a);
+            double[] res = new double[n * m];
             
-            int info = (int) NativeSafe.invoke(DGELS_HANDLE, LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, aSeg, n, xSeg, 1);
-            if (info == 0) {
-                double[] result = new double[n];
-                MemorySegment.copy(xSeg, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
-                return RealDoubleVector.of(result);
-            }
-            throw new ArithmeticException("Native dgels failed with info: " + info);
-        }
-    }
-
-    @Override
-    public Matrix<Real> transpose(Matrix<Real> a) {
-        int m = a.rows();
-        int n = a.cols();
-        double[] data = toDoubleArray(a);
-        double[] res = new double[n * m];
-        
-        // Tiled Transpose for better cache locality (March 24 Optimization)
-        int tileSize = 64;
-        for (int i = 0; i < m; i += tileSize) {
-            for (int j = 0; j < n; j += tileSize) {
-                for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
-                    for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
-                        res[jj * m + ii] = data[ii * n + jj];
+            int tileSize = 64;
+            for (int i = 0; i < m; i += tileSize) {
+                for (int j = 0; j < n; j += tileSize) {
+                    for (int ii = i; ii < Math.min(i + tileSize, m); ii++) {
+                        for (int jj = j; jj < Math.min(j + tileSize, n); jj++) {
+                            res[jj * m + ii] = data[ii * n + jj];
+                        }
                     }
                 }
             }
+            return (Matrix<E>)(Object) RealDoubleMatrix.of(res, n, m);
         }
-        return RealDoubleMatrix.of(res, n, m);
+        return LinearAlgebraProvider.super.transpose(a);
     }
 
 
     @Override
-    public Real determinant(Matrix<Real> a) {
-        if (!AVAILABLE || DGESV_HANDLE == null || a.rows() != a.cols()) throw new UnsupportedOperationException(getName() + ": determinant not available");
+    @SuppressWarnings("unchecked")
+    public E determinant(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (!AVAILABLE || DGETRF_HANDLE == null || a.rows() != a.cols()) throw new UnsupportedOperationException(getName() + ": determinant not available");
 
-        int n = a.rows();
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
-            
-            int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
-            if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-            if (info > 0) return Real.ZERO; // Singular matrix
-            
-            double[] luData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-            double det = 1.0;
-            for (int i = 0; i < n; i++) {
-                det *= luData[i * n + i];
-            }
-            
-            int swaps = 0;
-            for (int i = 0; i < n; i++) {
-                if (ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != (i + 1)) {
-                    swaps++;
-                }
-            }
-            if (swaps % 2 != 0) det = -det;
-            return Real.of(det);
-        }
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> lu(Matrix<Real> a) {
-        if (AVAILABLE && a.rows() == a.cols()) {
             int n = a.rows();
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
                 
                 int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
                 if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+                if (info > 0) return ring.zero(); // Singular matrix
                 
-                double[] luArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                double[] lData = new double[n * n];
-                double[] uData = new double[n * n];
-                
+                double[] luData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                double det = 1.0;
                 for (int i = 0; i < n; i++) {
-                    for (int j = 0; j < n; j++) {
-                        double val = luArr[i * n + j];
-                        if (i > j) {
-                            lData[i * n + j] = val;
-                            uData[i * n + j] = 0.0;
-                        } else if (i == j) {
-                            lData[i * n + j] = 1.0;
-                            uData[i * n + j] = val;
-                        } else {
-                            lData[i * n + j] = 0.0;
-                            uData[i * n + j] = val;
-                        }
-                    }
+                    det *= luData[i * n + i];
                 }
                 
-                double[] pData = new double[n];
-                if (n > 0) {
-                    for (int i = 0; i < n; i++) pData[i] = i;
+                int swaps = 0;
+                for (int i = 0; i < n; i++) {
+                    if (ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != (i + 1)) {
+                        swaps++;
+                    }
+                }
+                if (swaps % 2 != 0) det = -det;
+                return (E) Real.of(det);
+            }
+        }
+        return LinearAlgebraProvider.super.determinant(a);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (AVAILABLE && a.rows() == a.cols()) {
+                int n = a.rows();
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
+                    MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                    
+                    int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
+                    if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
+                    
+                    double[] luArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                    double[] lData = new double[n * n];
+                    double[] uData = new double[n * n];
+                    
                     for (int i = 0; i < n; i++) {
-                        int ip = ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) - 1;
-                        if (ip != i) {
-                            double tmp = pData[i];
-                            pData[i] = pData[ip];
-                            pData[ip] = tmp;
+                        for (int j = 0; j < n; j++) {
+                            double val = luArr[i * n + j];
+                            if (i > j) {
+                                lData[i * n + j] = val;
+                                uData[i * n + j] = 0.0;
+                            } else if (i == j) {
+                                lData[i * n + j] = 1.0;
+                                uData[i * n + j] = val;
+                            } else {
+                                lData[i * n + j] = 0.0;
+                                uData[i * n + j] = val;
+                            }
                         }
                     }
-                }
-                
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
-                    RealDoubleMatrix.of(lData, n, n),
-                    RealDoubleMatrix.of(uData, n, n),
-                    RealDoubleVector.of(pData)
-                );
-            }
-        }
-        throw new UnsupportedOperationException(getName() + ": lu() not available for these types");
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
-        if (AVAILABLE && a.rows() == a.cols()) {
-            int n = a.rows();
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-                MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
-                
-                int info = (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
-                if (info < 0) throw new IllegalArgumentException("Illegal argument to dsyev: " + info);
-                if (info > 0) throw new ArithmeticException("Eigenvalue decomposition failed to converge");
-                
-                double[] wData = wSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                double[] evData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-                    RealDoubleMatrix.of(evData, n, n),
-                    RealDoubleVector.of(wData)
-                );
-            }
-        }
-        throw new UnsupportedOperationException(getName() + ": eigen() not available for these types");
-    }
-
-
-
-
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
-        if (AVAILABLE && a.rows() == a.cols()) {
-            int n = a.rows();
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-                
-                int info = (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, n);
-                if (info < 0) throw new IllegalArgumentException("Illegal argument to dpotrf: " + info);
-                if (info > 0) throw new ArithmeticException("Matrix is not positive definite (info=" + info + ")");
-                
-                double[] data = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                // Zero out upper part
-                for (int i = 0; i < n; i++) {
-                    for (int j = i + 1; j < n; j++) {
-                        data[i * n + j] = 0.0;
+                    
+                    double[] pData = new double[n];
+                    if (n > 0) {
+                        for (int i = 0; i < n; i++) pData[i] = i;
+                        for (int i = 0; i < n; i++) {
+                            int ip = ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) - 1;
+                            if (ip != i) {
+                                double tmp = pData[i];
+                                pData[i] = pData[ip];
+                                pData[ip] = tmp;
+                            }
+                        }
                     }
+                    
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                        (Matrix<E>)(Object) RealDoubleMatrix.of(lData, n, n),
+                        (Matrix<E>)(Object) RealDoubleMatrix.of(uData, n, n),
+                        (Vector<E>)(Object) RealDoubleVector.of(pData)
+                    );
                 }
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
-                    RealDoubleMatrix.of(data, n, n)
-                );
             }
         }
-        throw new UnsupportedOperationException(getName() + ": cholesky() not available for these types");
+        return LinearAlgebraProvider.super.lu(a);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (AVAILABLE && a.rows() == a.cols()) {
+                int n = a.rows();
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
+                    MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+                    
+                    int info = (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
+                    if (info < 0) throw new IllegalArgumentException("Illegal argument to dsyev: " + info);
+                    if (info > 0) throw new ArithmeticException("Eigenvalue decomposition failed to converge");
+                    
+                    double[] wData = wSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                    double[] evData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                    
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                        (Matrix<E>)(Object) RealDoubleMatrix.of(evData, n, n),
+                        (Vector<E>)(Object) RealDoubleVector.of(wData)
+                    );
+                }
+            }
+        }
+        return LinearAlgebraProvider.super.eigen(a);
+    }
+
+
+
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (AVAILABLE && a.rows() == a.cols()) {
+                int n = a.rows();
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
+                    
+                    int info = (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, n);
+                    if (info < 0) throw new IllegalArgumentException("Illegal argument to dpotrf: " + info);
+                    if (info > 0) throw new ArithmeticException("Matrix is not positive definite (info=" + info + ")");
+                    
+                    double[] data = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                    // Zero out upper part
+                    for (int i = 0; i < n; i++) {
+                        for (int j = i + 1; j < n; j++) {
+                            data[i * n + j] = 0.0;
+                        }
+                    }
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
+                        (Matrix<E>)(Object) RealDoubleMatrix.of(data, n, n)
+                    );
+                }
+            }
+        }
+        return LinearAlgebraProvider.super.cholesky(a);
     }
     @Override
-    public Object dot(Vector<Object> a, Vector<Object> b) {
+    @SuppressWarnings("unchecked")
+    public E dot(Vector<E> a, Vector<E> b) {
         if (!AVAILABLE) return LinearAlgebraProvider.super.dot(a, b);
         if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         
-        Ring<?> ring = a.getScalarRing();
+        Ring<E> ring = a.getScalarRing();
         int n = a.dimension();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (SDOT_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
                     MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
-                    return org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(SDOT_HANDLE, n, aSeg, 1, bSeg, 1));
+                    return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(SDOT_HANDLE, n, aSeg, 1, bSeg, 1));
                 }
             }
             if (DDOT_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
                 MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
-                return org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DDOT_HANDLE, n, aSeg, 1, bSeg, 1));
+                return (E) org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DDOT_HANDLE, n, aSeg, 1, bSeg, 1));
             }
         } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (CDOTU_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
                     MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
-                    MemorySegment dotRes = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
-                    NativeSafe.invoke(CDOTU_HANDLE, n, aSeg, 1, bSeg, 1, dotRes);
-                    return org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(dotRes.get(ValueLayout.JAVA_FLOAT, 0)), org.episteme.core.mathematics.numbers.real.RealFloat.of(dotRes.get(ValueLayout.JAVA_FLOAT, 4)));
+                    MemorySegment resSeg = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+                    NativeSafe.invoke(CDOTU_HANDLE, resSeg, n, aSeg, 1, bSeg, 1);
+                    float[] res = resSeg.toArray(ValueLayout.JAVA_FLOAT);
+                    return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(res[0]), org.episteme.core.mathematics.numbers.real.RealFloat.of(res[1]));
                 }
             }
             if (ZDOTU_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
                 MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
-                MemorySegment dotRes = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
-                NativeSafe.invoke(ZDOTU_HANDLE, n, aSeg, 1, bSeg, 1, dotRes);
-                return org.episteme.core.mathematics.numbers.complex.Complex.of(dotRes.get(ValueLayout.JAVA_DOUBLE, 0), dotRes.get(ValueLayout.JAVA_DOUBLE, 8));
+                MemorySegment resSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                NativeSafe.invoke(ZDOTU_HANDLE, resSeg, n, aSeg, 1, bSeg, 1);
+                double[] res = resSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(res[0], res[1]);
             }
         }
         return LinearAlgebraProvider.super.dot(a, b);
     }
 
     @Override
-    public Object norm(Vector<Object> a) {
-        if (!AVAILABLE) return LinearAlgebraProvider.super.norm(a);
-        Ring<?> ring = a.getScalarRing();
+    @SuppressWarnings("unchecked")
+    public E norm(Vector<E> a) {
+        if (!AVAILABLE) return (E) LinearAlgebraProvider.super.norm(a);
+        Ring<E> ring = a.getScalarRing();
         int n = a.dimension();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (SNRM2_HANDLE != null) {
                     try (Arena arena = Arena.ofConfined()) {
                         MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
-                        return org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(SNRM2_HANDLE, n, aSeg, 1));
+                        return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(SNRM2_HANDLE, n, aSeg, 1));
                     }
                 }
             }
             if (DNRM2_HANDLE != null) {
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
-                    return org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DNRM2_HANDLE, n, aSeg, 1));
+                    return (E) org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DNRM2_HANDLE, n, aSeg, 1));
                 }
             }
         } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
+            E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (CNRM2_HANDLE != null) {
                     try (Arena arena = Arena.ofConfined()) {
                         MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
-                        return org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(CNRM2_HANDLE, n, aSeg, 1));
+                        return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(CNRM2_HANDLE, n, aSeg, 1));
                     }
                 }
             }
             if (ZNRM2_HANDLE != null) {
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
-                    return org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(ZNRM2_HANDLE, n, aSeg, 1));
+                    return (E) org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(ZNRM2_HANDLE, n, aSeg, 1));
                 }
             }
         }
@@ -1147,30 +1179,33 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
         // Manual Fallback
         double sumSq = 0.0;
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            for (int i=0; i<n; i++) { double d = ((Real)a.get(i)).doubleValue(); sumSq += d * d; }
+            for (int i=0; i<n; i++) { double d = ((org.episteme.core.mathematics.numbers.real.Real)a.get(i)).doubleValue(); sumSq += d * d; }
         } else {
             for (int i=0; i<n; i++) { Complex c = (Complex)a.get(i); sumSq += c.real()*c.real() + c.imaginary()*c.imaginary(); }
         }
-        return Real.of(Math.sqrt(sumSq));
+        return (E) org.episteme.core.mathematics.numbers.real.Real.of(Math.sqrt(sumSq));
     }
 
     @Override
-    public Vector<Object> normalize(Vector<Object> a) {
-        Real n = (Real) norm(a);
+    @SuppressWarnings("unchecked")
+    public Vector<E> normalize(Vector<E> a) {
+        org.episteme.core.mathematics.numbers.real.Real n = (org.episteme.core.mathematics.numbers.real.Real) norm(a);
         if (n.isZero()) return a;
-        return multiply(a, n.inverse());
+        return multiply(a, (E) n.inverse());
     }
 
     @Override
-    public Vector<Object> multiply(Vector<Object> vector, Object scalar) {
+    @SuppressWarnings("unchecked")
+    public Vector<E> multiply(Vector<E> vector, E scalar) {
         if (!AVAILABLE) return LinearAlgebraProvider.super.multiply(vector, scalar);
         int dim = vector.dimension();
-        Ring<?> ring = vector.getScalarRing();
+        Ring<E> ring = vector.getScalarRing();
         
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
-            float sFloat = ((org.episteme.core.mathematics.numbers.real.Real)scalar).floatValue();
-            double sDouble = ((org.episteme.core.mathematics.numbers.real.Real)scalar).doubleValue();
+            E zero = ring.zero();
+            org.episteme.core.mathematics.numbers.real.Real sVal = (org.episteme.core.mathematics.numbers.real.Real)scalar;
+            float sFloat = sVal.floatValue();
+            double sDouble = sVal.doubleValue();
             
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (SSCAL_HANDLE != null) {
@@ -1180,7 +1215,7 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                         float[] res = vSeg.toArray(ValueLayout.JAVA_FLOAT);
                         org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[dim];
                         for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(res[i]);
-                        return Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Reals.getInstance());
+                        return (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Reals.getInstance());
                     }
                 }
             } else {
@@ -1189,35 +1224,35 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
                         MemorySegment vSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)vector));
                         NativeSafe.invoke(DSCAL_HANDLE, dim, sDouble, vSeg, 1);
                         double[] res = vSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                        return (Vector<Object>)(Object) RealDoubleVector.of(res);
+                        return (Vector<E>)(Object) RealDoubleVector.of(res);
                     }
                 }
             }
         } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-             Object zero = ring.zero();
+             E zero = ring.zero();
              org.episteme.core.mathematics.numbers.complex.Complex s = (org.episteme.core.mathematics.numbers.complex.Complex)scalar;
              if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                  if (CSCAL_HANDLE != null) {
                      try (Arena arena = Arena.ofConfined()) {
                          MemorySegment vSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)vector));
-                         MemorySegment sSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, s.real().floatValue(), s.imaginary().floatValue());
+                         MemorySegment sSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, (float) s.real(), (float) s.imaginary());
                          NativeSafe.invoke(CSCAL_HANDLE, dim, sSeg, vSeg, 1);
                          float[] res = vSeg.toArray(ValueLayout.JAVA_FLOAT);
                          org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[dim];
                          for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(res[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(res[2*i+1]));
-                         return Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                         return (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
                      }
                  }
              } else {
                  if (ZSCAL_HANDLE != null) {
                      try (Arena arena = Arena.ofConfined()) {
                          MemorySegment vSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)vector));
-                         MemorySegment sSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, s.real().doubleValue(), s.imaginary().doubleValue());
+                         MemorySegment sSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, s.real(), s.imaginary());
                          NativeSafe.invoke(ZSCAL_HANDLE, dim, sSeg, vSeg, 1);
                          double[] res = vSeg.toArray(ValueLayout.JAVA_DOUBLE);
                          org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[dim];
                          for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(res[2*i], res[2*i+1]);
-                         return Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                         return (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
                      }
                  }
              }
@@ -1226,119 +1261,132 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Obje
     }
 
     @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> qr(Matrix<Real> a) {
-        if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException(getName() + ": QR not available");
-        int m = a.rows();
-        int n = a.cols();
-        int k = Math.min(m, n);
-
-        RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); // Used temporarily to hold A
-        qMat.getBuffer().put(toDoubleArray(a));
-        qMat.getBuffer().position(0);
-
-        DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 8)
-            .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-
-        // 1. DGEQRF
-        int info = dgeqrf(m, n, qMat.getBuffer(), n, tau);
-        if (info == 0) {
-            // 2. Extract R
-            double[] rData = new double[k * n];
-            double[] aFactored = qMat.toDoubleArray();
-            for (int i = 0; i < k; i++) {
-                for (int j = i; j < n; j++) {
-                    rData[i * n + j] = aFactored[i * n + j];
-                }
-            }
-            Matrix<Real> R = RealDoubleMatrix.of(rData, k, n);
-
-            // 3. DORGQR (Economy Q: m x k)
-            info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
-            if (info == 0) {
-                double[] qDataFull = qMat.toDoubleArray();
-                double[] qDataEconomy = new double[m * k];
-                for (int i = 0; i < m; i++) {
-                    for (int j = 0; j < k; j++) {
-                        qDataEconomy[i * k + j] = qDataFull[i * n + j];
-                    }
-                }
-                Matrix<Real> Q = RealDoubleMatrix.of(qDataEconomy, m, k);
-
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
-            }
-        }
-        throw new ArithmeticException("Native QR failed with info: " + info);
-    }
-
-    @Override
-    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> svd(Matrix<Real> a) {
-        if (AVAILABLE) {
+    @SuppressWarnings("unchecked")
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException(getName() + ": QR not available");
             int m = a.rows();
             int n = a.cols();
-            if (DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACKE dgesvd not available");
-            
-            boolean transposed = false;
-            Matrix<Real> workA = a;
-            if (m < n) {
-                transposed = true;
-                workA = a.transpose();
-                int tmp = m; m = n; n = tmp;
-            }
-
             int k = Math.min(m, n);
-            double[] aData = toDoubleArray(workA);
 
-            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            aBuf.put(aData); aBuf.flip();
+            RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); // Used temporarily to hold A
+            qMat.getBuffer().put(toDoubleArray((Matrix<Real>)(Object)a));
+            qMat.getBuffer().position(0);
 
-            DoubleBuffer sBuf = java.nio.ByteBuffer.allocateDirect(k * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            DoubleBuffer uBuf = java.nio.ByteBuffer.allocateDirect(m * m * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            DoubleBuffer vtBuf = java.nio.ByteBuffer.allocateDirect(n * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
-            DoubleBuffer superb = java.nio.ByteBuffer.allocateDirect(Math.max(1, k - 1) * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 8)
+                .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
 
-            int info = dgesvd((byte)'A', (byte)'A', m, n, aBuf, n, sBuf, uBuf, m, vtBuf, n, superb);
-            if (info != 0) throw new RuntimeException("dgesvd failed with info: " + info);
+            // 1. DGEQRF
+            int info = dgeqrf(m, n, qMat.getBuffer(), n, tau);
+            if (info == 0) {
+                // 2. Extract R
+                double[] rData = new double[k * n];
+                double[] aFactored = qMat.toDoubleArray();
+                for (int i = 0; i < k; i++) {
+                    for (int j = i; j < n; j++) {
+                        rData[i * n + j] = aFactored[i * n + j];
+                    }
+                }
+                Matrix<E> R = (Matrix<E>)(Object) RealDoubleMatrix.of(rData, k, n);
 
-            double[] sArr = new double[k];
-            sBuf.get(sArr);
-            double[] uArr = new double[m * m];
-            uBuf.get(uArr);
-            double[] vtArr = new double[n * n];
-            vtBuf.get(vtArr);
-            
-            // Transpose VT to get V
-            double[] vArr = new double[n * n];
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    vArr[i * n + j] = vtArr[j * n + i];
+                // 3. DORGQR (Economy Q: m x k)
+                info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
+                if (info == 0) {
+                    double[] qDataFull = qMat.toDoubleArray();
+                    double[] qDataEconomy = new double[m * k];
+                    for (int i = 0; i < m; i++) {
+                        for (int j = 0; j < k; j++) {
+                            qDataEconomy[i * k + j] = qDataFull[i * n + j];
+                        }
+                    }
+                    Matrix<E> Q = (Matrix<E>)(Object) RealDoubleMatrix.of(qDataEconomy, m, k);
+
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
                 }
             }
-
-            Matrix<Real> U = RealDoubleMatrix.of(uArr, m, m);
-            Vector<Real> S = RealDoubleVector.of(sArr);
-            Matrix<Real> V = RealDoubleMatrix.of(vArr, n, n);
-
-            if (transposed) {
-                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(V, S, U);
-            }
-            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
+            throw new ArithmeticException("Native QR failed with info: " + info);
         }
-        throw new UnsupportedOperationException(getName() + ": svd() not available");
+        return LinearAlgebraProvider.super.qr(a);
     }
 
     @Override
-    public Vector<Real> solve(LUResult<Real> lu, Vector<Real> b) {
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.solve(lu, b, (org.episteme.core.mathematics.structures.rings.Field<Real>)b.getScalarRing(), this);
+    @SuppressWarnings("unchecked")
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (AVAILABLE) {
+                int m = a.rows();
+                int n = a.cols();
+                if (DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACKE dgesvd not available");
+                
+                boolean transposed = false;
+                Matrix<Real> workA = (Matrix<Real>)(Object)a;
+                if (m < n) {
+                    transposed = true;
+                    workA = workA.transpose();
+                    int tmp = m; m = n; n = tmp;
+                }
+
+                int k = Math.min(m, n);
+                double[] aData = toDoubleArray(workA);
+
+                DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+                aBuf.put(aData); aBuf.flip();
+
+                DoubleBuffer sBuf = java.nio.ByteBuffer.allocateDirect(k * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+                DoubleBuffer uBuf = java.nio.ByteBuffer.allocateDirect(m * m * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+                DoubleBuffer vtBuf = java.nio.ByteBuffer.allocateDirect(n * n * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+                DoubleBuffer superb = java.nio.ByteBuffer.allocateDirect(Math.max(1, k - 1) * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+
+                int info = dgesvd((byte)'A', (byte)'A', m, n, aBuf, n, sBuf, uBuf, m, vtBuf, n, superb);
+                if (info != 0) throw new RuntimeException("dgesvd failed with info: " + info);
+
+                double[] sArr = new double[k];
+                sBuf.get(sArr);
+                double[] uArr = new double[m * m];
+                uBuf.get(uArr);
+                double[] vtArr = new double[n * n];
+                vtBuf.get(vtArr);
+                
+                // Transpose VT to get V
+                double[] vArr = new double[n * n];
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        vArr[i * n + j] = vtArr[j * n + i];
+                    }
+                }
+
+                Matrix<E> U = (Matrix<E>)(Object) RealDoubleMatrix.of(uArr, m, m);
+                Vector<E> S = (Vector<E>)(Object) RealDoubleVector.of(sArr);
+                Matrix<E> V = (Matrix<E>)(Object) RealDoubleMatrix.of(vArr, n, n);
+
+                if (transposed) {
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(V, S, U);
+                }
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
+            }
+            throw new UnsupportedOperationException(getName() + ": svd() not available");
+        }
+        return LinearAlgebraProvider.super.svd(a);
     }
 
     @Override
-    public Vector<Real> solve(QRResult<Real> qr, Vector<Real> b) {
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.solve(qr, b, (org.episteme.core.mathematics.structures.rings.Field<Real>)b.getScalarRing(), this);
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.solve(lu, b, (Field<E>)b.getScalarRing(), this);
     }
 
     @Override
-    public Vector<Real> solve(CholeskyResult<Real> cholesky, Vector<Real> b) {
-        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericCholesky.solve(cholesky, b, (org.episteme.core.mathematics.structures.rings.Field<Real>)b.getScalarRing(), this);
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericQR.solve(qr, b, (Field<E>)b.getScalarRing(), this);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
+        return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericCholesky.solve(cholesky, b, (Field<E>)b.getScalarRing(), this);
     }
 
 }

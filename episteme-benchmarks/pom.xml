@@ -292,7 +292,6 @@
                     <compilerArgs>
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
-                        <arg>--enable-preview</arg>
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
@@ -315,7 +314,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
-                    <argLine>--enable-preview --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED</argLine>
+                    <argLine>--enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>

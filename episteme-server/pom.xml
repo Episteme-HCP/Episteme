@@ -339,7 +339,7 @@
                 <version>3.5.0</version>
                 <configuration>
                     <mainClass>org.episteme.server.server.EpistemeApplication</mainClass>
-                    <jvmArguments>--add-modules jdk.incubator.vector --enable-preview</jvmArguments>
+                    <jvmArguments>--add-modules jdk.incubator.vector</jvmArguments>
                     <classifier>exec</classifier>
                 </configuration>
                 <executions>

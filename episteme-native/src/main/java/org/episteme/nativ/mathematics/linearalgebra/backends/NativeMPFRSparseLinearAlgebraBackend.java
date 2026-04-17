@@ -41,6 +41,13 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     // Redundant handles removed, centralized in NativeMPFRNumbers
     private static final MemoryLayout MPFR_LAYOUT = NativeMPFRNumbers.MPFR_LAYOUT;
     private static final boolean AVAILABLE = NativeMPFRNumbers.AVAILABLE;
+    private volatile boolean closed = false;
+
+    private void ensureAlive() {
+        if (closed) throw new IllegalStateException("Backend is closed");
+    }
+
+    public boolean isAlive() { return !closed && AVAILABLE; }
 
     @Override public boolean isAvailable() { return AVAILABLE; }
     @Override public String getId() { return "native-mpfr-sparse"; }
@@ -55,7 +62,10 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override public org.episteme.core.technical.backend.ExecutionContext createContext() { 
         return new org.episteme.core.technical.backend.ExecutionContext() {
             @Override public <T> T execute(org.episteme.core.technical.backend.Operation<T> op) { return op.compute(this); }
-            @Override public void close() {}
+            @Override
+            public void close() {
+                closed = true;
+            }
         };
     }
     @Override public void shutdown() {}
@@ -267,6 +277,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        ensureAlive();
         if (a.cols() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
         int prec = (int) getPrecision();
@@ -552,6 +563,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
+        ensureAlive();
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
         long prec = getPrecision();
         org.episteme.core.mathematics.structures.rings.Ring<E> ring = (org.episteme.core.mathematics.structures.rings.Ring<E>) sa.getScalarRing();
@@ -634,6 +646,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     public Vector<E> multiply(Vector<E> a, E scalar) {
+        ensureAlive();
         Field<E> field = (Field<E>) a.getScalarRing();
         int n = a.dimension();
         long prec = getPrecision();
@@ -701,6 +714,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        ensureAlive();
         if (a.rows() != b.rows() || a.cols() != b.cols()) throw new IllegalArgumentException("Dimension mismatch");
         long prec = getPrecision();
         boolean isComplex = isComplex(a);

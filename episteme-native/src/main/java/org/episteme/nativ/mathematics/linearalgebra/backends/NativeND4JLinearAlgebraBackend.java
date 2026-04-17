@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.inverse.InvertMatrix;
-import org.nd4j.linalg.ops.transforms.Transforms;
-import org.episteme.core.mathematics.structures.rings.Ring;
 
 /**
  * NativeND4J Linear Algebra Backend (Dense).
@@ -39,7 +37,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
  * @since 1.0
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Object>, NativeBackend, CPUBackend {
+public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeND4JLinearAlgebraBackend.class);
 
 
@@ -133,7 +131,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Obj
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring instanceof org.episteme.core.mathematics.sets.Reals || ring instanceof org.episteme.core.mathematics.sets.Complexes;
+        return ring instanceof org.episteme.core.mathematics.sets.Reals;
     }
 
     @Override
@@ -144,248 +142,122 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Obj
         return score;
     }
 
-    private INDArray toINDArray(Matrix<Object> m) {
-        Ring<?> ring = m.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
-            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                float[] data = new float[m.rows() * m.cols()];
-                for (int i=0; i<m.rows(); i++) for (int j=0; j<m.cols(); j++) data[i*m.cols()+j] = ((Real)m.get(i, j)).floatValue();
-                return Nd4j.create(data, new int[]{m.rows(), m.cols()}, 'c');
-            }
-            double[] data = new double[m.rows() * m.cols()];
-            for (int i=0; i<m.rows(); i++) for (int j=0; j<m.cols(); j++) data[i*m.cols()+j] = ((Real)m.get(i, j)).doubleValue();
-            return Nd4j.create(data, new int[]{m.rows(), m.cols()}, 'c');
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
-            boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
-            if (isFloat) {
-                INDArray res = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.valueOf("COMPLEXFLOAT"), m.rows(), m.cols());
-                for (int i=0; i<m.rows(); i++) for (int j=0; j<m.cols(); j++) {
-                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex)m.get(i, j);
-                    res.data().put(2*(i*m.cols()+j), (float) c.real());
-                    res.data().put(2*(i*m.cols()+j)+1, (float) c.imaginary());
-                }
-                return res;
-            } else {
-                double[] data = new double[2 * m.rows() * m.cols()];
-                for (int i=0; i<m.rows(); i++) for (int j=0; j<m.cols(); j++) {
-                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex)m.get(i, j);
-                    data[2*(i*m.cols()+j)] = c.real();
-                    data[2*(i*m.cols()+j)+1] = c.imaginary();
-                }
-                INDArray res = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.valueOf("COMPLEXDOUBLE"), m.rows(), m.cols());
-                for (int i=0; i<m.rows(); i++) for (int j=0; j<m.cols(); j++) {
-                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) m.get(i, j);
-                    res.data().put(2*(i*m.cols()+j), c.real());
-                    res.data().put(2*(i*m.cols()+j)+1, c.imaginary());
-                }
-                return res;
+    private INDArray toINDArray(Matrix<Real> m) {
+        if (m instanceof RealDoubleMatrix) {
+            RealDoubleMatrix rdm = (RealDoubleMatrix) m;
+            // Use explicit 'c' ordering (row-major) to match RealDoubleMatrix.toDoubleArray()
+            return Nd4j.create(rdm.toDoubleArray(), new int[]{m.rows(), m.cols()}, 'c');
+        }
+        double[][] data = new double[m.rows()][m.cols()];
+        for(int r=0; r<m.rows(); r++) {
+            for(int c=0; c<m.cols(); c++) {
+                data[r][c] = m.get(r,c).doubleValue();
             }
         }
-        throw new UnsupportedOperationException("Unsupported ring: " + ring);
+        return Nd4j.create(data);
     }
 
-    private Matrix<Object> fromINDArray(INDArray array, Ring<?> ring) {
+    private Matrix<Real> fromINDArray(INDArray array) {
         if (array == null) return null;
+        if (array.rank() > 2) {
+            logger.debug("fromINDArray: Slicing array of rank {} to rank 2", array.rank());
+            while (array.rank() > 2) array = array.slice(0);
+        }
+        if (array.rank() == 1) {
+            array = array.reshape(1, array.length());
+        }
         int rows = (int) array.rows();
         int cols = (int) array.columns();
-        
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
-            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                org.episteme.core.mathematics.numbers.real.Real[] data = new org.episteme.core.mathematics.numbers.real.Real[rows * cols];
-                for (int i=0; i<rows; i++) for (int j=0; j<cols; j++) data[i*cols+j] = org.episteme.core.mathematics.numbers.real.RealFloat.of(array.getFloat(i, j));
-                return Matrix.of(data, rows, cols, ring);
+        logger.debug("[ND4J] fromINDArray: {}x{}, first element: {}, ordering: {}", rows, cols, array.getDouble(0), array.ordering());
+        double[] data = new double[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i * cols + j] = array.getDouble(i, j);
             }
-            double[] data = new double[rows * cols];
-            for (int i=0; i<rows; i++) for (int j=0; j<cols; j++) data[i*cols+j] = array.getDouble(i, j);
-            return (Matrix<Object>)(Object) RealDoubleMatrix.of(data, rows, cols);
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
-            boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
-            org.episteme.core.mathematics.numbers.complex.Complex[] data = new org.episteme.core.mathematics.numbers.complex.Complex[rows * cols];
-            for (int i=0; i<rows; i++) for (int j=0; j<cols; j++) {
-                if (isFloat) {
-                    org.nd4j.linalg.api.complex.IComplexFloat c = array.getComplexFloat((long)i, (long)j);
-                    data[i*cols+j] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(c.realComponent().floatValue()), org.episteme.core.mathematics.numbers.real.RealFloat.of(c.imaginaryComponent().floatValue()));
-                } else {
-                    org.nd4j.linalg.api.complex.IComplexDouble c = array.getComplexDouble((long)i, (long)j);
-                    data[i*cols+j] = org.episteme.core.mathematics.numbers.complex.Complex.of(c.realComponent().doubleValue(), c.imaginaryComponent().doubleValue());
-                }
-            }
-            return Matrix.of(data, rows, cols, ring);
         }
-        throw new UnsupportedOperationException("Unsupported ring: " + ring);
+        return RealDoubleMatrix.of(data, rows, cols);
     }
 
-    private INDArray toINDArray(Vector<Object> v) {
-        Ring<?> ring = v.getScalarRing();
-        int n = v.dimension();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
-            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                float[] data = new float[n];
-                for (int i=0; i<n; i++) data[i] = ((Real)v.get(i)).floatValue();
-                return Nd4j.create(data, new int[]{n, 1});
-            }
-            double[] data = new double[n];
-            for (int i=0; i<n; i++) data[i] = ((Real)v.get(i)).doubleValue();
-            return Nd4j.create(data, new int[]{n, 1});
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
-            boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
-            if (isFloat) {
-                INDArray res = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.valueOf("COMPLEXFLOAT"), n, 1);
-                for (int i=0; i<n; i++) {
-                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex)v.get(i);
-                    res.data().put(2*i, (float) c.real());
-                    res.data().put(2*i+1, (float) c.imaginary());
-                }
-                return res;
-            } else {
-                INDArray res = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.valueOf("COMPLEXDOUBLE"), n, 1);
-                for (int i=0; i<n; i++) {
-                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex)v.get(i);
-                    res.data().put(2*i, c.real());
-                    res.data().put(2*i+1, c.imaginary());
-                }
-                return res;
-            }
+    private INDArray toINDArray(Vector<Real> v) {
+        double[] data = new double[v.dimension()];
+        for(int i=0; i<v.dimension(); i++) {
+            data[i] = v.get(i).doubleValue();
         }
-        throw new UnsupportedOperationException("Unsupported ring: " + ring);
+        return Nd4j.create(data, new int[]{v.dimension(), 1}); // Column vector
     }
 
-    private Vector<Object> fromINDArrayVector(INDArray arr, Ring<?> ring) {
-        if (arr == null) return null;
-        int n = (int) arr.length();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
-            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                org.episteme.core.mathematics.numbers.real.Real[] data = new org.episteme.core.mathematics.numbers.real.Real[n];
-                for (int i=0; i<n; i++) data[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(arr.getFloat(i));
-                return Vector.of(java.util.Arrays.asList(data), ring);
-            }
-            double[] data = arr.isView() || arr.ordering() != 'c' ? arr.dup('c').data().asDouble() : arr.data().asDouble();
-            return (Vector<Object>)(Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
-            Object zero = ring.zero();
-            boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
-            org.episteme.core.mathematics.numbers.complex.Complex[] data = new org.episteme.core.mathematics.numbers.complex.Complex[n];
-            for (int i=0; i<n; i++) {
-                if (isFloat) {
-                    org.nd4j.linalg.api.complex.IComplexFloat c = arr.getComplexFloat((long)i);
-                    data[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(c.realComponent().floatValue()), org.episteme.core.mathematics.numbers.real.RealFloat.of(c.imaginaryComponent().floatValue()));
-                } else {
-                    org.nd4j.linalg.api.complex.IComplexDouble c = arr.getComplexDouble((long)i);
-                    data[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(c.realComponent().doubleValue(), c.imaginaryComponent().doubleValue());
-                }
-            }
-            return Vector.of(java.util.Arrays.asList(data), ring);
-        }
-        throw new UnsupportedOperationException("Unsupported ring: " + ring);
+    private Vector<Real> fromINDArrayVector(INDArray arr) {
+        INDArray contiguous = arr.isView() || arr.ordering() != 'c' ? arr.dup('c') : arr;
+        double[] data = contiguous.data().asDouble();
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
     }
 
     @Override
-    public Vector<Object> add(Vector<Object> a, Vector<Object> b) {
+    public Vector<Real> add(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArrayVector(toINDArray(a).add(toINDArray(b)), a.getScalarRing());
+        return fromINDArrayVector(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
-    public Vector<Object> subtract(Vector<Object> a, Vector<Object> b) {
+    public Vector<Real> subtract(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArrayVector(toINDArray(a).sub(toINDArray(b)), a.getScalarRing());
+        return fromINDArrayVector(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
-    public Vector<Object> multiply(Vector<Object> vector, Object scalar) {
+    public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        INDArray arr = toINDArray(vector);
-        Ring<?> ring = vector.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            return fromINDArrayVector(arr.mul(((Real)scalar).doubleValue()), ring);
-        } else {
-            org.episteme.core.mathematics.numbers.complex.Complex s = (org.episteme.core.mathematics.numbers.complex.Complex)scalar;
-            INDArray sc = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.valueOf("COMPLEXDOUBLE"), 1, 1);
-            sc.data().put(0, s.real());
-            sc.data().put(1, s.imaginary());
-            INDArray vRes = arr.mul(sc);
-            return fromINDArrayVector(vRes, ring);
-        }
+        return fromINDArrayVector(toINDArray(vector).mul(scalar.doubleValue()));
     }
 
     @Override
-    public Object dot(Vector<Object> a, Vector<Object> b) {
+    public Real dot(Vector<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        // Ensure both are column vectors for dot product
         INDArray arrA = toINDArray(a);
         INDArray arrB = toINDArray(b);
-        INDArray res = arrA.transpose().mmul(arrB);
-        
-        Ring<?> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            Object zero = ring.zero();
-            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                return org.episteme.core.mathematics.numbers.real.RealFloat.of(res.getFloat(0));
-            }
-            return org.episteme.core.mathematics.numbers.real.Real.of(res.getDouble(0));
-        } else {
-            Object zero = ring.zero();
-            boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
-            if (isFloat) {
-                return org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(res.getFloat(0, 0)), org.episteme.core.mathematics.numbers.real.RealFloat.of(res.getFloat(0, 1)));
-            }
-            return org.episteme.core.mathematics.numbers.complex.Complex.of(res.getDouble(0, 0), res.getDouble(0, 1));
-        }
+        return Real.of(org.nd4j.linalg.factory.Nd4j.getBlasWrapper().dot(arrA, arrB));
     }
 
     @Override
-    public Object norm(Vector<Object> a) {
+    public Real norm(Vector<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        INDArray arr = toINDArray(a);
-        double n = arr.norm2Number().doubleValue();
-        
-        Ring<?> ring = a.getScalarRing();
-        Object zero = ring.zero();
-        boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) || 
-                         (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
-        
-        if (isFloat) return org.episteme.core.mathematics.numbers.real.RealFloat.of((float)n);
-        return org.episteme.core.mathematics.numbers.real.Real.of(n);
+        return Real.of(toINDArray(a).norm2Number().doubleValue());
     }
 
     @Override
-    public Matrix<Object> add(Matrix<Object> a, Matrix<Object> b) {
+    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(toINDArray(a).add(toINDArray(b)), a.getScalarRing());
+        return fromINDArray(toINDArray(a).add(toINDArray(b)));
     }
 
     @Override
-    public Matrix<Object> subtract(Matrix<Object> a, Matrix<Object> b) {
+    public Matrix<Real> subtract(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(toINDArray(a).sub(toINDArray(b)), a.getScalarRing());
+        return fromINDArray(toINDArray(a).sub(toINDArray(b)));
     }
 
     @Override
-    public Matrix<Object> multiply(Matrix<Object> a, Matrix<Object> b) {
+    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(toINDArray(a).mmul(toINDArray(b)), a.getScalarRing());
+        return fromINDArray(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
-    public Vector<Object> multiply(Matrix<Object> a, Vector<Object> b) {
+    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArrayVector(toINDArray(a).mmul(toINDArray(b)), a.getScalarRing());
+        return fromINDArrayVector(toINDArray(a).mmul(toINDArray(b)));
     }
 
     @Override
-    public Matrix<Object> inverse(Matrix<Object> a) {
+    public Matrix<Real> inverse(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         INDArray arr = toINDArray(a);
         if (a.rows() == a.cols()) {
-            return fromINDArray(org.nd4j.linalg.inverse.InvertMatrix.invert(arr, false), a.getScalarRing());
+            return fromINDArray(InvertMatrix.invert(arr, false));
         } else {
-            return fromINDArray(org.nd4j.linalg.inverse.InvertMatrix.pinvert(arr, false), a.getScalarRing());
+            // For rectangular, ND4J has InvertMatrix.pInvert for pseudo-inverse
+            return fromINDArray(InvertMatrix.pinvert(arr, false));
         }
     }
 
@@ -393,77 +265,106 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Obj
      * Determinant via Gaussian elimination on ND4J arrays. O(n^3), no external lib.
      */
     @Override
-    public Object determinant(Matrix<Object> a) {
+    public Real determinant(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        INDArray m = toINDArray(a);
-        INDArray detArr = Nd4j.det(m);
-        double det = detArr.getDouble(0);
-        Ring<?> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            return Real.of(det);
-        } else {
-            // Check if complex via name match
-            if (detArr.dataType().name().contains("COMPLEX")) {
-                org.nd4j.linalg.api.complex.IComplexDouble c = detArr.getComplexDouble(0L);
-                return org.episteme.core.mathematics.numbers.complex.Complex.of(c.realComponent().doubleValue(), c.imaginaryComponent().doubleValue());
+        int n = a.rows();
+        INDArray m = toINDArray(a).dup();
+        
+        double det = 1.0;
+        int swaps = 0;
+        
+        for (int k = 0; k < n; k++) {
+            // Find pivot
+            int maxIdx = k;
+            double maxVal = Math.abs(m.getDouble(k, k));
+            for (int i = k + 1; i < n; i++) {
+                double v = Math.abs(m.getDouble(i, k));
+                if (v > maxVal) { maxVal = v; maxIdx = i; }
             }
-            return org.episteme.core.mathematics.numbers.complex.Complex.of(det);
+            
+            if (maxVal < 1e-15) return Real.of(0.0); // Singular
+            
+            if (maxIdx != k) {
+                // Swap rows k and maxIdx
+                for (int j = 0; j < n; j++) {
+                    double tmp = m.getDouble(k, j);
+                    m.putScalar(k, j, m.getDouble(maxIdx, j));
+                    m.putScalar(maxIdx, j, tmp);
+                }
+                swaps++;
+            }
+            
+            det *= m.getDouble(k, k);
+            
+            // Eliminate below
+            for (int i = k + 1; i < n; i++) {
+                double factor = m.getDouble(i, k) / m.getDouble(k, k);
+                for (int j = k + 1; j < n; j++) {
+                    m.putScalar(i, j, m.getDouble(i, j) - factor * m.getDouble(k, j));
+                }
+                m.putScalar(i, k, 0.0);
+            }
         }
+        
+        if (swaps % 2 != 0) det = -det;
+        return Real.of(det);
     }
 
     /**
      * Solve Ax=b via ND4J's LU decomposition.
      */
     @Override
-    public Vector<Object> solve(Matrix<Object> a, Vector<Object> b) {
+    public Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        INDArray arrA = toINDArray(a);
-        INDArray arrB = toINDArray(b);
+        try {
+            INDArray arrA = toINDArray(a).dup(); // dup because gels might modify it
+            INDArray arrB = toINDArray(b).dup();
 
-        if (a.rows() == a.cols()) {
-            INDArray resArr = org.nd4j.linalg.inverse.InvertMatrix.invert(arrA, false);
-            resArr = resArr.mmul(arrB);
-            return fromINDArrayVector(resArr, a.getScalarRing());
-        } else {
-            INDArray pinvA = org.nd4j.linalg.inverse.InvertMatrix.pinvert(arrA, false);
-            INDArray resArr = pinvA.mmul(arrB);
-            return fromINDArrayVector(resArr, a.getScalarRing());
+            if (a.rows() == a.cols()) {
+                // InvertMatrix.invert is reliable for square
+                INDArray inverse = InvertMatrix.invert(arrA, false);
+                return fromINDArrayVector(inverse.mmul(arrB));
+            } else {
+                // For rectangular, use gels (Least Squares)
+                // Note: gels usually needs a specific work array and handles dimensions.
+                // ND4J's wrapper might handle it.
+                // If gels is not convenient, we use pseudo-inverse: x = A+ * b
+                INDArray pinv = InvertMatrix.pinvert(arrA, false);
+                return fromINDArrayVector(pinv.mmul(arrB));
+            }
+        } catch (Exception e) {
+            logger.error("[ND4J] Solve failed: {}", e.getMessage());
+            throw new RuntimeException("ND4J Solve Operation Failed", e);
         }
     }
 
     @Override
-    public Matrix<Object> transpose(Matrix<Object> a) {
+    public Matrix<Real> transpose(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(toINDArray(a).transpose(), a.getScalarRing());
+        return fromINDArray(toINDArray(a).transpose());
     }
 
     /**
      * QR decomposition via ND4J's 'qr' custom op.
      */
     @Override
-    public QRResult<Object> qr(Matrix<Object> a) {
+    public QRResult<Real> qr(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         INDArray A = toINDArray(a);
-        org.nd4j.linalg.api.ops.DynamicCustomOp op = org.nd4j.linalg.api.ops.DynamicCustomOp.builder("qr").addInputs(A).build();
+        
+        // Use DynamicCustomOp for QR: returns Q and R
+        org.nd4j.linalg.api.ops.DynamicCustomOp op = org.nd4j.linalg.api.ops.DynamicCustomOp.builder("qr")
+                .addInputs(A)
+                .build();
         INDArray[] outputs = Nd4j.getExecutioner().exec(op);
-        return new QRResult<Object>(fromINDArray(outputs[0], a.getScalarRing()), fromINDArray(outputs[1], a.getScalarRing()));
+        
+        return new QRResult<Real>(fromINDArray(outputs[0]), fromINDArray(outputs[1]));
     }
 
     @Override
-    public Matrix<Object> scale(Object scalar, Matrix<Object> a) {
+    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        INDArray arr = toINDArray(a);
-        Ring<?> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            return fromINDArray(arr.mul(((Real)scalar).doubleValue()), ring);
-        } else {
-            org.episteme.core.mathematics.numbers.complex.Complex s = (org.episteme.core.mathematics.numbers.complex.Complex)scalar;
-            INDArray sc = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.valueOf("COMPLEXDOUBLE"), 1, 1);
-            sc.data().put(0, s.real());
-            sc.data().put(1, s.imaginary());
-            INDArray mRes = arr.mul(sc);
-            return fromINDArray(mRes, ring);
-        }
+        return fromINDArray(toINDArray(a).mul(scalar.doubleValue()));
     }
 
     /**
@@ -471,19 +372,30 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Obj
      * Returns U, S-diagonal-vector, V.
      */
     @Override
-    public SVDResult<Object> svd(Matrix<Object> a) {
+    public SVDResult<Real> svd(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int m = a.rows();
         int n = a.cols();
         INDArray A = toINDArray(a);
         
-        INDArray S = Nd4j.create(A.dataType(), new long[]{Math.min(m, n)});
-        INDArray U = Nd4j.create(A.dataType(), new long[]{m, m});
-        INDArray Vt = Nd4j.create(A.dataType(), new long[]{n, n});
+        // LAPACK gesvd: 'A' for all columns of U, 'A' for all columns of V
+        INDArray S = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, new long[]{Math.min(m, n)});
+        INDArray U = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, new long[]{m, m});
+        INDArray Vt = Nd4j.create(org.nd4j.linalg.api.buffer.DataType.DOUBLE, new long[]{n, n});
         
-        Nd4j.getBlasWrapper().lapack().gesvd(A.dup(), S, U, Vt);
+        try {
+            Nd4j.getBlasWrapper().lapack().gesvd(A.dup(), S, U, Vt);
+        } catch (Exception e) {
+            logger.error("[ND4J] SVD failed: {}", e.getMessage());
+            // Fallback or rethrow with more context
+            throw new RuntimeException("ND4J SVD Failed", e);
+        }
         
-        return new SVDResult<Object>(fromINDArray(U, a.getScalarRing()), fromINDArrayVector(S, (Ring<Object>)(Object)org.episteme.core.mathematics.sets.Reals.getInstance()), fromINDArray(Vt.transpose(), a.getScalarRing()));
+        INDArray contiguousU = U.isView() || U.ordering() != 'c' ? U.dup('c') : U;
+        INDArray contiguousVt = Vt.isView() || Vt.ordering() != 'c' ? Vt.dup('c') : Vt;
+        
+        // SVDResult expects V, but gesvd returns Vt. So we transpose Vt back to V.
+        return new SVDResult<Real>(fromINDArray(contiguousU), fromINDArrayVector(S), fromINDArray(contiguousVt.transpose()));
     }
 
     /**
@@ -491,73 +403,215 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Obj
      * Returns L (lower triangular), U (upper triangular), and pivot vector P.
      */
     @Override
-    public LUResult<Object> lu(Matrix<Object> a) {
+    public LUResult<Real> lu(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return LinearAlgebraProvider.super.lu(a); // Direct fallback to default as ND4J LU is double-centric in older wrappers
+        int n = a.rows();
+        
+        // Pure Java LU decomposition with partial pivoting to avoid ND4J ordering issues
+        double[][] work = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                work[i][j] = a.get(i, j).doubleValue();
+        
+        int[] perm = new int[n];
+        for (int i = 0; i < n; i++) perm[i] = i;
+        
+        for (int k = 0; k < n; k++) {
+            // Find pivot
+            int maxIdx = k;
+            double maxVal = Math.abs(work[k][k]);
+            for (int i = k + 1; i < n; i++) {
+                double v = Math.abs(work[i][k]);
+                if (v > maxVal) { maxVal = v; maxIdx = i; }
+            }
+            
+            if (maxIdx != k) {
+                // Swap rows
+                double[] tmp = work[k];
+                work[k] = work[maxIdx];
+                work[maxIdx] = tmp;
+                int tmpP = perm[k]; perm[k] = perm[maxIdx]; perm[maxIdx] = tmpP;
+            }
+            
+            // Gaussian elimination
+            double pivot = work[k][k];
+            if (Math.abs(pivot) > 1e-15) {
+                for (int i = k + 1; i < n; i++) {
+                    double factor = work[i][k] / pivot;
+                    work[i][k] = factor; // Store L factor in lower part
+                    for (int j = k + 1; j < n; j++) {
+                        work[i][j] -= factor * work[k][j];
+                    }
+                }
+            }
+        }
+        
+        // Extract L and U
+        double[] lFlat = new double[n * n];
+        double[] uFlat = new double[n * n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i > j) {
+                    lFlat[i * n + j] = work[i][j];
+                } else if (i == j) {
+                    lFlat[i * n + j] = 1.0;
+                    uFlat[i * n + j] = work[i][j];
+                } else {
+                    uFlat[i * n + j] = work[i][j];
+                }
+            }
+        }
+        
+        double[] p = new double[n];
+        for (int i = 0; i < n; i++) p[i] = perm[i];
+        
+        return new LUResult<Real>(
+            RealDoubleMatrix.of(lFlat, n, n),
+            RealDoubleMatrix.of(uFlat, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p)
+        );
     }
 
     @Override
-    public CholeskyResult<Object> cholesky(Matrix<Object> a) {
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> cholesky(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return LinearAlgebraProvider.super.cholesky(a);
+        int n = a.rows();
+        
+        // Pure Java Cholesky decomposition to avoid ND4J potrf ordering issues
+        double[][] aData = new double[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                aData[i][j] = a.get(i, j).doubleValue();
+        
+        double[][] lData = new double[n][n];
+        for (int j = 0; j < n; j++) {
+            double sum = 0;
+            for (int k = 0; k < j; k++) sum += lData[j][k] * lData[j][k];
+            double diag = aData[j][j] - sum;
+            if (diag <= 0) throw new ArithmeticException("Matrix is not positive definite");
+            lData[j][j] = Math.sqrt(diag);
+            for (int i = j + 1; i < n; i++) {
+                sum = 0;
+                for (int k = 0; k < j; k++) sum += lData[i][k] * lData[j][k];
+                lData[i][j] = (aData[i][j] - sum) / lData[j][j];
+            }
+        }
+        
+        // Flatten row-major
+        double[] flat = new double[n * n];
+        for (int i = 0; i < n; i++)
+            System.arraycopy(lData[i], 0, flat, i * n, n);
+        
+        return new CholeskyResult<Real>(RealDoubleMatrix.of(flat, n, n));
     }
 
     @Override
-    public EigenResult<Object> eigen(Matrix<Object> a) {
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> eigen(Matrix<Real> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        INDArray A = toINDArray(a);
-        int n = (int) A.rows();
-        INDArray S = Nd4j.create(A.dataType(), n);
-        Nd4j.getBlasWrapper().lapack().syev('V', 'U', A, S);
-        Matrix<Object> V = fromINDArray(A, a.getScalarRing());
-        Vector<Object> D = fromINDArrayVector(S, a.getScalarRing());
-        return new EigenResult<Object>(V, D);
+        
+        // For efficiency and robustness with standard ND4J, we use Jacobi for symmetric matrices
+        boolean isSymmetric = true;
+        int n = a.rows();
+        for (int i = 0; i < n && isSymmetric; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (Math.abs(a.get(i, j).doubleValue() - a.get(j, i).doubleValue()) > 1e-10) {
+                    isSymmetric = false;
+                    break;
+                }
+            }
+        }
+
+        if (isSymmetric) {
+            return jacobi(a);
+        }
+
+        // Fallback to ND4J native eig for non-symmetric
+        try {
+            INDArray[] result = org.nd4j.linalg.eigen.Eigen.eig(toINDArray(a));
+            INDArray eigVals = result[0];
+            INDArray eigVecs = result[1];
+            
+            if (eigVals.rank() == 2 && eigVals.columns() == 2) {
+                 eigVals = eigVals.getColumn(0).dup(); // Take real part
+            }
+            if (eigVecs.rank() == 3) {
+                eigVecs = eigVecs.get(org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.all(), org.nd4j.linalg.indexing.NDArrayIndex.point(0)).dup(); 
+            }
+            
+            return new EigenResult<Real>(
+                fromINDArray(eigVecs),
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigVals.data().asDouble())
+            );
+        } catch (Exception e) {
+            logger.warn("ND4J Native eig failed: {}. Falling back to Jacobi (as approximate).", e.getMessage());
+            return jacobi(a);
+        }
     }
 
-    // --- Transcendental Functions ---
+    private EigenResult<Real> jacobi(Matrix<Real> a) {
+        int n = a.rows();
+        double[] data = new double[n * n];
+        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i * n + j] = a.get(i, j).doubleValue();
+        
+        double[] vData = new double[n * n];
+        for (int i = 0; i < n; i++) vData[i * n + i] = 1.0;
+        
+        int maxSweeps = 50;
+        double eps = 1e-15;
+        
+        for (int sweep = 0; sweep < maxSweeps; sweep++) {
+            double offDiag = 0;
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) offDiag += Math.abs(data[i * n + j]);
+            }
+            if (offDiag < eps) break;
+            
+            for (int p = 0; p < n - 1; p++) {
+                for (int q = p + 1; q < n; q++) {
+                    double apq = data[p * n + q];
+                    if (Math.abs(apq) < eps) continue;
+                    
+                    double app = data[p * n + p];
+                    double aqq = data[q * n + q];
+                    
+                    double tau = (aqq - app) / (2.0 * apq);
+                    double t = (tau >= 0) ? 1.0 / (tau + Math.sqrt(1.0 + tau * tau)) 
+                                         : 1.0 / (tau - Math.sqrt(1.0 + tau * tau));
+                    double c = 1.0 / Math.sqrt(1.0 + t * t);
+                    double s = t * c;
 
-    @Override
-    public Matrix<Object> exp(Matrix<Object> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(Transforms.exp(toINDArray(a), true), a.getScalarRing());
-    }
-
-    @Override
-    public Matrix<Object> log(Matrix<Object> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(Transforms.log(toINDArray(a), true), a.getScalarRing());
-    }
-
-    @Override
-    public Matrix<Object> sin(Matrix<Object> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(Transforms.sin(toINDArray(a), true), a.getScalarRing());
-    }
-
-    @Override
-    public Matrix<Object> cos(Matrix<Object> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(Transforms.cos(toINDArray(a), true), a.getScalarRing());
-    }
-
-    @Override
-    public Matrix<Object> tan(Matrix<Object> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(Transforms.tan(toINDArray(a), true), a.getScalarRing());
-    }
-
-    @Override
-    public Matrix<Object> sqrt(Matrix<Object> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        return fromINDArray(Transforms.sqrt(toINDArray(a), true), a.getScalarRing());
-    }
-
-    @Override
-    public Vector<Object> normalize(Vector<Object> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        INDArray arr = toINDArray(a);
-        double n = arr.norm2Number().doubleValue();
-        if (n == 0) return a;
-        return fromINDArrayVector(arr.div(n), a.getScalarRing());
+                    for (int i = 0; i < n; i++) {
+                        double tp = data[p * n + i];
+                        double tq = data[q * n + i];
+                        data[p * n + i] = c * tp - s * tq;
+                        data[q * n + i] = s * tp + c * tq;
+                    }
+                    for (int j = 0; j < n; j++) {
+                        data[j * n + p] = data[p * n + j];
+                        data[j * n + q] = data[q * n + j];
+                    }
+                    
+                    data[p * n + p] = app - t * apq;
+                    data[q * n + q] = aqq + t * apq;
+                    data[p * n + q] = 0.0;
+                    data[q * n + p] = 0.0;
+                    
+                    for (int i = 0; i < n; i++) {
+                        double vp = vData[i * n + p];
+                        double vq = vData[i * n + q];
+                        vData[i * n + p] = c * vp - s * vq;
+                        vData[i * n + q] = s * vp + c * vq;
+                    }
+                }
+            }
+        }
+        
+        double[] eigenvalues = new double[n];
+        for (int i = 0; i < n; i++) eigenvalues[i] = data[i * n + i];
+        
+        return new EigenResult<>(
+            RealDoubleMatrix.of(vData, n, n),
+            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(eigenvalues)
+        );
     }
 }
