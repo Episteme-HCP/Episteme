@@ -85,6 +85,11 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     private static MethodHandle ZSCAL;
 
     private static MethodHandle DOMATCOPY;
+
+    private static MethodHandle STRSM;
+    private static MethodHandle DTRSM;
+    private static MethodHandle CTRSM;
+    private static MethodHandle ZTRSM;
     
     // LAPACK Method Handles
     private static MethodHandle SGESV;
@@ -467,6 +472,36 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 CGELS = findLapackSymbol("LAPACKE_cgels").map(s -> LINKER.downcallHandle(s, gelsDescriptor)).orElse(null);
                 ZGELS = findLapackSymbol("LAPACKE_zgels").map(s -> LINKER.downcallHandle(s, gelsDescriptor)).orElse(null);
 
+                // --- TRSM (Triangular Solve) ---
+                FunctionDescriptor ctrsmDesc = FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                CTRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_ctrsm")
+                        .map(s -> LINKER.downcallHandle(s, ctrsmDesc)).orElse(null);
+                ZTRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_ztrsm")
+                        .map(s -> LINKER.downcallHandle(s, ctrsmDesc)).orElse(null);
+
+                FunctionDescriptor dtrsmDesc = FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                DTRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dtrsm")
+                        .map(s -> LINKER.downcallHandle(s, dtrsmDesc)).orElse(null);
+
+                FunctionDescriptor strsmDesc = FunctionDescriptor.ofVoid(
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                STRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_strsm")
+                        .map(s -> LINKER.downcallHandle(s, strsmDesc)).orElse(null);
+
                 available = (DGEMM != null && DGEMV != null && DDOT != null);
 
                 if (available) {
@@ -493,6 +528,53 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": solveTriangular() not available");
+        int n = A.rows();
+        if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
+        if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+
+        boolean single = isFloat(A);
+        boolean complex = isComplex(A);
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment segA = getSegment(A, arena, tracker);
+            MemorySegment segB = getSegment(b, arena, tracker);
+            
+            // CBLAS Constants
+            int side = 141; // CblasLeft
+            int uplo = upper ? 121 : 122; // CblasUpper : CblasLower
+            int trans = transpose ? 112 : 111; // CblasTrans : CblasNoTrans
+            int diag = unit ? 131 : 132; // CblasUnit : CblasNonUnit
+
+            if (complex) {
+                MemorySegment alpha;
+                if (single) {
+                    alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    NativeSafe.invoke(CTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
+                } else {
+                    alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                    NativeSafe.invoke(ZTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
+                }
+            } else {
+                if (single) {
+                    NativeSafe.invoke(STRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0f, segA, n, segB, 1);
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
+                } else {
+                    NativeSafe.invoke(DTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0, segA, n, segB, 1);
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
+                }
+            }
+        } catch (Throwable t) { 
+            throw new RuntimeException("TRSM failed", t); 
+        }
+    }
+
+    @Override
     public Vector<E> solve(Matrix<E> A, Vector<E> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": solve() not available");
         org.episteme.core.mathematics.context.MathContext.checkCancelled();
@@ -503,60 +585,43 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
 
         if (m == n) {
              if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
-             if (complex) {
-                 if (single) {
-                     try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
-                         MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
-                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+             try (ResourceTracker tracker = new ResourceTracker()) {
+                 Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+                 MemorySegment segA = getSegment(A, arena, tracker);
+                 MemorySegment segB = getSegment(b, arena, tracker);
+                 MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+
+                 if (complex) {
+                     if (single) {
                          int info = (int) NativeSafe.invoke(CGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                          if (info != 0) throw new ArithmeticException("CGESV failed: " + info);
-                         float[] resData = segB.toArray(ValueLayout.JAVA_FLOAT);
-                         return createDenseVector(resData, n, A);
-                     }
-                 } else {
-                     try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
-                         MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
-                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                         return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
+                     } else {
                          int info = (int) NativeSafe.invoke(ZGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                          if (info != 0) throw new ArithmeticException("ZGESV failed: " + info);
-                         double[] resData = segB.toArray(ValueLayout.JAVA_DOUBLE);
-                         return createDenseVector(resData, n, A);
-                     }
-                 }
-             } else {
-                 if (single) {
-                     try (ResourceTracker tracker = new ResourceTracker()) {
-                         Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
-                         MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
-                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
-                         int info = (int) NativeSafe.invoke(SGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
-                         if (info != 0) throw new ArithmeticException("SGESV failed: " + info);
-                         float[] resData = segB.toArray(ValueLayout.JAVA_FLOAT);
-                         return createDenseVector(resData, n, A);
+                         return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
                      }
                  } else {
-                     try (ResourceTracker tracker = new ResourceTracker()) {
-                         Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
-                         MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                     if (single) {
+                         int info = (int) NativeSafe.invoke(SGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
+                         if (info != 0) throw new ArithmeticException("SGESV failed: " + info);
+                         return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
+                     } else {
                          int info = (int) NativeSafe.invoke(DGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                          if (info != 0) throw new ArithmeticException("DGESV failed: " + info);
-                         double[] resultSize = segB.toArray(ValueLayout.JAVA_DOUBLE);
-                         return createDenseVector(resultSize, n, A);
+                         return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
                      }
                  }
              }
         } else {
              // Least Squares
-             if (complex) {
-                 if (single) {
-                     try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
-                         int maxDim = Math.max(m, n);
+             try (ResourceTracker tracker = new ResourceTracker()) {
+                 Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+                 int maxDim = Math.max(m, n);
+
+                 if (complex) {
+                     MemorySegment segA = getSegment(A, arena, tracker);
+                     if (single) {
                          float[] bPad = new float[maxDim * 2];
                          float[] bOrig = toInterlacedFloatArray(b);
                          System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
@@ -567,28 +632,22 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                          float[] resData = new float[n * 2];
                          System.arraycopy(resFull, 0, resData, 0, n * 2);
                          return createDenseVector(resData, n, A);
-                     }
-                 } else {
-                     try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
-                         int maxDim = Math.max(m, n);
+                     } else {
+                         MemorySegment segA_D = getSegment(A, arena, tracker);
                          double[] bPad = new double[maxDim * 2];
                          double[] bOrig = toInterlacedDoubleArray(b);
                          System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
                          MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bPad);
-                         int info = (int) NativeSafe.invoke(ZGELS, LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, segA, n, segB, 1);
+                         int info = (int) NativeSafe.invoke(ZGELS, LAPACK_ROW_MAJOR, (byte) 'N', m, n, 1, segA_D, n, segB, 1);
                          if (info != 0) throw new RuntimeException("ZGELS failed: " + info);
                          double[] resFull = segB.toArray(ValueLayout.JAVA_DOUBLE);
                          double[] resData = new double[n * 2];
                          System.arraycopy(resFull, 0, resData, 0, n * 2);
                          return createDenseVector(resData, n, A);
                      }
-                 }
-             } else {
-                 if (single) {
-                     try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
-                         int maxDim = Math.max(m, n);
+                 } else {
+                     MemorySegment segA = getSegment(A, arena, tracker);
+                     if (single) {
                          float[] bPad = new float[maxDim];
                          float[] bOrig = toFloatArray(b);
                          System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
@@ -598,11 +657,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                          float[] result = new float[n];
                          MemorySegment.copy(segB, ValueLayout.JAVA_FLOAT, 0L, result, 0, n);
                          return createDenseVector(result, n, A);
-                     }
-                 } else {
-                     try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
-                         int maxDim = Math.max(m, n);
+                     } else {
                          double[] bPad = new double[maxDim];
                          double[] bOrig = toDoubleArray(b);
                          System.arraycopy(bOrig, 0, bPad, 0, bOrig.length);
@@ -641,8 +696,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 double[] arrA = toDoubleArray(a);
                 MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, arrA);
                 MemorySegment segC = MemorySegment.ofBuffer(res.getBuffer());
-                NativeSafe.invoke(DOMATCOPY, CblasRowMajor, 112, m, n, 1.0, segA, n, segC, m);
-                return (Matrix<E>) (Matrix<?>) res;
+                @SuppressWarnings("unchecked")
+                Matrix<E> casted = (Matrix<E>) (Matrix<?>) res;
+                return casted;
             }
         }
 
@@ -726,7 +782,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 double sVal = ((org.episteme.core.mathematics.numbers.real.Real)(Object)svd.S().get(i)).doubleValue();
                 if (sVal > 1e-12) sData[i][i] = org.episteme.core.mathematics.numbers.complex.Complex.of(1.0 / sVal);
             }
-            sInv = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>((E[][]) sData, (Ring<E>) a.getScalarRing());
+            @SuppressWarnings("unchecked")
+            E[][] castedArr = (E[][]) sData;
+            sInv = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(castedArr, (Ring<E>) a.getScalarRing());
         } else {
             Real[][] sData = new Real[n][m];
             for(int i=0; i<n; i++) for(int j=0; j<m; j++) sData[i][j] = Real.ZERO;
@@ -734,7 +792,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 double sVal = ((Real)(Object)svd.S().get(i)).doubleValue();
                 if (sVal > 1e-12) sData[i][i] = Real.of(1.0 / sVal);
             }
-            sInv = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>((E[][]) sData, (Ring<E>) a.getScalarRing());
+            @SuppressWarnings("unchecked")
+            E[][] castedArr = (E[][]) sData;
+            sInv = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(castedArr, (Ring<E>) a.getScalarRing());
         }
         return svd.V().multiply(sInv).multiply(conjugateTranspose(svd.U()));
     }
@@ -743,8 +803,10 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         Matrix<E> mt = m.transpose();
         if (isComplex(m)) {
             return mt.map(val -> {
+                @SuppressWarnings("unchecked")
                 org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) val;
-                return (E) (Object) c.conjugate();
+                E casted = (E) (Object) c.conjugate();
+                return casted;
             });
         }
         return mt;
@@ -776,7 +838,9 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                      return (E) (Object) det;
                  } catch (Throwable e) { logger.debug("Native determinant failed, falling back: {}", e.getMessage()); }
              }
-             return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant(A, (org.episteme.core.mathematics.structures.rings.Field<E>)A.getScalarRing(), this);
+             @SuppressWarnings("unchecked")
+             Ring<E> ring = A.getScalarRing();
+             return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant(A, (org.episteme.core.mathematics.structures.rings.Field<E>)ring, this);
          }
          
          if (DGETRF != null) {
@@ -793,7 +857,13 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                  return (E) (Object) Real.of(det);
              } catch (Throwable e) { logger.debug("Native determinant failed, falling back: {}", e.getMessage()); }
          }
-         return (E) (Object) org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant((Matrix<Real>)A, (org.episteme.core.mathematics.structures.rings.Field<Real>)A.getScalarRing(), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>)(Object)this);
+         @SuppressWarnings("unchecked")
+         LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>)(Object)this;
+         @SuppressWarnings("unchecked")
+         Matrix<Real> mReal = (Matrix<Real>)A;
+         @SuppressWarnings("unchecked")
+         E res = (E) (Object) org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant(mReal, (org.episteme.core.mathematics.structures.rings.Field<Real>)A.getScalarRing(), provider);
+         return res;
     }
     
     @Override
@@ -1192,34 +1262,26 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         int n = B.cols();
         if (k != B.rows()) throw new IllegalArgumentException("Matrix dimensions mismatch");
 
-        if (isFloat(A)) {
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
-                MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(B));
+        boolean single = isFloat(A);
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment segA = getSegment(A, arena, tracker);
+            MemorySegment segB = getSegment(B, arena, tracker);
+            
+            if (single) {
                 MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
                 NativeSafe.invoke(SGEMM, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0f, segA, k, segB, n, 0.0f, segC, n);
-                float[] result = segC.toArray(ValueLayout.JAVA_FLOAT);
-                return createDenseMatrix(result, m, n, A);
-            } catch (Throwable t) { throw new RuntimeException("SGEMM failed", t); }
-        }
-
-        MemorySegment segC;
-        Arena resultArena = Arena.ofAuto();
-        segC = resultArena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
-
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment segA = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
-            MemorySegment segB = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(B));
-
-            try {
-                NativeSafe.invoke(DGEMM, CblasRowMajor, CblasNoTrans, CblasNoTrans, 
-                                  m, n, k, 1.0, segA, k, segB, n, 0.0, segC, n);
-            } catch (Throwable e) {
-                logger.warn("FFM DGEMM failed: {}", e.getMessage());
-                throw new RuntimeException("FFM Multiply Operation Failed", e);
+                return createDenseMatrix(segC.toArray(ValueLayout.JAVA_FLOAT), m, n, A);
+            } else {
+                Arena resultArena = Arena.ofAuto();
+                MemorySegment segC = resultArena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+                NativeSafe.invoke(DGEMM, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, segA, k, segB, n, 0.0, segC, n);
+                return createZeroCopyDoubleMatrix(segC, m, n, resultArena, A);
             }
+        } catch (Throwable t) { 
+            throw new RuntimeException((single ? "SGEMM" : "DGEMM") + " failed", t); 
         }
-        return createZeroCopyDoubleMatrix(segC, m, n, resultArena, A);
     }
 
     private boolean isComplex(Matrix<E> m) {
@@ -1402,33 +1464,26 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         int n = a.cols();
         if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
 
-        if (isFloat(a)) {
-            try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+        boolean single = isFloat(a);
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment segA = getSegment(a, arena, tracker);
+            MemorySegment segX = getSegment(b, arena, tracker);
+            
+            if (single) {
                 MemorySegment segY = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m);
                 NativeSafe.invoke(SGEMV, CblasRowMajor, CblasNoTrans, m, n, 1.0f, segA, n, segX, 1, 0.0f, segY, 1);
-                float[] result = segY.toArray(ValueLayout.JAVA_FLOAT);
-                return createDenseVector(result, m, a);
-            } catch (Throwable t) { throw new RuntimeException("SGEMV failed", t); }
-        }
-
-        MemorySegment segY;
-        Arena resultArena = Arena.ofAuto();
-        segY = resultArena.allocate(ValueLayout.JAVA_DOUBLE, m);
-
-        try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment segA = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            MemorySegment segX = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-            
-            try {
+                return createDenseVector(segY.toArray(ValueLayout.JAVA_FLOAT), m, a);
+            } else {
+                Arena resultArena = Arena.ofAuto();
+                MemorySegment segY = resultArena.allocate(ValueLayout.JAVA_DOUBLE, (long) m);
                 NativeSafe.invoke(DGEMV, CblasRowMajor, CblasNoTrans, m, n, 1.0, segA, n, segX, 1, 0.0, segY, 1);
-            } catch (Throwable t) {
-                logger.warn("FFM DGEMV failed: {}", t.getMessage());
-                throw new RuntimeException("DGEMV failed", t);
+                return createZeroCopyDoubleVector(segY, m, resultArena, a);
             }
+        } catch (Throwable t) { 
+            throw new RuntimeException((single ? "SGEMV" : "DGEMV") + " failed", t); 
         }
-        return createZeroCopyDoubleVector(segY, m, resultArena, a);
     }
 
     private Vector<E> multiplyComplex(Matrix<E> a, Vector<E> b) {
@@ -2411,5 +2466,47 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     @Override
     public void close() {
         // No-op.
+    }
+
+    private MemorySegment getSegment(Object obj, Arena arena, ResourceTracker tracker) {
+        if (obj instanceof NativeSegmentProxy proxy) {
+            if (proxy.isAlive()) return proxy.segment();
+            logger.warn("NativeSegmentProxy scope is not alive, falling back to copy");
+        }
+        
+        if (obj instanceof Matrix<?> m) {
+            boolean single = isFloat(m);
+            boolean complex = isComplex(m);
+            if (complex) {
+                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray((Matrix<E>)m));
+                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray((Matrix<E>)m));
+            } else {
+                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<E>)m));
+                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<E>)m));
+            }
+        } else if (obj instanceof Vector<?> v) {
+            boolean single = isFloat(v);
+            boolean complex = isComplex(v);
+             if (complex) {
+                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray((Vector<E>)v));
+                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray((Vector<E>)v));
+            } else {
+                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<E>)v));
+                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<E>)v));
+            }
+        }
+        throw new IllegalArgumentException("Unsupported object for FFM conversion: " + (obj != null ? obj.getClass() : "null"));
+    }
+
+    private boolean isFloat(Object obj) {
+        if (obj instanceof Matrix<?> m) return m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat;
+        if (obj instanceof Vector<?> v) return v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat;
+        return false;
+    }
+
+    private boolean isComplex(Object obj) {
+        if (obj instanceof Matrix<?> m) return m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (obj instanceof Vector<?> v) return v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        return false;
     }
 }

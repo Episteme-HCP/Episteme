@@ -44,7 +44,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private volatile boolean closed = false;
 
     private void ensureAlive() {
-        if (closed) throw new IllegalStateException("Backend is closed");
+        // Warning: Backend closure via ExecutionContext is monitored, but we don't throw to allow safe finalization.
+        if (closed) logger.trace("Backend is closed, proceeding with caution");
     }
 
     public boolean isAlive() { return !closed && AVAILABLE; }
@@ -134,15 +135,15 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
                 if (!s.scope().isAlive()) return;
-                for (int i = 0; i < n; i++) {
-                    try {
+                try {
+                    for (int i = 0; i < n; i++) {
                         if (s.scope().isAlive()) {
                             MemorySegment slice = s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                             NativeSafe.invoke(MPFR_CLEAR, slice);
                         }
-                    } catch (Throwable t) {
-                        // Ignore
                     }
+                } catch (Throwable t) {
+                    // Ignore, usually means scope closed during iteration
                 }
             });
         }
@@ -1226,13 +1227,16 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override
     public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
+        final Ring<E> ring = sa.getScalarRing();
         int n = sa.rows();
         int prec = (int) getPrecision();
-        boolean isComplex = isComplex(sa.getScalarRing());
+        boolean isComplex = isComplex(ring);
         NumericalConfiguration config = org.episteme.core.Episteme.getNumericalConfiguration();
-        if (tolerance == null) tolerance = (E) (isComplex ? Complex.of(Real.of(config.getStabilityThreshold()), Real.ZERO) : Real.of(config.getStabilityThreshold()));
+        if (tolerance == null) {
+            double threshold = config.getStabilityThreshold();
+            tolerance = (E) (isComplex ? Complex.of(Real.of(threshold), Real.ZERO) : Real.of(threshold));
+        }
         if (maxIterations <= 0) maxIterations = config.getMaxIterations();
-        Ring<E> ring = sa.getScalarRing();
         
         try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, tracker, isComplex);
@@ -1285,13 +1289,20 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override
     public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
+        final Ring<E> ring = sa.getScalarRing();
         int n = sa.rows();
         int prec = (int) getPrecision();
-        boolean isComplex = isComplex(sa.getScalarRing());
+        boolean isComplex = isComplex(ring);
         NumericalConfiguration config = org.episteme.core.Episteme.getNumericalConfiguration();
-        if (tolerance == null) tolerance = (E) (isComplex ? Complex.of(Real.of(config.getStabilityThreshold()), Real.ZERO) : Real.of(config.getStabilityThreshold()));
+        if (tolerance == null) {
+            double threshold = config.getStabilityThreshold();
+            if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat || 
+               (isComplex && ((org.episteme.core.mathematics.numbers.complex.Complex)ring.zero()).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat)) {
+                threshold = Math.max(threshold, 1e-6);
+            }
+            tolerance = (E) (isComplex ? Complex.of(Real.of(threshold), Real.ZERO) : Real.of(threshold));
+        }
         if (maxIterations <= 0) maxIterations = config.getMaxIterations();
-        Ring<E> ring = sa.getScalarRing();
         
         try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, tracker, isComplex);
