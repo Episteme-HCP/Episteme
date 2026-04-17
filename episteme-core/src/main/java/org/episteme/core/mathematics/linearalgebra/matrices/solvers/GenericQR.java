@@ -100,8 +100,17 @@ public class GenericQR {
     }
 
     private static <E> boolean isNonZero(E element, Field<E> field) {
-        if (element instanceof Real) return ((Real) element).abs().doubleValue() > 1e-30;
-        if (element instanceof Complex) return ((Complex) element).abs().doubleValue() > 1e-30;
+        if (element instanceof Real) {
+            Real r = (Real) element;
+            if (r.isZero()) return false;
+            // Use extremely small epsilon for high-precision stability
+            return r.abs().doubleValue() > 1e-100;
+        }
+        if (element instanceof Complex) {
+            Complex c = (Complex) element;
+            if (c.getReal().isZero() && c.getImaginary().isZero()) return false;
+            return c.abs().doubleValue() > 1e-100;
+        }
         if (element instanceof Number) return Math.abs(((Number) element).doubleValue()) > 1e-30;
         return !field.zero().equals(element);
     }

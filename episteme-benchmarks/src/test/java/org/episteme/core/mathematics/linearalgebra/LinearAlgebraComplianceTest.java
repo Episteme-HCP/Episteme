@@ -94,7 +94,7 @@ public class LinearAlgebraComplianceTest {
     private void configureForMode() {
         switch (mode) {
             case FAST -> { matrixSize = 8; reportFileName = "UNIVERSAL_AUDIT_FAST.md"; }
-            case EXACT -> { matrixSize = 4; reportFileName = "UNIVERSAL_AUDIT_EXACT.md"; }
+            case EXACT -> { matrixSize = 6; reportFileName = "UNIVERSAL_AUDIT_EXACT.md"; }
             default -> { matrixSize = 12; reportFileName = "UNIVERSAL_AUDIT_NORMAL.md"; }
         }
     }
@@ -113,6 +113,9 @@ public class LinearAlgebraComplianceTest {
     private void runStandardAudit(ComplianceResult res, LinearAlgebraProvider<Real> prov, LinearAlgebraProvider<Real> ref) {
         Ring<Real> realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
         double tolerance = (mode == PrecisionMode.FAST) ? 1e-7 : 1e-14;
+        if (System.getProperty("org.episteme.test.tolerance.strict") != null) {
+            tolerance = Double.parseDouble(System.getProperty("org.episteme.test.tolerance.strict"));
+        }
         LinearAlgebraAuditSuite.runFullAudit(prov, ref, matrixSize, (op, test) -> auditOp(res, op, test), realRing, "R:", tolerance);
         
         Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();

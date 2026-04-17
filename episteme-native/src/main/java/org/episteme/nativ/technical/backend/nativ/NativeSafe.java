@@ -95,6 +95,17 @@ public class NativeSafe {
             try {
                 return handle.invokeWithArguments(coercedArgs);
             } catch (Throwable t2) {
+                boolean isAlreadyClosed = t2 instanceof IllegalStateException && 
+                                          t2.getMessage() != null && 
+                                          t2.getMessage().contains("already closed");
+                
+                if (isAlreadyClosed) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Native Invoke: Call to {} aborted because segment was already closed.", handle);
+                    }
+                    throw (RuntimeException) t2;
+                }
+
                 // 3. Final Fallback: Critical Failure reporting
                 logger.error("CRITICAL: Native call failed after coercion! Handle: {}", handle);
                 for (int i = 0; i < args.length; i++) {

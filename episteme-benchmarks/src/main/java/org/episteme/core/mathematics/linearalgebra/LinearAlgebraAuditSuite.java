@@ -2,6 +2,7 @@ package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
+import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
@@ -126,10 +127,22 @@ public class LinearAlgebraAuditSuite {
     }
 
     private static <E> E randomElement(Ring<E> ring, Random rand, boolean isComplex) {
-        if (isComplex) return (E) Complex.of(rand.nextDouble(), rand.nextDouble());
-        if (ring.one() instanceof RealBig) return (E) RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
-        if (ring.one() instanceof Real) return (E) Real.of(rand.nextDouble());
-        return ring.one();
+        E zero = ring.zero();
+        boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) ||
+                         (isComplex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
+        
+        if (isComplex) {
+            if (isFloat) {
+                return (E) Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble()), 
+                                    org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble()));
+            }
+            return (E) Complex.of(rand.nextDouble(), rand.nextDouble());
+        }
+        
+        if (zero instanceof RealBig) return (E) RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
+        if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble());
+        if (zero instanceof Real) return (E) Real.of(rand.nextDouble());
+        return zero;
     }
 
     private static <E> Matrix<E> createTriangular(int n, boolean upper, Ring<E> ring, Random rand) {
@@ -152,8 +165,14 @@ public class LinearAlgebraAuditSuite {
         @SuppressWarnings("unchecked")
         E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.one().getClass(), n, n);
         boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
-        E large = ring.add(ring.one(), ring.one()); // 2.0
-        for (int i = 0; i < 3; i++) large = ring.add(large, large); // 16.0
+        E large;
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+            large = (E) org.episteme.core.mathematics.numbers.real.RealFloat.of(16.0f);
+        } else if (ring.zero() instanceof RealBig) {
+             large = (E) RealBig.create(new java.math.BigDecimal("16.0"));
+        } else {
+             large = (E) Real.of(16.0);
+        }
         
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {

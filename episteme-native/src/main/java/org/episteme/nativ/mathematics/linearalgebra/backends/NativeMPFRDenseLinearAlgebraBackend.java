@@ -123,7 +123,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         if (p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
                 try {
-                    NativeSafe.invoke(MPFR_CLEAR, s);
+                    if (s.scope().isAlive()) {
+                        NativeSafe.invoke(MPFR_CLEAR, s);
+                    }
                 } catch (Throwable t) {
                     // ResourceTracker handles robustness
                 }
@@ -134,10 +136,13 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     private static void trackArray(ResourceTracker tracker, MemorySegment p, int n) {
         if (p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
+                if (!s.scope().isAlive()) return;
                 for (int i = 0; i < n; i++) {
                     try {
-                        MemorySegment slice = s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_CLEAR, slice);
+                        if (s.scope().isAlive()) {
+                            MemorySegment slice = s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                            NativeSafe.invoke(MPFR_CLEAR, slice);
+                        }
                     } catch (Throwable t) {
                         // Ignore
                     }
@@ -674,9 +679,13 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
     
     private static void clearMPFRArray(MemorySegment mat, int count) {
-        if (mat == MemorySegment.NULL) return;
+        if (mat == MemorySegment.NULL || !mat.scope().isAlive()) return;
         for (int i = 0; i < count; i++) {
-            try { NativeSafe.invoke(MPFR_CLEAR, mat.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT)); } catch (Throwable t) {}
+            try { 
+                if (mat.scope().isAlive()) {
+                    NativeSafe.invoke(MPFR_CLEAR, mat.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT)); 
+                }
+            } catch (Throwable t) {}
         }
     }
 

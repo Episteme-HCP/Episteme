@@ -22,6 +22,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
@@ -45,7 +46,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeSafe;
  * @since 1.1
  */
 @com.google.auto.service.AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
-public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
+public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Object>, NativeBackend, CPUBackend {
 
     private static final System.Logger logger = System.getLogger(NativeCPULinearAlgebraBackend.class.getName());
 
@@ -65,6 +66,30 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     private static final MethodHandle DORGQR_HANDLE;
     private static final MethodHandle DGESVD_HANDLE;
     private static final MethodHandle DGELS_HANDLE;
+
+    // Single Precision (S)
+    private static final MethodHandle SGEMM_HANDLE;
+    private static final MethodHandle SGEMV_HANDLE;
+    private static final MethodHandle SDOT_HANDLE;
+    private static final MethodHandle SNRM2_HANDLE;
+    private static final MethodHandle SSCAL_HANDLE;
+    private static final MethodHandle SGESV_HANDLE;
+
+    // Complex Double (Z)
+    private static final MethodHandle ZGEMM_HANDLE;
+    private static final MethodHandle ZGEMV_HANDLE;
+    private static final MethodHandle ZDOTU_HANDLE;
+    private static final MethodHandle ZNRM2_HANDLE;
+    private static final MethodHandle ZSCAL_HANDLE;
+    private static final MethodHandle ZGESV_HANDLE;
+
+    // Complex Float (C)
+    private static final MethodHandle CGEMM_HANDLE;
+    private static final MethodHandle CGEMV_HANDLE;
+    private static final MethodHandle CDOTU_HANDLE;
+    private static final MethodHandle CNRM2_HANDLE;
+    private static final MethodHandle CSCAL_HANDLE;
+    private static final MethodHandle CGESV_HANDLE;
     
     private static final boolean AVAILABLE;
 
@@ -93,6 +118,10 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         MethodHandle dorgqr = null;
         MethodHandle dgesvd = null;
         MethodHandle dgels = null;
+
+        MethodHandle sgemm = null, sgemv = null, sdot = null, snrm2 = null, sscal = null, sgesv = null;
+        MethodHandle zgemm = null, zgemv = null, zdotu = null, znrm2 = null, zscal = null, zgesv = null;
+        MethodHandle cgemm = null, cgemv = null, cdotu = null, cnrm2 = null, cscal = null, cgesv = null;
         
         boolean avail = false;
 
@@ -143,6 +172,36 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
                 dscal = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
+                // --- Single Precision (S) ---
+                sgemm = lookup.find("cblas_sgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                sgemv = lookup.find("cblas_sgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                sdot = lookup.find("cblas_sdot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                snrm2 = lookup.find("cblas_snrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                sscal = lookup.find("cblas_sscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
+                // --- Complex Double (Z) ---
+                zgemm = lookup.find("cblas_zgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                zgemv = lookup.find("cblas_zgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                zdotu = lookup.find("cblas_zdotu_sub").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                znrm2 = lookup.find("cblas_dznrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                zscal = lookup.find("cblas_zscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
+                // --- Complex Float (C) ---
+                cgemm = lookup.find("cblas_cgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                cgemv = lookup.find("cblas_cgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                cdotu = lookup.find("cblas_cdotu_sub").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                cnrm2 = lookup.find("cblas_scnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                cscal = lookup.find("cblas_cscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
                 // LAPACKE (Standard C interface names and variants)
                 // Windows OpenBLAS often uses dgesv_ or lapack_dgesv
                 dgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "dgesv_", "lapack_dgesv")
@@ -177,10 +236,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
                     dgesvd = linker.downcallHandle(s_dgesvd.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 }
 
-                dgels = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgels", "dgels", "dgels_", "lapack_dgels")
-                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-
                 avail = (dgemm != null || dgemv != null);
+                
+                // LAPACKE S/Z/C variants
+                sgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "sgesv_", "lapack_sgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                zgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "zgesv_", "lapack_zgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                cgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "cgesv_", "lapack_cgesv").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
             }
         } catch (Throwable t) {
             logger.log(System.Logger.Level.DEBUG, "Native CPU initialization failed: " + t.getMessage());
@@ -204,6 +265,27 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         DORGQR_HANDLE = dorgqr;
         DGESVD_HANDLE = dgesvd;
         DGELS_HANDLE = dgels;
+
+        SGEMM_HANDLE = sgemm;
+        SGEMV_HANDLE = sgemv;
+        SDOT_HANDLE = sdot;
+        SNRM2_HANDLE = snrm2;
+        SSCAL_HANDLE = sscal;
+        SGESV_HANDLE = sgesv;
+
+        ZGEMM_HANDLE = zgemm;
+        ZGEMV_HANDLE = zgemv;
+        ZDOTU_HANDLE = zdotu;
+        ZNRM2_HANDLE = znrm2;
+        ZSCAL_HANDLE = zscal;
+        ZGESV_HANDLE = zgesv;
+
+        CGEMM_HANDLE = cgemm;
+        CGEMV_HANDLE = cgemv;
+        CDOTU_HANDLE = cdotu;
+        CNRM2_HANDLE = cnrm2;
+        CSCAL_HANDLE = cscal;
+        CGESV_HANDLE = cgesv;
         
         // Broadened availability check
         AVAILABLE = avail;
@@ -260,11 +342,12 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         if (ring == null) return false;
-        // Native CPU backend is strictly for double-precision Real numbers.
-        // It does not support Complex numbers or Native high-precision types.
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
         Object zero = ring.zero();
-        return zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble;
+        return zero instanceof org.episteme.core.mathematics.numbers.real.RealDouble ||
+               zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat ||
+               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     @Override
@@ -371,30 +454,82 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
 
     @Override
-    public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
-        if (AVAILABLE && a instanceof RealDoubleMatrix && b instanceof RealDoubleVector) {
-            RealDoubleMatrix adm = (RealDoubleMatrix) a;
-            RealDoubleVector bdv = (RealDoubleVector) b;
-            
-            if (adm.cols() != bdv.dimension()) {
-                throw new IllegalArgumentException("Matrix-Vector dimension mismatch: " + adm.cols() + " != " + bdv.dimension());
+    public Vector<Object> multiply(Matrix<Object> a, Vector<Object> b) {
+        if (!AVAILABLE) return LinearAlgebraProvider.super.multiply(a, b);
+        
+        Ring<?> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                return (Vector<Object>)(Object) multiplyRealFloat((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
             }
+            return (Vector<Object>)(Object) multiplyReal((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                return (Vector<Object>)(Object) multiplyComplexFloat((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
+            }
+            return (Vector<Object>)(Object) multiplyComplex((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
+        }
+        return LinearAlgebraProvider.super.multiply(a, b);
+    }
 
-            int m = adm.rows();
-            int n = adm.cols();
+    private Vector<org.episteme.core.mathematics.numbers.real.Real> multiplyRealFloat(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
+        if (AVAILABLE && SGEMV_HANDLE != null) {
+            int m = a.rows();
+            int n = a.cols();
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m);
+                NativeSafe.invoke(SGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, 1.0f, aSeg, n, bSeg, 1, 0.0f, rSeg, 1);
+                float[] result = rSeg.toArray(ValueLayout.JAVA_FLOAT);
+                org.episteme.core.mathematics.numbers.real.Real[] res = new org.episteme.core.mathematics.numbers.real.Real[m];
+                for (int i=0; i<m; i++) res[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(result[i]);
+                return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Reals.getInstance());
+            }
+        }
+        return LinearAlgebraProvider.super.multiply((Matrix<Object>)(Object)a, (Vector<Object>)(Object)b);
+    }
+
+    private Vector<org.episteme.core.mathematics.numbers.complex.Complex> multiplyComplexFloat(Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
+        if (AVAILABLE && CGEMV_HANDLE != null) {
+            int m = a.rows();
+            int n = a.cols();
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray(a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray(b));
+                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * 2);
+                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
+                NativeSafe.invoke(CGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, alpha, aSeg, n, bSeg, 1, beta, rSeg, 1);
+                float[] result = rSeg.toArray(ValueLayout.JAVA_FLOAT);
+                org.episteme.core.mathematics.numbers.complex.Complex[] res = new org.episteme.core.mathematics.numbers.complex.Complex[m];
+                for (int i=0; i<m; i++) res[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i+1]));
+                return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
+            }
+        }
+        return LinearAlgebraProvider.super.multiply((Matrix<Object>)(Object)a, (Vector<Object>)(Object)b);
+    }
+
+    private Vector<Real> multiplyReal(Matrix<Real> a, Vector<Real> b) {
+        if (AVAILABLE && DGEMV_HANDLE != null) {
+            int m = a.rows();
+            int n = a.cols();
             
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, adm.toDoubleArray());
-                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bdv.toDoubleArray());
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
                 MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m);
                 
                 NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, 1.0, aSeg, n, bSeg, 1, 0.0, rSeg, 1);
                 
                 double[] result = rSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                return RealDoubleVector.of(result);
+                return (Vector<Real>)(Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
             }
         }
-        // Fallback for non-RealDouble types or if not available
+        
+        // Fallback
         double[] ad = toDoubleArray(a);
         double[] bd = toDoubleArray(b);
         double[] rd = new double[a.rows()];
@@ -405,11 +540,36 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
             }
             rd[i] = sum;
         }
-        return RealDoubleVector.of(rd);
+        return (Vector<Real>)(Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(rd);
+    }
+
+    private Vector<Complex> multiplyComplex(Matrix<Complex> a, Vector<Complex> b) {
+        if (AVAILABLE && ZGEMV_HANDLE != null) {
+            int m = a.rows();
+            int n = a.cols();
+            try (Arena arena = Arena.ofConfined()) {
+                double[] aData = toComplexDoubleArray(a);
+                double[] bData = toComplexDoubleArray(b);
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, aData);
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, bData);
+                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * 2);
+                
+                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
+                
+                NativeSafe.invoke(ZGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, alpha, aSeg, n, bSeg, 1, beta, rSeg, 1);
+                
+                double[] result = rSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                Complex[] complexRes = new Complex[m];
+                for (int i=0; i<m; i++) complexRes[i] = Complex.of(result[2*i], result[2*i+1]);
+                return Vector.of(java.util.Arrays.asList(complexRes), org.episteme.core.mathematics.sets.Complexes.getInstance());
+            }
+        }
+        return LinearAlgebraProvider.super.multiply((Matrix<Object>)(Object)a, (Vector<Object>)(Object)b);
     }
 
     private double[] toDoubleArray(Vector<Real> v) {
-        if (v instanceof RealDoubleVector) return ((RealDoubleVector) v).toDoubleArray();
+        if (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) return ((org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) v).toDoubleArray();
         double[] d = new double[v.dimension()];
         for (int i = 0; i < v.dimension(); i++) d[i] = v.get(i).doubleValue();
         return d;
@@ -420,6 +580,70 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         double[] d = new double[m.rows() * m.cols()];
         for (int i = 0; i < m.rows(); i++) {
             for (int j = 0; j < m.cols(); j++) d[i * m.cols() + j] = m.get(i, j).doubleValue();
+        }
+        return d;
+    }
+
+    private double[] toComplexDoubleArray(Vector<Complex> v) {
+        int n = v.dimension();
+        double[] d = new double[2 * n];
+        for (int i = 0; i < n; i++) {
+            Complex c = v.get(i);
+            d[2 * i] = c.real();
+            d[2 * i + 1] = c.imaginary();
+        }
+        return d;
+    }
+
+    private double[] toComplexDoubleArray(Matrix<org.episteme.core.mathematics.numbers.complex.Complex> m) {
+        int r = m.rows();
+        int c = m.cols();
+        double[] d = new double[2 * r * c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                org.episteme.core.mathematics.numbers.complex.Complex val = m.get(i, j);
+                d[2 * (i * c + j)] = val.real();
+                d[2 * (i * c + j) + 1] = val.imaginary();
+            }
+        }
+        return d;
+    }
+
+    private float[] toFloatArray(Vector<org.episteme.core.mathematics.numbers.real.Real> v) {
+        float[] d = new float[v.dimension()];
+        for (int i = 0; i < v.dimension(); i++) d[i] = v.get(i).floatValue();
+        return d;
+    }
+
+    private float[] toFloatArray(Matrix<org.episteme.core.mathematics.numbers.real.Real> m) {
+        float[] d = new float[m.rows() * m.cols()];
+        for (int i = 0; i < m.rows(); i++) {
+            for (int j = 0; j < m.cols(); j++) d[i * m.cols() + j] = m.get(i, j).floatValue();
+        }
+        return d;
+    }
+
+    private float[] toComplexFloatArray(Vector<org.episteme.core.mathematics.numbers.complex.Complex> v) {
+        int n = v.dimension();
+        float[] d = new float[2 * n];
+        for (int i = 0; i < n; i++) {
+            org.episteme.core.mathematics.numbers.complex.Complex c = v.get(i);
+            d[2 * i] = c.real().floatValue();
+            d[2 * i + 1] = c.imaginary().floatValue();
+        }
+        return d;
+    }
+
+    private float[] toComplexFloatArray(Matrix<org.episteme.core.mathematics.numbers.complex.Complex> m) {
+        int r = m.rows();
+        int c = m.cols();
+        float[] d = new float[2 * r * c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                org.episteme.core.mathematics.numbers.complex.Complex val = m.get(i, j);
+                d[2 * (i * c + j)] = val.real().floatValue();
+                d[2 * (i * c + j) + 1] = val.imaginary().floatValue();
+            }
         }
         return d;
     }
@@ -438,14 +662,44 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
 
 
     @Override
-    public Matrix<Real> add(Matrix<Real> a, Matrix<Real> b) {
-        int rows = a.rows();
-        int cols = a.cols();
-        double[] ad = toDoubleArray(a);
-        double[] bd = toDoubleArray(b);
-        double[] rd = new double[ad.length];
-        for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-        return RealDoubleMatrix.of(rd, rows, cols);
+    public Matrix<Object> add(Matrix<Object> a, Matrix<Object> b) {
+        Ring<?> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                float[] ad = toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
+                float[] bd = toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
+                float[] rd = new float[ad.length];
+                for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+                org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[a.rows() * a.cols()];
+                for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[i]);
+                return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Reals.getInstance());
+            }
+            double[] ad = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
+            double[] bd = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+            return (Matrix<Object>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                float[] ad = toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a);
+                float[] bd = toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
+                float[] rd = new float[ad.length];
+                for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+                org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[a.rows() * a.cols()];
+                for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i+1]));
+                return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Complexes.getInstance());
+            }
+            double[] ad = toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a);
+            double[] bd = toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+            org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[a.rows() * a.cols()];
+            for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(rd[2*i], rd[2*i+1]);
+            return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Complexes.getInstance());
+        }
+        return LinearAlgebraProvider.super.add(a, b);
     }
 
     @Override
@@ -460,35 +714,111 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
     }
 
     @Override
-    public Matrix<Real> scale(Real scalar, Matrix<Real> a) {
-        int rows = a.rows();
-        int cols = a.cols();
-        double s = scalar.doubleValue();
-        double[] ad = toDoubleArray(a);
-        double[] rd = new double[ad.length];
-        for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
-        return RealDoubleMatrix.of(rd, rows, cols);
+    public Matrix<Object> scale(Object scalar, Matrix<Object> a) {
+        Ring<?> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                float s = ((org.episteme.core.mathematics.numbers.real.Real)scalar).floatValue();
+                float[] ad = toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
+                float[] rd = new float[ad.length];
+                for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
+                org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[a.rows() * a.cols()];
+                for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[i]);
+                return (Matrix<Object>)(Object) Matrix.of(resData, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Reals.getInstance());
+            }
+            double s = ((org.episteme.core.mathematics.numbers.real.Real)scalar).doubleValue();
+            double[] ad = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] * s;
+            return (Matrix<Object>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            Object zero = ring.zero();
+            org.episteme.core.mathematics.numbers.complex.Complex s = (org.episteme.core.mathematics.numbers.complex.Complex)scalar;
+            boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
+            
+            org.episteme.core.mathematics.numbers.complex.Complex[] res = new org.episteme.core.mathematics.numbers.complex.Complex[a.rows() * a.cols()];
+            for (int i=0; i<a.rows(); i++) {
+                for (int j=0; j<a.cols(); j++) res[i*a.cols()+j] = s.multiply(((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a).get(i, j));
+            }
+            return (Matrix<Object>)(Object) Matrix.of(res, a.rows(), a.cols(), org.episteme.core.mathematics.sets.Complexes.getInstance());
+        }
+        return LinearAlgebraProvider.super.scale(scalar, a);
     }
 
     @Override
-    public Matrix<Real> multiply(Matrix<Real> a, Matrix<Real> b) {
+    public Matrix<Object> multiply(Matrix<Object> a, Matrix<Object> b) {
         if (a.cols() != b.rows()) throw new IllegalArgumentException("Incompatible dimensions: " + a.cols() + " != " + b.rows());
-        if (!AVAILABLE || DGEMM_HANDLE == null) throw new UnsupportedOperationException(getName() + ": DGEMM not available");
         
-        int m = a.rows();
-        int k = a.cols();
-        int n = b.cols();
-        
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-            MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
-            
-            NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, aSeg, k, bSeg, n, 0.0, cSeg, n);
-            
-            double[] cData = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
-            return RealDoubleMatrix.of(cData, m, n);
+        Ring<?> ring = a.getScalarRing();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                if (!AVAILABLE || SGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
+                int m = a.rows();
+                int k = a.cols();
+                int n = b.cols();
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
+                    MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
+                    MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
+                    NativeSafe.invoke(SGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0f, aSeg, k, bSeg, n, 0.0f, cSeg, n);
+                    float[] cData = cSeg.toArray(ValueLayout.JAVA_FLOAT);
+                    org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[m * n];
+                    for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(cData[i]);
+                    return (Matrix<Object>)(Object) Matrix.of(resData, m, n, org.episteme.core.mathematics.sets.Reals.getInstance());
+                }
+            }
+            if (!AVAILABLE || DGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
+            int m = a.rows();
+            int k = a.cols();
+            int n = b.cols();
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
+                MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+                NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, aSeg, k, bSeg, n, 0.0, cSeg, n);
+                double[] cData = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                return (Matrix<Object>)(Object) RealDoubleMatrix.of(cData, m, n);
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                if (!AVAILABLE || CGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
+                int m = a.rows();
+                int k = a.cols();
+                int n = b.cols();
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
+                    MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
+                    MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
+                    NativeSafe.invoke(CGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, aSeg, k, bSeg, n, beta, cSeg, n);
+                    float[] result = cSeg.toArray(ValueLayout.JAVA_FLOAT);
+                    org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
+                    for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i+1]));
+                    return (Matrix<Object>)(Object) Matrix.of(resData, m, n, org.episteme.core.mathematics.sets.Complexes.getInstance());
+                }
+            }
+            if (!AVAILABLE || ZGEMM_HANDLE == null) return LinearAlgebraProvider.super.multiply(a, b);
+            int m = a.rows();
+            int k = a.cols();
+            int n = b.cols();
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
+                MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
+                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
+                NativeSafe.invoke(ZGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, aSeg, k, bSeg, n, beta, cSeg, n);
+                double[] result = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
+                for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(result[2*i], result[2*i+1]);
+                return (Matrix<Object>)(Object) Matrix.of(resData, m, n, org.episteme.core.mathematics.sets.Complexes.getInstance());
+            }
         }
+        return LinearAlgebraProvider.super.multiply(a, b);
     }
 
     @Override
@@ -729,36 +1059,170 @@ public class NativeCPULinearAlgebraBackend implements LinearAlgebraProvider<Real
         throw new UnsupportedOperationException(getName() + ": cholesky() not available for these types");
     }
     @Override
-    public Real dot(Vector<Real> a, Vector<Real> b) {
-        if (!AVAILABLE || DDOT_HANDLE == null) throw new UnsupportedOperationException(getName() + ": dot not available");
+    public Object dot(Vector<Object> a, Vector<Object> b) {
+        if (!AVAILABLE) return LinearAlgebraProvider.super.dot(a, b);
         if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-            double result = (double) NativeSafe.invoke(DDOT_HANDLE, a.dimension(), aSeg, 1, bSeg, 1);
-            return Real.of(result);
+        
+        Ring<?> ring = a.getScalarRing();
+        int n = a.dimension();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                if (SDOT_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
+                    MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
+                    return org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(SDOT_HANDLE, n, aSeg, 1, bSeg, 1));
+                }
+            }
+            if (DDOT_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
+                return org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DDOT_HANDLE, n, aSeg, 1, bSeg, 1));
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                if (CDOTU_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
+                    MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
+                    MemorySegment dotRes = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+                    NativeSafe.invoke(CDOTU_HANDLE, n, aSeg, 1, bSeg, 1, dotRes);
+                    return org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(dotRes.get(ValueLayout.JAVA_FLOAT, 0)), org.episteme.core.mathematics.numbers.real.RealFloat.of(dotRes.get(ValueLayout.JAVA_FLOAT, 4)));
+                }
+            }
+            if (ZDOTU_HANDLE == null) return LinearAlgebraProvider.super.dot(a, b);
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
+                MemorySegment dotRes = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                NativeSafe.invoke(ZDOTU_HANDLE, n, aSeg, 1, bSeg, 1, dotRes);
+                return org.episteme.core.mathematics.numbers.complex.Complex.of(dotRes.get(ValueLayout.JAVA_DOUBLE, 0), dotRes.get(ValueLayout.JAVA_DOUBLE, 8));
+            }
         }
+        return LinearAlgebraProvider.super.dot(a, b);
     }
 
     @Override
-    public Real norm(Vector<Real> a) {
-        double[] ad = toDoubleArray(a);
+    public Object norm(Vector<Object> a) {
+        if (!AVAILABLE) return LinearAlgebraProvider.super.norm(a);
+        Ring<?> ring = a.getScalarRing();
+        int n = a.dimension();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                if (SNRM2_HANDLE != null) {
+                    try (Arena arena = Arena.ofConfined()) {
+                        MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
+                        return org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(SNRM2_HANDLE, n, aSeg, 1));
+                    }
+                }
+            }
+            if (DNRM2_HANDLE != null) {
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
+                    return org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DNRM2_HANDLE, n, aSeg, 1));
+                }
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                if (CNRM2_HANDLE != null) {
+                    try (Arena arena = Arena.ofConfined()) {
+                        MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
+                        return org.episteme.core.mathematics.numbers.real.RealFloat.of((float) NativeSafe.invoke(CNRM2_HANDLE, n, aSeg, 1));
+                    }
+                }
+            }
+            if (ZNRM2_HANDLE != null) {
+                try (Arena arena = Arena.ofConfined()) {
+                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
+                    return org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(ZNRM2_HANDLE, n, aSeg, 1));
+                }
+            }
+        }
+        
+        // Manual Fallback
         double sumSq = 0.0;
-        for (double d : ad) sumSq += d * d;
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            for (int i=0; i<n; i++) { double d = ((Real)a.get(i)).doubleValue(); sumSq += d * d; }
+        } else {
+            for (int i=0; i<n; i++) { Complex c = (Complex)a.get(i); sumSq += c.real()*c.real() + c.imaginary()*c.imaginary(); }
+        }
         return Real.of(Math.sqrt(sumSq));
     }
 
     @Override
-    public Vector<Real> multiply(Vector<Real> vector, Real scalar) {
-        if (AVAILABLE) {
-            int dim = vector.dimension();
-            RealDoubleVector res = RealDoubleVector.direct(dim);
-            res.getBuffer().put(toDoubleArray(vector));
-            res.getBuffer().flip();
-            dscal(dim, scalar.doubleValue(), res.getBuffer(), 1);
-            return res;
+    public Vector<Object> normalize(Vector<Object> a) {
+        Real n = (Real) norm(a);
+        if (n.isZero()) return a;
+        return multiply(a, n.inverse());
+    }
+
+    @Override
+    public Vector<Object> multiply(Vector<Object> vector, Object scalar) {
+        if (!AVAILABLE) return LinearAlgebraProvider.super.multiply(vector, scalar);
+        int dim = vector.dimension();
+        Ring<?> ring = vector.getScalarRing();
+        
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            Object zero = ring.zero();
+            float sFloat = ((org.episteme.core.mathematics.numbers.real.Real)scalar).floatValue();
+            double sDouble = ((org.episteme.core.mathematics.numbers.real.Real)scalar).doubleValue();
+            
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                if (SSCAL_HANDLE != null) {
+                    try (Arena arena = Arena.ofConfined()) {
+                        MemorySegment vSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)vector));
+                        NativeSafe.invoke(SSCAL_HANDLE, dim, sFloat, vSeg, 1);
+                        float[] res = vSeg.toArray(ValueLayout.JAVA_FLOAT);
+                        org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[dim];
+                        for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(res[i]);
+                        return Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Reals.getInstance());
+                    }
+                }
+            } else {
+                if (DSCAL_HANDLE != null) {
+                    try (Arena arena = Arena.ofConfined()) {
+                        MemorySegment vSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)vector));
+                        NativeSafe.invoke(DSCAL_HANDLE, dim, sDouble, vSeg, 1);
+                        double[] res = vSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                        return (Vector<Object>)(Object) RealDoubleVector.of(res);
+                    }
+                }
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+             Object zero = ring.zero();
+             org.episteme.core.mathematics.numbers.complex.Complex s = (org.episteme.core.mathematics.numbers.complex.Complex)scalar;
+             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                 if (CSCAL_HANDLE != null) {
+                     try (Arena arena = Arena.ofConfined()) {
+                         MemorySegment vSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)vector));
+                         MemorySegment sSeg = arena.allocateFrom(ValueLayout.JAVA_FLOAT, s.real().floatValue(), s.imaginary().floatValue());
+                         NativeSafe.invoke(CSCAL_HANDLE, dim, sSeg, vSeg, 1);
+                         float[] res = vSeg.toArray(ValueLayout.JAVA_FLOAT);
+                         org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[dim];
+                         for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(res[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(res[2*i+1]));
+                         return Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                     }
+                 }
+             } else {
+                 if (ZSCAL_HANDLE != null) {
+                     try (Arena arena = Arena.ofConfined()) {
+                         MemorySegment vSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)vector));
+                         MemorySegment sSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, s.real().doubleValue(), s.imaginary().doubleValue());
+                         NativeSafe.invoke(ZSCAL_HANDLE, dim, sSeg, vSeg, 1);
+                         double[] res = vSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                         org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[dim];
+                         for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(res[2*i], res[2*i+1]);
+                         return Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                     }
+                 }
+             }
         }
-        throw new UnsupportedOperationException(getName() + ": Vector multiply(scalar) not available for these types");
+        return LinearAlgebraProvider.super.multiply(vector, scalar);
     }
 
     @Override

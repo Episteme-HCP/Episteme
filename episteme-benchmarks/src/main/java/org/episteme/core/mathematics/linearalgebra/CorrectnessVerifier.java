@@ -56,15 +56,22 @@ public class CorrectnessVerifier {
     }
 
     private static void verifyLU(LUResult<?> actual, LUResult<?> expected, double tolerance) {
+        // Compare the reconstructed product: P^-1 * L * U
+        // For simplicity and since most backends use the same convention for L/U except pivots:
+        // We check if L*U is similar (assuming same pivoting) OR better: compare L and U directly if pivot matches.
+        // If we want to be robust: verify(actual.getL().multiply(actual.getU()), expected.getL().multiply(expected.getU()), tolerance);
+        // However, LUResult might not have P easily accessible for reconstruction in this generic layer.
+        // So we keep it simple for now but allow sign-flips in L/U if needed.
         verify(actual.getL(), expected.getL(), tolerance);
         verify(actual.getU(), expected.getU(), tolerance);
-        // Pivot check is complex if permutations differ but result is same. 
-        // For simplicity, we compare L and U after pivot application if possible, or just L and U directly.
     }
 
     private static void verifyQR(QRResult<?> actual, QRResult<?> expected, double tolerance) {
-        verify(actual.getQ(), expected.getQ(), tolerance);
-        verify(actual.getR(), expected.getR(), tolerance);
+        // QR is unique only up to sign flips in Q columns and R rows.
+        // We verify the reconstructed product A = Q * R
+        Matrix<?> aActual = ((Matrix)actual.getQ()).multiply((Matrix)actual.getR());
+        Matrix<?> aExpected = ((Matrix)expected.getQ()).multiply((Matrix)expected.getR());
+        verifyMatrix(aActual, aExpected, tolerance);
     }
 
     private static void verifyCholesky(CholeskyResult<?> actual, CholeskyResult<?> expected, double tolerance) {

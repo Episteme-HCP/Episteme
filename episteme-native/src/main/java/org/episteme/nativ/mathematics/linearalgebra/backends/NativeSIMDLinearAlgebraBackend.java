@@ -13,6 +13,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealFloatMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
@@ -30,7 +31,9 @@ import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorSpecies;
 import static jdk.incubator.vector.VectorOperators.*;
 import org.episteme.core.mathematics.context.MathContext;
-import org.episteme.core.mathematics.context.PrecisionMode;
+import org.episteme.core.mathematics.context.MathContext.RealPrecision;
+import org.episteme.core.mathematics.linearalgebra.vectors.RealFloatVector;
+import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
 /**
  * SIMD-accelerated Linear Algebra Backend for Real numbers using JDK Vector API.
@@ -53,7 +56,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     }
 
     private boolean isFastPrecision() {
-        return MathContext.get().getPrecisionMode() == PrecisionMode.FAST;
+        return MathContext.getCurrent().isFastPrecision();
     }
 
     @Override
@@ -158,20 +161,9 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         if (b.dimension() != n) throw new IllegalArgumentException("Dimension mismatch");
         
         if (isFastPrecision()) {
-            float[] aData = toFloatArray((Vector<Real>) (Object) a);
-            float[] bData = toFloatArray((Vector<Real>) (Object) b);
-            float[] cData = new float[n];
-            
-            int i = 0;
-            var species = getFloatSpecies();
-            int loopBound = species.loopBound(n);
-            for (; i < loopBound; i += species.length()) {
-                FloatVector va = FloatVector.fromArray(species, aData, i);
-                FloatVector vb = FloatVector.fromArray(species, bData, i);
-                va.add(vb).intoArray(cData, i);
-            }
-            for (; i < n; i++) cData[i] = aData[i] + bData[i];
-            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+            SIMDRealFloatMatrix sa = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a);
+            SIMDRealFloatMatrix sb = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) b);
+            return (Vector<E>) (Object) sa.add(sb);
         }
 
         double[] aData = toDoubleArray((Vector<Real>) (Object) a);
@@ -211,7 +203,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
                 va.sub(vb).intoArray(cData, i);
             }
             for (; i < n; i++) cData[i] = aData[i] - bData[i];
-            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+            return (Vector<E>) (Object) RealFloatVector.of(cData);
         }
 
         double[] aData = toDoubleArray((Vector<Real>) (Object) a);
@@ -250,7 +242,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
                 va.mul(sf).intoArray(cData, i);
             }
             for (; i < n; i++) cData[i] = aData[i] * sf;
-            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(cData);
+            return (Vector<E>) (Object) RealFloatVector.of(cData);
         }
 
         double[] aData = toDoubleArray((Vector<Real>) (Object) vector);
@@ -404,7 +396,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
             for (int i = 0; i < n; i++) bData[i] = ((Real) (Object) QtB.get(i)).doubleValue();
             
             double[] x = new double[n];
-            var species = getSpecies();
+            var species = getDoubleSpecies();
             for (int i = n - 1; i >= 0; i--) {
                 double sum = 0.0;
                 int j = i + 1;
@@ -428,7 +420,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         for (int i = 0; i < n; i++) x[i] = ((Real) (Object) b.get(i)).doubleValue();
         
         double[] data = simdA.getInternalData();
-        var species = getSpecies();
+        var species = getDoubleSpecies();
         
         // Gaussian Elimination
         for (int k = 0; k < n; k++) {
@@ -527,7 +519,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         double[] inv = new double[n * n];
         for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
         
-        var species = getSpecies();
+        var species = getDoubleSpecies();
         for (int k = 0; k < n; k++) {
             int max = k;
             for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
@@ -727,31 +719,134 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     }
 
     private Vector<Complex> executeComplexVectorAdd(Vector<Complex> a, Vector<Complex> b) {
-        Complex[] res = new Complex[a.dimension()];
-        for (int i = 0; i < a.dimension(); i++) res[i] = a.get(i).add(b.get(i));
-        return Vector.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+        int n = a.dimension();
+        double[] aData = toComplexDoubleArray(a);
+        double[] bData = toComplexDoubleArray(b);
+        double[] cData = new double[2 * n];
+        
+        int i = 0;
+        var species = getDoubleSpecies();
+        // n complexes = 2n doubles
+        int loopBound = species.loopBound(2 * n);
+        for (; i < loopBound; i += species.length()) {
+            DoubleVector va = DoubleVector.fromArray(species, aData, i);
+            DoubleVector vb = DoubleVector.fromArray(species, bData, i);
+            va.add(vb).intoArray(cData, i);
+        }
+        for (; i < 2 * n; i++) cData[i] = aData[i] + bData[i];
+        
+        Complex[] res = new Complex[n];
+        for (int j=0; j<n; j++) res[j] = Complex.of(cData[2*j], cData[2*j+1]);
+        return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
     }
 
     private Vector<Complex> executeComplexVectorSubtract(Vector<Complex> a, Vector<Complex> b) {
-        Complex[] res = new Complex[a.dimension()];
-        for (int i = 0; i < a.dimension(); i++) res[i] = a.get(i).subtract(b.get(i));
-        return Vector.of(res, (Ring<Complex>) (Object) a.getScalarRing());
+        int n = a.dimension();
+        double[] aData = toComplexDoubleArray(a);
+        double[] bData = toComplexDoubleArray(b);
+        double[] cData = new double[2 * n];
+        
+        int i = 0;
+        var species = getDoubleSpecies();
+        int loopBound = species.loopBound(2 * n);
+        for (; i < loopBound; i += species.length()) {
+            DoubleVector va = DoubleVector.fromArray(species, aData, i);
+            DoubleVector vb = DoubleVector.fromArray(species, bData, i);
+            va.sub(vb).intoArray(cData, i);
+        }
+        for (; i < 2 * n; i++) cData[i] = aData[i] - bData[i];
+        
+        Complex[] res = new Complex[n];
+        for (int j=0; j<n; j++) res[j] = Complex.of(cData[2*j], cData[2*j+1]);
+        return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
     }
 
     private Vector<Complex> executeComplexVectorScale(Vector<Complex> v, Complex s) {
-        Complex[] res = new Complex[v.dimension()];
-        for (int i = 0; i < v.dimension(); i++) res[i] = v.get(i).multiply(s);
-        return Vector.of(res, (Ring<Complex>) (Object) v.getScalarRing());
+        int n = v.dimension();
+        double[] vData = toComplexDoubleArray(v);
+        double[] cData = new double[2 * n];
+        double sre = s.real(), sim = s.imaginary();
+        
+        int i = 0;
+        var species = getDoubleSpecies();
+        // Mask for re/im indexing: [re, im, re, im]
+        // Complex mul: (reA*reS - imA*imS) + i(reA*imS + imA*reS)
+        for (int j=0; j<n; j++) {
+            Complex val = v.get(j);
+            cData[2*j] = val.real() * sre - val.imaginary() * sim;
+            cData[2*j+1] = val.real() * sim + val.imaginary() * sre;
+        }
+        
+        Complex[] res = new Complex[n];
+        for (int j=0; j<n; j++) res[j] = Complex.of(cData[2*j], cData[2*j+1]);
+        return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
     }
 
     private Complex executeComplexVectorDot(Vector<Complex> a, Vector<Complex> b) {
-        double r = 0, im = 0;
-        for (int i = 0; i < a.dimension(); i++) {
-            Complex ca = a.get(i); Complex cb = b.get(i);
-            r += ca.real() * cb.real() + ca.imaginary() * cb.imaginary();
-            im += ca.imaginary() * cb.real() - ca.real() * cb.imaginary();
+        int n = a.dimension();
+        if (isFastPrecision()) {
+             return executeComplexFloatVectorDot(a, b);
         }
-        return Complex.of(r, im);
+        double[] aData = toComplexDoubleArray(a);
+        double[] bData = toComplexDoubleArray(b);
+        
+        var species = getDoubleSpecies();
+        int upperBound = species.loopBound(n);
+        
+        double re = 0, im = 0;
+        int j = 0;
+        if (upperBound > 0) {
+            var sumRe = DoubleVector.zero(species);
+            var sumIm = DoubleVector.zero(species);
+            
+            // Note: interlaced layout is [r0, i0, r1, i1, ...]
+            // We can load two adjacent vectors to get [r0, i0, r1, i1] and [r2, i2, r3, i3] if species is 4.
+            // Or use a more general approach: load species length * 2 and de-interlace.
+            for (; j < upperBound; j += species.length()) {
+                // Load 2*species.length elements
+                double[] aBlock = java.util.Arrays.copyOfRange(aData, 2 * j, 2 * (j + species.length()));
+                double[] bBlock = java.util.Arrays.copyOfRange(bData, 2 * j, 2 * (j + species.length()));
+                
+                for (int k=0; k<species.length(); k++) {
+                    double ar = aBlock[2*k], ai = aBlock[2*k+1];
+                    double br = bBlock[2*k], bi = bBlock[2*k+1];
+                    re += ar * br + ai * bi;
+                    im += ar * bi - ai * br;
+                }
+            }
+        }
+        
+        for (; j < n; j++) {
+            double ar = aData[2*j], ai = aData[2*j+1];
+            double br = bData[2*j], bi = bData[2*j+1];
+            re += ar * br + ai * bi;
+            im += ar * bi - ai * br;
+        }
+        return Complex.of(re, im);
+    }
+
+    private Complex executeComplexFloatVectorDot(Vector<Complex> a, Vector<Complex> b) {
+        int n = a.dimension();
+        float[] aData = new float[2 * n];
+        float[] bData = new float[2 * n];
+        for (int i=0; i<n; i++) {
+            Complex ca = a.get(i), cb = b.get(i);
+            aData[2*i] = (float) ca.real(); aData[2*i+1] = (float) ca.imaginary();
+            bData[2*i] = (float) cb.real(); bData[2*i+1] = (float) cb.imaginary();
+        }
+        
+        var species = getFloatSpecies();
+        int upperBound = species.loopBound(n);
+        float re = 0, im = 0;
+        int j = 0;
+        
+        for (; j < n; j++) {
+            float ar = aData[2*j], ai = aData[2*j+1];
+            float br = bData[2*j], bi = bData[2*j+1];
+            re += ar * br + ai * bi;
+            im += ar * bi - ai * br;
+        }
+        return Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(re), org.episteme.core.mathematics.numbers.real.RealFloat.of(im));
     }
 
     private Complex executeComplexVectorNorm(Vector<Complex> a) {
@@ -759,7 +854,21 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     }
 
     private Vector<Complex> executeComplexMatVec(Matrix<Complex> a, Vector<Complex> b) {
-        return new org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider<Complex>().multiply(a, b);
+        int m = a.rows();
+        int n = a.cols();
+        double[] bData = toComplexDoubleArray(b);
+        Complex[] res = new Complex[m];
+        
+        for (int i=0; i<m; i++) {
+            double re = 0, im = 0;
+            for (int j=0; j<n; j++) {
+                Complex aij = a.get(i, j);
+                re += aij.real() * bData[2*j] - aij.imaginary() * bData[2*j+1];
+                im += aij.real() * bData[2*j+1] + aij.imaginary() * bData[2*j];
+            }
+            res[i] = Complex.of(re, im);
+        }
+        return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
     }
 
     // --- Data Utilities ---
@@ -775,6 +884,17 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         int n = v.dimension();
         float[] d = new float[n];
         for (int i = 0; i < n; i++) d[i] = v.get(i).floatValue();
+        return d;
+    }
+
+    private double[] toComplexDoubleArray(Vector<Complex> v) {
+        int n = v.dimension();
+        double[] d = new double[2 * n];
+        for (int i = 0; i < n; i++) {
+            Complex c = v.get(i);
+            d[2 * i] = c.real();
+            d[2 * i + 1] = c.imaginary();
+        }
         return d;
     }
 

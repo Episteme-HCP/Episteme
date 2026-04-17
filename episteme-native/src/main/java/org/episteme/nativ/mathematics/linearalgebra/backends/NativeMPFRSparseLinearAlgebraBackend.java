@@ -110,9 +110,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
                 try {
-                    NativeSafe.invoke(MPFR_CLEAR, s);
+                    if (s.scope().isAlive()) {
+                        NativeSafe.invoke(MPFR_CLEAR, s);
+                    }
                 } catch (Throwable t) {
-                    // ResourceTracker handles robustness, lambda just tries to invoke clear
+                    // ResourceTracker handles robustness
                 }
             });
         }
@@ -121,10 +123,13 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     private static void trackArray(ResourceTracker tracker, MemorySegment p, int n) {
         if (p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
+                if (!s.scope().isAlive()) return;
                 for (int i = 0; i < n; i++) {
                     try {
-                        MemorySegment slice = s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                        NativeSafe.invoke(MPFR_CLEAR, slice);
+                        if (s.scope().isAlive()) {
+                            MemorySegment slice = s.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                            NativeSafe.invoke(MPFR_CLEAR, slice);
+                        }
                     } catch (Throwable t) {
                         // Ignore
                     }
@@ -1312,29 +1317,46 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             
             for (int i = 0; i < maxIterations; i++) {
                 E rhoNew = dot_internal(r0hat, r, n, prec, arena, tracker, isComplex, ring);
-                if (compare(rhoNew, tolerance) < 0 || compare(rho, tolerance) < 0 || compare(omega, tolerance) < 0) break;
-                E beta = multiply(isComplex, divide(isComplex, rhoNew, rho), divide(isComplex, alpha, omega));
+                // Check for breakdown
+                if (compare(rhoNew, ring.zero()) == 0) {
+                    logger.warn("BiCGSTAB breakdown: rhoNew is zero at iteration " + i);
+                    break;
+                }
                 
-                axpy_internal(p, negate(isComplex, omega), v, n, prec, arena, tracker, isComplex);
-                scale_internal(p, beta, n, (long)prec, arena, tracker, isComplex);
-                axpy_internal(p, (E)(Object) (isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE), r, n, prec, arena, tracker, isComplex);
+                if (i == 0) {
+                    copy_internal(p, r, n, isComplex);
+                } else {
+                    E beta = multiply(isComplex, divide(isComplex, rhoNew, rho), divide(isComplex, alpha, omega));
+                    axpy_internal(p, negate(isComplex, omega), v, n, prec, arena, tracker, isComplex);
+                    scale_internal(p, beta, n, (long)prec, arena, tracker, isComplex);
+                    axpy_internal(p, (E)(Object) (isComplex?Complex.of(Real.ONE, Real.ZERO):Real.ONE), r, n, prec, arena, tracker, isComplex);
+                }
 
                 spmv_internal(sa, h_vals, p, v, prec, arena, tracker, isComplex);
                 E v_dot_r0 = dot_internal(r0hat, v, n, prec, arena, tracker, isComplex, ring);
-                if (compare(v_dot_r0, tolerance) < 0) break;
+                if (compare(v_dot_r0, ring.zero()) == 0) {
+                    logger.warn("BiCGSTAB breakdown: v_dot_r0 is zero at iteration " + i);
+                    break;
+                }
                 alpha = divide(isComplex, rhoNew, v_dot_r0);
                 
                 copy_internal(s, r, n, isComplex);
                 axpy_internal(s, negate(isComplex, alpha), v, n, prec, arena, tracker, isComplex);
                 
-                if (compare(norm_internal(s, n, prec, arena, tracker, isComplex, ring), tolerance) < 0) {
+                // Partial update for convergence check
+                E normS = norm_internal(s, n, prec, arena, tracker, isComplex, ring);
+                if (compare(normS, tolerance) < 0) {
                     axpy_internal(h_x, alpha, p, n, prec, arena, tracker, isComplex);
+                    logger.debug("BiCGSTAB converged via s-vector at iteration " + i);
                     break;
                 }
                 
                 spmv_internal(sa, h_vals, s, t, prec, arena, tracker, isComplex);
                 E t_dot_t = dot_internal(t, t, n, prec, arena, tracker, isComplex, ring);
-                if (compare(t_dot_t, tolerance) < 0) break;
+                if (compare(t_dot_t, ring.zero()) == 0) {
+                    logger.warn("BiCGSTAB breakdown: t_dot_t is zero at iteration " + i);
+                    break;
+                }
                 omega = divide(isComplex, dot_internal(t, s, n, prec, arena, tracker, isComplex, ring), t_dot_t);
                 
                 axpy_internal(h_x, alpha, p, n, prec, arena, tracker, isComplex);
@@ -1343,8 +1365,16 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 copy_internal(r, s, n, isComplex);
                 axpy_internal(r, negate(isComplex, omega), t, n, prec, arena, tracker, isComplex);
                 
-                if (compare(norm_internal(r, n, prec, arena, tracker, isComplex, ring), tolerance) < 0) break;
+                E normR = norm_internal(r, n, prec, arena, tracker, isComplex, ring);
+                if (compare(normR, tolerance) < 0) {
+                    logger.debug("BiCGSTAB converged at iteration " + i + " with residual " + normR);
+                    break;
+                }
                 rho = rhoNew;
+                if (compare(omega, ring.zero()) == 0) {
+                    logger.warn("BiCGSTAB breakdown: omega is zero at iteration " + i);
+                    break;
+                }
             }
             return backToVector(h_x, n, isComplex, ring, arena);
         } catch (Throwable th) {
@@ -1642,10 +1672,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { return GenericEigen.decompose(a, (Field<E>) a.getScalarRing(), this); }
 
     private static void clearMPFRArray(MemorySegment mat, int count) {
-        if (mat == null || mat.equals(MemorySegment.NULL)) return;
+        if (mat == null || mat.equals(MemorySegment.NULL) || !mat.scope().isAlive()) return;
         for (int i = 0; i < count; i++) {
             try {
-                NativeSafe.invoke(MPFR_CLEAR, mat.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT));
+                if (mat.scope().isAlive()) {
+                    NativeSafe.invoke(MPFR_CLEAR, mat.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT));
+                }
             } catch (Throwable t) {
                 // Ignore failures during cleanup
             }

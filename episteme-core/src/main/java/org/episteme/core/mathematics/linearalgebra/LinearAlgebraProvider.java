@@ -85,6 +85,8 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
         E n = norm(a);
         Ring<E> ring = a.getScalarRing();
         if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
+            // Check for zero norm to avoid division by zero
+            if (n instanceof org.episteme.core.mathematics.numbers.real.Real r && r.isZero()) return a;
             E invNorm = field.inverse(n);
             return multiply(a, invNorm);
         }
@@ -113,15 +115,32 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
      * Returns the angle between two vectors in radians.
      */
     default E angle(Vector<E> a, Vector<E> b) {
+        Ring<E> ring = a.getScalarRing();
         E dAB = dot(a, b);
         E nA = norm(a);
         E nB = norm(b);
-        Ring<E> ring = a.getScalarRing();
         E denom = ring.multiply(nA, nB);
+
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            double dot = ((org.episteme.core.mathematics.numbers.real.Real)dAB).doubleValue();
+            double n1 = ((org.episteme.core.mathematics.numbers.real.Real)nA).doubleValue();
+            double n2 = ((org.episteme.core.mathematics.numbers.real.Real)nB).doubleValue();
+            
+            // Use atan2 for better numerical stability: theta = atan2(|a x b|, a . b)
+            // For general n-D, |a x b|^2 = |a|^2 |b|^2 - (a.b)^2
+            double crossNorm = Math.sqrt(Math.max(0, (n1 * n1 * n2 * n2) - (dot * dot)));
+            double theta = Math.atan2(crossNorm, dot);
+            
+            Object zero = ring.zero();
+            if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+                return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float)theta);
+            }
+            return (E) org.episteme.core.mathematics.numbers.real.Real.of(theta);
+        }
         
+        // Complex angle or fallback
         if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
             E cosTheta = field.divide(dAB, denom);
-            // Reuse matrix transcendental fallback for element-wise acos
             @SuppressWarnings("unchecked")
             E[][] data = (E[][]) new Object[][]{{cosTheta}};
             return acos(Matrix.of(data, ring)).get(0, 0);
@@ -173,113 +192,113 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
     }
     @SuppressWarnings("unchecked")
     default Matrix<E> exp(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).exp();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).exp();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).exp();
         throw new UnsupportedOperationException("exp not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> log(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).log();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).log();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).log();
         throw new UnsupportedOperationException("log not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> log10(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).log10();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).log10();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).log10();
         throw new UnsupportedOperationException("log10 not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> sin(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).sin();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).sin();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).sin();
         throw new UnsupportedOperationException("sin not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> cos(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).cos();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).cos();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).cos();
         throw new UnsupportedOperationException("cos not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> tan(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).tan();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).tan();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).tan();
         throw new UnsupportedOperationException("tan not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> asin(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).asin();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).asin();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).asin();
         throw new UnsupportedOperationException("asin not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> acos(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).acos();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).acos();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).acos();
         throw new UnsupportedOperationException("acos not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> atan(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).atan();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).atan();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).atan();
         throw new UnsupportedOperationException("atan not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> sinh(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).sinh();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).sinh();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).sinh();
         throw new UnsupportedOperationException("sinh not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> cosh(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).cosh();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).cosh();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).cosh();
         throw new UnsupportedOperationException("cosh not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> tanh(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).tanh();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).tanh();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).tanh();
         throw new UnsupportedOperationException("tanh not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> asinh(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).asinh();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).asinh();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).asinh();
         throw new UnsupportedOperationException("asinh not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> acosh(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).acosh();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).acosh();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).acosh();
         throw new UnsupportedOperationException("acosh not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> atanh(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).atanh();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).atanh();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).atanh();
         throw new UnsupportedOperationException("atanh not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> pow(Matrix<E> a, E exponent) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig && exponent instanceof org.episteme.core.mathematics.numbers.real.Real) 
-            return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).pow((org.episteme.core.mathematics.numbers.real.Real)exponent);
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real && exponent instanceof org.episteme.core.mathematics.numbers.real.Real) 
+            return (E)((org.episteme.core.mathematics.numbers.real.Real)val).pow((org.episteme.core.mathematics.numbers.real.Real)exponent);
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex && exponent instanceof org.episteme.core.mathematics.numbers.complex.Complex) 
             return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).pow((org.episteme.core.mathematics.numbers.complex.Complex)exponent);
         throw new UnsupportedOperationException("pow not supported for " + val.getClass().getSimpleName());
@@ -287,14 +306,14 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
 
     @SuppressWarnings("unchecked")
     default Matrix<E> sqrt(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).sqrt();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).sqrt();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).sqrt();
         throw new UnsupportedOperationException("sqrt not supported for " + val.getClass().getSimpleName());
     }); }
 
     @SuppressWarnings("unchecked")
     default Matrix<E> cbrt(Matrix<E> a) { return a.map(val -> {
-        if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) return (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).cbrt();
+        if (val instanceof org.episteme.core.mathematics.numbers.real.Real) return (E)((org.episteme.core.mathematics.numbers.real.Real)val).cbrt();
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).cbrt();
         throw new UnsupportedOperationException("cbrt not supported for " + val.getClass().getSimpleName());
     }); }

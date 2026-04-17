@@ -126,8 +126,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             for (int j = 0; j < n; j++) {
                 E val = a.get(i, j);
                 E res;
-                if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig && exponent instanceof org.episteme.core.mathematics.numbers.real.Real) {
-                    res = (E)((org.episteme.core.mathematics.numbers.real.RealBig)val).pow((org.episteme.core.mathematics.numbers.real.Real)exponent);
+                if (val instanceof org.episteme.core.mathematics.numbers.real.Real && exponent instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                    res = (E)((org.episteme.core.mathematics.numbers.real.Real)val).pow((org.episteme.core.mathematics.numbers.real.Real)exponent);
                 } else if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex && exponent instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
                     res = (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).pow((org.episteme.core.mathematics.numbers.complex.Complex)exponent);
                 } else {
@@ -149,8 +149,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             for (int j = 0; j < n; j++) {
                 E val = a.get(i, j);
                 E res;
-                if (val instanceof org.episteme.core.mathematics.numbers.real.RealBig) {
-                    org.episteme.core.mathematics.numbers.real.RealBig rb = (org.episteme.core.mathematics.numbers.real.RealBig)val;
+                if (val instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                    org.episteme.core.mathematics.numbers.real.Real rb = (org.episteme.core.mathematics.numbers.real.Real)val;
                     res = switch(op) {
                         case "exp" -> (E)rb.exp();
                         case "log" -> (E)rb.log();
