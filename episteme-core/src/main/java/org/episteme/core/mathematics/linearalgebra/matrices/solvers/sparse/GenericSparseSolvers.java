@@ -35,8 +35,7 @@ public class GenericSparseSolvers {
             // Check for breakdown
             double breakdownThreshold = getThreshold(f);
             if (isSmaller(rho, breakdownThreshold, f)) {
-                 // Try to recover by resetting r0 if possible, or just break
-                 break; 
+                 throw new ArithmeticException("BiCGSTAB breakdown: rho is " + rho + " (near zero). Matrix might be singular or non-positive definite.");
             }
 
             if (iter == 0) p = r;
@@ -63,10 +62,8 @@ public class GenericSparseSolvers {
             E tDotT = provider.dot(t, t);
             
             if (isSmaller(tDotT, breakdownThreshold, f)) {
-                // Omega would be undefined, but we can still update x with alpha step
-                x = provider.add(x, provider.multiply(p, alpha));
-                r = s;
-                break;
+                // Omega would be undefined, divergence check
+                throw new ArithmeticException("BiCGSTAB breakdown: omega denominator (t.t) is near zero.");
             }
             
             omega = f.divide(provider.dot(t, s), tDotT);
@@ -225,42 +222,51 @@ public class GenericSparseSolvers {
 
     private static <E> double getThreshold(Field<E> f) {
         Object zero = f.zero();
-        if (zero instanceof Complex) zero = ((Complex) zero).real();
-        if (zero instanceof RealBig) return 1e-100;
+        if (zero instanceof Complex c) zero = c.real();
+        if (zero instanceof RealBig rb) {
+            // High precision needs much smaller threshold to avoid premature termination
+            return 1e-120;
+        }
         if (zero instanceof Real r) {
-            String s = r.toString();
-            if (s.contains("RealFloat")) return 1e-18;
-            return 1e-45;
+            String s = r.getClass().getSimpleName();
+            if (s.contains("RealFloat")) return 1e-15;
+            return 1e-40;
         }
         return 1e-45;
     }
 
     private static boolean isSmaller(Object element, Object tolerance, Field<?> f) {
-        Object eAbs = (element instanceof Complex c) ? c.abs() : element;
-        Object tAbs = (tolerance instanceof Complex ct) ? ct.abs() : tolerance;
+        if (element == null) return true;
+        
+        // Exact equality check
+        if (element.equals(f.zero()) && !tolerance.equals(f.zero())) return true;
 
-        if (eAbs instanceof RealBig rb) {
-            java.math.BigDecimal val = rb.abs().bigDecimalValue();
-            if (tAbs instanceof RealBig rt) return val.compareTo(rt.abs().bigDecimalValue()) < 0;
-            if (tAbs instanceof Number nt) return val.compareTo(new java.math.BigDecimal(nt.toString())) < 0;
-            return val.doubleValue() < abs(tAbs, f);
+        if (element instanceof RealBig rb && tolerance instanceof RealBig rt) {
+             return rb.abs().bigDecimalValue().compareTo(rt.abs().bigDecimalValue()) < 0;
         }
         
-        return abs(eAbs, f) < abs(tAbs, f);
+        if (element instanceof RealBig rb && (tolerance instanceof Number || tolerance instanceof Real)) {
+             double tVal = (tolerance instanceof Real r) ? r.doubleValue() : ((Number)tolerance).doubleValue();
+             return rb.abs().doubleValue() < tVal;
+        }
+
+        double eAbs = abs(element, f);
+        double tAbs = abs(tolerance, f);
+        
+        return eAbs < tAbs;
     }
 
     private static boolean isGreater(Object element, Object threshold, Field<?> f) {
-        Object eAbs = (element instanceof Complex c) ? c.abs() : element;
-        Object tAbs = (threshold instanceof Complex ct) ? ct.abs() : threshold;
+        if (element == null) return false;
 
-        if (eAbs instanceof RealBig rb) {
-            java.math.BigDecimal val = rb.abs().bigDecimalValue();
-            if (tAbs instanceof RealBig rt) return val.compareTo(rt.abs().bigDecimalValue()) > 0;
-            if (tAbs instanceof Number nt) return val.compareTo(new java.math.BigDecimal(nt.toString())) > 0;
-            return val.doubleValue() > abs(tAbs, f);
+        if (element instanceof RealBig rb && threshold instanceof RealBig rt) {
+             return rb.abs().bigDecimalValue().compareTo(rt.abs().bigDecimalValue()) > 0;
         }
+
+        double eAbs = abs(element, f);
+        double tAbs = abs(threshold, f);
         
-        return abs(eAbs, f) > abs(tAbs, f);
+        return eAbs > tAbs;
     }
 
     private static Class<?> componentType(Field<?> field) {

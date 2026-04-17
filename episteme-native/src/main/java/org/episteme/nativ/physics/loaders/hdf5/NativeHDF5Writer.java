@@ -35,12 +35,12 @@ import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.episteme.core.io.AbstractResourceWriter;
-import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeRealDoubleMatrixStorage;
 
 /**
  * High-performance HDF5 writer using Panama.
  */
-public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixStorage> implements AutoCloseable {
+public class NativeHDF5Writer extends AbstractResourceWriter<NativeRealDoubleMatrixStorage> implements AutoCloseable {
 
     private final long fileId;
     private final boolean isShared;
@@ -153,21 +153,21 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
     @Override public String getName() { return "Native HDF5 Writer"; }
     @Override public String getDescription() { return "HDF5 writer using Panama and native HDF5 library."; }
     @Override public String getCategory() { return "I/O / Native"; }
-    @Override public Class<NativeDoubleMatrixStorage> getResourceType() { return NativeDoubleMatrixStorage.class; }
+    @Override public Class<NativeRealDoubleMatrixStorage> getResourceType() { return NativeRealDoubleMatrixStorage.class; }
     @Override public String getResourcePath() { return null; }
-    @Override public String getLongDescription() { return "High-performance HDF5 writer leveraging Project Panama for zero-copy data persistence from NativeDoubleMatrixStorage objects into HDF5 files."; }
+    @Override public String getLongDescription() { return "High-performance HDF5 writer leveraging Project Panama for zero-copy data persistence from NativeRealDoubleMatrixStorage objects into HDF5 files."; }
     @Override public String[] getSupportedVersions() { return new String[] { "1.10", "1.12" }; }
     @Override public String[] getSupportedExtensions() { return new String[] { ".h5", ".hdf5" }; }
 
     @Override
-    public void save(NativeDoubleMatrixStorage resource, String destinationId) throws Exception {
+    public void save(NativeRealDoubleMatrixStorage resource, String destinationId) throws Exception {
         Path path = Paths.get(destinationId);
         try (NativeHDF5Writer writer = new NativeHDF5Writer(path)) {
             writer.writeMatrix("data", resource);
         }
     }
 
-    public void writeMatrix(String datasetName, NativeDoubleMatrixStorage matrix, String compression, int level) {
+    public void writeMatrix(String datasetName, NativeRealDoubleMatrixStorage matrix, String compression, int level) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment dims = arena.allocate(ValueLayout.JAVA_LONG, 2);
             dims.set(ValueLayout.JAVA_LONG, 0, matrix.rows());
@@ -225,7 +225,7 @@ public class NativeHDF5Writer extends AbstractResourceWriter<NativeDoubleMatrixS
         }
     }
 
-    public void writeMatrix(String datasetName, NativeDoubleMatrixStorage matrix) {
+    public void writeMatrix(String datasetName, NativeRealDoubleMatrixStorage matrix) {
         writeMatrix(datasetName, matrix, null, 0);
     }
 

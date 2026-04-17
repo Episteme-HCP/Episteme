@@ -146,7 +146,8 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring instanceof org.episteme.core.mathematics.sets.Reals;
+        if (ring == null) return false;
+        return ring instanceof org.episteme.core.mathematics.sets.Reals || ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real;
     }
 
     private static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor descriptor) {

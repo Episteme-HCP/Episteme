@@ -26,6 +26,7 @@ package org.episteme.core.mathematics.numbers.complex;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.FieldElement;
+import org.episteme.core.mathematics.sets.Complexes;
 
 /**
  * Represents a complex number (Ã¢â€žâ€š), defined as a + bi where a, b are Real
@@ -500,7 +501,7 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
 
 
     public org.episteme.core.mathematics.structures.rings.Ring<Complex> getScalarRing() {
-        return this;
+        return Complexes.getInstance();
     }
 }
 

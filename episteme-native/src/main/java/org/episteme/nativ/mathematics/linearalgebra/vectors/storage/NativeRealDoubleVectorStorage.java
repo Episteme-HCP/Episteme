@@ -11,22 +11,19 @@ import java.lang.foreign.ValueLayout;
 import java.nio.DoubleBuffer;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.RealDoubleVectorStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.nativ.technical.backend.nativ.NativeSegmentProxy;
 
 /**
- * A dense vector backed by off-heap native memory.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.1
+ * A dense vector backed by off-heap native memory for 64-bit Reals.
  */
-public class NativeDoubleVectorStorage implements RealDoubleVectorStorage, AutoCloseable {
+public class NativeRealDoubleVectorStorage implements RealDoubleVectorStorage, NativeSegmentProxy, AutoCloseable {
 
     private final MemorySegment data;
     private final int dimension;
     private final Arena arena;
     private final boolean ownsArena;
 
-    public NativeDoubleVectorStorage(int dimension, Arena arena) {
+    public NativeRealDoubleVectorStorage(int dimension, Arena arena) {
         this.dimension = dimension;
         this.arena = arena;
         this.ownsArena = false;
@@ -34,7 +31,7 @@ public class NativeDoubleVectorStorage implements RealDoubleVectorStorage, AutoC
         data.fill((byte) 0);
     }
 
-    public NativeDoubleVectorStorage(int dimension) {
+    public NativeRealDoubleVectorStorage(int dimension) {
         this.dimension = dimension;
         this.arena = Arena.ofConfined();
         this.ownsArena = true;
@@ -42,21 +39,17 @@ public class NativeDoubleVectorStorage implements RealDoubleVectorStorage, AutoC
         data.fill((byte) 0);
     }
 
-    public NativeDoubleVectorStorage(MemorySegment data, int dimension, Arena arena) {
+    public NativeRealDoubleVectorStorage(MemorySegment data, int dimension, Arena arena) {
         this.data = data;
         this.dimension = dimension;
         this.arena = arena;
         this.ownsArena = false;
     }
 
-    public MemorySegment segment() {
-        return data;
-    }
+    @Override public MemorySegment segment() { return data; }
+    @Override public Arena arena() { return arena; }
 
-    @Override
-    public int dimension() {
-        return dimension;
-    }
+    @Override public int dimension() { return dimension; }
 
     @Override
     public Real get(int index) {
@@ -97,26 +90,10 @@ public class NativeDoubleVectorStorage implements RealDoubleVectorStorage, AutoC
         }
     }
 
-    /**
-     * Views this vector as a matrix.
-     */
-    public org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage asMatrix(int rows, int cols) {
-        if ((long) rows * cols != dimension) {
-            throw new IllegalArgumentException("Dimension mismatch");
-        }
-        return new org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage(data, rows, cols, arena);
-    }
-
     @Override
     public org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<Real> copy() {
-        NativeDoubleVectorStorage copy = new NativeDoubleVectorStorage(dimension);
+        NativeRealDoubleVectorStorage copy = new NativeRealDoubleVectorStorage(dimension);
         MemorySegment.copy(this.data, 0, copy.data, 0, (long) dimension * Double.BYTES);
         return copy;
     }
 }
-
-
-
-
-
-

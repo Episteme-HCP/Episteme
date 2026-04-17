@@ -4,6 +4,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
 
@@ -26,36 +27,50 @@ public class LinearAlgebraPerformanceAudit {
         reporter.addMetadata("Precision", precisionProp);
         reporter.addMetadata("Matrix Size", MATRIX_SIZE + "x" + MATRIX_SIZE);
 
-        List<LinearAlgebraProvider<?>> providers = discoverProviders();
+        MathContext targetCtx = MathContext.normal();
+        if (precisionProp.equals("exact")) targetCtx = MathContext.exact();
+        else if (precisionProp.equals("fast")) targetCtx = MathContext.fast();
 
-        LinearAlgebraProvider<?> referenceProvider = providers.stream()
-            .filter(p -> p.getName().contains("Standard"))
-            .findFirst()
-            .orElse(providers.get(0));
+        org.episteme.core.Episteme.getNumericalConfiguration().setRealPrecision(targetCtx.getRealPrecision());
+        org.episteme.core.Episteme.setMathContext(targetCtx.getJavaMathContext());
+        
+        MathContext previous = MathContext.getCurrent();
+        try {
+            MathContext.setCurrent(targetCtx);
+            List<LinearAlgebraProvider<?>> providers = discoverProviders();
 
-        for (LinearAlgebraProvider<?> prov : providers) {
-            if (!prov.isAvailable()) continue;
-            
-            try {
-                System.out.println("[PerfAudit] Benchmarking exhaustive operations for: " + prov.getName());
-                Map<String, Object> metrics = new LinkedHashMap<>();
-                measureExecution(metrics, prov, referenceProvider, precisionProp);
+            LinearAlgebraProvider<?> referenceProvider = providers.stream()
+                .filter(p -> p.getName().contains("Standard") || p.getName().contains("Foundation"))
+                .findFirst()
+                .orElse(providers.get(0));
 
-                BenchmarkResult res = new BenchmarkResult(
-                    "perf-" + prov.getName().toLowerCase().replace(" ", "-"),
-                    prov.getName(),
-                    prov.getClass().getSimpleName(),
-                    "Linear Algebra Performance",
-                    "SUCCESS",
-                    System.currentTimeMillis(),
-                    0, 0, 0, 0, 0,
-                    new HashMap<>(),
-                    metrics
-                );
-                reporter.addResult(res);
-            } catch (Throwable t) {
-                System.err.println("Benchmark failed for " + prov.getName() + ": " + t.getMessage());
+            for (LinearAlgebraProvider<?> prov : providers) {
+                if (!prov.isAvailable()) continue;
+                
+                try {
+                    System.out.println("[PerfAudit] Benchmarking exhaustive operations for: " + prov.getName() + " in " + targetCtx.getRealPrecision() + " mode");
+                    Map<String, Object> metrics = new LinkedHashMap<>();
+                    measureExecution(metrics, prov, referenceProvider, precisionProp);
+
+                    BenchmarkResult res = new BenchmarkResult(
+                        "perf-" + prov.getName().toLowerCase().replace(" ", "-"),
+                        prov.getName(),
+                        prov.getClass().getSimpleName(),
+                        "Linear Algebra Performance",
+                        "SUCCESS",
+                        System.currentTimeMillis(),
+                        0, 0, 0, 0, 0,
+                        new HashMap<>(),
+                        metrics
+                    );
+                    reporter.addResult(res);
+                } catch (Throwable t) {
+                    System.err.println("Benchmark failed for " + prov.getName() + ": " + t.getMessage());
+                    t.printStackTrace();
+                }
             }
+        } finally {
+            MathContext.setCurrent(previous);
         }
 
         reporter.generateReport();

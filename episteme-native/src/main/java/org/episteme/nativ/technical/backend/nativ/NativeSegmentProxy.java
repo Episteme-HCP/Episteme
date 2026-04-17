@@ -2,7 +2,7 @@
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
-package org.episteme.nativ.mathematics.linearalgebra.backends;
+package org.episteme.nativ.technical.backend.nativ;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.Arena;

@@ -399,7 +399,11 @@ public class NativeCUDADenseLinearAlgebraBackend implements LinearAlgebraProvide
         return "Native CUDA Dense Linear Algebra Backend";
     }
     @Override public int getPriority() { return 110; }
-    @Override public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) { return ring instanceof org.episteme.core.mathematics.sets.Reals; }
+    @Override 
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) { 
+        if (ring == null) return false;
+        return ring instanceof org.episteme.core.mathematics.sets.Reals || ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real; 
+    }
 
     @Override
     public Matrix<Real> transpose(Matrix<Real> a) {

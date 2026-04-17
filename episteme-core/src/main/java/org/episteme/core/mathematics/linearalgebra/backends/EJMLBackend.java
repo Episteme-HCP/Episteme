@@ -191,6 +191,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Matrix<E> transpose(Matrix<E> a) { checkEjml(); return ejmlImpl.transpose(a); }
     @Override public Matrix<E> scale(E s, Matrix<E> a) { checkEjml(); return ejmlImpl.scale(s, a); }
     @Override public E norm(Vector<E> a) { checkEjml(); return ejmlImpl.norm(a); }
+    @Override public E angle(Vector<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.angle(a, b); }
 
     @Override public QRResult<E> qr(Matrix<E> a) { checkEjml(); return ejmlImpl.qr(a); }
     @Override public SVDResult<E> svd(Matrix<E> a) { checkEjml(); return ejmlImpl.svd(a); }
@@ -217,9 +218,38 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             this.field = field;
         }
 
-        @Override public String getName() { return "EJML (Inner)"; }
-        @Override public boolean isAvailable() { return true; }
         @Override public int getPriority() { return parent.getPriority(); }
+        
+        @Override
+        public E angle(Vector<E> a, Vector<E> b) {
+            // EJML doesn't have specialized angle, but we ensure consistent double path
+            // Using atan2 for better numerical stability: theta = atan2(|a x b|, a . b)
+            // For n-D vectors, |a x b|^2 = |a|^2 |b|^2 - (a.b)^2
+            double dot = toDouble(dot(a, b));
+            double nA = toDouble(norm(a));
+            double nB = toDouble(norm(b));
+            
+            double crossNormSq = Math.max(0, (nA * nA * nB * nB) - (dot * dot));
+            double theta = Math.atan2(Math.sqrt(crossNormSq), dot);
+            
+            return fromDouble(theta);
+        }
+
+        private double toDouble(E val) {
+            if (val instanceof Real) return ((Real) val).doubleValue();
+            if (val instanceof Number) return ((Number) val).doubleValue();
+            return Double.parseDouble(val.toString());
+        }
+
+        @SuppressWarnings("unchecked")
+        private E fromDouble(double val) {
+            if (field.zero() instanceof Real) return (E) Real.of(val);
+            if (field.zero() instanceof Number) {
+                 // Hack for other Number types if absolutely needed
+                 return (E) (Object) val; 
+            }
+            return (E) (Object) val;
+        }
 
         private org.ejml.simple.SimpleMatrix toEjmlMatrix(Matrix<E> m) {
             org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(m.rows(), m.cols());

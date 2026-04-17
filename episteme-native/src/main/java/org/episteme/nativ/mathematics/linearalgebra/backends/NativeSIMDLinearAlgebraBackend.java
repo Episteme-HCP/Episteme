@@ -117,7 +117,11 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring instanceof Reals || ring instanceof org.episteme.core.mathematics.sets.Complexes;
+        if (ring == null) return false;
+        Object zero = ring.zero();
+        return ring instanceof Reals || ring instanceof org.episteme.core.mathematics.sets.Complexes ||
+               zero instanceof org.episteme.core.mathematics.numbers.real.Real ||
+               zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     @Override
@@ -307,6 +311,14 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     public E norm(Vector<E> a) {
         if (isComplex(a)) return (E) (Object) executeComplexVectorNorm((Vector<Complex>) (Object) a);
         return (E) (Object) Real.of(Math.sqrt(((Real) (Object) dot(a, a)).doubleValue()));
+    }
+
+    @Override
+    public Vector<E> normalize(Vector<E> a) {
+        if (isComplex(a)) return LinearAlgebraProvider.super.normalize(a);
+        double n = ((Real) (Object) norm(a)).doubleValue();
+        if (n == 0) return a;
+        return multiply(a, (E) (Object) Real.of(1.0 / n));
     }
 
     @Override

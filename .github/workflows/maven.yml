@@ -40,7 +40,7 @@ jobs:
       # Currently skips tests because they are known to be broken.
       # TODO: Re-enable tests once Unit Tests are fixed.
       shell: bash
-      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true --file pom.xml
+      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=${{ matrix.java-version }} --file pom.xml
 
     - name: Run Benchmarks (CLI)
       # Run benchmarks and export JSON. 

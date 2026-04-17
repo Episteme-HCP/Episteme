@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import org.episteme.natural.physics.loaders.fits.ImageHDU;
 import org.episteme.natural.physics.loaders.fits.FITSConstants;
 import org.episteme.natural.physics.loaders.fits.Header;
-import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeRealDoubleMatrixStorage;
 import java.lang.foreign.Arena;
 
 /**
@@ -27,18 +27,18 @@ public class OptimizedImageHDU extends ImageHDU {
     }
 
     /**
-     * Reads image data directly into a NativeDoubleMatrixStorage using cfitsio.
+     * Reads image data directly into a NativeRealDoubleMatrixStorage using cfitsio.
      * 
      * @param path the path to the FITS file
      * @param arena the arena for the result matrix
      * @return the native matrix containing image data
      * @throws IOException if an error occurs
      */
-    public NativeDoubleMatrixStorage asNativeDoubleMatrixStorage(Path path, Arena arena) throws IOException {
+    public NativeRealDoubleMatrixStorage asNativeRealDoubleMatrixStorage(Path path, Arena arena) throws IOException {
         int width = header.getIntValue(FITSConstants.KEY_NAXIS + "1", 0);
         int height = header.getIntValue(FITSConstants.KEY_NAXIS + "2", 0);
         
-        NativeDoubleMatrixStorage matrix = new NativeDoubleMatrixStorage(height, width, arena);
+        NativeRealDoubleMatrixStorage matrix = new NativeRealDoubleMatrixStorage(height, width, arena);
         
         try (NativeFITSReader reader = new NativeFITSReader(path)) {
             // Read first plane (assuming 2D for now)

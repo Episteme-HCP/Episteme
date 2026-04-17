@@ -30,7 +30,7 @@ import org.episteme.core.mathematics.context.MathContext;
 
 /**
  * Native implementation of VectorStorageFactory.
- * Creates {@link NativeDoubleVectorStorage} instances for Real numbers.
+ * Creates {@link NativeRealDoubleVectorStorage} instances for Real numbers.
  */
 public class NativeVectorStorageFactory implements VectorStorageFactory {
 
@@ -38,7 +38,7 @@ public class NativeVectorStorageFactory implements VectorStorageFactory {
     @SuppressWarnings("unchecked")
     public <E> VectorStorage<E> createDense(int dim, Ring<E> ring) {
         if (ring.getClass().getName().contains("Reals") && !MathContext.getCurrent().isHighPrecision()) {
-            return (VectorStorage<E>) new NativeDoubleVectorStorage(dim);
+            return (VectorStorage<E>) new NativeRealDoubleVectorStorage(dim);
         }
         return null;
     }
