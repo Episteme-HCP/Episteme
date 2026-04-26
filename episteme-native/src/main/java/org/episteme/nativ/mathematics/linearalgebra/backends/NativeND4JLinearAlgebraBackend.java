@@ -95,7 +95,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     private static final boolean IS_AVAILABLE;
     static {
         boolean avail = false;
-        if (true) { // Disabling now handled by Backend.isAvailable()
+        if (!Boolean.getBoolean("episteme.backend.disable.nd4j")) {
             try {
                 Class.forName("org.nd4j.linalg.factory.Nd4j");
                 // Test actual ND4J initialization

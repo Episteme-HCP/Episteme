@@ -89,6 +89,11 @@ public class NativeFFMLoader {
         if (FAILED_LIBS.contains(libName)) {
             return Optional.empty();
         }
+        
+        if (Boolean.getBoolean("episteme.native.skip." + libName)) {
+             logger.warn("[NativeFFMLoader] Skipping library {} as requested by system property (base name)", libName);
+             return Optional.empty();
+        }
 
         List<String> variants = new ArrayList<>();
         variants.add(libName);
@@ -180,8 +185,13 @@ public class NativeFFMLoader {
             if (java.nio.file.Files.exists(fullPath)) {
                 logger.debug("[NativeFFMLoader] Found file: {}, attempting to load...", fullPath);
                 try {
+                    if (Boolean.getBoolean("episteme.native.skip." + mappedName)) {
+                         logger.warn("[NativeFFMLoader] Skipping library {} as requested by system property", mappedName);
+                         return Optional.empty();
+                    }
+                    logger.info("[NativeFFMLoader] Attempting to load library: {}", fullPath);
                     SymbolLookup lookup = SymbolLookup.libraryLookup(fullPath, arena);
-                    logger.info("[NativeFFMLoader] Successfully loaded library from: {}", fullPath);
+                    logger.info("[NativeFFMLoader] Successfully loaded library: {}", fullPath);
                     return Optional.of(lookup);
                 } catch (Throwable t) {
                     logger.error("[NativeFFMLoader] Failed to load library from {}: {}", fullPath, t.getMessage());

@@ -58,26 +58,38 @@ public class LinearAlgebraPerformanceAudit {
             
             System.out.println("[PerfAudit] Using reference provider: " + referenceProvider.getName());
 
+            System.out.println("[PerfAudit] Total available providers to benchmark: " + providers.size());
             for (LinearAlgebraProvider<?> prov : providers) {
+                String safeName = prov.getName().replace(" ", "").replace("(", "").replace(")", "");
+                if (Boolean.getBoolean("episteme.audit.skip." + safeName)) {
+                    System.out.println("[PerfAudit] -> Skipping provider via audit skip property: " + prov.getName());
+                    continue;
+                }
+                
                 try {
-                    System.out.println("[PerfAudit] Benchmarking exhaustive operations for: " + prov.getName() + " in " + targetCtx.getRealPrecision() + " mode");
+                    System.out.println("[PerfAudit] >>> Starting benchmark for: " + prov.getName() + " [" + prov.getEnvironmentInfo() + "]");
                     Map<String, Object> metrics = new LinkedHashMap<>();
                     measureExecution(metrics, prov, referenceProvider, precisionProp);
 
+                    System.out.println("[PerfAudit] Finished benchmark for " + prov.getName() + ". Total metrics collected: " + metrics.size());
+                    if (metrics.isEmpty()) {
+                        System.err.println("[PerfAudit] WARNING: No metrics were collected for provider " + prov.getName());
+                    }
+                    
                     BenchmarkResult res = new BenchmarkResult(
-                        "perf-" + prov.getName().toLowerCase().replace(" ", "-"),
+                        "perf-" + prov.getName().toLowerCase().replace(" ", "-").replace("(", "").replace(")", ""),
                         prov.getName(),
                         prov.getClass().getSimpleName(),
                         "Linear Algebra Performance",
                         "SUCCESS",
                         System.currentTimeMillis(),
-                        0, 0, 0, 0, 0,
+                        0L, 1L, 0.0, 0.0, 0L,
                         new HashMap<>(),
                         metrics
                     );
                     reporter.addResult(res);
                 } catch (Throwable t) {
-                    System.err.println("[PerfAudit] Benchmark failed for " + prov.getName() + ": " + t.toString());
+                    System.err.println("[PerfAudit] ! Benchmark failed for " + prov.getName() + ": " + t.toString());
                     t.printStackTrace();
                 }
             }
@@ -148,9 +160,16 @@ public class LinearAlgebraPerformanceAudit {
         try {
             @SuppressWarnings("rawtypes")
             ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-            for (LinearAlgebraProvider<?> p : loader) {
-                System.out.println("[PerfAudit] Found provider: " + p.getName() + " (" + p.getClass().getName() + ")");
-                providers.add(p);
+            Iterator<LinearAlgebraProvider> it = loader.iterator();
+            while (it.hasNext()) {
+                try {
+                    System.out.println("[PerfAudit] -> Scanning for next provider...");
+                    LinearAlgebraProvider<?> p = it.next();
+                    System.out.println("[PerfAudit] -> Discovered: " + p.getName() + " (" + p.getClass().getName() + ")");
+                    providers.add(p);
+                } catch (Throwable t) {
+                    System.err.println("[PerfAudit] ! Failed to activate a provider: " + t.toString());
+                }
             }
         } catch (Throwable t) {
             System.err.println("[PerfAudit] Error during provider discovery: " + t.getMessage());
@@ -158,13 +177,13 @@ public class LinearAlgebraPerformanceAudit {
         }
         
         if (providers.isEmpty()) {
-            System.err.println("[PerfAudit] CRITICAL: No LinearAlgebraProviders found! Manual fallback to standard providers...");
+            System.err.println("[PerfAudit] CRITICAL: No LinearAlgebraProviders found! Manual fallback to known providers...");
             // Manual fallbacks if classpath issues exist during test run
             try {
-               providers.add((LinearAlgebraProvider<?>) Class.forName("org.episteme.core.mathematics.linearalgebra.backends.StandardLinearAlgebraProvider").getDeclaredConstructor().newInstance());
+               providers.add((LinearAlgebraProvider<?>) Class.forName("org.episteme.core.mathematics.linearalgebra.providers.StandardLinearAlgebraProvider").getDeclaredConstructor().newInstance());
                providers.add((LinearAlgebraProvider<?>) Class.forName("org.episteme.core.mathematics.linearalgebra.backends.EJMLBackend").getDeclaredConstructor().newInstance());
             } catch (Exception e) {
-               System.err.println("[PerfAudit] Manual fallback also failed: " + e.getMessage());
+               System.err.println("[PerfAudit] Manual fallback failed: " + e.getMessage());
             }
         }
         

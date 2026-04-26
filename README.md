@@ -35,7 +35,7 @@ Most libraries are "computer-oriented"—built around arrays and pointers. Epist
 
 ## 💼 Career Note
 **I am currently looking for a full-time job.**  
-If you are impressed by the scale and quality of Episteme and are looking for a dedicated software engineer with experience in high-performance computing and AI-driven development, please reach out via GitHub or [LinkedIn](https://linkedin.com).
+If you are impressed by the scale and quality of Episteme and are looking for a dedicated software engineer with experience in high-performance computing and AI-driven development, please reach out via GitHub or [LinkedIn](https://www.linkedin.com/in/silv%C3%A8re-martin-michiellot-65b6a95/).
 
 ---
 
@@ -154,7 +154,6 @@ MIT License - see [LICENSE](LICENSE) file.
 
 - **Original Vision**: Silvere Martin-Michiellot
 - **Implementation**: Gemini AI (Google DeepMind)
-- **Inspired by**: Episteme (Jean-Marie Dautelle et al.)
 
 ## Contributing
 

@@ -38,9 +38,11 @@ jobs:
 
     - name: Build with Maven
       # SKIPPING TESTS IN CI:
-      # Several tests in 'episteme-ui' require a graphical environment (JavaFX) which is not available in headless CI.
-      # Also, some native tests require pre-installed libraries (MPFR, OpenCL) which might be missing on some runners.
-      # Unit tests are verified locally before release.
+      # 1. 'episteme-ui' requires a graphical environment (JavaFX/Glass) which is not available on headless GitHub runners.
+      # 2. 'episteme-native' and 'episteme-jni' tests require pre-installed native shared libraries (MPFR, OpenBLAS, OpenCL, CUDA) 
+      #    and specific hardware (GPUs) not present on standard runners.
+      # 3. 'episteme-server' requires a running gRPC/Database environment for full integration.
+      # Full verification is performed on local production-grade environments before tagging.
       shell: bash
       run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=${{ matrix.java-version }} --file pom.xml
 

@@ -27,7 +27,9 @@ public class LinearAlgebraAuditSuite {
     }
 
     public static <E> void runFullAudit(LinearAlgebraProvider<E> p, LinearAlgebraProvider<E> ref, int n, AuditAction action, Ring<E> ring, String prefix, double tolerance) {
-        Random rand = new Random(42);
+        System.out.println("[LinearAlgebraAudit] Running full audit for " + p.getName() + " (Domain: " + prefix + ")...");
+        try {
+            Random rand = new Random(42);
         
         // --- 1. SQUARE MATRIX OPERATIONS (N x N) ---
         Matrix<E> A = randomMatrix(n, n, ref, ring, rand);
@@ -109,6 +111,10 @@ public class LinearAlgebraAuditSuite {
             action.run(prefix + "Sparse:BiCGSTAB", () -> verify(sp.bicgstab(invA, v, x0, ring.one(), 5), ref.solve(invA, v), tolerance * 100)); 
             action.run(prefix + "Sparse:ConjGrad", () -> verify(sp.conjugateGradient(spdA, v, x0, ring.one(), 5), ref.solve(spdA, v), tolerance * 100));
             action.run(prefix + "Sparse:GMRES", () -> verify(sp.gmres(invA, v, x0, ring.one(), 5, 2), ref.solve(invA, v), tolerance * 100));
+        }
+        } catch (Throwable t) {
+            System.err.println("[LinearAlgebraAudit] CRITICAL FAILURE during audit of " + p.getName() + " (" + prefix + "): " + t.toString());
+            t.printStackTrace();
         }
     }
 
