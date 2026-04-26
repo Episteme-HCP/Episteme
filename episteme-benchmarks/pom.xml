@@ -13,9 +13,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <mainClass>org.episteme.benchmarks.ui.EpistemeBenchmarkingApp</mainClass>
     </properties>
 
     <name>Episteme Benchmarking Suite</name>

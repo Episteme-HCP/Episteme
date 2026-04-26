@@ -100,6 +100,7 @@
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
     <argLine></argLine>
+    <mainClass></mainClass>
   </properties>
 
   <dependencyManagement>
@@ -815,6 +816,19 @@
           <artifactId>protobuf-maven-plugin</artifactId>
           <version>0.6.1</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.5.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>2.16.2</version>
+          <configuration>
+            <generateBackupPoms>false</generateBackupPoms>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -963,6 +977,86 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+    </profile>
+
+    <!-- Multi-JDK Release Profiles (Centralised from submodules) -->
+    <profile>
+      <id>release-jdk21</id>
+      <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <classifier>jdk21</classifier>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>release-jdk25</id>
+      <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <classifier>jdk25</classifier>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Fat Jar Profile using Maven Shade -->
+    <profile>
+      <id>fat-jar</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <shadedClassifierName>fat</shadedClassifierName>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+                  <transformers>
+                    <!-- Manifest for Executable Jars -->
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <mainClass>${mainClass}</mainClass>
+                    </transformer>
+                    <!-- Services Resource Transformer for SPI (AutoService) compatibility -->
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                  </transformers>
+                  <filters>
+                    <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                      </excludes>
+                    </filter>
+                  </filters>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

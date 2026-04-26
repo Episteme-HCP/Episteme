@@ -15,9 +15,6 @@
     <description>Native library integration via Project Panama (FFM API)</description>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
         <cuda.exclude.1>**/_NONE_/**</cuda.exclude.1>
         <cuda.exclude.2>**/_NONE_/**</cuda.exclude.2>
         <cuda.exclude.3>**/_NONE_/**</cuda.exclude.3>
@@ -182,7 +179,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <!-- IMPORTANT: Ensure your IDE is configured for Java 25 for this module -->
-                    <release>25</release>
+                    <release>${maven.compiler.release}</release>
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>--add-modules</arg>

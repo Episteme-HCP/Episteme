@@ -12,6 +12,7 @@
     <description>JavaFX client applications for the Episteme Grid (Whiteboard, Monitor, Browser)</description>
 
     <properties>
+        <mainClass>org.episteme.client.GridMonitorApp</mainClass>
     </properties>
 
     <dependencies>

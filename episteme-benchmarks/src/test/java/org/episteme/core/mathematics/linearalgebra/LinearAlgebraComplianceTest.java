@@ -6,6 +6,8 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
+import org.episteme.benchmarks.benchmark.BenchmarkResult;
+import org.episteme.benchmarks.reporting.BenchmarkReporter;
 
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
@@ -92,6 +94,33 @@ public class LinearAlgebraComplianceTest {
             results.add(res);
         }
 
+        BenchmarkReporter reporter = new BenchmarkReporter("Universal Linear Algebra Compliance Audit (Mode: " + mode + ")");
+        reporter.addMetadata("Mode", mode.toString());
+        reporter.addMetadata("Reference", referenceProvider.getName());
+        reporter.addMetadata("Matrix Size", String.valueOf(matrixSize));
+
+        for (ComplianceResult r : results) {
+            Map<String, Object> metrics = new HashMap<>();
+            r.status.forEach((k, v) -> metrics.put(k, v));
+            
+            String overallStatus = r.available ? "SUCCESS" : "DISABLED";
+            if (r.status.values().stream().anyMatch(v -> v.contains("FAIL"))) overallStatus = "FAILURE";
+
+            BenchmarkResult res = new BenchmarkResult(
+                "compliance-" + r.providerName.toLowerCase().replace(" ", "-"),
+                r.providerName,
+                r.environment,
+                "Linear Algebra Compliance",
+                overallStatus,
+                System.currentTimeMillis(),
+                0L, 1L, 0.0, 0.0, 0L,
+                new HashMap<>(),
+                metrics
+            );
+            reporter.addResult(res);
+        }
+
+        reporter.generateReport("compliance_audit_" + mode.toString().toLowerCase());
         printMarkdownReport(results);
     }
 

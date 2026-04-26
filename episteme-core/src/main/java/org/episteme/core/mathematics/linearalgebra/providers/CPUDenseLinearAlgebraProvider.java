@@ -218,26 +218,31 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Vector dimensions must match");
         }
 
-        final Field<E> r = (Field<E>) a.getScalarRing();
+        final Ring<E> r = a.getScalarRing();
+        final Class<?> componentType;
+        if (r.zero() instanceof Real) componentType = Real.class;
+        else if (r.zero() instanceof Complex) componentType = Complex.class;
+        else componentType = r.zero().getClass();
+
         if (a.dimension() < PARALLEL_THRESHOLD) {
             @SuppressWarnings("unchecked")
-            E[] data = (E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), a.dimension());
+            E[] data = (E[]) java.lang.reflect.Array.newInstance(componentType, a.dimension());
             for (int i = 0; i < a.dimension(); i++) {
-                data[i] = ((Field<E>) r).add(a.get(i), b.get(i));
+                data[i] = ((Ring<E>) r).add(a.get(i), b.get(i));
             }
             return new GenericVector<>(
-                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, (Field<E>) r);
+                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, (Ring<E>) r);
         } else {
             return Episteme.computeParallel(() -> {
                 List<E> list = java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
-                    .mapToObj(i -> ((Field<E>) r).add(a.get(i), b.get(i)))
+                    .mapToObj(i -> ((Ring<E>) r).add(a.get(i), b.get(i)))
                     .collect(Collectors.toList());
                 @SuppressWarnings("unchecked")
-                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), list.size()));
+                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, list.size()));
                 return new GenericVector<>(
                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),
-                        this, (Field<E>) r);
+                        this, (Ring<E>) r);
             });
         }
     }
@@ -257,62 +262,75 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         final Ring<E> r = a.getScalarRing();
+        final Class<?> componentType;
+        if (r.zero() instanceof Real) componentType = Real.class;
+        else if (r.zero() instanceof Complex) componentType = Complex.class;
+        else componentType = r.zero().getClass();
+
         if (a.dimension() < PARALLEL_THRESHOLD) {
             List<E> result = new java.util.ArrayList<>(a.dimension());
             for (int i = 0; i < a.dimension(); i++) {
-                E negB = ((Field<E>) r).negate(b.get(i));
-                result.add(((Field<E>) r).add(a.get(i), negB));
+                E negB = ((Ring<E>) r).negate(b.get(i));
+                result.add(((Ring<E>) r).add(a.get(i), negB));
             }
-            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), result.size()));
+            @SuppressWarnings("unchecked")
+            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, result.size()));
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this,
-                    (Field<E>) r);
+                    (Ring<E>) r);
         } else {
             return org.episteme.core.Episteme.computeParallel(() -> {
                 List<E> list = java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
                         if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
-                        E negB = ((Field<E>) r).negate(b.get(i));
-                        return ((Field<E>) r).add(a.get(i), negB);
+                        E negB = ((Ring<E>) r).negate(b.get(i));
+                        return ((Ring<E>) r).add(a.get(i), negB);
                     })
                     .collect(java.util.stream.Collectors.toList());
-                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(r.zero().getClass(), list.size()));
+                @SuppressWarnings("unchecked")
+                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, list.size()));
                 return new GenericVector<>(
                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),
-                        this, (Field<E>) r);
+                        this, (Ring<E>) r);
             });
         }
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        Ring<E> ring = vector.getScalarRing();
+        final Ring<E> ring = vector.getScalarRing();
+        final Class<?> componentType;
+        if (ring.zero() instanceof Real) componentType = Real.class;
+        else if (ring.zero() instanceof Complex) componentType = Complex.class;
+        else componentType = ring.zero().getClass();
+
         if (vector.dimension() < PARALLEL_THRESHOLD) {
             List<E> result = new java.util.ArrayList<>(vector.dimension());
             for (int i = 0; i < vector.dimension(); i++) {
-                result.add(((Field<E>)ring).multiply(vector.get(i), scalar));
+                result.add(((Ring<E>)ring).multiply(vector.get(i), scalar));
             }
             @SuppressWarnings("unchecked")
-            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), result.size()));
+            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, result.size()));
             return new GenericVector<>(
-                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, (Field<E>)ring);
+                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, (Ring<E>)ring);
         } else {
+            final Class<?> finalType = componentType;
             return java.util.stream.IntStream.range(0, vector.dimension())
                     .parallel()
                     .mapToObj(i -> {
                         if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
-                        return ((Field<E>)ring).multiply(vector.get(i), scalar);
+                        return ((Ring<E>)ring).multiply(vector.get(i), scalar);
                     })
                     .collect(java.util.stream.Collectors.collectingAndThen(
                             java.util.stream.Collectors.toList(),
                             list -> {
                                 @SuppressWarnings("unchecked")
-                                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), list.size()));
+                                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(finalType, list.size()));
                                 return new GenericVector<>(
                                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
-                                        this, (Field<E>)ring);
+                                        this, (Ring<E>)ring);
                             }));
         }
     }
@@ -811,7 +829,12 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         int m = a.rows();
         int n = a.cols();
         final Field<E> f = (Field<E>) a.getScalarRing();
-        E[] resArray = (E[]) java.lang.reflect.Array.newInstance(f.zero().getClass(), m);
+        Class<?> componentType = f.zero().getClass();
+        if (f.zero() instanceof Real) componentType = Real.class;
+        else if (f.zero() instanceof Complex) componentType = Complex.class;
+
+        @SuppressWarnings("unchecked")
+        E[] resArray = (E[]) java.lang.reflect.Array.newInstance(componentType, m);
         for (int i = 0; i < m; i++) {
             E sum = f.zero();
             for (int j = 0; j < n; j++) {

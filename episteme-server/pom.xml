@@ -16,6 +16,7 @@
     <description>RPC Server for Distributed Scientific Computing (Coordinator Node)</description>
 
     <properties>
+        <mainClass>org.episteme.server.server.EpistemeApplication</mainClass>
     </properties>
 
     <dependencyManagement>

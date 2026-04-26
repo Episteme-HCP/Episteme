@@ -5,6 +5,12 @@ import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
+import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
+import org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.OperationContext;
 
 import java.util.Random;
 import java.util.function.Supplier;
@@ -24,7 +30,6 @@ public class LinearAlgebraAuditSuite {
         Random rand = new Random(42);
         
         // --- 1. SQUARE MATRIX OPERATIONS (N x N) ---
-        // We use the reference provider to create matrices to ensure they are standard/stable
         Matrix<E> A = randomMatrix(n, n, ref, ring, rand);
         Matrix<E> B = randomMatrix(n, n, ref, ring, rand);
         Vector<E> v = randomVector(n, ref, ring, rand);
@@ -41,7 +46,7 @@ public class LinearAlgebraAuditSuite {
         action.run(prefix + "Inv", () -> verify(p.inverse(invA), ref.inverse(invA), tolerance));
         action.run(prefix + "Det", () -> verify(p.determinant(invA), ref.determinant(invA), tolerance));
         action.run(prefix + "Solve", () -> verify(p.solve(invA, v), ref.solve(invA, v), tolerance));
-        action.run(prefix + "Trace", () -> verify(A.trace(), A.trace(), tolerance)); // Trace is intrinsic but good to check
+        action.run(prefix + "Trace", () -> verify(A.trace(), A.trace(), tolerance));
 
         // Decompositions
         action.run(prefix + "LU", () -> verify(p.lu(invA), ref.lu(invA), tolerance));
@@ -77,7 +82,6 @@ public class LinearAlgebraAuditSuite {
         action.run(prefix + "Vec:Norm", () -> verify(p.norm(v), ref.norm(v), tolerance));
         action.run(prefix + "Vec:Normalize", () -> verify(p.normalize(v), ref.normalize(v), tolerance));
         
-        // Specific 3D test for Cross Product
         Vector<E> v3a = randomVector(3, ref, ring, rand);
         Vector<E> v3b = randomVector(3, ref, ring, rand);
         action.run(prefix + "Vec:Cross", () -> verify(p.cross(v3a, v3b), ref.cross(v3a, v3b), tolerance));
@@ -102,7 +106,7 @@ public class LinearAlgebraAuditSuite {
         // --- 6. SPARSE ITERATIVE ---
         if (p instanceof SparseLinearAlgebraProvider<E> sp) {
             Vector<E> x0 = randomVector(n, ref, ring, rand);
-            action.run(prefix + "Sparse:BiCGSTAB", () -> verify(sp.bicgstab(invA, v, x0, ring.one(), 5), ref.solve(invA, v), tolerance * 100)); // Relaxed for iterative
+            action.run(prefix + "Sparse:BiCGSTAB", () -> verify(sp.bicgstab(invA, v, x0, ring.one(), 5), ref.solve(invA, v), tolerance * 100)); 
             action.run(prefix + "Sparse:ConjGrad", () -> verify(sp.conjugateGradient(spdA, v, x0, ring.one(), 5), ref.solve(spdA, v), tolerance * 100));
             action.run(prefix + "Sparse:GMRES", () -> verify(sp.gmres(invA, v, x0, ring.one(), 5, 2), ref.solve(invA, v), tolerance * 100));
         }
@@ -114,15 +118,14 @@ public class LinearAlgebraAuditSuite {
     }
 
     private static <E> Matrix<E> randomMatrix(int rows, int cols, LinearAlgebraProvider<E> p, Ring<E> ring, Random rand) {
-        @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.one().getClass(), rows, cols);
+        MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(rows, cols, ring, 1.0);
         boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i][j] = randomElement(ring, rand, isComplex);
+                storage.set(i, j, randomElement(ring, rand, isComplex));
             }
         }
-        return Matrix.of(data, ring);
+        return new GenericMatrix<>(storage, p, ring);
     }
 
     @SuppressWarnings("unchecked")
@@ -145,28 +148,8 @@ public class LinearAlgebraAuditSuite {
         return zero;
     }
 
-
-    // createTriangular - Currently unused but kept for future triangular audit expansion (Suppressed)
-    @SuppressWarnings("unused")
-    private static <E> Matrix<E> createTriangular(int n, boolean upper, Ring<E> ring, Random rand) {
-        @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.one().getClass(), n, n);
-        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if ((upper && i <= j) || (!upper && i >= j)) {
-                    data[i][j] = randomElement(ring, rand, isComplex);
-                } else {
-                    data[i][j] = ring.zero();
-                }
-            }
-        }
-        return Matrix.of(data, ring);
-    }
-
     private static <E> Matrix<E> randomInvertibleMatrix(int n, Ring<E> ring, Random rand) {
-        @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.one().getClass(), n, n);
+        MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(n, n, ring, 1.0);
         boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         E large;
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
@@ -185,10 +168,11 @@ public class LinearAlgebraAuditSuite {
         
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                data[i][j] = i == j ? large : randomElement(ring, rand, isComplex);
+                storage.set(i, j, i == j ? large : randomElement(ring, rand, isComplex));
             }
         }
-        return Matrix.of(data, ring);
+        LinearAlgebraProvider<E> p = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
+        return new GenericMatrix<>(storage, p, ring);
     }
 
     private static <E> Matrix<E> randomSPDMatrix(int n, LinearAlgebraProvider<E> p, Ring<E> ring, Random rand) {
@@ -199,23 +183,21 @@ public class LinearAlgebraAuditSuite {
         E boost = ring.add(ring.one(), ring.one());
         for (int i = 0; i < 4; i++) boost = ring.add(boost, boost); // 32.0
         
-        @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.one().getClass(), n, n);
+        MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(n, n, ring, 1.0);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                data[i][j] = i == j ? ring.add(res.get(i, j), boost) : res.get(i, j);
+                storage.set(i, j, i == j ? ring.add(res.get(i, j), boost) : res.get(i, j));
             }
         }
-        return Matrix.of(data, ring);
+        return new GenericMatrix<>(storage, p, ring);
     }
 
     private static <E> Vector<E> randomVector(int n, LinearAlgebraProvider<E> p, Ring<E> ring, Random rand) {
-        @SuppressWarnings("unchecked")
-        E[] data = (E[]) java.lang.reflect.Array.newInstance(ring.one().getClass(), n);
+        VectorStorage<E> storage = AlgorithmManager.getRegistry().createVectorStorage(n, ring, 1.0);
         boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         for (int i = 0; i < n; i++) {
-            data[i] = randomElement(ring, rand, isComplex);
+            storage.set(i, randomElement(ring, rand, isComplex));
         }
-        return Vector.of(data, ring);
+        return new GenericVector<>(storage, p, ring);
     }
 }

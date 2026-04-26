@@ -14,6 +14,7 @@
   <description>Standalone Distributed Worker for Episteme Grid</description>
 
   <properties>
+    <mainClass>org.episteme.worker.WorkerNode</mainClass>
   </properties>
 
   <dependencies>

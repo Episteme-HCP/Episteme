@@ -16,6 +16,7 @@
 
     <properties>
         <jzy3d.exclude>**/Jzy3d*.java,**/SpinField2DViewer.java</jzy3d.exclude>
+        <mainClass>org.episteme.apps.apps.Launcher</mainClass>
     </properties>
 
     <dependencies>

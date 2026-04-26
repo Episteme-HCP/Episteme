@@ -37,16 +37,28 @@ public class LinearAlgebraPerformanceAudit {
         MathContext previous = MathContext.getCurrent();
         try {
             MathContext.setCurrent(targetCtx);
-            List<LinearAlgebraProvider<?>> providers = discoverProviders();
+            List<LinearAlgebraProvider<?>> discovered = discoverProviders();
+            List<LinearAlgebraProvider<?>> providers = new ArrayList<>();
+            for (LinearAlgebraProvider<?> p : discovered) {
+                boolean av = p.isAvailable();
+                System.out.println("[PerfAudit] Provider " + p.getName() + " isAvailable: " + av);
+                if (av) providers.add(p);
+            }
+
+            System.out.println("[PerfAudit] Total available providers: " + providers.size());
+            if (providers.isEmpty()) {
+                System.err.println("[PerfAudit] No available providers found in " + precisionProp + " mode. Aborting.");
+                return;
+            }
 
             LinearAlgebraProvider<?> referenceProvider = providers.stream()
-                .filter(p -> p.getName().contains("Standard") || p.getName().contains("Foundation"))
+                .filter(p -> p.getName().contains("Foundation") || p.getName().contains("Standard"))
                 .findFirst()
                 .orElse(providers.get(0));
+            
+            System.out.println("[PerfAudit] Using reference provider: " + referenceProvider.getName());
 
             for (LinearAlgebraProvider<?> prov : providers) {
-                if (!prov.isAvailable()) continue;
-                
                 try {
                     System.out.println("[PerfAudit] Benchmarking exhaustive operations for: " + prov.getName() + " in " + targetCtx.getRealPrecision() + " mode");
                     Map<String, Object> metrics = new LinkedHashMap<>();
@@ -65,7 +77,7 @@ public class LinearAlgebraPerformanceAudit {
                     );
                     reporter.addResult(res);
                 } catch (Throwable t) {
-                    System.err.println("Benchmark failed for " + prov.getName() + ": " + t.getMessage());
+                    System.err.println("[PerfAudit] Benchmark failed for " + prov.getName() + ": " + t.toString());
                     t.printStackTrace();
                 }
             }
@@ -73,18 +85,18 @@ public class LinearAlgebraPerformanceAudit {
             MathContext.setCurrent(previous);
         }
 
-        reporter.generateReport();
+        reporter.generateReport("performance_audit_" + precisionProp);
     }
 
     private void measureExecution(Map<String, Object> metrics, LinearAlgebraProvider<?> prov, LinearAlgebraProvider<?> ref, String precision) {
         double tolerance = 1.0; // High tolerance for performance measurement (we focus on timing)
         if (precision.equals("exact")) {
             @SuppressWarnings("unchecked")
-            Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
+            Ring<Real> rbRing = (Ring<Real>) (Object) RealBig.ZERO.getScalarRing();
             @SuppressWarnings("unchecked")
-            LinearAlgebraProvider<RealBig> castedProv = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) prov;
+            LinearAlgebraProvider<Real> castedProv = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) prov;
             @SuppressWarnings("unchecked")
-            LinearAlgebraProvider<RealBig> castedRef = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) ref;
+            LinearAlgebraProvider<Real> castedRef = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) ref;
             LinearAlgebraAuditSuite.runFullAudit(castedProv, castedRef, MATRIX_SIZE, (op, test) -> measure(metrics, op, test), rbRing, "RB:", tolerance);
             
             Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
@@ -131,10 +143,32 @@ public class LinearAlgebraPerformanceAudit {
     }
 
     private List<LinearAlgebraProvider<?>> discoverProviders() {
-        Set<LinearAlgebraProvider<?>> providers = new LinkedHashSet<>();
-        @SuppressWarnings("rawtypes")
-        ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-        for (LinearAlgebraProvider<?> p : loader) providers.add(p);
-        return new ArrayList<>(providers);
+        System.out.println("[PerfAudit] Discovering LinearAlgebraProviders via ServiceLoader...");
+        List<LinearAlgebraProvider<?>> providers = new ArrayList<>();
+        try {
+            @SuppressWarnings("rawtypes")
+            ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
+            for (LinearAlgebraProvider<?> p : loader) {
+                System.out.println("[PerfAudit] Found provider: " + p.getName() + " (" + p.getClass().getName() + ")");
+                providers.add(p);
+            }
+        } catch (Throwable t) {
+            System.err.println("[PerfAudit] Error during provider discovery: " + t.getMessage());
+            t.printStackTrace();
+        }
+        
+        if (providers.isEmpty()) {
+            System.err.println("[PerfAudit] CRITICAL: No LinearAlgebraProviders found! Manual fallback to standard providers...");
+            // Manual fallbacks if classpath issues exist during test run
+            try {
+               providers.add((LinearAlgebraProvider<?>) Class.forName("org.episteme.core.mathematics.linearalgebra.backends.StandardLinearAlgebraProvider").getDeclaredConstructor().newInstance());
+               providers.add((LinearAlgebraProvider<?>) Class.forName("org.episteme.core.mathematics.linearalgebra.backends.EJMLBackend").getDeclaredConstructor().newInstance());
+            } catch (Exception e) {
+               System.err.println("[PerfAudit] Manual fallback also failed: " + e.getMessage());
+            }
+        }
+        
+        System.out.println("[PerfAudit] Total providers discovered: " + providers.size());
+        return providers;
     }
 }

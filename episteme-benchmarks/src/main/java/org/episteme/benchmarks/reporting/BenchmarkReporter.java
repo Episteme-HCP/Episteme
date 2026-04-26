@@ -138,17 +138,22 @@ public class BenchmarkReporter {
     }
 
     public void generateReport() {
+        generateReport(null);
+    }
+
+    public void generateReport(String customName) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         
         java.nio.file.Path rootPath = getProjectRoot();
         String baseDir = rootPath.resolve("docs/benchmark-results").toString();
         new java.io.File(baseDir).mkdirs();
         
-        String baseName = baseDir + "/benchmark_result_high_precision_" + timestamp;
+        String reportName = (customName != null) ? customName : "benchmark_result_high_precision_" + timestamp;
+        String baseName = baseDir + "/" + reportName;
         
         System.out.println("[INFO] Generating standardized high-precision audit reports to: " + baseName);
         exportJson(baseName + ".json");
-        generateReport(baseName + ".pdf");
+        generatePdfReport(baseName + ".pdf");
     }
 
     public void exportToRoot(String relativePath) {
@@ -216,7 +221,7 @@ public class BenchmarkReporter {
         return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
-    public void generateReport(String pdfPath) {
+    public void generatePdfReport(String pdfPath) {
         System.out.println("[INFO] Generating High-Precision Audit PDF (" + results.size() + " providers) to " + pdfPath);
         Document document = new Document(PageSize.A4.rotate());
         try {
