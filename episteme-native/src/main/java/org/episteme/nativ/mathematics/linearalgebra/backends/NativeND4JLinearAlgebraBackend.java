@@ -131,7 +131,8 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring instanceof org.episteme.core.mathematics.sets.Reals;
+        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) return false;
+        return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
     }
 
     @Override

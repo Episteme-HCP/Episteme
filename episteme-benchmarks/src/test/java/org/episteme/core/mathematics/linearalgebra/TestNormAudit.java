@@ -15,7 +15,7 @@ public class TestNormAudit {
     public void testNorm() {
         try {
             MathContext.normal().compute(() -> {
-                LinearAlgebraProvider<Real> ref = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, Reals.getInstance());
+                LinearAlgebraProvider<Real> ref = new org.episteme.core.mathematics.linearalgebra.backends.EpistemeLinearAlgebraBackend<>(Reals.getInstance());
                 
                 Vector<Real> v = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
                     AlgorithmManager.getRegistry().createVectorStorage(10, Reals.getInstance(), 1.0),

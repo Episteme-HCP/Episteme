@@ -126,46 +126,12 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
 
     @SuppressWarnings("unchecked")
     private LinearAlgebraProvider<E> getBestProvider(Matrix<E> a) {
-        // Strict delegation: prioritize specialized backends, fallback to foundation
-        Class providerClass = (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) ? SparseLinearAlgebraProvider.class : LinearAlgebraProvider.class;
-        LinearAlgebraProvider<E> internal = (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
-
-        try {
-            List<LinearAlgebraProvider> available = AlgorithmManager.getProviders(providerClass);
-            LinearAlgebraProvider<E> best = (LinearAlgebraProvider<E>) available.stream()
-                .filter(p -> !p.getClass().equals(this.getClass()) && !(p instanceof EpistemeLinearAlgebraBackend))
-                .findFirst()
-                .orElse(null);
-
-            if (best == null || best == this || best.getClass().equals(this.getClass())) {
-                return internal;
-            }
-            return best;
-        } catch (Exception e) {
-            return internal;
-        }
+        return (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
     }
 
     @SuppressWarnings("unchecked")
     private LinearAlgebraProvider<E> getBestVectorProvider(Vector<E> v) {
-        LinearAlgebraProvider<E> internal = (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.SparseVector) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
-        try {
-            // Treat even vector operations as part of the general provider lookup
-            Class providerClass = (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.SparseVector) ? 
-                                                                    SparseLinearAlgebraProvider.class : LinearAlgebraProvider.class;
-            List available = AlgorithmManager.getProviders(providerClass);
-            LinearAlgebraProvider<E> best = (LinearAlgebraProvider<E>) available.stream()
-                .filter(p -> !p.getClass().equals(this.getClass()) && !(p instanceof EpistemeLinearAlgebraBackend))
-                .findFirst()
-                .orElse(null);
-
-            if (best == null || best == this || best.getClass().equals(this.getClass())) {
-                return internal;
-            }
-            return best;
-        } catch (Exception e) {
-            return internal;
-        }
+        return (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.SparseVector) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
     }
 
     @SuppressWarnings("unchecked")

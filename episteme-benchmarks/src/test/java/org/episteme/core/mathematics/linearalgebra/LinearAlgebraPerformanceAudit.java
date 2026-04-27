@@ -22,8 +22,15 @@ public class LinearAlgebraPerformanceAudit {
     @Test
     public void runPerformanceAudit() {
         String precisionProp = System.getProperty("org.episteme.test.precision", "normal").toLowerCase();
+        
+        String modeDesc = "";
+        if (precisionProp.equals("exact")) modeDesc = "Décimales illimitées";
+        else if (precisionProp.equals("normal")) modeDesc = "Double (64-bit)";
+        else if (precisionProp.equals("fast")) modeDesc = "Float (32-bit)";
+        
         BenchmarkReporter reporter = new BenchmarkReporter("Universal Linear Algebra Performance Audit (" + precisionProp.toUpperCase() + ")");
         
+        reporter.addMetadata("Description", modeDesc);
         reporter.addMetadata("Precision", precisionProp);
         reporter.addMetadata("Matrix Size", MATRIX_SIZE + "x" + MATRIX_SIZE);
 
@@ -42,7 +49,36 @@ public class LinearAlgebraPerformanceAudit {
             for (LinearAlgebraProvider<?> p : discovered) {
                 boolean av = p.isAvailable();
                 System.out.println("[PerfAudit] Provider " + p.getName() + " isAvailable: " + av);
-                if (av) providers.add(p);
+                if (av) {
+                    String name = p.getName().toLowerCase();
+                    String className = p.getClass().getSimpleName().toLowerCase();
+                    boolean isGrpcOrDistributed = name.contains("grpc") || className.contains("grpc") || name.contains("distributed") || className.contains("distributed");
+                    boolean include = false;
+                    
+                    if (isGrpcOrDistributed) {
+                        include = true;
+                    } else if (precisionProp.equals("exact")) {
+                        if (name.contains("episteme") || name.contains("foundation") || name.contains("core") ||
+                            name.contains("dense") || name.contains("strassen") || name.contains("standard") || 
+                            name.contains("karma") || name.contains("mpfr") || name.contains("sparse")) {
+                            include = true;
+                        }
+                    } else if (precisionProp.equals("normal")) {
+                        if (!name.contains("mpfr") && !name.contains("float") && !className.contains("float")) {
+                            include = true;
+                        }
+                    } else if (precisionProp.equals("fast")) {
+                        if (name.contains("float") || className.contains("float") || name.contains("nd4j") || name.contains("ffm")) {
+                            include = true;
+                        }
+                    }
+
+                    if (include) {
+                        providers.add(p);
+                    } else {
+                        System.out.println("[PerfAudit] -> Skipping provider due to precision constraints: " + p.getName());
+                    }
+                }
             }
 
             System.out.println("[PerfAudit] Total available providers: " + providers.size());
