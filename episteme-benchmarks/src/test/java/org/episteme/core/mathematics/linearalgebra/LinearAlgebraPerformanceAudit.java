@@ -160,17 +160,16 @@ public class LinearAlgebraPerformanceAudit {
         try {
             @SuppressWarnings("rawtypes")
             ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-            Iterator<LinearAlgebraProvider> it = loader.iterator();
-            while (it.hasNext()) {
+            loader.stream().forEach(provider -> {
                 try {
                     System.out.println("[PerfAudit] -> Scanning for next provider...");
-                    LinearAlgebraProvider<?> p = it.next();
+                    LinearAlgebraProvider<?> p = provider.get();
                     System.out.println("[PerfAudit] -> Discovered: " + p.getName() + " (" + p.getClass().getName() + ")");
                     providers.add(p);
                 } catch (Throwable t) {
-                    System.err.println("[PerfAudit] ! Failed to activate a provider: " + t.toString());
+                    System.err.println("[PerfAudit] ! Failed to activate provider " + provider.type().getName() + ": " + t.toString());
                 }
-            }
+            });
         } catch (Throwable t) {
             System.err.println("[PerfAudit] Error during provider discovery: " + t.getMessage());
             t.printStackTrace();

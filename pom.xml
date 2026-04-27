@@ -984,35 +984,15 @@
       <id>release-jdk21</id>
       <properties>
         <maven.compiler.release>21</maven.compiler.release>
+        <artifact.classifier>jdk21</artifact.classifier>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-              <classifier>jdk21</classifier>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
       <id>release-jdk25</id>
       <properties>
         <maven.compiler.release>25</maven.compiler.release>
+        <artifact.classifier>jdk25</artifact.classifier>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-              <classifier>jdk25</classifier>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
 
     <!-- Fat Jar Profile using Maven Shade -->
