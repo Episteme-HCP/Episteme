@@ -38,6 +38,7 @@ certs/*.srl
 # Large Data & Reports
 *.h5
 *.pdf
+!docs/**/*.pdf
 
 # VM / Docker temp files
 /tmp/
