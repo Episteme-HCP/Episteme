@@ -107,8 +107,6 @@
     <maven.compiler.release>${target.java.version}</maven.compiler.release>
     <maven.compiler.source>${target.java.version}</maven.compiler.source>
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
-    <maven.compiler.args>--add-modules jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
-    <maven.compiler.compilerArgs>--add-modules jdk.incubator.vector</maven.compiler.compilerArgs>
     <extra.compiler.args></extra.compiler.args>
     <argLine></argLine>
     <mainClass></mainClass>
@@ -961,6 +959,34 @@
       <properties>
         <os.detected.classifier>windows-x86_64</os.detected.classifier>
       </properties>
+    </profile>
+    <profile>
+      <id>legacy</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <release>${maven.compiler.release}</release>
+              <compilerArgs>
+                <arg>--add-modules</arg>
+                <arg>jdk.incubator.vector</arg>
+                <arg>-Xpkginfo:always</arg>
+              </compilerArgs>
+              <testExcludes>
+                <exclude>module-info.java</exclude>
+              </testExcludes>
+              <excludes>
+                <exclude>module-info.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>ossrh</id>
