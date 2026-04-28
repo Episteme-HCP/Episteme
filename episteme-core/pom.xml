@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.episteme</groupId>
         <artifactId>episteme-parent</artifactId>
-        <version>1.0.0-beta1</version>
+        <version>1</version>
     </parent>
 
     <artifactId>episteme-core</artifactId>
@@ -352,7 +352,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>${maven.compiler.release}</release>
+                    <source>${target.java.version}</source>
+                    <target>${target.java.version}</target>
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>--add-modules</arg>

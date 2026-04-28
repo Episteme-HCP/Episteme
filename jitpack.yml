@@ -1,0 +1,4 @@
+jdk:
+  - openjdk25
+install:
+  - mvn install -DskipTests -Dtarget.java.version=25

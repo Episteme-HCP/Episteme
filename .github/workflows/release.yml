@@ -56,15 +56,19 @@ jobs:
         run: |
           mvn -B versions:set -DnewVersion=${{ steps.versioning.outputs.VERSION }} -DgenerateBackupPoms=false
 
-      - name: Build Fat & Thin Jars (JDK 25)
-        # builds and attaches both thin (default) and fat (-fat classifier) jars
+      - name: Build & Deploy to GitHub Packages (JDK 25)
+        # builds, attaches fat jars, and deploys to GitHub Packages
         shell: bash
-        run: mvn -B package -DskipTests -Djacoco.skip=true -Prelease-jdk25,fat-jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B deploy -DskipTests -Djacoco.skip=true -Prelease-jdk25,fat-jar
 
-      - name: Build Fat & Thin Jars (JDK 21)
-        # builds and attaches both thin (default) and fat (-fat classifier) jars
+      - name: Build & Deploy to GitHub Packages (JDK 21)
+        # builds, attaches fat jars, and deploys to GitHub Packages
         shell: bash
-        run: mvn -B package -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B deploy -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
