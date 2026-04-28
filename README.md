@@ -135,10 +135,10 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete design.
 
 - 📚 **Online API Javadoc**: [https://silveremartin-dev.github.io/Episteme/](https://silveremartin-dev.github.io/Episteme/)
 - [Architecture Guide](docs/ARCHITECTURE.md)
-- [Mathematical Concepts](docs/MATH_CONCEPTS.md)
-- [API Reference](docs/API.md)
+- [Mathematical Concepts](docs/VISION.md)
+- [API Reference](docs/REST_API.md)
 - [Examples](docs/EXAMPLES.md)
-- [Contributing Guide](CONTRIBUTING.md)
+- [Contributing Guide](docs/CONTRIBUTING.md)
 
 ## Requirements
 
