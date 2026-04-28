@@ -45,9 +45,9 @@ If you are impressed by the scale and quality of Episteme and are looking for a 
 Add Episteme to your `pom.xml`:
 ```xml
 <dependency>
-    <groupId>org.episteme</groupId>
+    <groupId>io.github.silveremartin-dev</groupId>
     <artifactId>episteme-core</artifactId>
-    <version>1.0.0-beta1</version>
+    <version>1.0.0-beta2</version>
 </dependency>
 ```
 
