@@ -961,34 +961,6 @@
       </properties>
     </profile>
     <profile>
-      <id>legacy</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <release>${maven.compiler.release}</release>
-              <compilerArgs>
-                <arg>--add-modules</arg>
-                <arg>jdk.incubator.vector</arg>
-                <arg>-Xpkginfo:always</arg>
-              </compilerArgs>
-              <testExcludes>
-                <exclude>module-info.java</exclude>
-              </testExcludes>
-              <excludes>
-                <exclude>module-info.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>ossrh</id>
       <distributionManagement>
         <snapshotRepository>
