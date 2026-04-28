@@ -18,7 +18,7 @@
         <cuda.exclude.1>**/_NONE_/**</cuda.exclude.1>
         <cuda.exclude.2>**/_NONE_/**</cuda.exclude.2>
         <cuda.exclude.3>**/_NONE_/**</cuda.exclude.3>
-        <extra.compiler.args>--enable-preview</extra.compiler.args>
+        <extra.compiler.args></extra.compiler.args>
         <native.compiler.release>${maven.compiler.release}</native.compiler.release>
     </properties>
 

@@ -14,7 +14,7 @@
 
     <properties>
         <mainClass>org.episteme.benchmarks.ui.EpistemeBenchmarkingApp</mainClass>
-        <extra.compiler.args>--enable-preview</extra.compiler.args>
+        <extra.compiler.args></extra.compiler.args>
     </properties>
 
     <name>Episteme Benchmarking Suite</name>
