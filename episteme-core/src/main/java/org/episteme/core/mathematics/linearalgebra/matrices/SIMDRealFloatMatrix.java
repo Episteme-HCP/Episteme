@@ -48,15 +48,16 @@ public class SIMDRealFloatMatrix extends GenericMatrix<Real> implements AutoClos
     }
     
     public SIMDRealFloatMatrix(int rows, int cols, float[] data) {
-        @SuppressWarnings("unchecked")
-        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider = 
-            (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>) 
-            AlgorithmManager.getProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class);
-            
         super(new HeapRealFloatMatrixStorage(data, rows, cols),
-              provider,
+              getDefaultProvider(),
               Reals.getInstance());
         this.data = data;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> getDefaultProvider() {
+        return (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real>) 
+               AlgorithmManager.getProvider(org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider.class);
     }
 
     @Override

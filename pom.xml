@@ -94,13 +94,17 @@
     <!-- Platform targeting to avoid downloading all binaries (e.g. Windows DLLs in Docker) -->
     <javacpp.platform>${os.detected.classifier}</javacpp.platform>
     
-    <target.java.version>25</target.java.version>
+    <target.java.version>21</target.java.version>
     <maven.compiler.release>${target.java.version}</maven.compiler.release>
     <maven.compiler.source>${target.java.version}</maven.compiler.source>
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
-    <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
+    <maven.compiler.args>--add-modules jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
+    <extra.compiler.args></extra.compiler.args>
     <argLine></argLine>
     <mainClass></mainClass>
+    <artifact.classifier></artifact.classifier>
+    <artifact.suffix></artifact.suffix>
+    <maven.jar.finalName>${project.artifactId}-${project.version}</maven.jar.finalName>
   </properties>
 
   <dependencyManagement>
@@ -719,6 +723,15 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.3.2</version>
+          <configuration>
+            <failOnError>false</failOnError>
+            <retryOnError>true</retryOnError>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
           <configuration>
@@ -728,6 +741,7 @@
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
               <arg>-Xpkginfo:always</arg>
+              <arg>${extra.compiler.args}</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -820,6 +834,14 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>3.5.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.3.0</version>
+          <configuration>
+            <finalName>${maven.jar.finalName}</finalName>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -985,6 +1007,8 @@
       <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <artifact.classifier>jdk21</artifact.classifier>
+        <artifact.suffix>-jdk21</artifact.suffix>
+        <maven.jar.finalName>${project.artifactId}-${project.version}-jdk21</maven.jar.finalName>
       </properties>
     </profile>
     <profile>
@@ -992,6 +1016,8 @@
       <properties>
         <maven.compiler.release>25</maven.compiler.release>
         <artifact.classifier>jdk25</artifact.classifier>
+        <artifact.suffix>-jdk25</artifact.suffix>
+        <maven.jar.finalName>${project.artifactId}-${project.version}-jdk25</maven.jar.finalName>
       </properties>
     </profile>
 
@@ -1011,7 +1037,8 @@
                 </goals>
                 <configuration>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
-                  <shadedClassifierName>fat</shadedClassifierName>
+                  <shadedClassifierName>${artifact.classifier}-fat</shadedClassifierName>
+                  <outputFile>${project.build.directory}/${maven.jar.finalName}-fat.jar</outputFile>
                   <createDependencyReducedPom>false</createDependencyReducedPom>
                   <transformers>
                     <!-- Manifest for Executable Jars -->

@@ -16,9 +16,6 @@
     <description>Episteme Core - Mathematics, Measure, and Computing Infrastructure</description>
 
     <properties>
-        <maven.compiler.release>25</maven.compiler.release>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
         <jzy3d.exclude>**/Jzy3d*.java</jzy3d.exclude>
     </properties>
 
@@ -361,6 +358,7 @@
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
                         <arg>-Xpkginfo:always</arg>
+                        
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>

@@ -14,6 +14,7 @@
 
     <properties>
         <mainClass>org.episteme.benchmarks.ui.EpistemeBenchmarkingApp</mainClass>
+        <extra.compiler.args>--enable-preview</extra.compiler.args>
     </properties>
 
     <name>Episteme Benchmarking Suite</name>
@@ -288,12 +289,13 @@
                 <version>3.13.0</version>
                 <configuration>
                     <!-- IMPORTANT: Ensure your IDE is configured for Java 25 for this module -->
-                    <release>${maven.compiler.release}</release>
+                    <release>25</release>
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
                         <arg>-Xpkginfo:always</arg>
+                        <arg>${extra.compiler.args}</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
