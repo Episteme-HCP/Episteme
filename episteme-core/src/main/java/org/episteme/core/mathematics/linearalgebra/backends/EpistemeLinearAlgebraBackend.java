@@ -124,12 +124,10 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
 
     // --- Delegation Logic ---
 
-    @SuppressWarnings("unchecked")
     private LinearAlgebraProvider<E> getBestProvider(Matrix<E> a) {
         return (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
     }
 
-    @SuppressWarnings("unchecked")
     private LinearAlgebraProvider<E> getBestVectorProvider(Vector<E> v) {
         return (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.SparseVector) ? (LinearAlgebraProvider<E>) sparseProvider : (LinearAlgebraProvider<E>) denseProvider;
     }

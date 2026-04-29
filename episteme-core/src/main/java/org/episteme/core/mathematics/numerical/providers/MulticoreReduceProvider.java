@@ -303,7 +303,6 @@ public class MulticoreReduceProvider implements ReduceProvider {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public double reduce(String operation, DoubleBuffer input, int size) {
         double[] array = new double[size];
         input.get(array);

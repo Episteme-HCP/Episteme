@@ -193,6 +193,7 @@ public class VariableEliminationProvider implements BayesianInferenceProvider {
 
     private DoubleFactor toDoubleFactor(BayesNodeData node, Map<String, String> evidence) {
         String name = node.getName();
+        @SuppressWarnings("deprecation")
         Map<Map<String, String>, Map<String, Double>> cpt = node.getCPT();
         Set<String> vars = new HashSet<>();
         vars.add(name);

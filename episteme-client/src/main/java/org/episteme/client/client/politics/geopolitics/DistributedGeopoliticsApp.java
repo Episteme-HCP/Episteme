@@ -6,12 +6,11 @@
 package org.episteme.client.client.politics.geopolitics;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
 import javafx.stage.Stage;
 import org.episteme.server.server.tasks.economics.DistributedEconomyTask;
 import org.episteme.natural.economics.growth.EconomyParameters;
@@ -19,7 +18,6 @@ import org.episteme.social.politics.loaders.WorldBankReader;
 import org.episteme.server.server.tasks.politics.GeopoliticalEngineTask;
 import org.episteme.natural.politics.GeopoliticalParameters;
 import org.episteme.social.politics.loaders.FactbookReader;
-import org.episteme.server.server.proto.*;
 import org.episteme.core.ui.ThemeManager;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.slf4j.Logger;

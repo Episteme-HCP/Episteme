@@ -8,7 +8,6 @@ package org.episteme.server.server.tasks.biology.structure;
 import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.distributed.TaskRegistry;
 import org.episteme.core.distributed.TaskState;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.biology.structure.ProteinFoldingProvider;
 import org.episteme.natural.biology.structure.providers.StandardProteinFoldingProvider;
 import java.io.Serializable;

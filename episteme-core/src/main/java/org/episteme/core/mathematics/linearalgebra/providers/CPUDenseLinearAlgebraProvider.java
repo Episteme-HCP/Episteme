@@ -833,7 +833,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (f.zero() instanceof Real) componentType = Real.class;
         else if (f.zero() instanceof Complex) componentType = Complex.class;
 
-        @SuppressWarnings("unchecked")
         E[] resArray = (E[]) java.lang.reflect.Array.newInstance(componentType, m);
         for (int i = 0; i < m; i++) {
             E sum = f.zero();

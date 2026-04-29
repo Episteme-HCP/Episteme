@@ -395,7 +395,7 @@ public class CPUCollisionProvider implements CollisionProvider {
             Real invM1 = Real.ONE.divide(m1);
             Real invM2 = Real.ONE.divide(m2);
             
-            Real jImpulse = velAlongNormal.multiply(Real.of(1.8)).negate().divide(invM1.add(invM2));
+            Real jImpulse = velAlongNormal.multiply(Real.ONE.add(e)).negate().divide(invM1.add(invM2));
             
             Real impulseX = jImpulse.multiply(nx);
             Real impulseY = jImpulse.multiply(ny);

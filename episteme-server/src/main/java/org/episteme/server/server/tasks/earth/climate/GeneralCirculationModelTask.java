@@ -11,7 +11,6 @@ import org.episteme.core.distributed.TaskState;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider;
 import org.episteme.natural.physics.classical.matter.fluids.providers.MulticoreNavierStokesProvider;
-import java.io.Serializable;
 import com.google.auto.service.AutoService;
 
 /**
@@ -122,7 +121,6 @@ public class GeneralCirculationModelTask
         
         switch (mode) {
             case REAL -> {
-                Real[] flat = state.getReal();
                 // Simulation logic here... simplified for now as it's a huge step
                 // Call provider.solve for each layer
             }

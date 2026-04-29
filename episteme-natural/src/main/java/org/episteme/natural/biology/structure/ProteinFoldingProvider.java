@@ -7,7 +7,6 @@ package org.episteme.natural.biology.structure;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import java.util.List;
 
 /**
  * Provider for protein folding using the HP model.

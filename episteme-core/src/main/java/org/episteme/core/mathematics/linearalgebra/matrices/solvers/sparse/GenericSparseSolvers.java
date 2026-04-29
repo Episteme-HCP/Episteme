@@ -223,7 +223,7 @@ public class GenericSparseSolvers {
     private static <E> double getThreshold(Field<E> f) {
         Object zero = f.zero();
         if (zero instanceof Complex c) zero = c.real();
-        if (zero instanceof RealBig rb) {
+        if (zero instanceof RealBig) {
             // High precision needs much smaller threshold to avoid premature termination
             return 1e-120;
         }

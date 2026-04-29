@@ -5,7 +5,6 @@
 
 package org.episteme.core.distributed;
 
-import org.episteme.core.mathematics.numbers.real.Real;
 import java.io.Serializable;
 import java.util.function.Function;
 

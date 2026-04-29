@@ -46,7 +46,6 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
 
     private static MethodHandle FPLAN_R2C_1D;
     private static MethodHandle FPLAN_C2R_1D;
-    private static MethodHandle FPLAN_DFT_1D;
     private static MethodHandle FPLAN_DFT_2D;
     private static MethodHandle FPLAN_DFT_3D;
     private static MethodHandle FEXECUTE;
@@ -109,9 +108,6 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             FPLAN_C2R_1D = linker.downcallHandle(lookup.find("fftwf_plan_dft_c2r_1d").get(),
                     FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
                             ValueLayout.JAVA_INT));
-            FPLAN_DFT_1D = linker.downcallHandle(lookup.find("fftwf_plan_dft_1d").get(),
-                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
             FPLAN_DFT_2D = linker.downcallHandle(lookup.find("fftwf_plan_dft_2d").get(),
                     FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
@@ -888,11 +884,6 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
         return result;
     }
 
-    private static double[][][] toDouble3D(float[][][] a) {
-        double[][][] result = new double[a.length][][];
-        for (int i = 0; i < a.length; i++) result[i] = toDouble2D(a[i]);
-        return result;
-    }
 
     private static float[][] toFloat2D(double[][] a) {
         float[][] result = new float[a.length][];
@@ -903,11 +894,6 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
         return result;
     }
 
-    private static float[][][] toFloat3D(double[][][] a) {
-        float[][][] result = new float[a.length][][];
-        for (int i = 0; i < a.length; i++) result[i] = toFloat2D(a[i]);
-        return result;
-    }
 
     @Override
     public void shutdown() {

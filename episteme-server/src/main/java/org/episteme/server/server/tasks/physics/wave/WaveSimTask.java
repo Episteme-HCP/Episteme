@@ -11,7 +11,6 @@ import org.episteme.core.distributed.TaskState;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.waves.WaveProvider;
 import org.episteme.natural.physics.classical.waves.providers.MulticoreWaveProvider;
-import java.io.Serializable;
 import com.google.auto.service.AutoService;
 
 /**

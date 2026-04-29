@@ -14,7 +14,6 @@ import org.episteme.natural.economics.growth.EconomyParameters;
 import org.episteme.natural.economics.growth.EconomyProvider;
 import org.episteme.natural.economics.growth.providers.StandardEconomyProvider;
 import com.google.auto.service.AutoService;
-import java.io.Serializable;
 
 /**
  * Distributed Economic Simulation Task.

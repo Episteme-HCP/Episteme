@@ -14,7 +14,6 @@ import org.episteme.natural.physics.classical.matter.molecular.MolecularDynamics
 import org.episteme.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider;
 import java.io.Serializable;
 import com.google.auto.service.AutoService;
-import java.util.ArrayList;
 import java.util.List;
 import org.episteme.natural.physics.classical.mechanics.Particle;
 

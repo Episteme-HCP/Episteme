@@ -9,7 +9,6 @@ import org.episteme.core.distributed.DistributedTask;
 import org.episteme.natural.biology.genome.GenomeProvider;
 import org.episteme.natural.biology.genome.providers.StandardGenomeProvider;
 import com.google.auto.service.AutoService;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +40,14 @@ public class CrisprTask implements DistributedTask<CrisprTask, ArrayList<GenomeP
     @Override
     @SuppressWarnings("unchecked")
     public Class<ArrayList<GenomeProvider.Target>> getOutputType() { 
-        return (Class) ArrayList.class; 
+        return (Class<ArrayList<GenomeProvider.Target>>) (Class<?>) ArrayList.class; 
     }
 
     @Override
     public ArrayList<GenomeProvider.Target> execute(CrisprTask input) {
-        if (input != null && input.sequence.length() > 0) {
-            return new ArrayList<>(input.scan());
+        if (input != null && !input.sequence.isEmpty()) {
+            List<GenomeProvider.Target> result = input.scan();
+            return new ArrayList<>(result);
         }
         return new ArrayList<>();
     }
