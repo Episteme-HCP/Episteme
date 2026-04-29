@@ -17,6 +17,7 @@ import org.episteme.natural.physics.classical.mechanics.collision.RigidBodyBridg
 import org.episteme.natural.physics.classical.mechanics.simulation.SimulationProvider;
 import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 import java.lang.foreign.*;
 import java.util.List;
@@ -138,6 +139,30 @@ public class ODEBackend implements NativeCollisionProvider, MechanicsBackend, CP
                 MemorySegment.copy(velSeg, ValueLayout.JAVA_DOUBLE, 0, velocities, 0, n * 3);
             }
         }
+    }
+
+    @Override
+    public int detectSphereCollisions(Real[] positions, Real[] radii, int n, int[] collisions) {
+        double[] posD = new double[positions.length];
+        double[] radD = new double[radii.length];
+        for (int i = 0; i < positions.length; i++) posD[i] = positions[i].doubleValue();
+        for (int i = 0; i < radii.length; i++) radD[i] = radii[i].doubleValue();
+        return detectSphereCollisions(posD, radD, n, collisions);
+    }
+
+    @Override
+    public void resolveCollisions(Real[] positions, Real[] velocities, Real[] masses, int n, int[] collisions, int numCollisions) {
+        double[] posD = new double[positions.length];
+        double[] velD = new double[velocities.length];
+        double[] massD = new double[masses.length];
+        for (int i = 0; i < positions.length; i++) posD[i] = positions[i].doubleValue();
+        for (int i = 0; i < velocities.length; i++) velD[i] = velocities[i].doubleValue();
+        for (int i = 0; i < masses.length; i++) massD[i] = masses[i].doubleValue();
+        
+        resolveCollisions(posD, velD, massD, n, collisions, numCollisions);
+        
+        for (int i = 0; i < positions.length; i++) positions[i] = Real.of(posD[i]);
+        for (int i = 0; i < velocities.length; i++) velocities[i] = Real.of(velD[i]);
     }
 
     @Override
