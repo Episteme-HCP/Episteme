@@ -2,9 +2,9 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.episteme</groupId>
+    <groupId>io.github.silveremartin-dev</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta1</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>episteme-worker</artifactId>
@@ -20,23 +20,23 @@
   <dependencies>
     <!-- Core Logic -->
     <dependency>
-      <groupId>org.episteme</groupId>
+      <groupId>io.github.silveremartin-dev</groupId>
       <artifactId>episteme-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Communication -->
     <dependency>
-      <groupId>org.episteme</groupId>
+      <groupId>io.github.silveremartin-dev</groupId>
       <artifactId>episteme-natural</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.episteme</groupId>
+      <groupId>io.github.silveremartin-dev</groupId>
       <artifactId>episteme-server</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.episteme</groupId>
+      <groupId>io.github.silveremartin-dev</groupId>
       <artifactId>episteme-client</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -135,7 +135,7 @@
             </goals>
             <configuration>
               <outputDirectory>${project.build.directory}/lib</outputDirectory>
-              <excludeGroupIds>org.episteme</excludeGroupIds>
+              <excludeGroupIds>io.github.silveremartin-dev</excludeGroupIds>
             </configuration>
           </execution>
         </executions>

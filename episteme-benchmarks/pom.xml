@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.episteme</groupId>
+        <groupId>io.github.silveremartin-dev</groupId>
         <artifactId>episteme-parent</artifactId>
-        <version>1.0.0-beta1</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>episteme-benchmarks</artifactId>
@@ -21,7 +21,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -36,7 +36,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -51,7 +51,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-social</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -66,7 +66,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-native</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -81,7 +81,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-client</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -96,7 +96,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-server</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -346,7 +346,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <excludeGroupIds>org.episteme</excludeGroupIds>
+                            <excludeGroupIds>io.github.silveremartin-dev</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>

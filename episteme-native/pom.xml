@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.episteme</groupId>
+        <groupId>io.github.silveremartin-dev</groupId>
         <artifactId>episteme-parent</artifactId>
-        <version>1.0.0-beta1</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>episteme-native</artifactId>
@@ -22,13 +22,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
         </dependency>
