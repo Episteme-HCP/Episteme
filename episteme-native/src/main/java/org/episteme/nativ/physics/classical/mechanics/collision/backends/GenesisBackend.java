@@ -120,7 +120,7 @@ public class GenesisBackend implements NativeCollisionProvider, MechanicsBackend
                 MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
                 MemorySegment radSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, radii);
                 MemorySegment colSeg = arena.allocate(ValueLayout.JAVA_INT, (long) n * n * 2);
-                int count = detectSphereCollisions(posSeg, radSeg, n, colSeg);
+                int count = detectSphereCollisions(posSeg, radSeg, n, colSeg, ValueLayout.JAVA_DOUBLE);
                 MemorySegment.copy(colSeg, ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
                 return count;
             }
@@ -136,7 +136,7 @@ public class GenesisBackend implements NativeCollisionProvider, MechanicsBackend
                 MemorySegment velSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, velocities);
                 MemorySegment massSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, masses);
                 MemorySegment colSeg = arena.allocateFrom(ValueLayout.JAVA_INT, collisions);
-                resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions);
+                resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions, ValueLayout.JAVA_DOUBLE);
                 MemorySegment.copy(posSeg, ValueLayout.JAVA_DOUBLE, 0, positions, 0, n * 3);
                 MemorySegment.copy(velSeg, ValueLayout.JAVA_DOUBLE, 0, velocities, 0, n * 3);
             }
@@ -144,12 +144,12 @@ public class GenesisBackend implements NativeCollisionProvider, MechanicsBackend
     }
 
     @Override
-    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
+    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions, ValueLayout layout) {
         throw new UnsupportedOperationException("Raw MemorySegment collision detection not yet implemented for Genesis.");
     }
 
     @Override
-    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
+    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions, ValueLayout layout) {
         throw new UnsupportedOperationException("Raw MemorySegment collision resolution not yet implemented for Genesis.");
     }
 

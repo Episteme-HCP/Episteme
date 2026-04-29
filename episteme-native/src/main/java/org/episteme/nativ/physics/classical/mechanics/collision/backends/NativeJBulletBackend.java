@@ -125,7 +125,7 @@ public class NativeJBulletBackend implements NativeCollisionProvider, MechanicsB
         MemorySegment posSeg = MemorySegment.ofArray(positions);
         MemorySegment radSeg = MemorySegment.ofArray(radii);
         MemorySegment colSeg = MemorySegment.ofArray(collisions);
-        return detectSphereCollisions(posSeg, radSeg, n, colSeg);
+        return detectSphereCollisions(posSeg, radSeg, n, colSeg, java.lang.foreign.ValueLayout.JAVA_DOUBLE);
     }
 
     @Override
@@ -134,11 +134,11 @@ public class NativeJBulletBackend implements NativeCollisionProvider, MechanicsB
         MemorySegment velSeg = MemorySegment.ofArray(velocities);
         MemorySegment massSeg = MemorySegment.ofArray(masses);
         MemorySegment colSeg = MemorySegment.ofArray(collisions);
-        resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions);
+        resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions, java.lang.foreign.ValueLayout.JAVA_DOUBLE);
     }
 
     @Override
-    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
+    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions, java.lang.foreign.ValueLayout layout) {
         if (n == 0) return 0;
         // Use scavenge-protected segments for buffer access
         java.nio.DoubleBuffer posBuf  = NativeSafe.scavenge(positions, (long) n * 3 * 8, java.lang.foreign.Arena.global(), "jbullet_positions").segment().asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
@@ -202,7 +202,7 @@ public class NativeJBulletBackend implements NativeCollisionProvider, MechanicsB
     }
 
     @Override
-    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
+    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions, java.lang.foreign.ValueLayout layout) {
         // java.nio.DoubleBuffer posBuf = positions.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
         // java.nio.DoubleBuffer velBuf = velocities.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
         // java.nio.DoubleBuffer massBuf = masses.asByteBuffer().order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
