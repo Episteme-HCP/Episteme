@@ -1,40 +1,24 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.server.server.tasks.chemistry;
 
 import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.distributed.TaskRegistry;
-
+import org.episteme.core.distributed.TaskState;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.natural.chemistry.Atom;
-import org.episteme.natural.chemistry.Element;
+import org.episteme.core.mathematics.random.RandomGenerator;
+import org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider;
+import org.episteme.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Molecular Dynamics Simulation Task.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
@@ -46,135 +30,83 @@ public class MolecularDynamicsTask
     private final double timeStep;
     private final int steps;
     private final double boxSize;
-    private List<AtomState> atoms;
+    
+    private TaskState<AtomState[]> state;
     private double totalEnergy;
-
-
-
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
-    private List<Atom> epistemeAtoms;
-    private float[] positionsFloat;
-    private float[] velocitiesFloat;
-    private float[] forcesFloat;
-    private float[] massesFloat;
 
     public MolecularDynamicsTask(int numAtoms, double timeStep, int steps, double boxSize) {
         this.numAtoms = numAtoms;
         this.timeStep = timeStep;
         this.steps = steps;
         this.boxSize = boxSize;
-        this.atoms = new ArrayList<>(numAtoms);
-        initialize();
+        
+        AtomState[] initialAtoms = new AtomState[numAtoms];
+        RandomGenerator rng = new RandomGenerator(System.nanoTime());
+        for (int i = 0; i < numAtoms; i++) {
+            initialAtoms[i] = new AtomState(
+                    rng.nextReal().doubleValue() * boxSize, rng.nextReal().doubleValue() * boxSize, rng.nextReal().doubleValue() * boxSize,
+                    (rng.nextReal().doubleValue() - 0.5), (rng.nextReal().doubleValue() - 0.5), (rng.nextReal().doubleValue() - 0.5),
+                    1.0);
+        }
+        
+        this.state = new TaskState<>(initialAtoms,
+            arr -> flattenDouble(arr), d -> unflattenDouble(d),
+            arr -> flattenFloat(arr), f -> unflattenFloat(f)
+        );
     }
 
-    // No-arg constructor for ServiceLoader/Reflective instantiation
+    private double[] flattenDouble(AtomState[] arr) {
+        double[] flat = new double[arr.length * 7];
+        for (int i = 0; i < arr.length; i++) {
+            AtomState a = arr[i];
+            flat[i*7] = a.x; flat[i*7+1] = a.y; flat[i*7+2] = a.z;
+            flat[i*7+3] = a.vx; flat[i*7+4] = a.vy; flat[i*7+5] = a.vz;
+            flat[i*7+6] = a.mass;
+        }
+        return flat;
+    }
+
+    private AtomState[] unflattenDouble(double[] arr) {
+        AtomState[] res = new AtomState[arr.length / 7];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = new AtomState(arr[i*7], arr[i*7+1], arr[i*7+2], arr[i*7+3], arr[i*7+4], arr[i*7+5], arr[i*7+6]);
+        }
+        return res;
+    }
+
+    private float[] flattenFloat(AtomState[] arr) {
+        float[] flat = new float[arr.length * 7];
+        for (int i = 0; i < arr.length; i++) {
+            AtomState a = arr[i];
+            flat[i*7] = (float)a.x; flat[i*7+1] = (float)a.y; flat[i*7+2] = (float)a.z;
+            flat[i*7+3] = (float)a.vx; flat[i*7+4] = (float)a.vy; flat[i*7+5] = (float)a.vz;
+            flat[i*7+6] = (float)a.mass;
+        }
+        return flat;
+    }
+
+    private AtomState[] unflattenFloat(float[] arr) {
+        AtomState[] res = new AtomState[arr.length / 7];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = new AtomState(arr[i*7], arr[i*7+1], arr[i*7+2], arr[i*7+3], arr[i*7+4], arr[i*7+5], arr[i*7+6]);
+        }
+        return res;
+    }
+
     public MolecularDynamicsTask() {
         this(0, 0, 0, 0);
     }
 
-    public MolecularDynamicsTask(List<? extends Object> particles, double boxSize) {
-        this.numAtoms = particles.size();
-        this.timeStep = 0.001;
-        this.steps = 100;
-        this.boxSize = boxSize;
-        this.atoms = new ArrayList<>(numAtoms);
-        initialize();
-    }
-
-    private void initialize() {
-        if (numAtoms == 0)
-            return;
-        for (int i = 0; i < numAtoms; i++) {
-            atoms.add(new AtomState(
-                    Math.random() * boxSize, Math.random() * boxSize, Math.random() * boxSize,
-                    (Math.random() - 0.5), (Math.random() - 0.5), (Math.random() - 0.5),
-                    1.0));
-        }
-    }
-
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
-        if (mode == TaskRegistry.PrecisionMode.REAL && epistemeAtoms == null) {
-            syncToEpisteme();
-        } else if (mode == TaskRegistry.PrecisionMode.FLOAT && positionsFloat == null) {
-            syncToFloat();
-        }
-    }
-
-    private void syncToFloat() {
-        int n = numAtoms;
-        positionsFloat = new float[n * 3];
-        velocitiesFloat = new float[n * 3];
-        forcesFloat = new float[n * 3];
-        massesFloat = new float[n];
-        for (int i = 0; i < n; i++) {
-            AtomState a = atoms.get(i);
-            positionsFloat[i * 3] = (float) a.x;
-            positionsFloat[i * 3 + 1] = (float) a.y;
-            positionsFloat[i * 3 + 2] = (float) a.z;
-            velocitiesFloat[i * 3] = (float) a.vx;
-            velocitiesFloat[i * 3 + 1] = (float) a.vy;
-            velocitiesFloat[i * 3 + 2] = (float) a.vz;
-            massesFloat[i] = (float) a.mass;
-        }
-    }
-
-    private void syncFromFloat() {
-        for (int i = 0; i < numAtoms; i++) {
-            AtomState a = atoms.get(i);
-            a.x = positionsFloat[i * 3];
-            a.y = positionsFloat[i * 3 + 1];
-            a.z = positionsFloat[i * 3 + 2];
-            a.vx = velocitiesFloat[i * 3];
-            a.vy = velocitiesFloat[i * 3 + 1];
-            a.vz = velocitiesFloat[i * 3 + 2];
-        }
-    }
-
-    private void syncToEpisteme() {
-        epistemeAtoms = new ArrayList<>(numAtoms);
-        Element hydrogen = new Element("Hydrogen", "H");
-        for (AtomState a : atoms) {
-            org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> pos = createVector(
-                    a.x, a.y, a.z);
-            Atom atom = new Atom(hydrogen, pos);
-            atom.setVelocity(createVector(a.vx, a.vy, a.vz));
-            epistemeAtoms.add(atom);
-        }
-    }
-
-    private void syncFromEpisteme() {
-        for (int i = 0; i < numAtoms; i++) {
-            Atom atom = epistemeAtoms.get(i);
-            AtomState a = atoms.get(i);
-            a.x = atom.getPosition().get(0).doubleValue();
-            a.y = atom.getPosition().get(1).doubleValue();
-            a.z = atom.getPosition().get(2).doubleValue();
-            a.vx = atom.getVelocity().get(0).doubleValue();
-            a.vy = atom.getVelocity().get(1).doubleValue();
-            a.vz = atom.getVelocity().get(2).doubleValue();
-        }
-    }
-
-    private org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> createVector(
-            double x, double y, double z) {
-        List<org.episteme.core.mathematics.numbers.real.Real> list = new ArrayList<>();
-        list.add(org.episteme.core.mathematics.numbers.real.Real.of(x));
-        list.add(org.episteme.core.mathematics.numbers.real.Real.of(y));
-        list.add(org.episteme.core.mathematics.numbers.real.Real.of(z));
-        return org.episteme.core.mathematics.linearalgebra.Vector.of(list,
-                org.episteme.core.mathematics.sets.Reals.getInstance());
+        this.state.syncTo(mode);
     }
 
     @Override
-    public Class<MolecularDynamicsTask> getInputType() {
-        return MolecularDynamicsTask.class;
-    }
-
+    public Class<MolecularDynamicsTask> getInputType() { return MolecularDynamicsTask.class; }
     @Override
-    public Class<MolecularDynamicsTask> getOutputType() {
-        return MolecularDynamicsTask.class;
-    }
+    public Class<MolecularDynamicsTask> getOutputType() { return MolecularDynamicsTask.class; }
 
     @Override
     public MolecularDynamicsTask execute(MolecularDynamicsTask input) {
@@ -182,207 +114,102 @@ public class MolecularDynamicsTask
             input.run();
             return input;
         }
-        if (this.numAtoms > 0) {
-            this.run();
-            return this;
-        }
         return null;
     }
 
     @Override
-    public String getTaskType() {
-        return "MOLECULAR_DYNAMICS";
-    }
+    public String getTaskType() { return "MOLECULAR_DYNAMICS"; }
 
     public void run() {
-        org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider = new org.episteme.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider();
+        MolecularDynamicsProvider provider = new MulticoreMolecularDynamicsProvider();
         for (int s = 0; s < steps; s++) {
             switch (mode) {
-                case REAL -> epistemeStep(provider);
-                case FLOAT -> floatStep(provider);
-                default -> primitiveStep(provider);
+                case REAL -> runRealStep(provider);
+                case FLOAT -> runFloatStep(provider);
+                default -> runPrimitiveStep(provider);
             }
         }
         calculateTotalEnergy();
     }
 
-    private void floatStep(org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider) {
-        provider.calculateNonBondedForces(positionsFloat, forcesFloat, 1.0f, 1.0f, 2.5f);
-        provider.integrate(positionsFloat, velocitiesFloat, forcesFloat, massesFloat, (float) timeStep, 1.0f);
-
-        for (int i = 0; i < numAtoms; i++) {
-            if (positionsFloat[i * 3] < 0 || positionsFloat[i * 3] > boxSize) {
-                velocitiesFloat[i * 3] *= -1;
-                positionsFloat[i * 3] = Math.max(0f, Math.min((float) boxSize, positionsFloat[i * 3]));
-            }
-            if (positionsFloat[i * 3 + 1] < 0 || positionsFloat[i * 3 + 1] > boxSize) {
-                velocitiesFloat[i * 3 + 1] *= -1;
-                positionsFloat[i * 3 + 1] = Math.max(0f, Math.min((float) boxSize, positionsFloat[i * 3 + 1]));
-            }
-            if (positionsFloat[i * 3 + 2] < 0 || positionsFloat[i * 3 + 2] > boxSize) {
-                velocitiesFloat[i * 3 + 2] *= -1;
-                positionsFloat[i * 3 + 2] = Math.max(0f, Math.min((float) boxSize, positionsFloat[i * 3 + 2]));
-            }
+    private void runFloatStep(MolecularDynamicsProvider provider) {
+        float[] flat = state.getFloat();
+        int n = numAtoms;
+        float[] pos = new float[n*3], vel = new float[n*3], forces = new float[n*3], masses = new float[n];
+        for(int i=0; i<n; i++) {
+            pos[i*3]=flat[i*7]; pos[i*3+1]=flat[i*7+1]; pos[i*3+2]=flat[i*7+2];
+            vel[i*3]=flat[i*7+3]; vel[i*3+1]=flat[i*7+4]; vel[i*3+2]=flat[i*7+5];
+            masses[i]=flat[i*7+6];
         }
-        syncFromFloat();
+        provider.calculateNonBondedForces(pos, forces, 1.0f, 1.0f, 2.5f);
+        provider.integrate(pos, vel, forces, masses, (float)timeStep, 1.0f);
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<3; j++) {
+                if(pos[i*3+j] < 0 || pos[i*3+j] > boxSize) { vel[i*3+j]*=-1; pos[i*3+j] = (float)Math.max(0, Math.min(boxSize, pos[i*3+j])); }
+            }
+            flat[i*7]=pos[i*3]; flat[i*7+1]=pos[i*3+1]; flat[i*7+2]=pos[i*3+2];
+            flat[i*7+3]=vel[i*3]; flat[i*7+4]=vel[i*3+1]; flat[i*7+5]=vel[i*3+2];
+        }
     }
 
-    private void epistemeStep(org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider) {
+    private void runPrimitiveStep(MolecularDynamicsProvider provider) {
+        double[] flat = state.getDouble();
         int n = numAtoms;
-        org.episteme.core.mathematics.numbers.real.Real[] positions = new org.episteme.core.mathematics.numbers.real.Real[n * 3];
-        org.episteme.core.mathematics.numbers.real.Real[] velocities = new org.episteme.core.mathematics.numbers.real.Real[n * 3];
-        org.episteme.core.mathematics.numbers.real.Real[] forces = new org.episteme.core.mathematics.numbers.real.Real[n * 3];
-        org.episteme.core.mathematics.numbers.real.Real[] masses = new org.episteme.core.mathematics.numbers.real.Real[n];
-
-        for (int i = 0; i < n; i++) {
-            Atom a = epistemeAtoms.get(i);
-            positions[i * 3] = a.getPosition().get(0);
-            positions[i * 3 + 1] = a.getPosition().get(1);
-            positions[i * 3 + 2] = a.getPosition().get(2);
-            velocities[i * 3] = a.getVelocity().get(0);
-            velocities[i * 3 + 1] = a.getVelocity().get(1);
-            velocities[i * 3 + 2] = a.getVelocity().get(2);
-            forces[i * 3] = org.episteme.core.mathematics.numbers.real.Real.ZERO;
-            forces[i * 3 + 1] = org.episteme.core.mathematics.numbers.real.Real.ZERO;
-            forces[i * 3 + 2] = org.episteme.core.mathematics.numbers.real.Real.ZERO;
-            masses[i] = org.episteme.core.mathematics.numbers.real.Real.of(a.getMass().getValue().doubleValue());
+        double[] pos = new double[n*3], vel = new double[n*3], forces = new double[n*3], masses = new double[n];
+        for(int i=0; i<n; i++) {
+            pos[i*3]=flat[i*7]; pos[i*3+1]=flat[i*7+1]; pos[i*3+2]=flat[i*7+2];
+            vel[i*3]=flat[i*7+3]; vel[i*3+1]=flat[i*7+4]; vel[i*3+2]=flat[i*7+5];
+            masses[i]=flat[i*7+6];
         }
-
-        org.episteme.core.mathematics.numbers.real.Real epsilon = org.episteme.core.mathematics.numbers.real.Real.ONE;
-        org.episteme.core.mathematics.numbers.real.Real sigma = org.episteme.core.mathematics.numbers.real.Real.ONE;
-        org.episteme.core.mathematics.numbers.real.Real cutoff = org.episteme.core.mathematics.numbers.real.Real.of(2.5);
-
-        provider.calculateNonBondedForces(positions, forces, epsilon, sigma, cutoff);
-        provider.integrate(positions, velocities, forces, masses,
-                org.episteme.core.mathematics.numbers.real.Real.of(timeStep),
-                org.episteme.core.mathematics.numbers.real.Real.ONE);
-
-        for (int i = 0; i < n; i++) {
-            Atom a = epistemeAtoms.get(i);
-            a.setPosition(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
-            a.setVelocity(velocities[i * 3], velocities[i * 3 + 1], velocities[i * 3 + 2]);
-
-            double x = a.getX();
-            double y = a.getY();
-            double z = a.getZ();
-            boolean hit = false;
-            if (x < 0 || x > boxSize) {
-                hit = true;
-                x = Math.max(0, Math.min(boxSize, x));
+        provider.calculateNonBondedForces(pos, forces, 1.0, 1.0, 2.5);
+        provider.integrate(pos, vel, forces, masses, timeStep, 1.0);
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<3; j++) {
+                if(pos[i*3+j] < 0 || pos[i*3+j] > boxSize) { vel[i*3+j]*=-1; pos[i*3+j] = Math.max(0, Math.min(boxSize, pos[i*3+j])); }
             }
-            if (y < 0 || y > boxSize) {
-                hit = true;
-                y = Math.max(0, Math.min(boxSize, y));
-            }
-            if (z < 0 || z > boxSize) {
-                hit = true;
-                z = Math.max(0, Math.min(boxSize, z));
-            }
-
-            if (hit) {
-                a.setPosition(Real.of(x),
-                        Real.of(y),
-                        Real.of(z));
-                a.setVelocity(a.getVelocity().multiply(Real.of(-1)));
-            }
+            flat[i*7]=pos[i*3]; flat[i*7+1]=pos[i*3+1]; flat[i*7+2]=pos[i*3+2];
+            flat[i*7+3]=vel[i*3]; flat[i*7+4]=vel[i*3+1]; flat[i*7+5]=vel[i*3+2];
         }
-        syncFromEpisteme();
     }
 
-    private void primitiveStep(org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider) {
+    private void runRealStep(MolecularDynamicsProvider provider) {
+        AtomState[] atoms = state.getReal();
         int n = numAtoms;
-        double[] positions = new double[n * 3];
-        double[] velocities = new double[n * 3];
-        double[] forces = new double[n * 3];
-        double[] masses = new double[n];
-
-        for (int i = 0; i < n; i++) {
-            AtomState a = atoms.get(i);
-            positions[i * 3] = a.x;
-            positions[i * 3 + 1] = a.y;
-            positions[i * 3 + 2] = a.z;
-            velocities[i * 3] = a.vx;
-            velocities[i * 3 + 1] = a.vy;
-            velocities[i * 3 + 2] = a.vz;
-            masses[i] = a.mass;
+        Real[] pos = new Real[n*3], vel = new Real[n*3], forces = new Real[n*3], masses = new Real[n];
+        for(int i=0; i<n; i++) {
+            AtomState a = atoms[i];
+            pos[i*3]=Real.of(a.x); pos[i*3+1]=Real.of(a.y); pos[i*3+2]=Real.of(a.z);
+            vel[i*3]=Real.of(a.vx); vel[i*3+1]=Real.of(a.vy); vel[i*3+2]=Real.of(a.vz);
+            masses[i]=Real.of(a.mass);
+            forces[i*3]=Real.ZERO; forces[i*3+1]=Real.ZERO; forces[i*3+2]=Real.ZERO;
         }
-
-        provider.calculateNonBondedForces(positions, forces, 1.0, 1.0, 2.5);
-        provider.integrate(positions, velocities, forces, masses, timeStep, 1.0);
-
-        for (int i = 0; i < n; i++) {
-            AtomState a = atoms.get(i);
-            a.x = positions[i * 3];
-            a.y = positions[i * 3 + 1];
-            a.z = positions[i * 3 + 2];
-            a.vx = velocities[i * 3];
-            a.vy = velocities[i * 3 + 1];
-            a.vz = velocities[i * 3 + 2];
-
-            if (a.x < 0 || a.x > boxSize) {
-                a.vx *= -1;
-                a.x = Math.max(0, Math.min(boxSize, a.x));
-            }
-            if (a.y < 0 || a.y > boxSize) {
-                a.vy *= -1;
-                a.y = Math.max(0, Math.min(boxSize, a.y));
-            }
-            if (a.z < 0 || a.z > boxSize) {
-                a.vz *= -1;
-                a.z = Math.max(0, Math.min(boxSize, a.z));
-            }
+        provider.calculateNonBondedForces(pos, forces, Real.ONE, Real.ONE, Real.of(2.5));
+        provider.integrate(pos, vel, forces, masses, Real.of(timeStep), Real.ONE);
+        for(int i=0; i<n; i++) {
+            double x=pos[i*3].doubleValue(), y=pos[i*3+1].doubleValue(), z=pos[i*3+2].doubleValue();
+            double vx=vel[i*3].doubleValue(), vy=vel[i*3+1].doubleValue(), vz=vel[i*3+2].doubleValue();
+            if(x<0||x>boxSize) { vx*=-1; x=Math.max(0, Math.min(boxSize, x)); }
+            if(y<0||y>boxSize) { vy*=-1; y=Math.max(0, Math.min(boxSize, y)); }
+            if(z<0||z>boxSize) { vz*=-1; z=Math.max(0, Math.min(boxSize, z)); }
+            atoms[i] = new AtomState(x,y,z, vx,vy,vz, atoms[i].mass);
         }
     }
 
     private void calculateTotalEnergy() {
         totalEnergy = 0;
-        for (AtomState a : atoms) {
+        state.syncTo(TaskRegistry.PrecisionMode.REAL);
+        for (AtomState a : state.getReal()) {
             totalEnergy += 0.5 * a.mass * (a.vx * a.vx + a.vy * a.vy + a.vz * a.vz);
         }
     }
 
-    public List<AtomState> getAtoms() {
-        return atoms;
-    }
-
-    public double getTotalEnergy() {
-        return totalEnergy;
-    }
-
-    public int getNumAtoms() {
-        return numAtoms;
-    }
-
-    public double getTimeStep() {
-        return timeStep;
-    }
-
-    public int getSteps() {
-        return steps;
-    }
-
-    public double getBoxSize() {
-        return boxSize;
-    }
-
-    public void updateState(List<AtomState> newAtoms, double newEnergy) {
-        this.atoms = newAtoms;
-        this.totalEnergy = newEnergy;
-    }
+    public AtomState[] getAtoms() { state.syncTo(TaskRegistry.PrecisionMode.REAL); return state.getReal(); }
+    public double getTotalEnergy() { return totalEnergy; }
 
     public static class AtomState implements Serializable {
-        public double x, y, z;
-        public double vx, vy, vz;
-        public double mass;
-
+        public double x, y, z, vx, vy, vz, mass;
         public AtomState(double x, double y, double z, double vx, double vy, double vz, double mass) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.vx = vx;
-            this.vy = vy;
-            this.vz = vz;
-            this.mass = mass;
+            this.x = x; this.y = y; this.z = z; this.vx = vx; this.vy = vy; this.vz = vz; this.mass = mass;
         }
     }
 }

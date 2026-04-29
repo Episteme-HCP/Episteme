@@ -1,76 +1,48 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.client.client.politics.geopolitics;
 
-import com.google.protobuf.ByteString;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.episteme.server.server.tasks.economics.DistributedEconomyTask;
+import org.episteme.natural.economics.growth.EconomyParameters;
 import org.episteme.social.politics.loaders.WorldBankReader;
 import org.episteme.server.server.tasks.politics.GeopoliticalEngineTask;
+import org.episteme.natural.politics.GeopoliticalParameters;
 import org.episteme.social.politics.loaders.FactbookReader;
 import org.episteme.server.server.proto.*;
 import org.episteme.core.ui.ThemeManager;
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.io.*;
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.episteme.core.mathematics.numbers.real.Real;
 
 /**
- * Distributed Social Simulation App (Economics & Politics).
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Demo Application for Distributed Geopolitics simulation.
  */
-public class DistributedGeopoliticsApp extends Application implements org.episteme.core.ui.App {
+public class DistributedGeopoliticsApp extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(DistributedGeopoliticsApp.class);
 
-    private ManagedChannel channel;
-    private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
-
     private DistributedEconomyTask economyTask;
     private GeopoliticalEngineTask politicsTask;
-
+    private LineChart<Number, Number> gdpChart;
+    private XYChart.Series<Number, Number> gdpSeries;
     private ListView<String> console;
     private Label economyLabel;
-    private boolean serverAvailable = false;
     private long step = 0;
 
     @Override
@@ -78,26 +50,18 @@ public class DistributedGeopoliticsApp extends Application implements org.episte
         try { stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/episteme/core/ui/icon.png"))); } catch (Exception e) {}
         stage.setTitle(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.title", "ðŸ“‰ Episteme Social Grid - Global Economics & Politics"));
 
-        // Fetch real data (blocking for simplicity in start)
-        double gdp = 23000000000000.0; // Fallback
-        double inflation = 0.03;
+        // Initialization
+        double gdp = 100e12; // 100 Trillion global GDP proxy
         try {
-            Map<String, Double> gdpData = WorldBankReader.getInstance().fetchIndicatorData("USA", "NY.GDP.MKTP.CD")
-                    .join();
-            if (!gdpData.isEmpty())
-                gdp = gdpData.values().iterator().next();
-
-            Map<String, Double> inflData = WorldBankReader.getInstance().fetchIndicatorData("USA", "FP.CPI.TOTL.ZG")
-                    .join();
-            if (!inflData.isEmpty())
-                inflation = inflData.values().iterator().next() / 100.0;
+            WorldBankReader wb = new WorldBankReader();
+            gdp = wb.getGlobalGDP();
         } catch (Exception e) {
             logger.error("Failed to fetch WB data: {}", e.getMessage());
         }
 
         economyTask = new DistributedEconomyTask("Global Core",
-                Real.of(gdp),
-                Real.of(inflation));
+                Real.of(gdp / 1e12), // Scaled capital
+                EconomyParameters.standard());
 
         List<GeopoliticalEngineTask.NationState> nations = new ArrayList<>();
         // Load nations from FactbookReader
@@ -115,7 +79,7 @@ public class DistributedGeopoliticsApp extends Application implements org.episte
             nations.add(
                     new GeopoliticalEngineTask.NationState(c.getName(), stability, military));
         }
-        politicsTask = new GeopoliticalEngineTask(nations);
+        politicsTask = new GeopoliticalEngineTask(nations, GeopoliticalParameters.standard());
 
         console = new ListView<>();
         economyLabel = new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.economy_label", "GDP: -- | Inflation: --"));
@@ -124,87 +88,53 @@ public class DistributedGeopoliticsApp extends Application implements org.episte
         Button exportBtn = new Button(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.btn.export", "ðŸ“„ Export Report"));
         exportBtn.setOnAction(e -> exportReport(stage));
 
-        VBox root = new VBox(10, economyLabel, console, exportBtn);
-        root.setPadding(new Insets(15));
-        root.getStyleClass().add("viewer-root");
+        // UI Setup
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(20));
+        root.getStyleClass().add("main-container");
 
-        Scene scene = new Scene(root, 600, 450);
-        ThemeManager.getInstance().applyTheme(scene);
+        NumberAxis xAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.chart.time", "Time (Steps)"));
+        yAxis.setLabel(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.chart.gdp", "Global GDP ($T)"));
+
+        gdpChart = new LineChart<>(xAxis, yAxis);
+        gdpChart.setTitle(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.chart.title", "Global Economic Growth"));
+        gdpSeries = new XYChart.Series<>();
+        gdpSeries.setName(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.chart.series.gdp", "GDP"));
+        gdpChart.getData().add(gdpSeries);
+
+        Button stepBtn = new Button(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.btn.step", "â–¶ Run Next Step"));
+        stepBtn.setOnAction(e -> runStep());
+
+        root.getChildren().addAll(economyLabel, gdpChart, new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.label.geopolitical_events", "Geopolitical Events")), console, stepBtn, exportBtn);
+
+        Scene scene = new Scene(root, 1000, 800);
+        ThemeManager.applyTo(scene);
         stage.setScene(scene);
         stage.show();
-
-        initGrpc();
-
-        new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (step++ % 60 == 0) { // Every ~1 second
-                    runStep();
-                }
-            }
-        }.start();
-    }
-
-    private void initGrpc() {
-        try {
-            channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
-            blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
-            serverAvailable = true;
-        } catch (Exception e) {
-            serverAvailable = false;
-        }
     }
 
     private void runStep() {
-        if (!serverAvailable) {
-            economyTask.run();
-            politicsTask.run();
-            updateUI();
-            return;
-        }
+        step++;
+        economyTask.run();
+        politicsTask.run();
 
-        new Thread(() -> {
-            try {
-                // Submit economy task
-                TaskRequest reqE = TaskRequest.newBuilder()
-                        .setTaskId("econ-" + step)
-                        .setSerializedTask(ByteString.copyFrom(serialize(economyTask)))
-                        .build();
-                TaskResponse resE = blockingStub.submitTask(reqE);
-
-                // Submit politics task
-                TaskRequest reqP = TaskRequest.newBuilder()
-                        .setTaskId("pol-" + step)
-                        .setSerializedTask(ByteString.copyFrom(serialize(politicsTask)))
-                        .build();
-                TaskResponse resP = blockingStub.submitTask(reqP);
-
-                // Stream results (simplified)
-                TaskResult rE = blockingStub.withDeadlineAfter(3, TimeUnit.SECONDS)
-                        .streamResults(TaskIdentifier.newBuilder().setTaskId(resE.getTaskId()).build()).next();
-                TaskResult rP = blockingStub.withDeadlineAfter(3, TimeUnit.SECONDS)
-                        .streamResults(TaskIdentifier.newBuilder().setTaskId(resP.getTaskId()).build()).next();
-
-                if (rE.getStatus() == Status.COMPLETED)
-                    economyTask = (DistributedEconomyTask) deserialize(rE.getSerializedData().toByteArray());
-                if (rP.getStatus() == Status.COMPLETED)
-                    politicsTask = (GeopoliticalEngineTask) deserialize(rP.getSerializedData().toByteArray());
-
-                Platform.runLater(this::updateUI);
-            } catch (Exception e) {
-                Platform.runLater(() -> console.getItems().add(0, org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.grid_error", "Grid Error: {0}", e.getMessage())));
-            }
-        }).start();
+        updateUI();
     }
 
     private void updateUI() {
-        economyLabel.setText(String.format(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.format", "GDP: $%.2fT | Inflation: %.2f%%"),
-                economyTask.getGDP().doubleValue() / 1e12,
-                economyTask.getInflation().doubleValue() * 100));
+        economyLabel.setText(String.format(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.format", "GDP: $%.2fT | Capital: $%.2fT"),
+                economyTask.getGDP().doubleValue(),
+                economyTask.getCapital().doubleValue()));
+
+        gdpSeries.getData().add(new XYChart.Data<>(step, economyTask.getGDP().doubleValue()));
+        if (gdpSeries.getData().size() > 50)
+            gdpSeries.getData().remove(0);
 
         for (GeopoliticalEngineTask.NationState n : politicsTask.getNations()) {
             console.getItems().add(0, String.format(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.status.nation_format", "[%d] %s: Stability=%.2f, Military=%.0f"),
-                    step, n.name, n.stability, n.militaryPower));
+                    step, n.name, n.getStability(), n.getMilitary()));
         }
         if (console.getItems().size() > 50)
             console.getItems().remove(50, console.getItems().size());
@@ -213,71 +143,18 @@ public class DistributedGeopoliticsApp extends Application implements org.episte
     private void exportReport(Stage stage) {
         File file = org.episteme.client.client.util.FileHelper.showSaveDialog(stage, org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.export_report", "Export Report"), org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.file.csv", "CSV Files"), "*.csv");
         if (file != null) {
-            try (PrintWriter pw = new PrintWriter(file)) {
-                pw.println("Step,Metric,Value");
-                pw.println(step + ",GDP," + economyTask.getGDP());
-                pw.println(step + ",Inflation," + economyTask.getInflation());
-                pw.println(step + ",ActiveNations," + politicsTask.getNations().size());
-                new Alert(Alert.AlertType.INFORMATION, org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.alert.report_saved", "Report saved")).show();
+            try (PrintWriter writer = new PrintWriter(file)) {
+                writer.println("Nation,Stability,MilitaryPower");
+                for (GeopoliticalEngineTask.NationState n : politicsTask.getNations()) {
+                    writer.printf("%s,%.4f,%.2f\n", n.name, n.getStability(), n.getMilitary());
+                }
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.alert.export_failed", "Export failed")).show();
+                logger.error("Export failed", e);
             }
         }
-    }
-
-    private byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(obj);
-        return bos.toByteArray();
-    }
-
-    private Object deserialize(byte[] data) throws Exception {
-        return new ObjectInputStream(new ByteArrayInputStream(data)).readObject();
-    }
-
-    @Override
-    public void stop() {
-        if (channel != null)
-            channel.shutdown();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-
-    // App Interface Implementation
-    @Override
-    public boolean isDemo() {
-        return false;
-    }
-
-    @Override
-    public String getCategory() { return org.episteme.core.ui.i18n.I18N.getInstance().get("category.politics", "Politics"); }
-
-    @Override
-    public String getName() { return org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.name", "Distributed Geopolitics App"); }
-
-    @Override
-    public String getDescription() { return org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.desc", "Distributed social simulation for global economics and geopolitics."); }
-
-    @Override
-    public String getLongDescription() { return org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.longdesc", "Simulate complex world systems by coupling economic indicators (GDP, Inflation) with geopolitical stability and military power across nations. Uses the Episteme cluster for intensive social dynamics forecasting."); }
-
-    @Override
-    public void show(javafx.stage.Stage stage) {
-        try {
-            start(stage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public java.util.List<org.episteme.core.ui.Parameter<?>> getViewerParameters() {
-        return new java.util.ArrayList<>();
-    }
 }
-
-
-

@@ -1,24 +1,6 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.server.server.tasks.economics;
@@ -26,96 +8,70 @@ package org.episteme.server.server.tasks.economics;
 import java.io.Serializable;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.distributed.TaskRegistry;
+import org.episteme.core.distributed.TaskState;
+import org.episteme.core.mathematics.random.RandomGenerator;
+import org.episteme.natural.economics.growth.EconomyProvider;
+import org.episteme.natural.economics.growth.EconomyParameters;
+import org.episteme.natural.economics.growth.providers.StandardEconomyProvider;
 
 
 /**
  * Distributed Economic Simulation Task.
  * 
- * Simulates macro-economic indicators (GDP, Inflation) based on stochastic
- * shocks
- * and policy interventions.
+ * Simulates macro-economic dynamics using a stochastic Solow-Swan growth model.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DistributedEconomyTask implements Serializable {
+public class DistributedEconomyTask implements java.io.Serializable {
 
     private String economyName;
-    private Real gdp;
-    private Real inflation;
-    private double gdpD;
-    private double inflationD;
-    private float gdpF;
-    private float inflationF;
-    private double dt; // years
+    private EconomyParameters params;
+    private TaskState<Real> state;
+    
+    private double dt = 0.1;
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.REAL;
+    private long seed;
 
-    public DistributedEconomyTask(String name, Real gdp, Real inflation) {
+    public DistributedEconomyTask(String name, Real initialK, EconomyParameters params) {
         this.economyName = name;
-        this.gdp = gdp;
-        this.inflation = inflation;
-        this.gdpD = gdp.doubleValue();
-        this.inflationD = inflation.doubleValue();
-        this.gdpF = gdp.floatValue();
-        this.inflationF = inflation.floatValue();
-        this.dt = 1.0;
+        this.params = params;
+        this.seed = System.nanoTime();
+        this.state = new TaskState<>(initialK, 
+            k -> new double[]{k.doubleValue()}, 
+            arr -> Real.of(arr[0]),
+            k -> new float[]{k.floatValue()}, 
+            arr -> Real.of(arr[0])
+        );
     }
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
-        if (this.mode != mode) {
-            if (mode == TaskRegistry.PrecisionMode.DOUBLE) {
-                gdpD = (this.mode == TaskRegistry.PrecisionMode.REAL) ? gdp.doubleValue() : (double) gdpF;
-                inflationD = (this.mode == TaskRegistry.PrecisionMode.REAL) ? inflation.doubleValue() : (double) inflationF;
-            } else if (mode == TaskRegistry.PrecisionMode.FLOAT) {
-                gdpF = (this.mode == TaskRegistry.PrecisionMode.REAL) ? gdp.floatValue() : (float) gdpD;
-                inflationF = (this.mode == TaskRegistry.PrecisionMode.REAL) ? inflation.floatValue() : (float) inflationD;
-            } else {
-                gdp = (this.mode == TaskRegistry.PrecisionMode.DOUBLE) ? Real.of(gdpD) : Real.of(gdpF);
-                inflation = (this.mode == TaskRegistry.PrecisionMode.DOUBLE) ? Real.of(inflationD) : Real.of(inflationF);
-            }
-            this.mode = mode;
-        }
+        this.mode = mode;
+        this.state.syncTo(mode);
     }
 
     public void run() {
-        // Solow-Swan inspired growth with stochastic shocks
-        double growthRate = 0.02 + 0.05 * (Math.random() - 0.5);
-        double inflationShock = 0.01 * (Math.random() - 0.5);
+        EconomyProvider provider = new StandardEconomyProvider();
+        RandomGenerator rng = new RandomGenerator(seed);
+        double dW = rng.nextGaussian().doubleValue() * Math.sqrt(dt);
 
         switch (mode) {
-            case REAL -> {
-                double gValue = gdp.doubleValue();
-                double iValue = inflation.doubleValue();
-                gValue *= (1 + growthRate * dt);
-                iValue += inflationShock;
-                this.gdp = Real.of(gValue);
-                this.inflation = Real.of(iValue);
-            }
-            case FLOAT -> {
-                gdpF *= (float) (1 + growthRate * dt);
-                inflationF += (float) inflationShock;
-            }
-            default -> {
-                gdpD *= (1 + growthRate * dt);
-                inflationD += inflationShock;
-            }
+            case REAL -> state.setReal(provider.evolve(state.getReal(), params, dt, dW));
+            case FLOAT -> state.getFloat()[0] = provider.evolve(state.getFloat()[0], params, (float)dt, (float)dW);
+            default -> state.getDouble()[0] = provider.evolve(state.getDouble()[0], params, dt, dW);
         }
+        seed = rng.nextInteger(0, Integer.MAX_VALUE).intValue(); // Advance seed
     }
 
     public Real getGDP() {
-        return switch (mode) {
-            case REAL -> gdp;
-            case FLOAT -> Real.of(gdpF);
-            default -> Real.of(gdpD);
-        };
+        double kVal = getCapital().doubleValue();
+        return Real.of(Math.pow(kVal, params.capitalShare()));
     }
 
-    public Real getInflation() {
-        return switch (mode) {
-            case REAL -> inflation;
-            case FLOAT -> Real.of(inflationF);
-            default -> Real.of(inflationD);
-        };
+    public Real getCapital() {
+        state.syncTo(TaskRegistry.PrecisionMode.REAL);
+        return state.getReal();
     }
 
     public String getEconomyName() {

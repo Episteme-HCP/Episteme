@@ -1,311 +1,167 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.server.server.tasks.biology.structure;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.distributed.TaskRegistry;
-
+import org.episteme.core.distributed.TaskState;
+import org.episteme.core.mathematics.random.RandomGenerator;
+import org.episteme.natural.biology.structure.DnaFoldingProvider;
+import org.episteme.natural.biology.structure.providers.StandardDnaFoldingProvider;
 
 /**
  * DNA Folding Simulation Task.
  * 
- * Simulates the folding of a DNA/RNA sequence using a simplified energy model.
- * 
- * <p>
- * References:
- * <ul>
- * <li>Zuker, M., & Stiegler, P. (1981). Optimal computer folding of large RNA
- * sequences using thermodynamics and auxiliary information. Nucleic Acids
- * Research, 9(1), 133-148.</li>
- * <li>Tinoco Jr, I., Uhlenbeck, O. C., & Levine, M. D. (1971). Estimation of
- * secondary structure in ribonucleic acids. Nature, 230(5293), 362-367.</li>
- * </ul>
- * </p>
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public class DnaFoldingTask implements Serializable {
+public class DnaFoldingTask
+        implements org.episteme.core.distributed.DistributedTask<DnaFoldingTask, DnaFoldingTask> {
 
-    private final String sequence; // ACGT...
-    private final int iterations;
+    private final int numBases;
+    private final int steps;
     private final double temperature;
+    private final String sequence;
+    
+    private TaskState<Real[][]> state;
+    private double currentEnergy;
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
+    private long seed;
 
-    // Result
-    private List<Point3D> foldedStructure;
-    private List<Point3DFloat> foldedStructureFloat;
-    private List<Point3DReal> foldedStructureReal;
-    private double finalEnergy;
-
-    public DnaFoldingTask(String sequence, int iterations, double temperature) {
-        this.sequence = sequence;
-        this.iterations = iterations;
+    public DnaFoldingTask(int numBases, int steps, double temperature) {
+        this.numBases = numBases;
+        this.steps = steps;
         this.temperature = temperature;
+        char[] seqArr = new char[numBases];
+        Arrays.fill(seqArr, 'A');
+        this.sequence = new String(seqArr);
+        this.seed = System.nanoTime();
+        
+        Real[][] initial = new Real[numBases][3];
+        RandomGenerator rng = new RandomGenerator(seed);
+        for (int i = 0; i < numBases; i++) {
+            initial[i][0] = Real.of(i * 0.34);
+            initial[i][1] = Real.of(rng.nextReal().doubleValue() * 0.1);
+            initial[i][2] = Real.of(rng.nextReal().doubleValue() * 0.1);
+        }
+        
+        this.state = new TaskState<>(initial,
+            r -> flattenDouble(r), d -> unflattenDouble(d),
+            r -> flattenFloat(r), f -> unflattenFloat(f)
+        );
+    }
+
+    private double[] flattenDouble(Real[][] r) {
+        double[] d = new double[r.length * 3];
+        for (int i = 0; i < r.length; i++) {
+            d[i*3] = r[i][0].doubleValue();
+            d[i*3+1] = r[i][1].doubleValue();
+            d[i*3+2] = r[i][2].doubleValue();
+        }
+        return d;
+    }
+
+    private Real[][] unflattenDouble(double[] d) {
+        Real[][] r = new Real[d.length / 3][3];
+        for (int i = 0; i < r.length; i++) {
+            r[i][0] = Real.of(d[i*3]);
+            r[i][1] = Real.of(d[i*3+1]);
+            r[i][2] = Real.of(d[i*3+2]);
+        }
+        return r;
+    }
+
+    private float[] flattenFloat(Real[][] r) {
+        float[] f = new float[r.length * 3];
+        for (int i = 0; i < r.length; i++) {
+            f[i*3] = r[i][0].floatValue();
+            f[i*3+1] = r[i][1].floatValue();
+            f[i*3+2] = r[i][2].floatValue();
+        }
+        return f;
+    }
+
+    private Real[][] unflattenFloat(float[] f) {
+        Real[][] r = new Real[f.length / 3][3];
+        for (int i = 0; i < r.length; i++) {
+            r[i][0] = Real.of(f[i*3]);
+            r[i][1] = Real.of(f[i*3+1]);
+            r[i][2] = Real.of(f[i*3+2]);
+        }
+        return r;
+    }
+
+    public DnaFoldingTask() {
+        this(0, 0, 0);
     }
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
+        this.state.syncTo(mode);
     }
+
+    @Override
+    public Class<DnaFoldingTask> getInputType() { return DnaFoldingTask.class; }
+    @Override
+    public Class<DnaFoldingTask> getOutputType() { return DnaFoldingTask.class; }
+
+    @Override
+    public DnaFoldingTask execute(DnaFoldingTask input) {
+        if (input != null && input.numBases > 0) {
+            input.run();
+            return input;
+        }
+        return null;
+    }
+
+    @Override
+    public String getTaskType() { return "DNA_FOLDING"; }
 
     public void run() {
+        DnaFoldingProvider provider = new StandardDnaFoldingProvider();
+        RandomGenerator rng = new RandomGenerator(seed);
+        for (int s = 0; s < steps; s++) {
+            long currentSeed = rng.nextInteger(0, Integer.MAX_VALUE).longValue();
+            switch (mode) {
+                case REAL -> {
+                    List<Real[]> pointsList = new ArrayList<>(Arrays.asList(state.getReal()));
+                    provider.step(pointsList, sequence, temperature, currentSeed);
+                    // StandardDnaFoldingProvider.step(List<Real[]>) modifies the list items?
+                    // Yes, it does points.set(idx, ...). But our TaskState holds the Real[][] array.
+                    // We need to sync back if the list was a COPY of the array elements.
+                    // Arrays.asList(state.getReal()) creates a list backed by the array.
+                    // So pointsList.set(idx, ...) will modify the Real[][] array!
+                }
+                case FLOAT -> {
+                    float[] flat = state.getFloat();
+                    provider.step(flat, sequence, (float)temperature, currentSeed);
+                }
+                default -> {
+                    double[] flat = state.getDouble();
+                    provider.step(flat, sequence, temperature, currentSeed);
+                }
+            }
+        }
+        calculateEnergy(provider);
+        seed = rng.nextInteger(0, Integer.MAX_VALUE).longValue();
+    }
+
+    private void calculateEnergy(DnaFoldingProvider provider) {
         switch (mode) {
-            case REAL -> runReal();
-            case FLOAT -> runFloat();
-            default -> runPrimitive();
+            case REAL -> currentEnergy = provider.calculateEnergy(Arrays.asList(state.getReal()), sequence).doubleValue();
+            case FLOAT -> currentEnergy = provider.calculateEnergy(state.getFloat(), sequence);
+            default -> currentEnergy = provider.calculateEnergy(state.getDouble(), sequence);
         }
     }
 
-    private void runFloat() {
-        List<Point3DFloat> structure = new ArrayList<>();
-        Random rand = new Random();
-
-        if (foldedStructureFloat == null) {
-            for (int i = 0; i < sequence.length(); i++) {
-                structure.add(new Point3DFloat(i * 3.4f, 0f, 0f));
-            }
-        } else {
-            structure.addAll(foldedStructureFloat);
-        }
-
-        float currentEnergy = calculateEnergyFloat(structure);
-
-        for (int i = 0; i < iterations; i++) {
-            int idx = rand.nextInt(sequence.length());
-            Point3DFloat originalPos = structure.get(idx);
-
-            float dx = (float) (rand.nextDouble() - 0.5) * 2.0f;
-            float dy = (float) (rand.nextDouble() - 0.5) * 2.0f;
-            float dz = (float) (rand.nextDouble() - 0.5) * 2.0f;
-            Point3DFloat newPos = new Point3DFloat(originalPos.x + dx, originalPos.y + dy, originalPos.z + dz);
-
-            structure.set(idx, newPos);
-            float newEnergy = calculateEnergyFloat(structure);
-
-            if (newEnergy < currentEnergy || Math.exp(-(newEnergy - currentEnergy) / temperature) > rand.nextDouble()) {
-                currentEnergy = newEnergy;
-            } else {
-                structure.set(idx, originalPos);
-            }
-        }
-
-        this.foldedStructureFloat = structure;
-        this.finalEnergy = (double) currentEnergy;
-    }
-
-    private void runReal() {
-        List<Point3DReal> structure = new ArrayList<>();
-        Random rand = new Random();
-
-        if (foldedStructureReal == null) {
-            for (int i = 0; i < sequence.length(); i++) {
-                structure.add(new Point3DReal(Real.of(i * 3.4), Real.of(0), Real.of(0)));
-            }
-        } else {
-            structure.addAll(foldedStructureReal);
-        }
-
-        Real currentEnergy = calculateEnergyReal(structure);
-
-        for (int i = 0; i < iterations; i++) {
-            int idx = rand.nextInt(sequence.length());
-            Point3DReal originalPos = structure.get(idx);
-
-            Real dx = Real.of((rand.nextDouble() - 0.5) * 2.0);
-            Real dy = Real.of((rand.nextDouble() - 0.5) * 2.0);
-            Real dz = Real.of((rand.nextDouble() - 0.5) * 2.0);
-            Point3DReal newPos = new Point3DReal(originalPos.x.add(dx), originalPos.y.add(dy), originalPos.z.add(dz));
-
-            structure.set(idx, newPos);
-            Real newEnergy = calculateEnergyReal(structure);
-
-            if (newEnergy.doubleValue() < currentEnergy.doubleValue()
-                    || Math.exp(-(newEnergy.subtract(currentEnergy).doubleValue()) / temperature) > rand.nextDouble()) {
-                currentEnergy = newEnergy;
-            } else {
-                structure.set(idx, originalPos);
-            }
-        }
-
-        this.foldedStructureReal = structure;
-        this.finalEnergy = currentEnergy.doubleValue();
-    }
-
-    private void runPrimitive() {
-        List<Point3D> structure = new ArrayList<>();
-        Random rand = new Random();
-
-        // Initial linear structure if none exists
-        if (foldedStructure == null) {
-            for (int i = 0; i < sequence.length(); i++) {
-                structure.add(new Point3D(i * 3.4, 0, 0));
-            }
-        } else {
-            structure.addAll(foldedStructure);
-        }
-
-        double currentEnergy = calculateEnergy(structure);
-
-        for (int i = 0; i < iterations; i++) {
-            int idx = rand.nextInt(sequence.length());
-            Point3D originalPos = structure.get(idx);
-
-            double dx = (rand.nextDouble() - 0.5) * 2.0;
-            double dy = (rand.nextDouble() - 0.5) * 2.0;
-            double dz = (rand.nextDouble() - 0.5) * 2.0;
-            Point3D newPos = new Point3D(originalPos.x + dx, originalPos.y + dy, originalPos.z + dz);
-
-            structure.set(idx, newPos);
-            double newEnergy = calculateEnergy(structure);
-
-            if (newEnergy < currentEnergy || Math.exp(-(newEnergy - currentEnergy) / temperature) > rand.nextDouble()) {
-                currentEnergy = newEnergy;
-            } else {
-                structure.set(idx, originalPos);
-            }
-        }
-
-        this.foldedStructure = structure;
-        this.finalEnergy = currentEnergy;
-    }
-
-    private float calculateEnergyFloat(List<Point3DFloat> points) {
-        float energy = 0f;
-        float idealDist = 3.4f;
-        float k = 10.0f;
-
-        for (int i = 0; i < points.size() - 1; i++) {
-            float dist = points.get(i).distance(points.get(i + 1));
-            energy += k * (float) Math.pow(dist - idealDist, 2);
-        }
-
-        for (int i = 0; i < points.size(); i++) {
-            for (int j = i + 2; j < points.size(); j++) {
-                float dist = points.get(i).distance(points.get(j));
-                if (dist < 1.0f)
-                    energy += 1000f;
-                else if (dist < 6.0f && isPair(sequence.charAt(i), sequence.charAt(j)))
-                    energy -= 10.0f / dist;
-            }
-        }
-        return energy;
-    }
-
-    private Real calculateEnergyReal(List<Point3DReal> points) {
-        Real energy = Real.of(0);
-        Real idealDist = Real.of(3.4);
-        Real k = Real.of(10.0);
-
-        for (int i = 0; i < points.size() - 1; i++) {
-            Real dist = points.get(i).distance(points.get(i + 1));
-            energy = energy.add(k.multiply(dist.subtract(idealDist).pow(2)));
-        }
-
-        for (int i = 0; i < points.size(); i++) {
-            for (int j = i + 2; j < points.size(); j++) {
-                Real dist = points.get(i).distance(points.get(j));
-                if (dist.doubleValue() < 1.0)
-                    energy = energy.add(Real.of(1000));
-                else if (dist.doubleValue() < 6.0 && isPair(sequence.charAt(i), sequence.charAt(j)))
-                    energy = energy.subtract(Real.of(10.0).divide(dist));
-            }
-        }
-        return energy;
-    }
-
-    private double calculateEnergy(List<Point3D> points) {
-        double energy = 0;
-        double idealDist = 3.4;
-        double k = 10.0;
-
-        for (int i = 0; i < points.size() - 1; i++) {
-            double dist = points.get(i).distance(points.get(i + 1));
-            energy += k * Math.pow(dist - idealDist, 2);
-        }
-
-        for (int i = 0; i < points.size(); i++) {
-            for (int j = i + 2; j < points.size(); j++) {
-                double dist = points.get(i).distance(points.get(j));
-                if (dist < 1.0)
-                    energy += 1000;
-                else if (dist < 6.0 && isPair(sequence.charAt(i), sequence.charAt(j)))
-                    energy -= 10.0 / dist;
-            }
-        }
-        return energy;
-    }
-
-    private boolean isPair(char b1, char b2) {
-        return (b1 == 'A' && b2 == 'T') || (b1 == 'T' && b2 == 'A') || (b1 == 'C' && b2 == 'G')
-                || (b1 == 'G' && b2 == 'C');
-    }
-
-    public List<Point3D> getFoldedStructure() {
-        return foldedStructure;
-    }
-
-    public double getFinalEnergy() {
-        return finalEnergy;
-    }
-
-    public String getSequence() {
-        return sequence;
-    }
-
-    public void updateState(List<Point3D> newStructure, double newEnergy) {
-        this.foldedStructure = newStructure;
-        this.finalEnergy = newEnergy;
-    }
-
-    public record Point3D(double x, double y, double z) implements Serializable {
-        public double distance(Point3D other) {
-            double dx = x - other.x;
-            double dy = y - other.y;
-            double dz = z - other.z;
-            return Math.sqrt(dx * dx + dy * dy + dz * dz);
-        }
-    }
-
-    public record Point3DFloat(float x, float y, float z) implements Serializable {
-        public float distance(Point3DFloat other) {
-            float dx = x - other.x;
-            float dy = y - other.y;
-            float dz = z - other.z;
-            return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
-        }
-    }
-
-    public record Point3DReal(Real x, Real y, Real z) implements Serializable {
-        public Real distance(Point3DReal other) {
-            Real dx = x.subtract(other.x);
-            Real dy = y.subtract(other.y);
-            Real dz = z.subtract(other.z);
-            return dx.pow(2).add(dy.pow(2)).add(dz.pow(2)).sqrt();
-        }
-    }
+    public Real[][] getCoordinates() { state.syncTo(TaskRegistry.PrecisionMode.REAL); return state.getReal(); }
+    public double getCurrentEnergy() { return currentEnergy; }
 }
