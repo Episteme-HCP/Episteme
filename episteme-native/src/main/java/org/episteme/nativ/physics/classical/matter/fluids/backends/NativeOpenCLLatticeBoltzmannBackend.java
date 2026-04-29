@@ -90,10 +90,63 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
     "    }\n" +
     "}\n";
 
+    private static final String KERNEL_SOURCE_FLOAT = 
+    "__kernel void lbm_d2q9_f(__global float* f, __global float* fNew, __global int* obstacle, int width, int height, float omega) {\n" +
+    "    int x = get_global_id(0);\n" +
+    "    int y = get_global_id(1);\n" +
+    "    if (x >= width || y >= height) return;\n" +
+    "\n" +
+    "    int idx = y * width + x;\n" +
+    "    int base = idx * 9;\n" +
+    "\n" +
+    "    // D2Q9 Constants\n" +
+    "    int ex[9] = {0, 1, 0, -1, 0, 1, -1, -1, 1};\n" +
+    "    int ey[9] = {0, 0, 1, 0, -1, 1, 1, -1, -1};\n" +
+    "    float w[9] = {4.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f, 1.0f/36.0f, 1.0f/36.0f, 1.0f/36.0f, 1.0f/36.0f};\n" +
+    "\n" +
+    "    // Check obstacle\n" +
+    "    if (obstacle[idx] != 0) return;\n" +
+    "\n" +
+    "    // Macroscopic\n" +
+    "    float rho = 0.0f;\n" +
+    "    float ux = 0.0f;\n" +
+    "    float uy = 0.0f;\n" +
+    "    float f_local[9];\n" +
+    "\n" +
+    "    for(int i=0; i<9; i++) {\n" +
+    "        f_local[i] = f[base + i];\n" +
+    "        rho += f_local[i];\n" +
+    "        ux += f_local[i] * ex[i];\n" +
+    "        uy += f_local[i] * ey[i];\n" +
+    "    }\n" +
+    "    \n" +
+    "    if (rho > 0.0f) {\n" +
+    "        ux /= rho;\n" +
+    "        uy /= rho;\n" +
+    "    }\n" +
+    "    \n" +
+    "    float u2 = ux*ux + uy*uy;\n" +
+    "    \n" +
+    "    // Collide & Stream\n" +
+    "    for(int i=0; i<9; i++) {\n" +
+    "        float cu = 3.0f * (ux * ex[i] + uy * ey[i]);\n" +
+    "        float feq = rho * w[i] * (1.0f + cu + 0.5f * cu * cu - 1.5f * u2);\n" +
+    "        float f_post = f_local[i] + omega * (feq - f_local[i]);\n" +
+    "        \n" +
+    "        // Stream to neighbor\n" +
+    "        int nx = (x + ex[i] + width) % width;\n" +
+    "        int ny = (y + ey[i] + height) % height;\n" +
+    "        int n_idx = (ny * width + nx) * 9 + i;\n" +
+    "        \n" +
+    "        fNew[n_idx] = f_post;\n" +
+    "    }\n" +
+    "}\n";
+
     private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
     private boolean initialized = false;
     private cl_program program;
-    private cl_kernel kernel;
+    private cl_kernel kernelDouble;
+    private cl_kernel kernelFloat;
  
     @Override
     public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() {
@@ -113,7 +166,8 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
     @Override
     public void shutdown() {
         if (initialized) {
-            clReleaseKernel(kernel);
+            clReleaseKernel(kernelDouble);
+            clReleaseKernel(kernelFloat);
             clReleaseProgram(program);
             initialized = false;
         }
@@ -132,11 +186,12 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
             cl_context context = ctx.getContext();
 
             // Create Program
-            program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE}, null, null);
+            program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE + KERNEL_SOURCE_FLOAT}, null, null);
             clBuildProgram(program, 0, null, null, null, null);
 
-            // Create Kernel
-            kernel = clCreateKernel(program, "lbm_d2q9", null);
+            // Create Kernels
+            kernelDouble = clCreateKernel(program, "lbm_d2q9", null);
+            kernelFloat = clCreateKernel(program, "lbm_d2q9_f", null);
 
             initialized = true;
         } catch (Exception e) {
@@ -174,22 +229,56 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
 
     @Override
     public void evolve(float[][][] f, boolean[][] obstacle, float omega) {
+        initialize();
+        
         int width = f.length;
         int height = f[0].length;
-        double[][][] fD = new double[width][height][9];
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                for (int i = 0; i < 9; i++) fD[x][y][i] = f[x][y][i];
+        int size = width * height;
+        
+        float[] fFlat = new float[size * 9];
+        int[] obsFlat = new int[size];
+        
+        for(int x=0; x<width; x++) {
+            for(int y=0; y<height; y++) {
+                int idx = y * width + x;
+                for(int i=0; i<9; i++) fFlat[idx * 9 + i] = f[x][y][i];
+                if (obstacle != null) obsFlat[idx] = obstacle[x][y] ? 1 : 0;
             }
         }
-
-        evolve(fD, obstacle, (double) omega);
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                for (int i = 0; i < 9; i++) f[x][y][i] = (float) fD[x][y][i];
+        
+        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) return;
+        cl_context context = ctx.getContext();
+        cl_command_queue queue = ctx.getCommandQueue();
+        
+        cl_mem memF = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * fFlat.length, Pointer.to(fFlat), null);
+        cl_mem memFNew = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_float * fFlat.length, null, null);
+        cl_mem memObs = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * obsFlat.length, Pointer.to(obsFlat), null);
+        
+        try {
+            clSetKernelArg(kernelFloat, 0, Sizeof.cl_mem, Pointer.to(memF));
+            clSetKernelArg(kernelFloat, 1, Sizeof.cl_mem, Pointer.to(memFNew));
+            clSetKernelArg(kernelFloat, 2, Sizeof.cl_mem, Pointer.to(memObs));
+            clSetKernelArg(kernelFloat, 3, Sizeof.cl_int, Pointer.to(new int[]{width}));
+            clSetKernelArg(kernelFloat, 4, Sizeof.cl_int, Pointer.to(new int[]{height}));
+            clSetKernelArg(kernelFloat, 5, Sizeof.cl_float, Pointer.to(new float[]{omega}));
+            
+            long[] globalWorkSize = new long[]{width, height};
+            clEnqueueNDRangeKernel(queue, kernelFloat, 2, null, globalWorkSize, null, 0, null, null);
+            
+            clEnqueueReadBuffer(queue, memFNew, CL_TRUE, 0, Sizeof.cl_float * fFlat.length, Pointer.to(fFlat), 0, null, null);
+            
+            for(int x=0; x<width; x++) {
+                for(int y=0; y<height; y++) {
+                    int idx = y * width + x;
+                    if (obstacle != null && obstacle[x][y]) continue;
+                    for(int i=0; i<9; i++) f[x][y][i] = fFlat[idx * 9 + i];
+                }
             }
+        } finally {
+            clReleaseMemObject(memF);
+            clReleaseMemObject(memFNew);
+            clReleaseMemObject(memObs);
         }
     }
 
@@ -228,16 +317,16 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
         
         try {
             // Args
-            clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memF));
-            clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memFNew));
-            clSetKernelArg(kernel, 2, Sizeof.cl_mem, Pointer.to(memObs));
-            clSetKernelArg(kernel, 3, Sizeof.cl_int, Pointer.to(new int[]{width}));
-            clSetKernelArg(kernel, 4, Sizeof.cl_int, Pointer.to(new int[]{height}));
-            clSetKernelArg(kernel, 5, Sizeof.cl_double, Pointer.to(new double[]{omega}));
+            clSetKernelArg(kernelDouble, 0, Sizeof.cl_mem, Pointer.to(memF));
+            clSetKernelArg(kernelDouble, 1, Sizeof.cl_mem, Pointer.to(memFNew));
+            clSetKernelArg(kernelDouble, 2, Sizeof.cl_mem, Pointer.to(memObs));
+            clSetKernelArg(kernelDouble, 3, Sizeof.cl_int, Pointer.to(new int[]{width}));
+            clSetKernelArg(kernelDouble, 4, Sizeof.cl_int, Pointer.to(new int[]{height}));
+            clSetKernelArg(kernelDouble, 5, Sizeof.cl_double, Pointer.to(new double[]{omega}));
             
             // Execute
             long[] globalWorkSize = new long[]{width, height};
-            clEnqueueNDRangeKernel(queue, kernel, 2, null, globalWorkSize, null, 0, null, null);
+            clEnqueueNDRangeKernel(queue, kernelDouble, 2, null, globalWorkSize, null, 0, null, null);
             
             // Read back
             clEnqueueReadBuffer(queue, memFNew, CL_TRUE, 0, Sizeof.cl_double * fFlat.length, Pointer.to(fFlat), 0, null, null);

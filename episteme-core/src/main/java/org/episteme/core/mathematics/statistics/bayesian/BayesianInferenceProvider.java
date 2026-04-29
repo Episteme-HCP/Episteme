@@ -22,13 +22,33 @@ public interface BayesianInferenceProvider extends AlgorithmProvider {
     interface BayesNodeData {
         String getName();
         List<String> getStates();
+        @Deprecated
         Map<Map<String, String>, Map<String, Double>> getCPT();
+        
         default Map<Map<String, String>, Map<String, Float>> getCPTFloat() {
-             // Default implementation converting from Double if needed, or overridden
-             throw new UnsupportedOperationException("getCPTFloat not implemented");
+             Map<Map<String, String>, Map<String, Double>> cpt = getCPT();
+             Map<Map<String, String>, Map<String, Float>> res = new java.util.HashMap<>();
+             for (var entry : cpt.entrySet()) {
+                 Map<String, Float> inner = new java.util.HashMap<>();
+                 for (var state : entry.getValue().entrySet()) {
+                     inner.put(state.getKey(), state.getValue().floatValue());
+                 }
+                 res.put(entry.getKey(), inner);
+             }
+             return res;
         }
+        
         default Map<Map<String, String>, Map<String, Real>> getCPTReal() {
-             throw new UnsupportedOperationException("getCPTReal not implemented");
+             Map<Map<String, String>, Map<String, Double>> cpt = getCPT();
+             Map<Map<String, String>, Map<String, Real>> res = new java.util.HashMap<>();
+             for (var entry : cpt.entrySet()) {
+                 Map<String, Real> inner = new java.util.HashMap<>();
+                 for (var state : entry.getValue().entrySet()) {
+                     inner.put(state.getKey(), Real.of(state.getValue()));
+                 }
+                 res.put(entry.getKey(), inner);
+             }
+             return res;
         }
     }
 

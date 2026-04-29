@@ -365,11 +365,10 @@ public class CPUCollisionProvider implements CollisionProvider {
             Real dy = y2.subtract(y1);
             Real dz = z2.subtract(z1);
             Real distSq = dx.multiply(dx).add(dy.multiply(dy)).add(dz.multiply(dz));
-            double dist = Math.sqrt(distSq.doubleValue());
+            Real distReal = distSq.sqrt();
             
-            if (dist == 0) continue;
+            if (distReal.isZero()) continue;
             
-            Real distReal = Real.of(dist);
             Real nx = dx.divide(distReal);
             Real ny = dy.divide(distReal);
             Real nz = dz.divide(distReal);
@@ -411,12 +410,11 @@ public class CPUCollisionProvider implements CollisionProvider {
             velocities[j * 3 + 2] = vz2.add(invM2.multiply(impulseZ));
             
             // Positional correction simplified
-            double percent = 0.2;
-            double r1 = Math.sqrt(m1.doubleValue());
-            double r2 = Math.sqrt(m2.doubleValue());
-            double minDist = r1 + r2;
-            double correctionVal = Math.max(minDist - dist, 0) / (invM1.add(invM2)).doubleValue() * percent;
-            Real correction = Real.of(correctionVal);
+            Real percent = Real.of(0.2);
+            Real r1 = m1.sqrt();
+            Real r2 = m2.sqrt();
+            Real minDist = r1.add(r2);
+            Real correction = minDist.subtract(distReal).max(Real.ZERO).divide(invM1.add(invM2)).multiply(percent);
             
             positions[i * 3] = x1.subtract(invM1.multiply(nx).multiply(correction));
             positions[i * 3 + 1] = y1.subtract(invM1.multiply(ny).multiply(correction));

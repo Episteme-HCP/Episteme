@@ -102,10 +102,13 @@ public class MulticoreMandelbrotProvider implements MandelbrotProvider {
                 Real x = Real.ZERO;
                 Real y = Real.ZERO;
                 int iter = 0;
-                while (x.multiply(x).add(y.multiply(y)).compareTo(FOUR) <= 0 && iter < maxIterations) {
-                    Real xTemp = x.multiply(x).subtract(y.multiply(y)).add(x0);
+                Real x2 = Real.ZERO;
+                Real y2 = Real.ZERO;
+                while (x2.add(y2).compareTo(FOUR) <= 0 && iter < maxIterations) {
                     y = x.multiply(y).multiply(TWO).add(y0);
-                    x = xTemp;
+                    x = x2.subtract(y2).add(x0);
+                    x2 = x.multiply(x);
+                    y2 = y.multiply(y);
                     iter++;
                 }
                 result[px][py] = iter;
@@ -210,10 +213,11 @@ public class MulticoreMandelbrotProvider implements MandelbrotProvider {
                     iter++;
                 }
                 if (iter < maxIterations) {
-                    double zn2 = x2.add(y2).doubleValue();
-                    double log_zn = Math.log(zn2) / 2.0;
-                    double nu = Math.log(log_zn / Math.log(2.0)) / Math.log(2.0);
-                    result[px][py] = Real.of(iter + 1.0 - nu);
+                    Real zn2 = x2.add(y2);
+                    Real log_zn = zn2.log().divide(TWO);
+                    Real ln2 = Real.of(2.0).log();
+                    Real nu = log_zn.divide(ln2).log().divide(ln2);
+                    result[px][py] = Real.of(iter + 1.0).subtract(nu);
                 } else {
                     result[px][py] = Real.of(maxIterations);
                 }

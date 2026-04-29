@@ -13,6 +13,7 @@ import java.util.*;
 
 /**
  * Implementation of the Variable Elimination algorithm for Bayesian Inference.
+ * Supports multiple precisions (float, double, Real).
  * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
@@ -28,9 +29,9 @@ public class VariableEliminationProvider implements BayesianInferenceProvider {
 
     @Override
     public Real query(String target, String targetState, Map<String, String> evidence, List<BayesNodeData> nodes) {
-        List<Factor> factors = new ArrayList<>();
+        List<RealFactor> factors = new ArrayList<>();
         for (BayesNodeData node : nodes) {
-            factors.add(toFactor(node, evidence));
+            factors.add(toRealFactor(node, evidence));
         }
 
         Set<String> allVars = new HashSet<>();
@@ -43,9 +44,9 @@ public class VariableEliminationProvider implements BayesianInferenceProvider {
         varsToEliminate.removeAll(evidence.keySet());
 
         for (String var : varsToEliminate) {
-            List<Factor> toMultiply = new ArrayList<>();
-            List<Factor> remaining = new ArrayList<>();
-            for (Factor f : factors) {
+            List<RealFactor> toMultiply = new ArrayList<>();
+            List<RealFactor> remaining = new ArrayList<>();
+            for (RealFactor f : factors) {
                 if (f.variables.contains(var)) {
                     toMultiply.add(f);
                 } else {
@@ -53,49 +54,165 @@ public class VariableEliminationProvider implements BayesianInferenceProvider {
                 }
             }
             if (!toMultiply.isEmpty()) {
-                Factor product = Factor.multiply(toMultiply);
-                Factor marginalized = product.marginalize(var);
+                RealFactor product = RealFactor.multiply(toMultiply);
+                RealFactor marginalized = product.marginalize(var);
                 remaining.add(marginalized);
             }
             factors = remaining;
         }
 
-        Factor finalFactor = Factor.multiply(factors);
-        Factor normalized = finalFactor.normalize();
+        RealFactor finalFactor = RealFactor.multiply(factors);
+        RealFactor normalized = finalFactor.normalize();
         
         Map<String, String> assignment = new HashMap<>();
         assignment.put(target, targetState);
-        return Real.of(normalized.get(assignment));
+        return normalized.get(assignment);
     }
 
-    private Factor toFactor(BayesNodeData node, Map<String, String> evidence) {
-        String name = node.getName();
-        Map<Map<String, String>, Map<String, Double>> cpt = node.getCPT();
-        
-        Set<String> vars = new HashSet<>();
-        vars.add(name);
-        if (!cpt.isEmpty()) {
-            vars.addAll(cpt.keySet().iterator().next().keySet());
+    @Override
+    public float queryFloat(String target, String targetState, Map<String, String> evidence, List<BayesNodeData> nodes) {
+        List<FloatFactor> factors = new ArrayList<>();
+        for (BayesNodeData node : nodes) {
+            factors.add(toFloatFactor(node, evidence));
         }
 
+        Set<String> allVars = new HashSet<>();
+        for (BayesNodeData node : nodes) {
+            allVars.add(node.getName());
+        }
+        
+        List<String> varsToEliminate = new ArrayList<>(allVars);
+        varsToEliminate.remove(target);
+        varsToEliminate.removeAll(evidence.keySet());
+
+        for (String var : varsToEliminate) {
+            List<FloatFactor> toMultiply = new ArrayList<>();
+            List<FloatFactor> remaining = new ArrayList<>();
+            for (FloatFactor f : factors) {
+                if (f.variables.contains(var)) toMultiply.add(f);
+                else remaining.add(f);
+            }
+            if (!toMultiply.isEmpty()) {
+                remaining.add(FloatFactor.multiply(toMultiply).marginalize(var));
+            }
+            factors = remaining;
+        }
+
+        FloatFactor finalFactor = FloatFactor.multiply(factors);
+        FloatFactor normalized = finalFactor.normalize();
+        
+        Map<String, String> assignment = new HashMap<>();
+        assignment.put(target, targetState);
+        return normalized.get(assignment);
+    }
+
+    @Override
+    public double queryDouble(String target, String targetState, Map<String, String> evidence, List<BayesNodeData> nodes) {
+        List<DoubleFactor> factors = new ArrayList<>();
+        for (BayesNodeData node : nodes) {
+            factors.add(toDoubleFactor(node, evidence));
+        }
+
+        Set<String> allVars = new HashSet<>();
+        for (BayesNodeData node : nodes) {
+            allVars.add(node.getName());
+        }
+        
+        List<String> varsToEliminate = new ArrayList<>(allVars);
+        varsToEliminate.remove(target);
+        varsToEliminate.removeAll(evidence.keySet());
+
+        for (String var : varsToEliminate) {
+            List<DoubleFactor> toMultiply = new ArrayList<>();
+            List<DoubleFactor> remaining = new ArrayList<>();
+            for (DoubleFactor f : factors) {
+                if (f.variables.contains(var)) toMultiply.add(f);
+                else remaining.add(f);
+            }
+            if (!toMultiply.isEmpty()) {
+                remaining.add(DoubleFactor.multiply(toMultiply).marginalize(var));
+            }
+            factors = remaining;
+        }
+
+        DoubleFactor finalFactor = DoubleFactor.multiply(factors);
+        DoubleFactor normalized = finalFactor.normalize();
+        
+        Map<String, String> assignment = new HashMap<>();
+        assignment.put(target, targetState);
+        return normalized.get(assignment);
+    }
+
+    private RealFactor toRealFactor(BayesNodeData node, Map<String, String> evidence) {
+        String name = node.getName();
+        Map<Map<String, String>, Map<String, Real>> cpt = node.getCPTReal();
+        Set<String> vars = new HashSet<>();
+        vars.add(name);
+        if (!cpt.isEmpty()) vars.addAll(cpt.keySet().iterator().next().keySet());
+        Set<String> resultVars = new HashSet<>(vars);
+        resultVars.removeAll(evidence.keySet());
+
+        Map<Map<String, String>, Real> table = new HashMap<>();
+        for (var entry : cpt.entrySet()) {
+            for (var stateProb : entry.getValue().entrySet()) {
+                Map<String, String> full = new HashMap<>(entry.getKey());
+                full.put(name, stateProb.getKey());
+                if (isConsistentWithEvidence(full, evidence)) {
+                    Map<String, String> reduced = new HashMap<>(full);
+                    reduced.keySet().removeAll(evidence.keySet());
+                    table.put(reduced, stateProb.getValue());
+                }
+            }
+        }
+        return new RealFactor(resultVars, table);
+    }
+
+    private FloatFactor toFloatFactor(BayesNodeData node, Map<String, String> evidence) {
+        String name = node.getName();
+        Map<Map<String, String>, Map<String, Float>> cpt = node.getCPTFloat();
+        Set<String> vars = new HashSet<>();
+        vars.add(name);
+        if (!cpt.isEmpty()) vars.addAll(cpt.keySet().iterator().next().keySet());
+        Set<String> resultVars = new HashSet<>(vars);
+        resultVars.removeAll(evidence.keySet());
+
+        Map<Map<String, String>, Float> table = new HashMap<>();
+        for (var entry : cpt.entrySet()) {
+            for (var stateProb : entry.getValue().entrySet()) {
+                Map<String, String> full = new HashMap<>(entry.getKey());
+                full.put(name, stateProb.getKey());
+                if (isConsistentWithEvidence(full, evidence)) {
+                    Map<String, String> reduced = new HashMap<>(full);
+                    reduced.keySet().removeAll(evidence.keySet());
+                    table.put(reduced, stateProb.getValue());
+                }
+            }
+        }
+        return new FloatFactor(resultVars, table);
+    }
+
+    private DoubleFactor toDoubleFactor(BayesNodeData node, Map<String, String> evidence) {
+        String name = node.getName();
+        Map<Map<String, String>, Map<String, Double>> cpt = node.getCPT();
+        Set<String> vars = new HashSet<>();
+        vars.add(name);
+        if (!cpt.isEmpty()) vars.addAll(cpt.keySet().iterator().next().keySet());
         Set<String> resultVars = new HashSet<>(vars);
         resultVars.removeAll(evidence.keySet());
 
         Map<Map<String, String>, Double> table = new HashMap<>();
-        for (Map.Entry<Map<String, String>, Map<String, Double>> entry : cpt.entrySet()) {
-            Map<String, String> parentStates = entry.getKey();
-            for (Map.Entry<String, Double> stateProb : entry.getValue().entrySet()) {
-                Map<String, String> fullAssignment = new HashMap<>(parentStates);
-                fullAssignment.put(name, stateProb.getKey());
-                
-                if (isConsistentWithEvidence(fullAssignment, evidence)) {
-                    Map<String, String> reducedAssignment = new HashMap<>(fullAssignment);
-                    reducedAssignment.keySet().removeAll(evidence.keySet());
-                    table.put(reducedAssignment, stateProb.getValue());
+        for (var entry : cpt.entrySet()) {
+            for (var stateProb : entry.getValue().entrySet()) {
+                Map<String, String> full = new HashMap<>(entry.getKey());
+                full.put(name, stateProb.getKey());
+                if (isConsistentWithEvidence(full, evidence)) {
+                    Map<String, String> reduced = new HashMap<>(full);
+                    reduced.keySet().removeAll(evidence.keySet());
+                    table.put(reduced, stateProb.getValue());
                 }
             }
         }
-        return new Factor(resultVars, table);
+        return new DoubleFactor(resultVars, table);
     }
 
     private boolean isConsistentWithEvidence(Map<String, String> assignment, Map<String, String> evidence) {
@@ -107,69 +224,184 @@ public class VariableEliminationProvider implements BayesianInferenceProvider {
         return true;
     }
 
-    private static class Factor {
-        private final Set<String> variables;
-        private final Map<Map<String, String>, Double> table;
+    // --- Specialized Factor Classes ---
 
-        Factor(Set<String> variables, Map<Map<String, String>, Double> table) {
+    private static class RealFactor {
+        private final Set<String> variables;
+        private final Map<Map<String, String>, Real> table;
+
+        RealFactor(Set<String> variables, Map<Map<String, String>, Real> table) {
             this.variables = variables;
             this.table = table;
         }
 
-        static Factor multiply(List<Factor> factors) {
-            if (factors.isEmpty()) return new Factor(Collections.emptySet(), Collections.singletonMap(new HashMap<>(), 1.0));
-            Factor result = factors.get(0);
-            for (int i = 1; i < factors.size(); i++) {
-                result = result.multiply(factors.get(i));
-            }
+        static RealFactor multiply(List<RealFactor> factors) {
+            if (factors.isEmpty()) return new RealFactor(Collections.emptySet(), Collections.singletonMap(new HashMap<>(), Real.ONE));
+            RealFactor result = factors.get(0);
+            for (int i = 1; i < factors.size(); i++) result = result.multiply(factors.get(i));
             return result;
         }
 
-        Factor multiply(Factor other) {
+        RealFactor multiply(RealFactor other) {
             Set<String> newVars = new HashSet<>(this.variables);
             newVars.addAll(other.variables);
-            Map<Map<String, String>, Double> newTable = new HashMap<>();
-
-            for (Map.Entry<Map<String, String>, Double> e1 : this.table.entrySet()) {
-                for (Map.Entry<Map<String, String>, Double> e2 : other.table.entrySet()) {
+            Map<Map<String, String>, Real> newTable = new HashMap<>();
+            for (var e1 : this.table.entrySet()) {
+                for (var e2 : other.table.entrySet()) {
                     if (isCompatible(e1.getKey(), e2.getKey())) {
                         Map<String, String> combined = new HashMap<>(e1.getKey());
                         combined.putAll(e2.getKey());
-                        newTable.put(combined, e1.getValue() * e2.getValue());
+                        newTable.put(combined, e1.getValue().multiply(e2.getValue()));
                     }
                 }
             }
-            return new Factor(newVars, newTable);
+            return new RealFactor(newVars, newTable);
         }
 
-        boolean isCompatible(Map<String, String> a, Map<String, String> b) {
+        static boolean isCompatible(Map<String, String> a, Map<String, String> b) {
             for (String var : a.keySet()) {
                 if (b.containsKey(var) && !a.get(var).equals(b.get(var))) return false;
             }
             return true;
         }
 
-        Factor marginalize(String var) {
+        RealFactor marginalize(String var) {
+            Set<String> newVars = new HashSet<>(variables);
+            newVars.remove(var);
+            Map<Map<String, String>, Real> newTable = new HashMap<>();
+            for (var entry : table.entrySet()) {
+                Map<String, String> assignment = new HashMap<>(entry.getKey());
+                assignment.remove(var);
+                newTable.put(assignment, newTable.getOrDefault(assignment, Real.ZERO).add(entry.getValue()));
+            }
+            return new RealFactor(newVars, newTable);
+        }
+
+        RealFactor normalize() {
+            Real sum = Real.ZERO;
+            for (Real val : table.values()) sum = sum.add(val);
+            Map<Map<String, String>, Real> newTable = new HashMap<>();
+            Real scale = sum.isZero() ? Real.ONE : sum.inverse();
+            for (var entry : table.entrySet()) {
+                newTable.put(entry.getKey(), entry.getValue().multiply(scale));
+            }
+            return new RealFactor(variables, newTable);
+        }
+
+        Real get(Map<String, String> assignment) {
+            return table.getOrDefault(assignment, Real.ZERO);
+        }
+    }
+
+    private static class FloatFactor {
+        private final Set<String> variables;
+        private final Map<Map<String, String>, Float> table;
+
+        FloatFactor(Set<String> variables, Map<Map<String, String>, Float> table) {
+            this.variables = variables;
+            this.table = table;
+        }
+
+        static FloatFactor multiply(List<FloatFactor> factors) {
+            if (factors.isEmpty()) return new FloatFactor(Collections.emptySet(), Collections.singletonMap(new HashMap<>(), 1.0f));
+            FloatFactor result = factors.get(0);
+            for (int i = 1; i < factors.size(); i++) result = result.multiply(factors.get(i));
+            return result;
+        }
+
+        FloatFactor multiply(FloatFactor other) {
+            Set<String> newVars = new HashSet<>(this.variables);
+            newVars.addAll(other.variables);
+            Map<Map<String, String>, Float> newTable = new HashMap<>();
+            for (var e1 : this.table.entrySet()) {
+                for (var e2 : other.table.entrySet()) {
+                    if (RealFactor.isCompatible(e1.getKey(), e2.getKey())) {
+                        Map<String, String> combined = new HashMap<>(e1.getKey());
+                        combined.putAll(e2.getKey());
+                        newTable.put(combined, e1.getValue() * e2.getValue());
+                    }
+                }
+            }
+            return new FloatFactor(newVars, newTable);
+        }
+
+        FloatFactor marginalize(String var) {
+            Set<String> newVars = new HashSet<>(variables);
+            newVars.remove(var);
+            Map<Map<String, String>, Float> newTable = new HashMap<>();
+            for (var entry : table.entrySet()) {
+                Map<String, String> assignment = new HashMap<>(entry.getKey());
+                assignment.remove(var);
+                newTable.put(assignment, newTable.getOrDefault(assignment, 0.0f) + entry.getValue());
+            }
+            return new FloatFactor(newVars, newTable);
+        }
+
+        FloatFactor normalize() {
+            float sum = 0;
+            for (float val : table.values()) sum += val;
+            Map<Map<String, String>, Float> newTable = new HashMap<>();
+            float scale = sum == 0 ? 1.0f : 1.0f / sum;
+            for (var entry : table.entrySet()) newTable.put(entry.getKey(), entry.getValue() * scale);
+            return new FloatFactor(variables, newTable);
+        }
+
+        float get(Map<String, String> assignment) {
+            return table.getOrDefault(assignment, 0.0f);
+        }
+    }
+
+    private static class DoubleFactor {
+        private final Set<String> variables;
+        private final Map<Map<String, String>, Double> table;
+
+        DoubleFactor(Set<String> variables, Map<Map<String, String>, Double> table) {
+            this.variables = variables;
+            this.table = table;
+        }
+
+        static DoubleFactor multiply(List<DoubleFactor> factors) {
+            if (factors.isEmpty()) return new DoubleFactor(Collections.emptySet(), Collections.singletonMap(new HashMap<>(), 1.0));
+            DoubleFactor result = factors.get(0);
+            for (int i = 1; i < factors.size(); i++) result = result.multiply(factors.get(i));
+            return result;
+        }
+
+        DoubleFactor multiply(DoubleFactor other) {
+            Set<String> newVars = new HashSet<>(this.variables);
+            newVars.addAll(other.variables);
+            Map<Map<String, String>, Double> newTable = new HashMap<>();
+            for (var e1 : this.table.entrySet()) {
+                for (var e2 : other.table.entrySet()) {
+                    if (RealFactor.isCompatible(e1.getKey(), e2.getKey())) {
+                        Map<String, String> combined = new HashMap<>(e1.getKey());
+                        combined.putAll(e2.getKey());
+                        newTable.put(combined, e1.getValue() * e2.getValue());
+                    }
+                }
+            }
+            return new DoubleFactor(newVars, newTable);
+        }
+
+        DoubleFactor marginalize(String var) {
             Set<String> newVars = new HashSet<>(variables);
             newVars.remove(var);
             Map<Map<String, String>, Double> newTable = new HashMap<>();
-
-            for (Map.Entry<Map<String, String>, Double> entry : table.entrySet()) {
+            for (var entry : table.entrySet()) {
                 Map<String, String> assignment = new HashMap<>(entry.getKey());
                 assignment.remove(var);
                 newTable.put(assignment, newTable.getOrDefault(assignment, 0.0) + entry.getValue());
             }
-            return new Factor(newVars, newTable);
+            return new DoubleFactor(newVars, newTable);
         }
 
-        Factor normalize() {
+        DoubleFactor normalize() {
             double sum = 0;
             for (double val : table.values()) sum += val;
             Map<Map<String, String>, Double> newTable = new HashMap<>();
-            for (Map.Entry<Map<String, String>, Double> entry : table.entrySet()) {
-                newTable.put(entry.getKey(), entry.getValue() / (sum == 0 ? 1.0 : sum));
-            }
-            return new Factor(variables, newTable);
+            double scale = sum == 0 ? 1.0 : 1.0 / sum;
+            for (var entry : table.entrySet()) newTable.put(entry.getKey(), entry.getValue() * scale);
+            return new DoubleFactor(variables, newTable);
         }
 
         double get(Map<String, String> assignment) {

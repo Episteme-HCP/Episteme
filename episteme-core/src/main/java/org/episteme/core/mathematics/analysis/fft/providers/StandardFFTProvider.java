@@ -130,8 +130,11 @@ public class StandardFFTProvider implements FFTProvider {
         Complex[] r = computeFFT(odd, inverse);
 
         Complex[] y = new Complex[n];
-        double angle = (inverse ? 2 : -2) * Math.PI / n;
-        Complex wn = Complex.of(Math.cos(angle), Math.sin(angle));
+        Real twoPi = Real.PI.multiply(Real.of(2.0));
+        Real angle = twoPi.divide(Real.of(n));
+        if (!inverse) angle = angle.negate();
+        
+        Complex wn = Complex.of(angle.cos(), angle.sin());
         Complex w = Complex.ONE;
 
         for (int k = 0; k < n / 2; k++) {

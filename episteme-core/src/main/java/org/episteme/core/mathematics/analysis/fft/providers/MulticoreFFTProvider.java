@@ -409,15 +409,24 @@ public class MulticoreFFTProvider implements FFTProvider {
         Real[][] evenResult = evenTask.join();
 
         Real[] resReal = new Real[n], resImag = new Real[n];
+        Real twoPi = Real.PI.multiply(Real.of(2.0));
         for (int k = 0; k < half; k++) {
-            double angle = -2 * Math.PI * k / n;
-            double cos = Math.cos(angle), sin = Math.sin(angle);
-            double oddR = oddResult[0][k].doubleValue(), oddI = oddResult[1][k].doubleValue();
-            double tReal = cos * oddR - sin * oddI, tImag = sin * oddR + cos * oddI;
-            double evenR = evenResult[0][k].doubleValue(), evenI = evenResult[1][k].doubleValue();
+            Real angle = twoPi.multiply(Real.of(k)).divide(Real.of(n)).negate();
+            Real cos = angle.cos(), sin = angle.sin();
+            
+            Real oddR = oddResult[0][k], oddI = oddResult[1][k];
+            // t = w * odd = (cos + i*sin) * (oddR + i*oddI)
+            // tReal = cos * oddR - sin * oddI
+            // tImag = cos * oddI + sin * oddR
+            Real tReal = cos.multiply(oddR).subtract(sin.multiply(oddI));
+            Real tImag = cos.multiply(oddI).add(sin.multiply(oddR));
+            
+            Real evenR = evenResult[0][k], evenI = evenResult[1][k];
 
-            resReal[k] = Real.of(evenR + tReal); resImag[k] = Real.of(evenI + tImag);
-            resReal[k + half] = Real.of(evenR - tReal); resImag[k + half] = Real.of(evenI - tImag);
+            resReal[k] = evenR.add(tReal); 
+            resImag[k] = evenI.add(tImag);
+            resReal[k + half] = evenR.subtract(tReal); 
+            resImag[k + half] = evenI.subtract(tImag);
         }
         return new Real[][] { resReal, resImag };
     }
