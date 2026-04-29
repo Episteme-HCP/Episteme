@@ -203,11 +203,9 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         if (f.zero() instanceof Real) componentType = Real.class;
         else if (f.zero() instanceof Complex) componentType = Complex.class;
 
-        @SuppressWarnings("unchecked")
         E[] invData = (E[]) (Object) java.lang.reflect.Array.newInstance(componentType, n * n);
         LUResult<E> lu = lu(a);
         for (int j = 0; j < n; j++) {
-            @SuppressWarnings("unchecked")
             E[] e_j = (E[]) java.lang.reflect.Array.newInstance(componentType, n);
             java.util.Arrays.fill(e_j, f.zero());
             e_j[j] = f.one();

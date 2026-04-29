@@ -122,6 +122,7 @@ public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebra
     private static MethodHandle CUBLAS_DSCAL;
     private static MethodHandle CUBLAS_DGEAM;
  
+
     private static MethodHandle CUSPARSE_CREATE_MAT_DESCR;
     private static MethodHandle CUSPARSE_SET_MAT_TYPE;
     private static MethodHandle CUSPARSE_SET_MAT_INDEX_BASE;

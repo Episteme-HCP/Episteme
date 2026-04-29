@@ -27,7 +27,7 @@ import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.distributed.TaskRegistry;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.matter.fluids.LatticeBoltzmannProvider;
-import org.episteme.natural.physics.classical.matter.fluids.providers.FluidSimPrimitiveSupport;
+
 
 public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask> {
 

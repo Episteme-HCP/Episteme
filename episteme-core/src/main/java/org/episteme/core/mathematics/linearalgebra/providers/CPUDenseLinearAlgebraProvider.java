@@ -273,7 +273,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 E negB = ((Ring<E>) r).negate(b.get(i));
                 result.add(((Ring<E>) r).add(a.get(i), negB));
             }
-            @SuppressWarnings("unchecked")
             E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, result.size()));
             return new GenericVector<>(
                     new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this,
@@ -288,7 +287,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                         return ((Ring<E>) r).add(a.get(i), negB);
                     })
                     .collect(java.util.stream.Collectors.toList());
-                @SuppressWarnings("unchecked")
                 E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, list.size()));
                 return new GenericVector<>(
                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),

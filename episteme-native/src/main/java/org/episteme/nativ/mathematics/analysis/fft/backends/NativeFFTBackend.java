@@ -875,24 +875,8 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
         return result;
     }
 
-    private static double[][] toDouble2D(float[][] a) {
-        double[][] result = new double[a.length][];
-        for (int i = 0; i < a.length; i++) {
-            result[i] = new double[a[i].length];
-            for (int j = 0; j < a[i].length; j++) result[i][j] = a[i][j];
-        }
-        return result;
-    }
 
 
-    private static float[][] toFloat2D(double[][] a) {
-        float[][] result = new float[a.length][];
-        for (int i = 0; i < a.length; i++) {
-            result[i] = new float[a[i].length];
-            for (int j = 0; j < a[i].length; j++) result[i][j] = (float) a[i][j];
-        }
-        return result;
-    }
 
 
     @Override

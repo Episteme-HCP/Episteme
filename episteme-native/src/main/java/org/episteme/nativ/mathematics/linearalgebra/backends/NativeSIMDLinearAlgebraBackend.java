@@ -32,7 +32,6 @@ import jdk.incubator.vector.VectorSpecies;
 import static jdk.incubator.vector.VectorOperators.*;
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealFloatVector;
-import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 
 /**
  * SIMD-accelerated Linear Algebra Backend for Real numbers using JDK Vector API.
@@ -42,6 +41,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
  * @since 1.2
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class})
+@SuppressWarnings("unchecked")
 public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend, SIMDBackend {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSIMDLinearAlgebraBackend.class);
@@ -795,12 +795,9 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
 
     private Vector<Complex> executeComplexVectorScale(Vector<Complex> v, Complex s) {
         int n = v.dimension();
-        double[] vData = toComplexDoubleArray(v);
         double[] cData = new double[2 * n];
         double sre = s.real(), sim = s.imaginary();
         
-        int i = 0;
-        var species = getDoubleSpecies();
         // Mask for re/im indexing: [re, im, re, im]
         // Complex mul: (reA*reS - imA*imS) + i(reA*imS + imA*reS)
         for (int j=0; j<n; j++) {
@@ -828,8 +825,6 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
         double re = 0, im = 0;
         int j = 0;
         if (upperBound > 0) {
-            var sumRe = DoubleVector.zero(species);
-            var sumIm = DoubleVector.zero(species);
             
             // Note: interlaced layout is [r0, i0, r1, i1, ...]
             // We can load two adjacent vectors to get [r0, i0, r1, i1] and [r2, i2, r3, i3] if species is 4.

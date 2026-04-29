@@ -524,8 +524,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         return "openblas";
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": solveTriangular() not available");
         int n = A.rows();
@@ -1592,7 +1590,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": dot() not available");
         int n = a.dimension();
