@@ -704,7 +704,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     private Matrix<Complex> executeComplexAdd(Matrix<Complex> a, Matrix<Complex> b) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).add(b.get(i, j));
-        @SuppressWarnings("unchecked")
+
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
         return Matrix.of(res, ring);
     }
@@ -712,7 +712,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     private Matrix<Complex> executeComplexSubtract(Matrix<Complex> a, Matrix<Complex> b) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).subtract(b.get(i, j));
-        @SuppressWarnings("unchecked")
+
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
         return Matrix.of(res, ring);
     }
@@ -737,7 +737,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     private Matrix<Complex> executeComplexScale(Complex s, Matrix<Complex> a) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = s.multiply(a.get(i, j));
-        @SuppressWarnings("unchecked")
+
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
         return Matrix.of(res, ring);
     }
@@ -745,7 +745,7 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     private Matrix<Complex> executeComplexTranspose(Matrix<Complex> a) {
         Complex[][] res = new Complex[a.cols()][a.rows()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[j][i] = a.get(i, j);
-        @SuppressWarnings("unchecked")
+
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
         return Matrix.of(res, ring);
     }

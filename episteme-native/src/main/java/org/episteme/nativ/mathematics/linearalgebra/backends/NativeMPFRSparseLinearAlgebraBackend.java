@@ -34,6 +34,7 @@ import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNum
  * Optimized for CSR storage.
  */
 @com.google.auto.service.AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class})
+@SuppressWarnings("unchecked")
 public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);
     private static final NativeMPFRDenseLinearAlgebraBackend<?> SHARED_DENSE = new NativeMPFRDenseLinearAlgebraBackend<>();
@@ -101,7 +102,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return (long) (digits * 3.322) + 1;
     }
 
-    @SuppressWarnings("unchecked")
     private org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> toSparse(Matrix<E> a) {
         if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) return (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>) a;
         org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
@@ -284,7 +284,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         ensureAlive();
         if (a.cols() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
@@ -367,7 +367,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         }
     }
 
-    @SuppressWarnings("unchecked")
+
     private E dot_internal(MemorySegment x, MemorySegment y, int n, int prec, Arena arena, ResourceTracker tracker, boolean isComplex, Ring<E> ring) throws Throwable {
         MemorySegment sumR = arena.allocate(MPFR_LAYOUT); track(tracker, sumR);
         NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec); NativeSafe.invoke(MPFR_SET_UI, sumR, 0, 0);
@@ -414,7 +414,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         }
     }
 
-    @SuppressWarnings("unchecked")
+
     private E norm_internal(MemorySegment x, int n, int prec, Arena arena, ResourceTracker tracker, boolean isComplex, Ring<E> ring) throws Throwable {
         MemorySegment sumSq = arena.allocate(MPFR_LAYOUT); track(tracker, sumSq);
         NativeSafe.invoke(MPFR_INIT2, sumSq, (int) prec); NativeSafe.invoke(MPFR_SET_UI, sumSq, 0, 0);
@@ -569,7 +569,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         ensureAlive();
         org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(a);
@@ -641,7 +641,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public Vector<E> multiply(Vector<E> a, E scalar) {
         ensureAlive();
         Field<E> field = (Field<E>) a.getScalarRing();
@@ -710,7 +710,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
         ensureAlive();
         if (a.rows() != b.rows() || a.cols() != b.cols()) throw new IllegalArgumentException("Dimension mismatch");
@@ -834,7 +834,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public Vector<E> subtract(Vector<E> v1, Vector<E> v2) {
         if (v1.dimension() != v2.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         long prec = getPrecision();
@@ -889,7 +889,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
         if (a.rows() != b.rows() || a.cols() != b.cols()) throw new IllegalArgumentException("Dimension mismatch");
         long prec = getPrecision();
@@ -978,7 +978,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (a.cols() != b.rows()) throw new IllegalArgumentException("Dimension mismatch");
         long prec = getPrecision();
@@ -1526,7 +1526,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return absA.compareTo(absB);
     }
 
-    @SuppressWarnings("unchecked")
+
     private E negate(boolean isComplex, E val) {
         if (isComplex) {
             Complex c = (val instanceof Complex cv) ? cv : Complex.of((Real) val);
@@ -1535,7 +1535,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return (E)(Object)((Real)val).negate();
     }
 
-    @SuppressWarnings("unchecked")
+
     private E divide(boolean isComplex, E a, E b) {
         if (isComplex) {
             Complex ca = (a instanceof Complex c) ? c : Complex.of((Real) a);
@@ -1545,7 +1545,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return (E)(Object)((Real)a).divide((Real)b);
     }
 
-    @SuppressWarnings("unchecked")
+
     private E multiply(boolean isComplex, E a, E b) {
         if (isComplex) {
             Complex ca = (a instanceof Complex c) ? c : Complex.of((Real) a);
@@ -1555,7 +1555,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         return (E)(Object)((Real)a).multiply((Real)b);
     }
 
-    @SuppressWarnings("unchecked")
+
     private Vector<E> backToVector(MemorySegment h_x, int n, boolean isComplex, Ring<E> ring, Arena arena) throws Throwable {
         E[] resultArr = (E[]) new Object[n];
         boolean useRealDouble = !isComplex && ring instanceof org.episteme.core.mathematics.sets.Reals;

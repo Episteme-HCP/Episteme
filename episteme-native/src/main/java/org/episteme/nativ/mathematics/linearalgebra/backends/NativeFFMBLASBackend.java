@@ -27,7 +27,6 @@ import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeRealD
 import org.episteme.nativ.mathematics.linearalgebra.vectors.storage.NativeRealDoubleVectorStorage;
 import org.episteme.nativ.mathematics.linearalgebra.matrices.NativeRealDoubleMatrix;
 import org.episteme.nativ.mathematics.linearalgebra.vectors.NativeRealDoubleVector;
-import org.episteme.nativ.mathematics.linearalgebra.matrices.NativeRealFloatMatrix;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -45,6 +44,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
+@SuppressWarnings("unchecked")
 public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     
     private static final Logger logger = LoggerFactory.getLogger(NativeFFMBLASBackend.class);
@@ -703,7 +703,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         
         if (DOMATCOPY != null) {
             org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix res = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.direct(n, m);
-            @SuppressWarnings("unchecked")
+
             Matrix<E> casted = (Matrix<E>) (Matrix<?>) res;
             return casted;
         }
@@ -788,7 +788,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 double sVal = ((org.episteme.core.mathematics.numbers.real.Real)(Object)svd.S().get(i)).doubleValue();
                 if (sVal > 1e-12) sData[i][i] = org.episteme.core.mathematics.numbers.complex.Complex.of(1.0 / sVal);
             }
-            @SuppressWarnings("unchecked")
+
             E[][] castedArr = (E[][]) sData;
             sInv = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(castedArr, (Ring<E>) a.getScalarRing());
         } else {
@@ -798,7 +798,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                 double sVal = ((Real)(Object)svd.S().get(i)).doubleValue();
                 if (sVal > 1e-12) sData[i][i] = Real.of(1.0 / sVal);
             }
-            @SuppressWarnings("unchecked")
+
             E[][] castedArr = (E[][]) sData;
             sInv = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(castedArr, (Ring<E>) a.getScalarRing());
         }
@@ -809,7 +809,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         Matrix<E> mt = m.transpose();
         if (isComplex(m)) {
             return mt.map(val -> {
-                @SuppressWarnings("unchecked")
+
                 org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) val;
                 E casted = (E) (Object) c.conjugate();
                 return casted;
@@ -819,7 +819,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public E determinant(Matrix<E> A) {
          if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": determinant() not available");
          int n = A.rows();
@@ -845,7 +845,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                      return (E) (Object) det;
                  } catch (Throwable e) { logger.debug("Native determinant failed, falling back: {}", e.getMessage()); }
              }
-             @SuppressWarnings("unchecked")
+
              Ring<E> ring = A.getScalarRing();
              return org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant(A, (org.episteme.core.mathematics.structures.rings.Field<E>)ring, this);
          }
@@ -864,11 +864,11 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
                  return (E) (Object) Real.of(det);
              } catch (Throwable e) { logger.debug("Native determinant failed, falling back: {}", e.getMessage()); }
          }
-         @SuppressWarnings("unchecked")
+
          LinearAlgebraProvider<Real> provider = (LinearAlgebraProvider<Real>)(Object)this;
-         @SuppressWarnings("unchecked")
+
          Matrix<Real> mReal = (Matrix<Real>)A;
-         @SuppressWarnings("unchecked")
+
          E res = (E) (Object) org.episteme.core.mathematics.linearalgebra.matrices.solvers.GenericLU.determinant(mReal, (org.episteme.core.mathematics.structures.rings.Field<Real>)A.getScalarRing(), provider);
          return res;
     }
@@ -990,7 +990,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public SVDResult<E> svd(Matrix<E> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": svd() not available");
         int m = a.rows();
@@ -1101,7 +1101,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+
     public EigenResult<E> eigen(Matrix<E> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": eigen() not available");
         int n = a.rows();
@@ -1633,7 +1633,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
     
     @Override
-    @SuppressWarnings("unchecked")
+
     public E norm(Vector<E> a) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": norm() not available");
         int n = a.dimension();
@@ -1814,7 +1814,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
     }
 
 
-    @SuppressWarnings("unchecked")
+
     public Vector<E> divide(Vector<E> v, E scalar) {
         if (isComplex(v)) {
             org.episteme.core.mathematics.numbers.complex.Complex sc = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) scalar;
@@ -2121,7 +2121,6 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         }
 
         List<E> pList = new java.util.ArrayList<>(m);
-        @SuppressWarnings("unchecked")
         Ring<E> ring = (Ring<E>) a.getScalarRing();
         for (int idx : pIndices) {
             if (complex) pList.add((E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(idx, 0));
@@ -2351,7 +2350,7 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+
     private Matrix<E> createDenseMatrix(double[] data, int rows, int cols, Matrix<E> ref) {
         if (isComplex(ref)) {
               // Interlaced double[] to Complex[][]
@@ -2391,19 +2390,19 @@ public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, Native
         }
     }
 
-    @SuppressWarnings("unchecked")
+
     private Matrix<E> createZeroCopyDoubleMatrix(MemorySegment data, int rows, int cols, Arena arena, Matrix<E> ref) {
         NativeRealDoubleMatrixStorage storage = new NativeRealDoubleMatrixStorage(data, rows, cols, arena);
         return (Matrix<E>) (Matrix<?>) new NativeRealDoubleMatrix(storage, (LinearAlgebraProvider<Real>) (Object) this);
     }
 
-    @SuppressWarnings("unchecked")
+
     private Vector<E> createZeroCopyDoubleVector(MemorySegment data, int dim, Arena arena, Matrix<E> ref) {
         NativeRealDoubleVectorStorage storage = new NativeRealDoubleVectorStorage(data, dim, arena);
         return (Vector<E>) (Vector<?>) new NativeRealDoubleVector(storage, (LinearAlgebraProvider<Real>) (Object) this);
     }
 
-    @SuppressWarnings("unchecked")
+
     private Vector<E> createZeroCopyDoubleVector(MemorySegment data, int dim, Arena arena, Vector<E> ref) {
         NativeRealDoubleVectorStorage storage = new NativeRealDoubleVectorStorage(data, dim, arena);
         return (Vector<E>) (Vector<?>) new NativeRealDoubleVector(storage, (LinearAlgebraProvider<Real>) (Object) this);
