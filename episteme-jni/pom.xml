@@ -4,11 +4,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>io.github.silveremartin-dev</groupId>
+    <groupId>org.episteme</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta2</version>
+    <version>1.0.0-beta1</version>
   </parent>
-  <groupId>io.github.silveremartin-dev</groupId>
+  <groupId>org.episteme</groupId>
   <artifactId>episteme-jni</artifactId>
   <name>episteme-jni</name>
   <url>http://maven.apache.org</url>
@@ -16,12 +16,12 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>io.github.silveremartin-dev</groupId>
+      <groupId>org.episteme</groupId>
       <artifactId>episteme-natural</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.github.silveremartin-dev</groupId>
+      <groupId>org.episteme</groupId>
       <artifactId>episteme-core</artifactId>
       <version>${project.version}</version>
     </dependency>

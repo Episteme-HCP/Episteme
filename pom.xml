@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.github.silveremartin-dev</groupId>
+  <groupId>org.episteme</groupId>
   <artifactId>episteme-parent</artifactId>
-  <version>1.0.0-beta2</version>
+  <version>1.0.0-beta1</version>
   <packaging>pom</packaging>
   <name>Episteme Unifying Parent</name>
   <description>Episteme - Unified Scientific Computing Framework (Parent POM)</description>
@@ -48,9 +48,15 @@
         <role>Original Author</role>
       </roles>
     </developer>
-
+    <developer>
+      <id>gemini</id>
+      <name>Gemini AI (Google DeepMind)</name>
+      <roles>
+        <role>Implementation</role>
+        <role>Architecture Design</role>
+      </roles>
+    </developer>
   </developers>
-  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- JSR-385 Units of Measurement -->
@@ -101,18 +107,18 @@
     <dependencies>
       <!-- Internal modules -->
       <dependency>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>org.episteme</groupId>
         <artifactId>episteme-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>org.episteme</groupId>
         <artifactId>episteme-natural</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>org.episteme</groupId>
         <artifactId>episteme-database</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -156,13 +162,12 @@
         <artifactId>log4j-to-slf4j</artifactId>
         <version>2.20.0</version>
       </dependency>
-      <!-- Serialization -->
-      
-      <!-- Core Dependencies -->
+      <!-- Ensure conflicting bridges are never used (test scope = strongest ban) -->
       <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>33.0.0-jre</version>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>2.20.0</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
@@ -750,7 +755,7 @@
           <version>0.8.12</version>
           <configuration>
             <includes>
-              <include>io.github.silveremartin-dev/**</include>
+              <include>org/episteme/**</include>
             </includes>
             <excludes>
               <exclude>com/sun/**</exclude>
@@ -810,11 +815,6 @@
           <groupId>org.xolstice.maven.plugins</groupId>
           <artifactId>protobuf-maven-plugin</artifactId>
           <version>0.6.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.4.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
