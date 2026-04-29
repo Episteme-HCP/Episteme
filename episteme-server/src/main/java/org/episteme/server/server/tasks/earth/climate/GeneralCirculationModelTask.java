@@ -177,11 +177,45 @@ public class GeneralCirculationModelTask
         System.arraycopy(s, 0, flat, start, s.length);
     }
 
-    public double[][] getSurfaceTemp() {
+    public double[][] getSurfaceTemperature() {
         state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
         double[] flat = state.getDouble();
         double[][] grid = new double[latBins][longBins];
         for(int i=0; i<latBins; i++) System.arraycopy(flat, i*longBins, grid[i], 0, longBins);
         return grid;
+    }
+
+    public double[][] getAirTemperature() {
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        double[] flat = state.getDouble();
+        int gridSize = latBins * longBins;
+        double[][] grid = new double[latBins][longBins];
+        for(int i=0; i<latBins; i++) System.arraycopy(flat, gridSize + i*longBins, grid[i], 0, longBins);
+        return grid;
+    }
+
+    public double[][] getHumidity() {
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        double[] flat = state.getDouble();
+        int gridSize = latBins * longBins;
+        double[][] grid = new double[latBins][longBins];
+        for(int i=0; i<latBins; i++) System.arraycopy(flat, 12 * gridSize + i*longBins, grid[i], 0, longBins);
+        return grid;
+    }
+
+    public void updateState(double[][][] temps, double[][] humidity) {
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        double[] flat = state.getDouble();
+        int gridSize = latBins * longBins;
+        if (temps != null) {
+            for(int k=0; k<Math.min(temps.length, 3); k++) {
+                if (temps[k] != null) {
+                    for(int i=0; i<latBins; i++) System.arraycopy(temps[k][i], 0, flat, k*gridSize + i*longBins, longBins);
+                }
+            }
+        }
+        if (humidity != null) {
+            for(int i=0; i<latBins; i++) System.arraycopy(humidity[i], 0, flat, 12*gridSize + i*longBins, longBins);
+        }
     }
 }

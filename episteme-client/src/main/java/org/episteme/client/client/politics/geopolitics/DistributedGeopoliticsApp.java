@@ -110,7 +110,7 @@ public class DistributedGeopoliticsApp extends Application {
         root.getChildren().addAll(economyLabel, gdpChart, new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgeopoliticsapp.label.geopolitical_events", "Geopolitical Events")), console, stepBtn, exportBtn);
 
         Scene scene = new Scene(root, 1000, 800);
-        ThemeManager.applyTo(scene);
+        ThemeManager.getInstance().applyTheme(scene);
         stage.setScene(scene);
         stage.show();
     }

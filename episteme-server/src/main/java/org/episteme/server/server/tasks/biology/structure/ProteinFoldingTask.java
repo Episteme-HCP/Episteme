@@ -24,6 +24,16 @@ public class ProteinFoldingTask implements DistributedTask<ProteinFoldingTask, P
 
     public enum ResidueType { HYDROPHOBIC('H'), POLAR('P'); final char code; ResidueType(char c) { this.code = c; } }
     
+    public static class Monomer implements Serializable {
+        public int x, y, z;
+        public ResidueType type;
+        public Monomer(int x, int y, int z, ResidueType type) { this.x = x; this.y = y; this.z = z; this.type = type; }
+        public int x() { return x; }
+        public int y() { return y; }
+        public int z() { return z; }
+        public ResidueType type() { return type; }
+    }
+    
     private final List<ResidueType> sequence;
     private final boolean[] isHydrophobic;
     private final int iterations;
@@ -118,5 +128,13 @@ public class ProteinFoldingTask implements DistributedTask<ProteinFoldingTask, P
     }
 
     public int[][] getFold() { return state.getReal(); }
+    
+    public List<Monomer> getResult() {
+        int[][] pos = state.getReal();
+        List<Monomer> res = new ArrayList<>();
+        for(int i=0; i<pos.length; i++) res.add(new Monomer(pos[i][0], pos[i][1], pos[i][2], sequence.get(i)));
+        return res;
+    }
+
     public double getEnergy() { return currentEnergy; }
 }

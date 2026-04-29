@@ -16,6 +16,7 @@ import java.io.Serializable;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
+import org.episteme.natural.physics.classical.mechanics.Particle;
 
 /**
  * Molecular Dynamics Simulation Task.
@@ -52,6 +53,28 @@ public class MolecularDynamicsTask
                     1.0);
         }
         
+        initTaskState(initialAtoms);
+    }
+
+    public MolecularDynamicsTask(List<Particle> particles, double timeStep) {
+        this.numAtoms = particles.size();
+        this.timeStep = timeStep;
+        this.steps = 100; 
+        this.boxSize = 10.0;
+        
+        AtomState[] initialAtoms = new AtomState[numAtoms];
+        for (int i = 0; i < numAtoms; i++) {
+            Particle p = particles.get(i);
+            initialAtoms[i] = new AtomState(p.getX(), p.getY(), p.getZ(), 
+                p.getVelocity().get(0).doubleValue(), 
+                p.getVelocity().get(1).doubleValue(), 
+                p.getVelocity().get(2).doubleValue(), 
+                p.getMass().to(org.episteme.core.measure.Units.KILOGRAM).getValue().doubleValue());
+        }
+        initTaskState(initialAtoms);
+    }
+
+    private void initTaskState(AtomState[] initialAtoms) {
         this.state = new TaskState<>(initialAtoms,
             arr -> flattenDouble(arr), d -> unflattenDouble(d),
             arr -> flattenFloat(arr), f -> unflattenFloat(f)
@@ -205,8 +228,23 @@ public class MolecularDynamicsTask
         }
     }
 
-    public AtomState[] getAtoms() { state.syncTo(TaskRegistry.PrecisionMode.REAL); return state.getReal(); }
+    public List<AtomState> getAtoms() { 
+        state.syncTo(TaskRegistry.PrecisionMode.REAL); 
+        return java.util.Arrays.asList(state.getReal()); 
+    }
     public double getTotalEnergy() { return totalEnergy; }
+    
+    public int getNumAtoms() { return numAtoms; }
+    public double getTimeStep() { return timeStep; }
+    public int getSteps() { return steps; }
+    public double getBoxSize() { return boxSize; }
+
+    public void updateState(List<AtomState> atoms, double energy) {
+        this.totalEnergy = energy;
+        state.syncTo(TaskRegistry.PrecisionMode.REAL);
+        AtomState[] real = state.getReal();
+        for(int i=0; i<Math.min(real.length, atoms.size()); i++) real[i] = atoms.get(i);
+    }
 
     public static class AtomState implements Serializable {
         public double x, y, z, vx, vy, vz, mass;

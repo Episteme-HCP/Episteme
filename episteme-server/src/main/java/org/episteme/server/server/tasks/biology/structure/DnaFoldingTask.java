@@ -29,6 +29,17 @@ import org.episteme.core.distributed.DistributedTask;
 public class DnaFoldingTask
         implements org.episteme.core.distributed.DistributedTask<DnaFoldingTask, DnaFoldingTask> {
 
+    public static class Point3D implements Serializable {
+        public double x, y, z;
+        public Point3D(double x, double y, double z) { this.x = x; this.y = y; this.z = z; }
+        public double x() { return x; }
+        public double y() { return y; }
+        public double z() { return z; }
+        public double distance(Point3D other) {
+            return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2) + Math.pow(z - other.z, 2));
+        }
+    }
+
     private final int numBases;
     private final int steps;
     private final double temperature;
@@ -39,13 +50,11 @@ public class DnaFoldingTask
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
     private long seed;
 
-    public DnaFoldingTask(int numBases, int steps, double temperature) {
-        this.numBases = numBases;
+    public DnaFoldingTask(String sequence, int steps, double temperature) {
+        this.sequence = sequence.toUpperCase().replaceAll("[^ATCG]", "");
+        this.numBases = this.sequence.length();
         this.steps = steps;
         this.temperature = temperature;
-        char[] seqArr = new char[numBases];
-        Arrays.fill(seqArr, 'A');
-        this.sequence = new String(seqArr);
         this.seed = System.nanoTime();
         
         Real[][] initial = new Real[numBases][3];
@@ -102,8 +111,27 @@ public class DnaFoldingTask
         return r;
     }
 
+    private void initTaskState(Real[][] initial) {
+        this.state = new TaskState<>(initial,
+            r -> flattenDouble(r), d -> unflattenDouble(d),
+            r -> flattenFloat(r), f -> unflattenFloat(f)
+        );
+    }
+
     public DnaFoldingTask() {
-        this(0, 0, 0);
+        this("", 0, 0.0);
+    }
+
+    public DnaFoldingTask(int numBases, int steps, double temperature) {
+        this.numBases = numBases;
+        this.steps = steps;
+        this.temperature = temperature;
+        this.sequence = "A".repeat(numBases);
+        this.seed = System.nanoTime();
+        
+        Real[][] initial = new Real[numBases][3];
+        for (int i = 0; i < numBases; i++) { initial[i][0] = Real.of(i); initial[i][1] = Real.ZERO; initial[i][2] = Real.ZERO; }
+        initTaskState(initial);
     }
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
@@ -166,5 +194,26 @@ public class DnaFoldingTask
     }
 
     public Real[][] getCoordinates() { state.syncTo(TaskRegistry.PrecisionMode.REAL); return state.getReal(); }
+    
+    public List<Point3D> getFoldedStructure() {
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        double[] flat = state.getDouble();
+        List<Point3D> res = new ArrayList<>();
+        for(int i=0; i<numBases; i++) res.add(new Point3D(flat[i*3], flat[i*3+1], flat[i*3+2]));
+        return res;
+    }
+
+    public String getSequence() { return sequence; }
     public double getCurrentEnergy() { return currentEnergy; }
+    public double getFinalEnergy() { return currentEnergy; }
+
+    public void updateState(List<Point3D> points, double energy) {
+        this.currentEnergy = energy;
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        double[] flat = state.getDouble();
+        for(int i=0; i<Math.min(numBases, points.size()); i++) {
+            Point3D p = points.get(i);
+            flat[i*3] = p.x; flat[i*3+1] = p.y; flat[i*3+2] = p.z;
+        }
+    }
 }

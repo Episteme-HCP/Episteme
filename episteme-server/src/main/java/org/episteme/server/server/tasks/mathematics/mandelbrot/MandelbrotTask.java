@@ -39,6 +39,12 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
         this.result = new int[width][height];
     }
 
+    public MandelbrotTask(int width, int height, Real xMin, Real xMax, Real yMin, Real yMax, int maxIter) {
+        this(width, height, xMin.doubleValue(), xMax.doubleValue(), yMin.doubleValue(), yMax.doubleValue());
+        this.maxIterations = maxIter;
+        this.mode = TaskRegistry.PrecisionMode.REAL;
+    }
+
     public MandelbrotTask() {
         this(0, 0, 0, 0, 0, 0);
     }

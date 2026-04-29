@@ -167,4 +167,14 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
         flatten2DDouble(u, flat, 0);
         flatten2DDouble(uPrev, flat, width * height);
     }
+
+    public void setC(double c) { this.c = c; }
+    public void setDamping(double d) { this.damping = d; }
+    public double getC() { return c; }
+    public double getDamping() { return damping; }
+    
+    public double[][] getUPrev() {
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        return unflatten2DDouble(state.getDouble(), width * height);
+    }
 }

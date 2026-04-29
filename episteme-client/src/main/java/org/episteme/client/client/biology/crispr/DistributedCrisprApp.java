@@ -36,6 +36,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.episteme.server.server.tasks.biology.genome.CrisprTask;
+import org.episteme.natural.biology.genome.GenomeProvider;
 import org.episteme.natural.biology.loaders.FASTAReader;
 import org.episteme.server.server.proto.*;
 
@@ -60,7 +61,7 @@ public class DistributedCrisprApp extends Application implements org.episteme.co
     private ManagedChannel channel;
     private ComputeServiceGrpc.ComputeServiceStub asyncStub;
     private TextArea genomeArea;
-    private TableView<CrisprTask.Target> resultsTable;
+    private TableView<GenomeProvider.Target> resultsTable;
     private Label statusLabel;
 
     @Override
@@ -121,7 +122,7 @@ public class DistributedCrisprApp extends Application implements org.episteme.co
                 List<FASTAReader.Sequence> sequences = new ArrayList<>();
                 // Create a FASTA sequence from the results
                 int i = 1;
-                for (CrisprTask.Target target : resultsTable.getItems()) {
+                for (GenomeProvider.Target target : resultsTable.getItems()) {
                     sequences.add(new FASTAReader.Sequence("CrISPR_Target_" + i + "_Pos_" + target.position(),
                             target.spacer()));
                     i++;
@@ -160,21 +161,21 @@ public class DistributedCrisprApp extends Application implements org.episteme.co
         resultsTable = new TableView<>();
         resultsTable.setStyle("-fx-background-color: #0f3460;");
 
-        TableColumn<CrisprTask.Target, Integer> colPos = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.pos", "Position"));
+        TableColumn<GenomeProvider.Target, Integer> colPos = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.pos", "Position"));
         colPos.setCellValueFactory(new PropertyValueFactory<>("position"));
 
-        TableColumn<CrisprTask.Target, String> colSpacer = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.spacer", "Spacer (20bp)"));
+        TableColumn<GenomeProvider.Target, String> colSpacer = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.spacer", "Spacer (20bp)"));
         colSpacer.setCellValueFactory(new PropertyValueFactory<>("spacer"));
         colSpacer.setPrefWidth(250);
 
-        TableColumn<CrisprTask.Target, String> colPam = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.pam", "PAM"));
+        TableColumn<GenomeProvider.Target, String> colPam = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.pam", "PAM"));
         colPam.setCellValueFactory(new PropertyValueFactory<>("pam"));
 
-        TableColumn<CrisprTask.Target, Double> colScore = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.score", "Efficiency Score"));
+        TableColumn<GenomeProvider.Target, Double> colScore = new TableColumn<>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedcrisprapp.col.score", "Efficiency Score"));
         colScore.setCellValueFactory(new PropertyValueFactory<>("score"));
 
         @SuppressWarnings("unchecked")
-        TableColumn<CrisprTask.Target, ?>[] columns = new TableColumn[] { colPos, colSpacer, colPam, colScore };
+        TableColumn<GenomeProvider.Target, ?>[] columns = new TableColumn[] { colPos, colSpacer, colPam, colScore };
         resultsTable.getColumns().addAll(columns);
         VBox.setVgrow(resultsTable, javafx.scene.layout.Priority.ALWAYS);
 
@@ -230,7 +231,7 @@ public class DistributedCrisprApp extends Application implements org.episteme.co
                 if (result.getStatus() == Status.COMPLETED) {
                     try {
                         @SuppressWarnings("unchecked")
-                        List<CrisprTask.Target> targets = (List<CrisprTask.Target>) deserialize(
+                        List<GenomeProvider.Target> targets = (List<GenomeProvider.Target>) deserialize(
                                 result.getSerializedData().toByteArray());
                         Platform.runLater(() -> {
                             resultsTable.setItems(FXCollections.observableArrayList(targets));

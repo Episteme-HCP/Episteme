@@ -5,6 +5,7 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
+import org.episteme.benchmarks.audit.mathematics.linearalgebra.LinearAlgebraAuditSuite;
 
 import org.junit.jupiter.api.Test;
 import java.io.IOException;

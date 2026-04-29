@@ -7,6 +7,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.benchmarks.benchmark.BenchmarkResult;
 import org.episteme.benchmarks.reporting.BenchmarkReporter;
+import org.episteme.benchmarks.audit.mathematics.linearalgebra.LinearAlgebraAuditSuite;
 
 import org.junit.jupiter.api.Test;
 import java.util.*;

@@ -24,7 +24,6 @@
 package org.episteme.client.client.mathematics.mandelbrot;
 
 import org.episteme.server.server.tasks.mathematics.mandelbrot.MandelbrotTask;
-import org.episteme.server.server.tasks.mathematics.mandelbrot.RealMandelbrotTask;
 import org.episteme.core.mathematics.numbers.real.Real;
 
 import com.google.protobuf.ByteString;
@@ -276,7 +275,7 @@ public class DistributedMandelbrotApp extends Application implements org.epistem
 
             MandelbrotTask task;
             if (highPrecisionToggle != null && highPrecisionToggle.isSelected()) {
-                task = new RealMandelbrotTask(WIDTH, sliceHeight,
+                task = new MandelbrotTask(WIDTH, sliceHeight,
                         Real.of(minRe), Real.of(maxRe),
                         Real.of(sliceMinIm), Real.of(sliceMaxIm),
                         100);
