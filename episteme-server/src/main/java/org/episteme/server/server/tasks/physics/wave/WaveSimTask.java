@@ -41,11 +41,13 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     private final int height;
     private double[][] u; // Current (Primitive mode)
     private double[][] uPrev; // Previous (Primitive mode)
+    private float[][] uFloat; // Current (Float mode)
+    private float[][] uPrevFloat; // Previous (Float mode)
 
     private double c = 0.5;
     private double damping = 0.99;
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
     private org.episteme.core.mathematics.numbers.real.Real[][] uReal;
     private org.episteme.core.mathematics.numbers.real.Real[][] uRealPrev;
 
@@ -65,6 +67,19 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
         this.mode = mode;
         if (mode == TaskRegistry.PrecisionMode.REAL && uReal == null) {
             syncToReal();
+        } else if (mode == TaskRegistry.PrecisionMode.FLOAT && uFloat == null) {
+            syncToFloat();
+        }
+    }
+
+    private void syncToFloat() {
+        uFloat = new float[width][height];
+        uPrevFloat = new float[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                uFloat[x][y] = (float) u[x][y];
+                uPrevFloat[x][y] = (float) uPrev[x][y];
+            }
         }
     }
 
@@ -117,17 +132,31 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
     }
 
     public void step() {
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            // Episteme Mode: Use Real-based Provider
-            org.episteme.natural.physics.classical.waves.WaveProvider provider = new org.episteme.natural.physics.classical.waves.providers.MulticoreWaveProvider();
-            provider.solve(uReal, uRealPrev, width, height,
-                    org.episteme.core.mathematics.numbers.real.Real.of(c),
-                    org.episteme.core.mathematics.numbers.real.Real.of(damping));
-            syncFromReal();
-        } else {
-            // Primitive Mode: Use side-by-side Support
-            WaveSimPrimitiveSupport support = new WaveSimPrimitiveSupport();
-            support.solve(u, uPrev, width, height, c, damping);
+        org.episteme.natural.physics.classical.waves.WaveProvider provider = new org.episteme.natural.physics.classical.waves.providers.MulticoreWaveProvider();
+        switch (mode) {
+            case REAL -> {
+                provider.solve(uReal, uRealPrev, width, height,
+                        org.episteme.core.mathematics.numbers.real.Real.of(c),
+                        org.episteme.core.mathematics.numbers.real.Real.of(damping));
+                syncFromReal();
+            }
+            case FLOAT -> {
+                provider.solve(uFloat, uPrevFloat, width, height, (float) c, (float) damping);
+                syncFromFloat();
+            }
+            default -> {
+                // Primitive Mode
+                provider.solve(u, uPrev, width, height, c, damping);
+            }
+        }
+    }
+
+    private void syncFromFloat() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                u[x][y] = uFloat[x][y];
+                uPrev[x][y] = uPrevFloat[x][y];
+            }
         }
     }
 

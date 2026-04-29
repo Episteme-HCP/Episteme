@@ -35,7 +35,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import org.episteme.server.server.biology.genome.CrisprTask;
+import org.episteme.server.server.tasks.biology.genome.CrisprTask;
 import org.episteme.natural.biology.loaders.FASTAReader;
 import org.episteme.server.server.proto.*;
 

@@ -40,7 +40,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.episteme.server.server.physics.fluid.LatticeBoltzmann;
+import org.episteme.server.server.tasks.physics.fluid.LatticeBoltzmann;
 import org.episteme.server.server.proto.*;
 import org.episteme.core.ui.ThemeManager;
 

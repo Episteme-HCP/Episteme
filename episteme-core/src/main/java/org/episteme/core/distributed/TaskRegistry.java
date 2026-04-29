@@ -132,7 +132,7 @@ public final class TaskRegistry {
      * Gets a task instance with specific precision mode.
      *
      * @param taskType the task type identifier
-     * @param mode     the precision mode (PRIMITIVE or REAL)
+     * @param mode     the precision mode (DOUBLE, FLOAT or REAL)
      * @return Optional containing the task instance
      */
     public Optional<DistributedTask<?, ?>> get(String taskType, PrecisionMode mode) {
@@ -190,13 +190,15 @@ public final class TaskRegistry {
 
     /**
      * Precision mode for task execution.
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
- */
+     * @author Silvere Martin-Michiellot
+     * @author Gemini AI (Google DeepMind)
+     * @since 1.0
+     */
     public enum PrecisionMode {
         /** Use primitive double - fastest, no GPU */
-        PRIMITIVE,
+        DOUBLE,
+        /** Use primitive float - fast, efficient GPU usage */
+        FLOAT,
         /** Use Real API - configurable precision, GPU-enabled */
         REAL
     }

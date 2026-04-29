@@ -45,22 +45,26 @@ public class GeopoliticalEngineTask implements Serializable {
     public static class NationState implements Serializable {
         public String name;
         public double stability; // 0.0 to 1.0
+        public float stabilityFloat;
         public Real stabilityReal;
         public double militaryPower;
+        public float militaryPowerFloat;
         public Real militaryPowerReal;
         public List<String> allies = new ArrayList<>();
 
         public NationState(String name, double stability, double mil) {
             this.name = name;
             this.stability = stability;
+            this.stabilityFloat = (float) stability;
             this.stabilityReal = Real.of(stability);
             this.militaryPower = mil;
+            this.militaryPowerFloat = (float) mil;
             this.militaryPowerReal = Real.of(mil);
         }
     }
 
     private List<NationState> nations;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     public GeopoliticalEngineTask(List<NationState> nations) {
         this.nations = nations;
@@ -71,10 +75,10 @@ public class GeopoliticalEngineTask implements Serializable {
     }
 
     public void run() {
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            runReal();
-        } else {
-            runPrimitive();
+        switch (mode) {
+            case REAL -> runReal();
+            case FLOAT -> runFloat();
+            default -> runPrimitive();
         }
     }
 
@@ -114,6 +118,34 @@ public class GeopoliticalEngineTask implements Serializable {
                     }
                 }
             }
+        }
+    }
+
+    private void runFloat() {
+        for (NationState n : nations) {
+            // Internal stability fluctuation
+            n.stabilityFloat += 0.1f * (float) (Math.random() - 0.5);
+            n.stabilityFloat = Math.max(0f, Math.min(1.0f, n.stabilityFloat));
+
+            // Interaction: if stability is very low, chance of conflict
+            if (n.stabilityFloat < 0.2f) {
+                for (NationState other : nations) {
+                    if (other != n && !n.allies.contains(other.name)) {
+                        // Potential tension
+                        militaryInteractionFloat(n, other);
+                    }
+                }
+            }
+        }
+    }
+
+    private void militaryInteractionFloat(NationState a, NationState b) {
+        // Simple balance of power check
+        float tension = (a.militaryPowerFloat / (b.militaryPowerFloat + 1e-6f)) * (1.0f - a.stabilityFloat);
+        if (tension > 2.0f && Math.random() > 0.95) {
+            // Conflict event reduce stability for both
+            a.stabilityFloat -= 0.1f;
+            b.stabilityFloat -= 0.05f;
         }
     }
 

@@ -50,7 +50,7 @@ import org.episteme.natural.biology.loaders.PDBWriter;
 import org.episteme.natural.biology.Protein;
 import org.episteme.natural.chemistry.Atom;
 import org.episteme.natural.chemistry.PeriodicTable;
-import org.episteme.server.server.chemistry.MolecularDynamicsTask;
+import org.episteme.server.server.tasks.chemistry.MolecularDynamicsTask;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.sets.Reals;

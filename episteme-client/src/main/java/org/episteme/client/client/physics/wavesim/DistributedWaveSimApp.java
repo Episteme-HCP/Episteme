@@ -23,7 +23,7 @@
 
 package org.episteme.client.client.physics.wavesim;
 
-import org.episteme.server.server.physics.wave.WaveSimTask;
+import org.episteme.server.server.tasks.physics.wave.WaveSimTask;
 
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;

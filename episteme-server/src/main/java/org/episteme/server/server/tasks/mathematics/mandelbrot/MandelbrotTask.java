@@ -36,7 +36,7 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
 
 
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     public MandelbrotTask(int width, int height, double xMin, double xMax, double yMin, double yMax) {
         this.width = width;

@@ -50,7 +50,9 @@ public class LatticeBoltzmann implements Serializable {
     private final int nx, ny;
     private final double tau; // Relaxation time
     private final double[][][] f; // Distribution functions [x][y][9]
+    private float[][][] fFloat;
     private final boolean[][] obstacle;
+    private org.episteme.core.distributed.TaskRegistry.PrecisionMode mode = org.episteme.core.distributed.TaskRegistry.PrecisionMode.REAL;
 
     // D2Q9 Directions
     // private static final int[] CX = { 0, 1, 0, -1, 0, 1, -1, -1, 1 };
@@ -77,6 +79,19 @@ public class LatticeBoltzmann implements Serializable {
         initialize();
     }
 
+    public void setMode(org.episteme.core.distributed.TaskRegistry.PrecisionMode mode) {
+        if (this.mode != mode) {
+            if (mode == org.episteme.core.distributed.TaskRegistry.PrecisionMode.FLOAT && fFloat == null) {
+                fFloat = new float[nx][ny][9];
+                for (int x = 0; x < nx; x++)
+                    for (int y = 0; y < ny; y++)
+                        for (int i = 0; i < 9; i++)
+                            fFloat[x][y][i] = fReal[x][y][i].floatValue();
+            }
+            this.mode = mode;
+        }
+    }
+
     public void setProvider(org.episteme.natural.physics.classical.matter.fluids.LatticeBoltzmannProvider provider) {
         this.provider = provider;
     }
@@ -98,12 +113,11 @@ public class LatticeBoltzmann implements Serializable {
     }
 
     public void step() {
-        // Delegate to Provider (Multicore usually)
-        provider.evolve(fReal, obstacle, omega);
-
-        // Sync back to double[][] f for legacy getters/renderers if needed
-        // Ideally we refactor App to use Real, but for minimal breakage we sync.
-        // Or we assume the App uses getDensity() which we can refactor.
+        switch (mode) {
+            case REAL -> provider.evolve(fReal, obstacle, omega);
+            case FLOAT -> provider.evolve(fFloat, obstacle, omega.floatValue());
+            default -> provider.evolve(f, obstacle, omega.doubleValue());
+        }
     }
 
     public double[][][] getDistributions() {

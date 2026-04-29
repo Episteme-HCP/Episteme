@@ -70,7 +70,7 @@ public class ProteinFoldingTask implements Serializable {
     private final List<ResidueType> sequence;
     private final int iterations;
     private final double temperature;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     private List<Monomer> currentFold;
     private double energy;
@@ -98,11 +98,17 @@ public class ProteinFoldingTask implements Serializable {
             attemptMove(rand);
         }
 
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            this.energyReal = calculateEnergyReal(currentFold);
-            this.energy = energyReal.doubleValue();
-        } else {
-            this.energy = calculateEnergy(currentFold);
+        switch (mode) {
+            case REAL -> {
+                this.energyReal = calculateEnergyReal(currentFold);
+                this.energy = energyReal.doubleValue();
+            }
+            case FLOAT -> {
+                this.energy = (double) calculateEnergyFloat(currentFold);
+            }
+            default -> {
+                this.energy = calculateEnergy(currentFold);
+            }
         }
     }
 
@@ -171,6 +177,23 @@ public class ProteinFoldingTask implements Serializable {
                     int dist = Math.abs(m1.x - m2.x) + Math.abs(m1.y - m2.y) + Math.abs(m1.z - m2.z);
                     if (dist == 1)
                         e = e.subtract(Real.of(1.0));
+                }
+            }
+        }
+        return e;
+    }
+
+    private float calculateEnergyFloat(List<Monomer> fold) {
+        float e = 0f;
+        // HP Model: -1 for each topological H-H contact (non-sequential neighbors)
+        for (int i = 0; i < fold.size(); i++) {
+            for (int j = i + 2; j < fold.size(); j++) {
+                Monomer m1 = fold.get(i);
+                Monomer m2 = fold.get(j);
+                if (m1.type == ResidueType.HYDROPHOBIC && m2.type == ResidueType.HYDROPHOBIC) {
+                    int dist = Math.abs(m1.x - m2.x) + Math.abs(m1.y - m2.y) + Math.abs(m1.z - m2.z);
+                    if (dist == 1)
+                        e -= 1.0f;
                 }
             }
         }

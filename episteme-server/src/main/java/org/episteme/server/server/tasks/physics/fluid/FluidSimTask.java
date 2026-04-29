@@ -41,6 +41,7 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
     private boolean[][] obstacle;
     private Real viscosity = Real.of(0.02);
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.REAL;
+    private float[][][] fFloat;
     private transient LatticeBoltzmannProvider provider; // Transient, re-initialized on execution
 
     private static final double[] W = { 4.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 9, 1.0 / 36, 1.0 / 36, 1.0 / 36,
@@ -112,10 +113,40 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
     }
 
     public void step() {
-        if (this.mode == TaskRegistry.PrecisionMode.REAL) {
-            stepReal();
-        } else {
-            stepPrimitive();
+        if (this.provider == null) {
+            this.provider = new org.episteme.natural.physics.classical.matter.fluids.providers.MulticoreLatticeBoltzmannProvider();
+        }
+        switch (mode) {
+            case REAL -> stepReal();
+            case FLOAT -> stepFloat();
+            default -> stepPrimitive();
+        }
+    }
+
+    private void stepFloat() {
+        if (fFloat == null) {
+            initializeFloat();
+        }
+        float omega = 1.0f / (3.0f * viscosity.floatValue() + 0.5f);
+        this.provider.evolve(fFloat, obstacle, omega);
+
+        // Update Macroscopic
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (obstacle[x][y])
+                    continue;
+                float r = 0, vx = 0, vy = 0;
+                for (int i = 0; i < 9; i++) {
+                    r += fFloat[x][y][i];
+                    vx += CX[i] * fFloat[x][y][i];
+                    vy += CY[i] * fFloat[x][y][i];
+                }
+                rho[x][y] = Real.of(r);
+                if (r > 0) {
+                    ux[x][y] = Real.of(vx / r);
+                    uy[x][y] = Real.of(vy / r);
+                }
+            }
         }
     }
 
@@ -123,10 +154,8 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
         if (fPrimitive == null) {
             initializePrimitive();
         }
-
-        FluidSimPrimitiveSupport support = new FluidSimPrimitiveSupport();
         double omega = 1.0 / (3.0 * viscosity.doubleValue() + 0.5);
-        support.evolve(fPrimitive, obstacle, omega, width, height);
+        this.provider.evolve(fPrimitive, obstacle, omega);
 
         // Update Macroscopic
         for (int x = 0; x < width; x++) {
@@ -149,9 +178,6 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
     }
 
     private void stepReal() {
-        if (this.provider == null) {
-            this.provider = new org.episteme.natural.physics.classical.matter.fluids.providers.MulticoreLatticeBoltzmannProvider();
-        }
         Real omega = Real.ONE.divide(viscosity.multiply(Real.of(3.0)).add(Real.of(0.5)));
 
         if (fPrimitive != null && f[0][0][0] == null) {
@@ -186,17 +212,20 @@ public class FluidSimTask implements DistributedTask<FluidSimTask, FluidSimTask>
         if (fPrimitive == null) {
             fPrimitive = new double[width][height][9];
         }
-        if (f != null && f[0][0][0] != null) {
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++)
-                    for (int i = 0; i < 9; i++)
-                        fPrimitive[x][y][i] = f[x][y][i].doubleValue();
-        } else {
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++)
-                    for (int i = 0; i < 9; i++)
-                        fPrimitive[x][y][i] = W[i];
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                for (int i = 0; i < 9; i++)
+                    fPrimitive[x][y][i] = (f != null && f[x][y][i] != null) ? f[x][y][i].doubleValue() : W[i];
+    }
+
+    private void initializeFloat() {
+        if (fFloat == null) {
+            fFloat = new float[width][height][9];
         }
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                for (int i = 0; i < 9; i++)
+                    fFloat[x][y][i] = (f != null && f[x][y][i] != null) ? f[x][y][i].floatValue() : (float) W[i];
     }
 
     private void syncToReal() {

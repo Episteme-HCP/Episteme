@@ -56,7 +56,7 @@ public class ClimateModelTask implements Serializable {
     private final int longitudeBins;
     private double[][] temperature; // [lat][long] in Kelvin
     private Real[][] temperatureReal;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     // Physical Constants
     private static final double SOLAR_CONSTANT = 1361.0; // W/m^2

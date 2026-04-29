@@ -55,7 +55,13 @@ public class GeneralCirculationModelTask
 
 
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
+    private float[][][] temperatureFloat;
+    private float[][] humidityFloat;
+    private float[][][] uFloat;
+    private float[][][] vFloat;
+    private float[][][] wFloat;
+
     private org.episteme.core.mathematics.numbers.real.Real[][][] temperatureReal;
     private org.episteme.core.mathematics.numbers.real.Real[][] humidityReal;
 
@@ -124,6 +130,49 @@ public class GeneralCirculationModelTask
         this.mode = mode;
         if (mode == TaskRegistry.PrecisionMode.REAL && temperatureReal == null) {
             syncToReal();
+        } else if (mode == TaskRegistry.PrecisionMode.FLOAT && temperatureFloat == null) {
+            syncToFloat();
+        }
+    }
+
+    private void syncToFloat() {
+        temperatureFloat = new float[3][latBins][longBins];
+        humidityFloat = new float[latBins][longBins];
+        uFloat = new float[3][latBins][longBins];
+        vFloat = new float[3][latBins][longBins];
+        wFloat = new float[3][latBins][longBins];
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    temperatureFloat[k][i][j] = (float) temperature[k][i][j];
+                    uFloat[k][i][j] = (float) u[k][i][j];
+                    vFloat[k][i][j] = (float) v[k][i][j];
+                    wFloat[k][i][j] = (float) w[k][i][j];
+                }
+            }
+        }
+        for (int i = 0; i < latBins; i++) {
+            for (int j = 0; j < longBins; j++) {
+                humidityFloat[i][j] = (float) specificHumidity[i][j];
+            }
+        }
+    }
+
+    private void syncFromFloat() {
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    temperature[k][i][j] = (double) temperatureFloat[k][i][j];
+                    u[k][i][j] = (double) uFloat[k][i][j];
+                    v[k][i][j] = (double) vFloat[k][i][j];
+                    w[k][i][j] = (double) wFloat[k][i][j];
+                }
+            }
+        }
+        for (int i = 0; i < latBins; i++) {
+            for (int j = 0; j < longBins; j++) {
+                specificHumidity[i][j] = (double) humidityFloat[i][j];
+            }
         }
     }
 
@@ -160,55 +209,125 @@ public class GeneralCirculationModelTask
     }
 
     public void step(double dt) {
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            // Episteme Mode: Use Real-based Providers (LBM/NS)
-            org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider nsProvider = new org.episteme.natural.physics.classical.matter.fluids.providers.MulticoreNavierStokesProvider();
+        org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider nsProvider = new org.episteme.natural.physics.classical.matter.fluids.providers.MulticoreNavierStokesProvider();
 
-            // Flatten state for NavierStokesProvider (Real[])
-            int size = 3 * latBins * longBins;
-            org.episteme.core.mathematics.numbers.real.Real[] flatDensity = new org.episteme.core.mathematics.numbers.real.Real[size];
-            org.episteme.core.mathematics.numbers.real.Real[] flatU = new org.episteme.core.mathematics.numbers.real.Real[size];
-            org.episteme.core.mathematics.numbers.real.Real[] flatV = new org.episteme.core.mathematics.numbers.real.Real[size];
-            org.episteme.core.mathematics.numbers.real.Real[] flatW = new org.episteme.core.mathematics.numbers.real.Real[size];
+        switch (mode) {
+            case REAL -> runRealStep(nsProvider, dt);
+            case FLOAT -> runFloatStep(nsProvider, dt);
+            default -> runPrimitiveStep(nsProvider, dt);
+        }
+    }
 
-            int idx = 0;
-            for (int k = 0; k < 3; k++) {
-                for (int i = 0; i < latBins; i++) {
-                    for (int j = 0; j < longBins; j++) {
-                        flatDensity[idx] = temperatureReal[k][i][j];
-                        flatU[idx] = org.episteme.core.mathematics.numbers.real.Real.of(u[k][i][j]);
-                        flatV[idx] = org.episteme.core.mathematics.numbers.real.Real.of(v[k][i][j]);
-                        flatW[idx] = org.episteme.core.mathematics.numbers.real.Real.of(w[k][i][j]);
-                        idx++;
-                    }
+    private void runFloatStep(org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider provider, double dt) {
+        int size = 3 * latBins * longBins;
+        float[] flatDensity = new float[size];
+        float[] flatU = new float[size];
+        float[] flatV = new float[size];
+        float[] flatW = new float[size];
+
+        int idx = 0;
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    flatDensity[idx] = temperatureFloat[k][i][j];
+                    flatU[idx] = uFloat[k][i][j];
+                    flatV[idx] = vFloat[k][i][j];
+                    flatW[idx] = wFloat[k][i][j];
+                    idx++;
                 }
             }
+        }
 
-            nsProvider.solve(flatDensity, flatU, flatV, flatW,
-                    org.episteme.core.mathematics.numbers.real.Real.of(dt),
-                    org.episteme.core.mathematics.numbers.real.Real.of(0.0001),
-                    longBins, latBins, 3);
+        provider.solve(flatDensity, flatU, flatV, flatW, (float) dt, 0.0001f, longBins, latBins, 3);
 
-            // Unpack
-            idx = 0;
-            for (int k = 0; k < 3; k++) {
-                for (int i = 0; i < latBins; i++) {
-                    for (int j = 0; j < longBins; j++) {
-                        temperatureReal[k][i][j] = flatDensity[idx];
-                        u[k][i][j] = flatU[idx].doubleValue();
-                        v[k][i][j] = flatV[idx].doubleValue();
-                        w[k][i][j] = flatW[idx].doubleValue();
-                        idx++;
-                    }
+        idx = 0;
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    temperatureFloat[k][i][j] = flatDensity[idx];
+                    uFloat[k][i][j] = flatU[idx];
+                    vFloat[k][i][j] = flatV[idx];
+                    wFloat[k][i][j] = flatW[idx];
+                    idx++;
                 }
             }
-            // Add other radiative logic for Real mode if necessary, but focusing on
-            // provider integration
-            syncFromReal();
-        } else {
-            // Primitive Mode: Use side-by-side Support
-            GCMPrimitiveSupport support = new GCMPrimitiveSupport();
-            support.step(temperature, specificHumidity, u, v, w, dt, latBins, longBins);
+        }
+        syncFromFloat();
+    }
+
+    private void runRealStep(org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider provider, double dt) {
+        int size = 3 * latBins * longBins;
+        org.episteme.core.mathematics.numbers.real.Real[] flatDensity = new org.episteme.core.mathematics.numbers.real.Real[size];
+        org.episteme.core.mathematics.numbers.real.Real[] flatU = new org.episteme.core.mathematics.numbers.real.Real[size];
+        org.episteme.core.mathematics.numbers.real.Real[] flatV = new org.episteme.core.mathematics.numbers.real.Real[size];
+        org.episteme.core.mathematics.numbers.real.Real[] flatW = new org.episteme.core.mathematics.numbers.real.Real[size];
+
+        int idx = 0;
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    flatDensity[idx] = temperatureReal[k][i][j];
+                    flatU[idx] = org.episteme.core.mathematics.numbers.real.Real.of(u[k][i][j]);
+                    flatV[idx] = org.episteme.core.mathematics.numbers.real.Real.of(v[k][i][j]);
+                    flatW[idx] = org.episteme.core.mathematics.numbers.real.Real.of(w[k][i][j]);
+                    idx++;
+                }
+            }
+        }
+
+        provider.solve(flatDensity, flatU, flatV, flatW,
+                org.episteme.core.mathematics.numbers.real.Real.of(dt),
+                org.episteme.core.mathematics.numbers.real.Real.of(0.0001),
+                longBins, latBins, 3);
+
+        idx = 0;
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    temperatureReal[k][i][j] = flatDensity[idx];
+                    u[k][i][j] = flatU[idx].doubleValue();
+                    v[k][i][j] = flatV[idx].doubleValue();
+                    w[k][i][j] = flatW[idx].doubleValue();
+                    idx++;
+                }
+            }
+        }
+        syncFromReal();
+    }
+
+    private void runPrimitiveStep(org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider provider, double dt) {
+        int size = 3 * latBins * longBins;
+        double[] flatDensity = new double[size];
+        double[] flatU = new double[size];
+        double[] flatV = new double[size];
+        double[] flatW = new double[size];
+
+        int idx = 0;
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    flatDensity[idx] = temperature[k][i][j];
+                    flatU[idx] = u[k][i][j];
+                    flatV[idx] = v[k][i][j];
+                    flatW[idx] = w[k][i][j];
+                    idx++;
+                }
+            }
+        }
+
+        provider.solve(flatDensity, flatU, flatV, flatW, dt, 0.0001, longBins, latBins, 3);
+
+        idx = 0;
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < latBins; i++) {
+                for (int j = 0; j < longBins; j++) {
+                    temperature[k][i][j] = flatDensity[idx];
+                    u[k][i][j] = flatU[idx];
+                    v[k][i][j] = flatV[idx];
+                    w[k][i][j] = flatW[idx];
+                    idx++;
+                }
+            }
         }
     }
 

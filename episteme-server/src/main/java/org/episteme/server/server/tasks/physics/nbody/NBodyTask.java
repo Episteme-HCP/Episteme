@@ -54,8 +54,8 @@ public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
     private List<Body> bodies;
     private double dt = 0.01;
     private double softening = 0.1;
-    private static final double G = 1.0;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private double G = 1.0;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     public NBodyTask(List<Body> bodies) {
         this.bodies = new ArrayList<>(bodies);
@@ -98,10 +98,42 @@ public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
     }
 
     public void step() {
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            stepReal();
-        } else {
-            stepPrimitive();
+        switch (mode) {
+            case REAL -> stepReal();
+            case FLOAT -> stepFloat();
+            default -> stepPrimitive();
+        }
+    }
+
+    private void stepFloat() {
+        int n = bodies.size();
+        float[] positions = new float[n * 3];
+        float[] masses = new float[n];
+        float[] forces = new float[n * 3];
+
+        for (int i = 0; i < n; i++) {
+            Body b = bodies.get(i);
+            positions[i * 3] = (float) b.x;
+            positions[i * 3 + 1] = (float) b.y;
+            positions[i * 3 + 2] = (float) b.z;
+            masses[i] = (float) b.mass;
+        }
+
+        NBodyProvider provider = new MulticoreNBodyProvider();
+        provider.computeForces(positions, masses, forces, (float) G, (float) softening);
+
+        for (int i = 0; i < n; i++) {
+            Body b = bodies.get(i);
+            float ax = forces[i * 3] / (float) b.mass;
+            float ay = forces[i * 3 + 1] / (float) b.mass;
+            float az = forces[i * 3 + 2] / (float) b.mass;
+
+            b.vx += ax * dt;
+            b.vy += ay * dt;
+            b.vz += az * dt;
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+            b.z += b.vz * dt;
         }
     }
 
@@ -179,5 +211,9 @@ public class NBodyTask implements DistributedTask<NBodyTask, NBodyTask> {
 
     public void setSoftening(double s) {
         this.softening = s;
+    }
+
+    public void setG(double G) {
+        this.G = G;
     }
 }

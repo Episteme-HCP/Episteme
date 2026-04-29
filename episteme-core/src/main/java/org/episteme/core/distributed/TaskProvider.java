@@ -29,10 +29,10 @@ import java.io.Serializable;
  * Provider interface for creating distributed task instances.
  * 
  * <p>
- * TaskProvider enables the Primitive/Real abstraction. Each task type can have
+ * TaskProvider enables the DOUBLE/Real abstraction. Each task type can have
  * two implementations:
  * <ul>
- * <li><b>Primitive</b>: Uses raw double/float primitives. Fastest execution,
+ * <li><b>DOUBLE</b>: Uses raw double/float DOUBLEs. Fastest execution,
  * but limited precision and no automatic GPU acceleration.</li>
  * <li><b>Real</b>: Uses the {@link org.episteme.core.mathematics.numbers.real.Real}
  * API.
@@ -53,8 +53,8 @@ import java.io.Serializable;
  * 
  *     &#64;Override
  *     public DistributedTask&lt;int[], double[]&gt; createTask(TaskRegistry.PrecisionMode mode) {
- *         return mode == TaskRegistry.PrecisionMode.PRIMITIVE
- *                 ? new PrimitiveMandelbrotTask()
+ *         return mode == TaskRegistry.PrecisionMode.DOUBLE
+ *                 ? new DOUBLEMandelbrotTask()
  *                 : new RealMandelbrotTask();
  *     }
  * }
@@ -80,7 +80,7 @@ public interface TaskProvider<I extends Serializable, O extends Serializable> {
     /**
      * Creates a task instance with the specified precision mode.
      *
-     * @param mode the precision mode (PRIMITIVE or REAL)
+     * @param mode the precision mode (DOUBLE or REAL)
      * @return a new task instance
      */
     DistributedTask<I, O> createTask(TaskRegistry.PrecisionMode mode);

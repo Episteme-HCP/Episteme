@@ -44,7 +44,7 @@ import javafx.stage.Stage;
 import org.episteme.natural.biology.Protein;
 
 import org.episteme.natural.biology.loaders.PDBWriter;
-import org.episteme.server.server.biology.structure.DnaFoldingTask;
+import org.episteme.server.server.tasks.biology.structure.DnaFoldingTask;
 import org.episteme.natural.chemistry.Atom;
 import org.episteme.natural.chemistry.PeriodicTable;
 import org.episteme.core.mathematics.sets.Reals;

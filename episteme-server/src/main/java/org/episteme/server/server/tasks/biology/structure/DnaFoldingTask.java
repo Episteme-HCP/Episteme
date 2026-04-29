@@ -55,10 +55,11 @@ public class DnaFoldingTask implements Serializable {
     private final String sequence; // ACGT...
     private final int iterations;
     private final double temperature;
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     // Result
     private List<Point3D> foldedStructure;
+    private List<Point3DFloat> foldedStructureFloat;
     private List<Point3DReal> foldedStructureReal;
     private double finalEnergy;
 
@@ -73,11 +74,48 @@ public class DnaFoldingTask implements Serializable {
     }
 
     public void run() {
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            runReal();
-        } else {
-            runPrimitive();
+        switch (mode) {
+            case REAL -> runReal();
+            case FLOAT -> runFloat();
+            default -> runPrimitive();
         }
+    }
+
+    private void runFloat() {
+        List<Point3DFloat> structure = new ArrayList<>();
+        Random rand = new Random();
+
+        if (foldedStructureFloat == null) {
+            for (int i = 0; i < sequence.length(); i++) {
+                structure.add(new Point3DFloat(i * 3.4f, 0f, 0f));
+            }
+        } else {
+            structure.addAll(foldedStructureFloat);
+        }
+
+        float currentEnergy = calculateEnergyFloat(structure);
+
+        for (int i = 0; i < iterations; i++) {
+            int idx = rand.nextInt(sequence.length());
+            Point3DFloat originalPos = structure.get(idx);
+
+            float dx = (float) (rand.nextDouble() - 0.5) * 2.0f;
+            float dy = (float) (rand.nextDouble() - 0.5) * 2.0f;
+            float dz = (float) (rand.nextDouble() - 0.5) * 2.0f;
+            Point3DFloat newPos = new Point3DFloat(originalPos.x + dx, originalPos.y + dy, originalPos.z + dz);
+
+            structure.set(idx, newPos);
+            float newEnergy = calculateEnergyFloat(structure);
+
+            if (newEnergy < currentEnergy || Math.exp(-(newEnergy - currentEnergy) / temperature) > rand.nextDouble()) {
+                currentEnergy = newEnergy;
+            } else {
+                structure.set(idx, originalPos);
+            }
+        }
+
+        this.foldedStructureFloat = structure;
+        this.finalEnergy = (double) currentEnergy;
     }
 
     private void runReal() {
@@ -156,6 +194,28 @@ public class DnaFoldingTask implements Serializable {
         this.finalEnergy = currentEnergy;
     }
 
+    private float calculateEnergyFloat(List<Point3DFloat> points) {
+        float energy = 0f;
+        float idealDist = 3.4f;
+        float k = 10.0f;
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            float dist = points.get(i).distance(points.get(i + 1));
+            energy += k * (float) Math.pow(dist - idealDist, 2);
+        }
+
+        for (int i = 0; i < points.size(); i++) {
+            for (int j = i + 2; j < points.size(); j++) {
+                float dist = points.get(i).distance(points.get(j));
+                if (dist < 1.0f)
+                    energy += 1000f;
+                else if (dist < 6.0f && isPair(sequence.charAt(i), sequence.charAt(j)))
+                    energy -= 10.0f / dist;
+            }
+        }
+        return energy;
+    }
+
     private Real calculateEnergyReal(List<Point3DReal> points) {
         Real energy = Real.of(0);
         Real idealDist = Real.of(3.4);
@@ -228,6 +288,15 @@ public class DnaFoldingTask implements Serializable {
             double dy = y - other.y;
             double dz = z - other.z;
             return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        }
+    }
+
+    public record Point3DFloat(float x, float y, float z) implements Serializable {
+        public float distance(Point3DFloat other) {
+            float dx = x - other.x;
+            float dy = y - other.y;
+            float dz = z - other.z;
+            return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
         }
     }
 

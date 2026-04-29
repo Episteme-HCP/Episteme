@@ -45,8 +45,8 @@ import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import org.episteme.core.ui.ThemeManager;
-import org.episteme.server.server.biology.structure.ProteinFoldingTask;
-import org.episteme.server.server.biology.structure.ProteinFoldingTask.Monomer;
+import org.episteme.server.server.tasks.biology.structure.ProteinFoldingTask;
+import org.episteme.server.server.tasks.biology.structure.ProteinFoldingTask.Monomer;
 import org.episteme.server.server.proto.*;
 
 import java.io.*;

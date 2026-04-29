@@ -249,7 +249,7 @@ public class DistributedMonteCarloPiApp extends Application implements org.epist
 
     private byte[] serializeSamplingTask(long numSamples) throws IOException {
         // Use proper object serialization of the Task
-        org.episteme.server.server.mathematics.montecarlo.MonteCarloPiTask task = new org.episteme.server.server.mathematics.montecarlo.MonteCarloPiTask(
+        org.episteme.server.server.tasks.mathematics.montecarlo.MonteCarloPiTask task = new org.episteme.server.server.tasks.mathematics.montecarlo.MonteCarloPiTask(
                 numSamples);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);

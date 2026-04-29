@@ -23,8 +23,8 @@
 
 package org.episteme.client.client.mathematics.mandelbrot;
 
-import org.episteme.server.server.mathematics.mandelbrot.MandelbrotTask;
-import org.episteme.server.server.mathematics.mandelbrot.RealMandelbrotTask;
+import org.episteme.server.server.tasks.mathematics.mandelbrot.MandelbrotTask;
+import org.episteme.server.server.tasks.mathematics.mandelbrot.RealMandelbrotTask;
 import org.episteme.core.mathematics.numbers.real.Real;
 
 import com.google.protobuf.ByteString;

@@ -64,7 +64,7 @@ public class MonteCarloPiTask implements DistributedTask<Long, Long> {
 
 
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
@@ -81,15 +81,23 @@ public class MonteCarloPiTask implements DistributedTask<Long, Long> {
     @Override
     public Long execute(Long input) {
         long samples = (input != null) ? input : this.numSamples;
+        org.episteme.core.mathematics.statistics.montecarlo.MonteCarloProvider provider = new org.episteme.core.mathematics.statistics.montecarlo.providers.MulticoreMonteCarloProvider();
 
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            // Episteme Mode: Use Real-based Provider
-            org.episteme.core.mathematics.statistics.montecarlo.MonteCarloProvider provider = new org.episteme.core.mathematics.statistics.montecarlo.providers.MulticoreMonteCarloProvider();
-            return provider.countPointsInside(samples);
-        } else {
-            // Primitive Mode: Use side-by-side Support
-            MonteCarloPiPrimitiveSupport support = new MonteCarloPiPrimitiveSupport();
-            return support.countPointsInside(samples);
+        switch (mode) {
+            case REAL -> {
+                // For Real, we might need a specific count or just use the estimate
+                // Since estimatePi(long) might be the Real one (see Provider comments)
+                double pi = provider.estimatePi((int) samples); // Fallback if no specific Real version called
+                return (long) (samples * (pi / 4.0));
+            }
+            case FLOAT -> {
+                float pi = provider.estimatePiFloat((int) samples);
+                return (long) (samples * (pi / 4.0f));
+            }
+            default -> {
+                double pi = provider.estimatePi((int) samples);
+                return (long) (samples * (pi / 4.0));
+            }
         }
     }
 

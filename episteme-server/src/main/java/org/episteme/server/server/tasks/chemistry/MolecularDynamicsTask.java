@@ -51,8 +51,12 @@ public class MolecularDynamicsTask
 
 
 
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.PRIMITIVE;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
     private List<Atom> epistemeAtoms;
+    private float[] positionsFloat;
+    private float[] velocitiesFloat;
+    private float[] forcesFloat;
+    private float[] massesFloat;
 
     public MolecularDynamicsTask(int numAtoms, double timeStep, int steps, double boxSize) {
         this.numAtoms = numAtoms;
@@ -92,6 +96,38 @@ public class MolecularDynamicsTask
         this.mode = mode;
         if (mode == TaskRegistry.PrecisionMode.REAL && epistemeAtoms == null) {
             syncToEpisteme();
+        } else if (mode == TaskRegistry.PrecisionMode.FLOAT && positionsFloat == null) {
+            syncToFloat();
+        }
+    }
+
+    private void syncToFloat() {
+        int n = numAtoms;
+        positionsFloat = new float[n * 3];
+        velocitiesFloat = new float[n * 3];
+        forcesFloat = new float[n * 3];
+        massesFloat = new float[n];
+        for (int i = 0; i < n; i++) {
+            AtomState a = atoms.get(i);
+            positionsFloat[i * 3] = (float) a.x;
+            positionsFloat[i * 3 + 1] = (float) a.y;
+            positionsFloat[i * 3 + 2] = (float) a.z;
+            velocitiesFloat[i * 3] = (float) a.vx;
+            velocitiesFloat[i * 3 + 1] = (float) a.vy;
+            velocitiesFloat[i * 3 + 2] = (float) a.vz;
+            massesFloat[i] = (float) a.mass;
+        }
+    }
+
+    private void syncFromFloat() {
+        for (int i = 0; i < numAtoms; i++) {
+            AtomState a = atoms.get(i);
+            a.x = positionsFloat[i * 3];
+            a.y = positionsFloat[i * 3 + 1];
+            a.z = positionsFloat[i * 3 + 2];
+            a.vx = velocitiesFloat[i * 3];
+            a.vy = velocitiesFloat[i * 3 + 1];
+            a.vz = velocitiesFloat[i * 3 + 2];
         }
     }
 
@@ -159,19 +195,39 @@ public class MolecularDynamicsTask
     }
 
     public void run() {
+        org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider = new org.episteme.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider();
         for (int s = 0; s < steps; s++) {
-            if (mode == TaskRegistry.PrecisionMode.REAL) {
-                epistemeStep();
-            } else {
-                primitiveStep();
+            switch (mode) {
+                case REAL -> epistemeStep(provider);
+                case FLOAT -> floatStep(provider);
+                default -> primitiveStep(provider);
             }
         }
         calculateTotalEnergy();
     }
 
-    private void epistemeStep() {
-        org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider = new org.episteme.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider();
+    private void floatStep(org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider) {
+        provider.calculateNonBondedForces(positionsFloat, forcesFloat, 1.0f, 1.0f, 2.5f);
+        provider.integrate(positionsFloat, velocitiesFloat, forcesFloat, massesFloat, (float) timeStep, 1.0f);
 
+        for (int i = 0; i < numAtoms; i++) {
+            if (positionsFloat[i * 3] < 0 || positionsFloat[i * 3] > boxSize) {
+                velocitiesFloat[i * 3] *= -1;
+                positionsFloat[i * 3] = Math.max(0f, Math.min((float) boxSize, positionsFloat[i * 3]));
+            }
+            if (positionsFloat[i * 3 + 1] < 0 || positionsFloat[i * 3 + 1] > boxSize) {
+                velocitiesFloat[i * 3 + 1] *= -1;
+                positionsFloat[i * 3 + 1] = Math.max(0f, Math.min((float) boxSize, positionsFloat[i * 3 + 1]));
+            }
+            if (positionsFloat[i * 3 + 2] < 0 || positionsFloat[i * 3 + 2] > boxSize) {
+                velocitiesFloat[i * 3 + 2] *= -1;
+                positionsFloat[i * 3 + 2] = Math.max(0f, Math.min((float) boxSize, positionsFloat[i * 3 + 2]));
+            }
+        }
+        syncFromFloat();
+    }
+
+    private void epistemeStep(org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider) {
         int n = numAtoms;
         org.episteme.core.mathematics.numbers.real.Real[] positions = new org.episteme.core.mathematics.numbers.real.Real[n * 3];
         org.episteme.core.mathematics.numbers.real.Real[] velocities = new org.episteme.core.mathematics.numbers.real.Real[n * 3];
@@ -233,8 +289,7 @@ public class MolecularDynamicsTask
         syncFromEpisteme();
     }
 
-    private void primitiveStep() {
-        MolecularDynamicsPrimitiveSupport support = new MolecularDynamicsPrimitiveSupport();
+    private void primitiveStep(org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider provider) {
         int n = numAtoms;
         double[] positions = new double[n * 3];
         double[] velocities = new double[n * 3];
@@ -252,8 +307,8 @@ public class MolecularDynamicsTask
             masses[i] = a.mass;
         }
 
-        support.calculateNonBondedForces(positions, forces, 1.0, 1.0, 2.5, n);
-        support.integrate(positions, velocities, forces, masses, timeStep, 1.0, n);
+        provider.calculateNonBondedForces(positions, forces, 1.0, 1.0, 2.5);
+        provider.integrate(positions, velocities, forces, masses, timeStep, 1.0);
 
         for (int i = 0; i < n; i++) {
             AtomState a = atoms.get(i);

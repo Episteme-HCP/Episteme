@@ -1,8 +1,10 @@
-package org.episteme.audit.mathematics.linearalgebra;
+package org.episteme.benchmarks.audit.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 
 

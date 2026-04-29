@@ -51,28 +51,35 @@ import org.episteme.core.mathematics.discrete.TextAlgorithms;
 public class CrisprTask implements Serializable {
 
     private final String sequence;
-    private final String targetMotif = "GG"; // PAM for Cas9 is NGG
+    private final String pamMotif;
+    private final int spacerLength;
 
     public record Target(int position, String spacer, String pam, double score) implements Serializable {
     }
 
     public CrisprTask(String sequence) {
+        this(sequence, "GG", 20);
+    }
+
+    public CrisprTask(String sequence, String pamMotif, int spacerLength) {
         this.sequence = sequence.toUpperCase().replaceAll("[^ATCG]", "");
+        this.pamMotif = pamMotif.toUpperCase();
+        this.spacerLength = spacerLength;
     }
 
     public List<Target> scan() {
         List<Target> targets = new ArrayList<>();
-        // Find all "GG" positions using bit-parallel Shift-Or
-        List<Integer> ggPositions = TextAlgorithms.shiftOrSearch(sequence, targetMotif);
+        // Find all PAM positions using bit-parallel Shift-Or
+        List<Integer> pamPositions = TextAlgorithms.shiftOrSearch(sequence, pamMotif);
 
-        for (int pos : ggPositions) {
-            // PAM is NGG, so pos is the index of the first G.
-            // We need 21 bp before the GG (20bp spacer + 1bp for N in NGG)
-            if (pos >= 21) {
-                int start = pos - 21;
-                String fullMatch = sequence.substring(start, pos + 2); // 23 bp
-                String spacer = fullMatch.substring(0, 20);
-                String pam = fullMatch.substring(20);
+        for (int pos : pamPositions) {
+            // spacerLength + 1 (for N in NGG or equivalent)
+            int totalBack = spacerLength + 1;
+            if (pos >= totalBack) {
+                int start = pos - totalBack;
+                String fullMatch = sequence.substring(start, pos + pamMotif.length());
+                String spacer = fullMatch.substring(0, spacerLength);
+                String pam = fullMatch.substring(spacerLength);
 
                 double score = evaluateEfficiency(spacer);
                 targets.add(new Target(start + 1, spacer, pam, score));
@@ -87,7 +94,7 @@ public class CrisprTask implements Serializable {
         for (char c : spacer.toCharArray())
             if (c == 'G' || c == 'C')
                 gc++;
-        double gcPercent = gc / 20.0;
+        double gcPercent = gc / (double) spacerLength;
 
         // Penalize deviations from 50% GC
         double score = 100.0 * (1.0 - Math.abs(0.5 - gcPercent) * 2.0);

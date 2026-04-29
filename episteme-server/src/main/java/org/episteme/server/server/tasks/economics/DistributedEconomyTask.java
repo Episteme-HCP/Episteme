@@ -45,6 +45,8 @@ public class DistributedEconomyTask implements Serializable {
     private Real inflation;
     private double gdpD;
     private double inflationD;
+    private float gdpF;
+    private float inflationF;
     private double dt; // years
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.REAL;
 
@@ -54,17 +56,22 @@ public class DistributedEconomyTask implements Serializable {
         this.inflation = inflation;
         this.gdpD = gdp.doubleValue();
         this.inflationD = inflation.doubleValue();
+        this.gdpF = gdp.floatValue();
+        this.inflationF = inflation.floatValue();
         this.dt = 1.0;
     }
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         if (this.mode != mode) {
-            if (mode == TaskRegistry.PrecisionMode.PRIMITIVE) {
-                gdpD = gdp.doubleValue();
-                inflationD = inflation.doubleValue();
+            if (mode == TaskRegistry.PrecisionMode.DOUBLE) {
+                gdpD = (this.mode == TaskRegistry.PrecisionMode.REAL) ? gdp.doubleValue() : (double) gdpF;
+                inflationD = (this.mode == TaskRegistry.PrecisionMode.REAL) ? inflation.doubleValue() : (double) inflationF;
+            } else if (mode == TaskRegistry.PrecisionMode.FLOAT) {
+                gdpF = (this.mode == TaskRegistry.PrecisionMode.REAL) ? gdp.floatValue() : (float) gdpD;
+                inflationF = (this.mode == TaskRegistry.PrecisionMode.REAL) ? inflation.floatValue() : (float) inflationD;
             } else {
-                gdp = Real.of(gdpD);
-                inflation = Real.of(inflationD);
+                gdp = (this.mode == TaskRegistry.PrecisionMode.DOUBLE) ? Real.of(gdpD) : Real.of(gdpF);
+                inflation = (this.mode == TaskRegistry.PrecisionMode.DOUBLE) ? Real.of(inflationD) : Real.of(inflationF);
             }
             this.mode = mode;
         }
@@ -75,27 +82,40 @@ public class DistributedEconomyTask implements Serializable {
         double growthRate = 0.02 + 0.05 * (Math.random() - 0.5);
         double inflationShock = 0.01 * (Math.random() - 0.5);
 
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            double gValue = gdp.doubleValue();
-            double iValue = inflation.doubleValue();
-
-            gValue *= (1 + growthRate * dt);
-            iValue += inflationShock;
-
-            this.gdp = Real.of(gValue);
-            this.inflation = Real.of(iValue);
-        } else {
-            gdpD *= (1 + growthRate * dt);
-            inflationD += inflationShock;
+        switch (mode) {
+            case REAL -> {
+                double gValue = gdp.doubleValue();
+                double iValue = inflation.doubleValue();
+                gValue *= (1 + growthRate * dt);
+                iValue += inflationShock;
+                this.gdp = Real.of(gValue);
+                this.inflation = Real.of(iValue);
+            }
+            case FLOAT -> {
+                gdpF *= (float) (1 + growthRate * dt);
+                inflationF += (float) inflationShock;
+            }
+            default -> {
+                gdpD *= (1 + growthRate * dt);
+                inflationD += inflationShock;
+            }
         }
     }
 
     public Real getGDP() {
-        return mode == TaskRegistry.PrecisionMode.REAL ? gdp : Real.of(gdpD);
+        return switch (mode) {
+            case REAL -> gdp;
+            case FLOAT -> Real.of(gdpF);
+            default -> Real.of(gdpD);
+        };
     }
 
     public Real getInflation() {
-        return mode == TaskRegistry.PrecisionMode.REAL ? inflation : Real.of(inflationD);
+        return switch (mode) {
+            case REAL -> inflation;
+            case FLOAT -> Real.of(inflationF);
+            default -> Real.of(inflationD);
+        };
     }
 
     public String getEconomyName() {

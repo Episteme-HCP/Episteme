@@ -39,7 +39,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.episteme.server.server.earth.climate.GeneralCirculationModelTask;
+import org.episteme.server.server.tasks.earth.climate.GeneralCirculationModelTask;
 
 import org.episteme.core.mathematics.loaders.VTKWriter;
 import org.episteme.server.server.proto.*;
