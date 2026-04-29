@@ -1,48 +1,29 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.server.server.tasks.mathematics.montecarlo;
 
 import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.distributed.TaskRegistry;
-
-// import java.io.Serializable;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.statistics.montecarlo.MonteCarloProvider;
+import org.episteme.core.mathematics.statistics.montecarlo.providers.MulticoreMonteCarloProvider;
+import com.google.auto.service.AutoService;
 
 /**
  * Monte Carlo Pi Estimation Task.
- 
- * <p>
- * <b>Reference:</b><br>
- * Metropolis, N., et al. (1953). Equation of State Calculations by Fast Computing Machines. <i>The Journal of Chemical Physics</i>, 21(6), 1087.
- * </p>
- *
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(DistributedTask.class)
 public class MonteCarloPiTask implements DistributedTask<Long, Long> {
 
-    private long numSamples;
+    private final long numSamples;
+    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     public MonteCarloPiTask(long numSamples) {
         this.numSamples = numSamples;
@@ -53,60 +34,29 @@ public class MonteCarloPiTask implements DistributedTask<Long, Long> {
     }
 
     @Override
-    public Class<Long> getInputType() {
-        return Long.class;
-    }
-
+    public Class<Long> getInputType() { return Long.class; }
     @Override
-    public Class<Long> getOutputType() {
-        return Long.class;
-    }
-
-
-
-    private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
+    public Class<Long> getOutputType() { return Long.class; }
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
     }
 
-    /**
-     * Executes the task.
-     * 
-     * @param input Optional input. If null, uses internal numSamples.
-     *              If provided, overrides internal numSamples (for pure function
-     *              usage).
-     * @return Number of points inside circle
-     */
     @Override
     public Long execute(Long input) {
         long samples = (input != null) ? input : this.numSamples;
-        org.episteme.core.mathematics.statistics.montecarlo.MonteCarloProvider provider = new org.episteme.core.mathematics.statistics.montecarlo.providers.MulticoreMonteCarloProvider();
+        MonteCarloProvider provider = new MulticoreMonteCarloProvider();
 
+        double pi;
         switch (mode) {
-            case REAL -> {
-                // For Real, we might need a specific count or just use the estimate
-                // Since estimatePi(long) might be the Real one (see Provider comments)
-                double pi = provider.estimatePi((int) samples); // Fallback if no specific Real version called
-                return (long) (samples * (pi / 4.0));
-            }
-            case FLOAT -> {
-                float pi = provider.estimatePiFloat((int) samples);
-                return (long) (samples * (pi / 4.0f));
-            }
-            default -> {
-                double pi = provider.estimatePi((int) samples);
-                return (long) (samples * (pi / 4.0));
-            }
+            case REAL -> pi = provider.estimatePi((int) samples, true).doubleValue();
+            case FLOAT -> pi = (double) provider.estimatePiFloat((int) samples);
+            default -> pi = provider.estimatePi((int) samples);
         }
+        return (long) (samples * (pi / 4.0));
     }
 
     @Override
-    public String getTaskType() {
-        return "MONTECARLO_PI";
-    }
-
-    public long getNumSamples() {
-        return numSamples;
-    }
+    public String getTaskType() { return "MONTECARLO_PI"; }
+    public long getNumSamples() { return numSamples; }
 }

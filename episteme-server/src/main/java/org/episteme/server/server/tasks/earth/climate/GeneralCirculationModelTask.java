@@ -12,6 +12,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.matter.fluids.NavierStokesProvider;
 import org.episteme.natural.physics.classical.matter.fluids.providers.MulticoreNavierStokesProvider;
 import java.io.Serializable;
+import com.google.auto.service.AutoService;
 
 /**
  * Advanced General Circulation Model (GCM) Task.
@@ -20,6 +21,7 @@ import java.io.Serializable;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(DistributedTask.class)
 public class GeneralCirculationModelTask
         implements DistributedTask<GeneralCirculationModelTask, GeneralCirculationModelTask> {
 

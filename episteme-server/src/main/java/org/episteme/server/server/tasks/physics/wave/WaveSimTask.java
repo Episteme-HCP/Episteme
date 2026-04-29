@@ -1,117 +1,86 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.server.server.tasks.physics.wave;
 
 import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.distributed.TaskRegistry;
-
-
-
+import org.episteme.core.distributed.TaskState;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.natural.physics.classical.waves.WaveProvider;
+import org.episteme.natural.physics.classical.waves.providers.MulticoreWaveProvider;
+import java.io.Serializable;
+import com.google.auto.service.AutoService;
 
 /**
  * Wave Equation Simulation Task.
+ * 
  * @author Silvere Martin-Michiellot
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(DistributedTask.class)
 public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
 
     private final int width;
     private final int height;
-    private double[][] u; // Current (Primitive mode)
-    private double[][] uPrev; // Previous (Primitive mode)
-    private float[][] uFloat; // Current (Float mode)
-    private float[][] uPrevFloat; // Previous (Float mode)
-
+    
+    // State: [u(width*height), uPrev(width*height)]
+    private TaskState<Real[]> state;
     private double c = 0.5;
     private double damping = 0.99;
-
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
-    private org.episteme.core.mathematics.numbers.real.Real[][] uReal;
-    private org.episteme.core.mathematics.numbers.real.Real[][] uRealPrev;
 
     public WaveSimTask(int width, int height) {
         this.width = width;
         this.height = height;
-        this.u = new double[width][height];
-        this.uPrev = new double[width][height];
+        if (width > 0) {
+            Real[] initial = new Real[width * height * 2];
+            for (int i = 0; i < initial.length; i++) initial[i] = Real.ZERO;
+            this.state = new TaskState<>(initial,
+                r -> flattenDouble(r), d -> unflattenReal(d),
+                r -> flattenFloat(r), f -> unflattenReal(f)
+            );
+        }
     }
 
-    // No-arg constructor for ServiceLoader
-    public WaveSimTask() {
-        this(0, 0);
+    private double[] flattenDouble(Real[] r) {
+        double[] d = new double[r.length];
+        for(int i=0; i<r.length; i++) d[i] = r[i].doubleValue();
+        return d;
     }
+
+    private float[] flattenFloat(Real[] r) {
+        float[] f = new float[r.length];
+        for(int i=0; i<r.length; i++) f[i] = r[i].floatValue();
+        return f;
+    }
+
+    private Real[] unflattenReal(double[] d) {
+        Real[] r = new Real[d.length];
+        for(int i=0; i<d.length; i++) r[i] = Real.of(d[i]);
+        return r;
+    }
+
+    private Real[] unflattenReal(float[] f) {
+        Real[] r = new Real[f.length];
+        for(int i=0; i<f.length; i++) r[i] = Real.of(f[i]);
+        return r;
+    }
+
+    public WaveSimTask() { this(0, 0); }
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
-        if (mode == TaskRegistry.PrecisionMode.REAL && uReal == null) {
-            syncToReal();
-        } else if (mode == TaskRegistry.PrecisionMode.FLOAT && uFloat == null) {
-            syncToFloat();
-        }
-    }
-
-    private void syncToFloat() {
-        uFloat = new float[width][height];
-        uPrevFloat = new float[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                uFloat[x][y] = (float) u[x][y];
-                uPrevFloat[x][y] = (float) uPrev[x][y];
-            }
-        }
-    }
-
-    private void syncToReal() {
-        uReal = new org.episteme.core.mathematics.numbers.real.Real[width][height];
-        uRealPrev = new org.episteme.core.mathematics.numbers.real.Real[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                uReal[x][y] = org.episteme.core.mathematics.numbers.real.Real.of(u[x][y]);
-                uRealPrev[x][y] = org.episteme.core.mathematics.numbers.real.Real.of(uPrev[x][y]);
-            }
-        }
-    }
-
-    private void syncFromReal() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                u[x][y] = uReal[x][y].doubleValue();
-                uPrev[x][y] = uRealPrev[x][y].doubleValue();
-            }
-        }
+        if(state != null) this.state.syncTo(mode);
     }
 
     @Override
-    public Class<WaveSimTask> getInputType() {
-        return WaveSimTask.class;
-    }
-
+    public Class<WaveSimTask> getInputType() { return WaveSimTask.class; }
     @Override
-    public Class<WaveSimTask> getOutputType() {
-        return WaveSimTask.class;
-    }
+    public Class<WaveSimTask> getOutputType() { return WaveSimTask.class; }
 
     @Override
     public WaveSimTask execute(WaveSimTask input) {
@@ -119,81 +88,83 @@ public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
             input.step();
             return input;
         }
-        if (this.width > 0) {
-            this.step();
-            return this;
-        }
         return null;
     }
 
     @Override
-    public String getTaskType() {
-        return "WAVE_SIM";
-    }
+    public String getTaskType() { return "WAVE_SIM"; }
 
     public void step() {
-        org.episteme.natural.physics.classical.waves.WaveProvider provider = new org.episteme.natural.physics.classical.waves.providers.MulticoreWaveProvider();
+        WaveProvider provider = new MulticoreWaveProvider();
+        int gridSize = width * height;
+        
         switch (mode) {
             case REAL -> {
-                provider.solve(uReal, uRealPrev, width, height,
-                        org.episteme.core.mathematics.numbers.real.Real.of(c),
-                        org.episteme.core.mathematics.numbers.real.Real.of(damping));
-                syncFromReal();
+                Real[] flat = state.getReal();
+                Real[][] u = unflatten2D(flat, 0);
+                Real[][] uPrev = unflatten2D(flat, gridSize);
+                provider.solve(u, uPrev, width, height, Real.of(c), Real.of(damping));
+                flatten2D(u, flat, 0);
+                flatten2D(uPrev, flat, gridSize);
             }
             case FLOAT -> {
-                provider.solve(uFloat, uPrevFloat, width, height, (float) c, (float) damping);
-                syncFromFloat();
+                float[] flat = state.getFloat();
+                float[][] u = unflatten2DFloat(flat, 0);
+                float[][] uPrev = unflatten2DFloat(flat, gridSize);
+                provider.solve(u, uPrev, width, height, (float)c, (float)damping);
+                flatten2DFloat(u, flat, 0);
+                flatten2DFloat(uPrev, flat, gridSize);
             }
             default -> {
-                // Primitive Mode
+                double[] flat = state.getDouble();
+                double[][] u = unflatten2DDouble(flat, 0);
+                double[][] uPrev = unflatten2DDouble(flat, gridSize);
                 provider.solve(u, uPrev, width, height, c, damping);
+                flatten2DDouble(u, flat, 0);
+                flatten2DDouble(uPrev, flat, gridSize);
             }
         }
     }
 
-    private void syncFromFloat() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                u[x][y] = uFloat[x][y];
-                uPrev[x][y] = uPrevFloat[x][y];
-            }
-        }
+    private Real[][] unflatten2D(Real[] flat, int start) {
+        Real[][] res = new Real[width][height];
+        for(int i=0; i<width; i++) System.arraycopy(flat, start + i*height, res[i], 0, height);
+        return res;
+    }
+
+    private void flatten2D(Real[][] src, Real[] flat, int start) {
+        for(int i=0; i<width; i++) System.arraycopy(src[i], 0, flat, start + i*height, height);
+    }
+
+    private double[][] unflatten2DDouble(double[] flat, int start) {
+        double[][] res = new double[width][height];
+        for(int i=0; i<width; i++) System.arraycopy(flat, start + i*height, res[i], 0, height);
+        return res;
+    }
+
+    private void flatten2DDouble(double[][] src, double[] flat, int start) {
+        for(int i=0; i<width; i++) System.arraycopy(src[i], 0, flat, start + i*height, height);
+    }
+
+    private float[][] unflatten2DFloat(float[] flat, int start) {
+        float[][] res = new float[width][height];
+        for(int i=0; i<width; i++) System.arraycopy(flat, start + i*height, res[i], 0, height);
+        return res;
+    }
+
+    private void flatten2DFloat(float[][] src, float[] flat, int start) {
+        for(int i=0; i<width; i++) System.arraycopy(src[i], 0, flat, start + i*height, height);
     }
 
     public double[][] getU() {
-        return u;
-    }
-
-    public double[][] getUPrev() {
-        return uPrev;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public double getC() {
-        return c;
-    }
-
-    public double getDamping() {
-        return damping;
-    }
-
-    public void setC(double c) {
-        this.c = c;
-    }
-
-    public void setDamping(double damping) {
-        this.damping = damping;
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        return unflatten2DDouble(state.getDouble(), 0);
     }
 
     public void updateState(double[][] u, double[][] uPrev) {
-        this.u = u;
-        this.uPrev = uPrev;
+        state.syncTo(TaskRegistry.PrecisionMode.DOUBLE);
+        double[] flat = state.getDouble();
+        flatten2DDouble(u, flat, 0);
+        flatten2DDouble(uPrev, flat, width * height);
     }
 }

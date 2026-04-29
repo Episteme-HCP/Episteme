@@ -13,6 +13,7 @@ import org.episteme.core.mathematics.random.RandomGenerator;
 import org.episteme.natural.physics.classical.matter.molecular.MolecularDynamicsProvider;
 import org.episteme.natural.physics.classical.matter.molecular.providers.MulticoreMolecularDynamicsProvider;
 import java.io.Serializable;
+import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(DistributedTask.class)
 public class MolecularDynamicsTask
         implements DistributedTask<MolecularDynamicsTask, MolecularDynamicsTask> {
 

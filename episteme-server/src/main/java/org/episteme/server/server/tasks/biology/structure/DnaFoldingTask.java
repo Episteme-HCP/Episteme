@@ -15,6 +15,8 @@ import org.episteme.core.distributed.TaskState;
 import org.episteme.core.mathematics.random.RandomGenerator;
 import org.episteme.natural.biology.structure.DnaFoldingProvider;
 import org.episteme.natural.biology.structure.providers.StandardDnaFoldingProvider;
+import com.google.auto.service.AutoService;
+import org.episteme.core.distributed.DistributedTask;
 
 /**
  * DNA Folding Simulation Task.
@@ -23,6 +25,7 @@ import org.episteme.natural.biology.structure.providers.StandardDnaFoldingProvid
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(DistributedTask.class)
 public class DnaFoldingTask
         implements org.episteme.core.distributed.DistributedTask<DnaFoldingTask, DnaFoldingTask> {
 

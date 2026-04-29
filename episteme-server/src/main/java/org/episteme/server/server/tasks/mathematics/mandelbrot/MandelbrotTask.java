@@ -1,41 +1,32 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.server.server.tasks.mathematics.mandelbrot;
 
 import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.distributed.TaskRegistry;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.analysis.fractals.MandelbrotProvider;
+import org.episteme.core.mathematics.analysis.fractals.providers.MulticoreMandelbrotProvider;
+import com.google.auto.service.AutoService;
 
+/**
+ * Mandelbrot Set Generation Task.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+@AutoService(DistributedTask.class)
 public class MandelbrotTask implements DistributedTask<MandelbrotTask, MandelbrotTask> {
 
-    protected final int width;
-    protected final int height;
-    protected double xMin, xMax, yMin, yMax;
-    protected int maxIterations = 256;
-    protected int[][] result;
-
-
-
+    private final int width;
+    private final int height;
+    private double xMin, xMax, yMin, yMax;
+    private int maxIterations = 256;
+    private int[][] result;
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
 
     public MandelbrotTask(int width, int height, double xMin, double xMax, double yMin, double yMax) {
@@ -48,7 +39,6 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
         this.result = new int[width][height];
     }
 
-    // No-arg constructor for ServiceLoader
     public MandelbrotTask() {
         this(0, 0, 0, 0, 0, 0);
     }
@@ -58,14 +48,9 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
     }
 
     @Override
-    public Class<MandelbrotTask> getInputType() {
-        return MandelbrotTask.class;
-    }
-
+    public Class<MandelbrotTask> getInputType() { return MandelbrotTask.class; }
     @Override
-    public Class<MandelbrotTask> getOutputType() {
-        return MandelbrotTask.class;
-    }
+    public Class<MandelbrotTask> getOutputType() { return MandelbrotTask.class; }
 
     @Override
     public MandelbrotTask execute(MandelbrotTask input) {
@@ -73,57 +58,33 @@ public class MandelbrotTask implements DistributedTask<MandelbrotTask, Mandelbro
             input.compute();
             return input;
         }
-        if (this.width > 0) {
-            this.compute();
-            return this;
-        }
         return null;
     }
 
     @Override
-    public String getTaskType() {
-        return "MANDELBROT";
-    }
+    public String getTaskType() { return "MANDELBROT"; }
 
     public void compute() {
-        if (mode == TaskRegistry.PrecisionMode.REAL) {
-            // Episteme Mode: Use Real-based Provider (handled by Multicore provider with
-            // conversion internal or special Real provider)
-            // Implementation note: existing provider uses doubles but we wrap for
-            // architecture consistency.
-            org.episteme.core.mathematics.analysis.fractals.MandelbrotProvider provider = new org.episteme.core.mathematics.analysis.fractals.providers.MulticoreMandelbrotProvider();
-            this.result = provider.compute(xMin, xMax, yMin, yMax, width, height, maxIterations);
-        } else {
-            // Primitive Mode: Use side-by-side Support
-            MandelbrotPrimitiveSupport support = new MandelbrotPrimitiveSupport();
-            support.generate(result, width, height, xMin, yMin, xMax - xMin, yMax - yMin, maxIterations);
+        MandelbrotProvider provider = new MulticoreMandelbrotProvider();
+        switch (mode) {
+            case REAL -> {
+                result = provider.compute(Real.of(xMin), Real.of(xMax), Real.of(yMin), Real.of(yMax), width, height, maxIterations);
+            }
+            case FLOAT -> {
+                result = provider.compute((float)xMin, (float)xMax, (float)yMin, (float)yMax, width, height, maxIterations);
+            }
+            default -> {
+                result = provider.compute(xMin, xMax, yMin, yMax, width, height, maxIterations);
+            }
         }
     }
 
     public void setRegion(double xMin, double xMax, double yMin, double yMax) {
-        this.xMin = xMin;
-        this.xMax = xMax;
-        this.yMin = yMin;
-        this.yMax = yMax;
+        this.xMin = xMin; this.xMax = xMax; this.yMin = yMin; this.yMax = yMax;
     }
 
-    public void setMaxIterations(int max) {
-        this.maxIterations = max;
-    }
-
-    public int[][] getResult() {
-        return result;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getMaxIterations() {
-        return maxIterations;
-    }
+    public void setMaxIterations(int max) { this.maxIterations = max; }
+    public int[][] getResult() { return result; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
 }

@@ -7,26 +7,25 @@ package org.episteme.server.server.tasks.politics;
 
 import org.episteme.core.distributed.TaskRegistry;
 import org.episteme.core.distributed.TaskState;
+import org.episteme.core.distributed.DistributedTask;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.random.RandomGenerator;
 import org.episteme.natural.politics.GeopoliticalParameters;
 import java.io.Serializable;
+import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Geopolitical Engine Distributed Task.
- * 
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
-public class GeopoliticalEngineTask implements Serializable {
+@AutoService(DistributedTask.class)
+public class GeopoliticalEngineTask implements DistributedTask<GeopoliticalEngineTask, GeopoliticalEngineTask> {
 
     public static class NationState implements Serializable {
         public String name;
         public List<String> allies = new ArrayList<>();
-        public TaskState<Real[]> data; // [stability, militaryPower]
+        public TaskState<Real[]> data;
 
         public NationState(String name, double stability, double military) {
             this.name = name;
@@ -40,19 +39,15 @@ public class GeopoliticalEngineTask implements Serializable {
         }
 
         public double getStability() {
-            return switch (data.getDouble() != null ? 0 : (data.getFloat() != null ? 1 : 2)) {
-                case 0 -> data.getDouble()[0];
-                case 1 -> data.getFloat()[0];
-                default -> data.getReal()[0].doubleValue();
-            };
+            if (data.getDouble() != null) return data.getDouble()[0];
+            if (data.getFloat() != null) return data.getFloat()[0];
+            return data.getReal()[0].doubleValue();
         }
 
         public double getMilitary() {
-            return switch (data.getDouble() != null ? 0 : (data.getFloat() != null ? 1 : 2)) {
-                case 0 -> data.getDouble()[1];
-                case 1 -> data.getFloat()[1];
-                default -> data.getReal()[1].doubleValue();
-            };
+            if (data.getDouble() != null) return data.getDouble()[1];
+            if (data.getFloat() != null) return data.getFloat()[1];
+            return data.getReal()[1].doubleValue();
         }
     }
 
@@ -67,10 +62,29 @@ public class GeopoliticalEngineTask implements Serializable {
         this.seed = System.nanoTime();
     }
 
+    public GeopoliticalEngineTask() { this(new ArrayList<>(), GeopoliticalParameters.standard()); }
+
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
-        for (NationState n : nations) n.data.syncTo(mode);
+        for (NationState n : nations) if(n.data != null) n.data.syncTo(mode);
     }
+
+    @Override
+    public Class<GeopoliticalEngineTask> getInputType() { return GeopoliticalEngineTask.class; }
+    @Override
+    public Class<GeopoliticalEngineTask> getOutputType() { return GeopoliticalEngineTask.class; }
+
+    @Override
+    public GeopoliticalEngineTask execute(GeopoliticalEngineTask input) {
+        if (input != null && input.nations != null) {
+            input.run();
+            return input;
+        }
+        return null;
+    }
+
+    @Override
+    public String getTaskType() { return "GEOPOLITICS"; }
 
     public void run() {
         RandomGenerator rng = new RandomGenerator(seed);
@@ -135,7 +149,5 @@ public class GeopoliticalEngineTask implements Serializable {
         }
     }
 
-    public List<NationState> getNations() {
-        return nations;
-    }
+    public List<NationState> getNations() { return nations; }
 }

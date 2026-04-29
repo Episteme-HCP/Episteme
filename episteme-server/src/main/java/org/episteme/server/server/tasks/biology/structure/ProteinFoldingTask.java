@@ -1,223 +1,122 @@
 /*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
 package org.episteme.server.server.tasks.biology.structure;
 
+import org.episteme.core.distributed.DistributedTask;
+import org.episteme.core.distributed.TaskRegistry;
+import org.episteme.core.distributed.TaskState;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.natural.biology.structure.ProteinFoldingProvider;
+import org.episteme.natural.biology.structure.providers.StandardProteinFoldingProvider;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.distributed.TaskRegistry;
-
+import com.google.auto.service.AutoService;
 
 /**
- * Protein Folding Simulation Task using the HP (Hydrophobic-Polar) Model.
- * 
- * Simulates protein folding on a 3D lattice using Metropolis Monte Carlo.
- * Hydrophobic monomers (H) attract each other, representing the hydrophobic
- * collapse.
- * 
- * <p>
- * References:
- * <ul>
- * <li>Dill, K. A. (1985). Theory for the folding and stability of globular
- * proteins. Biochemistry, 24(6), 1501-1509. (HP Model)</li>
- * <li>Lau, K. F., & Dill, K. A. (1989). A lattice statistical mechanics model
- * of the conformational and sequence spaces of proteins. Macromolecules,
- * 22(10), 3986-3997.</li>
- * </ul>
- * </p>
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Protein Folding Simulation Task.
  */
-public class ProteinFoldingTask implements Serializable {
+@AutoService(DistributedTask.class)
+public class ProteinFoldingTask implements DistributedTask<ProteinFoldingTask, ProteinFoldingTask> {
 
-    public enum ResidueType {
-        HYDROPHOBIC('H'), POLAR('P');
-
-        final char code;
-
-        ResidueType(char c) {
-            this.code = c;
-        }
-    }
-
-    public record Monomer(int x, int y, int z, ResidueType type) implements Serializable {
-    }
-
+    public enum ResidueType { HYDROPHOBIC('H'), POLAR('P'); final char code; ResidueType(char c) { this.code = c; } }
+    
     private final List<ResidueType> sequence;
+    private final boolean[] isHydrophobic;
     private final int iterations;
     private final double temperature;
+    
+    private TaskState<int[][]> state;
+    private double currentEnergy;
     private TaskRegistry.PrecisionMode mode = TaskRegistry.PrecisionMode.DOUBLE;
-
-    private List<Monomer> currentFold;
-    private double energy;
-    private Real energyReal;
+    private long seed;
 
     public ProteinFoldingTask(String hpSequence, int iterations, double temperature) {
         this.sequence = new ArrayList<>();
-        for (char c : hpSequence.toUpperCase().toCharArray()) {
-            sequence.add(c == 'P' ? ResidueType.POLAR : ResidueType.HYDROPHOBIC);
+        this.isHydrophobic = new boolean[hpSequence.length()];
+        for (int i = 0; i < hpSequence.length(); i++) {
+            char c = Character.toUpperCase(hpSequence.charAt(i));
+            ResidueType type = (c == 'P' ? ResidueType.POLAR : ResidueType.HYDROPHOBIC);
+            sequence.add(type);
+            isHydrophobic[i] = (type == ResidueType.HYDROPHOBIC);
         }
         this.iterations = iterations;
         this.temperature = temperature;
+        this.seed = System.nanoTime();
+        
+        int[][] initial = new int[isHydrophobic.length][3];
+        for (int i = 0; i < initial.length; i++) { initial[i][0] = i; initial[i][1] = 0; initial[i][2] = 0; }
+        
+        this.state = new TaskState<>(initial,
+            r -> flattenToDouble(r), d -> unflattenFromDouble(d),
+            r -> flattenToFloat(r), f -> unflattenFromFloat(f)
+        );
     }
+
+    private double[] flattenToDouble(int[][] r) {
+        double[] d = new double[r.length * 3];
+        for(int i=0; i<r.length; i++) { d[i*3] = r[i][0]; d[i*3+1] = r[i][1]; d[i*3+2] = r[i][2]; }
+        return d;
+    }
+
+    private int[][] unflattenFromDouble(double[] d) {
+        int[][] r = new int[d.length/3][3];
+        for(int i=0; i<r.length; i++) { r[i][0] = (int)d[i*3]; r[i][1] = (int)d[i*3+1]; r[i][2] = (int)d[i*3+2]; }
+        return r;
+    }
+
+    private float[] flattenToFloat(int[][] r) {
+        float[] f = new float[r.length * 3];
+        for(int i=0; i<r.length; i++) { f[i*3] = r[i][0]; f[i*3+1] = r[i][1]; f[i*3+2] = r[i][2]; }
+        return f;
+    }
+
+    private int[][] unflattenFromFloat(float[] f) {
+        int[][] r = new int[f.length/3][3];
+        for(int i=0; i<r.length; i++) { r[i][0] = (int)f[i*3]; r[i][1] = (int)f[i*3+1]; r[i][2] = (int)f[i*3+2]; }
+        return r;
+    }
+
+    public ProteinFoldingTask() { this("", 0, 0); }
 
     public void setMode(TaskRegistry.PrecisionMode mode) {
         this.mode = mode;
+        if(state != null) state.syncTo(mode);
     }
+
+    @Override
+    public Class<ProteinFoldingTask> getInputType() { return ProteinFoldingTask.class; }
+    @Override
+    public Class<ProteinFoldingTask> getOutputType() { return ProteinFoldingTask.class; }
+
+    @Override
+    public ProteinFoldingTask execute(ProteinFoldingTask input) {
+        if (input != null && input.isHydrophobic.length > 0) {
+            input.run();
+            return input;
+        }
+        return null;
+    }
+
+    @Override
+    public String getTaskType() { return "PROTEIN_FOLDING"; }
 
     public void run() {
-        if (currentFold == null)
-            initializeLinear();
-
-        Random rand = new Random();
-        for (int i = 0; i < iterations; i++) {
-            attemptMove(rand);
-        }
-
+        ProteinFoldingProvider provider = new StandardProteinFoldingProvider();
+        int[][] pos = state.getReal();
+        provider.simulate(pos, isHydrophobic, iterations, temperature, seed);
+        
         switch (mode) {
-            case REAL -> {
-                this.energyReal = calculateEnergyReal(currentFold);
-                this.energy = energyReal.doubleValue();
-            }
-            case FLOAT -> {
-                this.energy = (double) calculateEnergyFloat(currentFold);
-            }
-            default -> {
-                this.energy = calculateEnergy(currentFold);
-            }
+            case REAL -> currentEnergy = provider.calculateEnergy(pos, isHydrophobic).doubleValue();
+            case FLOAT -> currentEnergy = provider.calculateEnergyFloat(pos, isHydrophobic);
+            default -> currentEnergy = provider.calculateEnergyDouble(pos, isHydrophobic);
         }
+        seed = System.nanoTime();
     }
 
-    private void initializeLinear() {
-        currentFold = new ArrayList<>();
-        for (int i = 0; i < sequence.size(); i++) {
-            currentFold.add(new Monomer(i, 0, 0, sequence.get(i)));
-        }
-        energy = calculateEnergy(currentFold);
-    }
-
-    private void attemptMove(Random rand) {
-        int idx = rand.nextInt(sequence.size());
-        Monomer oldM = currentFold.get(idx);
-
-        // Pivot move or end-flip
-        int dx = rand.nextInt(3) - 1;
-        int dy = rand.nextInt(3) - 1;
-        int dz = rand.nextInt(3) - 1;
-
-        Monomer newM = new Monomer(oldM.x + dx, oldM.y + dy, oldM.z + dz, oldM.type);
-
-        if (isValid(newM, idx)) {
-            List<Monomer> nextFold = new ArrayList<>(currentFold);
-            nextFold.set(idx, newM);
-            double nextEnergy = calculateEnergy(nextFold);
-
-            if (nextEnergy < energy || Math.exp(-(nextEnergy - energy) / temperature) > rand.nextDouble()) {
-                currentFold = nextFold;
-                energy = nextEnergy;
-            }
-        }
-    }
-
-    private boolean isValid(Monomer m, int idx) {
-        // Self-avoidance
-        for (int i = 0; i < currentFold.size(); i++) {
-            if (i != idx) {
-                Monomer other = currentFold.get(i);
-                if (other.x == m.x && other.y == m.y && other.z == m.z)
-                    return false;
-            }
-        }
-        // Connectivity check
-        if (idx > 0) {
-            Monomer prev = currentFold.get(idx - 1);
-            if (Math.abs(prev.x - m.x) + Math.abs(prev.y - m.y) + Math.abs(prev.z - m.z) != 1)
-                return false;
-        }
-        if (idx < currentFold.size() - 1) {
-            Monomer next = currentFold.get(idx + 1);
-            if (Math.abs(next.x - m.x) + Math.abs(next.y - m.y) + Math.abs(next.z - m.z) != 1)
-                return false;
-        }
-        return true;
-    }
-
-    private Real calculateEnergyReal(List<Monomer> fold) {
-        Real e = Real.of(0);
-        // HP Model: -1 for each topological H-H contact (non-sequential neighbors)
-        for (int i = 0; i < fold.size(); i++) {
-            for (int j = i + 2; j < fold.size(); j++) {
-                Monomer m1 = fold.get(i);
-                Monomer m2 = fold.get(j);
-                if (m1.type == ResidueType.HYDROPHOBIC && m2.type == ResidueType.HYDROPHOBIC) {
-                    int dist = Math.abs(m1.x - m2.x) + Math.abs(m1.y - m2.y) + Math.abs(m1.z - m2.z);
-                    if (dist == 1)
-                        e = e.subtract(Real.of(1.0));
-                }
-            }
-        }
-        return e;
-    }
-
-    private float calculateEnergyFloat(List<Monomer> fold) {
-        float e = 0f;
-        // HP Model: -1 for each topological H-H contact (non-sequential neighbors)
-        for (int i = 0; i < fold.size(); i++) {
-            for (int j = i + 2; j < fold.size(); j++) {
-                Monomer m1 = fold.get(i);
-                Monomer m2 = fold.get(j);
-                if (m1.type == ResidueType.HYDROPHOBIC && m2.type == ResidueType.HYDROPHOBIC) {
-                    int dist = Math.abs(m1.x - m2.x) + Math.abs(m1.y - m2.y) + Math.abs(m1.z - m2.z);
-                    if (dist == 1)
-                        e -= 1.0f;
-                }
-            }
-        }
-        return e;
-    }
-
-    private double calculateEnergy(List<Monomer> fold) {
-        double e = 0;
-        // HP Model: -1 for each topological H-H contact (non-sequential neighbors)
-        for (int i = 0; i < fold.size(); i++) {
-            for (int j = i + 2; j < fold.size(); j++) {
-                Monomer m1 = fold.get(i);
-                Monomer m2 = fold.get(j);
-                if (m1.type == ResidueType.HYDROPHOBIC && m2.type == ResidueType.HYDROPHOBIC) {
-                    int dist = Math.abs(m1.x - m2.x) + Math.abs(m1.y - m2.y) + Math.abs(m1.z - m2.z);
-                    if (dist == 1)
-                        e -= 1.0;
-                }
-            }
-        }
-        return e;
-    }
-
-    public List<Monomer> getResult() {
-        return currentFold;
-    }
+    public int[][] getFold() { return state.getReal(); }
+    public double getEnergy() { return currentEnergy; }
 }
