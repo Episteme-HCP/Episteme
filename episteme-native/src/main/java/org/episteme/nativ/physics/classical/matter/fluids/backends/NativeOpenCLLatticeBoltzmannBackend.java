@@ -173,6 +173,27 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
     }
 
     @Override
+    public void evolve(float[][][] f, boolean[][] obstacle, float omega) {
+        int width = f.length;
+        int height = f[0].length;
+        double[][][] fD = new double[width][height][9];
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                for (int i = 0; i < 9; i++) fD[x][y][i] = f[x][y][i];
+            }
+        }
+
+        evolve(fD, obstacle, (double) omega);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                for (int i = 0; i < 9; i++) f[x][y][i] = (float) fD[x][y][i];
+            }
+        }
+    }
+
+    @Override
     public void evolve(double[][][] f, boolean[][] obstacle, double omega) {
         initialize();
         

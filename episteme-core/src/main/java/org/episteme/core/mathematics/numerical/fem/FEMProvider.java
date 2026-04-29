@@ -19,8 +19,11 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface FEMProvider extends AlgorithmProvider {
 
-    Vector<Real> solvePoisson(Mesh mesh, org.episteme.core.mathematics.analysis.Function<Vector<Real>, Real> sourceTerm);
+    float[] solvePoisson(Mesh mesh, org.episteme.core.technical.function.ToFloatFunction<float[]> sourceTerm);
+
     double[] solvePoisson(Mesh mesh, java.util.function.ToDoubleFunction<double[]> sourceTerm);
+
+    Vector<Real> solvePoisson(Mesh mesh, org.episteme.core.mathematics.analysis.Function<Vector<Real>, Real> sourceTerm);
 
     @Override
     default String getName() {

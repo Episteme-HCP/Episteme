@@ -17,9 +17,11 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface SCFProvider extends AlgorithmProvider {
 
+    void computeFockMatrix(float[] densityMatrix, float[] oneElectronIntegrals, float[] twoElectronIntegrals, float[] fockMatrix, int n);
+
     void computeFockMatrix(double[] densityMatrix, double[] oneElectronIntegrals, double[] twoElectronIntegrals, double[] fockMatrix, int n);
 
-    void computeFockMatrixReal(Real[] densityMatrix, Real[] oneElectronIntegrals, Real[] twoElectronIntegrals, Real[] fockMatrix, int n);
+    void computeFockMatrix(Real[] densityMatrix, Real[] oneElectronIntegrals, Real[] twoElectronIntegrals, Real[] fockMatrix, int n);
 
     @Override
     default String getName() {

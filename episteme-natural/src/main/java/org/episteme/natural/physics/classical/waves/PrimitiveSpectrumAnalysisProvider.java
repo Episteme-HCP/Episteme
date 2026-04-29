@@ -42,6 +42,25 @@ public class PrimitiveSpectrumAnalysisProvider implements SpectrumAnalysisProvid
     private final FFTProvider fftProvider = new MulticoreFFTProvider();
 
     @Override
+    public float[] computeSpectrum(float[] samples, int bands, float sensitivity) {
+        int n = samples.length;
+        float[] imag = new float[n];
+        
+        float[][] result = fftProvider.transform(samples, imag);
+        float[] transformedReal = result[0];
+        float[] transformedImag = result[1];
+        
+        float[] spectrum = new float[bands];
+        for (int i = 0; i < bands; i++) {
+            float r = transformedReal[i];
+            float im = transformedImag[i];
+            float mag = (float) Math.sqrt(r * r + im * im) / n;
+            spectrum[i] = Math.max(0.0f, Math.min(1.0f, mag * sensitivity * 20.0f));
+        }
+        return spectrum;
+    }
+
+    @Override
     public double[] computeSpectrum(double[] samples, int bands, double sensitivity) {
         int n = samples.length;
         double[] imag = new double[n];

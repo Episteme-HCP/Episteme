@@ -35,6 +35,11 @@ public class MulticoreNavierStokesProvider implements NavierStokesProvider {
     }
 
     @Override
+    public void solve(float[] density, float[] u, float[] v, float[] w, float dt, float viscosity, int width, int height, int depth) {
+        logger.trace("Performing float-based Navier-Stokes step on {}x{}x{} grid.", width, height, depth);
+    }
+
+    @Override
     public void solve(double[] density, double[] u, double[] v, double[] w, double dt, double viscosity, int width, int height, int depth) {
         logger.trace("Performing double-based Navier-Stokes step on {}x{}x{} grid.", width, height, depth);
     }

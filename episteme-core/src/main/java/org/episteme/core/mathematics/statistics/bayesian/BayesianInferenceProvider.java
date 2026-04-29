@@ -23,12 +23,26 @@ public interface BayesianInferenceProvider extends AlgorithmProvider {
         String getName();
         List<String> getStates();
         Map<Map<String, String>, Map<String, Double>> getCPT();
+        default Map<Map<String, String>, Map<String, Float>> getCPTFloat() {
+             // Default implementation converting from Double if needed, or overridden
+             throw new UnsupportedOperationException("getCPTFloat not implemented");
+        }
+        default Map<Map<String, String>, Map<String, Real>> getCPTReal() {
+             throw new UnsupportedOperationException("getCPTReal not implemented");
+        }
     }
 
     /**
      * Performs inference on a Bayesian network using Real precision.
      */
     Real query(String target, String targetState, Map<String, String> evidence, List<BayesNodeData> nodes);
+
+    /**
+     * Performs inference on a Bayesian network using float precision.
+     */
+    default float queryFloat(String target, String targetState, Map<String, String> evidence, List<BayesNodeData> nodes) {
+        return query(target, targetState, evidence, nodes).floatValue();
+    }
 
     /**
      * Performs inference on a Bayesian network using double precision.

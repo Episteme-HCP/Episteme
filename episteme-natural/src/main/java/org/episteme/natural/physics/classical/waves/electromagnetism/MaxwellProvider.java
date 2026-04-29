@@ -18,8 +18,9 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface MaxwellProvider extends AlgorithmProvider {
 
-    double[][] computeTensor(Vector4D point);
-    Real[][] computeTensorReal(Vector4D point);
+    float[][] computeTensorFloat(Vector4D point);
+    double[][] computeTensorDouble(Vector4D point);
+    Real[][] computeTensor(Vector4D point);
 
     @Override
     default String getName() {

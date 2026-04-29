@@ -17,6 +17,8 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface LatticeBoltzmannProvider extends AlgorithmProvider {
 
+    void evolve(float[][][] f, boolean[][] obstacle, float omega);
+
     void evolve(double[][][] f, boolean[][] obstacle, double omega);
 
     void evolve(Real[][][] f, boolean[][] obstacle, Real omega);

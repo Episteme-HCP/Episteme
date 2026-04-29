@@ -33,7 +33,7 @@ public class MulticoreMaxwellProviderTest {
     public void testTensorAntisymmetry() {
         MulticoreMaxwellProvider provider = new MulticoreMaxwellProvider();
         Vector4D point = new Vector4D(1.0, 2.0, 3.0, 4.0);
-        double[][] f = provider.computeTensor(point);
+        double[][] f = provider.computeTensorDouble(point);
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -47,7 +47,7 @@ public class MulticoreMaxwellProviderTest {
         MulticoreMaxwellProvider provider = new MulticoreMaxwellProvider();
         // Default source at origin, oscillating along Z axis
         Vector4D point = new Vector4D(10.0, 2.0, 0.0, 0.0); // 2 units away on X axis
-        double[][] f = provider.computeTensor(point);
+        double[][] f = provider.computeTensorDouble(point);
 
         boolean hasNonZero = false;
         for (int i = 0; i < 4; i++) {

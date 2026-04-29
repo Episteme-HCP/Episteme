@@ -16,7 +16,27 @@ import java.util.List;
  */
 public interface AudioSpectrogramProvider extends AlgorithmProvider {
 
+     /**
+     * Calculates the magnitude spectrum of a buffer.
+     * 
+     * @param buffer Input audio data.
+     * @param window Window function to apply.
+     * @return Magnitude spectrum (half size of buffer if buffer is power of 2).
+     */
+    float[] calculateSpectrum(float[] buffer, AudioSpectrogram.WindowFunction window);
+
     /**
+     * Computes a full spectrogram (list of spectrums) for a long buffer.
+     * 
+     * @param audioData Full audio data.
+     * @param windowSize Size of the analysis window.
+     * @param overlap Overlap between consecutive windows.
+     * @param window Window function to apply.
+     * @return List of magnitude spectrums.
+     */
+    List<float[]> computeSpectrogram(float[] audioData, int windowSize, int overlap, AudioSpectrogram.WindowFunction window);
+
+   /**
      * Calculates the magnitude spectrum of a buffer.
      * 
      * @param buffer Input audio data.

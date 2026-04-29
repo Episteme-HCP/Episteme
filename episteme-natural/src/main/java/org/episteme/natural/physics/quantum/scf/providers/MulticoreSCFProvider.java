@@ -28,6 +28,28 @@ public class MulticoreSCFProvider implements SCFProvider {
     }
 
     @Override
+    public void computeFockMatrix(float[] P, float[] H, float[] ERIs, float[] F, int n) {
+        System.arraycopy(H, 0, F, 0, n * n);
+        
+        IntStream.range(0, n).parallel().forEach(u -> {
+           for (int v = 0; v < n; v++) {
+               float g_uv = 0.0f;
+               for (int l = 0; l < n; l++) {
+                   for (int s = 0; s < n; s++) {
+                       float p_ls = P[l * n + s];
+                       int idx_uvls = u*n*n*n + v*n*n + l*n + s;
+                       int idx_ulvs = u*n*n*n + l*n*n + v*n + s;
+                       float eri_coulomb = ERIs[idx_uvls];
+                       float eri_exchange = ERIs[idx_ulvs];
+                       g_uv += p_ls * (eri_coulomb - 0.5f * eri_exchange);
+                   }
+               }
+               F[u * n + v] += g_uv;
+           } 
+        });
+    }
+
+    @Override
     public void computeFockMatrix(double[] P, double[] H, double[] ERIs, double[] F, int n) {
         System.arraycopy(H, 0, F, 0, n * n);
         
@@ -50,7 +72,7 @@ public class MulticoreSCFProvider implements SCFProvider {
     }
 
     @Override
-    public void computeFockMatrixReal(Real[] P, Real[] H, Real[] ERIs, Real[] F, int n) {
+    public void computeFockMatrix(Real[] P, Real[] H, Real[] ERIs, Real[] F, int n) {
         System.arraycopy(H, 0, F, 0, n * n);
 
         IntStream.range(0, n).parallel().forEach(u -> {

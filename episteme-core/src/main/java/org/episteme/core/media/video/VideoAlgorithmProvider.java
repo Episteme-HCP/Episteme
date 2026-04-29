@@ -23,23 +23,8 @@ public interface VideoAlgorithmProvider extends AlgorithmProvider {
     }
 
     @Override
-    default int getPriority() {
-        return 0;
-    }
-
-    @Override
-    default boolean isAvailable() {
-        return true;
-    }
-
-    @Override
     default String getAlgorithmType() {
         return "Video Engine";
-    }
-
-    @Override
-    default void shutdown() {
-        // Default no-op
     }
 
     /**

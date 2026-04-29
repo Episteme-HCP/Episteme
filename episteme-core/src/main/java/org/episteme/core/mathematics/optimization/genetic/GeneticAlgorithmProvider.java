@@ -18,7 +18,10 @@ import java.util.function.Function;
  */
 public interface GeneticAlgorithmProvider extends AlgorithmProvider {
 
+    float[] solve(org.episteme.core.technical.function.ToFloatFunction<float[]> fitnessFunction, int dimensions, int populationSize, int generations, float mutationRate);
+    
     double[] solve(java.util.function.ToDoubleFunction<double[]> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate);
+
     Real[] solve(Function<Real[], Real> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate);
 
     @Override

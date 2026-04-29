@@ -44,6 +44,14 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
     private static MethodHandle DEXECUTE;
     private static MethodHandle DDESTROY_PLAN;
 
+    private static MethodHandle FPLAN_R2C_1D;
+    private static MethodHandle FPLAN_C2R_1D;
+    private static MethodHandle FPLAN_DFT_1D;
+    private static MethodHandle FPLAN_DFT_2D;
+    private static MethodHandle FPLAN_DFT_3D;
+    private static MethodHandle FEXECUTE;
+    private static MethodHandle FDESTROY_PLAN;
+
     private static boolean initialized = false;
     private static boolean available = false;
 
@@ -92,6 +100,27 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             DEXECUTE = linker.downcallHandle(lookup.find("fftw_execute").get(),
                     FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
             DDESTROY_PLAN = linker.downcallHandle(lookup.find("fftw_destroy_plan").get(),
+                    FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+
+            // Float versions
+            FPLAN_R2C_1D = linker.downcallHandle(lookup.find("fftwf_plan_dft_r2c_1d").get(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+                            ValueLayout.JAVA_INT));
+            FPLAN_C2R_1D = linker.downcallHandle(lookup.find("fftwf_plan_dft_c2r_1d").get(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+                            ValueLayout.JAVA_INT));
+            FPLAN_DFT_1D = linker.downcallHandle(lookup.find("fftwf_plan_dft_1d").get(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+                            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            FPLAN_DFT_2D = linker.downcallHandle(lookup.find("fftwf_plan_dft_2d").get(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            FPLAN_DFT_3D = linker.downcallHandle(lookup.find("fftwf_plan_dft_3d").get(),
+                    FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            FEXECUTE = linker.downcallHandle(lookup.find("fftwf_execute").get(),
+                    FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+            FDESTROY_PLAN = linker.downcallHandle(lookup.find("fftwf_destroy_plan").get(),
                     FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
             
             available = true;
@@ -286,6 +315,63 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
             throw new RuntimeException("Complex Inverse FFT execution failed", e);
         }
     }
+
+    @Override
+    public float[][] transform(float[] real, float[] imag) {
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library (float) not available");
+
+        int n = real.length;
+        try (Arena arena = Arena.ofConfined();
+             ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment in = arena.allocate(ValueLayout.JAVA_FLOAT, n);
+            for (int i = 0; i < n; i++)
+                in.setAtIndex(ValueLayout.JAVA_FLOAT, i, real[i]);
+            MemorySegment out = arena.allocate(ValueLayout.JAVA_FLOAT, (n / 2 + 1) * 2);
+
+            MemorySegment plan = (MemorySegment) NativeSafe.invoke(FPLAN_R2C_1D, n, in, out, 1 << 6); // FFTW_ESTIMATE
+            tracker.trackPlan(plan, p -> NativeSafe.invoke(FDESTROY_PLAN, p));
+            NativeSafe.invoke(FEXECUTE, plan);
+
+            float[] re = new float[n / 2 + 1];
+            float[] im = new float[n / 2 + 1];
+            for (int i = 0; i < n / 2 + 1; i++) {
+                re[i] = out.getAtIndex(ValueLayout.JAVA_FLOAT, i * 2);
+                im[i] = out.getAtIndex(ValueLayout.JAVA_FLOAT, i * 2 + 1);
+            }
+            return new float[][] { re, im };
+        } catch (Throwable e) {
+            throw new RuntimeException("Float FFT execution failed", e);
+        }
+    }
+
+    @Override
+    public float[][] inverseTransform(float[] real, float[] imag) {
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library (float) not available");
+
+        int outN = (real.length - 1) * 2;
+        try (Arena arena = Arena.ofConfined();
+             ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment in = arena.allocate(ValueLayout.JAVA_FLOAT, real.length * 2);
+            for (int i = 0; i < real.length; i++) {
+                in.setAtIndex(ValueLayout.JAVA_FLOAT, i * 2, real[i]);
+                in.setAtIndex(ValueLayout.JAVA_FLOAT, i * 2 + 1, imag[i]);
+            }
+            MemorySegment out = arena.allocate(ValueLayout.JAVA_FLOAT, outN);
+
+            MemorySegment plan = (MemorySegment) NativeSafe.invoke(FPLAN_C2R_1D, outN, in, out, 1 << 6);
+            tracker.trackPlan(plan, p -> NativeSafe.invoke(FDESTROY_PLAN, p));
+            NativeSafe.invoke(FEXECUTE, plan);
+
+            float[] resultReal = new float[outN];
+            for (int i = 0; i < outN; i++)
+                resultReal[i] = out.getAtIndex(ValueLayout.JAVA_FLOAT, i) / outN;
+            return new float[][] { resultReal, new float[outN] };
+        } catch (Throwable e) {
+            throw new RuntimeException("Float Inverse FFT execution failed", e);
+        }
+    }
     @Override
     public double[][][] transform2D(double[][] real, double[][] imag) {
         ensureInitialized();
@@ -464,6 +550,276 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
     }
 
     @Override
+    public float[][][] transform2D(float[][] real, float[][] imag) {
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library (float) not available");
+
+        int n0 = real.length;
+        int n1 = real[0].length;
+        long totalElements = (long) n0 * n1;
+        
+        try (Arena arena = Arena.ofConfined();
+             ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment in = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    long offset = ((long) i * n1 + j) * 2;
+                    in.setAtIndex(ValueLayout.JAVA_FLOAT, offset, real[i][j]);
+                    in.setAtIndex(ValueLayout.JAVA_FLOAT, offset + 1, imag[i][j]);
+                }
+            }
+            
+            MemorySegment out = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+            
+            MemorySegment plan = (MemorySegment) NativeSafe.invoke(FPLAN_DFT_2D, n0, n1, in, out, -1, 1 << 6);
+            tracker.trackPlan(plan, p -> NativeSafe.invoke(FDESTROY_PLAN, p));
+            NativeSafe.invoke(FEXECUTE, plan);
+            
+            float[][][] result = new float[2][n0][n1];
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    long offset = ((long) i * n1 + j) * 2;
+                    result[0][i][j] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset);
+                    result[1][i][j] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset + 1);
+                }
+            }
+            return result;
+        } catch (Throwable e) {
+            throw new RuntimeException("2D Float FFT execution failed", e);
+        }
+    }
+
+    @Override
+    public float[][][] inverseTransform2D(float[][] real, float[][] imag) {
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library (float) not available");
+
+        int n0 = real.length;
+        int n1 = real[0].length;
+        long totalElements = (long) n0 * n1;
+        
+        try (Arena arena = Arena.ofConfined();
+             ResourceTracker tracker = new ResourceTracker()) {
+             MemorySegment in = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     long offset = ((long) i * n1 + j) * 2;
+                     in.setAtIndex(ValueLayout.JAVA_FLOAT, offset, real[i][j]);
+                     in.setAtIndex(ValueLayout.JAVA_FLOAT, offset + 1, imag[i][j]);
+                 }
+             }
+             
+             MemorySegment out = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+             
+             MemorySegment plan = (MemorySegment) NativeSafe.invoke(FPLAN_DFT_2D, n0, n1, in, out, 1, 1 << 6);
+             tracker.trackPlan(plan, p -> NativeSafe.invoke(FDESTROY_PLAN, p));
+             NativeSafe.invoke(FEXECUTE, plan);
+             
+             float[][][] result = new float[2][n0][n1];
+             float norm = (float) totalElements;
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     long offset = ((long) i * n1 + j) * 2;
+                     result[0][i][j] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset) / norm;
+                     result[1][i][j] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset + 1) / norm;
+                 }
+             }
+             return result;
+        } catch (Throwable e) {
+             throw new RuntimeException("2D Float Inverse FFT execution failed", e);
+        }
+    }
+
+    @Override
+    public float[][][][] transform3D(float[][][] real, float[][][] imag) {
+        ensureInitialized();
+        if (!available) throw new UnsupportedOperationException("FFTW3 library (float) not available");
+
+        int n0 = real.length;
+        int n1 = real[0].length;
+        int n2 = real[0][0].length;
+        long totalElements = (long) n0 * n1 * n2;
+        
+        try (Arena arena = Arena.ofConfined();
+             ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment in = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    for(int k=0; k<n2; k++) {
+                        long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                        in.setAtIndex(ValueLayout.JAVA_FLOAT, offset, real[i][j][k]);
+                        in.setAtIndex(ValueLayout.JAVA_FLOAT, offset + 1, imag[i][j][k]);
+                    }
+                }
+            }
+            
+            MemorySegment out = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+            
+            MemorySegment plan = (MemorySegment) NativeSafe.invoke(FPLAN_DFT_3D, n0, n1, n2, in, out, -1, 1 << 6);
+            tracker.trackPlan(plan, p -> NativeSafe.invoke(FDESTROY_PLAN, p));
+            NativeSafe.invoke(FEXECUTE, plan);
+            
+            float[][][][] result = new float[2][n0][n1][n2];
+            for(int i=0; i<n0; i++) {
+                for(int j=0; j<n1; j++) {
+                    for(int k=0; k<n2; k++) {
+                        long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                        result[0][i][j][k] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset);
+                        result[1][i][j][k] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset + 1);
+                    }
+                }
+            }
+            return result;
+        } catch (Throwable e) {
+            throw new RuntimeException("3D Float FFT execution failed", e);
+        }
+    }
+
+    @Override
+    public float[][][][] inverseTransform3D(float[][][] real, float[][][] imag) {
+         ensureInitialized();
+         if (!available) throw new UnsupportedOperationException("FFTW3 library (float) not available");
+ 
+         int n0 = real.length;
+         int n1 = real[0].length;
+         int n2 = real[0][0].length;
+         long totalElements = (long) n0 * n1 * n2;
+         
+         try (Arena arena = Arena.ofConfined();
+              ResourceTracker tracker = new ResourceTracker()) {
+             MemorySegment in = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     for(int k=0; k<n2; k++) {
+                         long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                         in.setAtIndex(ValueLayout.JAVA_FLOAT, offset, real[i][j][k]);
+                         in.setAtIndex(ValueLayout.JAVA_FLOAT, offset + 1, imag[i][j][k]);
+                     }
+                 }
+             }
+             
+             MemorySegment out = arena.allocate(ValueLayout.JAVA_FLOAT, totalElements * 2);
+             
+             MemorySegment plan = (MemorySegment) NativeSafe.invoke(FPLAN_DFT_3D, n0, n1, n2, in, out, 1, 1 << 6);
+             tracker.trackPlan(plan, p -> NativeSafe.invoke(FDESTROY_PLAN, p));
+             NativeSafe.invoke(FEXECUTE, plan);
+             
+             float[][][][] result = new float[2][n0][n1][n2];
+             float norm = (float) totalElements;
+             for(int i=0; i<n0; i++) {
+                 for(int j=0; j<n1; j++) {
+                     for(int k=0; k<n2; k++) {
+                         long offset = ((long) i * n1 * n2 + (long) j * n2 + k) * 2;
+                         result[0][i][j][k] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset) / norm;
+                         result[1][i][j][k] = out.getAtIndex(ValueLayout.JAVA_FLOAT, offset + 1) / norm;
+                     }
+                 }
+             }
+             return result;
+         } catch (Throwable e) {
+             throw new RuntimeException("3D Float Inverse FFT execution failed", e);
+         }
+    }
+
+    @Override
+    public Complex[][] transformComplex2D(Complex[][] data) {
+        int n0 = data.length;
+        int n1 = data[0].length;
+        double[][] r = new double[n0][n1];
+        double[][] im = new double[n0][n1];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                r[i][j] = data[i][j].real();
+                im[i][j] = data[i][j].imaginary();
+            }
+        }
+        double[][][] res = transform2D(r, im);
+        Complex[][] result = new Complex[n0][n1];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                result[i][j] = Complex.of(res[0][i][j], res[1][i][j]);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Complex[][] inverseTransformComplex2D(Complex[][] data) {
+        int n0 = data.length;
+        int n1 = data[0].length;
+        double[][] r = new double[n0][n1];
+        double[][] im = new double[n0][n1];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                r[i][j] = data[i][j].real();
+                im[i][j] = data[i][j].imaginary();
+            }
+        }
+        double[][][] res = inverseTransform2D(r, im);
+        Complex[][] result = new Complex[n0][n1];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                result[i][j] = Complex.of(res[0][i][j], res[1][i][j]);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Complex[][][] transformComplex3D(Complex[][][] data) {
+        int n0 = data.length;
+        int n1 = data[0].length;
+        int n2 = data[0][0].length;
+        double[][][] r = new double[n0][n1][n2];
+        double[][][] im = new double[n0][n1][n2];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                for(int k=0; k<n2; k++) {
+                    r[i][j][k] = data[i][j][k].real();
+                    im[i][j][k] = data[i][j][k].imaginary();
+                }
+            }
+        }
+        double[][][][] res = transform3D(r, im);
+        Complex[][][] result = new Complex[n0][n1][n2];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                for(int k=0; k<n2; k++) {
+                    result[i][j][k] = Complex.of(res[0][i][j][k], res[1][i][j][k]);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Complex[][][] inverseTransformComplex3D(Complex[][][] data) {
+        int n0 = data.length;
+        int n1 = data[0].length;
+        int n2 = data[0][0].length;
+        double[][][] r = new double[n0][n1][n2];
+        double[][][] im = new double[n0][n1][n2];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                for(int k=0; k<n2; k++) {
+                    r[i][j][k] = data[i][j][k].real();
+                    im[i][j][k] = data[i][j][k].imaginary();
+                }
+            }
+        }
+        double[][][][] res = inverseTransform3D(r, im);
+        Complex[][][] result = new Complex[n0][n1][n2];
+        for(int i=0; i<n0; i++) {
+            for(int j=0; j<n1; j++) {
+                for(int k=0; k<n2; k++) {
+                    result[i][j][k] = Complex.of(res[0][i][j][k], res[1][i][j][k]);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public Real[][][] transform2D(Real[][] real, Real[][] imag) {
         double[][] r = toDouble2D(real);
         double[][] i = toDouble2D(imag);
@@ -520,6 +876,36 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
     private static Real[][][] toReal3D(double[][][] a) {
         Real[][][] result = new Real[a.length][][];
         for (int i = 0; i < a.length; i++) result[i] = toReal2D(a[i]);
+        return result;
+    }
+
+    private static double[][] toDouble2D(float[][] a) {
+        double[][] result = new double[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            result[i] = new double[a[i].length];
+            for (int j = 0; j < a[i].length; j++) result[i][j] = a[i][j];
+        }
+        return result;
+    }
+
+    private static double[][][] toDouble3D(float[][][] a) {
+        double[][][] result = new double[a.length][][];
+        for (int i = 0; i < a.length; i++) result[i] = toDouble2D(a[i]);
+        return result;
+    }
+
+    private static float[][] toFloat2D(double[][] a) {
+        float[][] result = new float[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            result[i] = new float[a[i].length];
+            for (int j = 0; j < a[i].length; j++) result[i][j] = (float) a[i][j];
+        }
+        return result;
+    }
+
+    private static float[][][] toFloat3D(double[][][] a) {
+        float[][][] result = new float[a.length][][];
+        for (int i = 0; i < a.length; i++) result[i] = toFloat2D(a[i]);
         return result;
     }
 

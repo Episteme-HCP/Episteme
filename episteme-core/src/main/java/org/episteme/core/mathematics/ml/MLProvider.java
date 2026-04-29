@@ -8,8 +8,12 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface MLProvider extends AlgorithmProvider {
 
+    int[] kMeans(float[][] data, int k, int maxIterations);
+    float[][] pca(float[][] data, int nComponents);
+
     int[] kMeans(double[][] data, int k, int maxIterations);
     double[][] pca(double[][] data, int nComponents);
+
     int[] kMeans(Real[][] data, int k, int maxIterations);
     Real[][] pca(Real[][] data, int nComponents);
     

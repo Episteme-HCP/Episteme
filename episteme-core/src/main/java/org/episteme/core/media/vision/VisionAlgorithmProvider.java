@@ -33,22 +33,8 @@ public interface VisionAlgorithmProvider<T> extends AlgorithmProvider {
     T createImage(Object data, int width, int height);
 
     @Override
-    default int getPriority() {
-        return 0;
-    }
-
-    @Override
-    default boolean isAvailable() {
-        return true;
-    }
-
-    @Override
     default String getAlgorithmType() {
         return "Computer Vision";
     }
 
-    @Override
-    default void shutdown() {
-        // Default no-op
-    }
 }

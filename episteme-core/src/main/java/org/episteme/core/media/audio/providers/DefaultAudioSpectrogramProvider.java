@@ -29,6 +29,50 @@ public class DefaultAudioSpectrogramProvider implements AudioSpectrogramProvider
     }
 
     @Override
+    public float[] calculateSpectrum(float[] buffer, AudioSpectrogram.WindowFunction window) {
+        int n = buffer.length;
+        if ((n & (n - 1)) != 0) {
+            int powerOfTwo = 1 << (31 - Integer.numberOfLeadingZeros(n));
+            float[] truncated = new float[powerOfTwo];
+            System.arraycopy(buffer, 0, truncated, 0, powerOfTwo);
+            buffer = truncated;
+            n = powerOfTwo;
+        }
+        
+        float[] real = buffer.clone();
+        applyWindowFloat(real, window);
+        float[] imag = new float[n];
+
+        FFTProvider provider = AlgorithmManager.getProvider(FFTProvider.class);
+        if (provider == null) provider = new MulticoreFFTProvider();
+        
+        float[][] result = provider.transform(real, imag);
+        
+        float[] rReal = result[0];
+        float[] rImag = result[1];
+        
+        float[] magnitude = new float[n / 2];
+        for (int i = 0; i < n / 2; i++) {
+            magnitude[i] = (float) Math.sqrt(rReal[i] * rReal[i] + rImag[i] * rImag[i]);
+        }
+        
+        return magnitude;
+    }
+
+    @Override
+    public List<float[]> computeSpectrogram(float[] audioData, int windowSize, int overlap, AudioSpectrogram.WindowFunction window) {
+        List<float[]> spectrogram = new ArrayList<>();
+        int step = windowSize - overlap;
+
+        for (int i = 0; i < audioData.length - windowSize; i += step) {
+            float[] chunk = new float[windowSize];
+            System.arraycopy(audioData, i, chunk, 0, windowSize);
+            spectrogram.add(calculateSpectrum(chunk, window));
+        }
+        return spectrogram;
+    }
+
+    @Override
     public double[] calculateSpectrum(double[] buffer, AudioSpectrogram.WindowFunction window) {
         int n = buffer.length;
         // FFT requires power of 2
@@ -71,6 +115,19 @@ public class DefaultAudioSpectrogramProvider implements AudioSpectrogramProvider
             spectrogram.add(calculateSpectrum(chunk, window));
         }
         return spectrogram;
+    }
+
+    private void applyWindowFloat(float[] data, AudioSpectrogram.WindowFunction type) {
+        int n = data.length;
+        for (int i = 0; i < n; i++) {
+            float factor = (float) (switch (type) {
+                case RECTANGULAR -> 1.0;
+                case HANNING -> 0.5 * (1 - Math.cos(2 * Math.PI * i / (n - 1)));
+                case HAMMING -> 0.54 - 0.46 * Math.cos(2 * Math.PI * i / (n - 1));
+                case BLACKMAN -> 0.42 - 0.5 * Math.cos(2 * Math.PI * i / (n - 1)) + 0.08 * Math.cos(4 * Math.PI * i / (n - 1));
+            });
+            data[i] *= factor;
+        }
     }
 
     private void applyWindow(double[] data, AudioSpectrogram.WindowFunction type) {

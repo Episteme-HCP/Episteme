@@ -35,6 +35,30 @@ import org.episteme.core.mathematics.analysis.transform.SignalFFT;
 public class RealSpectrumAnalysisProvider implements SpectrumAnalysisProvider {
 
     @Override
+    public float[] computeSpectrum(float[] samples, int bands, float sensitivity) {
+        int n = samples.length;
+        Real[] realArr = new Real[n];
+        for (int i = 0; i < n; i++) realArr[i] = Real.of(samples[i]);
+        
+        Real[][] result = SignalFFT.fftReal(realArr);
+        Real[] transformedReal = result[0];
+        Real[] transformedImag = result[1];
+        
+        float[] spectrum = new float[bands];
+        Real nReal = Real.of(n);
+        Real sensitivityReal = Real.of(sensitivity * 20.0);
+        
+        for (int i = 0; i < bands; i++) {
+            Real r = transformedReal[i];
+            Real im = transformedImag[i];
+            Real mag = r.multiply(r).add(im.multiply(im)).sqrt().divide(nReal);
+            float val = mag.multiply(sensitivityReal).floatValue();
+            spectrum[i] = Math.max(0, Math.min(1.0f, val));
+        }
+        return spectrum;
+    }
+
+    @Override
     public double[] computeSpectrum(double[] samples, int bands, double sensitivity) {
         int n = samples.length;
         Real[] realArr = new Real[n];

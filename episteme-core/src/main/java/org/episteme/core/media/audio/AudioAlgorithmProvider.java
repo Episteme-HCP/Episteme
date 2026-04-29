@@ -30,13 +30,4 @@ public interface AudioAlgorithmProvider<T> extends AlgorithmProvider {
         return "Audio Processing";
     }
 
-    @Override
-    default int getPriority() {
-        return 0;
-    }
-
-    @Override
-    default boolean isAvailable() {
-        return true;
-    }
 }

@@ -17,6 +17,10 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface MolecularDynamicsProvider extends AlgorithmProvider {
 
+    void integrate(float[] positions, float[] velocities, float[] forces, float[] masses, float dt, float damping);
+    void calculateBondForces(float[] positions, float[] forces, int[] bondIndices, float[] bondLengths, float[] bondConstants);
+    void calculateNonBondedForces(float[] positions, float[] forces, float epsilon, float sigma, float cutoff);
+
     void integrate(double[] positions, double[] velocities, double[] forces, double[] masses, double dt, double damping);
     void calculateBondForces(double[] positions, double[] forces, int[] bondIndices, double[] bondLengths, double[] bondConstants);
     void calculateNonBondedForces(double[] positions, double[] forces, double epsilon, double sigma, double cutoff);

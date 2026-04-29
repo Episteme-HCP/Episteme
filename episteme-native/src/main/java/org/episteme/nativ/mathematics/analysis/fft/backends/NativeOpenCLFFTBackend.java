@@ -324,6 +324,44 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
     }
 
     @Override
+    public float[][] transform(float[] real, float[] imag) {
+        int n = real.length;
+        double[] r = new double[n];
+        double[] i = new double[n];
+        for (int k = 0; k < n; k++) {
+            r[k] = real[k];
+            i[k] = imag[k];
+        }
+        double[][] res = transform(r, i);
+        float[] fr = new float[n];
+        float[] fi = new float[n];
+        for (int k = 0; k < n; k++) {
+            fr[k] = (float) res[0][k];
+            fi[k] = (float) res[1][k];
+        }
+        return new float[][]{fr, fi};
+    }
+
+    @Override
+    public float[][] inverseTransform(float[] real, float[] imag) {
+        int n = real.length;
+        double[] r = new double[n];
+        double[] i = new double[n];
+        for (int k = 0; k < n; k++) {
+            r[k] = real[k];
+            i[k] = imag[k];
+        }
+        double[][] res = inverseTransform(r, i);
+        float[] fr = new float[n];
+        float[] fi = new float[n];
+        for (int k = 0; k < n; k++) {
+            fr[k] = (float) res[0][k];
+            fi[k] = (float) res[1][k];
+        }
+        return new float[][]{fr, fi};
+    }
+
+    @Override
     public double[][][] transform2D(double[][] real, double[][] imag) {
         int rows = real.length;
         int cols = real[0].length;
@@ -443,6 +481,109 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         double[][][] i = toDouble3D(imag);
         double[][][][] res = inverseTransform3D(r, i);
         return new Real[][][][]{toReal3D(res[0]), toReal3D(res[1])};
+    }
+
+    @Override
+    public float[][][] transform2D(float[][] real, float[][] imag) {
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = transform2D(r, i);
+        return new float[][][]{toFloat2D(res[0]), toFloat2D(res[1])};
+    }
+
+    @Override
+    public float[][][] inverseTransform2D(float[][] real, float[][] imag) {
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = inverseTransform2D(r, i);
+        return new float[][][]{toFloat2D(res[0]), toFloat2D(res[1])};
+    }
+
+    @Override
+    public float[][][][] transform3D(float[][][] real, float[][][] imag) {
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = transform3D(r, i);
+        return new float[][][][]{toFloat3D(res[0]), toFloat3D(res[1])};
+    }
+
+    @Override
+    public float[][][][] inverseTransform3D(float[][][] real, float[][][] imag) {
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = inverseTransform3D(r, i);
+        return new float[][][][]{toFloat3D(res[0]), toFloat3D(res[1])};
+    }
+
+    @Override
+    public Complex[][] transformComplex2D(Complex[][] data) {
+        int n0 = data.length, n1 = data[0].length;
+        double[][] r = new double[n0][n1], im = new double[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) { r[i][j] = data[i][j].real(); im[i][j] = data[i][j].imaginary(); }
+        double[][][] res = transform2D(r, im);
+        Complex[][] out = new Complex[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) out[i][j] = Complex.of(res[0][i][j], res[1][i][j]);
+        return out;
+    }
+
+    @Override
+    public Complex[][] inverseTransformComplex2D(Complex[][] data) {
+        int n0 = data.length, n1 = data[0].length;
+        double[][] r = new double[n0][n1], im = new double[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) { r[i][j] = data[i][j].real(); im[i][j] = data[i][j].imaginary(); }
+        double[][][] res = inverseTransform2D(r, im);
+        Complex[][] out = new Complex[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) out[i][j] = Complex.of(res[0][i][j], res[1][i][j]);
+        return out;
+    }
+
+    @Override
+    public Complex[][][] transformComplex3D(Complex[][][] data) {
+        int n0 = data.length, n1 = data[0].length, n2 = data[0][0].length;
+        double[][][] r = new double[n0][n1][n2], im = new double[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) { r[i][j][k] = data[i][j][k].real(); im[i][j][k] = data[i][j][k].imaginary(); }
+        double[][][][] res = transform3D(r, im);
+        Complex[][][] out = new Complex[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) out[i][j][k] = Complex.of(res[0][i][j][k], res[1][i][j][k]);
+        return out;
+    }
+
+    @Override
+    public Complex[][][] inverseTransformComplex3D(Complex[][][] data) {
+        int n0 = data.length, n1 = data[0].length, n2 = data[0][0].length;
+        double[][][] r = new double[n0][n1][n2], im = new double[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) { r[i][j][k] = data[i][j][k].real(); im[i][j][k] = data[i][j][k].imaginary(); }
+        double[][][][] res = inverseTransform3D(r, im);
+        Complex[][][] out = new Complex[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) out[i][j][k] = Complex.of(res[0][i][j][k], res[1][i][j][k]);
+        return out;
+    }
+
+    private static double[][] toDouble2D(float[][] a) {
+        double[][] r = new double[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            r[i] = new double[a[i].length];
+            for (int j = 0; j < a[i].length; j++) r[i][j] = a[i][j];
+        }
+        return r;
+    }
+    private static double[][][] toDouble3D(float[][][] a) {
+        double[][][] r = new double[a.length][][];
+        for (int i = 0; i < a.length; i++) r[i] = toDouble2D(a[i]);
+        return r;
+    }
+    private static float[][] toFloat2D(double[][] a) {
+        float[][] r = new float[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            r[i] = new float[a[i].length];
+            for (int j = 0; j < a[i].length; j++) r[i][j] = (float) a[i][j];
+        }
+        return r;
+    }
+    private static float[][][] toFloat3D(double[][][] a) {
+        float[][][] r = new float[a.length][][];
+        for (int i = 0; i < a.length; i++) r[i] = toFloat2D(a[i]);
+        return r;
     }
 
     private static double[][] toDouble2D(Real[][] a) {

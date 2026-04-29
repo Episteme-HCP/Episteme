@@ -88,6 +88,64 @@ public class MulticoreMolecularDynamicsProvider implements MolecularDynamicsProv
     }
 
     @Override
+    public void integrate(float[] positions, float[] velocities, float[] forces, float[] masses, float dt, float damping) {
+        int n = masses.length;
+        IntStream.range(0, n).parallel().forEach(i -> {
+            int idx = i * 3;
+            float m = masses[i];
+            for (int d = 0; d < 3; d++) {
+                float a = forces[idx + d] / m;
+                velocities[idx + d] = (velocities[idx + d] + a * dt) * (1.0f - damping);
+                positions[idx + d] += velocities[idx + d] * dt;
+                forces[idx + d] = 0;
+            }
+        });
+    }
+
+    @Override
+    public void calculateBondForces(float[] positions, float[] forces, int[] bondIndices, float[] bondLengths, float[] bondConstants) {
+        int numBonds = bondIndices.length / 2;
+        for (int i = 0; i < numBonds; i++) {
+            int a1 = bondIndices[i * 2] * 3;
+            int a2 = bondIndices[i * 2 + 1] * 3;
+
+            float dx = positions[a2] - positions[a1], dy = positions[a2 + 1] - positions[a1 + 1], dz = positions[a2 + 2] - positions[a1 + 2];
+            float dist = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+            float f = bondConstants[i] * (dist - bondLengths[i]);
+            float fx = (dx / dist) * f, fy = (dy / dist) * f, fz = (dz / dist) * f;
+
+            synchronized (this) {
+                forces[a1] += fx; forces[a1 + 1] += fy; forces[a1 + 2] += fz;
+                forces[a2] -= fx; forces[a2 + 1] -= fy; forces[a2 + 2] -= fz;
+            }
+        }
+    }
+
+    @Override
+    public void calculateNonBondedForces(float[] positions, float[] forces, float epsilon, float sigma, float cutoff) {
+        int n = positions.length / 3;
+        float s6 = (float) Math.pow(sigma, 6), s12 = s6 * s6, cutoff2 = cutoff * cutoff;
+
+        IntStream.range(0, n).parallel().forEach(i -> {
+            int a1 = i * 3;
+            for (int j = i + 1; j < n; j++) {
+                int a2 = j * 3;
+                float dx = positions[a2] - positions[a1], dy = positions[a2 + 1] - positions[a1 + 1], dz = positions[a2 + 2] - positions[a1 + 2];
+                float r2 = dx * dx + dy * dy + dz * dz;
+                if (r2 < cutoff2) {
+                    float r6inv = s6 / (float) Math.pow(r2, 3), r12inv = s12 / (float) Math.pow(r2, 6);
+                    float f = 24 * epsilon * (2 * r12inv - r6inv) / r2;
+                    float fx = f * dx, fy = f * dy, fz = f * dz;
+                    synchronized (this) {
+                        forces[a1] -= fx; forces[a1 + 1] -= fy; forces[a1 + 2] -= fz;
+                        forces[a2] += fx; forces[a2 + 1] += fy; forces[a2 + 2] += fz;
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
     public void integrate(double[] positions, double[] velocities, double[] forces, double[] masses, double dt, double damping) {
         int n = masses.length;
         IntStream.range(0, n).parallel().forEach(i -> {

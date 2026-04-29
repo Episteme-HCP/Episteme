@@ -20,9 +20,18 @@ public interface NativeCollisionProvider extends CollisionProvider {
     void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions);
 
     @Override
+    default int detectSphereCollisions(float[] positions, float[] radii, int n, int[] collisions) {
+        return 0;
+    }
+
+    @Override
     default int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
         // Default implementation that can be overridden or use a fallback
         return 0; 
+    }
+
+    @Override
+    default void resolveCollisions(float[] positions, float[] velocities, float[] masses, int n, int[] collisions, int numCollisions) {
     }
 
     @Override

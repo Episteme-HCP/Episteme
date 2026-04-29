@@ -23,20 +23,32 @@ public interface FFTProvider extends AlgorithmProvider {
         return "Fast Fourier Transform";
     }
 
+    float[][] transform(float[] real, float[] imag);
+    float[][] inverseTransform(float[] real, float[] imag);
     double[][] transform(double[] real, double[] imag);
     double[][] inverseTransform(double[] real, double[] imag);
     Real[][] transform(Real[] real, Real[] imag);
     Real[][] inverseTransform(Real[] real, Real[] imag);
     Complex[] transformComplex(Complex[] data);
     Complex[] inverseTransformComplex(Complex[] data);
+
+    float[][][] transform2D(float[][] real, float[][] imag);
+    float[][][] inverseTransform2D(float[][] real, float[][] imag);
     double[][][] transform2D(double[][] real, double[][] imag);
     double[][][] inverseTransform2D(double[][] real, double[][] imag);
     Real[][][] transform2D(Real[][] real, Real[][] imag);
     Real[][][] inverseTransform2D(Real[][] real, Real[][] imag);
+    Complex[][] transformComplex2D(Complex[][] data);
+    Complex[][] inverseTransformComplex2D(Complex[][] data);
+
+    float[][][][] transform3D(float[][][] real, float[][][] imag);
+    float[][][][] inverseTransform3D(float[][][] real, float[][][] imag);
     double[][][][] transform3D(double[][][] real, double[][][] imag);
     double[][][][] inverseTransform3D(double[][][] real, double[][][] imag);
     Real[][][][] transform3D(Real[][][] real, Real[][][] imag);
     Real[][][][] inverseTransform3D(Real[][][] real, Real[][][] imag);
+    Complex[][][] transformComplex3D(Complex[][][] data);
+    Complex[][][] inverseTransformComplex3D(Complex[][][] data);
 
     @Override
     default String getName() {

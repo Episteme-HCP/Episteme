@@ -37,6 +37,15 @@ public interface SpectrumAnalysisProvider {
      * @param sensitivity scaling factor (0.0 to 1.0)
      * @return magnitude spectrum
      */
+    float[] computeSpectrum(float[] samples, int bands, float sensitivity);
+
+    /**
+     * Compute the magnitude spectrum for the given time-domain samples.
+     * @param samples time-domain signal samples
+     * @param bands number of frequency bands to return
+     * @param sensitivity scaling factor (0.0 to 1.0)
+     * @return magnitude spectrum
+     */
     double[] computeSpectrum(double[] samples, int bands, double sensitivity);
 }
 

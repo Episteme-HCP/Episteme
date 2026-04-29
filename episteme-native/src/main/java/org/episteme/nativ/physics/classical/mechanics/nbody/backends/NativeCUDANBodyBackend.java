@@ -34,6 +34,7 @@ public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, Native
     private boolean initialized = false;
     private CUmodule module;
     private CUfunction kernel;
+    private CUfunction kernelFloat;
 
     private static final String KERNEL_SOURCE = 
         "extern \"C\"\n" +
@@ -62,6 +63,42 @@ public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, Native
         "        double invDist = rsqrt(distSq);\n" +
         "        double invDist3 = invDist * invDist * invDist;\n" +
         "        double s = G * masses[j] * invDist3;\n" +
+        "        fx += dx * s;\n" +
+        "        fy += dy * s;\n" +
+        "        fz += dz * s;\n" +
+        "    }\n" +
+        "    forces[i * 3 + 0] = fx;\n" +
+        "    forces[i * 3 + 1] = fy;\n" +
+        "    forces[i * 3 + 2] = fz;\n" +
+        "}";
+
+    private static final String KERNEL_SOURCE_FLOAT = 
+        "extern \"C\"\n" +
+        "__global__ void nbody_forces_f(\n" +
+        "    const float* positions,\n" +
+        "    const float* masses,\n" +
+        "    float* forces,\n" +
+        "    int num_particles,\n" +
+        "    float G,\n" +
+        "    float softening)\n" +
+        "{\n" +
+        "    int i = blockIdx.x * blockDim.x + threadIdx.x;\n" +
+        "    if (i >= num_particles) return;\n" +
+        "\n" +
+        "    float fx = 0.0f, fy = 0.0f, fz = 0.0f;\n" +
+        "    float xi = positions[i * 3 + 0];\n" +
+        "    float yi = positions[i * 3 + 1];\n" +
+        "    float zi = positions[i * 3 + 2];\n" +
+        "\n" +
+        "    for (int j = 0; j < num_particles; j++) {\n" +
+        "        if (i == j) continue;\n" +
+        "        float dx = positions[j * 3 + 0] - xi;\n" +
+        "        float dy = positions[j * 3 + 1] - yi;\n" +
+        "        float dz = positions[j * 3 + 2] - zi;\n" +
+        "        float distSq = dx * dx + dy * dy + dz * dz + softening * softening;\n" +
+        "        float invDist = rsqrtf(distSq);\n" +
+        "        float invDist3 = invDist * invDist * invDist;\n" +
+        "        float s = G * masses[j] * invDist3;\n" +
         "        fx += dx * s;\n" +
         "        fy += dy * s;\n" +
         "        fz += dz * s;\n" +
@@ -142,6 +179,18 @@ public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, Native
             
             kernel = new CUfunction();
             cuModuleGetFunction(kernel, module, "nbody_forces");
+
+            nvrtcProgram programFloat = new nvrtcProgram();
+            nvrtcCreateProgram(programFloat, KERNEL_SOURCE_FLOAT, "nbody_f.cu", 0, null, null);
+            nvrtcCompileProgram(programFloat, 0, null);
+            String[] ptxFloat = new String[1];
+            nvrtcGetPTX(programFloat, ptxFloat);
+            nvrtcDestroyProgram(programFloat);
+            
+            CUmodule moduleFloat = new CUmodule();
+            cuModuleLoadData(moduleFloat, ptxFloat[0]);
+            kernelFloat = new CUfunction();
+            cuModuleGetFunction(kernelFloat, moduleFloat, "nbody_forces_f");
             
             initialized = true;
         } catch (Exception e) {
@@ -188,6 +237,50 @@ public class NativeCUDANBodyBackend implements NBodyProvider, GPUBackend, Native
             throw new IllegalStateException("Problem size too small.");
         }
         computeForcesCUDA(positions, masses, forces, G, softening);
+    }
+
+    @Override
+    public void computeForces(float[] positions, float[] masses, float[] forces, float G, float softening) {
+        if (!initialized) initialize();
+        if (!initialized) throw new IllegalStateException("CUDA Backend not initialized");
+        
+        int n = masses.length;
+        CUdeviceptr d_positions = new CUdeviceptr();
+        CUdeviceptr d_masses = new CUdeviceptr();
+        CUdeviceptr d_forces = new CUdeviceptr();
+        
+        cuMemAlloc(d_positions, (long) n * 3 * 4);
+        cuMemAlloc(d_masses, (long) n * 4);
+        cuMemAlloc(d_forces, (long) n * 3 * 4);
+        
+        cuMemcpyHtoD(d_positions, jcuda.Pointer.to(positions), (long) n * 3 * 4);
+        cuMemcpyHtoD(d_masses, jcuda.Pointer.to(masses), (long) n * 4);
+        
+        Pointer kernelParams = Pointer.to(
+            Pointer.to(d_positions),
+            Pointer.to(d_masses),
+            Pointer.to(d_forces),
+            Pointer.to(new int[]{n}),
+            Pointer.to(new float[]{G}),
+            Pointer.to(new float[]{softening})
+        );
+        
+        int blockSizeX = 256;
+        int gridSizeX = (n + blockSizeX - 1) / blockSizeX;
+        
+        cuLaunchKernel(kernelFloat,
+            gridSizeX, 1, 1,
+            blockSizeX, 1, 1,
+            0, null,
+            kernelParams, null
+        );
+        cuCtxSynchronize();
+        
+        cuMemcpyDtoH(jcuda.Pointer.to(forces), d_forces, (long) n * 3 * 4);
+        
+        cuMemFree(d_positions);
+        cuMemFree(d_masses);
+        cuMemFree(d_forces);
     }
 
     @Override
