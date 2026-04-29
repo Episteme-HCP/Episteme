@@ -18,8 +18,6 @@
         <cuda.exclude.1>**/_NONE_/**</cuda.exclude.1>
         <cuda.exclude.2>**/_NONE_/**</cuda.exclude.2>
         <cuda.exclude.3>**/_NONE_/**</cuda.exclude.3>
-        <extra.compiler.args></extra.compiler.args>
-        <native.compiler.release>${maven.compiler.release}</native.compiler.release>
     </properties>
 
     <dependencies>
@@ -181,13 +179,12 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <!-- IMPORTANT: Ensure your IDE is configured for Java 25 for this module -->
-                    <release>25</release>
+                    <release>${maven.compiler.release}</release>
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>--add-modules</arg>
                         <arg>jdk.incubator.vector</arg>
                         <arg>-Xpkginfo:always</arg>
-                        <arg>${extra.compiler.args}</arg>
                     </compilerArgs>
                     <excludes>
                         <exclude>${cuda.exclude.1}</exclude>
@@ -410,18 +407,6 @@
                 <cuda.exclude.1>**/*CUDA*</cuda.exclude.1>
                 <cuda.exclude.2>**/*Cuda*</cuda.exclude.2>
                 <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
-            </properties>
-        </profile>
-        <profile>
-            <id>override-native-for-jdk21-build</id>
-            <activation>
-                <property>
-                    <name>artifact.classifier</name>
-                    <value>jdk21</value>
-                </property>
-            </activation>
-            <properties>
-                <native.compiler.release>25</native.compiler.release>
             </properties>
         </profile>
     </profiles>

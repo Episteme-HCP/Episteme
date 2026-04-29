@@ -118,7 +118,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
                 <excludes>
                     <exclude>**/*.jpg</exclude>
                     <exclude>**/*.png</exclude>
@@ -137,7 +137,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -153,7 +152,6 @@
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>-Xpkginfo:always</arg>
-                        
                     </compilerArgs>
                     <excludes>
                         <!-- Medical/Consultation files remain in episteme-social -->
