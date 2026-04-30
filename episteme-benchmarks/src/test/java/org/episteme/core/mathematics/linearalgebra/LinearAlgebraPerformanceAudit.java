@@ -134,7 +134,7 @@ public class LinearAlgebraPerformanceAudit {
             MathContext.setCurrent(previous);
         }
 
-        reporter.generateReport("performance_audit_" + precisionProp);
+        reporter.generateReport("linear_algebra_performance_" + precisionProp);
     }
 
     private void measureExecution(Map<String, Object> metrics, LinearAlgebraProvider<?> prov, LinearAlgebraProvider<?> ref, String precision) {

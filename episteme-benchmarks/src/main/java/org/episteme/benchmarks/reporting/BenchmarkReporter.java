@@ -342,30 +342,42 @@ public class BenchmarkReporter {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         for (BenchmarkResult r : results) {
-            String key = isLatency ? op + ":latency" : op + ":throughput";
-            Object valObj = r.extraMetrics().get(key);
-            if (valObj == null && !isLatency) {
-                 // Fallback to legacy key or manual calc if throughput not present
-                 valObj = r.extraMetrics().get(op);
-                 if (valObj instanceof Number n && n.doubleValue() > 0 && !isLatency) {
-                     // If it's legacy duration, convert to ops/sec
-                     // but wait, duration is what we have. Let's stick to the new format.
-                 }
+            // Check for multi-mode metrics (e.g., "FAST (32-bit):latency")
+            boolean foundMultiMode = false;
+            for (String key : r.extraMetrics().keySet()) {
+                if (key.contains(":") && key.endsWith(isLatency ? ":latency" : ":throughput")) {
+                    String mode = key.substring(0, key.indexOf(":"));
+                    Object valObj = r.extraMetrics().get(key);
+                    double val = (valObj instanceof Number n) ? n.doubleValue() : 0.0;
+                    if (val > 0) {
+                        dataset.addValue(val, mode, r.provider());
+                        foundMultiMode = true;
+                    }
+                }
             }
-            
-            double val = (valObj instanceof Number n) ? n.doubleValue() : 0.0;
-            if (val > 0) {
-                dataset.addValue(val, metricType, r.provider());
+
+            if (!foundMultiMode) {
+                String key = isLatency ? op + ":latency" : op + ":throughput";
+                Object valObj = r.extraMetrics().get(key);
+                if (valObj == null && !isLatency) {
+                     valObj = r.extraMetrics().get(op);
+                }
+                
+                double val = (valObj instanceof Number n) ? n.doubleValue() : 0.0;
+                if (val > 0) {
+                    dataset.addValue(val, metricType, r.provider());
+                }
             }
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                op + " | " + metricType,
+                op + " | " + (dataset.getRowCount() > 1 ? "Mode Comparison" : metricType),
                 null,
                 yLabel,
                 dataset,
                 PlotOrientation.HORIZONTAL,
-                false, true, false);
+                dataset.getRowCount() > 1, // Show legend if multiple modes
+                true, false);
 
         chart.setBackgroundPaint(java.awt.Color.WHITE);
         CategoryPlot plot = chart.getCategoryPlot();

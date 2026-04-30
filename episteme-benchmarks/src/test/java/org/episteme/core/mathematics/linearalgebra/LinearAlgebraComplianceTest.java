@@ -127,9 +127,9 @@ public class LinearAlgebraComplianceTest {
 
     private void configureForMode() {
         switch (mode) {
-            case FAST -> { matrixSize = 8; reportFileName = "UNIVERSAL_AUDIT_FAST.md"; }
-            case EXACT -> { matrixSize = 6; reportFileName = "UNIVERSAL_AUDIT_EXACT.md"; }
-            default -> { matrixSize = 12; reportFileName = "UNIVERSAL_AUDIT_NORMAL.md"; }
+            case FAST -> { matrixSize = 8; reportFileName = "LINEAR_ALGEBRA_AUDIT_FAST.md"; }
+            case EXACT -> { matrixSize = 6; reportFileName = "LINEAR_ALGEBRA_AUDIT_EXACT.md"; }
+            default -> { matrixSize = 12; reportFileName = "LINEAR_ALGEBRA_AUDIT_NORMAL.md"; }
         }
     }
 
@@ -207,7 +207,7 @@ public class LinearAlgebraComplianceTest {
     private void printMarkdownReport(List<ComplianceResult> results) {
         if (results.isEmpty()) return;
         StringBuilder sb = new StringBuilder();
-        sb.append("# Episteme Universal Linear Algebra Audit Report (").append(mode).append(")\n\n");
+        sb.append("# Episteme Linear Algebra Audit Report (").append(mode).append(")\n\n");
         sb.append("This report summarizes the compliance and feature support for all discovered Linear Algebra backends. ");
         sb.append("Status codes: ✅ PASS, ❌ FAIL, 🔘 DISABLED (Hardware missing), ➕ N/A (Unsupported).\n\n");
         

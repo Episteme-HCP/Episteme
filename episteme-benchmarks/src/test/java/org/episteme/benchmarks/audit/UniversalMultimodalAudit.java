@@ -62,6 +62,7 @@ public class UniversalMultimodalAudit {
         }
 
         reporter.generateReport("universal_multimodal_audit");
+        reporter.exportToRoot("docs/UNIVERSAL_MULTIMODAL_AUDIT.md");
     }
 
     private void auditMode(AlgorithmProvider provider, String modeName, MathContext ctx, Map<String, Object> metrics, int size, Supplier<Object> matrixSupplier) {
