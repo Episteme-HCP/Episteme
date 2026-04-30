@@ -32,6 +32,7 @@ public class BenchmarkReporter {
 
     public enum ReportType { ALL, FAST, NORMAL, EXACT }
 
+    private final String reportTitle;
     private final java.util.List<BenchmarkResult> results = new java.util.ArrayList<>();
     private final Map<String, String> metadata = new LinkedHashMap<>();
 
