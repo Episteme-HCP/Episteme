@@ -1,16 +1,16 @@
 #!/bin/bash
-# run_universal_audit.sh
-# Launches the Universal Multimodal Performance Audit (Single JVM)
+# run_full_performance_benchmark.sh
+# Launches the Full Multimodal Performance Benchmark (Single JVM)
 
 echo "=========================================="
-echo "Starting Universal Multimodal Performance Audit"
+echo "Starting Full Multimodal Performance Benchmark"
 echo "=========================================="
 
 export MAVEN_OPTS="--add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED"
 
-mvn test -pl episteme-benchmarks -am -Dtest=UniversalMultimodalAudit -Dsurefire.failIfNoSpecifiedTests=false
+mvn clean test -pl episteme-benchmarks -am -Dtest=UniversalMultimodalAudit -Dsurefire.failIfNoSpecifiedTests=false
 
 echo "=========================================="
-echo "Audit Completed."
+echo "Benchmark Completed."
 echo "Reports generated in docs/benchmark-results/"
 echo "=========================================="
