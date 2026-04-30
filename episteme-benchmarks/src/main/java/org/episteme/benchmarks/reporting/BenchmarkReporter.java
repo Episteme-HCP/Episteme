@@ -32,8 +32,7 @@ public class BenchmarkReporter {
 
     public enum ReportType { ALL, FAST, NORMAL, EXACT }
 
-    private final String reportTitle;
-    private final List<BenchmarkResult> results = new ArrayList<>();
+    private final java.util.List<BenchmarkResult> results = new java.util.ArrayList<>();
     private final Map<String, String> metadata = new LinkedHashMap<>();
 
     public BenchmarkReporter(String title) {
@@ -48,7 +47,7 @@ public class BenchmarkReporter {
         results.add(result);
     }
 
-    public List<BenchmarkResult> getResults() {
+    public java.util.List<BenchmarkResult> getResults() {
         return results;
     }
 
@@ -91,7 +90,7 @@ public class BenchmarkReporter {
                 
                 json.append("\"metrics\":{");
                 if (r.extraMetrics() != null) {
-                    List<String> keys = new ArrayList<>(r.extraMetrics().keySet());
+                    java.util.List<String> keys = new java.util.ArrayList<>(r.extraMetrics().keySet());
                     for (int j = 0; j < keys.size(); j++) {
                         String k = keys.get(j);
                         Object v = r.extraMetrics().get(k);
@@ -161,7 +160,7 @@ public class BenchmarkReporter {
             document.add(table);
 
             // --- OPERATION COMPARISON PAGES ---
-            Set<String> allOps = new LinkedHashSet<>();
+            java.util.Set<String> allOps = new java.util.LinkedHashSet<>();
             for (BenchmarkResult r : results) allOps.add(r.benchmarkName());
 
             for (String op : allOps) {
@@ -192,7 +191,7 @@ public class BenchmarkReporter {
 
     private JFreeChart createComparisonChart(String operation, ReportType type) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        List<BenchmarkResult> opResults = results.stream()
+        java.util.List<BenchmarkResult> opResults = results.stream()
                 .filter(r -> r.benchmarkName().equals(operation))
                 .toList();
 

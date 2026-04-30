@@ -719,6 +719,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <release>${maven.compiler.release}</release>
+          <fork>false</fork>
           <compilerArgs>
             <arg>--add-modules</arg>
             <arg>jdk.incubator.vector</arg>
@@ -745,6 +746,7 @@
           <version>3.13.0</version>
           <configuration>
             <release>${maven.compiler.release}</release>
+            <fork>false</fork>
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>

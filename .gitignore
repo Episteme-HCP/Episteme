@@ -1,4 +1,6 @@
 target/
+bin/
+**/bin/
 *.class
 *.log
 *.jar
