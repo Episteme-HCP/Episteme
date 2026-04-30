@@ -145,7 +145,7 @@ public class ProviderRegistry {
             return specialized;
         }
         
-        return new DenseMatrixStorage<>(rows, cols, ring.zero());
+        return new DenseMatrixStorage<>(rows, cols, ring);
     }
 
     /**
@@ -156,6 +156,6 @@ public class ProviderRegistry {
             return new SparseVectorStorage<E>(dim, ring.zero());
         }
         // Native vector storage could be added here similar to matrix
-        return new DenseVectorStorage<E>(dim);
+        return new DenseVectorStorage<E>(dim, ring);
     }
 }

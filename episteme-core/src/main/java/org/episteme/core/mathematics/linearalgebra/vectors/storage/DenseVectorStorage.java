@@ -24,6 +24,9 @@
 package org.episteme.core.mathematics.linearalgebra.vectors.storage;
 
 import java.util.Arrays;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 
 /**
  * Dense storage for vectors using a standard array.
@@ -36,18 +39,27 @@ public class DenseVectorStorage<E> implements VectorStorage<E> {
     private final E[] data;
     private final int dimension;
 
-    public DenseVectorStorage(int dimension) {
+    @SuppressWarnings("unchecked")
+    public DenseVectorStorage(int dimension, E initialValue) {
         this.dimension = dimension;
-        // Generic array creation requires reflection or Object[] cast.
-        // For storage, we might just store Object[] if E is not reified, but here we
-        // assume caller might provide array or we cast.
-        // Actually, to be type-safe without passing Class<E>, we might have to use
-        // Object[] and cast on get.
-        // However, GenericVector usually knows the class.
-        // For simplicity in this refactor, we'll use Object[] internally and cast.
-        @SuppressWarnings("unchecked")
-        E[] arr = (E[]) new Object[dimension];
-        this.data = arr;
+        Class<?> componentType = Object.class;
+        if (initialValue != null) {
+            componentType = initialValue.getClass();
+            if (initialValue instanceof Real) componentType = Real.class;
+            else if (initialValue instanceof Complex) componentType = Complex.class;
+        }
+        this.data = (E[]) java.lang.reflect.Array.newInstance(componentType, dimension);
+        if (initialValue != null) {
+            java.util.Arrays.fill(this.data, initialValue);
+        }
+    }
+
+    public DenseVectorStorage(int dimension, Ring<E> ring) {
+        this(dimension, ring.zero());
+    }
+
+    public DenseVectorStorage(int dimension) {
+        this(dimension, (E) null);
     }
 
     public DenseVectorStorage(E[] data) {
@@ -57,9 +69,16 @@ public class DenseVectorStorage<E> implements VectorStorage<E> {
 
     public DenseVectorStorage(java.util.List<E> data) {
         this.dimension = data.size();
-        @SuppressWarnings("unchecked")
-        E[] arr = (E[]) data.toArray();
-        this.data = arr;
+        if (data.isEmpty()) {
+            this.data = (E[]) new Object[0];
+        } else {
+            E first = data.get(0);
+            Class<?> componentType = first.getClass();
+            if (first instanceof Real) componentType = Real.class;
+            else if (first instanceof Complex) componentType = Complex.class;
+            this.data = (E[]) java.lang.reflect.Array.newInstance(componentType, dimension);
+            for (int i = 0; i < dimension; i++) this.data[i] = data.get(i);
+        }
     }
 
     @Override

@@ -63,7 +63,7 @@ public class GenericCholesky {
 
     private static <E> E[] flatten(E[][] data, int n, Field<E> field) {
         @SuppressWarnings("unchecked")
-        E[] flat = (E[]) new Object[n * n];
+        E[] flat = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n * n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 flat[i * n + j] = data[i][j];

@@ -112,9 +112,9 @@ public class LinearAlgebraAuditSuite {
         // --- 6. SPARSE ITERATIVE ---
         if (p instanceof SparseLinearAlgebraProvider<E> sp) {
             Vector<E> x0 = randomVector(n, ref, ring, rand);
-            action.run(prefix + "Sparse:BiCGSTAB", () -> verify(sp.bicgstab(invA, v, x0, ring.one(), 5), ref.solve(invA, v), tolerance * 100)); 
-            action.run(prefix + "Sparse:ConjGrad", () -> verify(sp.conjugateGradient(spdA, v, x0, ring.one(), 5), ref.solve(spdA, v), tolerance * 100));
-            action.run(prefix + "Sparse:GMRES", () -> verify(sp.gmres(invA, v, x0, ring.one(), 5, 2), ref.solve(invA, v), tolerance * 100));
+            action.run(prefix + "Sparse:BiCGSTAB", () -> verify(sp.bicgstab(invA, v, x0, ring.one(), 50), ref.solve(invA, v), tolerance * 100)); 
+            action.run(prefix + "Sparse:ConjGrad", () -> verify(sp.conjugateGradient(spdA, v, x0, ring.one(), 50), ref.solve(spdA, v), tolerance * 100));
+            action.run(prefix + "Sparse:GMRES", () -> verify(sp.gmres(invA, v, x0, ring.one(), 50, 2), ref.solve(invA, v), tolerance * 100));
         }
         } catch (Throwable t) {
             System.err.println("[LinearAlgebraAudit] CRITICAL FAILURE during audit of " + p.getName() + " (" + prefix + "): " + t.toString());
@@ -145,11 +145,18 @@ public class LinearAlgebraAuditSuite {
                          (isComplex && ((org.episteme.core.mathematics.numbers.complex.Complex)(Object)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
         
         if (isComplex) {
+            Real rVal, iVal;
             if (isFloat) {
-                return (E) Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble()), 
-                                    org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble()));
+                rVal = org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble());
+                iVal = org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble());
+            } else if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex c && c.getReal() instanceof RealBig) {
+                rVal = RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
+                iVal = RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
+            } else {
+                rVal = Real.of(rand.nextDouble());
+                iVal = Real.of(rand.nextDouble());
             }
-            return (E) Complex.of(rand.nextDouble(), rand.nextDouble());
+            return (E) Complex.of(rVal, iVal);
         }
         
         if (zero instanceof RealBig) return (E) RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
@@ -169,6 +176,16 @@ public class LinearAlgebraAuditSuite {
         } else if (ring.zero() instanceof RealBig) {
             @SuppressWarnings("unchecked")
             E casted = (E) RealBig.create(new java.math.BigDecimal("16.0"));
+            large = casted;
+        } else if (isComplex) {
+            Real rVal;
+            if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex c && c.getReal() instanceof RealBig) {
+                rVal = RealBig.create(new java.math.BigDecimal("16.0"));
+            } else {
+                rVal = Real.of(16.0);
+            }
+            @SuppressWarnings("unchecked")
+            E casted = (E) Complex.of(rVal);
             large = casted;
         } else {
             @SuppressWarnings("unchecked")

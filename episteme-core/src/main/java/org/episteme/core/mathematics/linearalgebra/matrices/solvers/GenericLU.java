@@ -64,10 +64,9 @@ public class GenericLU {
 
         // Extract L and U
 
+        E[] lFlat = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n * n);
         @SuppressWarnings("unchecked")
-        E[] lFlat = (E[]) new Object[n * n];
-        @SuppressWarnings("unchecked")
-        E[] uFlat = (E[]) new Object[n * n];
+        E[] uFlat = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n * n);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i > j) { lFlat[i * n + j] = data[i][j]; uFlat[i * n + j] = field.zero(); }
@@ -105,14 +104,13 @@ public class GenericLU {
 
     public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int n = b.dimension();
+        E[] y = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         @SuppressWarnings("unchecked")
-        E[] y = (E[]) new Object[n];
-        @SuppressWarnings("unchecked")
-        E[] x = (E[]) new Object[n];
+        E[] x = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         
         // pb = P * b
         @SuppressWarnings("unchecked")
-        E[] pb = (E[]) new Object[n];
+        E[] pb = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);
         for (int i = 0; i < n; i++) pb[i] = b.get(toInt(lu.P().get(i)));
 
         Matrix<E> l = lu.L();
@@ -164,8 +162,7 @@ public class GenericLU {
     public static <E> Matrix<E> inverse(Matrix<E> a, Field<E> field, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider) {
         int n = a.rows();
         LUResult<E> lu = decompose(a, field, provider);
-        @SuppressWarnings("unchecked")
-        E[] invFlat = (E[]) new Object[n * n];
+        E[] invFlat = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n * n);
         for (int j = 0; j < n; j++) {
             @SuppressWarnings("unchecked")
             E[] e = (E[]) java.lang.reflect.Array.newInstance(componentType(field), n);

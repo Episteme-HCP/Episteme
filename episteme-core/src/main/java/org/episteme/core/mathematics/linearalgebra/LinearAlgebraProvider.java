@@ -126,10 +126,12 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
             double n1 = ((org.episteme.core.mathematics.numbers.real.Real)nA).doubleValue();
             double n2 = ((org.episteme.core.mathematics.numbers.real.Real)nB).doubleValue();
             
+            if (n1 == 0 || n2 == 0) return ring.zero(); // Or NaN? Usually 0 for parallel vectors if one is zero
+
             // Use atan2 for better numerical stability: theta = atan2(|a x b|, a . b)
             // For general n-D, |a x b|^2 = |a|^2 |b|^2 - (a.b)^2
-            double crossNorm = Math.sqrt(Math.max(0, (n1 * n1 * n2 * n2) - (dot * dot)));
-            double theta = Math.atan2(crossNorm, dot);
+            double crossNormSq = Math.max(0, (n1 * n1 * n2 * n2) - (dot * dot));
+            double theta = Math.atan2(Math.sqrt(crossNormSq), dot);
             
             Object zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
@@ -144,7 +146,16 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
         
         // Complex angle or fallback
         if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
+            if (ring.zero().equals(nA) || ring.zero().equals(nB)) return ring.zero();
             E cosTheta = field.divide(dAB, denom);
+            
+            // Manual clamping for Real values in Complex field if possible
+            if (cosTheta instanceof org.episteme.core.mathematics.numbers.real.Real r) {
+                double val = r.doubleValue();
+                if (val > 1.0) cosTheta = (E) org.episteme.core.mathematics.numbers.real.Real.of(1.0);
+                else if (val < -1.0) cosTheta = (E) org.episteme.core.mathematics.numbers.real.Real.of(-1.0);
+            }
+
             @SuppressWarnings("unchecked")
             E[][] data = (E[][]) new Object[][]{{cosTheta}};
             return acos(Matrix.of(data, ring)).get(0, 0);

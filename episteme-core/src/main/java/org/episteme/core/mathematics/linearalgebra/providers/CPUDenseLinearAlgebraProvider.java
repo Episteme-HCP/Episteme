@@ -779,7 +779,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             double s = ((Real) scalar).doubleValue();
             int rows = a.rows();
             int cols = a.cols();
-            double[] data = toDoubleArray(a);
+            double[] data = toDoubleArray(a).clone();
             for (int i = 0; i < data.length; i++) {
                 data[i] *= s;
             }

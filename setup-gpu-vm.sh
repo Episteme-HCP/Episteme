@@ -4,14 +4,17 @@
 
 set -e
 
+# Force non-interactive frontend for apt
+export DEBIAN_FRONTEND=noninteractive
+
 echo "--- [0/4] Basic Dependencies & Repositories ---"
 # Enable contrib, non-free and non-free-firmware for Debian 12 (Bookworm)
 if [ -f /etc/apt/sources.list.d/debian.sources ]; then
-    sudo sed -i 's/Components: main/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
+    sudo -E sed -i 's/Components: main/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
 fi
-sudo apt-get update
-sudo apt-get upgrade -y
-sudo apt-get install -y unzip zip curl git maven build-essential dkms
+sudo -E apt-get update
+sudo -E apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+sudo -E apt-get install -y unzip zip curl git maven build-essential dkms -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 echo "--- [1/4] JDK 25 Setup (SDKMAN) ---"
 if [ ! -d "$HOME/.sdkman" ]; then
@@ -35,9 +38,9 @@ sdk use java 25-open
 echo "--- [2/4] NVIDIA & CUDA Drivers ---"
 if ! command -v nvidia-smi &> /dev/null; then
     echo "Installing NVIDIA drivers..."
-    sudo apt-get update
-    sudo apt-get install -y linux-headers-cloud-amd64 build-essential
-    sudo apt-get install -y nvidia-driver nvidia-cuda-toolkit
+    sudo -E apt-get update
+    sudo -E apt-get install -y linux-headers-cloud-amd64 build-essential -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+    sudo -E apt-get install -y nvidia-driver nvidia-cuda-toolkit -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 else
     echo "[INFO] NVIDIA drivers found."
     nvidia-smi
@@ -45,7 +48,7 @@ fi
 
 # --- [3/4] OpenCL & Media Setup ---
 echo "Installing OpenCL runtimes and media dependencies..."
-sudo apt-get install -y mesa-opencl-icd ocl-icd-opencl-dev clinfo vlc
+sudo -E apt-get install -y mesa-opencl-icd ocl-icd-opencl-dev clinfo vlc -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 clinfo | grep -i "platform" || echo "[WARN] OpenCL clinfo check failed. You may need a reboot."
 
 echo "--- [4/4] Project Sync ---"
@@ -69,5 +72,5 @@ echo "IMPORTANT: If you just installed NVIDIA drivers, REBOOT the VM:"
 echo "sudo reboot"
 echo ""
 echo "After reboot, you can run benchmarks using:"
-echo "./run_vm_benchmark_local.sh"
+echo "./tmp/aws/run_la_compliance_aws.sh"
 echo "=========================================="

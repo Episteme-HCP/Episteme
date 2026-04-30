@@ -33,6 +33,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.Field;
+import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.OperationContext.Hint;
 import org.episteme.core.technical.backend.Backend;
@@ -222,17 +223,21 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         
         @Override
         public E angle(Vector<E> a, Vector<E> b) {
-            // EJML doesn't have specialized angle, but we ensure consistent double path
-            // Using atan2 for better numerical stability: theta = atan2(|a x b|, a . b)
-            // For n-D vectors, |a x b|^2 = |a|^2 |b|^2 - (a.b)^2
             double dot = toDouble(dot(a, b));
             double nA = toDouble(norm(a));
             double nB = toDouble(norm(b));
             
+            if (nA == 0 || nB == 0) return ring().zero();
+
+            // Using atan2 for better numerical stability: theta = atan2(|a x b|, a . b)
             double crossNormSq = Math.max(0, (nA * nA * nB * nB) - (dot * dot));
             double theta = Math.atan2(Math.sqrt(crossNormSq), dot);
             
             return fromDouble(theta);
+        }
+
+        private Ring<E> ring() {
+            return field;
         }
 
         private double toDouble(E val) {
@@ -275,10 +280,10 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         private Matrix<E> fromEjmlMatrix(org.ejml.simple.SimpleMatrix ejml) {
             int rows = ejml.getNumRows();
             int cols = ejml.getNumCols();
-            DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, (E) Real.ZERO);
+            DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, field.zero());
             for (int i = 0; i < rows; i++)
                 for (int j = 0; j < cols; j++)
-                    storage.set(i, j, (E) Real.of(ejml.get(i, j)));
+                    storage.set(i, j, fromDouble(ejml.get(i, j)));
             return new GenericMatrix<>(storage, this, field);
         }
 
@@ -306,7 +311,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             int size = ejml.getNumRows();
             E[] data = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), size);
             for (int i = 0; i < size; i++)
-                data[i] = (E) Real.of(ejml.get(i, 0));
+                data[i] = fromDouble(ejml.get(i, 0));
             return new GenericVector<>(new DenseVectorStorage<>(data), this, field);
         }
 
@@ -331,12 +336,12 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             }
         }
         @Override @SuppressWarnings("unchecked")
-        public E determinant(Matrix<E> a) { return (E) Real.of(toEjmlMatrix(a).determinant()); }
+        public E determinant(Matrix<E> a) { return fromDouble(toEjmlMatrix(a).determinant()); }
         @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return fromEjmlVector(toEjmlMatrix(a).solve(toEjmlVector(b))); }
         @Override public Matrix<E> transpose(Matrix<E> a) { return fromEjmlMatrix(toEjmlMatrix(a).transpose()); }
         @Override public Matrix<E> scale(E s, Matrix<E> a) { return fromEjmlMatrix(toEjmlMatrix(a).scale(((Real) s).doubleValue())); }
         @Override @SuppressWarnings("unchecked")
-        public E norm(Vector<E> a) { return (E) org.episteme.core.mathematics.numbers.real.Real.of(toEjmlVector(a).normF()); }
+        public E norm(Vector<E> a) { return fromDouble(toEjmlVector(a).normF()); }
 
         @Override
         public QRResult<E> qr(Matrix<E> a) {
@@ -371,7 +376,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             double[] singleton = svd.getSingularValues();
             
             E[] sData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), singleton.length);
-            for(int i=0; i<singleton.length; i++) sData[i] = (E)(Object) org.episteme.core.mathematics.numbers.real.Real.of(singleton[i]);
+            for(int i=0; i<singleton.length; i++) sData[i] = fromDouble(singleton[i]);
             Vector<E> S = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
                 new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(sData), this, field);
                 
@@ -392,7 +397,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             // Extract eigenvalues as a vector
             int size = Dmat.getNumRows();
             E[] dData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), size);
-            for(int i=0; i<size; i++) dData[i] = (E)(Object) org.episteme.core.mathematics.numbers.real.Real.of(Dmat.get(i, i));
+            for(int i=0; i<size; i++) dData[i] = fromDouble(Dmat.get(i, i));
             Vector<E> D = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
                 new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(dData), this, field);
                 
@@ -436,7 +441,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             
             int[] pivotArr = luDecomp.getRowPivotV(null);
             E[] pData = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), pivotArr.length);
-            for(int i=0; i<pivotArr.length; i++) pData[i] = (E)(Object) org.episteme.core.mathematics.numbers.real.Real.of(pivotArr[i]);
+            for(int i=0; i<pivotArr.length; i++) pData[i] = fromDouble(pivotArr[i]);
             Vector<E> P = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
                 new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(pData), this, field);
                 

@@ -76,39 +76,44 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             builder.addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION);
         }
         
-        R result = org.episteme.core.technical.algorithm.ProviderSelector.execute(
-            LinearAlgebraProvider.class, 
-            builder.build(), 
-            p -> {
-                if (this.getClass().isInstance(p) || (ring != null && !p.isCompatible(ring))) {
-                    throw new UnsupportedOperationException("Not suitable");
+        try {
+            R result = org.episteme.core.technical.algorithm.ProviderSelector.execute(
+                LinearAlgebraProvider.class, 
+                builder.build(), 
+                p -> {
+                    if (this.getClass().isInstance(p) || (ring != null && !p.isCompatible(ring))) {
+                        throw new UnsupportedOperationException("Not suitable");
+                    }
+                    org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected local provider: {} for operation", p.getName());
+                    R res = operation.apply((LinearAlgebraProvider<E>) (Object) p);
+                    if (res == null) {
+                        org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).warn("Provider {} returned null for operation!", p.getName());
+                    }
+                    return res;
                 }
-                org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected local provider: {} for operation", p.getName());
-                R res = operation.apply((LinearAlgebraProvider<E>) (Object) p);
-                if (res == null) {
-                    org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).warn("Provider {} returned null for operation!", p.getName());
+            );
+
+            if (result == null) {
+                throw new AlgorithmException("No suitable local provider found for operation in " + getName());
+            }
+
+            // Safety check to avoid ClassCastException (RealDouble -> RealBig)
+            if (isHighPrecision && result instanceof Matrix<?> m) {
+                if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                    throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
                 }
-                return res;
             }
-        );
-
-        if (result == null) {
-            throw new AlgorithmException("No suitable local provider found for operation in " + getName());
-        }
-
-        // Safety check to avoid ClassCastException (RealDouble -> RealBig)
-        if (isHighPrecision && result instanceof Matrix<?> m) {
-            if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
-                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+            if (isHighPrecision && result instanceof Vector<?> v) {
+                if (v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                    throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+                }
             }
-        }
-        if (isHighPrecision && result instanceof Vector<?> v) {
-            if (v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
-                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
-            }
-        }
 
-        return result;
+            return result;
+        } catch (Throwable t) {
+            if (t instanceof AlgorithmException) throw (AlgorithmException) t;
+            throw new AlgorithmException("Distributed operation fallback failed: " + t.getMessage(), t);
+        }
     }
 
     @Override
@@ -355,37 +360,42 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
             builder.addHint(org.episteme.core.technical.algorithm.OperationContext.Hint.HIGH_PRECISION);
         }
 
-        R result = org.episteme.core.technical.algorithm.ProviderSelector.execute(
-            SparseLinearAlgebraProvider.class, 
-            builder.build(), 
-            p -> {
-                if (this.getClass().isInstance(p)) throw new UnsupportedOperationException("Not suitable");
-                if (ring != null && !p.isCompatible(ring)) throw new UnsupportedOperationException("Not suitable");
-                org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected sparse local provider: {} for operation", p.getName());
-                R res = operation.apply((SparseLinearAlgebraProvider<E>) (Object) p);
-                if (res == null) {
-                    org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).warn("Sparse provider {} returned null for operation!", p.getName());
+        try {
+            R result = org.episteme.core.technical.algorithm.ProviderSelector.execute(
+                SparseLinearAlgebraProvider.class, 
+                builder.build(), 
+                p -> {
+                    if (this.getClass().isInstance(p)) throw new UnsupportedOperationException("Not suitable");
+                    if (ring != null && !p.isCompatible(ring)) throw new UnsupportedOperationException("Not suitable");
+                    org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).debug("Selected sparse local provider: {} for operation", p.getName());
+                    R res = operation.apply((SparseLinearAlgebraProvider<E>) (Object) p);
+                    if (res == null) {
+                        org.slf4j.LoggerFactory.getLogger(DistributedLinearAlgebraProvider.class).warn("Sparse provider {} returned null for operation!", p.getName());
+                    }
+                    return res;
                 }
-                return res;
-            }
-        );
+            );
 
-        if (result == null) {
-            throw new AlgorithmException("No suitable local sparse provider found for operation in " + getName());
-        }
-
-        if (isHighPrecision && result instanceof Matrix<?> m) {
-            if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
-                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+            if (result == null) {
+                throw new AlgorithmException("No suitable local sparse provider found for operation in " + getName());
             }
-        }
-        if (isHighPrecision && result instanceof Vector<?> v) {
-            if (v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
-                throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
-            }
-        }
 
-        return result;
+            if (isHighPrecision && result instanceof Matrix<?> m) {
+                if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                    throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+                }
+            }
+            if (isHighPrecision && result instanceof Vector<?> v) {
+                if (v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) {
+                    throw new UnsupportedOperationException("Fallback to double-precision detected for high-precision request in " + getName());
+                }
+            }
+
+            return result;
+        } catch (Throwable t) {
+            if (t instanceof AlgorithmException) throw (AlgorithmException) t;
+            throw new AlgorithmException("Distributed sparse operation fallback failed: " + t.getMessage(), t);
+        }
     }
 
     private Matrix<E> wrap(Matrix<E> m) {
