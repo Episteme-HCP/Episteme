@@ -717,6 +717,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <compilerArgs>
+            <arg>--add-modules</arg>
+            <arg>jdk.incubator.vector</arg>
+            <arg>-Xpkginfo:always</arg>
+            <arg>${extra.compiler.args}</arg>
+          </compilerArgs>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>
@@ -736,7 +745,6 @@
           <version>3.13.0</version>
           <configuration>
             <release>${maven.compiler.release}</release>
-            <fork>true</fork>
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
@@ -820,14 +828,7 @@
             </additionalOptions>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.3.0</version>
-          <configuration>
-            <finalName>${maven.jar.finalName}</finalName>
-          </configuration>
-        </plugin>
+
         <plugin>
           <groupId>kr.motd.maven</groupId>
           <artifactId>os-maven-plugin</artifactId>
@@ -952,35 +953,7 @@
         <os.detected.classifier>windows-x86_64</os.detected.classifier>
       </properties>
     </profile>
-    <profile>
-      <id>legacy</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <release>${maven.compiler.release}</release>
-              <compilerArgs>
-                <arg>--add-modules</arg>
-                <arg>jdk.incubator.vector</arg>
-                <arg>-Xpkginfo:always</arg>
-                <arg>${extra.compiler.args}</arg>
-              </compilerArgs>
-              <testExcludes>
-                <exclude>module-info.java</exclude>
-              </testExcludes>
-              <excludes>
-                <exclude>module-info.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
+
     <profile>
       <id>jpms</id>
       <build>
@@ -1080,6 +1053,17 @@
         <artifact.suffix>-jdk21</artifact.suffix>
         <maven.jar.finalName>${project.artifactId}-${project.version}-jdk21</maven.jar.finalName>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <finalName>${maven.jar.finalName}</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>release-jdk25</id>
@@ -1089,6 +1073,17 @@
         <artifact.suffix>-jdk25</artifact.suffix>
         <maven.jar.finalName>${project.artifactId}-${project.version}-jdk25</maven.jar.finalName>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <finalName>${maven.jar.finalName}</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <!-- Fat Jar Profile using Maven Shade -->

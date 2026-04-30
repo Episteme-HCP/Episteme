@@ -126,10 +126,11 @@ public class LinearAlgebraComplianceTest {
     }
 
     private void configureForMode() {
+        String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         switch (mode) {
-            case FAST -> { matrixSize = 8; reportFileName = "LINEAR_ALGEBRA_AUDIT_FAST.md"; }
-            case EXACT -> { matrixSize = 6; reportFileName = "LINEAR_ALGEBRA_AUDIT_EXACT.md"; }
-            default -> { matrixSize = 12; reportFileName = "LINEAR_ALGEBRA_AUDIT_NORMAL.md"; }
+            case FAST -> { matrixSize = 8; reportFileName = "LINEAR_ALGEBRA_AUDIT_FAST_" + timestamp + ".md"; }
+            case EXACT -> { matrixSize = 6; reportFileName = "LINEAR_ALGEBRA_AUDIT_EXACT_" + timestamp + ".md"; }
+            default -> { matrixSize = 12; reportFileName = "LINEAR_ALGEBRA_AUDIT_NORMAL_" + timestamp + ".md"; }
         }
     }
 

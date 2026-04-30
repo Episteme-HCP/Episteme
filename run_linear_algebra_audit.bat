@@ -21,7 +21,7 @@ call mvn test -pl episteme-benchmarks -am "-Drevision=1.0.0-beta2" -Dtest=Linear
 echo ==========================================
 echo Correctness Audit Completed.
 echo Reports generated in docs/:
-echo  - LINEAR_ALGEBRA_AUDIT_FAST.md
-echo  - LINEAR_ALGEBRA_AUDIT_NORMAL.md
-echo  - LINEAR_ALGEBRA_AUDIT_EXACT.md
+echo  - LINEAR_ALGEBRA_AUDIT_FAST_YYYYMMDD-HHMMSS.md
+echo  - LINEAR_ALGEBRA_AUDIT_NORMAL_YYYYMMDD-HHMMSS.md
+echo  - LINEAR_ALGEBRA_AUDIT_EXACT_YYYYMMDD-HHMMSS.md
 echo ==========================================

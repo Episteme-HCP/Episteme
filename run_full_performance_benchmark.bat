@@ -15,7 +15,7 @@ call mvn clean test -pl episteme-benchmarks -am "-Drevision=1.0.0-beta2" -Dtest=
 echo ==========================================
 echo Benchmark Completed.
 echo Reports generated in docs/benchmark-results/:
-echo  - linear_algebra_performance_multimodal.json
-echo  - linear_algebra_performance_multimodal.pdf
-echo  - LINEAR_ALGEBRA_PERFORMANCE_MULTIMODAL.md
+echo  - linear_algebra_performance_multimodal_YYYYMMDD-HHMMSS.json
+echo  - linear_algebra_performance_multimodal_YYYYMMDD-HHMMSS.pdf
+echo  - LINEAR_ALGEBRA_PERFORMANCE_MULTIMODAL_YYYYMMDD-HHMMSS.md
 echo ==========================================
