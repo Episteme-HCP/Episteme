@@ -102,6 +102,9 @@
     <argLine></argLine>
     <extra.compiler.args></extra.compiler.args>
     <mainClass></mainClass>
+    <artifact.classifier></artifact.classifier>
+    <artifact.suffix></artifact.suffix>
+    <maven.jar.finalName>${project.artifactId}-${project.version}</maven.jar.finalName>
   </properties>
 
   <dependencyManagement>
@@ -818,6 +821,14 @@
           </configuration>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.3.0</version>
+          <configuration>
+            <finalName>${maven.jar.finalName}</finalName>
+          </configuration>
+        </plugin>
+        <plugin>
           <groupId>kr.motd.maven</groupId>
           <artifactId>os-maven-plugin</artifactId>
           <version>1.7.1</version>
@@ -1066,6 +1077,8 @@
       <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <artifact.classifier>jdk21</artifact.classifier>
+        <artifact.suffix>-jdk21</artifact.suffix>
+        <maven.jar.finalName>${project.artifactId}-${project.version}-jdk21</maven.jar.finalName>
       </properties>
     </profile>
     <profile>
@@ -1073,6 +1086,8 @@
       <properties>
         <maven.compiler.release>25</maven.compiler.release>
         <artifact.classifier>jdk25</artifact.classifier>
+        <artifact.suffix>-jdk25</artifact.suffix>
+        <maven.jar.finalName>${project.artifactId}-${project.version}-jdk25</maven.jar.finalName>
       </properties>
     </profile>
 
