@@ -32,6 +32,11 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <scm>
+    <connection>scm:git:git://github.com/silveremartin-dev/Episteme.git</connection>
+    <developerConnection>scm:git:ssh://github.com:silveremartin-dev/Episteme.git</developerConnection>
+    <url>https://github.com/silveremartin-dev/Episteme/tree/main</url>
+  </scm>
   <distributionManagement>
     <repository>
       <id>github</id>
