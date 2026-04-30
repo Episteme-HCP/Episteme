@@ -68,7 +68,28 @@ public class UniversalMultimodalAudit {
         System.out.print("  -> Mode " + modeName + " (size=" + size + ")... ");
         MathContext previous = MathContext.getCurrent();
         try {
-            MathContext.setCurrent(ctx);
+            if (provider instanceof org.episteme.core.technical.algorithm.AlgorithmProvider) {
+                org.episteme.core.technical.algorithm.TestingAlgorithmService service = 
+                    new org.episteme.core.technical.algorithm.TestingAlgorithmService(java.util.List.of(provider), true);
+                
+                // Block fallback for all interfaces implemented by this provider
+                for (Class<?> iface : provider.getClass().getInterfaces()) {
+                    if (org.episteme.core.technical.algorithm.AlgorithmProvider.class.isAssignableFrom(iface) && 
+                        iface != org.episteme.core.technical.algorithm.AlgorithmProvider.class) {
+                        service.blockFallbackFor((Class<? extends org.episteme.core.technical.algorithm.AlgorithmProvider>) iface);
+                    }
+                }
+                org.episteme.core.technical.algorithm.AlgorithmManager.setService(service);
+            }
+
+            if (modeName.contains("EXACT")) {
+                MathContext exact = MathContext.exact();
+                MathContext.setCurrent(exact);
+                // Lower precision for audit to 64 digits (default is 1000)
+                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMathContext(new java.math.MathContext(64));
+            } else {
+                MathContext.setCurrent(ctx);
+            }
             
             // Define the task
             Runnable task = createTaskFor(provider, size, matrixSupplier);
@@ -97,6 +118,7 @@ public class UniversalMultimodalAudit {
             System.err.println("FAILED: " + t.getMessage());
             metrics.put(modeName + ":error", t.getMessage());
         } finally {
+            org.episteme.core.technical.algorithm.AlgorithmManager.setService(new org.episteme.core.technical.algorithm.StandardAlgorithmService());
             MathContext.setCurrent(previous);
         }
     }

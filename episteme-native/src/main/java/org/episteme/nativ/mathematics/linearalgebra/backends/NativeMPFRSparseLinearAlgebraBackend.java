@@ -56,7 +56,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override public String getName() { return "Native MPFR Sparse Linear Algebra Backend"; }
     @Override public String getDescription() { return "Native Arbitrary-Precision Sparse Linear Algebra using MPFR."; }
     @Override public String getType() { return "linearalgebra"; }
-    @Override public int getPriority() { return 1500; }
+    @Override public int getPriority() { return 5; }
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.CPU; }
     @Override public boolean isLoaded() { return AVAILABLE; }
     @Override public String getNativeLibraryName() { return "mpfr"; }

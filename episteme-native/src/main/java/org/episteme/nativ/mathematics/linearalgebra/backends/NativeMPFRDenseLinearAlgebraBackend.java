@@ -53,7 +53,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
     @Override
     public int getPriority() {
-        return 120;
+        return 5;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     public double score(OperationContext context) {
         if (!AVAILABLE) return -1.0;
         
-        double base = getPriority(); // 120
+        double base = getPriority(); 
         if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
             base += 1000.0; // King of precision
         }

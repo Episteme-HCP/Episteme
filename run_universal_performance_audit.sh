@@ -8,11 +8,8 @@ echo "=========================================="
 
 export MAVEN_OPTS="--add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED"
 
-echo "[1/2] Running NORMAL Performance Audit..."
-mvn test -pl episteme-benchmarks -Dtest=LinearAlgebraPerformanceAudit -Dorg.episteme.test.precision=normal
-
-echo "[2/2] Running EXACT Performance Audit (CAUTION: High Precision)..."
-mvn test -pl episteme-benchmarks -Dtest=LinearAlgebraPerformanceAudit -Dorg.episteme.test.precision=exact
+echo "Redirecting to run_universal_audit.sh..."
+./run_universal_audit.sh
 
 echo "=========================================="
 echo "Performance Audits Completed."

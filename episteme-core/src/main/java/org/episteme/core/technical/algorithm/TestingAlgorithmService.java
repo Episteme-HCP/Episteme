@@ -23,6 +23,7 @@ public class TestingAlgorithmService implements AlgorithmService {
     private final AlgorithmService delegate = new StandardAlgorithmService();
 
     private final boolean fallbackAllowed;
+    private final Set<Class<? extends AlgorithmProvider>> blockedFallbackClasses = new HashSet<>();
 
     public TestingAlgorithmService(AlgorithmProvider... providers) {
         this(Arrays.asList(providers), false);
@@ -35,6 +36,14 @@ public class TestingAlgorithmService implements AlgorithmService {
     public TestingAlgorithmService(List<AlgorithmProvider> providers, boolean fallbackAllowed) {
         this.allowedProviders = new ArrayList<>(providers);
         this.fallbackAllowed = fallbackAllowed;
+    }
+
+    /**
+     * Blocks fallback for a specific interface, forcing the use of allowedProviders only.
+     */
+    public TestingAlgorithmService blockFallbackFor(Class<? extends AlgorithmProvider> providerClass) {
+        blockedFallbackClasses.add(providerClass);
+        return this;
     }
 
     @Override
@@ -53,7 +62,7 @@ public class TestingAlgorithmService implements AlgorithmService {
                 .map(providerClass::cast)
                 .collect(Collectors.toList());
         
-        if (result.isEmpty() && fallbackAllowed) {
+        if (result.isEmpty() && fallbackAllowed && !blockedFallbackClasses.contains(providerClass)) {
             return delegate.getProviders(providerClass);
         }
         return result;
