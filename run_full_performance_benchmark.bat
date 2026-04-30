@@ -10,12 +10,12 @@ echo ==========================================
 set MAVEN_OPTS=--add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED
 
 echo Running Universal Multimodal Audit...
-call mvn clean test -pl episteme-benchmarks -am -Dtest=UniversalMultimodalAudit -Dsurefire.failIfNoSpecifiedTests=false
+call mvn clean test -pl episteme-benchmarks -am "-Drevision=1.0.0-beta2" -Dtest=UniversalMultimodalAudit -Dsurefire.failIfNoSpecifiedTests=false
 
 echo ==========================================
 echo Benchmark Completed.
 echo Reports generated in docs/benchmark-results/:
-echo  - universal_multimodal_audit.json
-echo  - universal_multimodal_audit.pdf
-echo  - UNIVERSAL_MULTIMODAL_AUDIT.md
+echo  - linear_algebra_performance_multimodal.json
+echo  - linear_algebra_performance_multimodal.pdf
+echo  - LINEAR_ALGEBRA_PERFORMANCE_MULTIMODAL.md
 echo ==========================================

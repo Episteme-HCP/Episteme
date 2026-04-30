@@ -121,7 +121,7 @@ public class LinearAlgebraComplianceTest {
             reporter.addResult(res);
         }
 
-        reporter.generateReport("compliance_audit_" + mode.toString().toLowerCase());
+        reporter.generateReport("linear_algebra_audit_" + mode.toString().toLowerCase());
         printMarkdownReport(results);
     }
 

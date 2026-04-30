@@ -11,6 +11,7 @@ import org.episteme.core.mathematics.structures.rings.Ring;
 
 import java.util.ServiceLoader;
 import org.episteme.core.mathematics.numbers.real.RealProvider;
+import org.episteme.audit.mathematics.linearalgebra.HighPrecisionAuditOperations;
 
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
@@ -205,7 +206,7 @@ public class HighPrecisionComplianceTest {
             reporter.addResult(res);
         }
 
-        reporter.generateReport("high_precision_compliance_audit");
+        reporter.generateReport("linear_algebra_compliance_hp_audit");
         printMarkdownReport(results);
     }
 

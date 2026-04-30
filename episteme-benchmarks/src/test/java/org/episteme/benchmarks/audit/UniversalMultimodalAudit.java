@@ -61,8 +61,8 @@ public class UniversalMultimodalAudit {
             reporter.addResult(result);
         }
 
-        reporter.generateReport("universal_multimodal_audit");
-        reporter.exportToRoot("docs/UNIVERSAL_MULTIMODAL_AUDIT.md");
+        reporter.generateReport("linear_algebra_performance_multimodal");
+        reporter.exportToRoot("docs/LINEAR_ALGEBRA_PERFORMANCE_MULTIMODAL.md");
     }
 
     private void auditMode(AlgorithmProvider provider, String modeName, MathContext ctx, Map<String, Object> metrics, int size, Supplier<Object> matrixSupplier) {
