@@ -43,7 +43,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * Binds to OpenBLAS/MKL for Matrix Operations.
  * Implements {@link CPUBackend}, {@link NativeBackend} and {@link AlgorithmProvider}.
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, AlgorithmProvider.class})
 @SuppressWarnings("unchecked")
 public class NativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     

@@ -33,7 +33,7 @@ import org.episteme.core.technical.backend.cpu.CPUBackend;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({FFTProvider.class, ComputeBackend.class, CPUBackend.class, Backend.class, NativeBackend.class})
+@AutoService({FFTProvider.class, ComputeBackend.class, CPUBackend.class, Backend.class, NativeBackend.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class})
 public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend {
 
     private static MethodHandle DPLAN_R2C_1D;

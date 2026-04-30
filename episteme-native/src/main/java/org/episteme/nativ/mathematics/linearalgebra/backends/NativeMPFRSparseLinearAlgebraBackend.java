@@ -33,7 +33,7 @@ import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNum
  * Arbitrary-precision Sparse Linear Algebra backend using MPFR (via Panama).
  * Optimized for CSR storage.
  */
-@com.google.auto.service.AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class})
+@com.google.auto.service.AutoService({LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class})
 @SuppressWarnings("unchecked")
 public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRSparseLinearAlgebraBackend.class);

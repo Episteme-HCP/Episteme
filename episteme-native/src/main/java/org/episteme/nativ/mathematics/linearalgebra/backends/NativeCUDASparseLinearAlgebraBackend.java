@@ -37,7 +37,7 @@ import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class})
 public class NativeCUDASparseLinearAlgebraBackend implements SparseLinearAlgebraProvider<Real>, NativeBackend, GPUBackend {
     
     @Override

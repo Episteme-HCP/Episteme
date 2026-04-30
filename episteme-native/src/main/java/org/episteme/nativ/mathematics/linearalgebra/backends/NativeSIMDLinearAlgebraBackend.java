@@ -40,7 +40,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.RealFloatVector;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class})
 @SuppressWarnings("unchecked")
 public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend, SIMDBackend {
 
@@ -343,6 +343,13 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (isComplex(a)) return (Matrix<E>) (Object) executeComplexMultiply((Matrix<Complex>) (Object) a, (Matrix<Complex>) (Object) b);
         logger.debug("Entering SIMD multiply: [{}x{}] * [{}x{}]", a.rows(), a.cols(), b.rows(), b.cols());
+        
+        if (isFastPrecision()) {
+            SIMDRealFloatMatrix sa = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a);
+            SIMDRealFloatMatrix sb = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) b);
+            return (Matrix<E>) (Object) sa.multiply(sb);
+        }
+
         SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
         SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) b);
         return (Matrix<E>) (Object) sa.multiply(sb);
@@ -351,6 +358,13 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
         if (isComplex(a)) return (Matrix<E>) (Object) executeComplexAdd((Matrix<Complex>) (Object) a, (Matrix<Complex>) (Object) b);
+        
+        if (isFastPrecision()) {
+            SIMDRealFloatMatrix sa = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a);
+            SIMDRealFloatMatrix sb = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) b);
+            return (Matrix<E>) (Object) sa.add(sb);
+        }
+
         SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
         SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) b);
         return (Matrix<E>) (Object) sa.add(sb);
@@ -359,6 +373,13 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
         if (isComplex(a)) return (Matrix<E>) (Object) executeComplexSubtract((Matrix<Complex>) (Object) a, (Matrix<Complex>) (Object) b);
+        
+        if (isFastPrecision()) {
+            SIMDRealFloatMatrix sa = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a);
+            SIMDRealFloatMatrix sb = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) b);
+            return (Matrix<E>) (Object) sa.subtract(sb);
+        }
+
         SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
         SIMDRealDoubleMatrix sb = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) b);
         return (Matrix<E>) (Object) sa.subtract(sb);
@@ -367,6 +388,12 @@ public class NativeSIMDLinearAlgebraBackend<E> implements LinearAlgebraProvider<
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         if (isComplex(a)) return (Matrix<E>) (Object) executeComplexScale((Complex) (Object) scalar, (Matrix<Complex>) (Object) a);
+        
+        if (isFastPrecision()) {
+            SIMDRealFloatMatrix sa = SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a);
+            return (Matrix<E>) (Object) sa.scale(((Real) (Object) scalar).floatValue());
+        }
+
         SIMDRealDoubleMatrix sa = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
         return (Matrix<E>) (Object) sa.scale(((Real) (Object) scalar).doubleValue());
     }
