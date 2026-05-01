@@ -96,7 +96,7 @@ else
     DEPENDENCY_DIR="episteme-benchmarks/target/lib"
     if [ ! -d "$DEPENDENCY_DIR" ]; then
         echo "[INFO] Dependencies not found in target, copying..."
-        mvn dependency:copy-dependencies -pl episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests -DexcludeGroupIds=org.episteme
+        mvn dependency:copy-dependencies -pl episteme-benchmarks -am -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests -DexcludeGroupIds=org.episteme
     fi
     java -XshowSettings:properties -Djava.awt.headless=true -verbose:jni --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "${MODULE_PATH}:${DEPENDENCY_DIR}/*:${LIB_DIR}/*" "${APP_CLASS}" "$@"
 fi

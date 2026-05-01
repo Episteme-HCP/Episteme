@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
 )
 
 echo [INFO] Cleaning and compiling episteme-server...
-call mvn clean package -pl episteme-server -DskipTests
+call mvn clean package -pl episteme-server -am -DskipTests
 
 if %errorlevel% neq 0 (
     echo [ERROR] Maven build failed.

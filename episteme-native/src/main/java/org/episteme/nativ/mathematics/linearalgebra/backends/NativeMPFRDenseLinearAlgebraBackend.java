@@ -891,16 +891,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         MemorySegment aR = getMPFR(h_A, i, j, cols, 0, true);
                         MemorySegment aI = getMPFR(h_A, i, j, cols, 1, true);
                         
-                        MemorySegment logAR = arena.allocate(MPFR_LAYOUT); tracker.track(logAR, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, logAR, (int) prec);
-                        MemorySegment logAI = arena.allocate(MPFR_LAYOUT); tracker.track(logAI, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, logAI, (int) prec);
+                        MemorySegment logAR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAR, (int) prec);
+                        MemorySegment logAI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, logAI, (int) prec);
                         try {
-                            complexLog(logAR, logAI, aR, aI, (int) prec, arena, tracker);
+                            complexLog(logAR, logAI, aR, aI, (int) prec, arena, null);
                             
-                            MemorySegment prodR = arena.allocate(MPFR_LAYOUT); tracker.track(prodR, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
-                            MemorySegment prodI = arena.allocate(MPFR_LAYOUT); tracker.track(prodI, s -> NativeSafe.invoke(MPFR_CLEAR, s)); NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
+                            MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
+                            MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
                             try {
-                                complexMultiply(prodR, prodI, h_ExponentR, h_ExponentI, logAR, logAI, (int) prec, arena, tracker);
-                                complexExp(resR, resI, prodR, prodI, (int) prec, arena, tracker);
+                                complexMultiply(prodR, prodI, h_ExponentR, h_ExponentI, logAR, logAI, (int) prec, arena, null);
+                                complexExp(resR, resI, prodR, prodI, (int) prec, arena, null);
                             } finally {
                                 NativeSafe.invoke(MPFR_CLEAR, prodR); NativeSafe.invoke(MPFR_CLEAR, prodI);
                             }
@@ -1612,31 +1612,43 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         if (MPFR_HYPOT != null) {
             NativeSafe.invoke(MPFR_HYPOT, rop, opR, opI, 0);
         } else {
-            MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
-            MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
+            MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
+            MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, t1, prec);
             NativeSafe.invoke(MPFR_INIT2, t2, prec);
-            NativeSafe.invoke(MPFR_MUL, t1, opR, opR, 0);
-            NativeSafe.invoke(MPFR_MUL, t2, opI, opI, 0);
-            NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
-            NativeSafe.invoke(MPFR_SQRT, rop, t1, 0);
+            try {
+                NativeSafe.invoke(MPFR_MUL, t1, opR, opR, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, opI, opI, 0);
+                NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                NativeSafe.invoke(MPFR_SQRT, rop, t1, 0);
+            } finally {
+                NativeSafe.invoke(MPFR_CLEAR, t1);
+                NativeSafe.invoke(MPFR_CLEAR, t2);
+            }
         }
     }
 
     public static void complexExp(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
-        MemorySegment expR = arena.allocate(MPFR_LAYOUT); track(tracker, expR);
-        MemorySegment cosI = arena.allocate(MPFR_LAYOUT); track(tracker, cosI);
-        MemorySegment sinI = arena.allocate(MPFR_LAYOUT); track(tracker, sinI);
+        MemorySegment expR = arena.allocate(MPFR_LAYOUT);
+        MemorySegment cosI = arena.allocate(MPFR_LAYOUT);
+        MemorySegment sinI = arena.allocate(MPFR_LAYOUT);
 
         NativeSafe.invoke(MPFR_INIT2, expR, prec);
-        NativeSafe.invoke(MPFR_EXP, expR, aR, 0);
         NativeSafe.invoke(MPFR_INIT2, cosI, prec);
         NativeSafe.invoke(MPFR_INIT2, sinI, prec);
-        NativeSafe.invoke(MPFR_COS, cosI, aI, 0);
-        NativeSafe.invoke(MPFR_SIN, sinI, aI, 0);
         
-        NativeSafe.invoke(MPFR_MUL, resR, expR, cosI, 0);
-        NativeSafe.invoke(MPFR_MUL, resI, expR, sinI, 0);
+        try {
+            NativeSafe.invoke(MPFR_EXP, expR, aR, 0);
+            NativeSafe.invoke(MPFR_COS, cosI, aI, 0);
+            NativeSafe.invoke(MPFR_SIN, sinI, aI, 0);
+            
+            NativeSafe.invoke(MPFR_MUL, resR, expR, cosI, 0);
+            NativeSafe.invoke(MPFR_MUL, resI, expR, sinI, 0);
+        } finally {
+            NativeSafe.invoke(MPFR_CLEAR, expR);
+            NativeSafe.invoke(MPFR_CLEAR, cosI);
+            NativeSafe.invoke(MPFR_CLEAR, sinI);
+        }
     }
 
     public static void complexLog(MemorySegment resR, MemorySegment resI, MemorySegment aR, MemorySegment aI, int prec, Arena arena, ResourceTracker tracker) {
@@ -1646,60 +1658,69 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             return;
         }
 
-        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
-        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
-        MemorySegment pi = arena.allocate(MPFR_LAYOUT); track(tracker, pi);
-        MemorySegment zero = arena.allocate(MPFR_LAYOUT); track(tracker, zero);
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
+        MemorySegment pi = arena.allocate(MPFR_LAYOUT);
+        MemorySegment zero = arena.allocate(MPFR_LAYOUT);
         
         NativeSafe.invoke(MPFR_INIT2, t1, prec);
         NativeSafe.invoke(MPFR_INIT2, t2, prec);
         NativeSafe.invoke(MPFR_INIT2, pi, prec);
-        NativeSafe.invoke(MPFR_INIT2, zero, (int) prec);
+        NativeSafe.invoke(MPFR_INIT2, zero, prec);
     
-        NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
-        NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
-        NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+        try {
+            NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
+            NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
+            NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
 
-        if (((Number) NativeSafe.invoke(MPFR_ZERO_P, t1)).intValue() != 0) {
-            NativeSafe.invoke(MPFR_SET_INF, resR, -1);
-        } else {
-            NativeSafe.invoke(MPFR_LOG, t1, t1, 0);
-            NativeSafe.invoke(MPFR_SET_D, t2, 0.5, 0);
-            NativeSafe.invoke(MPFR_MUL, resR, t1, t2, 0);
-        }
-        
-        if (MPFR_ATAN2 != null) {
-            NativeSafe.invoke(MPFR_ATAN2, resI, aI, aR, 0);
-        } else {
-            NativeSafe.invoke(MPFR_CONST_PI, pi, 0);
-            NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
-            int cmpX = (int) NativeSafe.invoke(MPFR_CMP, aR, zero);
-            int cmpY = (int) NativeSafe.invoke(MPFR_CMP, aI, zero);
-            
-            if (cmpX > 0) {
-                NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
-                NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
-            } else if (cmpX < 0) {
-                NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
-                NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
-                if (cmpY >= 0) NativeSafe.invoke(MPFR_ADD, resI, resI, pi, 0);
-                else NativeSafe.invoke(MPFR_SUB, resI, resI, pi, 0);
+            if (((Number) NativeSafe.invoke(MPFR_ZERO_P, t1)).intValue() != 0) {
+                NativeSafe.invoke(MPFR_SET_INF, resR, -1);
             } else {
-                if (cmpY > 0) {
-                    MemorySegment two = arena.allocate(MPFR_LAYOUT); track(tracker, two);
-                    NativeSafe.invoke(MPFR_INIT2, two, prec);
-                    NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
-                    NativeSafe.invoke(MPFR_DIV, resI, pi, two, 0);
-                } else if (cmpY < 0) {
-                    MemorySegment two = arena.allocate(MPFR_LAYOUT); track(tracker, two);
-                    NativeSafe.invoke(MPFR_INIT2, two, prec);
-                    NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
-                    NativeSafe.invoke(MPFR_DIV, resI, pi, two, 0);
-                    NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
+                NativeSafe.invoke(MPFR_LOG, t1, t1, 0);
+                NativeSafe.invoke(MPFR_SET_D, t2, 0.5, 0);
+                NativeSafe.invoke(MPFR_MUL, resR, t1, t2, 0);
+            }
+            
+            if (MPFR_ATAN2 != null) {
+                NativeSafe.invoke(MPFR_ATAN2, resI, aI, aR, 0);
+            } else {
+                NativeSafe.invoke(MPFR_CONST_PI, pi, 0);
+                NativeSafe.invoke(MPFR_SET_UI, zero, 0L, 0);
+                int cmpX = (int) NativeSafe.invoke(MPFR_CMP, aR, zero);
+                int cmpY = (int) NativeSafe.invoke(MPFR_CMP, aI, zero);
+                
+                if (cmpX > 0) {
+                    NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
+                    NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
+                } else if (cmpX < 0) {
+                    NativeSafe.invoke(MPFR_DIV, resI, aI, aR, 0);
+                    NativeSafe.invoke(MPFR_ATAN, resI, resI, 0);
+                    if (cmpY >= 0) NativeSafe.invoke(MPFR_ADD, resI, resI, pi, 0);
+                    else NativeSafe.invoke(MPFR_SUB, resI, resI, pi, 0);
                 } else {
-                    NativeSafe.invoke(MPFR_SET_UI, resI, 0L, 0);
+                    if (cmpY > 0) {
+                        MemorySegment two = arena.allocate(MPFR_LAYOUT);
+                        NativeSafe.invoke(MPFR_INIT2, two, prec);
+                        NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
+                        NativeSafe.invoke(MPFR_DIV, resI, pi, two, 0);
+                        NativeSafe.invoke(MPFR_CLEAR, two);
+                    } else if (cmpY < 0) {
+                        MemorySegment two = arena.allocate(MPFR_LAYOUT);
+                        NativeSafe.invoke(MPFR_INIT2, two, prec);
+                        NativeSafe.invoke(MPFR_SET_UI, two, 2L, 0);
+                        NativeSafe.invoke(MPFR_DIV, resI, pi, two, 0);
+                        NativeSafe.invoke(MPFR_NEG, resI, resI, 0);
+                        NativeSafe.invoke(MPFR_CLEAR, two);
+                    } else {
+                        NativeSafe.invoke(MPFR_SET_UI, resI, 0L, 0);
+                    }
                 }
             }
+        } finally {
+            NativeSafe.invoke(MPFR_CLEAR, t1);
+            NativeSafe.invoke(MPFR_CLEAR, t2);
+            NativeSafe.invoke(MPFR_CLEAR, pi);
+            NativeSafe.invoke(MPFR_CLEAR, zero);
         }
     }
 

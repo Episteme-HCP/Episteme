@@ -769,13 +769,13 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     // ==================== Sparse Iterative Solvers ====================
     
     @Override
-    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int getMaxIterations) {
+    public org.episteme.core.mathematics.linearalgebra.Vector<E> bicgstab(org.episteme.core.mathematics.linearalgebra.Matrix<E> a, org.episteme.core.mathematics.linearalgebra.Vector<E> b, org.episteme.core.mathematics.linearalgebra.Vector<E> x0, E tolerance, int maxIterations) {
         IterativeSolverRequest request = IterativeSolverRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
                 .setB(toProtoVector(b))
                 .setX0(toProtoVector(x0))
                 .setTolerance(toProtoScalar(tolerance))
-                .setMaxIterations(getMaxIterations)
+                .setMaxIterations(maxIterations)
                 .build();
         try {
             VectorResponse response = blockingStub.biCGSTAB(request);
@@ -786,13 +786,13 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     }
 
     @Override
-    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int getMaxIterations) {
+    public org.episteme.core.mathematics.linearalgebra.Vector<E> conjugateGradient(org.episteme.core.mathematics.linearalgebra.Matrix<E> a, org.episteme.core.mathematics.linearalgebra.Vector<E> b, org.episteme.core.mathematics.linearalgebra.Vector<E> x0, E tolerance, int maxIterations) {
         IterativeSolverRequest request = IterativeSolverRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
                 .setB(toProtoVector(b))
                 .setX0(toProtoVector(x0))
                 .setTolerance(toProtoScalar(tolerance))
-                .setMaxIterations(getMaxIterations)
+                .setMaxIterations(maxIterations)
                 .build();
         try {
             VectorResponse response = blockingStub.conjugateGradient(request);
@@ -803,13 +803,13 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     }
 
     @Override
-    public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int getMaxIterations, int restart) {
+    public org.episteme.core.mathematics.linearalgebra.Vector<E> gmres(org.episteme.core.mathematics.linearalgebra.Matrix<E> a, org.episteme.core.mathematics.linearalgebra.Vector<E> b, org.episteme.core.mathematics.linearalgebra.Vector<E> x0, E tolerance, int maxIterations, int restart) {
         GMRESRequest request = GMRESRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
                 .setB(toProtoVector(b))
                 .setX0(toProtoVector(x0))
                 .setTolerance(toProtoScalar(tolerance))
-                .setMaxIterations(getMaxIterations)
+                .setMaxIterations(maxIterations)
                 .setRestart(restart)
                 .build();
         try {
