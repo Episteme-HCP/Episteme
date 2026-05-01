@@ -119,14 +119,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     private static void track(ResourceTracker tracker, MemorySegment p) {
-        if (p != null && !p.equals(MemorySegment.NULL)) {
+        if (tracker != null && p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
                 try {
                     if (s.scope().isAlive()) {
                         NativeSafe.invoke(MPFR_CLEAR, s);
                     }
                 } catch (Throwable t) {
-                    // ResourceTracker handles robustness
+                    logger.error("Failed to clear MPFR segment: {}", t.getMessage());
                 }
             });
         }

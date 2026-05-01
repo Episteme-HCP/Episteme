@@ -118,7 +118,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
 
     private static void track(ResourceTracker tracker, MemorySegment p) {
-        if (p != null && !p.equals(MemorySegment.NULL)) {
+        if (tracker != null && p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
                 try {
                     if (s.scope().isAlive()) {
@@ -132,7 +132,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     private static void trackArray(ResourceTracker tracker, MemorySegment p, int n) {
-        if (p != null && !p.equals(MemorySegment.NULL)) {
+        if (tracker != null && p != null && !p.equals(MemorySegment.NULL)) {
             tracker.track(p, s -> {
                 if (!s.scope().isAlive()) return;
                 try {
