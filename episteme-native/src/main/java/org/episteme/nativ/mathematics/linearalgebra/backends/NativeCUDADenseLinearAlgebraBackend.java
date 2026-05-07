@@ -34,6 +34,7 @@ import org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
