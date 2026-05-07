@@ -21,7 +21,11 @@ public class MPFRTranscendentalTest {
 
     @Test
     public void testExpPrecision() {
-        System.err.println("[DIAG] Available RealProviders: " + org.episteme.core.technical.algorithm.AlgorithmManager.getProviders(org.episteme.core.mathematics.numbers.real.RealProvider.class));
+        try {
+            java.nio.file.Files.writeString(java.nio.file.Paths.get("/home/admin/episteme_diag.log"), 
+                "[DIAG] Available RealProviders: " + org.episteme.core.technical.algorithm.AlgorithmManager.getProviders(org.episteme.core.mathematics.numbers.real.RealProvider.class) + "\n",
+                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+        } catch (Exception e) {}
         MathContext.exact().compute(() -> {
             Real one = Real.of(1.0);
             Real e = one.exp();
