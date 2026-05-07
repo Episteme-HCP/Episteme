@@ -228,13 +228,10 @@ public final class NativeRealBig extends Real {
             if (strPtr.equals(MemorySegment.NULL)) return BigDecimal.ZERO;
 
             String digits = strPtr.reinterpret(bufSize).getString(0);
+            long exp = (C_LONG.byteSize() == 4) ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
+            System.out.println("[NativeRealBig] MPFR digits: " + digits + ", exp: " + exp);
             
             if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
-            if (digits.contains("@NaN@") || digits.contains("@Inf@") || digits.contains("NaN") || digits.contains("Inf")) {
-                return BigDecimal.ZERO; 
-            }
-
-            long exp = (C_LONG.byteSize() == 4) ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
             
             String sign = "";
             if (digits.startsWith("-")) {
