@@ -34,7 +34,8 @@ public class MPFRTranscendentalTest {
             
             // Check first 50 digits of e: 2.7182818284590452353602874713526624977572470936999
             String expected = "2.7182818284590452353602874713526624977572470936999";
-            assertTrue(e.toString().startsWith(expected), "exp(1) should match e with high precision");
+            String eStr = e.toString();
+            assertTrue(eStr.startsWith(expected), "exp(1) should match e with high precision, but was: " + eStr);
             
             return null;
         });
@@ -47,8 +48,9 @@ public class MPFRTranscendentalTest {
             Real logE = e.log();
             
             logger.info("log(e) = {}", logE);
+            String logEStr = logE.toString();
             assertThat(logE.doubleValue()).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-15));
-            assertTrue(logE.toString().startsWith("1.0000000000"), "log(e) should be 1.0 with high precision");
+            assertTrue(logEStr.startsWith("1.0000000000"), "log(e) should be 1.0 with high precision, but was: " + logEStr);
             
             return null;
         });
@@ -74,7 +76,7 @@ public class MPFRTranscendentalTest {
             logger.info("sin^2 + cos^2 = {}", oneStr);
             
             assertThat(one.doubleValue()).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-15));
-            assertThat(oneStr).as("Identity sin^2 + cos^2 = 1 should hold at high precision").startsWith("1.0000000000");
+            assertTrue(oneStr.startsWith("1.0000000000"), "Identity sin^2 + cos^2 = 1 should hold at high precision, but was: " + oneStr);
             
             return null;
         });
@@ -95,7 +97,7 @@ public class MPFRTranscendentalTest {
             logger.info("sqrt(2)^2 = {}", resStr);
             
             assertThat(res.doubleValue()).isCloseTo(2.0, org.assertj.core.data.Offset.offset(1e-15));
-            assertThat(resStr).as("sqrt(2)^2 should be 2.0 at high precision").startsWith("2.0000000000");
+            assertTrue(resStr.startsWith("2.0000000000"), "sqrt(2)^2 should be 2.0 at high precision, but was: " + resStr);
             
             return null;
         });
