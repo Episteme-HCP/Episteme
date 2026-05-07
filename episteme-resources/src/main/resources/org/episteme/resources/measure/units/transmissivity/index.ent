@@ -1,0 +1,11 @@
+
+<!ENTITY footSquaredPerDay.xml SYSTEM "../transmissivity/footSquaredPerDay.xml">
+<!ENTITY meterSquaredPerDay.xml SYSTEM "../transmissivity/meterSquaredPerDay.xml">
+<!ENTITY meterSquaredPerSecond.xml SYSTEM "../transmissivity/meterSquaredPerSecond.xml">
+
+<!ENTITY transmissivity.elements	"
+&footSquaredPerDay.xml;
+&meterSquaredPerDay.xml;
+&meterSquaredPerSecond.xml;
+">
+

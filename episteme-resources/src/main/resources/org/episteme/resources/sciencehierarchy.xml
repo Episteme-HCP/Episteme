@@ -1,0 +1,115 @@
+<science name="Mathematics">
+
+  <science name="Archaeology"/>
+
+  <science name="Biology">
+    <science name="Agricultural science"/>
+    <science name="Anatomy"/>
+    <science name="Anthropology"/>
+    <science name="Astrobiology"/>
+    <science name="Biochemistry"/>
+    <science name="Bioinformatics"/>
+    <science name="Biophysics"/>
+    <science name="Botany"/>
+    <science name="Cell biology"/>
+    <science name="Cladistics"/>
+    <science name="Cytology"/>
+    <science name="Developmental biology"/>
+    <science name="Ecology"/>
+    <science name="Entomology"/>
+    <science name="Epidemiology"/>
+    <science name="Evolution (Evolutionary biology)"/>
+    <science name="Evolutionary developmental biology"/>
+    <science name="Freshwater Biology"/>
+    <science name="Genetics (Population genetics, Genomics, Proteomics)"/>
+
+    <science name="Health Science">
+      <science name="Dentistry"/>
+      <science name="Medicine"/>
+      <science name="Pharmacology"/>
+      <science name="Toxicology"/>
+      <science name="Veterinary science"/>
+    </science>
+
+    <science name="Histology"/>
+    <science name="Immunology"/>
+    <science name="Marine biology"/>
+    <science name="Microbiology"/>
+    <science name="Molecular Biology"/>
+    <science name="Morphology"/>
+    <science name="Neuroscience"/>
+    <science name="Oncology (the study of cancer)"/>
+    <science name="Ontogeny"/>
+    <science name="Paleontology"/>
+    <science name="Pathology"/>
+    <science name="Phycology (Algology)"/>
+    <science name="Phylogeny"/>
+    <science name="Physiology"/>
+    <science name="Structural biology"/>
+    <science name="Taxonomy"/>
+    <science name="Toxicology"/>
+    <science name="Virology"/>
+    <science name="Zoology"/>
+  </science>
+
+  <science name="Earth Sciences">
+    <science name="Geology"/>
+    <science name="Meteorology"/>
+    <science name="Oceanography"/>
+    <science name="Seismology"/>
+  </science>
+
+  <science name="Physics">
+    <science name="Acoustics"/>
+    <science name="Astronomy"/>
+    <science name="Astrophysics"/>
+    <science name="Atomic, Molecular, and Optical physics"/>
+    <science name="Biophysics"/>
+    <science name="Computational physics"/>
+    <science name="Condensed matter physics"/>
+    <science name="Cryogenics"/>
+    <science name="Electronics"/>
+    <science name="Engineering"/>
+    <science name="Fluid dynamics"/>
+    <science name="Polymer physics"/>
+    <science name="Optics"/>
+    <science name="Materials physics"/>
+    <science name="Mathematical physics"/>
+    <science name="Nuclear physics"/>
+    <science name="Plasma physics"/>
+    <science name="Particle physics (or High Energy Physics)"/>
+    <science name="Vehicle dynamics"/>
+  </science>
+
+  <science name="Chemistry">
+    <science name="Analytical chemistry"/>
+    <science name="Biochemistry"/>
+    <science name="Computational chemistry"/>
+    <science name="Electrochemistry"/>
+    <science name="Inorganic chemistry"/>
+    <science name="Materials Science"/>
+    <science name="Organic chemistry"/>
+    <science name="Physical chemistry"/>
+    <science name="Quantum chemistry"/>
+    <science name="Spectroscopy"/>
+    <science name="Stereochemistry"/>
+    <science name="Thermochemistry"/>
+  </science>
+
+  <science name="Computer and information sciences">
+    <science name="Computer science"/>
+    <science name="Cognitive science"/>
+    <science name="Cognitive systems"/>
+    <science name="Cybernetics"/>
+    <science name="Systems theory"/>
+  </science>
+
+  <science name="Social sciences">
+    <science name="Economics"/>
+    <science name="Linguistics"/>
+    <science name="Etymology"/>
+    <science name="Psychology"/>
+    <science name="Sociology"/>
+  </science>
+
+</science>

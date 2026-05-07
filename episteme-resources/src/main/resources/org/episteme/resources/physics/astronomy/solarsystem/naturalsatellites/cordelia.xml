@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>cordelia</name>
+        <parent>uranus</parent>
+    </general>
+    <parameter>
+        <diameter>26</diameter>
+        <!-- km -->
+        <rotationperiod>0.335</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.335</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0003</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.085</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>49752</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

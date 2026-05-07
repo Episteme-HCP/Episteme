@@ -1,0 +1,50 @@
+I expected to design an XML file of resources, tools and tasks as a LEGO kit to design complex items to account for primitive and modern craft making. But such lists don't exist on the web apart from cooking/recipies: "take the onions, slice them, fry them in oil for 5 minutes...". This is weird since it is not that difficult to build such lists (apart for some XXth century chemical processes for example). If you have some data on this, let us know.
+
+
+
+Tasks (see http://en.wikipedia.org/wiki/Taxonomy_of_manufacturing_processes, or this directory):
+cut, lift, throw, break, cover, mix, heat, mould, move, nail...
+
+
+Resources:
+meat, vegetables, fruits, water, skin, bones, stones, sticks, fire, wood, earth, cattle, cotton, maize, oil, sand, copper, gold, silver, etc.
+
+
+
+From Wikipedia, http://en.wikipedia.org/wiki/Tool here is a list of tools by category.
+
+Varieties of tools
+Devices often typifies a newly invented or specific-purpose tool. 
+Implements tends to be a small and relatively simple tool. 
+Instruments are a concrete or abstract tool, in particular a refined one. 
+Utensils aid in eating 
+Machines can function as an ordered system of tools or as a super-tool. 
+Cadigans can represent a generic tool or a part thereof. 
+
+Physical tools
+Hand tools such as pliers, adze, axe, chisel, cramp, drill, file, hammer, Halligan bar, machete, plane, saw, screwdriver, shovel, stone tool, straightedge, rake, ruler, tire iron, scissors, wrenches. 
+Agricultural tools such as scythe, sickle. 
+Power tools such as crusher, drill, paper shredder, power grader, wire bonder, wood router. 
+Machine tools such as lathe, milling machine, shaping machine,grinding machine, pillar drill as used in metalworking. 
+Hydraulic tools such as the Hurst tool or hydraulic ram. 
+Pneumatic tools such as pneumatic grinder, pneumatic sander, pneumatic drill, pneumatic screwdriver, pneumatic tapping machine, pneumatic hammer, pneumatic hack saw, pneumatic trimmer. 
+Heat-based tools such as soldering irons, welding torches and thermic lances 
+Eating utensils such as chopsticks, fork, knife, spoon. 
+Food preparation utensils 
+Cleaning utensils, e.g. a brush, including toothbrush and broomstick, a cloth, a washing-glove, and cloths for drying, often after washing, e.g. a towel. 
+Writing instruments such as ballpoint pen, brush, fountain pen, pencil, quill, stylus. 
+Measuring instruments, Musical instruments 
+Special use tools: Buggy whip, Ox goad, dildo, vibrator, whetstone, hair dryer, egg poker, flat iron, fireplace poker 
+Multitools: Swiss Army knife, Leatherman 
+Sports equipment: Jump rope, Punching bag, Chess pieces, Pommel horse (gymnastics) 
+Other household implements such as backscratcher, bottle opener, can opener, fan, flyswatter, syringe, toothbrush, washcloth (or flannel). 
+Toy tools make popular playthings. Some simply consist of a cheap or small version of the real thing, such as a shovel and bucket to use on the beach or in a sandbox. Others are less functional, e.g. a dull plastic knife, or not functional at all.
+
+Mental tools
+Language 
+Logic 
+Tradition 
+Algorithms 
+
+
+Also see http://en.wikipedia.org/wiki/Timeline_of_invention

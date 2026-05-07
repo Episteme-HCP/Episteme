@@ -1,0 +1,4 @@
+<unit id="abvolt" name="abvolt" unitType="electricPotential" parentSI="volt" multiplierToSI="1.0E-8"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Part of the CGS absolute electromagnetic system. 1 abvolt = 10 nanovolts</description>
+</unit>

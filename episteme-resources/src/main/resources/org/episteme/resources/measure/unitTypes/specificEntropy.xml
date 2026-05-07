@@ -1,0 +1,5 @@
+<unitType id="specificEntropy" name="specific entropy">
+    <dimension name="length" power="2" preserve="no"/>
+    <dimension name="time" power="-2" preserve="no"/>
+    <dimension name="temp" power="-1" preserve="no"/>
+</unitType>

@@ -1,0 +1,6 @@
+<unitType id="electricFluxDensity" name="electric flux density">
+    <alternative type="synonym">electric displacement</alternative>
+    <dimension name="length" power="-2" preserve="no"/>
+    <dimension name="current" power="1" preserve="no"/>
+    <dimension name="time" power="1" preserve="no"/>
+</unitType>

@@ -1,0 +1,11 @@
+
+<!ENTITY bushelPerAcre.xml SYSTEM "../volumetricArea/bushelPerAcre.xml">
+<!ENTITY literPerHectare.xml SYSTEM "../volumetricArea/literPerHectare.xml">
+<!ENTITY meterCubedPerMeterSquared.xml SYSTEM "../volumetricArea/meterCubedPerMeterSquared.xml">
+
+<!ENTITY volumetricArea.elements	"
+&bushelPerAcre.xml;
+&literPerHectare.xml;
+&meterCubedPerMeterSquared.xml;
+">
+

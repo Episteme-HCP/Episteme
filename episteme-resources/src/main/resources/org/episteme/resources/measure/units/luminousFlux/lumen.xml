@@ -1,0 +1,6 @@
+<unit id="lumen" name="lumen" abbreviation="lm" unitType="luminousFlux" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Luminous flux in lumen = intensity in candelas * solid angle in steradians into which light is
+        emitted.
+    </description>
+</unit>

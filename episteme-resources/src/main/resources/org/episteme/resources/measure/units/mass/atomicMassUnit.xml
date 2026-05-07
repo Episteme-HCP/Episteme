@@ -1,0 +1,5 @@
+<unit id="atomicMassUnit" name="Atomic mass unit" abbreviation="amu" unitType="mass" parentSI="kilogram"
+      multiplierToSI="1.6605402E-27" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>
+    </description>
+</unit>

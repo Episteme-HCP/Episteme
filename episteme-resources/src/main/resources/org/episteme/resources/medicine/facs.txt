@@ -1,0 +1,59 @@
+http://en.wikipedia.org/wiki/Facial_Action_Coding_System
+
+Action units involving facial muscles
+1 Inner Brow Raiser -- Frontalis (pars medialis) 
+2 Outer Brow Raiser -- Frontalis (pars lateralis) 
+4 Brow Lowerer -- Corrugator supercilii, Depressor supercilii 
+5 Upper Lid Raiser -- Levator palpebrae superioris 
+6 Cheek Raiser -- Orbicularis oculi (pars orbitalis) 
+7 Lid Tightener -- Orbicularis oculi (pars palpebralis) 
+9 Nose Wrinkler -- Levator labii superioris alaquae nasi 
+10 Upper Lip Raiser -- Levator labii superioris 
+11 Nasolabial Deepener -- Zygomaticus minor 
+12 Lip Corner Puller -- Zygomaticus major 
+13 Cheek Puffer -- Levator anguli oris (also known as Caninus) 
+14 Dimpler -- Buccinator 
+15 Lip Corner Depressor -- Depressor anguli oris (also known as Triangularis) 
+16 Lower Lip Depressor -- Depressor labii inferioris 
+17 Chin Raiser -- Mentalis 
+18 Lip Puckerer -- Incisivii labii superioris and Incisivii labii inferioris 
+20 Lip stretcher -- Risorius w/ platysma 
+21 Neck Tightener 
+22 Lip Funneler -- Orbicularis oris 
+23 Lip Tightener -- Orbicularis oris 
+24 Lip Pressor -- Orbicularis oris 
+25 Lips part -- Depressor labii inferioris or relaxation of Mentalis, or Orbicularis oris 
+26 Jaw Drop -- Masseter, relaxed Temporalis and internal pterygoid 
+27 Mouth Stretch -- Pterygoids, Digastric 
+28 Lip Suck -- Orbicularis oris 
+31 Jaw Clencher 
+38 Nostril Dilator 
+39 Nostril Compressor 
+43 Eyes Closed -- Relaxation of Levator palpebrae superioris; Orbicularis oculi (pars palpebralis) 
+45 Blink -- Relaxation of Levator palpebrae superioris; Orbicularis oculi (pars palpebralis) 
+46 Wink -- Relaxation of Levator palpebrae superioris; Orbicularis oculi (pars palpebralis) 
+
+Action Descriptors
+19 Tongue Out 
+29 Jaw Thrust 
+30 Jaw Sideways 
+32 Lip Bite 
+33 Cheek Blow 
+34 Cheek Puff 
+35 Cheek Suck 
+36 Tongue Bulge 
+37 Lip Wipe 
+51 Head turn left 
+52 Head turn right 
+53 Head up 
+54 Head down 
+55 Head tilt left 
+56 Head tilt right 
+57 Head forward 
+58 Head back 
+61 Eyes turn left 
+62 Eyes turn right 
+63 Eyes up 
+64 Eyes down 
+65 Walleye 
+66 Cross-eye 

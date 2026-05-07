@@ -1,0 +1,1 @@
+These images are taken from Stellarium 4 Java under GPL.

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>planet</type>
+        <name>saturn</name>
+        <parent>sun</parent>
+    </general>
+    <parameter>
+        <diameter>120536.0</diameter>
+        <!-- km -->
+        <rotationperiod>0.44401</rotationperiod>
+        <!-- day -->
+        <orbitperiod>29.42351935</orbitperiod>
+        <!-- year -->
+        <meanorbitvelocity>9.6724</meanorbitvelocity>
+        <!-- km/s -->
+        <orbiteccentricity>0.5415060</orbiteccentricity>
+        <orbitinclinationtoecliptic>2.48446</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <inclinationofequatortoorbit>26.73</inclinationofequatortoorbit>
+        <!-- ° -->
+        <volume>755</volume>
+        <distance>9.53707032</distance>
+        <!-- AU -->
+        <mass>568.51e27</mass>
+        <!-- g -->
+        <density>0.70</density>
+        <!-- g/cm3 -->
+        <surfacegravity>8.96</surfacegravity>
+        <!-- m/s2 -->
+        <escapevelocity>35.49</escapevelocity>
+        <!-- km/s -->
+        <meantempatsolidsurface>88</meantempatsolidsurface>
+        <!-- Kelvin -->
+        <majoratmosphericconstitutents>H2,He</majoratmosphericconstitutents>
+    </parameter>
+</celestialobject>

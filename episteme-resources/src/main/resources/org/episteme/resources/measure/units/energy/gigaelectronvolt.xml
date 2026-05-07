@@ -1,0 +1,4 @@
+<unit id="gigaelectronvolt" name="gigaelectronvolt" abbreviation="GeV" unitType="energy" parentSI="joule"
+      multiplierToSI="1.60218E-10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 GeV = 10^9 eV</description>
+</unit>

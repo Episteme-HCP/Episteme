@@ -1,0 +1,11 @@
+<!-- entities -->
+
+<!-- the top level element -->
+<!ELEMENT countrycode (country, cc, idd, ndd)>
+
+<!-- elements -->
+<!ELEMENT country                        (#PCDATA)>
+<!ELEMENT cc                             (#PCDATA)>
+<!ELEMENT idd                            (#PCDATA)>
+<!ELEMENT ndd                            (#PCDATA)>
+

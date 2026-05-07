@@ -1,0 +1,3 @@
+<unit id="nanovoltPerMeter" name="nanovolt per meter" abbreviation="nV/m" unitType="electricFieldStrength"
+      parentSI="voltPerMeter" multiplierToSI="1.0E-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

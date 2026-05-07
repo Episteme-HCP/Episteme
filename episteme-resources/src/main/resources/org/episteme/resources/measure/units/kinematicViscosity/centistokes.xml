@@ -1,0 +1,3 @@
+<unit id="centistokes" name="centistokes" abbreviation="cSt" unitType="kinematicViscosity"
+      parentSI="meterSquaredPerSecond" multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

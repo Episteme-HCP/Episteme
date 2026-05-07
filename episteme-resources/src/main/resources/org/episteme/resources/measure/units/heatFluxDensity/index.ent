@@ -1,0 +1,7 @@
+
+<!ENTITY wattPerMeterSquared.xml SYSTEM "../heatFluxDensity/wattPerMeterSquared.xml">
+
+<!ENTITY heatFluxDensity.elements	"
+&wattPerMeterSquared.xml;
+">
+

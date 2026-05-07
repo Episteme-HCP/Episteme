@@ -1,0 +1,86 @@
+package org.episteme.benchmarks.benchmark.benchmarks;
+
+import org.episteme.benchmarks.benchmark.RunnableBenchmark;
+import com.google.auto.service.AutoService;
+import org.episteme.core.media.audio.AudioAlgorithmProvider;
+import org.episteme.core.media.audio.AudioOp;
+
+/**
+ * Benchmark for Audio Processing Providers (Tarsos, Native, etc.).
+ * Measures throughput for basic audio operations.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ */
+@AutoService(RunnableBenchmark.class)
+public class SystematicAudioBenchmark implements SystematicBenchmark<AudioAlgorithmProvider<?>> {
+
+    private AudioAlgorithmProvider<Object> provider;
+    private Object audio;
+    private final AudioOp<Object> computeOp = (aud) -> {
+        // Simulate real processing: gain adjustment + clipping
+        if (aud instanceof float[]) {
+            float[] data = (float[]) aud;
+            for (int i = 0; i < data.length; i++) {
+                data[i] = (float) Math.tanh(data[i] * 1.2);
+            }
+        }
+        return aud;
+    };
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Class<AudioAlgorithmProvider<?>> getProviderClass() { 
+        return (Class<AudioAlgorithmProvider<?>>) (Class<?>) AudioAlgorithmProvider.class; 
+    }
+    @Override public String getIdPrefix() { return "audio-throughput"; }
+    @Override public String getNameBase() { return "Audio Processing Throughput"; }
+
+    @Override public String getId() { return getIdPrefix() + "-default"; }
+    @Override public String getName() { return getNameBase() + (provider != null ? " (" + provider.getName() + ")" : ""); }
+    @Override public String getDescription() { return "Measures audio processing throughput (Gain + Tanh Clipping) on " + (provider != null ? provider.getName() : "default backend"); }
+    @Override public String getDomain() { return "Audio"; }
+    @Override public String getAlgorithmType() { return "Signal Processing"; }
+    @Override public String getAlgorithmProvider() { return provider != null ? provider.getName() : "None"; }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void setProvider(AudioAlgorithmProvider<?> provider) {
+        this.provider = (AudioAlgorithmProvider<Object>) provider;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return provider != null && provider.isAvailable();
+    }
+
+    @Override
+    public void setup() {
+        if (provider == null) throw new IllegalStateException("Provider not set");
+        try {
+            // Create 1s stereo float audio (44.1kHz * 2 channels)
+            float[] data = new float[44100 * 2];
+            java.util.Arrays.fill(data, 0.5f);
+            audio = provider.createAudio(data, 2, 44100);
+        } catch (Exception e) {
+            audio = null;
+        }
+    }
+
+    @Override
+    public void run() {
+        if (audio != null) {
+            provider.apply(audio, computeOp);
+        }
+    }
+
+    @Override
+    public void teardown() {
+        audio = null;
+    }
+
+    @Override
+    public int getSuggestedIterations() {
+        return 2000;
+    }
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>titania</name>
+        <parent>uranus</parent>
+    </general>
+    <parameter>
+        <diameter>1578</diameter>
+        <!-- km -->
+        <rotationperiod>8.706</rotationperiod>
+        <!-- day -->
+        <orbitperiod>8.706</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0012</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.112</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>436298</distance>
+        <!-- km -->
+        <mass>3.53e24</mass>
+        <!-- g -->
+        <density>1.71</density>
+        <!-- g/cm3 -->
+    </parameter>
+</celestialobject>

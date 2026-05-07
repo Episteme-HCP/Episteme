@@ -1,0 +1,4 @@
+<unitType id="volumetricRate" name="volumetric rate">
+    <dimension name="length" power="3" preserve="no"/>
+    <dimension name="time" power="-1" preserve="no"/>
+</unitType>

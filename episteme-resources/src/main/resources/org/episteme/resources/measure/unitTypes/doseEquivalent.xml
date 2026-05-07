@@ -1,0 +1,4 @@
+<unitType id="doseEquivalent" name="dose equivalent">
+    <dimension name="time" power="-2" preserve="no"/>
+    <dimension name="length" power="2" preserve="no"/>
+</unitType>

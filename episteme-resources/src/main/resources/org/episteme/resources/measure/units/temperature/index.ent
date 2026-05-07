@@ -1,0 +1,17 @@
+
+<!ENTITY celsius.xml SYSTEM "../temperature/celsius.xml">
+<!ENTITY centigrade.xml SYSTEM "../temperature/centigrade.xml">
+<!ENTITY fahrenheit.xml SYSTEM "../temperature/fahrenheit.xml">
+<!ENTITY kelvin.xml SYSTEM "../temperature/kelvin.xml">
+<!ENTITY megakelvin.xml SYSTEM "../temperature/megakelvin.xml">
+<!ENTITY rankine.xml SYSTEM "../temperature/rankine.xml">
+
+<!ENTITY temperature.elements	"
+&celsius.xml;
+&centigrade.xml;
+&fahrenheit.xml;
+&kelvin.xml;
+&megakelvin.xml;
+&rankine.xml;
+">
+

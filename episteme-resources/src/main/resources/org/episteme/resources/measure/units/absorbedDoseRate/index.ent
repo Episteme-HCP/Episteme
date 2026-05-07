@@ -1,0 +1,7 @@
+
+<!ENTITY grayPerSecond.xml SYSTEM "../absorbedDoseRate/grayPerSecond.xml">
+
+<!ENTITY absorbedDoseRate.elements	"
+&grayPerSecond.xml;
+">
+

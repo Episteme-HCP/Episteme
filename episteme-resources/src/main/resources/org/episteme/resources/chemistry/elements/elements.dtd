@@ -1,0 +1,35 @@
+<!-- entities -->
+
+<!ENTITY % series-values "alkali-metal|alkali-earth-metal|halogen|noble-gas|non-metal|metal|rare-earth-metal|transition-metal">
+<!ENTITY % properties "quantum-layers,electronegativity,covalent-radius,atomic-radius,ionization-energies,electronic-affinity,melting-point,boiling-point,density,formation-enthalpy,formation-energy,entropy,specific-heat,electrical-conductivity,thermal-conductivity">
+
+<!-- the top level element -->
+
+<!ELEMENT element (name,symbol,atomic-number,mass-number,%properties;,isotopes?)>
+<!ATTLIST element series (%series-values;) #REQUIRED>
+
+<!-- elements -->
+
+<!ELEMENT name                      (#PCDATA)>
+<!ELEMENT symbol                    (#PCDATA)>
+<!ELEMENT atomic-number             (#PCDATA)>
+<!ELEMENT mass-number               (#PCDATA)>
+<!ELEMENT quantum-layers            (#PCDATA)>
+<!ELEMENT electronegativity         (#PCDATA)>
+<!ELEMENT covalent-radius           (#PCDATA)>
+<!ELEMENT atomic-radius             (#PCDATA)>
+<!ELEMENT ionization-energies       (#PCDATA)>
+<!ELEMENT electronic-affinity       (#PCDATA)>
+<!ELEMENT melting-point             (#PCDATA)>
+<!ELEMENT boiling-point             (#PCDATA)>
+<!ELEMENT density                   (#PCDATA)>
+<!ELEMENT formation-enthalpy        (#PCDATA)>
+<!ELEMENT formation-energy          (#PCDATA)>
+<!ELEMENT entropy                  (#PCDATA)>
+<!ELEMENT specific-heat             (#PCDATA)>
+<!ELEMENT electrical-conductivity   (#PCDATA)>
+<!ELEMENT thermal-conductivity      (#PCDATA)>
+<!ELEMENT isotopes                  (isotope,isotope+)>
+<!ELEMENT isotope                   (mass-number,abundance)>
+<!ELEMENT abundance                 (#PCDATA)>
+

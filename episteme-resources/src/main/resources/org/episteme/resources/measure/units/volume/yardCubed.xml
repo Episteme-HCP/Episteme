@@ -1,0 +1,3 @@
+<unit id="yardCubed" name="yard cubed" abbreviation="yd^3" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="0.764554857984" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

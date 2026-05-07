@@ -1,0 +1,4 @@
+<unit id="inchPound" name="inch pound" abbreviation="in lb" unitType="energy" parentSI="joule" multiplierToSI="0.112985"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 in lbs = 0.112985 J. Pound is a unit of force in this context.</description>
+</unit>

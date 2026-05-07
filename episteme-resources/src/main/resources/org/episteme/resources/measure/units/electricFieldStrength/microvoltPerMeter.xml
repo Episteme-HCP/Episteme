@@ -1,0 +1,3 @@
+<unit id="microvoltPerMeter" name="microvolt per meter" abbreviation="microV/m" unitType="electricFieldStrength"
+      parentSI="voltPerMeter" multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

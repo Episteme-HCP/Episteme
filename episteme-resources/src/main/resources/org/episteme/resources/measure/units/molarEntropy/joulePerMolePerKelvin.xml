@@ -1,0 +1,4 @@
+<unit id="joulePerMolePerKelvin" name="joule per mole per Kelvin" abbreviation="J/mol K" unitType="molarEntropy"
+      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>The SI unit of molar entropy</description>
+</unit>

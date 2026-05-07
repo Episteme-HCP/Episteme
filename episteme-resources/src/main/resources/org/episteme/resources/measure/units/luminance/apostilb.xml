@@ -1,0 +1,4 @@
+<unit id="apostilb" name="apostilb" abbreviation="asb" unitType="luminance" parentSI="candelaPerMeterSquared"
+      multiplierToSI="0.318309886" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 apostilb = (1/pi) cd/m^2</description>
+</unit>

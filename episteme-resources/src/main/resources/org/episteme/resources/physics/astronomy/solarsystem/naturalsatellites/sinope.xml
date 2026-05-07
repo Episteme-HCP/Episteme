@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>sinope</name>
+        <parent>jupiter</parent>
+    </general>
+    <parameter>
+        <diameter>36</diameter>
+        <!-- km -->
+        <rotationperiod>724.51</rotationperiod>
+        <!-- day -->
+        <orbitperiod>724.51</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.25</orbiteccentricity>
+        <orbitinclinationtoecliptic>158.11</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>23940000</distance>
+        <!-- km -->
+        <mass>7.77e19</mass>
+        <!-- g -->
+        <density>3.1</density>
+        <!-- g/cm3 -->
+    </parameter>
+</celestialobject>

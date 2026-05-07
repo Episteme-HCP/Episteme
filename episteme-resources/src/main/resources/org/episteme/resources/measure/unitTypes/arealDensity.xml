@@ -1,0 +1,3 @@
+<unitType id="arealDensity" name="areal density">
+    <dimension name="length" power="-2" preserve="no"/>
+</unitType>

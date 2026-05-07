@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>nereid</name>
+        <parent>neptune</parent>
+    </general>
+    <parameter>
+        <diameter>340</diameter>
+        <!-- km -->
+        <rotationperiod>360.135</rotationperiod>
+        <!-- day -->
+        <orbitperiod>360.135</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.7512</orbiteccentricity>
+        <orbitinclinationtoecliptic>7.232</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>5513413</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

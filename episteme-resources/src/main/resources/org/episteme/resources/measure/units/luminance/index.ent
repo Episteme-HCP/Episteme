@@ -1,0 +1,15 @@
+
+<!ENTITY apostilb.xml SYSTEM "../luminance/apostilb.xml">
+<!ENTITY candelaPerCentimeterSquared.xml SYSTEM "../luminance/candelaPerCentimeterSquared.xml">
+<!ENTITY candelaPerMeterSquared.xml SYSTEM "../luminance/candelaPerMeterSquared.xml">
+<!ENTITY nit.xml SYSTEM "../luminance/nit.xml">
+<!ENTITY stilb.xml SYSTEM "../luminance/stilb.xml">
+
+<!ENTITY luminance.elements	"
+&apostilb.xml;
+&candelaPerCentimeterSquared.xml;
+&candelaPerMeterSquared.xml;
+&nit.xml;
+&stilb.xml;
+">
+

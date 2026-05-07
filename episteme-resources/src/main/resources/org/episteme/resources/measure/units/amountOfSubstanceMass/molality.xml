@@ -1,0 +1,4 @@
+<unit id="molality" name="molality" abbreviation="m" unitType="amountOfSubstanceMass" parentSI="molePerKilogram"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>molality = moles/kg</description>
+</unit>

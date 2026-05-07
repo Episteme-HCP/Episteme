@@ -1,0 +1,15 @@
+
+<!ENTITY abhenry.xml SYSTEM "../inductance/abhenry.xml">
+<!ENTITY henry.xml SYSTEM "../inductance/henry.xml">
+<!ENTITY millihenry.xml SYSTEM "../inductance/millihenry.xml">
+<!ENTITY stathenry.xml SYSTEM "../inductance/stathenry.xml">
+<!ENTITY weberPerAmpere.xml SYSTEM "../inductance/weberPerAmpere.xml">
+
+<!ENTITY inductance.elements	"
+&abhenry.xml;
+&henry.xml;
+&millihenry.xml;
+&stathenry.xml;
+&weberPerAmpere.xml;
+">
+

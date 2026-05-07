@@ -1,0 +1,4 @@
+<unit id="nit" name="nit" abbreviation="nt" unitType="luminance" parentSI="candelaPerMeterSquared" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>An MKS unit of luminance</description>
+</unit>

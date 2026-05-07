@@ -1,0 +1,9 @@
+
+<!ENTITY newtonCentimeter.xml SYSTEM "../momentOfForce/newtonCentimeter.xml">
+<!ENTITY newtonMeter.xml SYSTEM "../momentOfForce/newtonMeter.xml">
+
+<!ENTITY momentOfForce.elements	"
+&newtonCentimeter.xml;
+&newtonMeter.xml;
+">
+

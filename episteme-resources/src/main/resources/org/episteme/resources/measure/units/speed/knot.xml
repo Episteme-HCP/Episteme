@@ -1,0 +1,4 @@
+<unit id="knot" name="knot" abbreviation="kn" unitType="speed" parentSI="meterPerSecond" multiplierToSI="0.51444444444"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 knot = 1 nautical mile per hour</description>
+</unit>

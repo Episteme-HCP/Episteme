@@ -1,0 +1,4 @@
+<unit id="newtonPerMeterSquared" name="Newton per meter squared" abbreviation="N/m^2" unitType="pressure"
+      parentSI="pascal" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 N/m^2 = 1 Pa</description>
+</unit>

@@ -1,0 +1,5 @@
+<unit id="kilojoulePerMolePerKelvin" name="kilojoule per mole per Kelvin" abbreviation="kJ/mol K"
+      unitType="molarEntropy" parentSI="joulePerMolePerKelvin" multiplierToSI="1000"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Molar entropy</description>
+</unit>

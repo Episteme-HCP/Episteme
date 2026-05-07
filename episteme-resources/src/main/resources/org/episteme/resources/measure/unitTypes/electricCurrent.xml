@@ -1,0 +1,3 @@
+<unitType id="electricCurrent" name="electric current">
+    <dimension name="current" power="1" preserve="no"/>
+</unitType>

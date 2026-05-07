@@ -1,0 +1,3 @@
+<unit id="langley" name="langley" unitType="heatTransmission" parentSI="joulePerMeterSquared" multiplierToSI="4.184E+4"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

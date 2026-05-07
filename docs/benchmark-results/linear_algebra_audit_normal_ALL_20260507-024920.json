@@ -1,0 +1,22 @@
+{
+  "context": {
+    "title": "Universal Linear Algebra Compliance Audit (Mode: NORMAL)",
+    "timestamp": "2026-05-07T00:49:20.923956700Z"
+  },
+  "runs": [
+    {"name":"Episteme (Standard)","provider":"CPU (Standard)","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"ND4J (Native-Dense)","provider":"CPU (Native ND4J)","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native CPU-BLAS (Complex)","provider":"CPU (Native/Panama)","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native CPU-BLAS (Real)","provider":"CPU (Native/Panama)","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native CUDA Dense Linear Algebra Backend","provider":"N/A","domain":"Linear Algebra Compliance","status":"DISABLED","metrics":{}},
+    {"name":"Native CUDA Sparse Linear Algebra Backend","provider":"N/A","domain":"Linear Algebra Compliance","status":"DISABLED","metrics":{}},
+    {"name":"Native FFM-BLAS (Complex)","provider":"CPU (FFM-BLAS)","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native FFM-BLAS (Real)","provider":"CPU (FFM-BLAS)","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native MPFR Dense Linear Algebra Backend","provider":"CPU (Panama/MPFR)","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native MPFR Sparse Linear Algebra Backend","provider":"Generic JVM","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native OpenCL Dense Linear Algebra Backend","provider":"Generic JVM","domain":"Linear Algebra Compliance","status":"DISABLED","metrics":{}},
+    {"name":"Native OpenCL Sparse Linear Algebra Backend","provider":"Generic JVM","domain":"Linear Algebra Compliance","status":"DISABLED","metrics":{}},
+    {"name":"Native SIMD (Complex)","provider":"Generic JVM","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}},
+    {"name":"Native SIMD (Real)","provider":"Generic JVM","domain":"Linear Algebra Compliance","status":"SUCCESS","metrics":{"CRITICAL":"❌ NoSuchMethodError"}}
+  ]
+}

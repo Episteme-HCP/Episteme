@@ -1,0 +1,4 @@
+<unit id="dyne" name="dyne" abbreviation="dyn" unitType="force" parentSI="newton" multiplierToSI="1.0E-5"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>The dyne is the force unit in the CGS system</description>
+</unit>

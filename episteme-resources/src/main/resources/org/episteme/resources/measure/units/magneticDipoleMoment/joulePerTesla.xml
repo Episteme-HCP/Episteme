@@ -1,0 +1,4 @@
+<unit id="joulePerTesla" name="Joule per Tesla" Abbreviation="J/T" unitType="magneticDipoleMoment" parentSI="SELF"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>The SI unit of magnetic dipole moment</description>
+</unit>

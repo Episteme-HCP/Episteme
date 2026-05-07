@@ -1,0 +1,4 @@
+<unit id="megameter" name="megameter" abbreviation="Mm" unitType="length" parentSI="meter" multiplierToSI="1.0E+6"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1000000 meters</description>
+</unit>

@@ -1,0 +1,3 @@
+<unit id="revolutionPerMinute" name="revolution per minute" abbreviation="r/min" unitType="angularVelocity"
+      parentSI="radianPerSecond" multiplierToSI="0.1047197551" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

@@ -1,0 +1,4 @@
+<unitType id="massFraction" name="kilogram per kilogram">
+    <dimension name="mass" preserve="yes" power="1"/>
+    <dimension name="mass" preserve="yes" power="-1"/>
+</unitType>

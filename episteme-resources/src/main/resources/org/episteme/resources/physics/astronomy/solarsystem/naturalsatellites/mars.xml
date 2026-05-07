@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>planet</type>
+        <name>mars</name>
+        <parent>sun</parent>
+    </general>
+    <parameter>
+        <diameter>6794.0</diameter>
+        <!-- km -->
+        <rotationperiod>1.02595675</rotationperiod>
+        <!-- day -->
+        <orbitperiod>1.88071105</orbitperiod>
+        <!-- year -->
+        <meanorbitvelocity>24.1309</meanorbitvelocity>
+        <!-- km/s -->
+        <orbiteccentricity>0.09341233</orbiteccentricity>
+        <orbitinclinationtoecliptic>1.85061</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <inclinationofequatortoorbit>25.19</inclinationofequatortoorbit>
+        <!-- ° -->
+        <volume>0.149</volume>
+        <distance>1.52366231</distance>
+        <!-- AU -->
+        <mass>0.64191e27</mass>
+        <!-- g -->
+        <density>3.94</density>
+        <!-- g/cm3 -->
+        <surfacegravity>3.71</surfacegravity>
+        <!-- m/s2 -->
+        <escapevelocity>5.02</escapevelocity>
+        <!-- km/s -->
+        <meantempatsolidsurface>218</meantempatsolidsurface>
+        <!-- Kelvin - 183 - 268K -->
+        <majoratmosphericconstitutents>CO2,N2,Ar</majoratmosphericconstitutents>
+    </parameter>
+</celestialobject>

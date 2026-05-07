@@ -1,0 +1,15 @@
+
+<!ENTITY gramPerGram.xml SYSTEM "../massFraction/gramPerGram.xml">
+<!ENTITY gramPerKilogram.xml SYSTEM "../massFraction/gramPerKilogram.xml">
+<!ENTITY gramPerTonne.xml SYSTEM "../massFraction/gramPerTonne.xml">
+<!ENTITY kilogramPerKilogram.xml SYSTEM "../massFraction/kilogramPerKilogram.xml">
+<!ENTITY milligramPerKilogram.xml SYSTEM "../massFraction/milligramPerKilogram.xml">
+
+<!ENTITY massFraction.elements	"
+&gramPerGram.xml;
+&gramPerKilogram.xml;
+&gramPerTonne.xml;
+&kilogramPerKilogram.xml;
+&milligramPerKilogram.xml;
+">
+

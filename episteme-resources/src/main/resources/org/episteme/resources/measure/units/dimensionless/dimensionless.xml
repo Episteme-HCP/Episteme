@@ -1,0 +1,4 @@
+<unit id="dimensionless" name="dimensionless" unitType="dimensionless" parentSI="SELF"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>unit for fields with no unit</description>
+</unit>

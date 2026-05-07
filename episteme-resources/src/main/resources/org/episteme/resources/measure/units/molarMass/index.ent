@@ -1,0 +1,7 @@
+
+<!ENTITY kilogramPerMole.xml SYSTEM "../molarMass/kilogramPerMole.xml">
+
+<!ENTITY molarMass.elements	"
+&kilogramPerMole.xml;
+">
+

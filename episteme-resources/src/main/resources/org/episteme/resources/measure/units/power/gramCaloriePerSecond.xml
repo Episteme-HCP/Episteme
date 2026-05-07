@@ -1,0 +1,4 @@
+<unit id="gramCaloriePerSecond" name="gram-calorie per second" abbreviation="g-cal/s" unitType="power" parentSI="watt"
+      multiplierToSI="4.1868" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 g-cal/s = 1 cal/s</description>
+</unit>

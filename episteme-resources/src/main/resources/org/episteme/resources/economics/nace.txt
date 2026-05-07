@@ -1,0 +1,1376 @@
+1	AGRICULTURE AND HUNTING
+2	FORESTRY
+3	FISHING
+	
+11	EXTRACTION AND BRIQUETTING OF SOLID FUELS
+111	Extraction of hard coal (incl. manufacture of patent fuel)
+111.1	Extraction of hard coal (including opencast)
+111.2	Manufacture of patent fuel (incl. smokeless and similar solid fuels manufactured from coal)
+112	Extraction and briquettlng of lignite
+112.1	Extraction of black lignite
+112.2	Extraction of brown coal
+112.3	Manufacture of brown coal briquettes
+	
+12	
+120	COKE OVENS
+120.1	Colliery coke ovens
+120.2	Iron and steel industry coke ovens
+120.3	Other coke ovens
+	
+13	EXTRACTION OF PETROLEUM AND NATURAL GAS
+131	Extraction of petroleum
+132	Extraction and purifying of natural gas
+133	Extraction of bituminous shale
+134	Exploration for petroleum and natural gas
+	
+14	
+140	MINERAL OIL REFINING
+140.1	Petroleum refining
+140.11	Refining without distribution of petroleum products
+140.121	Refining with integrated distribution of petroleum products
+140.2	Processing of petroleum derivates (except petrochemicals)
+	
+15	NUCLEAR FUELS INDUSTRY			
+151	Extraction of ores containing fissionable and fertile materials			
+152	production and processing of fissionable and fertile materials			
+				
+16	"PRODUCTION AND DISTRIBUTION OF ELECTRICITY, GAS, STEAM AND"			
+	NOT WATER			
+161	generation and distribution of electric power (for public supply)			
+161.1	Generation of electricity from thermal energy (for public supply)			
+161.2	Generation of electricity from hydraulic energy (for public supply)			
+161.3	Generation of electricity from nuclear energy (for public supply)			
+161.4	Distribution of electricity (for public supply)			
+				
+161.5	Generation of electricity from thermal energy (for  own consumption)			
+161.6	Generation of electricity from hydraulic energy (for own consumption)			
+161.7	Generation of electricity from nuclear energy (for own consumption)			
+				
+162	Gasworks; gas distribution			
+162.1	Gasworks			
+162.2	Distribution of all types of gaseous fuels via mains			
+163	"Production and distribution of steam, hot water, compressed air; district"			
+	heating plants			
+169	Production and distribution of several types of energy Jointly			
+				
+17	"WATER SUPPLY: COLLECTION, PURIFICATION AND DISTRIBUTION OF"			
+170	WATER			
+				
+21	EXTRACTION AND PREPARATION OF METALLIFEROUS ORES			
+211	Extraction and preparation of Iron ore			
+211.1	Extraction of iron ore			
+211.2	"Preparation of iron ore (crushing, sintering, concentrating, etc.)"			
+212	Extraction and preparation of non-ferrous metal ores			
+212.1	Extraction of non-ferrous metal ores			
+212.2	"Preparation of non-ferrous metal ores (crushing, sintering, concen-trating, etc.)"
+	
+22	PRODUCTION AND PRELIMINARY PROCESSING OF METALS
+221	"Iron and steel Industry (as defined in the E.C.S.C. Treaty), excluding Integrated coke ovens"
+	
+221.1	Manufacture of pig iron (including high carbon ferro-manganese) and crude steel;
+	hot rolling (including continuous casting but excluding the
+	production of tubes and tyres): cold rolling of plates and sheets
+	
+221.2	Coating of sheets and plates
+222	Manufacture of steel tubes
+	
+223	"Drawing, cold rolling and cold folding of steel"
+223.1	Cold drawing of steel
+223.2	Cold rolling of hoop and strip
+223.3	"Cold forming or folding of angles, shapes and sections from flat rolled steel products"
+223.4	Steel-wire drawing and manufacture of steel-wire products
+223.41	Steel-wire drawing
+223.42	Manufacture of steel-wire products
+	
+224	Production and preliminary processing of non-ferrous metals
+224.1	Refining of non-ferrous metals
+224.2	Remelting of non-ferrous metals
+224.3	"Preliminary processing of non-ferrous metals: rolling, drawing, extrusion"
+224.4	Specialized production of ferro-alloys outside the Iron and steel industry
+	
+23	EXTRACTION OF MINERALS OTHER THAN METALLIFEROUS AND ENERGY-PRODUCING MINERALS; PEAT EXTRACTION
+231	Extraction of building materials and refractory clays
+231.1	Slate quarrying and mining
+231.2	"Stone quarrying and mining (limestone, marble, sandstone, lava, granite, basalt, porphyry, etc.)"
+231.3	Extraction of chalk and limestone for soil improvement
+231.4	"Extraction or dredging of sand, pebbles and gravel"
+231.5	Extraction of marl or stone for the manufacture of lime or cement
+231.6	Extraction of gypsum
+231.7	Extraction of clay and kaolin
+232	mining of potassium salt and natural phosphates
+232.1	Potassium salt extraction
+232.2	 Natural phosphate extraction
+233	Salt extraction
+233.1	Salt pans
+233.2	Salt mines and brine pits
+223.21	Rock-salt mines
+223.22	Brine pits
+239	Extraction of other minerals; peat extraction
+239.1	Extraction of sulphur and pyrites
+239.2	Extraction of asphalt and bitumen
+239.3	"Extraction of dolomite, pumice stone and pozzolana (volcanic ash)"
+239.4	Extraction of minerals not elsewhere specified
+239.41	Extraction of talc and steatite; preparation of talk
+239.42	Extraction of asbestos
+239.43	Extraction of siliceous fossil meals and of kieselguhr; preparation
+	"of bricks, painters' fillings, etc., from such materials"
+239.44	"Extraction of felspar, quartz and pegmatite"
+239.45	Extraction of fluorspar
+239.46	Extraction of barytes and strontianite
+239.47	"Extraction of other minerals (gemstones, mica, graphite, alunite, magnesite, etc.)"
+239.5	Peat extraction (including the manufacture of peat litter)
+	
+24	MANUFACTURE OF NON-METALLIC MINERAL PRODUCTS
+241	  Manufacture of clay products for constructional purposes
+242	"Manufacture of cement, lime and plaster"
+242.1	  Manufacture of cement
+242.2	  Manufacture of lime
+242.3	  Manufacture of plaster
+	
+243	"Manufacture of concrete, cement or plaster products for constructional"
+	purposes
+243.1	  Manufacture of asbestos-cement products
+243.2	  Manufacture of concrete products for constructional purposes
+243.3	  Manufacture of gypsum plaster tiles and of prefabricated compo-
+	  nents from plastering material
+243.4	  Manufacture of sand-lime brick products
+243.5	  Manufacture of pumice cement products
+243.6	  Manufacture of ready-mixed concrete
+244	Manufacture of articles of asbestos (except articles of asbestos-cement)
+	
+245	Working of stone and of non-metallic mineral products
+	
+245.1	Crushing of minerals and various substances
+245.2	"Slate cutting, except at slate quarries"
+245.3	Cutting of stone other than slate
+245.4	Ornamental and monumental masonary
+245.5	Manufacture of non-metallic mineral products not elsewhere specified
+	
+246	Production of grindstones and other abrasive products
+246.1	Production of grindstones and other abrasive products from agglomerated natural or artificial abrasives
+246.2	Production of grindstones and other abrasive goods manufactured artificially from natural or synthetic diamonds
+246.3	"Production of abrasive products with backings of paper, cloth or other materials"
+	
+247	Manufacture of glass and glassware
+247.1	Manufacture of flat glass and similar products
+247.2	"Manufacture of hollow glass and similar products, by automatic processes"
+247.3	"Manufacture of hollow glass and similar products, by manual or semiautomatic processes"
+247.4	Manufacture of technical glassware
+247.5	Manufacture of glass fibres
+247.6	Shaping and processing of flat glass
+247.7	Shaping and processing of hollow glass
+	
+248	Manufacture of ceramic goods
+248.1	Manufacture of heat-insulating and refractory goods
+248.2	Manufacture of common pottery goods
+248.3	Manufacture of floor and wall tiles
+248.4	Manufacture of stoneware pipework and drainage
+248.5	"Manufacture of sanitary ware of stoneware, earthenware, porcelain or vitreous china"
+248.6	"Manufacture of tableware, kitchenware and other domestic articles, including ornaments of earthenware and similar ceramic products"
+248.7	"Manufacture of tableware, kitchenware and other domestic articles, including ornaments of porcelain or vitreous china"
+248.8	Manufacture from ceramic materials of insulators and insulating fittings for electric overhead lines and cables and electric installation
+248.9	Manufacture of ceramic products not elsewhere specified
+	
+25	CHEMICAL INDUSTRY
+251	Manufacture of basic industrial chemicals and manufacture followed by further processing of such products
+	
+252	Manufacture of chemicals obtained from petroleum (petrochemicals) and from coal
+	
+253	Manufacture of other basic industrial chemicals
+	
+255	"Manufacture of paint, painters' fillings, varnish and printing ink"
+	
+256	"Manufacture of other chemical products, mainly for Industrial and agricultural purposes"
+256.1	Manufacture of compressed gases
+256.2	Manufacture of glues and gelatine
+256.3	Chemical treatment of oils and fats
+256.4	Manufacture of essential oils and of natural and artificial flavouring and perfume materials
+256.5	"Manufacture of explosives, pyrotechnic articles and matches"
+256.6	Manufacture of auxiliary products for the treatment of leather and textiles: manufacture of tanning agents
+256.7	Manufacture of miscellaneous chemical products for industrial purposes
+256.8	Manufacture of chemical products for agricultural purposes
+	
+257	Manufacture of pharmaceutical products
+257.1	"Manufacture of pharmaceutical products in bulk or ready for use, retail sale etc."
+257.2	"Making up pharmaceutical products ready for use, retail sale, etc. (excl.. manufacture)"
+	
+258	"Manufacture of soap, synthetic detergents, perfume and toilet preparations"
+258.1	Manufacture of soap and synthetic detergents
+258.2	Manufacture of perfume and toilet preparations
+	
+259	"Manufacture of other chemical products, chiefly for household and office use"
+259.1	"Manufacture of photographic chemical material (sensitized photographic film, plate, paper, etc., end auxiliary products)"
+259.2	"Manufacture of polishes and the like for household use (shoe, furniture and floor care products, metal polishes, car polishes, etc.)"
+259.3	Manufacture of chemical products for office use
+259.31	Manufacture of pencils
+259.32	Manufacture of writing Inks and office glues
+259.33	Manufacture of stencils and carbon paper
+	
+259.4	Manufacture of chemical products not elsewhere specified for non-industrial use	
+		
+26		
+260	MAN-MADE FIBRES INDUSTRY	
+		
+31	"MANUFACTURE OF METAL ARTICLES (EXCEPT FOR MECHANICAL, ELECTRICAL AND INSTRUMENT ENGINEERING AND VEHICLES)"	
+311	foundries	
+311.1	Ferrous metal foundries	
+311.2	Non-ferrous metal foundries	
+		
+312	"Forging; drop forging, closed die-forging, pressing and stamping"	
+312.1	"Forging; drop forging, closed die-forging"	
+312.11	  Forging	
+312.12	"  Drop forging, closed die-forging"	
+312.2	"Stamping, pressing (dropstamping)"	
+		
+313	"Secondary transformation, treatment and coating of metals"
+313.1	"Manufacture of articles on metal turning or forming machines (screws, bolts and nuts)"
+313.11	"Manufacture of articles on turning machines or lathe, including the manufacture of turned screws"
+313.12	"Manufacture of bolts, rivets and related products on metal-forming machines"
+313.2	Manufacture of springs (except furniture and watch springs)
+313.3	Sintering of metals
+313.4	Manufacture of chains (except articulated link chains)
+313.5	Treatment and coating of metals
+313.6	General mechanical engineering on a subcontract basis
+	
+314	Manufacture of structural metal products (incl. integrated assembly and installation)
+314.1	"Manufacture of metal structures and parts of structures (bridges, bridge-sections, frames, frameworks, superstructures)"
+314.2	"Manufacture of metal doors, windows, etc. from rolled angles, shapes and sections"
+314.3	Manufacture of pit-propping equipment
+314.4	"Manufacture of standard-gauge railway track, fixtures and fittings"
+	
+315	"Boilermaking, manufacture of reservoirs, tanks and other sheet-metal containers"
+315.1	"Manufacture of large boilers, including complete furnaces"
+315.2	"Manufacture of other boiler house products, reservoirs, tanks and other containers"
+	
+316	"Manufacture of tools and finished metal goods, except electrical equipment"
+316.1	Manufacture of hand tools and agricultural tools
+316.11	Manufacture of hand tools
+316.12	Manufacture of agricultural tools
+316.2	"Manufacture of cutlery and of forks, spoons and similar kitchen or tableware"
+316.3	"Manufacture of general hardware (locks, fittings)"
+316.4	Manufacture of metal boxes and other metal packing products
+316.41	Manufacture of heavy metal packaging
+316.42	Manufacture of light metal packaging
+316.5	Manufacture of domestic heating appliances and kitchen heating appliances of all kinds
+316.6	Manufacture of metal furniture (including safes)
+316.7	Manufacture of domestic and similar articles of base metal
+316.8	Manufacture of small arms and ammunition thereof	
+316.9	Manufacture of finished metal products not elsewhere specified	
+316.91	Founding of printing type	
+316.92	Manufacture of small metal articles	
+		
+319	Other metal workshops not elsewhere specified	
+319.1	"  Soldering, welding, smithery, blacksmithery"	
+319.2	  Rural workshops for the repair of agricultural equipment	
+		
+32	MECHANICAL Engineering	
+321	Manufacture of agricultural machinery and tractors	
+321.1	  Manufacture of agricultural machinery	
+321.2	  Manufacture of agricultural tractors	
+322	"Manufacture of machine-tools for working metal, and of other tools and"	
+	equipment for use with machines	
+322.1	Manufacture of metal-working machine-tools	
+322.11	Manufacture of metal-cutting machine-tools	
+322.12	Manufacture of metal-forming machine-tools	
+322.2	Manufacture of tools and equipment for use with machines	
+323	Manufacture of textile machinery and accessories; manufacture of sew	
+	ing machines	
+323.1	Manufacture of textile machinery and accessories	
+323.11	Manufacture of textile machinery	
+323.12	Manufacture of accessories for textile machinery	
+323.2	Manufacture of sewing machines	
+		
+324	"Manufacture of machinery for the food, chemical and related Industries"	
+324.1	Manufacture of food and drink processing machinery and of machin-	
+	ery for the chemical Industry	
+324.11	"Manufacture at food, drink and tobacco processing machinery"	
+324.12	Manufacture of machinery for the chemical industry	
+324.2	"Manufacture of bottling, packaging, wrapping and related machinery"	
+324.3	Manufacture of rubber and artificial plastics-working machinery	
+		
+325	"Manufacture of plant for mines, the Iron and steel industry and found"	
+	"ries, civil engineering and the building trade; manufacture of mechanical"	
+	handling equipment	
+325.1	Manufacture of mining machinery	
+325.2	Manufacture of plant for the iron and steel and metallurgical indu-	
+	stries and for foundries	
+325.3	Manufacture of brick making and other machinery for the preparation	
+	of building materials	
+325.4	Manufacture of construction and civil engineering equipment	
+325.5	Manufacture of mechanical lifting and handling equipment	
+		
+326	Manufacture of transmission equipment for motive power	
+326.1	"Manufacture of gears and gearing (including variable speed gears) ,transmission chains (including bicycle chains) and other transmission equipment"	
+326.2	"Manufacture of ball, roller and similar bearings"	
+	
+	
+327	Manufacture of other machinery and equipment for use in specific branches of Industry
+327.1	Manufacture of machinery for working wood and similar materials
+327.2	"Manufacture of paper, paper goods making, printing and bookbinding machinery"
+327.3	Manufacture of laundry and dry cleaning machinery
+327.4	"Manufacture of plant for the leather industry, including boot and shoe machinery"
+	
+328	Manufacture of other machinery and equipment
+328.1	Manufacture of internal combustion engines except those for road vehicles and aircraft
+328.2	Manufacture of water-wheels and water and heat-turbines and other mechanical energy producing machinery
+328.3	"Manufacture of compressors, pumps and equipment for operating machinery by hydraulic or pneumatic means"
+328.4	"Manufacture of space-heating, ventilating and air-conditioning equipment"
+328.5	Manufacture of refrigerating machinery (except domestic type refrigerators and domestic deep freeze units)
+328.6	Manufacture of non-electric industrial furnaces and ovens
+328.7	Manufacture of non-electric welding-equipment
+328.8	"Manufacture of taps, cocks, valves and similar appliances"
+328.9	Manufacture of machinery and appliances not elsewhere specified
+	
+33	
+330	MANUFACTURE OF OFFICE MACHINERY AND DATA PROCESSING
+	MACHINERY
+	
+34	ELECTRICAL ENGINEERING
+341	Manufacture of Insulated wires and cables
+342	"Manufacture of electrical machinery (comprising electric motors, electricity' generators, transformers, switches, switchgear and other basic electrical plant)"
+343	Manufacture of electrical apparatus and appliances for Industrial use; manufacture of batteries and accumulators
+343.1	Manufacture of electrical equipment for industrial use
+343.2	Manufacture of batteries and accumulators
+	
+344	"Manufacture of telecommunications equipment, electrical and electronic measuring and recording equipment, and electro-medical equipment"
+	
+345	"Manufacture of radio and television receiving sets, sound reproducing and recording equipment and of electronic equipment and apparatus (except electronic computers); manufacture of gramophone records and prerecorded magnetic tapes"
+345.1	"Manufacture of radio and television receivers, sound reproducing and recording equipment and of electronic equipment and apparatus (except electronic computers)"
+345.2	Manufacture of gramophone records and prerecorded tape
+	
+346	Manufacture of domestic type electric appliances
+	
+347	Manufacture of electric lamps and other electric lighting equipment
+347.1	Manufacture of electric lamps
+347.2	Manufacture of other electric lighting equipment
+	
+	
+348	Assembly and installation of electrical equipment and apparatus (except
+	for work relating to the wiring of buildings)
+	
+35	MANUFACTURE OF MOTOR VEHICLES AND OF MOTOR VEHICLE PARTS AND ACCESSORIES
+351	Manufacture and assembly of motor vehicles (including road tractors) and manufacture of motor vehicle engines
+352	Manufacture of bodies for motor vehicles and of motor-drawn trailers and caravans
+353	Manufacture of parts and accessories for motor vehicles
+	
+36	MANUFACTURE OF OTHER MEANS OF TRANSPORT
+361	Shipbuilding
+361.1	Building and repair of sea-going vessels
+361.2	Building and repair of vessels for inland navigation
+361.3	Building and repair of boats and yachts
+361.4	Painting of ships
+361.5	Shipbreaking
+	
+362	Manufacture of standard and narrow-gauge railway and tramway rolling-stock
+362.1	Manufacture of locomotives
+362.2	"Manufacture of other railway and tramway rolling-stock, including mechanically propelled coaches, vans and trucks"
+362.3	Repair of railway and tramway rolling-stock
+	
+363	"Manufacture of cycles, motor-cycles and parts and accessories thereof"
+363.1	"Manufacture of cycles, motor-cycles and mopeds"
+363.2	"Manufacture of parts and accessories for cycles, motor-cycles and mopeds"
+364	Aerospace equipment manufacturing and repairing
+364.1	Manufacture of aeroplanes and helicopters (including the engines)
+364.2	Repair of aeroplanes and helicopters
+364.3	"Manufacture and repair of other aerospace equipment, including air cushion vehicles (hovercraft), guided weapons and spacecraft"
+	
+365	Manufacture of transport equipment not elsewhere specified
+365.1	Manufacture of baby carriages
+365.2	Manufacture of other vehicles
+	
+37	INSTRUMENT ENGINEERING
+	
+371	"Manufacture of measuring, checking and precision instruments and apparatus"
+371.1	"Manufacture of gas meters, water meters and other liquid supply meters (including petrol pump meters)"
+371.2	"Manufacture of measuring, checking or automatically controlling instruments and apparatus"
+371.3	"Manufacture of navigational, hydrological, geophysical and meteorological instruments"
+371.4	Manufacture of drawing and mathematical calculating instruments
+371.5	Manufacture of precision measuring instruments
+371.6	"Manufacture of precision balances, laboratory apparatus and teaching equipment"
+371.7	Manufacture of other precision instruments and apparatus
+	
+372	Manufacture of medical and surgical equipment and orthopaedic appliances (except orthopaedic footwear)
+372.1	Manufacture of medical apparatus for diagnostic work
+372.2	"Manufacture of medical, surgical and veterinary equipment (except diagnostic apparatus)"
+372.3	Manufacture of dental instruments and apparatus
+372.4	"Manufacture of orthopaedic appliances and of artificial limbs, eyes, teeth and other artificial parts of the body"
+	
+313	Manufacture of optical instruments and photographic equipment
+373.1	"Manufacture of spectacles, including lenses, frames and mountings, and of equipment for use by opticians"
+373.2	Manufacture of optical precision instruments
+373.3	Manufacture of photographic and cinematographic equipment
+	
+374	Manufacture of clocks and watches and parts thereof
+	
+41/42	"FOOD, DRINK AND TOBACCO INDUSTRY"
+
+411	Manufacture of vegetable and animal oils and fats
+411.1	Production of marine animal oils and fats
+411.2	Production of olive oil
+411.3	Extraction (by pressure) of oil from oilseeds
+411.4	"Refining, hydrogenation and similar processing of vegetable and animal oils and fats"
+411.5	Manufacture of margarine and similar edible fats
+	
+412	"slaughtering, preparing and preserving of meat (except the butchers' trade)"
+412.1	Slaughter-houses
+412.11	Municipal slaughter-houses
+412.12	Other slaughter-houses
+412.2	Processing and preserving of meat (except poultry)
+412.21	Quick freezing of meat
+412.22	Processing of meat other than by quick freezing
+412.3	"Killing, preparing and preserving of poultry"
+412.4	"Manufacture of dripping, suet, tallow and other (terrestrial) animal fats and greases"
+412.5	Production of animal guts and meat offals
+	
+413	Manufacture of dairy products
+413.1	Processing of milk: butter and cheese making
+413.11	"Processing of fresh milk and cream, fermented milk and yoghourt"
+413.12	Butter making
+413.13	Cheese making
+413.14	Production of casein
+413.2	Production of preserved milk
+413.21	Production of evaporated or condensed milk
+413.22	Production of milk powder
+	
+414	Processing and preserving of fruit and vegetables
+414.1	Quick freezing of fruit and vegetables
+414.2	Alternating production of canned and otherwise preserved fruit and vegetables and of canned and otherwise preserved fish
+414.3	"Production of fruit and vegetables preserved by vinegar, in brine or in oil"
+414.4	Production of fruit and vegetable juices
+414.5	Production of fruit pulp packed in non-airtight containers
+414.6	Production of other canned and otherwise preserved fruit and vegetables
+414.61	Canning and otherwise preserving of tomatoes
+414.62	Canning and otherwise preserving of other vegetables
+414.63	Canning and otherwise preserving of fruit
+414.64	Dehydrating of vegetables
+414.65	"Manufacture of jam, marmalade and jellies"
+	
+415	Processing and preserving of fish and other sea foods fit for human consumption
+415.1	Quick freezing of edible fish and other sea foods	
+415.2	Processing of fish and other sea foods otherwise than by quick freezing	
+418	Grain milling	
+416.1	Manufacture of cereal meal and of cereal flours	
+416.11	Manufacture of hard-wheat meal	
+416.12	Manufacture of so If-wheat meal	
+416.2	Husking and sorting of grains and seeds (including maize and rice)	
+		
+417	"Manufacture of spaghetti, macaroni, etc."	
+418	Manufacture of starch and starch products	
+418.1	"Manufacture of maize, wheat and rice starches"	
+418.2	Manufacture of dextrins and of soluble or roasted starches	
+418.3	Manufacture of glucose	
+418.4	Manufacture of other starches and starch products	
+419	Bread and flour confectionery	
+419.1	"Large-scale breadmaking (bread factories) with delivery to retailers, hotels, etc."	
+419.2	Breadmaking at establishments other than bread factories (whether or not combined with the making of cakes and flour confectionery)
+419.3	Making of cakes and flour confectionery
+419.4	Rusk making
+419.5	Biscuit making (including the making of gingerbread)
+420	Sugar manufacturing and refining
+420.1	Manufacture of sugar
+420.2	Refining of sugar
+420.3	Manufacture of syrups and other sugar beet products and extraction of sugar from molasses
+420.31	Sugar beet slicing
+420.32	Extraction of sugar from molasses
+420.4	Manufacture of sugar candy
+	
+421	"Manufacture of cocoa, chocolate and sugar confectionery"
+421.1	Manufacture of cocoa and chocolate
+421.2	Manufacture of sugar confectionery
+421.3	Manufacture of ice-cream
+	
+422	Manufacture of animal and poultry foods (including fish meal and flour)
+	
+423	Manufacture of other food products
+423.1	Processing of coffee and tea
+423.2	Production of roasted chicory and other roasted coffee substitutes
+423.3	"Manufacture of vinegar, mustard and other condiments"
+423.4	Manufacture of ice
+423.5	Specialized manufacture of infants and dietetic foods
+423.6	"Manufacture of food preparations (generally in powder or granular form) for making puddings, custards, table creams, etc."
+423.7	"Manufacture of soups, broths and sauces"
+423.8	Manufacture of other food products not elsewhere specified
+	
+424	Distilling of ethyl alcohol from fermented materials; spirit distilling and compounding
+424.1	Distilling and rectifying of undenatured ethyl alcohol obtained by fermentation of agricultural products
+424.2	Distilling of spirits from fermented vegetable products
+424.3	Production of other spirituous beverages (including aperitives other than those with a wine base)
+	
+425	Manufacture of wine of fresh grapes and of beverages based thereon
+425.1	Manufacture of non-sparkling wine of fresh grapes
+425.2	"Manufacture of champagne and other sparkling wines Manufacture of other special wines (aperitives with a basis of wine, medicinal wines, etc.)"
+	
+425.3	" Manufacture of other special wines (aperitives with a basis of wine, medicinal wines, etc.)"
+	
+426	Manufacture of cider and of wines (Including sparkling wines) and other beverages obtained by fermentation of fruit Juices other than Juices of fresh grapes
+	
+427	brewing and malting
+427.1	Brewing beer
+427.2	Malting barley
+	
+428	"Manufacture of soft drinks, including the bottling of natural spa waters"
+428.1	"Bottling of natural spa waters, both treated and untreated"
+428.2	"Manufacture of aerated waters, lemonade, fruit squashes and cordials and other soft drinks"
+	
+429	Manufacture of tobacco products
+	
+43	TEXTILE INDUSTRY
+431	Wool Industry
+431.1	Fellmongery
+431.2	Preparation of wool fibres
+431.21	"Washing and scouring, carbonizing; carding, processing of waste"
+431.22	Combing
+431.3	Spinning
+431.31	Spinning of yarns on the worsted system
+431.32	Spinning of yarns on the woollen system
+431.33	Specialized spinning of fine (e.g. Angora) and coarse animal hair
+431.4	Twisting and winding
+431.41	Twisting
+431.42	Winding
+431.5	Weaving (except carpet weaving and weaving operations of the mis-
+	cellaneous textile industries)
+431.51	Worsted weaving
+431.52	Woollen weaving
+431.6	Spinning and weaving (except carpet weaving and weaving opera
+	tions of the miscellaneous textile industries)
+431.61	Worsted spinning and weaving
+431.62	Woollen spinning and weaving for making up blankets
+431.63	Woollen spinning and weaving Other than for the making up of
+	blankets
+
+432	Cotton Industry
+432.3	Spinning on the cotton system
+432.31	Cotton spinning other than waste spinning
+432.32	Cotton waste
+432.4	Doubling; production of finished thread
+432.41	Doubling
+432.42	Production of finished thread
+432.5	Weaving (except carpet weaving and weaving operations of the miscellaneous textile industries)
+432.6	Spinning and weaving (except carpet weaving and weaving operations of the miscellaneous textile industries)
+432.61	Spinning as an integral part of the operations of a weaving mill
+432.62	Weaving as an integral part of the operations of a spinning mill
+	
+433	Silk Industry
+433.2	Preparation of silk fibres for spinning
+433.3	Spinning
+433.31	Reeling of raw silk from cocoons
+433.32	Spinning of yarn from noil and other waste silk
+433.4	Yarn processing
+433.41	"Throwing, texturing and otherwise preparing yarn"
+433.42	Manufacture of sewing thread from silk or man-made filament
+	yarns	
+433.5	Weaving of silk (except carpet weaving and weaving operations of	
+	the miscellaneous textile industries)	
+434	"Preparation, spinning and weaving of flax, hemp and ramie"	
+434.1	Retting and scutching (of flax and hemp)	
+434.3	Spinning	
+434.31	Spinning of yarns for weaving and sewing	
+434.32	"Spinning of yarns for the manufacture of twine, cordage, ropes"	
+	and cables	
+434.4	Doubling and otherwise preparing yarn of flax; hemp and ramie	
+434.5	Weaving	
+434.6	Spinning and weaving	
+435	Jute industry	
+435.3	Spinning	
+435.5	Weaving (including the integrated manufacture of jute sacking)	
+435.6	Spinning and weaving (including the integrated manufacture of jute	
+	sacking)		
+436	Knitting Industry		
+436.1	"Manufacture of hosiery, including socks, tights and pantihose"		
+436.2	Manufacture of other knitted goods		
+436.21	"Manufacture of knitted or crocheted fabrics, not elastic or rubberized, for sale as such"		
+436.22	Manufacture of knitted headgear		
+436.23	Manufacture of knitted or crocheted goods not elsewhere specified		
+437	Textile finishing		
+437.1	Bleaching		
+437.2	Dyeing		
+437.3	Printing		
+437.4	Other finishing processes (except coating)		
+			
+438	"Manufacture of carpets, linoleum and other floor coverings, Including leathercloth and similar supported synthetic sheeting"		
+438.1	"Manufacture of carpets, carpeting, rugs, etc. from all types of fibres"		
+438.11	Manufacture of mats and matting from coir and other hard fibres		
+438.12	"Manufacture of carpets, rugs, mats and matting from other fibres"
+
+438.2	"Manufacture of linoleum and similar floor coverings (on paper, board or textile base)"
+438.3	Manufacture of leathercloth and similar supported synthetic sheeting (except rubberized fabrics)
+439	Miscellaneous textile industries
+439.1	Manufacture of felt
+439.11	Manufacture of woven felt
+439.12	Manufacture of needleloom and other non-woven felt
+439.2	Manufacture of non-woven (bonded fibre) fabrics
+439.3	"Manufacture of ribbon, tape, belting, webbing, braids and trimmings of textile material, as well as the manufacture of textile tubing"
+439.4	Manufacture of elastic textile fabrics and trimmings
+439.5	"Manufacture of tulle and other net fabrics (except woven, knitted or crocheted fabrics), lace, guipure, machine-made embroidery and similar products"
+439.6	"Manufacture of twine, cordage, ropes and cables of natural or manmade fibres"
+439.61	Not in conjunction with spinning
+439.62	In conjunction with spinning
+439.7	Manufacture of miscellaneous textiles
+439.71	Recovery of yarn (pulled and garnetted rags)
+439.72	"Preparation of kapok, horsehair and other upholstery material"
+439.73	Manufacture of nets and netting
+439.74	Manufacture of wadding
+439.75	Manufacture of textiles not elsewhere specified
+	
+44	LEATHER AND LEATHER GOODS INDUSTRY (except footwear and clothing)
+
+441	Tanning and dressing of leather
+441.1	Tanning and dressing
+441.2	Manufacture of imitation leather based on natural leather
+441.3	"Currying, dyeing and finishing of leather (at independent workshops)"
+442	Manufacture of products from leather and leather substitutes
+442.1	"Manufacture of handbags, brief-cases, purses and similar articles,"
+	"travel goods, saddlery and harness, sheaths, cases, boxes, belts and"
+	"straps, etc. from leather and leather substitutes"
+442.2	Manufacture of leather gloves
+442.3	Manufacture of leather articles of a kind used in machinery or me
+	chanical appliances or for industrial purposes
+	
+45	FOOTWEAR AND CLOTHING INDUSTRY
+451	Manufacture of mass-produced footwear (excluding footwear made completely of wood or of rubber)
+451.1	Manufacture of mass-produced Outdoor footwear (other than footwear classified to 451.3)
+451.2	Manufacture of mass-produced indoor footwear (other than footwear classified to 451.3)
+451.3	"Manufacture of special types of footwear (ballet shoes, wooden soled footwear, sports shoes, safety footwear, etc.)"
+451.4	Manufacture of footwear parts and accessories
+452	Production of hand-made footwear (including orthopaedic footwear)
+	
+453	Manufacture of ready-made clothing and accessories
+453.1	Manufacture of clothing from bought-in knitted or crocheted fabric
+453.2	"Manufacture of women's, girls' and infants' outerwear"
+453.3	Manufacture of men's and boys' outerwear
+453.4	Manufacture of special outer garments
+453.41	"Manufacture of workwear, uniforms and similar garments"
+453.42	Manufacture of rainwear (including stitched garments and garments made up of bonded or welded plastic materials)
+453.43	Manufacture of leather and similar clothing
+453.44	"Manufacture of cuter garments not elsewhere specified (clerical clothing, theatrical costumes)"
+453.5	"Making of underwear, corsets, shirts, etc."
+453.51	"Manufacture of corsets, suspender belts and brassieres"
+453.52	"Manufacture of other articles of women's, girls' and infants' underclothing"
+453.53	Manufacture of men's and boy's shirts and underclothing
+453.6	Manufacture of hats and other headgear
+453.61	"Manufacture of hats and other headgear for women, girls and infants"
+453.62	Manufacture of hats and other headgear for men and boys
+453.7	"Manufacture of clothing accessories (e.g. umbrellas, ties, braces, belts, gloves, etc. from woven materials)"
+453.8	Other activities connected with the clothing industry
+	
+454	"Bespoke tailoring, dressmaking and hatmaking"
+454.1	Making to measure outerwear and underclothing
+454.11	"Making to measure women's, girls' and infants' outerwear"
+454.12	Making to measure men's and boys' outerwear
+454.13	"Making to measure underwear, corsets, suspender belts, shirts, etc."
+454.2	Making to measure hats and other headgear
+	
+455	Manufacture of household textiles and other made-up textile goods (outside weaving-mills)
+
+455.1	Manufacture of household linen (outside weaving-mills)
+455.2	"Manufacture of quilts, eiderdowns, counterpanes and similar articles of bedding (except mattresses)"
+455.3	"Making-up of wall coverings, curtains and other soft furnishings"
+455.4	"Manufacture of made-up textile goods not elsewhere specified (outside weaving-mills) such as tents, awnings, tarpaulins, sails, sacks, bags and flags"
+	
+456	Manufacture of furs and of fur goods
+456.1	Dressing and finishing of furskins
+456.2	Cutting and sorting of rabbit hair for the hatmaking industry and for
+	spinning
+456.3	"Making up of furs, including the processing of pieces and cuttings of furskin and other byproducts of fur-making"
+456.31	Manufacture of ready-made fur goods for the wholesale trade
+456.32	Making up of fashion furs and of bespoke fur goods
+456.33	"Specialized processing of pieces or cuttings of furskin, including heads, paws, fails and the like"
+	
+46	TIMBER AND WOODEN FURNITURE INDUSTRIES
+461	Sawing and processing of wood
+461.1	Sawmilling
+461.2	Planing of wood
+461.3	Drying and seasoning of wood
+
+462	Manufacture of semI-fInished wood products
+462.1	Manufacture of veneers and plywood
+462.11	Manufacture of veneers
+462.12	Manufacture of plywood
+462.2	Manufacture of fibre board and of particle board
+462.21	Manufacture of hard fibre and porous fibre board
+462.22	Manufacture of particle board
+462.3	Manufacture of 'improved' wood
+462.4	"Preservation of wood (against fungi, insects and fire)"
+	
+463	Manufacture of carpentry and Joinery components and of parquet flooring
+463.1	"Manufacture, or manufacture combined with on site assembly of wooden buildings and wood components"
+463.2	"Manufacture, or manufacture combined with on site assembly of"
+	joinery for building and wooden fittings
+463.3	"Manufacture, or manufacture combined with laying of parquet flooring"
+	
+464	Manufacture of wooden containers
+464.1	"Manufacture of wooden boxes, packing cases, crates, pallets and the like"
+464.2	"Cooperage (including the manufacture of staves, cask heads, bungs, etc.)"
+	
+465	Other wood manufactures (except furniture)
+465.1	Miscellaneous wood manufactures
+465.2	Manufacture of wood flour
+465.3	Manufacture of wood wool and wood fibre
+465.4	Manufacture of wooden shoes
+	
+466	Manufacture of articles of cork and articles of straw and other plaiting materials (including basketware and wickerwork); manufacture of brushes
+	and brooms
+466.1	Manufacture of articles of cork
+466.2	"Manufacture of basketware, wickerwork and other articles of plaiting materials (except cane and wicker furniture)"
+466.3	Manufacture of brushes and brooms
+	
+467	Manufacture of wooden furniture
+467.1	Manufacture of domestic furniture
+467.2	Manufacture of office and school furniture
+467.3	Manufacture of chairs and other seats (Other than upholstered)
+467.4	Manufacture of upholstered and/or stuffed chairs and other seats
+467.5	Manufacture of miscellaneous furniture
+467.6	Manufacture of coffins
+467.7	Manufacture of cane and wicker furniture
+467.8	Manufacture of mattresses (of all kinds)
+467.9	"Activities ancillary to the furniture industry: varnishing, upholstering, gilding, etc."
+	
+47	MANUFACTURE OF PAPER AND PAPER PRODUCTS; PRINTING AND PUBLISHING
+	
+471	"Manufacture of pulp, paper and board"
+471.1	Manufacture of pulp (other than macerated straw pulp)
+471.2	Manufacture of straw paper and straw-board (including the integrated production of macerated straw pulp)
+471.3	Manufacture of paper and board
+471.31	Manufacture of printing and writing paper
+471.32	Manufacture of kraft paper and board and packing and wrapping paper
+471.33	Manufacture of thin paper and special paper
+471.34	Manufacture of paperboard
+	
+472	Processing of paper and board
+472.1	Manufacture of paper products for use in interior decoration
+472.11	Manufacture of wallpaper
+472.12	Manufacture of other paper goods for interior decoration
+472.2	"Manufacture of household and sanitary goods, toilet requisites and underwear of paper, board or pulp"
+472.3	"Manufacture of writing materials and of articles of paper or paper-board commonly used in offices, schools and the like (stationery and office supplies)"
+472.4	"Manufacture of packaging products, including display packaging"
+472.41	Manufacture of large capacity paper sacks and other large paper bags
+472.42	Manufacture of corrugated paper and board and of articles thereof
+472.43	Manufacture of paper and board packaging products
+472.44	Manufacture of other packaging products
+472.5	Manufacture of bituminized paper and paperboard for the building industry
+472.6	"Manufacture of impregnated, waxed, composite, adhesive and similar paper"
+472.7	Manufacture of coated (other than machine-coated) and fancy paper
+472.8	Manufacture of other articles of paper and board
+	
+473	Printing and allied Industries
+473.1	Printing of newspapers and periodicals
+473.2	Other printing
+473.21	Letterpress
+473.22	"Offset, lithographic, etc."
+473.23	Gravure printing
+473.3	"Bookbinding, including sewing and gilding"
+473.4	industries allied to the printing industry
+	
+474	Publishing
+474.1	Publishing of books
+474.2	"Publishing of pictures, engravings and picture postcards"
+474.3	Publishing of music
+474.4	Publishing of newspapers and periodicals
+474.5	Other publishing	
+		
+48	PROCESSING OF RUBBER AND PLASTICS	
+		
+481	Manufacture of rubber products	
+481.1	Manufacture of rubber tyres	
+481.2	Manufacture of other rubber products and reclamation of rubber	
+481.21	Manufacture of rubber belting and tubing	
+481.22	Manufacture of rubber adhesives and rubber solutions	
+481.23	"Manufacture of rubber goods of specialized rubber products for Industrial use (including rubber flooring material); manufacture of rubber derivatives (vulcanite, ebonite, etc.)"	
+481.24	Manufacture of rubber footwear	
+481.25	Manufacture of rubber sanitary and surgical goods	
+481.26	Manufacture of rubberized textile fabrics and of clothing and other articles made therefrom (except stitched goods)	
+481.27	Manufacture of rubber sports and camping equipment and rubber toys	
+481.28	Reclaiming of rubber	
+482	Retreading and repairing of rubber tyres	
+483	Processing of plastics	
+		
+49	OTHER MANUFACTURING INDUSTRIES	
+		
+491	Manufacture of articles of jewellery and goldsmiths' and silversmiths' wares; cutting or otherwise working of precious and semi-precious stones	
+491.1	Manufacture of articles of jewellery of precious metal or precious metal plated ware	
+491.2	Manufacture of goldsmiths' and silversmiths' wares	
+491.3	Manufacture of fancy jewellery	
+491.4	Diamond cutting and polishing	
+491.5	Working of precious and semi-precious stones	
+491.6	Striking of coins and medals	
+492	Manufacture of musical Instruments	
+492.1	"Manufacture of keyboard instruments: organs, pianos, harpsichords and the like"	
+492.2	"Manufacture of other musical instruments: accordions, wind, string and percussion instruments"	
+493	photographic and cinematographic laboratories	
+493.1	Developing and printing of cinematographic films	
+493.2	Developing and printing of photographic films
+494	Manufacture of toys and sports goods
+494.1	Manufacture of toys and games
+494.2	Manufacture of sports goods
+495	Miscellaneous manufacturing industries
+495.1	Manufacture of fountain pens and ball-point pens
+495.2	Specialized manufacture of stamps and seals
+495.3	Manufacturing industries not elsewhere specified
+	
+50	BUILDING AND CIVIL ENGINEERING
+500	General building and civil engineering work (without any particular specialization) and demolition work
+500.1	General building and civil engineering work (without any particular specialization)
+500.2	Demolition work
+	
+501	"Construction of fiats, office blocks, hospitals and other buildings, both residential and nonresidential"
+501.1	General building contractors
+501.2	Roofing
+501.3	"Construction of chimneys, kilns and furnaces"
+501.4	Waterproofing and dampproofing
+501.5	"Restoration and maintenance of outside walls (repointing, cleaning, etc.)"
+501.6	Erection and dismantlement of scaffolding
+501.7	Other specialized activities relating to construction work (including carpentry)
+	
+502	"Civil engineering: construction of roads, bridges, railways, etc."
+502.1	General civil engineering work
+502.2	Earth-moving (navvying)
+502.3	"Construction of bridges, tunnels and shafts, drilling"
+502.4	"Hydraulic engineering (rivers, canals, harbours, flows, locks and dams)"
+502.5	Road-building (including specialized construction of airports and runways)
+502.6	"Specialized construction work relating to water (i.e. to Irrigation, land drainage, water supply, sewage disposal, sewerage, etc.)"
+502.7	Specialized activities in other areas of civil engineering
+	
+503	installation (fittings and fixtures)
+503.1	General installation work
+503.2	"Gas fitting end plumbing, and the installation of sanitary equipment"
+503.3	"installation of heating and ventilating apparatus (central heating, air conditioning, ventilation)"
+503.4	"Sound and heat insulation, insulation against vibration"
+503.5	Electrical fittings
+503.6	"installation of aerials, lightning conductors, telephones, etc."
+	
+504	Building completion work
+504.1	General building completion work
+504.2	Plastering
+504.3	"Joinery, primarily engaged in on the site assembly and/or installation (including the laying of parquet flooring)"
+504.4	"Painting, glazing, paperhanging"
+504.5	Tiling and otherwise covering floors and walls
+504.6	"Other building completion work (putting in fireplaces, etc.)"
+	
+61	WHOLESALE DISTRIBUTION (EXCEPT DEALING IN SCRAP AND WASTE MATERIALS)
+	
+611	"Wholesale dealing In agricultural raw materials, live animals, textile raw materials and semi-finished goods"
+611.1	"Wholesale dealing in grain, seeds and animal feedingstuffs; fertilizers (without any particular specialization)"
+611.2	"Wholesale dealing in grain, seeds and animal feedingstuffs"
+611.3	Wholesale dealing in fertilizers
+611.4	Wholesale dealing in flowers and plants
+611.5	"Wholesale dealing in live animals, except poultry"
+611.6	Wholesale dealing in textile raw materials and semi-finished textile goods
+611.7	Wholesale dealing in hides and skins
+611.8	Wholesale dealing in leather
+611.9	Wholesale dealing in unmanufactured tobacco
+	
+612	"Wholesale dealing in fuels, ores, metals and industrial chemicals"
+612.1	Wholesale dealing in solid and liquid fuels (without any particular specialization)
+612.2	Wholesale dealing in petroleum products
+612.3	Wholesale dealing in coal and other solid fuels
+612.4	Wholesale dealing In iron and steel
+612.5	Wholesale dealing in ores
+612.6	Wholesale dealing in non-ferrous metals and semi4inished metal products
+612.7	Wholesale dealing in industrial chemicals and in animal and vegetable oils and fats of the kind used for industrial purposes; wholesale dealing in raw rubber
+	
+613	Wholesale dealing In timber and in building materials
+613.1	"Wholesale dealing in timber, semi-finished wood products, plywood and particle board, etc."
+613.2	Wholesale dealing in building materials
+613.3	"Wholesale dealing in fittings and fixtures (sanitary fixtures, etc.)"
+613.4	Wholesale dealing in flat glass
+	
+614	"Wholesale dealing in machinery, industrial equipment and vehicles (Including ships and aircraft)"
+614.1	Wholesale dealing In machine tools for working metal and wood
+614.2	Wholesale dealing in construction machinery
+614.3	"Wholesale dealing in machinery for the textile industry, and in sewing and knitting machines"
+614.4	Wholesale dealing in office machinery and equipment				
+614.5	"Wholesale dealing in other machinery for use in Industry, trade and navigation"				
+614.6	"Wholesale dealing in agricultural machinery and accessories and implements, including tractors"				
+614.7	Wholesale dealing In vehicles and vehicle parts and accessories				
+					
+615	"Wholesale dealing in furniture, household goods, hardware and iron"				
+	mongery				
+615.1	Wholesale dealing in wooden and metal furniture				
+615.2	Wholesale dealing in electrical household appliances and supplies.				
+	and in hardware and ironmongery				
+615.3	"Wholesale dealing in radio and television and accessories thereof,"				
+	musical instruments and gramophone records				
+615.4	Wholesale dealing in china and glassware				
+615.5	"Wholesale dealing in varnish, paint and wallpaper"				
+615.6	"Wholesale dealing in cooperage and other wooden ware, cork goods"				
+	and wickerwork				
+616	"Wholesale dealing in textiles, clothing, footwear and leather goods"				
+616.1	Wholesale dealing in a variety of textile goods (without any particular				
+	specialization)				
+616.2	"Wholesale dealing  in outerwear including overalls, uniforms, etc."				
+616.3	"Wholesale dealing in hats and other headgear, umbrellas and clothing"				
+	accessories				
+616.4	Wholesale dealing in clothing fabrics				
+616.5	"Wholesale dealing in underwear, nightwear, shirts, blouses, hosiery"				
+	and knitwear and haberdashery				
+616.6	Wholesale dealing in furs				
+616.7	Wholesale dealing in footwear				
+616.5	Wholesale dealing in leather goods and fancy goods				
+616.9	"Wholesale dealing in household textiles, carpets. carpeting and rugs"				
+617	"Wholesale dealing in food, drink and tobacco"				
+617.1	"Wholesale dealing in a variety of foodstuffs, drinks and tobacco"				
+	products (without any particular specialization)				
+617.2	"Wholesale dealing in fruit, vegetables and potatoes"				
+617.3	Wholesale dealing in meat and meat products (including game and				
+	poultry)				
+617.4	"Wholesale dealing in dairy produce, eggs, and edible oils and fats"				
+617.5	Wholesale dealing in alcoholic and other drinks				
+617.6	Wholesale dealing in tobacco products				
+617.7	"Wholesale dealing in sugar, and in chocolate and sugar confectionery"				
+617.8	"Wholesale dealing in coffee, tea, cocoa and spices"				
+617.9	"Specialized wholesale distribution of other foodstuffs, including"				
+	"seafood (fish, crustaceans, molluses)"				
+618	"Wholesale dealing in pharmaceutical and medical goods, cosmetics and"				
+	cleaning materials				
+618.1	Wholesale dealing in pharmaceutical goods				
+618.2	"Wholesale dealing in medical, surgical and orthopaedic instruments"				
+	and articles				
+618.3	Wholesale dealing in perfumes and cosmetics				
+618.4	Wholes ale dealing in cleaning materials				
+619	Other specialized wholesale distribution and wholesale dealing in a				
+	variety of goods (without any particular specialization)				
+619.1	"Wholesale dealing in paper, board and stationery"				
+619.2	"Wholesale dealing in books, periodicals and newspapers"				
+619.3	Wholesale dealing in photagraphic and optical goods				
+619.4	"Wholesale dealing in watches, clocks and jewellery"				
+619.5	"Wholesale dealing in toys, including sports goods"				
+619.6	Other specialized wholesale distribution				
+619.7	Wholesale dealing in a variety of goods (without any particular specialization)				
+					
+62	DEALING IN SCRAP AND WASTE MATERIALS				
+621	"Wholesale dealing in scrap iron, scrap steel and non4errous scrap metals"				
+					
+622	Wholesale dealing In other scrap and waste materials				
+63	AGENTS				
+	
+631	"Agents involved In the sale of agricultural raw materials, live animals, textile raw materials and semi-finished goods"
+	
+632	"Agents involved In the sale of fuels, ores, metals and industrial chemicals"
+	
+633	Agents Involved In the sale of timber and building materials
+	
+634	"Agents Involved in the sale of machinery, industrial equipment and vehicles (including ships and aircraft)"
+	
+635	"Agents involved in the sale of furniture, household goods, hardware and ironmongery"
+	
+636	"Agents Involved In the sale of textiles, clothing, footwear and leather goods"
+	
+637	"Agents Involved in the sale of food, drink and tobacco"
+	
+638	Agents specializing in the sale of particular products or ranges of products not elsewhere specified
+		
+639	Agents involved In the sale of a variety of goods (without any particular specialization)	
+64/65	RETAIL DISTRIBUTION	
+641/642	"Retail distribution of food, drink and tobacco"	
+641.1	"Retail distribution of a variety of goods with sales of food, drink and tobacco predominating"	
+641.2	Retail greengrocers	
+641.3	"Retail dairies (dairy produce, eggs and edible oils and fats)"	
+641.4	"Retailing of meat, meat products and tripe (e.g. butchers' trade)"	
+641.5	"Retail fishmongers (fish, crustaceans, molluses)"	
+641.6	Retailing of game and poultry	
+641.7	Retailing of bread	
+641.8	Retailing of cakes and flour confectionery	
+641.9	Retailing of sugar confectionery	
+642.1	Retailing of alcoholic and other drinks	
+642.2	Retail tobacconists	
+642.3	"Other specialized retail distribution of food, drink and tobacco"	
+643	Dispensing chemists	
+644	"Retail distribution of medical goods, cosmetics and cleaning materials"	
+644.1	"Retailing of medical, surgical and orthopaedic instruments and articles"	
+644.2	"Retailing of perfumery, cosmetics and toilet preparations"	
+644.3	"Retailing of chemists' wares, paints, varnishes, lacquer and cleaning"	
+	materials	
+645	Retail distribution of clothing	
+645.1	Retail distribution of a variety of textile and leather goods (without	
+	any particular specialization)	
+645.2	"Retailing of men's, women's and children's ready made outerwear"	
+	"including overalls, uniforms, etc. (without any particular specialization)"	
+645.3	"Retailing of men's and boys' ready made outerwear, including overalls,"	
+	uniforms etc.	
+645.4	Retailing of women's and girls' ready made outerwear including	
+	"overalls, uniforms etc."	
+645.5	Retailing of children's and infants' clothing	
+645.6	Retailing of clothing fabrics			
+645.7	"Retailing of underwear, nightwear, shirts, hats and umbrellas"			
+645.8	"Retailing of haberdashery, hand knitting yarn, thread, etc."			
+645.9	Retailing of furs			
+646	Retail distribution of footwear and leather goods			
+646.1	Retailing of footwear and other shoemakers' wares			
+646.2	Retailing of leather goods and travel goods			
+647	Retail distribution of furnishing fabrics and other household textiles			
+647.1	"Retailing of furnishing fabrics, bedding, carpets, carpeting and rugs"			
+647.2	Retailing of household and table linen			
+648/649	"Retail distribution of household equipment, fittings and appliances,"			
+	hardware and Ironmongery			
+648.1	"Retailing of a variety of household equipment. fittings and appliances,"			
+	hardware and ironmongery (without any particular specialization)			
+648.2	"Retailing of furniture, except office furniture"			
+648.3	Retailing of miscellaneous household supplies and kitchenware			
+648.4	Retailing of electrical household appliances and large domestic			
+	appliances			
+648.5	Retailing of articles for lighting			
+648.6	Retailing of hardware and ironmongery			
+648.7	"Retailing of china, pottery etc. and glassware"			
+648.8	"Retailing of radio and television receivers, radiograms, recordplayers,"			
+	"tape recorders, gramophone records, etc."			
+648.9	"Retailing of wood and cork products, wickerwork and plastic goods"			
+649.1	"Retailing of wallpaper and floor coverings except carpets, rugs etc."			
+649.2	Retailing of sanitary goods			
+649.3	Retailing of sewing machines and knitting machines			
+649.4	"Retailing of musical instruments, musical scores, and related goods"			
+649.5	Retailing of fancy goods and gifts			
+649.6	"Retailing of antiques, objets d'art, devotional goods and coins"			
+651	Retail distribution of motor vehicles and cycles			
+651.1	"Retailing of motor vehicles (other than motor cycles), new and"			
+	"second-hand, and parts and accessories thereof"
+651.2	"Retailing of motor cycles and cycles, new and second-hand, and"
+	parts and accessories thereof
+652	Retail distribution of motor fuels and lubricating oils
+653	"Retail distribution of books, newspapers, stationery and office supplies"
+653.1	"Retailing of books, newspapers and periodicals"
+653.2	Retailing of stationery and office supplies
+653.3	Retailing of office furniture and office machines and equipment
+653.4	Retailing of collectors' postage stamps
+654/655	Other retail distribution
+654.1	Retailing of photographic and optical goods
+654.2	"Retailing of watches, clocks, jewellery and plate"
+654.3	"Retailing of toys, whether or not together with the retailing of sports goods"
+654.4	Retailing of sports goods and camping equipment
+654.5	"Retailing of arms, ammunition and hunting equipment"
+654.6	Retailing of flowers and plants; florists
+654.7	Retailing of pets and requisites for the care thereof	
+654.8	"Retailing of seeds, animal feeding-stuffs and fertilizers"	
+654.9	Retailing of fuels	
+655.1	"Retailing of second-hand goods (except books, motor vehicles and antiques)"	
+655.2	Other specialized retail distribution	
+656	"Retail distribution of a wide range of goods, with non-food goods"	
+	predominating	
+66	HOTELS AND CATERING	
+661	"Restaurants, snack bars, cafes and other eating places (not providing"	
+	overnight accommodation)	
+662	Public houses and similar establishments supplying drinks for consump	
+	tion on the premises without entertainment (and not providing overnight	
+	accommodation)	
+663	"Nightclubs, dance halls and other establishments supplying drinks for"	
+	consumption on the premises In conjunction with entertainment	
+664	Canteens and messes	
+665	Hotel trade			
+665.1	"Hotels and motels, with restaurant"			
+665.2	Hotels without restaurant			
+665.3	Guest houses and boarding houses			
+666	Sleeping-car and dining-car services			
+667	Other provision of lodging			
+667.1	Youth hostels and (mountain) refuges			
+667.2	"Camping sites, including caravan sites"			
+667.3	Holiday centres and holiday homes			
+667.4	Convalescent and rest homes			
+667.5	Furnished accommodation for tourists			
+667.6	Other provision of lodgings not elsewhere specified			
+				
+67	REPAIR OF CONSUMER GOODS AND VEHICLES			
+671	Repair of motor vehicles and bicycles			
+672	"Repair of boots, shoes and other articles of leather"			
+673	Repair of electrical household goods			
+674	"Repair of watches, clocks and lewellery"			
+675	Repairs not elsewhere specified; general repairs			
+				
+71	710	RAILWAYS		
+72	"OTHER LAND TRANSPORT (URBAN TRANSPORT, ROAD TRANSPORT,"			
+	ETC.)			
+				
+721	"City underground, surface and elevated railway; tramways, regular bus and motor coach services"			
+721.1	"City underground, surface and elevated railways"			
+721.2	"Tramways, regular bus and motor coach services"			
+				
+722	"Road passenger transport, except regular bus and motor coach services"			
+723	Road haulage			
+723.1	Furniture removals by road			
+723.2	Other road haulage			
+724	Conveyance via pipeline
+725	Land transport not elsewhere specified
+	
+73	
+730	INLAND WATER TRANSPORT
+74	SEA TRANSPORT AND COASTAL SHIPPING
+	
+741	Sea transport (shipping on long sea routes)
+	
+742	Coastal shipping (shipping on coasting and short sea routes)
+	
+75	
+750	AIR TRANSPORT
+75	SUPPORTING SERVICES TO TRANSPORT
+761	Supporting services to land transport
+	
+762	"Supporting services to inland water transport (operation and upkeep of inland waterways, river ports and other inland water transport facilities)"
+	
+763	Supporting services to sea transport and coastal shipping (sea ports and other sea transport facilities)
+	
+764	Supporting services to air transport (airports and airfields)
+	
+77	"TRAVEL AGENTS, FREIGHT BROKERS AND OTHER AGENTS FACILI-"
+	TATING THE TRANSPORT OF PASSENGERS OR GOODS; STORAGE AND
+	WAREHOUSING
+	
+771	Travel agents
+	
+772	Freight brokers and other agents facilitating the transport of goods
+	
+773	Storage and warehousing including bonded warehousing
+	
+79		
+790	COMMUNICATION	
+81	BANKING AND FINANCE	
+811	Central banking authorities	
+812	Other monetary institutions	
+813	Other credit Institutions	
+813.1	institutions specializing in credit transactions	
+813.2	institutions specializing in investment in securities	
+		
+82	"INSURANCE, EXCEPT FOR COMPULSORY SOCIAL INSURANCE"	
+		
+821	"Units engaged in several types of insurance, except for compulsory social insurance"	
+		
+822	"Units engaged In life assurance, except for compulsory social insurance"	
+		
+823	"Units engaged in health, casualty, Injury, and accident Insurance, except for compulsory social insurance"	
+	
+83	"ACTIVITIES AUXILIARY TO BANKING AND FINANCE AND INSURANCE; REAL ESTATE TRANSACTIONS (EXCEPT LETTING OF REAL ESTATE BY THE OWNER), BUSINESS SERVICES"
+	
+631	Activities auxiliary to banking and finance
+	
+832	Activities auxiliary to insurance
+	
+833	Dealers in real estate (except letting of real estate by the owner)
+	
+834	House and estate agents
+	
+835	Legal services
+	
+836	"Accountants, tax experts, auditors"
+	
+831	Technical services
+	
+838	Advertising
+839	Other business services
+839.1	Market research and management consultancy
+839.2	Computer services and services provided by means of office machines
+	"(duplicating, document copying, etc.) to third parties on a fee or contract basis"
+839.3	Business services n.e.s.
+	
+84	"RENTING, LEASING AND HIRING OF MOVABLES"
+841	"renting, leasing and hiring of agricultural machinery and equipment (without permanent staff)"
+842	"Renting, leasing and hiring of construction machinery and equipment (without permanent staff)"
+843	"Renting, leasing and hiring of bookkeeping and office machines, electronic data processing equipment and cash registers (without permanent staff)"
+844	Car renting without driver
+845	"Renting, leasing and hiring of other means of transport without driver"
+846	Hiring of consumer goods
+846.1	Hiring of clothing and household articles
+846.2.	Hiring of other consumer goods
+847	"  Renting, leasing and hiring of other movables (without permanent staff)"
+	
+85	
+850	LETTING OF REAL ESTATE BY THE OWNER
+	
+9	OTHER SERVICES
+9A	OTHER SERVICES: NON-MARKET SERVICES OF GENERAL GOVERNMENT
+9 B	OTHER SERVICES: NON-MARKET SERVICES OF PRIVATE NON-PROFIT INSTITUTIONS
+9 C	OTHER SERVICES: MARKET SERVICES
+9 D	DOMESTIC SERVICES
+	
+91	"PUBLIC ADMINISTRATION, NATIONAL DEFENCE AND COMPULSORY SOCIAL SECURITY"
+911	"parliament and central, regional and local government (including Ministries)"
+912	Justice and judicial authorities
+913	"Public security, law and order"
+914	Fire service
+915	National Defence
+919	Compulsory social security schemes
+	
+91 A	"PUBLIC ADMINISTRATION, NATIONAL DEFENCE AND COMPULSORY"
+	SOCIAL SECURITY (NON-MARKET SERVICES OF GENERAL GOVERN
+	MENT)
+91 A 1	"Parliament and central, regional and local government (including"
+	Ministries) (non-market services of general government)
+91 A 2	Justice and judicial authorities (non-market services of general
+	government)
+91 A 3	"Public security, law and order (non-market services of general"
+	government)
+91 A 4	Fire service (non-market services of general government)
+91 A 5	National defence (non-market services of general government)
+91 A 9	Compulsory social security schemes (non-market services of general
+	government)
+
+92	SANITARY SERVICES AND ADMINISTRATION OF CEMETERIES
+921	"Refuse disposal, fumigation, sanitation and similar services"
+922	Administration of cemeteries
+923	Cleaning services
+92 A	SANITARY SERVICES AND ADMINISTRATION OF CEMETERIES: NON
+	MARKET SERVICES OF GENERAL GOVERNMENT
+92 A 1	"Refuse disposal, fumigation, sanitation and similar services: non-"
+	market services of general government
+92 A 2	Administration of cemeteries (non-market services of general govern
+	ment)
+92 C	SANITARY SERVICES AND ADMINISTRATION OF CEMETERIES: MARKET
+	SERVICES
+92 C 1	"Refuse disposal, fumigation, sanitation and similar services: market"
+	services
+92 C 3	Cleaning services (market services)
+	
+93	EDUCATION
+931	Higher education
+932	Primary and secondary education
+933	Vocational education and training
+934	Nursery education
+935	Private tuition
+936	Driving schools and flying schools (except for airline pilots)
+	
+93 A	EDUCATION: NON-MARKET SERVICES OF GENERAL GOVERNMENT
+93 A 1	Higher education: non-market services of general government
+93 A 2	Primary and secondary education: non-market services of general government
+93 A 3	Vocational education and training: non-market services of general government
+93 A 4	Nursery education: non-market services of general government
+	
+93 B	EDUCATION: NON-MARKET SERVICES OF PRIVATE NON-PROFIT INSTI
+	TUTIONS
+93 B 1	     Higher education: non-market services of private non-profit insti
+	     tutions
+93 B 2	     Primary and secondary education: non-market services of private
+	     non-profit institutions
+93 B 3	     Vocational education and training: non-market services of private
+	     non-profit institutions
+93 B 4	     Nursery education: non-market services of private non-profit insti
+	     tutions
+
+93 C	EDUCATION: MARKET SERVICES
+93 C 2	Primary and secondary education: market services
+93 C 3	Vocational education and training: market services
+93 C 4	Nursery education: market services
+93 C 5	Private tuition (market services)
+93 C 6	"Driving schools, flying schools (except for airline pilots) (market services)"
+	
+94	
+940	RESEARCH AND DEVELOPMENT
+
+94 A	RESEARCH AND DEVELOPMENT: NON-MARKET SERVICES OF GENERAL GOVERNMENT
+	
+94 B	RESEARCH AND DEVELOPMENT: NON-MARKET SERVICES OF PRIVATE NON-PROFIT INSTITUTIONS
+	
+94 C	RESEARCH AND DEVELOPMENT: MARKET SERVICES
+	
+95	MEDICAL AND OTHER HEALTH SERVICES; VETERINARY SERVICES
+951	"Hospitals, nursing homes and sanatoria"
+952	Other institutions providing medical care
+953	Medical practices
+954	Dental practices and dental clinics
+955	"Own account midwives, nurses and the like"
+956	Veterinary practices and animal hospitals
+	
+95 A	MEDICAL AND OTHER HEALTH SERVICES; VETERINARY SERVICES:
+	NON-MARKET SERVICES OF GENERAL GOVERNMENT
+95 A 1	"Hospitals, nursing homes and sanatoria: non-market services of"
+	general government
+95 A 2	Other institutions providing medical care: non-market services of
+	general government
+95 A 4	Dental practices and dental clinics: non-market services of general
+	government
+95 A 6	Veterinary practices and animal hospitals: non-market services of
+	general government
+95 B	MEDICAL AND OTHER HEALTH SERVICES: NON-MARKET SERVICES OF
+	PRIVATE NON-PROFIT INSTITUTIONS
+95 B 1	"Hospitals, nursing homes and sanatoria: non-market services of"
+	private non-profit institutions
+95 B 2	Other Institutions providing medical care: non-market services of
+	private non-profit institutions
+95 B 4	Dental practices and dental clinics: non-market services of private
+	non-profit institutions
+95 B 6	Veterinary practices and animal hospitals: non-market services of
+	private non-profit institutions
+
+95 C	MEDICAL AND OTHER HEALTH SERVICES: MARKET SERVICES
+95 C 1	"Hospitals, nursing homes and sanatoria: market services"
+95 C 2	Other institutions providing medical care: market services
+95 C 3	Medical practices (market services)
+95 C 4	Dental practices and dental clinics: market services
+95 C 5	Midwives and own account nurses and the like (market services)
+95 C 6	Veterinary practices and animal hospitals: market services
+	
+96	OTHER SERVICES PROVIDED TO THE GENERAL PUBLIC
+961	Social work
+962	Social homes
+963	Professional associations and economic organizations
+964	Employers' federations
+965	Trade unions
+966	Religious organizations and learned societies
+967	Tourist offices and tourist clubs
+968	services provided to the general public n.e.s.
+	
+96A	OTHER SERVICES PROVIDED TO THE GENERAL PUBLIC: NON-MARKET SERVICES OF GENERAL GOVERNMENT
+96 A 1	Social work: non-market services of general government
+96 A 2	Social homes: non-market services of general government
+96 A 7	Tourist offices and tourist clubs: non-market services of genera government
+	
+96 B	OTHER SERVICES PROVIDED TO THE GENERAL PUBLIC: NON-MARKET SERVICES OF PRIVATE NON-PROFIT INSTITUTIONS
+96 B 1	Social work: non-market services at private non-profit institutions	
+96 B 2	Social homes: non-market services of private non-profit institutions	
+96 B 5	"Trade unions (non-market services of private non-profit institutions,"	
+96 B 6	Religious organizations and learned societies (non-market services of private non-profit institutions)	
+96 B 7	Tourist offices and tourist clubs: non-market services of private non profit institutions	
+96 B 8	Services provided to the general public n.e.s. (non-market services of private non-profit institutions)	
+		
+96C	OTHER SERVICES PROVIDED TO THE GENERAL PUBLIC: MARKET SERVICES	
+96 C 2	Social homes: market services	
+96 C 3	Professional associations and economic organizations (market services)	
+96 C 4	Employers' federations (market services)	
+		
+97	RECREATIONAL SERVICES AND OTHER CULTURAL SERVICES	
+971	Film production	
+972	Film distribution	
+973	Cinemas	
+974	Radio and television services	
+975	Entertainment (except cinemas and sport)	
+976	"Liberal, artistic and literary professions"	
+977	"Libraries, public archives, museums, botanical and zoological gardens"	
+978	"sporting facilities and organizations, own account sportsmen and sports Instructors"	
+979	Recreational services n.e.s.	
+		
+97 A	RECREATIONAL SERVICES AND OTHER CULTURAL SERVICES: NON-MARKET SERVICES OF GENERAL GOVERNMENT	
+97 A 5	Entertainment (except cinemas and sport): non-market services of general government	
+97 A 7	"Libraries, public archives, museums, botanical and zoological gardens: non-market services of general government"	
+97 A 8	"Sporting facilities and organizations, own account sportsmen and sports instructors: non-market services of general government"	
+		
+97 B	RECREATIONAL SERVICES AND OTHER CULTURAL SERVICES: NON-MARKET SERVICES OF PRIVATE NON-PROFIT INSTITUTIONS	
+97 B 5	Entertainment (except cinemas and sport): non-market services of private non-profit institutions	
+97 B 7	"Libraries, public archives, museums, botanical and zoological gardens: non-market services of private non-profit institutions"	
+97 B 8	"Sporting facilities and organizations, own account sportsmen and sports instructors: non-market services of private non-profit institutions"	
+		
+97C	RECREATIONAL SERVICES AND OTHER CULTURAL SERVICES: MARKET SERVICES	
+97 C 1	Film production (market services)	
+97 C 2	Film distribution (market services)	
+97 C 3	Cinemas (market services)	
+97 C 4	Radio and television (market services)	
+97 C 5	Entertainment (except cinemas and sport): market services	
+97 C 6	"Liberal, artistic and literary professions (market services)"	
+97 C 7	"Libraries, public archives, museums, botanical and zoological gardens: market services"	
+97 C 8	"Sporting facilities and organizations, own account sportsmen and sports instructors: market services"	
+97 C 9	Recreational services n.e.s. (market services)	
+		
+98	PERSONAL SERVICES	
+981	"Laundries, dyers and cleaners and similar services"	
+982	Hairdressing and beauty parlours	
+983	Photographic studios	
+984	Personal services n.e.s.	
+		
+98 C	PERSONAL SERVICES (MARKET SERVICES)	
+98 C 7	"Laundries, dyers and cleaners and similar services (market services)"	
+98 C 2	Hairdressing and beauty parlours (market services)	
+98 C 3	Photographic studios (market services)	
+98 C 4	Personal services n.e.s. (market services)	
+		
+99		
+990	DOMESTIC SERVICES	
+99 D	DOMESTIC SERVICES	
+		
+00		
+000	"DIPLOMATIC REPRESENTATION, INTERNATIONAL ORGANIZATIONS AND ALLIED"	
+	ARMED FORCES	
+ÿ

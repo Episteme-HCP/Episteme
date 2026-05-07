@@ -1,0 +1,4 @@
+<unit id="caloriePerSecond" name="calorie per second" abbreviation="cal/s" unitType="power" parentSI="watt"
+      multiplierToSI="4.1868" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 cal/s = 4.1868 J/s</description>
+</unit>

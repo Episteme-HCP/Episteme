@@ -1,0 +1,4 @@
+<unit id="statohm" name="statohm" unitType="electricResistance" parentSI="ohm" multiplierToSI="8.9876E+11"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Part of the CGS electrostatic system</description>
+</unit>

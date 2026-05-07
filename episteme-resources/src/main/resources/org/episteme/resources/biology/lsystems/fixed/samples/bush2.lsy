@@ -1,0 +1,32 @@
+/*
+---------------------------------------------------------------------
+VIRTUAL PLANTS
+==============
+
+University of applied sciences Biel
+
+hosted by Claude Schwab
+
+programmed by Rene Gressly
+
+March - July 1999
+
+This is an input file for the VirtualPlants application.
+
+Modified Bush
+---------------------------------------------------------------------
+*/
+
+
+depth = 6
+angle = 22.5
+length = 0.5
+thickness = 0.2
+decrement = 0.007
+
+axiom = A
+
+rule = A -> [&FLA]/////'[&FLA]///////'[&FLA]
+rule = F -> !S/////F
+rule = S -> FL
+rule = L -> ['''^^{-f+f+f-|-f+f+f}]

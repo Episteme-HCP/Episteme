@@ -1,0 +1,3 @@
+<unit id="gramPerTonne" name="gram per tonne" abbreviation="g/t" unitType="massFraction" parentSI="kilogramPerKilogram"
+      multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>
