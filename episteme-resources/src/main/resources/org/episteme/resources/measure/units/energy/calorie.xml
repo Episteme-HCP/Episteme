@@ -1,0 +1,4 @@
+<unit id="calorie" name="calorie" abbreviation="cal" unitType="energy" parentSI="joule" multiplierToSI="4.1868"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>International steam table calorie. 1 cal = 4.1868 J</description>
+</unit>

@@ -1,0 +1,4 @@
+<unit id="fluidOunce_imperial" name="imperial fluid ounce" abbreviation="fl oz" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="2.8413063E-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>20 imperial fluid ounces = 1 imperial pint</description>
+</unit>

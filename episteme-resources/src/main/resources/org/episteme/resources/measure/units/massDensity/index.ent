@@ -1,0 +1,29 @@
+
+<!ENTITY gramPerCentimeterCubed.xml SYSTEM "../massDensity/gramPerCentimeterCubed.xml">
+<!ENTITY gramPerLiter.xml SYSTEM "../massDensity/gramPerLiter.xml">
+<!ENTITY gramPerMilliliter.xml SYSTEM "../massDensity/gramPerMilliliter.xml">
+<!ENTITY kilogramPerMeterCubed.xml SYSTEM "../massDensity/kilogramPerMeterCubed.xml">
+<!ENTITY microgramPerLiter.xml SYSTEM "../massDensity/microgramPerLiter.xml">
+<!ENTITY milligramPerDeciliter.xml SYSTEM "../massDensity/milligramPerDeciliter.xml">
+<!ENTITY milligramPerLiter.xml SYSTEM "../massDensity/milligramPerLiter.xml">
+<!ENTITY milligramPerMeterCubed.xml SYSTEM "../massDensity/milligramPerMeterCubed.xml">
+<!ENTITY milligramPerMilliliter.xml SYSTEM "../massDensity/milligramPerMilliliter.xml">
+<!ENTITY ouncePerGallon_imperial.xml SYSTEM "../massDensity/ouncePerGallon_imperial.xml">
+<!ENTITY ouncePerGallon_US.xml SYSTEM "../massDensity/ouncePerGallon_US.xml">
+<!ENTITY poundPerFootCubed.xml SYSTEM "../massDensity/poundPerFootCubed.xml">
+
+<!ENTITY massDensity.elements	"
+&gramPerCentimeterCubed.xml;
+&gramPerLiter.xml;
+&gramPerMilliliter.xml;
+&kilogramPerMeterCubed.xml;
+&microgramPerLiter.xml;
+&milligramPerDeciliter.xml;
+&milligramPerLiter.xml;
+&milligramPerMeterCubed.xml;
+&milligramPerMilliliter.xml;
+&ouncePerGallon_imperial.xml;
+&ouncePerGallon_US.xml;
+&poundPerFootCubed.xml;
+">
+

@@ -1,0 +1,4 @@
+<unit id="inch" name="inch" abbreviation="in" unitType="length" parentSI="meter" multiplierToSI="2.54E-2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>An imperial measure of length</description>
+</unit>

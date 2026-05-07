@@ -1,0 +1,7 @@
+
+<!ENTITY wattPerMeterSquaredPerSteradian.xml SYSTEM "../radiance/wattPerMeterSquaredPerSteradian.xml">
+
+<!ENTITY radiance.elements	"
+&wattPerMeterSquaredPerSteradian.xml;
+">
+

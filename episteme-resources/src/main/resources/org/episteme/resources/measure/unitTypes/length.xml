@@ -1,0 +1,3 @@
+<unitType id="length" name="length">
+    <dimension name="length" power="1" preserve="no"/>
+</unitType>

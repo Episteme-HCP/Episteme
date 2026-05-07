@@ -1,0 +1,4 @@
+<unit id="britishThermalUnit" name="british thermal unit" abbreviation="btu" unitType="energy" parentSI="joule"
+      multiplierToSI="1055.0559" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 btu = 1055.0559 J</description>
+</unit>

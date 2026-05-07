@@ -1,0 +1,97 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.episteme.benchmarks.benchmark;
+
+import java.util.Map;
+
+/**
+ * Captures the performance metrics of a single benchmark run.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public record BenchmarkResult(
+        String benchmarkId,
+        String benchmarkName,
+        String provider,
+        String domain,
+        String status,
+        long timestamp,
+        long totalTimeMillis,
+        long iterations,
+        double averageTimePerOpMillis,
+        double operationsPerSecond,
+        long memoryUsedBytes,
+        Map<String, String> environmentInfo,
+        Map<String, Object> extraMetrics) {
+    
+    public BenchmarkResult(
+            String benchmarkId,
+            String benchmarkName,
+            String provider,
+            String domain,
+            long totalTimeMillis,
+            long iterations,
+            double averageTimePerOpMillis,
+            double operationsPerSecond,
+            long memoryUsedBytes,
+            Map<String, Object> extraMetrics) {
+        this(benchmarkId, benchmarkName, provider, domain, "SUCCESS", System.currentTimeMillis(), totalTimeMillis, iterations,
+                averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes, 
+                generateEnvInfo(), extraMetrics);
+    }
+
+    /**
+     * Convenience constructor for expanded results (e.g. from High-Precision Audit).
+     */
+    public BenchmarkResult(String provider, String domain, Map<String, String> metrics) {
+        this(domain.toLowerCase().replace(" ", "_"), domain, provider, domain, "SUCCESS", 
+             System.currentTimeMillis(), 0, 1, 0, 0, 0, generateEnvInfo(), 
+             new java.util.HashMap<>(metrics));
+    }
+
+    public BenchmarkResult(String name, String provider, String domain, double latencyMs) {
+        this(name.toLowerCase().replace(" ", "_"), name, provider, domain, "SUCCESS", 
+             System.currentTimeMillis(), (long)latencyMs, 1, latencyMs, 
+             latencyMs > 0 ? 1000.0 / latencyMs : 0, 0, generateEnvInfo(), 
+             new java.util.HashMap<>());
+    }
+
+    private static Map<String, String> generateEnvInfo() {
+        Map<String, String> info = new java.util.HashMap<>();
+        info.put("os", System.getProperty("os.name"));
+        info.put("java.version", System.getProperty("java.version"));
+        info.put("processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
+        return info;
+    }
+
+    public String toSummaryString() {
+        return String.format("%-40s | %-20s | %10.3f ms/op | %10.0f ops/sec | %6d MB",
+                benchmarkName, provider, averageTimePerOpMillis, operationsPerSecond, memoryUsedBytes / (1024 * 1024));
+    }
+}
+
+
+

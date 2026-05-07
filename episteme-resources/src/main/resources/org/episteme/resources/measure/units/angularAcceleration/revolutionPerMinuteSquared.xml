@@ -1,0 +1,4 @@
+<unit id="revolutionPerMinuteSquared" name="revolution per minute squared" abbreviation="r/min^2"
+      unitType="angularAcceleration" parentSI="radianPerSecondSquared" multiplierToSI="1.74532925E-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

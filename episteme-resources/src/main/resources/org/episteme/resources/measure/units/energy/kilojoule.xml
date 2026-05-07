@@ -1,0 +1,5 @@
+<unit id="kilojoule" name="kilojoule" abbreviation="kJ" unitType="energy" parentSI="joule" multiplierToSI="1.0E+3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>A unit frequently used in chemistry. Sometimes "kJ" is loosely used for "kJ/mole" or molar energy.
+    </description>
+</unit>

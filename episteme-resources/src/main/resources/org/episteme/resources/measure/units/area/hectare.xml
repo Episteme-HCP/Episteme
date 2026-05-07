@@ -1,0 +1,4 @@
+<unit id="hectare" name="hectare" abbreviation="ha" unitType="area" parentSI="meterSquared" multiplierToSI="1.0E+4"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 hectare is 10^4 square meters</description>
+</unit>

@@ -1,0 +1,4 @@
+<unit id="const.hbar" name="Atomic unit of action" abbreviation="h/(2pi)" unitType="angularMomentum"
+      parentSI="jouleSecond" multiplierToSI="1.05459E-34" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Angular momentum in atomic units</description>
+</unit>

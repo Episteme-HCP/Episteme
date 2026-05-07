@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>juliet</name>
+        <parent>uranus</parent>
+    </general>
+    <parameter>
+        <diameter>84</diameter>
+        <!-- km -->
+        <rotationperiod>0.493</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.493</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0007</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.065</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>64358</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

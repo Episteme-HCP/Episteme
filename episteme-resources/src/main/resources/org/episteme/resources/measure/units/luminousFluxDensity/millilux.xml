@@ -1,0 +1,4 @@
+<unit id="millilux" name="millilux" abbreviation="mlx" unitType="luminousFluxDensity" parentSI="lux"
+      multiplierToSI="1.0E-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>0.001 lux</description>
+</unit>

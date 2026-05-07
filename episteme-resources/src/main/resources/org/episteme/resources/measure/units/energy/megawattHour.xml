@@ -1,0 +1,4 @@
+<unit id="megawattHour" name="megawatt hour" abbreviation="MW hr" unitType="energy" parentSI="joule"
+      multiplierToSI="3.6E+9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 megawatt hour = 3.6 GJ</description>
+</unit>

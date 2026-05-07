@@ -1,0 +1,1617 @@
+<item>
+    <code>290.0</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Late Onset, Uncomplicated
+    </description>
+</item>
+<item>
+    <code>290.10</code>
+    <description>
+        Dementia due to Pick's Disease
+    </description>
+</item>
+<item>
+    <code>290.10</code>
+    <description>
+        Dementia due to Creutzfeld-Jacob disease
+    </description>
+</item>
+<item>
+    <code>290.10</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Early Onset, Uncomplicated
+    </description>
+</item>
+<item>
+    <code>290.11</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Early Onset, With Delirium
+    </description>
+</item>
+<item>
+    <code>290.12</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Early Onset, With Delusions
+    </description>
+</item>
+<item>
+    <code>290.13</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Early Onset, With Depressed Mood
+    </description>
+</item>
+<item>
+    <code>290.20</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Late Onset, With Delusions
+    </description>
+</item>
+<item>
+    <code>290.21</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Late Onset, With Depressed Mood
+    </description>
+</item>
+<item>
+    <code>290.3</code>
+    <description>
+        Dementia of the Alzheimer�s Type, With Late Onset, With Delirium
+    </description>
+</item>
+<item>
+    <code>290.40</code>
+    <description>
+        Vascular Dementia, Uncomplicated
+    </description>
+</item>
+<item>
+    <code>290.41</code>
+    <description>
+        Vascular Dementia, With Delirium
+    </description>
+</item>
+<item>
+    <code>290.42</code>
+    <description>
+        Vascular Dementia, With Delusions
+    </description>
+</item>
+<item>
+    <code>290.43</code>
+    <description>
+        Vascular Dementia, With Depressed Mood
+    </description>
+</item>
+<item>
+    <code>291.0</code>
+    <description>
+        Alcohol Intoxication Delirium
+    </description>
+</item>
+<item>
+    <code>291.0</code>
+    <description>
+        Alcohol Withdrawal Delirium
+    </description>
+</item>
+<item>
+    <code>291.1</code>
+    <description>
+        Alcohol-Induced Persisting Amnestic Disorder
+    </description>
+</item>
+<item>
+    <code>291.2</code>
+    <description>
+        Alcohol-Induced Persisting Dementia
+    </description>
+</item>
+<item>
+    <code>291.3</code>
+    <description>Alcohol-Induced Psychotic Disorder With
+        Hallucinations
+    </description>
+</item>
+<item>
+    <code>291.5</code>
+    <description>Alcohol-Induced Psychotic Disorder With Delusions</description>
+</item>
+<item>
+    <code>291.8</code>
+    <description>
+        Alcohol Withdrawal
+    </description>
+</item>
+<item>
+    <code>291.8</code>
+    <description>
+        Alcohol-Induced Mood Disorder
+    </description>
+</item>
+<item>
+    <code>291.8</code>
+    <description>
+        Alcohol-Induced Anxiety Disorder
+    </description>
+</item>
+<item>
+    <code>291.8</code>
+    <description>
+        Alcohol-Induced Sleep Disorder
+    </description>
+</item>
+<item>
+    <code>291.8</code>
+    <description>Alcohol-Induced Sexual Dysfunction</description>
+</item>
+<item>
+    <code>291.9</code>
+    <description>Alcohol-Related Disorder NOS</description>
+</item>
+<item>
+    <code>292.0</code>
+    <description>
+        Substance [Amphetamine, Cocaine, Nicotine, Opioid, Sedative*, Other (or Unknown)] Withdrawal
+    </description>
+</item>
+<item>
+    <code>292.11</code>
+    <description>Substance [Amphetamine, Cannabis, Cocaine, Hallucinogen,
+        Inhalant, Opioid, Phencyclidine, Sedative*, Other (or
+        Unknown)]-Induced Psychotic Disorder, With Delusions
+    </description>
+</item>
+<item>
+    <code>292.12</code>
+    <description>Substance [Amphetamine, Cannabis, Cocaine, Hallucinogen, Inhalant, Opioid, Phencyclidine, Sedative*,
+        Other (or Unknown)]-Induced Psychotic Disorder, With Hallucinations
+    </description>
+</item>
+<item>
+    <code>292.81</code>
+    <description>Substance [Sedative*, Other (or Unknown)] Withdrawal Delirium</description>
+</item>
+<item>
+    <code>292.81</code>
+    <description>Substance [Amphetamine, Cannabis, Cocaine, Hallucinogen, Inhalant, Opioid, Phencyclidine, Sedative*,
+        Other (or Unknown)] Intoxication Delirium
+    </description>
+</item>
+<item>
+    <code>292.82</code>
+    <description>Substance [Inhalant, Sedative*, Other (or Unknown)]-Induced Persisting Dementia</description>
+</item>
+<item>
+    <code>292.83</code>
+    <description>Substance [Sedative*, Other (or Unknown)]-Induced Persisting Amnestic Disorder</description>
+</item>
+<item>
+    <code>292.84</code>
+    <description>Substance [Amphetamine, Cocaine, Hallucinogen, Inhalant, Opioid, Phencyclidine, Sedative*, Other (or
+        Unknown)]-Induced Mood Disorder
+    </description>
+</item>
+<item>
+    <code>292.89</code>
+    <description>Substance [Amphetamine, Caffeine, Cannabis, Cocaine, Hallucinogen, Inhalant, Phencyclidine, Sedative*,
+        Other (or Unknown)]-Induced Anxiety Disorder
+    </description>
+</item>
+<item>
+    <code>292.89</code>
+    <description>Substance [Amphetamine, Caffeine, Cocaine, Opioid, Sedative*, Other (or Unknown)]-Induced Sleep
+        Disorder
+    </description>
+</item>
+<item>
+    <code>292.89</code>
+    <description>Substance [Amphetamine, Cocaine, Opioid, Sedative*, Other (or Unknown)]-Induced Sexual Dysfunction
+    </description>
+</item>
+<item>
+    <code>292.89</code>
+    <description>
+        Hallucinogen Persisting Perception Disorder (Flashbacks)
+    </description>
+</item>
+<item>
+    <code>292.89</code>
+    <description>Substance [Amphetamine, Cannabis, Cocaine, Hallucinogen, Inhalant, Opioid, Phencyclidine, Sedative*,
+        Other (or Unknown)] Intoxication
+    </description>
+</item>
+<item>
+    <code>292.9</code>
+    <description>Substance [Amphetamine, Caffeine, Cannabis, Cocaine, Hallucinogen, Inhalant, Nicotine, Opioid,
+        Phencyclidine, Sedative*, Other (or Unknown)]-Related Disorder NOS
+    </description>
+</item>
+<item>
+    <code>293.0</code>
+    <description>
+        Delirium Due to General Medical Condition
+    </description>
+</item>
+<item>
+    <code>293.81</code>
+    <description>Psychotic Disorder Due to [General Medical Condition], With Delusions</description>
+</item>
+<item>
+    <code>293.82</code>
+    <description>Psychotic Disorder Due to [General Medical Condition], With Hallucinations</description>
+</item>
+<item>
+    <code>293.83</code>
+    <description>
+        Disorder Due to General Medical Condition
+    </description>
+</item>
+<item>
+    <code>293.89</code>
+    <description>
+        Anxiety Disorder Due to General Medical Condition
+    </description>
+</item>
+<item>
+    <code>293.89</code>
+    <description>
+        Catatonic Disorder Due to General Medical Condition
+    </description>
+</item>
+<item>
+    <code>293.9</code>
+    <description>Mental Disorder due to General Medical Condition</description>
+</item>
+<item>
+    <code>294.0</code>
+    <description>
+        Amnestic Disorder Due to General Medical Condition
+    </description>
+</item>
+<item>
+    <code>294.1</code>
+    <description>Dementia Due to Parkinson�s Disease</description>
+</item>
+<item>
+    <code>294.1</code>
+    <description>Dementia Due to Head Trauma</description>
+</item>
+<item>
+    <code>294.1</code>
+    <description>Dementia Due to Huntington�s Disease</description>
+</item>
+<item>
+    <code>294.1</code>
+    <description>Dementia Due to [Other General Medical Condition]</description>
+</item>
+<item>
+    <code>294.8</code>
+    <description>Dementia NOS or Amnestic Disorder NOS</description>
+</item>
+<item>
+    <code>294.9</code>
+    <description>Dementia Due to HIV Disease</description>
+</item>
+<item>
+    <code>294.9</code>
+    <description>Cognitive Disorder NOS</description>
+</item>
+<item>
+    <code>295.10</code>
+    <description>
+        Schizophrenia, Disorganized Type
+    </description>
+</item>
+<item>
+    <code>295.20</code>
+    <description>
+        Schizophrenia, Catatonic Type
+    </description>
+</item>
+<item>
+    <code>295.30</code>
+    <description>
+        Schizophrenia, Paranoid Type
+    </description>
+</item>
+<item>
+    <code>295.40</code>
+    <description>
+        Schizophreniform Disorder
+    </description>
+</item>
+<item>
+    <code>295.60</code>
+    <description>
+        Schizophrenia, Residual Type
+    </description>
+</item>
+<item>
+    <code>295.70</code>
+    <description>
+        Schizoaffective Disorder
+    </description>
+</item>
+<item>
+    <code>295.90</code>
+    <description>
+        Schizophrenia Undifferentiated Type
+    </description>
+</item>
+<item>
+    <code>296.0x</code>
+    <description>
+        Bipolar I Disorder Single Manic Episode
+    </description>
+</item>
+<item>
+    <code>296.2x</code>
+    <description>
+        Major Depressive Disorder Single Episode
+    </description>
+</item>
+<item>
+    <code>296.3x</code>
+    <description>
+        Major Depressive Disorder Recurrent
+    </description>
+</item>
+<item>
+    <code>296.40</code>
+    <description>
+        Bipolar I Disorder Most Recent Episode Hypomanic
+    </description>
+</item>
+<item>
+    <code>296.4x</code>
+    <description>
+        Bipolar I Disorder Most Recent Episode Manic
+    </description>
+</item>
+<item>
+    <code>296.5x</code>
+    <description>
+        Bipolar I Disorder Most Recent Episode Depressed
+    </description>
+</item>
+<item>
+    <code>296.6x</code>
+    <description>
+        Bipolar I Disorder Most Recent Episode Mixed
+    </description>
+</item>
+<item>
+    <code>296.7</code>
+    <description>
+        Bipolar I Disorder, Most recent episode Unspecified
+    </description>
+</item>
+<item>
+    <code>296.80</code>
+    <description>
+        Bipolar Disorder NOS
+    </description>
+</item>
+<item>
+    <code>296.89</code>
+    <description>
+        Bipolar II Disorder
+    </description>
+</item>
+<item>
+    <code>296.90</code>
+    <description>
+        Disorder NOS
+    </description>
+</item>
+<item>
+    <code>297.1</code>
+    <description>
+        Delusional Disorder
+    </description>
+</item>
+<item>
+    <code>297.3</code>
+    <description>
+        Shared Psychotic Disorder
+    </description>
+</item>
+<item>
+    <code>298.8</code>
+    <description>
+        Brief Psychotic Disorder
+    </description>
+</item>
+<item>
+    <code>298.9</code>
+    <description>Psychotic Disorder NOS</description>
+</item>
+<item>
+    <code>299.00</code>
+    <description>
+        Autistic Disorder
+    </description>
+</item>
+<item>
+    <code>299.10</code>
+    <description>
+        Childhood Disintegrative Disorder
+    </description>
+</item>
+<item>
+    <code>299.80</code>
+    <description>
+        Rett's Disorder
+    </description>
+</item>
+<item>
+    <code>299.80</code>
+    <description>
+        Asperger's Disorder
+    </description>
+</item>
+<item>
+    <code>299.80</code>
+    <description>
+        Pervasive Developmental Disorder NOS
+    </description>
+</item>
+<item>
+    <code>300.00</code>
+    <description>
+        Anxiety Disorder NOS
+    </description>
+</item>
+<item>
+    <code>300.01</code>
+    <description>
+        Panic Disorder Without Agoraphobia
+    </description>
+</item>
+<item>
+    <code>300.02</code>
+    <description>
+        Generalized Anxiety Disorder
+    </description>
+</item>
+<item>
+    <code>300.11</code>
+    <description>
+        Conversion Disorder
+    </description>
+</item>
+<item>
+    <code>300.12</code>
+    <description>
+        Dissociative Amnesia
+    </description>
+</item>
+<item>
+    <code>300.13</code>
+    <description>
+        Dissociative Fugue
+    </description>
+</item>
+<item>
+    <code>300.14</code>
+    <description>
+        Dissociative Identity Disorder
+    </description>
+</item>
+<item>
+    <code>300.15</code>
+    <description>
+        Dissociative Disorder NOS
+    </description>
+</item>
+<item>
+    <code>300.16</code>
+    <description>
+        Factitious Disorder With Predominantly Psychological Signs and Symptoms
+    </description>
+</item>
+<item>
+    <code>300.19</code>
+    <description>
+        Factitious Disorder NOS
+    </description>
+</item>
+<item>
+    <code>300.19</code>
+    <description>
+        Factitious Disorder With Combined Psychological and Physical Signs and Symptoms
+    </description>
+</item>
+<item>
+    <code>300.19</code>
+    <description>
+        Factitious Disorder With Predominantly Physical Signs and Symptoms
+    </description>
+</item>
+<item>
+    <code>300.21</code>
+    <description>
+        Panic Disorder With Agoraphobia
+    </description>
+</item>
+<item>
+    <code>300.22</code>
+    <description>
+        Agoraphobia Without History of Panic Disorder
+    </description>
+</item>
+<item>
+    <code>300.23</code>
+    <description>
+        Social Phobia
+    </description>
+</item>
+<item>
+    <code>300.29</code>
+    <description>
+        Specific Phobia
+    </description>
+</item>
+<item>
+    <code>300.3</code>
+    <description>
+        Obsessive-Compulsive Disorder
+    </description>
+</item>
+<item>
+    <code>300.4</code>
+    <description>
+        Dysthymic Disorder
+    </description>
+</item>
+<item>
+    <code>300.6</code>
+    <description>
+        Depersonalization Disorder
+    </description>
+</item>
+<item>
+    <code>300.7</code>
+    <description>
+        Body Dysmorphic Disorder
+    </description>
+</item>
+<item>
+    <code>300.7</code>
+    <description>
+        Hypochondriasis
+    </description>
+</item>
+<item>
+    <code>300.81</code>
+    <description>
+        Somatization Disorder
+    </description>
+</item>
+<item>
+    <code>300.81</code>
+    <description>Undifferentiated Somatoform Disorder</description>
+</item>
+<item>
+    <code>300.81</code>
+    <description>
+        Somatoform Disorder NOS
+    </description>
+</item>
+<item>
+    <code>300.9</code>
+    <description>Unspecified Mental Disorder (nonpsychotic)</description>
+</item>
+<item>
+    <code>301.0</code>
+    <description>
+        Paranoid Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.13</code>
+    <description>
+        Cyclothymic Disorder
+    </description>
+</item>
+<item>
+    <code>301.20</code>
+    <description>
+        Schizoid Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.22</code>
+    <description>
+        Schizotypal Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.4</code>
+    <description>
+        Obsessive-Compulsive Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.50</code>
+    <description>
+        Histrionic Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.6</code>
+    <description>
+        Dependent Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.7</code>
+    <description>
+        Antisocial Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.81</code>
+    <description>
+        Narcissistic Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.82</code>
+    <description>
+        Avoidant Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.83</code>
+    <description>
+        Borderline Personality Disorder
+    </description>
+</item>
+<item>
+    <code>301.9</code>
+    <description>
+        Personality Disorder NOS
+    </description>
+</item>
+<item>
+    <code>302.2</code>
+    <description>
+        Pedophilia
+    </description>
+</item>
+<item>
+    <code>302.3</code>
+    <description>
+        Transvestic Fetishism
+    </description>
+</item>
+<item>
+    <code>302.4</code>
+    <description>
+        Exhibitionism
+    </description>
+</item>
+<item>
+    <code>302.6</code>
+    <description>
+        Gender Identity Disorder NOS
+    </description>
+</item>
+<item>
+    <code>302.6</code>
+    <description>
+        Gender Identity Disorder in Children or Gender Identity Disorder NOS
+    </description>
+</item>
+<item>
+    <code>302.70</code>
+    <description>
+        Dysfunction NOS
+    </description>
+</item>
+<item>
+    <code>302.71</code>
+    <description>
+        Hypoactive Sexual Desire Disorder
+    </description>
+</item>
+<item>
+    <code>302.72</code>
+    <description>
+        Female Sexual Arousal Disorder
+    </description>
+</item>
+<item>
+    <code>302.72</code>
+    <description>
+        Male Erectile Disorder
+    </description>
+</item>
+<item>
+    <code>302.73</code>
+    <description>
+        Female Orgasmic Disorder
+    </description>
+</item>
+<item>
+    <code>302.74</code>
+    <description>
+        Male Orgasmic Disorder
+    </description>
+</item>
+<item>
+    <code>302.75</code>
+    <description>
+        Premature Ejaculation
+    </description>
+</item>
+<item>
+    <code>302.76</code>
+    <description>
+        Dyspareunia (Not Due to a General Medical Condition)
+    </description>
+</item>
+<item>
+    <code>302.79</code>
+    <description>
+        Aversion Disorder
+    </description>
+</item>
+<item>
+    <code>302.81</code>
+    <description>
+        Fetishism
+    </description>
+</item>
+<item>
+    <code>302.82</code>
+    <description>
+        Voyeurism
+    </description>
+</item>
+<item>
+    <code>302.83</code>
+    <description>
+        Sexual Masochism
+    </description>
+</item>
+<item>
+    <code>302.84</code>
+    <description>
+        Sexual Sadism
+    </description>
+</item>
+<item>
+    <code>302.85</code>
+    <description>
+        Gender Identity Disorder in Adolescents or Adults
+    </description>
+</item>
+<item>
+    <code>302.89</code>
+    <description>
+        Frotteurism
+    </description>
+</item>
+<item>
+    <code>302.9</code>
+    <description>
+        Disorder NOS
+    </description>
+</item>
+<item>
+    <code>302.9</code>
+    <description>
+        Paraphilia NOS
+    </description>
+</item>
+<item>
+    <code>303.00</code>
+    <description>
+        Alcohol Intoxication
+    </description>
+</item>
+<item>
+    <code>303.90</code>
+    <description>Alcohol Dependence</description>
+</item>
+<item>
+    <code>304.00</code>
+    <description>
+        Opioid Dependence
+    </description>
+</item>
+<item>
+    <code>304.10</code>
+    <description>Sedative, Hypnotic, or Anxiolytic Dependence</description>
+</item>
+<item>
+    <code>304.20</code>
+    <description>
+        Cocaine Dependence
+    </description>
+</item>
+<item>
+    <code>304.30</code>
+    <description>
+        Cannabis Dependence
+    </description>
+</item>
+<item>
+    <code>304.40</code>
+    <description>
+        Amphetamine Dependence
+    </description>
+</item>
+<item>
+    <code>304.50</code>
+    <description>
+        Hallucinogen Dependence
+    </description>
+</item>
+<item>
+    <code>304.60</code>
+    <description>
+        Inhalant Dependence
+    </description>
+</item>
+<item>
+    <code>304.80</code>
+    <description>Polysubstance Dependence</description>
+</item>
+<item>
+    <code>304.90</code>
+    <description>Phencyclidine Dependence</description>
+</item>
+<item>
+    <code>304.90</code>
+    <description>Other (or Unknown) Substance Dependence</description>
+</item>
+<item>
+    <code>305.00</code>
+    <description>
+        Alcohol Abuse
+    </description>
+</item>
+<item>
+    <code>305.10</code>
+    <description>
+        Nicotine Dependence
+    </description>
+</item>
+<item>
+    <code>305.20</code>
+    <description>
+        Cannabis Abuse
+    </description>
+</item>
+<item>
+    <code>305.30</code>
+    <description>
+        Hallucinogen Abuse
+    </description>
+</item>
+<item>
+    <code>305.40</code>
+    <description>Sedative, Hypnotic, or Anxiolytic Abuse</description>
+</item>
+<item>
+    <code>305.50</code>
+    <description>
+        Opioid Abuse
+    </description>
+</item>
+<item>
+    <code>305.60</code>
+    <description>
+        Cocaine Abuse
+    </description>
+</item>
+<item>
+    <code>305.70</code>
+    <description>
+        Amphetamine Abuse
+    </description>
+</item>
+<item>
+    <code>305.90</code>
+    <description>
+        Phencyclidine Abuse
+    </description>
+</item>
+<item>
+    <code>305.90</code>
+    <description>
+        Inhalant Abuse
+    </description>
+</item>
+<item>
+    <code>305.90</code>
+    <description>
+        Other (or Unknown) Substance Abuse
+    </description>
+</item>
+<item>
+    <code>306.51</code>
+    <description>
+        Vaginismus (Not Due to a General Medical Condition)
+    </description>
+</item>
+<item>
+    <code>307.0</code>
+    <description>
+        Stuttering
+    </description>
+</item>
+<item>
+    <code>307.1</code>
+    <description>
+        Anorexia Nervosa
+    </description>
+</item>
+<item>
+    <code>307.20</code>
+    <description>
+        Tic Disorder NOS
+    </description>
+</item>
+<item>
+    <code>307.21</code>
+    <description>
+        Transient Tic Disorder
+    </description>
+</item>
+<item>
+    <code>307.22</code>
+    <description>
+        Chronic Motor or Vocal Tic Disorder
+    </description>
+</item>
+<item>
+    <code>307.23</code>
+    <description>
+        Tourette's Disorder
+    </description>
+</item>
+<item>
+    <code>307.3</code>
+    <description>
+        Stereotypic Movement Disorder
+    </description>
+</item>
+<item>
+    <code>307.42</code>
+    <description>
+        Primary Insomnia
+    </description>
+</item>
+<item>
+    <code>307.42</code>
+    <description>
+        Insomnia Related to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>307.44</code>
+    <description>
+        Primary Hypersomnia
+    </description>
+</item>
+<item>
+    <code>307.44</code>
+    <description>
+        Hypersomnia Related to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>307.45</code>
+    <description>
+        Circadian Rhythm Sleep Disorder
+    </description>
+</item>
+<item>
+    <code>307.46</code>
+    <description>
+        Sleep Terror Disorder
+    </description>
+</item>
+<item>
+    <code>307.46</code>
+    <description>
+        Sleepwalking Disorder
+    </description>
+</item>
+<item>
+    <code>307.47</code>
+    <description>
+        Dyssomnia NOS
+    </description>
+</item>
+<item>
+    <code>307.47</code>
+    <description>
+        Nightmare Disorder
+    </description>
+</item>
+<item>
+    <code>307.47</code>
+    <description>
+        Parasomnia NOS
+    </description>
+</item>
+<item>
+    <code>307.50</code>
+    <description>
+        Eating Disorder NOS
+    </description>
+</item>
+<item>
+    <code>307.51</code>
+    <description>
+        Bulimia Nervosa
+    </description>
+</item>
+<item>
+    <code>307.52</code>
+    <description>
+        Pica
+    </description>
+</item>
+<item>
+    <code>307.53</code>
+    <description>
+        Rumination Disorder
+    </description>
+</item>
+<item>
+    <code>307.59</code>
+    <description>
+        Feeding Disorder of Infancy or Early Childhood
+    </description>
+</item>
+<item>
+    <code>307.6</code>
+    <description>
+        Enuresis (Not Due to a General Medical Condition)
+    </description>
+</item>
+<item>
+    <code>307.7</code>
+    <description>
+        Encopresis Without Constipation and Overflow Incontinence
+    </description>
+</item>
+<item>
+    <code>307.80</code>
+    <description>
+        Pain Disorder Associated With Psychological Factors
+    </description>
+</item>
+<item>
+    <code>307.89</code>
+    <description>
+        Pain Disorder Associated With Both Psychological Factors and a General Medical Condition
+    </description>
+</item>
+<item>
+    <code>307.9</code>
+    <description>
+        Communication Disorder NOS
+    </description>
+</item>
+<item>
+    <code>308.3</code>
+    <description>
+        Acute Stress Disorder
+    </description>
+</item>
+<item>
+    <code>309.0</code>
+    <description>
+        Adjustment Disorder With Depressed Mood
+    </description>
+</item>
+<item>
+    <code>309.21</code>
+    <description>
+        Separation Anxiety Disorder
+    </description>
+</item>
+<item>
+    <code>309.24</code>
+    <description>
+        Adjustment Disorder With Anxiety
+    </description>
+</item>
+<item>
+    <code>309.28</code>
+    <description>
+        Adjustment Disorder With Mixed Anxiety and Depressed Mood
+    </description>
+</item>
+<item>
+    <code>309.3</code>
+    <description>
+        Adjustment Disorder With Disturbance of Conduct
+    </description>
+</item>
+<item>
+    <code>309.4</code>
+    <description>
+        Adjustment Disorder With Mixed Disturbance of Emotions and Conduct
+    </description>
+</item>
+<item>
+    <code>309.81</code>
+    <description>
+        Posttraumatic Stress Disorder
+    </description>
+</item>
+<item>
+    <code>309.9</code>
+    <description>
+        Adjustment Disorder Unspecified
+    </description>
+</item>
+<item>
+    <code>310.1</code>
+    <description>
+        Personality Disorder Due to General Medical Condition
+    </description>
+</item>
+<item>
+    <code>311</code>
+    <description>
+        Disorder NOS
+    </description>
+</item>
+<item>
+    <code>312.30</code>
+    <description>
+        Impulse-Control Disorder NOS
+    </description>
+</item>
+<item>
+    <code>312.31</code>
+    <description>
+        Pathological Gambling
+    </description>
+</item>
+<item>
+    <code>312.32</code>
+    <description>
+        Kleptomania
+    </description>
+</item>
+<item>
+    <code>312.33</code>
+    <description>
+        Pyromania
+    </description>
+</item>
+<item>
+    <code>312.34</code>
+    <description>
+        Intermittent Explosive Disorder
+    </description>
+</item>
+<item>
+    <code>312.39</code>
+    <description>
+        Trichotillomania
+    </description>
+</item>
+<item>
+    <code>312.8</code>
+    <description>
+        Conduct Disorder
+    </description>
+</item>
+<item>
+    <code>312.81</code>
+    <description>
+        Oppositional Defiant Disorder
+    </description>
+</item>
+<item>
+    <code>312.9</code>
+    <description>
+        Disruptive Behavior Disorder NOS
+    </description>
+</item>
+<item>
+    <code>313.23</code>
+    <description>
+        Selective Mutism
+    </description>
+</item>
+<item>
+    <code>313.81</code>
+    <description>
+        Oppositional Defiant Disorder
+    </description>
+</item>
+<item>
+    <code>313.82</code>
+    <description>
+        Identity Problem
+    </description>
+</item>
+<item>
+    <code>313.89</code>
+    <description>
+        Reactive Attachment Disorder of Infancy or Early Childhood
+    </description>
+</item>
+<item>
+    <code>313.9</code>
+    <description>Disorder of Infancy, Childhood, or Adolescence NOS</description>
+</item>
+<item>
+    <code>314.00</code>
+    <description>
+        Attention-Deficit/Hyperactivity Disorder Predominantly Inattentive Type
+    </description>
+</item>
+<item>
+    <code>314.01</code>
+    <description>
+        Attention-Deficit/Hyperactivity Disorder Combined Type
+    </description>
+</item>
+<item>
+    <code>314.01</code>
+    <description>
+        Attention-Deficit/Hyperactivity Disorder Predominantly hyperactive-Impulsive Type
+    </description>
+</item>
+<item>
+    <code>314.9</code>
+    <description>
+        Attention-Deficit/Hyperactivity Disorder NOS
+    </description>
+</item>
+<item>
+    <code>315.00</code>
+    <description>
+        Reading Disorder
+    </description>
+</item>
+<item>
+    <code>315.1</code>
+    <description>
+        Mathematics Disorder
+    </description>
+</item>
+<item>
+    <code>315.2</code>
+    <description>
+        Disorder of Written Expression
+    </description>
+</item>
+<item>
+    <code>315.31</code>
+    <description>
+        Expressive Language Disorder
+    </description>
+</item>
+<item>
+    <code>315.31</code>
+    <description>
+        Mixed Receptive-Expressive Language Disorder
+    </description>
+</item>
+<item>
+    <code>315.39</code>
+    <description>
+        Phonological Disorder
+    </description>
+</item>
+<item>
+    <code>315.4</code>
+    <description>
+        Developmental Coordination Disorder
+    </description>
+</item>
+<item>
+    <code>315.9</code>
+    <description>
+        Learning Disorder NOS
+    </description>
+</item>
+<item>
+    <code>316</code>
+    <description>Psychological Factors Affecting Medical Condition</description>
+</item>
+<item>
+    <code>317</code>
+    <description>
+        Mild mental retardation
+    </description>
+</item>
+<item>
+    <code>318.0</code>
+    <description>
+        Moderate Mental Retardation
+    </description>
+</item>
+<item>
+    <code>318.1</code>
+    <description>
+        Severe Mental Retardation
+    </description>
+</item>
+<item>
+    <code>318.2</code>
+    <description>
+        Profound Mental Retardation
+    </description>
+</item>
+<item>
+    <code>319</code>
+    <description>
+        Mental Retardation, Severity Unspecified
+    </description>
+</item>
+<item>
+    <code>332.1</code>
+    <description>Neuroleptic-Induced Parkinsonism</description>
+</item>
+<item>
+    <code>333.1</code>
+    <description>Medication-Induced Postural Tremor</description>
+</item>
+<item>
+    <code>333.7</code>
+    <description>Neuroleptic-Induced Acute Dystonia</description>
+</item>
+<item>
+    <code>333.82</code>
+    <description>Neuroleptic-Induced Tardive Dyskinesia</description>
+</item>
+<item>
+    <code>333.90</code>
+    <description>Medication-Induced Movement Disorder NOS</description>
+</item>
+<item>
+    <code>333.92</code>
+    <description>Neuroleptic Malignant Syndrome</description>
+</item>
+<item>
+    <code>333.99</code>
+    <description>Neuroleptic-Induced Acute Akathisia</description>
+</item>
+<item>
+    <code>347</code>
+    <description>
+        Narcolepsy
+    </description>
+</item>
+<item>
+    <code>607.84</code>
+    <description>
+        Male Erectile Disorder Due to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>608.89</code>
+    <description>
+        Dyspareunia Due to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>608.89</code>
+    <description>
+        Male Sexual Dysfunction Due to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>608.89</code>
+    <description>
+        Male Hypoactive Sexual Desire Disorder Due to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>625.0</code>
+    <description>
+        Female Dyspareunia Due to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>625.8</code>
+    <description>
+        Female Sexual Dysfunction Due to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>625.8</code>
+    <description>
+        Female Hypoactive Sexual Desire Disorder Due to [General Medical Condition]
+    </description>
+</item>
+<item>
+    <code>780.09</code>
+    <description>
+        Delirium NOS
+    </description>
+</item>
+<item>
+    <code>780.52</code>
+    <description>
+        Sleep Disorder Due to [General Medical Condition], Insomnia Type
+    </description>
+</item>
+<item>
+    <code>780.54</code>
+    <description>
+        Sleep Disorder Due to [General Medical Condition], Hypersomnia Type
+    </description>
+</item>
+<item>
+    <code>780.59</code>
+    <description>
+        Sleep Disorder Due to [General Medical Condition], Parasomnia
+    </description>
+</item>
+<item>
+    <code>780.59</code>
+    <description>
+        Breathing-Related Sleep Disorder
+    </description>
+</item>
+<item>
+    <code>780.59</code>
+    <description>
+        Sleep Disorder Due to [General Medical Condition], Mixed
+        Type
+    </description>
+</item>
+<item>
+    <code>780.9</code>
+    <description>
+        Age-Related Cognitive Decline
+    </description>
+</item>
+<item>
+    <code>787.6</code>
+    <description>
+        href="http://www.psychnet-uk.com/dsm_iv/encopresis.htm">Encopresis, With Constipation and Overflow Incontinence
+    </description>
+</item>
+<item>
+    <code>799.9</code>
+    <description>Diagnosis or Condition Deferred on Axis I or Diagnosis Deferred on Axis II</description>
+</item>
+<item>
+    <code>995.2</code>
+    <description>Adverse Effects of Medication NOS</description>
+</item>
+<item>
+    <code>995.5</code>
+    <description>
+        Neglect of Child (if focus of attention is on victim)
+    </description>
+</item>
+<item>
+    <code>995.5</code>
+    <description>
+        Sexual abuse of child (if focus of attention is on victim)
+    </description>
+</item>
+<item>
+    <code>995.5</code>
+    <description>
+        Physical abuse of child (if focus of attention is on victim)
+    </description>
+</item>
+<item>
+    <code>995.81</code>
+    <description>
+        Physical abuse of adult (if focus of attention is on victim)
+    </description>
+</item>
+<item>
+    <code>995.81</code>
+    <description>
+        Sexual abuse of adult (if focus of attention is on victim)
+    </description>
+</item>
+<item>
+    <code>V15.81</code>
+    <description>Noncompliance With Treatment</description>
+</item>
+<item>
+    <code>V61.1</code>
+    <description>
+        Partner Relational Problem
+    </description>
+</item>
+<item>
+    <code>V61.1</code>
+    <description>
+        Physical or Sexual Abuse of Adult
+    </description>
+</item>
+<item>
+    <code>V61.20</code>
+    <description>
+        Parent-Child Relational Problem
+    </description>
+</item>
+<item>
+    <code>V61.21</code>
+    <description>
+        Sexual or Physical Abuse or Neglect of Child
+    </description>
+</item>
+<item>
+    <code>V61.8</code>
+    <description>
+        Sibling Relational Problem
+    </description>
+</item>
+<item>
+    <code>V61.9</code>
+    <description>Relational Problem Related to [a Mental Disorder or General
+        Medical Condition]
+    </description>
+</item>
+<item>
+    <code>V62.2</code>
+    <description>Occupational Problem</description>
+</item>
+<item>
+    <code>V62.3</code>
+    <description>Academic Problem</description>
+</item>
+<item>
+    <code>V62.4</code>
+    <description>Acculturation Problem</description>
+</item>
+<item>
+    <code>V62.81</code>
+    <description>
+        Relational Problem NOS
+    </description>
+</item>
+<item>
+    <code>V62.82</code>
+    <description>
+        Bereavement
+    </description>
+</item>
+<item>
+    <code>V62.89</code>
+    <description>Phase of Life Problem</description>
+</item>
+<item>
+    <code>V62.89</code>
+    <description>Religious or Spiritual Problem</description>
+</item>
+<item>
+    <code>V62.89</code>
+    <description>Borderline Intellectual Functioning</description>
+</item>
+<item>
+    <code>V65.2</code>
+    <description>
+        Malingering
+    </description>
+</item>
+<item>
+    <code>V71.01</code>
+    <description>
+        Adult Antisocial Behavior
+    </description>
+</item>
+<item>
+    <code>V71.02</code>
+    <description>
+        Child or Adolescent Antisocial Behavior
+    </description>
+</item>
+<item>
+    <code>V71.09</code>
+    <description>No Diagnosis or Condition on Axis I or Axis II</description>
+</item>

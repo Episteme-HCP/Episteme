@@ -1,0 +1,11 @@
+
+<!ENTITY amperePerMeter.xml SYSTEM "../magneticFieldStrength/amperePerMeter.xml">
+<!ENTITY kilo-oersted.xml SYSTEM "../magneticFieldStrength/kilo-oersted.xml">
+<!ENTITY oersted.xml SYSTEM "../magneticFieldStrength/oersted.xml">
+
+<!ENTITY magneticFieldStrength.elements	"
+&amperePerMeter.xml;
+&kilo-oersted.xml;
+&oersted.xml;
+">
+

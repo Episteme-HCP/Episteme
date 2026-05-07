@@ -1,0 +1,7 @@
+
+<!ENTITY reciprocalKelvin.xml SYSTEM "../coefficientOfLinearExpansion/reciprocalKelvin.xml">
+
+<!ENTITY coefficientOfLinearExpansion.elements	"
+&reciprocalKelvin.xml;
+">
+

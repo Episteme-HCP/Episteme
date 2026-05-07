@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Mercury</name>
+    <mass>0.3302</mass>
+    <volume>6.083</volume>
+    <equatorial-radius>2439.7</equatorial-radius>
+    <polar-radius>2439.7</polar-radius>
+    <volumetric-mean-radius>2439.7</volumetric-mean-radius>
+    <ellipticity>0.0000</ellipticity>
+    <mean-density>5427</mean-density>
+    <surface-gravity>3.70</surface-gravity>
+    <surface-acceleration>3.70</surface-acceleration>
+    <escape-velocity>4.3</escape-velocity>
+    <GM>0.02203</GM>
+    <bond-albedo>0.119</bond-albedo>
+    <visual-geometric-albedo>0.106</visual-geometric-albedo>
+    <visual-magnitude>-0.42</visual-magnitude>
+    <solar-irradiance>9126.6</solar-irradiance>
+    <black-body-temperature>442.5</black-body-temperature>
+    <moment-of-inertia>0.33</moment-of-inertia>
+    <J2>60.0</J2>
+    <number-of-natural-satellites>0</number-of-natural-satellites>
+    <planetary-ring-system>No</planetary-ring-system>
+    <semi-major-axis>57.91</semi-major-axis>
+    <sidereal-orbit-period>87.969</sidereal-orbit-period>
+    <tropical-orbit-period>87.968</tropical-orbit-period>
+    <perihelion>46.00</perihelion>
+    <aphelion>69.82</aphelion>
+    <synodic-period>115.88</synodic-period>
+    <mean-orbital-velocity>47.87</mean-orbital-velocity>
+    <maximum-orbital-velocity>58.98</maximum-orbital-velocity>
+    <minimum-orbital-velocity>38.86</minimum-orbital-velocity>
+    <orbit-inclination>7.00</orbit-inclination>
+    <orbit-eccentricity>0.2056</orbit-eccentricity>
+    <sidereal-rotation-period>1407.6</sidereal-rotation-period>
+    <length-of-day>4222.6</length-of-day>
+    <obliquity-to-orbit>0.01</obliquity-to-orbit>
+    <surface-pressure>1E-15</surface-pressure>
+    <average-temperature>440</average-temperature>
+    <atmospheric-composition>42% Oxygen (O2); 29% Sodium (Na); 22% Hydrogen (H2); 6% Helium (He); 0.5% Potassium (K);
+        possible trace amounts of Argon (Ar); Carbon Dioxide (CO2); Water (H2O); Nitrogen (N2); Xenon (Xe); Krypton
+        (Kr); Neon (Ne)
+    </atmospheric-composition>
+</natural-satellite>

@@ -1,0 +1,4 @@
+<unitType id="molarVolume" name="Molar volume">
+    <dimension name="length" power="3" preserve="no"/>
+    <dimension name="amount" power="-1" preserve="no"/>
+</unitType>

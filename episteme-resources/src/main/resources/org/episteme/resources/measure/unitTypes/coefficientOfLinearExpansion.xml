@@ -1,0 +1,3 @@
+<unitType id="coefficientOfLinearExpansion" name="coefficient of linear expansion">
+    <dimension name="temperature" power="-1" preserve="no"/>
+</unitType>

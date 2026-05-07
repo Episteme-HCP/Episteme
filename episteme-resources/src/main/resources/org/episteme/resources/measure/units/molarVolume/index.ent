@@ -1,0 +1,11 @@
+
+<!ENTITY centimeterCubedPerMole.xml SYSTEM "../molarVolume/centimeterCubedPerMole.xml">
+<!ENTITY literPerMole.xml SYSTEM "../molarVolume/literPerMole.xml">
+<!ENTITY meterCubedPerMole.xml SYSTEM "../molarVolume/meterCubedPerMole.xml">
+
+<!ENTITY molarVolume.elements	"
+&centimeterCubedPerMole.xml;
+&literPerMole.xml;
+&meterCubedPerMole.xml;
+">
+

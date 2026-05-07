@@ -1,0 +1,7 @@
+
+<!ENTITY meterSquaredPerKilogram.xml SYSTEM "../arealMass/meterSquaredPerKilogram.xml">
+
+<!ENTITY arealMass.elements	"
+&meterSquaredPerKilogram.xml;
+">
+

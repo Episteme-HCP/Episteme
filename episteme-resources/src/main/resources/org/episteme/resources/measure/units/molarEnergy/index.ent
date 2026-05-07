@@ -1,0 +1,15 @@
+
+<!ENTITY caloriePerMole.xml SYSTEM "../molarEnergy/caloriePerMole.xml">
+<!ENTITY invcm.xml SYSTEM "../molarEnergy/invcm.xml">
+<!ENTITY joulePerMole.xml SYSTEM "../molarEnergy/joulePerMole.xml">
+<!ENTITY kilocaloriePerMole.xml SYSTEM "../molarEnergy/kilocaloriePerMole.xml">
+<!ENTITY kilojoulePerMole.xml SYSTEM "../molarEnergy/kilojoulePerMole.xml">
+
+<!ENTITY molarEnergy.elements	"
+&caloriePerMole.xml;
+&invcm.xml;
+&joulePerMole.xml;
+&kilocaloriePerMole.xml;
+&kilojoulePerMole.xml;
+">
+

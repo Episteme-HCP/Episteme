@@ -1,0 +1,4 @@
+<unit id="coulombPerMeterCubed" name="Coulomb per meter cubed" abbreviation="C/m^3" unitType="electricChargeDensity"
+      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>The SI unit of charge per volume</description>
+</unit>

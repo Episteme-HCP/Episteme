@@ -1,0 +1,11 @@
+<!-- entities -->
+
+<!-- the top level element -->
+<!ELEMENT nobel-prize (date,category,winners,comments)>
+
+<!-- elements -->
+<!ELEMENT date				(#PCDATA)>
+<!ELEMENT category			(#PCDATA)>
+<!ELEMENT winners				(#PCDATA)>
+<!ELEMENT comments			(#PCDATA)>
+

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>metis</name>
+        <parent>jupiter</parent>
+    </general>
+    <parameter>
+        <diameter>40</diameter>
+        <!-- km -->
+        <rotationperiod>0.295</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.295</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0</orbiteccentricity>
+        <orbitinclinationtoecliptic>0</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>127980</distance>
+        <!-- km -->
+        <mass>9.56e19</mass>
+        <!-- g -->
+        <density>2.8</density>
+        <!-- g/cm3 -->
+    </parameter>
+</celestialobject>

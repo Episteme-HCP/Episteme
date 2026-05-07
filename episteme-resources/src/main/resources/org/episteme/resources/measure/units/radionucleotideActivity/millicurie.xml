@@ -1,0 +1,4 @@
+<unit id="millicurie" name="millicurie" abbreviation="mCi" unitType="radionucleotideActivity" parentSI="becquerel"
+      multiplierToSI="3.7E+7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 mCi = 37 MBq</description>
+</unit>

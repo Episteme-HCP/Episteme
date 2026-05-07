@@ -73,14 +73,14 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
     // CUDA Driver API
     private static MethodHandle CUDA_MALLOC;
     private static MethodHandle CUDA_FREE;
-    private static MethodHandle CUDA_MEMCPY;
+    private static MethodHandle CUDA_MEMCPY_H_TO_D;
+    private static MethodHandle CUDA_MEMCPY_D_TO_H;
     private static MethodHandle CUDA_DEVICE_SYNCHRONIZE;
     private static MethodHandle CUDA_GET_ERROR_STRING;
     private static MethodHandle CU_CTX_GET_CURRENT;
     private static MethodHandle CU_CTX_GET_DEVICE;
 
-    private static final int CUDA_MEMCPY_HOST_TO_DEVICE = 1;
-    private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
+    private static final int CUDA_SUCCESS = 0;
 
     // cuBLAS API
     private static MethodHandle CUBLAS_CREATE;
@@ -150,8 +150,11 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             // CUDA Symbols
             CUDA_MALLOC = lookup(cuda_lookup, "cuMemAlloc_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
             CUDA_FREE = lookup(cuda_lookup, "cuMemFree_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG));
-            CUDA_MEMCPY = lookup(cuda_lookup, "cuMemcpy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
-            if (CUDA_MEMCPY == null) CUDA_MEMCPY = lookup(cuda_lookup, "cuMemcpy", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
+            CUDA_MEMCPY_H_TO_D = lookup(cuda_lookup, "cuMemcpyHtoD_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+            if (CUDA_MEMCPY_H_TO_D == null) CUDA_MEMCPY_H_TO_D = lookup(cuda_lookup, "cuMemcpyHtoD", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG));
+            
+            CUDA_MEMCPY_D_TO_H = lookup(cuda_lookup, "cuMemcpyDtoH_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
+            if (CUDA_MEMCPY_D_TO_H == null) CUDA_MEMCPY_D_TO_H = lookup(cuda_lookup, "cuMemcpyDtoH", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
             
             CUDA_DEVICE_SYNCHRONIZE = lookup(cuda_lookup, "cuCtxSynchronize", FunctionDescriptor.of(ValueLayout.JAVA_INT));
             CUDA_GET_ERROR_STRING = lookup(cuda_lookup, "cuGetErrorString", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));

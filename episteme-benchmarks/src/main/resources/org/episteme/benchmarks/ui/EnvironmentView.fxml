@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="org.episteme.benchmarks.ui.EnvironmentController" 
+      spacing="10" styleClass="chart-content">
+      
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="System Environment &amp; Backends" styleClass="section-title"/>
+    
+    <Label text="Detected Algorithm Providers" style="-fx-text-fill: #aaaaaa; -fx-font-size: 14px;"/>
+    
+    <TableView fx:id="providerTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="typeColumn" text="Type" prefWidth="200" />
+            <TableColumn fx:id="nameColumn" text="Provider Name" prefWidth="250" />
+            <TableColumn fx:id="statusColumn" text="Status" prefWidth="120" />
+            <TableColumn fx:id="classColumn" text="Implementation Class" prefWidth="350" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+    
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button fx:id="refreshBtn" text="Refresh Providers" onAction="#handleRefresh" styleClass="action-button-outline"/>
+        <Label fx:id="systemInfoLabel" text="Java Version: ..." styleClass="status-text"/>
+    </HBox>
+
+</VBox>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>umbriel</name>
+        <parent>uranus</parent>
+    </general>
+    <parameter>
+        <diameter>1170</diameter>
+        <!-- km -->
+        <rotationperiod>4.144</rotationperiod>
+        <!-- day -->
+        <orbitperiod>4.144</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.004</orbiteccentricity>
+        <orbitinclinationtoecliptic>0.133</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>265998</distance>
+        <!-- km -->
+        <mass>1.17e24</mass>
+        <!-- g -->
+        <density>1.4</density>
+        <!-- g/cm3 -->
+    </parameter>
+</celestialobject>

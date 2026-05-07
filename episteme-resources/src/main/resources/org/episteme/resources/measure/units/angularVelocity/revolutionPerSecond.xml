@@ -1,0 +1,4 @@
+<unit id="revolutionPerSecond" name="revolution per second" abbreviation="r/s" unitType="angularVelocity"
+      parentSI="radianPerSecond" multiplierToSI="6.283185307" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 r/s = (2pi) rad/s</description>
+</unit>

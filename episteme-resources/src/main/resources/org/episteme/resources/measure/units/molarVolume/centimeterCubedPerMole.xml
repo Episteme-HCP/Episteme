@@ -1,0 +1,3 @@
+<unit id="centimeterCubedPerMole" name="centimeter cubed per mole" abbreviation="cm^3/mol" unitType="molarVolume"
+      parentSI="meterCubedPerMole" multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

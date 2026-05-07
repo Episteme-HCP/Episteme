@@ -1,0 +1,7 @@
+
+<!ENTITY wattPerMeterPerKelvin.xml SYSTEM "../thermalConductivity/wattPerMeterPerKelvin.xml">
+
+<!ENTITY thermalConductivity.elements	"
+&wattPerMeterPerKelvin.xml;
+">
+

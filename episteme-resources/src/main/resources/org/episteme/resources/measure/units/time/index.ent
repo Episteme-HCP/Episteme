@@ -1,0 +1,43 @@
+
+<!ENTITY auTime.xml SYSTEM "../time/auTime.xml">
+<!ENTITY beat.xml SYSTEM "../time/beat.xml">
+<!ENTITY blink.xml SYSTEM "../time/blink.xml">
+<!ENTITY centisecond.xml SYSTEM "../time/centisecond.xml">
+<!ENTITY day.xml SYSTEM "../time/day.xml">
+<!ENTITY decisecond.xml SYSTEM "../time/decisecond.xml">
+<!ENTITY dekasecond.xml SYSTEM "../time/dekasecond.xml">
+<!ENTITY hectosecond.xml SYSTEM "../time/hectosecond.xml">
+<!ENTITY hour.xml SYSTEM "../time/hour.xml">
+<!ENTITY kilosecond.xml SYSTEM "../time/kilosecond.xml">
+<!ENTITY megasecond.xml SYSTEM "../time/megasecond.xml">
+<!ENTITY microsecond.xml SYSTEM "../time/microsecond.xml">
+<!ENTITY millisecond.xml SYSTEM "../time/millisecond.xml">
+<!ENTITY minute.xml SYSTEM "../time/minute.xml">
+<!ENTITY month.xml SYSTEM "../time/month.xml">
+<!ENTITY nanosecond.xml SYSTEM "../time/nanosecond.xml">
+<!ENTITY picosecond.xml SYSTEM "../time/picosecond.xml">
+<!ENTITY second.xml SYSTEM "../time/second.xml">
+<!ENTITY year.xml SYSTEM "../time/year.xml">
+
+<!ENTITY time.elements	"
+&auTime.xml;
+&beat.xml;
+&blink.xml;
+&centisecond.xml;
+&day.xml;
+&decisecond.xml;
+&dekasecond.xml;
+&hectosecond.xml;
+&hour.xml;
+&kilosecond.xml;
+&megasecond.xml;
+&microsecond.xml;
+&millisecond.xml;
+&minute.xml;
+&month.xml;
+&nanosecond.xml;
+&picosecond.xml;
+&second.xml;
+&year.xml;
+">
+

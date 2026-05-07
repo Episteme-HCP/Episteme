@@ -1,0 +1,4 @@
+<unit id="radian" name="radian" abbreviation="rad" unitType="angle" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>radian</description>
+</unit>

@@ -1,0 +1,7 @@
+<!DOCTYPE unitList SYSTEM "../units.dtd" [
+        <!ENTITY % index.ent SYSTEM "index.ent">
+        %index.ent;
+        ]>
+<unitList>
+    &waveNumber.elements;
+</unitList>

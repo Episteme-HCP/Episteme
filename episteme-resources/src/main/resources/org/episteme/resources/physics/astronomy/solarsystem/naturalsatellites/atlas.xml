@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>atlas</name>
+        <parent>saturn</parent>
+    </general>
+    <parameter>
+        <diameter>30</diameter>
+        <!-- km -->
+        <rotationperiod>0.602</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.602</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0</orbiteccentricity>
+        <orbitinclinationtoecliptic>0</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>137662</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

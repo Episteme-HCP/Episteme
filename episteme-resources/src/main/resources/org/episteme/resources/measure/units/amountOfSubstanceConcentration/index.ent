@@ -1,0 +1,15 @@
+
+<!ENTITY millimolePerLiter.xml SYSTEM "../amountOfSubstanceConcentration/millimolePerLiter.xml">
+<!ENTITY molarity.xml SYSTEM "../amountOfSubstanceConcentration/molarity.xml">
+<!ENTITY molePerCentimeterCubed.xml SYSTEM "../amountOfSubstanceConcentration/molePerCentimeterCubed.xml">
+<!ENTITY molePerLiter.xml SYSTEM "../amountOfSubstanceConcentration/molePerLiter.xml">
+<!ENTITY molePerMeterCubed.xml SYSTEM "../amountOfSubstanceConcentration/molePerMeterCubed.xml">
+
+<!ENTITY amountOfSubstanceConcentration.elements	"
+&millimolePerLiter.xml;
+&molarity.xml;
+&molePerCentimeterCubed.xml;
+&molePerLiter.xml;
+&molePerMeterCubed.xml;
+">
+

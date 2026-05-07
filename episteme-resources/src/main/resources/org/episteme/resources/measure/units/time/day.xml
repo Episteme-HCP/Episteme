@@ -1,0 +1,5 @@
+<unit id="day" name="day" unitType="time" parentSI="second" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>24 hours (not a siderial day, etc.)</description>
+    <unit ref="hour" power="1"/>
+    <multiplier>24</multiplier>
+</unit>

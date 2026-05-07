@@ -1,0 +1,5 @@
+<unit id="katalPerMeterCubed" name="katal per meter cubed" abbreviation="kat/m^3"
+      unitType="catalyticActivityConcentration" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>katal per cubic meter</description>
+</unit>

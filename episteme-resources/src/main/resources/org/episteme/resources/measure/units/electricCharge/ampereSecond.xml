@@ -1,0 +1,4 @@
+<unit id="ampereSecond" name="Ampere second" abbreviation="A s" unitType="electricCharge" parentSI="coulomb"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 A s = 1 C</description>
+</unit>

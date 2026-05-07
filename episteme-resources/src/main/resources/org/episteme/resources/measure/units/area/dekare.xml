@@ -1,0 +1,4 @@
+<unit id="dekare" name="dekare" unitType="area" parentSI="meterSquared" multiplierToSI="1000"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1000 square meters</description>
+</unit>

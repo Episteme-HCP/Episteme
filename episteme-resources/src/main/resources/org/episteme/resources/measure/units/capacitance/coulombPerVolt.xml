@@ -1,0 +1,4 @@
+<unit id="coulombPerVolt" name="coulomb per volt" abbreviation="C/V" unitType="capacitance" parentSI="farad"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 C/V = 1 F</description>
+</unit>

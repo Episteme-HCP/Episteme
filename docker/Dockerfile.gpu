@@ -1,0 +1,149 @@
+# --- Stage 1: Builder (Devel Image) ---
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Build Tools and Java dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget curl git build-essential cmake pkg-config libvlc-dev libhdf5-dev libfftw3-dev libopenblas-dev portaudio19-dev libmpfr-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install OpenJDK 25 (Early Access)
+RUN wget https://download.java.net/java/early_access/jdk25/11/GPL/openjdk-25-ea+11_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz && \
+    mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 && \
+    tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 && \
+    rm /tmp/jdk25.tar.gz
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Install Maven
+RUN wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz -O /tmp/maven.tar.gz && \
+    mkdir -p /opt/maven && \
+    tar -xzf /tmp/maven.tar.gz -C /opt/maven --strip-components=1 && \
+    rm /tmp/maven.tar.gz
+ENV PATH="/opt/maven/bin:${PATH}"
+
+WORKDIR /build
+
+# 1. Compile Native Components (QuEST, Bullet)
+# These don't depend on project files, so they cache well.
+RUN git clone --depth 1 https://github.com/QuEST-Kit/QuEST.git /tmp/QuEST && \
+    cd /tmp/QuEST && mkdir build && cd build && \
+    cmake .. -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda -DCMAKE_CUDA_ARCHITECTURES=75 -DGPU_COMPUTE_CAPABILITY=75 -DENABLE_DISTRIBUTION=OFF && \
+    make -j$(nproc) && \
+    mkdir -p /build/libs && find . -name "libQuEST.so" -exec cp {} /build/libs/ \; && \
+    rm -rf /tmp/QuEST
+
+RUN git clone --depth 1 https://github.com/bulletphysics/bullet3.git /tmp/bullet3 && \
+    cd /tmp/bullet3 && cmake -DBUILD_SHARED_LIBS=ON -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_BULLET_ROBOTICS_GUI=OFF -DBUILD_BULLET3=OFF -S . -B build && \
+    cmake --build build -j$(nproc) && \
+    find build -name "libBulletDynamics.so" -exec cp {} /build/libs/libbulletc.so \; && \
+    find build -name "libBulletCollision.so" -exec cp {} /build/libs/ \; && \
+    find build -name "libLinearMath.so" -exec cp {} /build/libs/ \; && \
+    # Create the symlink expected by the benchmarks
+    cp /build/libs/libbulletc.so /build/libs/libbullet_capi.so && \
+    rm -rf /tmp/bullet3
+
+# 2. Prepare for Java Build
+# We DO NOT copy the whole 'libs' folder as it contains Windows .dlls
+# We only copy the specific .jar files needed for the builder
+COPY libs/mpj.jar /build/libs_local/
+COPY libs/mpi.jar /build/libs_local/
+RUN --mount=type=cache,target=/root/.m2 mvn install:install-file \
+    -Dfile=/build/libs_local/mpj.jar \
+    -DgroupId=org.mpjexpress \
+    -DartifactId=mpj \
+    -Dversion=0.44 \
+    -Dpackaging=jar
+
+# 3. Cache Maven Dependencies (Go Offline)
+COPY pom.xml /build/
+COPY episteme-core/pom.xml /build/episteme-core/
+COPY episteme-native/pom.xml /build/episteme-native/
+COPY episteme-natural/pom.xml /build/episteme-natural/
+COPY episteme-social/pom.xml /build/episteme-social/
+COPY episteme-server/pom.xml /build/episteme-server/
+COPY episteme-benchmarks/pom.xml /build/episteme-benchmarks/
+
+RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline -B -Dmdep.skip=true -Djavacpp.platform=linux-x86_64
+
+# 4. Compile Episteme Native Vision & Java Project
+COPY . /build/
+RUN mkdir -p /tmp/miniaudio && \
+    cp /build/episteme-native/src/main/cpp/audio/miniaudio.c /tmp/miniaudio/ && \
+    cp /build/episteme-native/src/main/cpp/audio/miniaudio.h /tmp/miniaudio/ && \
+    cd /tmp/miniaudio && \
+    gcc -O3 -shared -fPIC miniaudio.c -o /build/libs/libminiaudio.so -lpthread -lm -ldl && \
+    rm -rf /tmp/miniaudio && \
+    --mount=type=cache,target=/root/.m2 chmod +x /build/build_native.sh && ./build_native.sh && \
+    chmod +x /build/build_jni.sh && ./build_jni.sh && \
+    find episteme-native -name "libepisteme-native.so" -exec cp {} /build/libs/ \; && \
+    find episteme-jni -name "libepisteme-jni.so" -exec cp {} /build/libs/ \; && \
+    mvn install -DskipTests -Dmdep.skip=true -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
+    mvn dependency:copy-dependencies -pl episteme-server,episteme-benchmarks -DoutputDirectory=target/lib -DincludeScope=runtime -Dmdep.skip=false -Djavacpp.platform=linux-x86_64 -P!ui-desktop,headless && \
+    for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-server/target/lib/; done && \
+    for f in episteme-*/target/episteme-*.jar; do cp "$f" episteme-benchmarks/target/lib/; done
+
+# --- Stage 2: Final (Runtime Image) ---
+FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget curl python3 python3-pip python3-venv \
+    libvlc-dev vlc-plugin-base libhdf5-dev libfftw3-dev libopenblas-dev libportaudio2 \
+    libsnappy-dev libzstd-dev zlib1g-dev libmpfr-dev \
+    ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers liblapack-dev \
+    nvidia-opencl-icd \
+    libxxf86vm1 libglu1-mesa libxrender1 libxtst6 libxi6 libgl1 libgl1-mesa-dri \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Fix library names for Episteme's NativeLibraryLoader
+# We put them in /usr/lib/x86_64-linux-gnu so they are found by default
+RUN ln -sf /usr/lib/x86_64-linux-gnu/libfftw3.so.3 /usr/lib/x86_64-linux-gnu/libfftw3.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libopenblas.so.3 /usr/lib/x86_64-linux-gnu/libopenblas.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/liblapack.so.3 /usr/lib/x86_64-linux-gnu/liblapack.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libopencl.so && \
+    ln -sf /usr/local/cuda/lib64/libcublas.so /usr/lib/libcublas.so && \
+    ln -sf /usr/local/cuda/lib64/libcusolver.so /usr/lib/libcusolver.so && \
+    ln -sf /usr/local/cuda/lib64/libcudart.so /usr/lib/libcudart.so && \
+    ln -sf /usr/local/cuda/lib64/libcuda.so /usr/lib/libcuda.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/x86_64-linux-gnu/libOpenCL.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/x86_64-linux-gnu/libopencl.so
+
+# Install scientifiques python pour le plot (Legacy)
+RUN python3 -m venv /opt/qiskit_env && \
+    /opt/qiskit_env/bin/pip install --no-cache-dir qiskit qiskit-nature pandas matplotlib seaborn
+ENV EPISTEME_PYTHON=/opt/qiskit_env/bin/python
+
+# Install OpenJDK 25
+RUN wget https://download.java.net/java/GA/jdk25.0.2/b1e0dfa218384cb9959bdcb897162d4e/10/GPL/openjdk-25.0.2_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz && \
+    mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 && \
+    tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 && \
+    rm /tmp/jdk25.tar.gz
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+WORKDIR /app
+
+# Copy artifacts from builder stage
+COPY --from=builder /build/episteme-server/target/episteme-server-*.jar /app/server.jar
+COPY --from=builder /build/episteme-server/target/lib /app/lib
+COPY --from=builder /build/libs /app/libs
+COPY --from=builder /build/episteme-benchmarks/target/episteme-benchmarks-*.jar /app/benchmarks.jar
+COPY --from=builder /build/episteme-benchmarks/target/lib /app/lib/
+
+COPY run_diagnostic.sh run_benchmarks.sh /app/
+RUN chmod +x /app/*.sh
+
+ENV LD_LIBRARY_PATH="/app/libs:/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
+ENV CUDA_PATH="/usr/local/cuda"
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+EXPOSE 50051
+
+ENV JAVA_OPTS="-Xlog:library=info -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -ea"
+ENTRYPOINT ["./run_benchmarks.sh"]
+CMD ["--cli"]

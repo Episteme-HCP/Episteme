@@ -1,0 +1,4 @@
+<unit id="decimeterCubed" name="Decimeter cubed" abbreviation="dm^3" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="1.0E-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>0.001 meters cubed</description>
+</unit>

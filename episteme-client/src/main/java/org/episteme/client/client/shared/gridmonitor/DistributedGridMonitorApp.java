@@ -1,0 +1,239 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.episteme.client.client.shared.gridmonitor;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import org.episteme.core.ui.ThemeManager;
+import org.episteme.server.server.proto.*;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Real-time Grid Monitor Dashboard showing actual Episteme Cluster status.
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class DistributedGridMonitorApp extends Application implements org.episteme.core.ui.App {
+
+    private ManagedChannel channel;
+    private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
+    private Label workerCountLabel;
+    private Label jobCountLabel;
+    private Label completedCountLabel;
+    private Label statusLabel;
+    private ScheduledExecutorService scheduler;
+    private final ObservableList<WorkerInfo> workers = FXCollections.observableArrayList();
+    private final ObservableList<JobInfo> jobs = FXCollections.observableArrayList();
+
+    @Override
+    public void start(Stage primaryStage) {
+        try { primaryStage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/episteme/core/ui/icon.png"))); } catch (Exception e) {}
+        channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        blockingStub = ComputeServiceGrpc.newBlockingStub(channel);
+
+        BorderPane root = new BorderPane();
+        root.getStyleClass().add("viewer-root");
+        root.setTop(createHeader());
+
+        SplitPane splitPane = new SplitPane(createWorkersPane(), createJobsPane());
+        splitPane.setDividerPositions(0.4);
+        root.setCenter(splitPane);
+        root.setBottom(createFooter());
+
+        primaryStage.setTitle(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.title", "Episteme Cluster Monitor"));
+        Scene scene = new Scene(root, 1200, 700);
+        ThemeManager.getInstance().applyTheme(scene);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        startPolling();
+    }
+
+    private HBox createHeader() {
+        HBox header = new HBox(20);
+        header.setPadding(new Insets(15, 20, 15, 20));
+        header.getStyleClass().add("header-box");
+        Label title = new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.header", "âš¡ Episteme Grid Monitor"));
+        title.getStyleClass().add("header-label-white");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS); // Stats cards
+        workerCountLabel = createStatCard(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.workers", "Workers"), "0");
+        jobCountLabel = createStatCard(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.jobs", "Jobs"), "0");
+        completedCountLabel = createStatCard(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.completed", "Completed"), "0");
+
+        header.getChildren().addAll(title, spacer, workerCountLabel, jobCountLabel, completedCountLabel);
+        return header;
+    }
+
+    private Label createStatCard(String label, String value) {
+        Label card = new Label(label + ": " + value);
+        card.getStyleClass().add("demo-card");
+        return card;
+    }
+
+    private VBox createWorkersPane() {
+        VBox pane = new VBox(10);
+        pane.setPadding(new Insets(10));
+        pane.getStyleClass().add("section-box");
+        TableView<WorkerInfo> table = new TableView<>(workers);
+        table.getColumns().add(new TableColumn<WorkerInfo, String>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.col.worker_id", "Worker ID")));
+        table.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("workerId"));
+        VBox.setVgrow(table, javafx.scene.layout.Priority.ALWAYS);
+        pane.getChildren().addAll(new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.active_workers", "Active Workers")), table);
+        return pane;
+    }
+
+    private VBox createJobsPane() {
+        VBox pane = new VBox(10);
+        pane.setPadding(new Insets(10));
+        pane.getStyleClass().add("section-box");
+        TableView<JobInfo> table = new TableView<>(jobs);
+        table.getColumns().add(new TableColumn<JobInfo, String>(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.col.job_id", "Job ID")));
+        table.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("jobId"));
+        VBox.setVgrow(table, javafx.scene.layout.Priority.ALWAYS);
+        pane.getChildren().addAll(new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.queue", "Task Queue")), table);
+        return pane;
+    }
+
+    private HBox createFooter() {
+        HBox footer = new HBox(10);
+        footer.setPadding(new Insets(10));
+        footer.getStyleClass().add("status-bar");
+        statusLabel = new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.status.connecting", "Connecting..."));
+        statusLabel.setTextFill(
+                org.episteme.server.server.proto.Status.UNKNOWN.name().equals("UNKNOWN") ? Color.valueOf("#4ecca3")
+                        : Color.valueOf("#e94560"));
+        footer.getChildren().add(statusLabel);
+        return footer;
+    }
+
+    private void startPolling() {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(this::refreshData, 0, 2, TimeUnit.SECONDS);
+    }
+
+    private void refreshData() {
+        try {
+            ServerStatus status = blockingStub.getStatus(Empty.newBuilder().build());
+            Platform.runLater(() -> {
+                workerCountLabel.setText(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.workers", "Workers") + ": " + status.getActiveWorkers());
+                jobCountLabel.setText(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.jobs", "Jobs") + ": " + status.getQueuedTasks());
+                completedCountLabel.setText(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.stat.completed", "Completed") + ": " + status.getTotalTasksCompleted());
+                statusLabel.setText(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.status.connected", "âœ… Connected | Grid Load: {0}%", (int) (status.getSystemLoad() * 100)));
+                statusLabel.getStyleClass().setAll("label", "accent-button-green"); // Using green accent for connected
+            });
+        } catch (Exception e) {
+            Platform.runLater(() -> {
+                statusLabel.setText(org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.status.disconnected", "âŒ Server Disconnected"));
+                statusLabel.getStyleClass().setAll("label", "accent-button-red");
+            });
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (scheduler != null)
+            scheduler.shutdown();
+        if (channel != null)
+            channel.shutdown();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    public static class WorkerInfo {
+        String workerId;
+
+        public WorkerInfo(String id) {
+            this.workerId = id;
+        }
+
+        public String getWorkerId() {
+            return workerId;
+        }
+    }
+
+    public static class JobInfo {
+        String jobId;
+
+        public JobInfo(String id) {
+            this.jobId = id;
+        }
+
+        public String getJobId() {
+            return jobId;
+        }
+    }
+
+    // App Interface Implementation
+    @Override
+    public boolean isDemo() {
+        return false;
+    }
+
+    @Override
+    public String getCategory() { return org.episteme.core.ui.i18n.I18N.getInstance().get("category.general", "General"); }
+
+    @Override
+    public String getName() { return org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.name", "Distributed Grid Monitor App"); }
+
+    @Override
+    public String getDescription() { return org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.desc", "Real-time monitoring of the Episteme grid computing cluster."); }
+
+    @Override
+    public String getLongDescription() { return org.episteme.core.ui.i18n.I18N.getInstance().get("demo.apps.distributedgridmonitorapp.longdesc", "The Grid Monitor provides a comprehensive view of the Episteme distributed computing network. It tracks active worker nodes, queued tasks, and overall system load to ensure optimal cluster performance."); }
+
+    @Override
+    public void show(javafx.stage.Stage stage) {
+        try {
+            start(stage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public java.util.List<org.episteme.core.ui.Parameter<?>> getViewerParameters() {
+        return new java.util.ArrayList<>();
+    }
+}
+
+
+

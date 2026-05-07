@@ -1,0 +1,4 @@
+<unit id="voltAmpere" name="volt ampere" abbreviation="V A" unitType="power" parentSI="watt" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Power produced by a current of 1 A flowing across a potential difference of 1 V</description>
+</unit>

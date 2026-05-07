@@ -1,0 +1,3 @@
+<unit id="rad" name="rad" abbreviation="rd" unitType="absorbedDose" parentSI="gray" multiplierToSI="0.01"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

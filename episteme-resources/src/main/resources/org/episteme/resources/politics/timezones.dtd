@@ -1,0 +1,8 @@
+<!-- entities -->
+
+<!-- the top level element -->
+<!ELEMENT timezone (country, delta)>
+
+<!-- elements -->
+<!ELEMENT country                            (#PCDATA)>
+<!ELEMENT delta                              (#PCDATA)>

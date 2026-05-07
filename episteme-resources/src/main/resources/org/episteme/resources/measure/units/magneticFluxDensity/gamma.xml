@@ -1,0 +1,4 @@
+<unit id="gamma" name="gamma" unitType="magneticFluxDensity" parentSI="tesla" multiplierToSI="1.0E-9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 gamma = 1 nanotesla</description>
+</unit>

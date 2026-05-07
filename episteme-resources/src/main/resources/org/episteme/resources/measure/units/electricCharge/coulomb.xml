@@ -1,0 +1,4 @@
+<unit id="coulomb" name="coulomb" abbreviation="C" unitType="electricCharge" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>SI unit for charge</description>
+</unit>

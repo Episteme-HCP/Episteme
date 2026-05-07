@@ -1,0 +1,4 @@
+<unitType id="volumetricArea" name="volumetricArea">
+    <dimension name="length" power="3" preserve="no"/>
+    <dimension name="length" power="-2" preserve="no"/>
+</unitType>

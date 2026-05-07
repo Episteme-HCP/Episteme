@@ -1,0 +1,4 @@
+<unit id="blink" name="blink" unitType="time" parentSI="second" multiplierToSI="0.864"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>"Metric time". 1 blink = 1.0E-5 day</description>
+</unit>

@@ -1,0 +1,4 @@
+<unit id="hartree" name="Hartree" abbreviation="E_h" unitType="energy" parentSI="joule" multiplierToSI="4.35974823E-18"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Energy in atomic units</description>
+</unit>

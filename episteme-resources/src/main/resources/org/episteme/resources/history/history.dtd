@@ -1,0 +1,11 @@
+<!-- entities -->
+
+<!-- the top level element -->
+<!ELEMENT historical-event (date,name,place,participants,comments)>
+
+<!-- elements -->
+<!ELEMENT date				(#PCDATA)>
+<!ELEMENT name				(#PCDATA)>
+<!ELEMENT place				(#PCDATA)>
+<!ELEMENT participants			(#PCDATA)>
+<!ELEMENT comments			(#PCDATA)>

@@ -1,0 +1,4 @@
+<unit id="grayPerSecond" name="gray per second" abbreviation="Gy/s" unitType="absorbedDoseRate" parentSI="SELF"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>gray per second</description>
+</unit>

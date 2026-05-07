@@ -1,0 +1,6 @@
+<unit id="poundPerSquareInchAbsolute" name="Pound per square inch absolute" abbreviation="psia" unitType="pressure"
+      parentSI="pascal" multiplierToSI="6894.8" constantToSI="-101325.98"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Fluid pressure measured in pounds per square inch with the inclusion of atmospheric pressure
+    </description>
+</unit>

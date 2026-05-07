@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>pandora</name>
+        <parent>saturn</parent>
+    </general>
+    <parameter>
+        <diameter>48</diameter>
+        <!-- km -->
+        <rotationperiod>0.629</rotationperiod>
+        <!-- day -->
+        <orbitperiod>0.629</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0044</orbiteccentricity>
+        <orbitinclinationtoecliptic>0</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>141708</distance>
+        <!-- km -->
+        <mass>2.2e20</mass>
+        <!-- g -->
+        <density>0.7</density>
+        <!-- g/cm3 -->
+    </parameter>
+</celestialobject>

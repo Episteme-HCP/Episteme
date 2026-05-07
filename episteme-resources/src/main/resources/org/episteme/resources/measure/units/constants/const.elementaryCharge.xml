@@ -1,0 +1,4 @@
+<unit id="const.elementaryCharge" name="elementary charge" abbreviation="e" unitType="charge" parentSI="coulomb"
+      multiplierToSI="1.60218E-19" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Charge in atomic units</description>
+</unit>

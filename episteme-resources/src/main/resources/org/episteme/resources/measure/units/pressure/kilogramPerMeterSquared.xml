@@ -1,0 +1,4 @@
+<unit id="kilogramPerMeterSquared" name="kilogram per meter squared" abbreviation="kgf/m^2" unitType="pressure"
+      parentSI="pascal" multiplierToSI="9.80665" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>kgf = kilogram force</description>
+</unit>

@@ -1,0 +1,4 @@
+<unit id="gram" name="gram" abbreviation="gf" unitType="force" parentSI="newton" multiplierToSI="9.80665E-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 gram force = 1 gram mass * gravitational acceleration</description>
+</unit>
