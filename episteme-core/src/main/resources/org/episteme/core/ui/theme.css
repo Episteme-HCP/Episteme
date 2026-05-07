@@ -46,7 +46,7 @@
     font-size: 28px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: white;
+    -fx-text-fill: #1a1a1a !important;
 }
 
 .description-label {
@@ -316,7 +316,7 @@
     font-size: 28px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: white !important;
+    -fx-text-fill: #1a1a1a !important;
 }
 
 .header-subtitle {
@@ -349,7 +349,7 @@
     font-size: 16px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: white !important; color: white !important;
+    -fx-text-fill: #1a1a1a !important; color: #1a1a1a !important;
 }
 
 .launch-button {
