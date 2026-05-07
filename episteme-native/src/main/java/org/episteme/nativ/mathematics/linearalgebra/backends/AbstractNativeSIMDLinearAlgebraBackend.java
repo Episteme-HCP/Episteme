@@ -1254,8 +1254,8 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 for (int j = k + 1; j < m; j++) uData[k * n + j] = data[k * m + j];
             }
             
-            Matrix<E> L = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, lData), this, ring);
-            Matrix<E> U = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, uData), this, ring);
+            Matrix<E> L = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Complex>(n, n, lData), (LinearAlgebraProvider<Complex>)(Object)this, (Ring<Complex>)(Object)ring);
+            Matrix<E> U = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Complex>(n, n, uData), (LinearAlgebraProvider<Complex>)(Object)this, (Ring<Complex>)(Object)ring);
             Vector<E> P = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(p), (Ring<Complex>)(Object) ring);
 
             return new LUResult<>(L, U, P);
