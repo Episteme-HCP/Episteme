@@ -1254,9 +1254,9 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 for (int j = k + 1; j < m; j++) uData[k * n + j] = data[k * m + j];
             }
             
-            Matrix<E> L = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Complex>(n, n, lData), (LinearAlgebraProvider<Complex>)(Object)this, (Ring<Complex>)(Object)ring);
-            Matrix<E> U = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Complex>(n, n, uData), (LinearAlgebraProvider<Complex>)(Object)this, (Ring<Complex>)(Object)ring);
-            Vector<E> P = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(p), (Ring<Complex>)(Object) ring);
+            org.episteme.core.mathematics.linearalgebra.Matrix<E> L = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, lData), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+            org.episteme.core.mathematics.linearalgebra.Matrix<E> U = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, uData), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+            org.episteme.core.mathematics.linearalgebra.Vector<E> P = (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(p), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object) ring);
 
             return new LUResult<>(L, U, P);
         }
@@ -1396,20 +1396,20 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             }
 
             // Combine vectors into a single matrix
-            Real[][] vData = new Real[n][n];
+            org.episteme.core.mathematics.numbers.real.Real[][] vData = new org.episteme.core.mathematics.numbers.real.Real[n][n];
             for (int j = 0; j < n; j++) {
                 for (int i = 0; i < n; i++) {
-                    vData[i][j] = (Real) vectors[j].get(i, 0);
+                    vData[i][j] = (org.episteme.core.mathematics.numbers.real.Real) vectors[j].get(i, 0);
                 }
             }
-            Matrix<Real> V = Matrix.of(vData, (Ring<Real>) ring);
+            org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.Real> V = org.episteme.core.mathematics.linearalgebra.Matrix.of(vData, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.real.Real>) ring);
             
             // Values (simplified to Real for now, or use a complex vector if E allows)
-            Real[] dData = new Real[n];
-            for (int i = 0; i < n; i++) dData[i] = Real.of(values[i].real());
-            Vector<Real> D = Vector.of(java.util.Arrays.asList(dData), (Ring<Real>) ring);
+            org.episteme.core.mathematics.numbers.real.Real[] dData = new org.episteme.core.mathematics.numbers.real.Real[n];
+            for (int i = 0; i < n; i++) dData[i] = org.episteme.core.mathematics.numbers.real.Real.of(values[i].real());
+            org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> D = org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(dData), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.real.Real>) ring);
 
-            return (EigenResult<E>) (Object) new EigenResult<Real>(V, D);
+            return (EigenResult<E>) (Object) new EigenResult<org.episteme.core.mathematics.numbers.real.Real>(V, D);
         } else if (isComplexRing(ring)) {
             throw new UnsupportedOperationException("Complex Eigen decomposition not supported by EJML 0.43 for SIMD backend");
         }
