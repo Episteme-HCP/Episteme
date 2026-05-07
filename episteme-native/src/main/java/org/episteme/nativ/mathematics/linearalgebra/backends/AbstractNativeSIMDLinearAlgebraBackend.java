@@ -1256,7 +1256,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             
             Matrix<E> L = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, lData), this, ring);
             Matrix<E> U = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, uData), this, ring);
-            Vector<E> P = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(p), ring);
+            Vector<E> P = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(p), (Ring<Complex>)(Object) ring);
 
             return new LUResult<>(L, U, P);
         }
@@ -1345,18 +1345,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             if (transposed) return (SVDResult<E>) (Object) new SVDResult<>(V, S, U);
             return (SVDResult<E>) (Object) new SVDResult<>(U, S, V);
         } else if (isComplexRing(ring)) {
-            org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
-            var svdEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.svd(m, n, true, true, false);
-            if (!svdEjml.decompose(ejmlA)) throw new RuntimeException("Complex SVD decomposition failed");
-            
-            Matrix<E> U = fromEJMLComplex(svdEjml.getU(null, false));
-            Matrix<E> V = fromEJMLComplex(svdEjml.getV(null, false));
-            double[] sValues = svdEjml.getSingularValues();
-            Complex[] csValues = new Complex[sValues.length];
-            for (int i=0; i<sValues.length; i++) csValues[i] = Complex.of(sValues[i]);
-            Vector<E> S = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(csValues), ring);
-            
-            return new SVDResult<>(U, S, V);
+            throw new UnsupportedOperationException("Complex SVD not supported by EJML 0.43 for SIMD backend");
         }
         throw new UnsupportedOperationException("NativeSIMD SVD failed for ring: " + ring);
     }
