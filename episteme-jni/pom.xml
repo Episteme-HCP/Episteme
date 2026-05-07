@@ -10,10 +10,9 @@
   </parent>
   <groupId>io.github.silveremartin-dev</groupId>
   <artifactId>episteme-jni</artifactId>
-  <name>episteme-jni</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-  </properties>
+  <name>Episteme JNI Backend</name>
+  <description>Traditional JNI bindings for legacy native library integration.</description>
+
   <dependencies>
     <dependency>
       <groupId>io.github.silveremartin-dev</groupId>
@@ -26,9 +25,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
