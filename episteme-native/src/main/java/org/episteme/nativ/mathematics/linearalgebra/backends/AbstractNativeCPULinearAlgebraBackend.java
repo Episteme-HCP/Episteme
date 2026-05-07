@@ -1043,7 +1043,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] invData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 Complex[] complexRes = new Complex[n * n];
                 for (int i=0; i<n*n; i++) complexRes[i] = Complex.of(invData[2*i], invData[2*i+1]);
-                return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, complexRes), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+                return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, complexRes), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
             }
         }
         throw new UnsupportedOperationException("NativeCPU inverse failed or not available");
@@ -1148,7 +1148,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             }
             Complex[] complexRes = new Complex[n * m];
             for (int i=0; i<n*m; i++) complexRes[i] = Complex.of(resData[2*i], resData[2*i+1]);
-            return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, m, complexRes), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+            return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, m, complexRes), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
         }
         throw new UnsupportedOperationException("NativeCPU transpose failed or not available for ring " + ring.getClass().getName());
     }
