@@ -826,7 +826,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
                 E[] resData = (E[]) java.lang.reflect.Array.newInstance(zero.getClass(), a.rows() * a.cols());
                 for (int i=0; i<resData.length; i++) resData[i] = (E) org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[i]);
-                Matrix<E> result = new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), resData), this, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(a.rows(), a.cols(), resData), this, ring);
                 return result;
             }
             double[] ad = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
@@ -843,18 +843,14 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 float[] bd = toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
                 float[] rd = new float[ad.length];
                 for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-                E[] resData = (E[]) java.lang.reflect.Array.newInstance(zero.getClass(), a.rows() * a.cols());
-                for (int i=0; i<resData.length; i++) resData[i] = (E) org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i+1]));
-                Matrix<E> result = new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), resData), this, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(a.rows(), a.cols(), (E[])resData), this, ring);
                 return result;
             }
             double[] ad = toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a);
             double[] bd = toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
             double[] rd = new double[ad.length];
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-            E[] resData = (E[]) java.lang.reflect.Array.newInstance(zero.getClass(), a.rows() * a.cols());
-            for (int i=0; i<resData.length; i++) resData[i] = (E) org.episteme.core.mathematics.numbers.complex.Complex.of(rd[2*i], rd[2*i+1]);
-            Matrix<E> result = new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), resData), this, ring);
+            org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(a.rows(), a.cols(), resData), this, ring);
             return result;
         }
         throw new UnsupportedOperationException("Unsupported ring type for NativeCPU add: " + ring.getClass().getName());
@@ -881,7 +877,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
             E[] resData = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
             for (int i=0; i<rows*cols; i++) resData[i] = (E) Complex.of(rd[2*i], rd[2*i+1]);
-            return new GenericMatrix<>(new DenseMatrixStorage<>(rows, cols, resData), this, ring);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(rows, cols, resData), this, ring);
         }
         throw new UnsupportedOperationException("Unsupported ring type for NativeCPU subtract: " + ring.getClass().getName());
     }
@@ -900,7 +896,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[a.rows() * a.cols()];
                 for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[i]);
                 @SuppressWarnings("unchecked")
-                Matrix<E> result = new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), (E[])resData), this, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(a.rows(), a.cols(), (E[])resData), this, ring);
                 return result;
             }
             double s = ((org.episteme.core.mathematics.numbers.real.Real)scalar).doubleValue();
@@ -922,7 +918,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             for (int i=0; i<a.rows(); i++) {
                 for (int j=0; j<a.cols(); j++) res[i*a.cols()+j] = (E) s.multiply(((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a).get(i, j));
             }
-            Matrix<E> result = new GenericMatrix<>(new DenseMatrixStorage<>(a.rows(), a.cols(), res), this, ring);
+            org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(a.rows(), a.cols(), res), this, ring);
             return result;
         }
         throw new UnsupportedOperationException("Unsupported ring type for NativeCPU scale: " + ring.getClass().getName());
@@ -951,7 +947,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(cData[i]);
                     E[] castedRes = (E[]) resData;
                     @SuppressWarnings("unchecked")
-                    Matrix<E> result = new GenericMatrix<>(new DenseMatrixStorage<>(m, n, castedRes), this, ring);
+                    org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(m, n, castedRes), this, ring);
                     return result;
                 }
             }
@@ -985,7 +981,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i+1]));
                     E[] castedRes = (E[]) resData;
-                    return new GenericMatrix<>(new DenseMatrixStorage<>(m, n, castedRes), this, ring);
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(m, n, castedRes), this, ring);
                 }
             }
             if (!AVAILABLE || ZGEMM_HANDLE == null) throw new UnsupportedOperationException("ZGEMM not available");
@@ -1002,7 +998,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] result = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[m * n];
                 for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(result[2*i], result[2*i+1]);
-                Matrix<E> typedRes = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, n, (org.episteme.core.mathematics.numbers.complex.Complex[])resData), (LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)org.episteme.core.mathematics.sets.Complexes.getInstance());
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> typedRes = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(m, n, (org.episteme.core.mathematics.numbers.complex.Complex[])resData), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)org.episteme.core.mathematics.sets.Complexes.getInstance());
                 return typedRes;
             }
         }
@@ -1047,7 +1043,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] invData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 Complex[] complexRes = new Complex[n * n];
                 for (int i=0; i<n*n; i++) complexRes[i] = Complex.of(invData[2*i], invData[2*i+1]);
-                return new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexRes), this, ring);
+                return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, complexRes), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
             }
         }
         throw new UnsupportedOperationException("NativeCPU inverse failed or not available");
@@ -1152,7 +1148,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             }
             Complex[] complexRes = new Complex[n * m];
             for (int i=0; i<n*m; i++) complexRes[i] = Complex.of(resData[2*i], resData[2*i+1]);
-            return new GenericMatrix<>(new DenseMatrixStorage<>(n, m, complexRes), this, ring);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, m, complexRes), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
         }
         throw new UnsupportedOperationException("NativeCPU transpose failed or not available for ring " + ring.getClass().getName());
     }
@@ -1535,7 +1531,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         E c1 = ring.subtract(ring.multiply(a2, b3), ring.multiply(a3, b2));
         E c2 = ring.subtract(ring.multiply(a3, b1), ring.multiply(a1, b3));
         E c3 = ring.subtract(ring.multiply(a1, b2), ring.multiply(a2, b1));
-        return Vector.of(java.util.List.of(c1, c2, c3), ring);
+        return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.List.of(c1, c2, c3), ring);
     }
 
     @Override
