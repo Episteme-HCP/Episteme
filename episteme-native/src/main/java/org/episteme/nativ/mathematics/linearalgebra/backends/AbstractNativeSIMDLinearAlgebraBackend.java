@@ -864,7 +864,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> asin(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD asin not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, Complex::asin);
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).asin();
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).asin();
     }
@@ -872,7 +872,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> acos(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD acos not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, Complex::acos);
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).acos();
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).acos();
     }
@@ -880,7 +880,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> atan(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD atan not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, Complex::atan);
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).atan();
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).atan();
     }
@@ -924,7 +924,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> asinh(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD asinh not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, Complex::asinh);
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).asinh();
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).asinh();
     }
@@ -932,7 +932,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> acosh(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD acosh not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, Complex::acosh);
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).acosh();
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).acosh();
     }
@@ -940,7 +940,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> atanh(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD atanh not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, Complex::atanh);
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).atanh();
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).atanh();
     }
@@ -960,7 +960,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> cbrt(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD cbrt not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, Complex::cbrt);
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).cbrt();
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).cbrt();
     }
@@ -968,7 +968,10 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> pow(Matrix<E> a, E exponent) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD pow not yet implemented for Complex.");
+        if (isComplexRing(a.getScalarRing())) {
+            Complex exp = (Complex) exponent;
+            return (Matrix<E>) executeComplexUnaryOp((Matrix<Complex>) a, c -> c.pow(exp));
+        }
         if (isFastPrecision()) return (Matrix<E>) (Object) SIMDRealFloatMatrix.from((Matrix<Real>) (Object) a).powScalar(((Real) (Object) exponent).floatValue());
         return (Matrix<E>) (Object) SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a).powScalar(((Real) (Object) exponent).doubleValue());
     }
@@ -1009,328 +1012,438 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD solve not yet implemented for Complex.");
-        
-        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
-        int m = simdA.rows();
-        int n = simdA.cols();
+        Ring<E> ring = a.getScalarRing();
+        int m = a.rows();
+        int n = a.cols();
         
         if (m != n) {
-             // Rectangular solve (Least Squares) via QR: A = Q R => R x = Q^T b
-            logger.debug("Rectangular SIMD solve via QR Decomposition: [{}x{}]", m, n);
+            // Least Squares via QR
             QRResult<E> qr = qr(a);
-            Matrix<Real> Q = (Matrix<Real>) (Object) qr.getQ();
-            Matrix<Real> R = (Matrix<Real>) (Object) qr.getR();
+            Matrix<E> Q = qr.getQ();
+            Matrix<E> R = qr.getR();
+            Vector<E> QtB = Q.transpose().multiply(b);
             
-            // QtB = Q^T * b
-            Vector<Real> QtB = (Vector<Real>) (Object) Q.transpose().multiply((Vector<Real>) (Object) b);
-            
-            // Solve R x = QtB via back-substitution (R is economy upper triangular n x n)
-            double[] rData = toMatrixDoubleArray(R);
-            double[] bData = new double[n];
-            for (int i = 0; i < n; i++) bData[i] = ((Real) (Object) QtB.get(i)).doubleValue();
-            
-            double[] x = new double[n];
-            var species = getDoubleSpecies();
-            for (int i = n - 1; i >= 0; i--) {
-                double sum = 0.0;
-                int j = i + 1;
-                var vSum = DoubleVector.zero(species);
-                for (; j + species.length() <= n; j += species.length()) {
-                    var vA = DoubleVector.fromArray(species, rData, i * n + j);
-                    var vX = DoubleVector.fromArray(species, x, j);
-                    vSum = vSum.add(vA.mul(vX));
-                }
-                sum = vSum.reduceLanes(ADD);
-                for (; j < n; j++) sum += rData[i * n + j] * x[j];
-                
-                if (Math.abs(rData[i * n + i]) < 1e-15) x[i] = 0.0;
-                else x[i] = (bData[i] - sum) / rData[i * n + i];
-            }
-            return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
+            // Solve R x = QtB (R is upper triangular n x n)
+            return solveTriangular(R, QtB, true, false, false);
         }
 
-        // Standard Square Case
-        double[] x = new double[n];
-        for (int i = 0; i < n; i++) x[i] = ((Real) (Object) b.get(i)).doubleValue();
+        // Square Case: LU
+        return solve(lu(a), b);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
+        Ring<E> ring = b.getScalarRing();
+        int n = b.dimension();
         
-        double[] data = simdA.getInternalData();
-        var species = getDoubleSpecies();
-        
-        // Gaussian Elimination
-        for (int k = 0; k < n; k++) {
-            int max = k;
-            for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
-            if (k != max) {
-                for (int j = k; j < n; j++) {
-                    double temp = data[k * n + j];
-                    data[k * n + j] = data[max * n + j];
-                    data[max * n + j] = temp;
-                }
-                double t = x[k]; x[k] = x[max]; x[max] = t;
-            }
-            
-            if (Math.abs(data[k * n + k]) < 1e-15) throw new ArithmeticException("Matrix is singular");
-            
-            for (int i = k + 1; i < n; i++) {
-                double factor = data[i * n + k] / data[k * n + k];
-                x[i] -= factor * x[k];
-                data[i * n + k] = 0;
-                int j = k + 1;
-                for (; j + species.length() <= n; j += species.length()) {
-                    var vK = DoubleVector.fromArray(species, data, k * n + j);
-                    var vI = DoubleVector.fromArray(species, data, i * n + j);
-                    vI.sub(vK.mul(factor)).intoArray(data, i * n + j);
-                }
-                for (; j < n; j++) data[i * n + j] -= factor * data[k * n + j];
-            }
+        // 1. Permute b: b' = P * b
+        Vector<E> P = lu.getP();
+        E[] bDataArr = (E[]) new Object[n];
+        for (int i = 0; i < n; i++) {
+            int idx = (int) getRealValue(P.get(i));
+            bDataArr[i] = b.get(idx);
         }
+        Vector<E> pb = Vector.of(java.util.Arrays.asList(bDataArr), ring);
         
-        // Back-substitution
-        for (int i = n - 1; i >= 0; i--) {
-            double sum = 0.0;
-            int j = i + 1;
-            var vSum = DoubleVector.zero(species);
-            for (; j + species.length() <= n; j += species.length()) {
-                var vA = DoubleVector.fromArray(species, data, i * n + j);
-                var vX = DoubleVector.fromArray(species, x, j);
-                vSum = vSum.add(vA.mul(vX));
-            }
-            sum = vSum.reduceLanes(ADD);
-            for (; j < n; j++) sum += data[i * n + j] * x[j];
-            x[i] = (x[i] - sum) / data[i * n + i];
-        }
+        // 2. Solve L y = Pb (Lower unit triangular)
+        Vector<E> y = solveTriangular(lu.getL(), pb, false, false, true);
         
-        return (Vector<E>) (Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(x);
+        // 3. Solve U x = y (Upper triangular)
+        return solveTriangular(lu.getU(), y, true, false, false);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD determinant not yet implemented for Complex.");
+        Ring<E> ring = a.getScalarRing();
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         
         LUResult<E> lu = lu(a);
-        Matrix<Real> U = (Matrix<Real>) (Object) lu.getU();
-        double det = 1.0;
-        for (int i = 0; i < n; i++) det *= ((Real) (Object) U.get(i, i)).doubleValue();
+        Matrix<E> U = lu.getU();
         
-        Vector<Real> P = (Vector<Real>) (Object) lu.getP();
+        E det = ring.one();
+        for (int i = 0; i < n; i++) det = ring.multiply(det, U.get(i, i));
+        
+        Vector<E> P = lu.getP();
         int swaps = 0;
-        for (int i = 0; i < n; i++) if (Math.abs(((Real) (Object) P.get(i)).doubleValue() - i) > 0.1) swaps++;
-        if ((swaps / 2) % 2 != 0) det = -det;
+        for (int i = 0; i < n; i++) if (Math.abs(getRealValue(P.get(i)) - i) > 0.1) swaps++;
+        if ((swaps / 2) % 2 != 0) {
+            if (ring instanceof org.episteme.core.mathematics.sets.Reals) det = (E) Real.of(-getRealValue(det));
+            else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) det = (E) ((Complex)det).negate();
+        }
         
-        return createScalar(det, a);
+        return det;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Matrix<E> inverse(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD inverse not yet implemented for Complex.");
         int m = a.rows();
         int n = a.cols();
+        Ring<E> ring = a.getScalarRing();
         
         if (m != n) {
             // Pseudo-inverse via SVD
             SVDResult<E> svd = svd(a);
-            Matrix<Real> U = (Matrix<Real>) (Object) svd.getU();
-            Vector<Real> S = (Vector<Real>) (Object) svd.getS();
-            Matrix<Real> V = (Matrix<Real>) (Object) svd.getV();
+            Matrix<E> U = svd.getU();
+            Vector<E> S = svd.getS();
+            Matrix<E> V = svd.getV();
             
             int k = Math.min(m, n);
-            double[] sInv = new double[k];
-            for (int i = 0; i < k; i++) {
-                double val = ((Real) (Object) S.get(i)).doubleValue();
-                sInv[i] = val > 1e-12 ? 1.0 / val : 0.0;
-            }
+            double[] sData = new double[k];
+            for (int i=0; i<k; i++) sData[i] = getRealValue(S.get(i));
             
-            Matrix<Real> Sinv = org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.diagonal(sInv);
-            Matrix<Real> V_Sinv = V.multiply(Sinv);
-            return (Matrix<E>) (Object) V_Sinv.multiply(U.transpose());
+            double[] sInvData = new double[k];
+            for (int i = 0; i < k; i++) sInvData[i] = sData[i] > 1e-12 ? 1.0 / sData[i] : 0.0;
+            
+            Matrix<E> Sinv;
+            if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+                Sinv = (Matrix<E>)(Object) RealDoubleMatrix.diagonal(sInvData);
+            } else {
+                Complex[] complexSInv = new Complex[k*k];
+                for (int i=0; i<k; i++) {
+                    for (int j=0; j<k; j++) complexSInv[i*k+j] = (i==j) ? Complex.of(sInvData[i]) : Complex.ZERO;
+                }
+                Sinv = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(k, k, complexSInv), this, ring);
+            }
+
+            Matrix<E> V_Sinv = V.multiply(Sinv);
+            return V_Sinv.multiply(U.transpose());
         }
-        
-        // Square Inverse via Gaussian
-        SIMDRealDoubleMatrix simdA = SIMDRealDoubleMatrix.from((Matrix<Real>) (Object) a);
-        double[] data = simdA.getInternalData();
-        double[] inv = new double[n * n];
-        for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
-        
-        var species = getDoubleSpecies();
-        for (int k = 0; k < n; k++) {
-            int max = k;
-            for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
-            if (k != max) {
-                for (int j = k; j < n; j++) {
-                    double t = data[k * n + j]; data[k * n + j] = data[max * n + j]; data[max * n + j] = t;
+
+        // Square case: Gaussian Elimination for Reals (SIMD)
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+            double[] inv = new double[n * n];
+            for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
+            
+            var species = getDoubleSpecies();
+            for (int k = 0; k < n; k++) {
+                int max = k;
+                for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
+                if (k != max) {
+                    for (int j = k; j < n; j++) {
+                        double t = data[k * n + j]; data[k * n + j] = data[max * n + j]; data[max * n + j] = t;
+                    }
+                    for (int j = 0; j < n; j++) {
+                        double t = inv[k * n + j]; inv[k * n + j] = inv[max * n + j]; inv[max * n + j] = t;
+                    }
                 }
-                for (int j = 0; j < n; j++) {
-                    double t = inv[k * n + j]; inv[k * n + j] = inv[max * n + j]; inv[max * n + j] = t;
+                
+                double pivot = data[k * n + k];
+                if (Math.abs(pivot) < 1e-18) throw new ArithmeticException("Matrix is singular");
+                
+                for (int j = k + 1; j < n; j++) data[k * n + j] /= pivot;
+                for (int j = 0; j < n; j++) inv[k * n + j] /= pivot;
+                data[k * n + k] = 1.0;
+                
+                for (int i = 0; i < n; i++) {
+                    if (i != k) {
+                        double f = data[i * n + k];
+                        int j = k + 1;
+                        for (; j + species.length() <= n; j += species.length()) {
+                            var vK = DoubleVector.fromArray(species, data, k * n + j);
+                            var vI = DoubleVector.fromArray(species, data, i * n + j);
+                            vI.sub(vK.mul(f)).intoArray(data, i * n + j);
+                        }
+                        for (; j < n; j++) data[i * n + j] -= f * data[k * n + j];
+                        
+                        j = 0;
+                        for (; j + species.length() <= n; j += species.length()) {
+                            var vIK = DoubleVector.fromArray(species, inv, k * n + j);
+                            var vII = DoubleVector.fromArray(species, inv, i * n + j);
+                            vII.sub(vIK.mul(f)).intoArray(inv, i * n + j);
+                        }
+                        for (; j < n; j++) inv[i * n + j] -= f * inv[k * n + j];
+                    }
                 }
             }
-            
-            double pivot = data[k * n + k];
-            if (Math.abs(pivot) < 1e-15) throw new ArithmeticException("Matrix is singular");
-            
-            for (int j = k + 1; j < n; j++) data[k * n + j] /= pivot;
-            for (int j = 0; j < n; j++) inv[k * n + j] /= pivot;
-            data[k * n + k] = 1.0;
-            
-            for (int i = 0; i < n; i++) {
-                if (i != k) {
-                    double f = data[i * n + k];
-                    int j = k + 1;
-                    for (; j + species.length() <= n; j += species.length()) {
-                        var vK = DoubleVector.fromArray(species, data, k * n + j);
-                        var vI = DoubleVector.fromArray(species, data, i * n + j);
-                        vI.sub(vK.mul(f)).intoArray(data, i * n + j);
-                    }
-                    for (; j < n; j++) data[i * n + j] -= f * data[k * n + j];
-                    
-                    j = 0;
-                    for (; j + species.length() <= n; j += species.length()) {
-                        var vIK = DoubleVector.fromArray(species, inv, k * n + j);
-                        var vII = DoubleVector.fromArray(species, inv, i * n + j);
-                        vII.sub(vIK.mul(f)).intoArray(inv, i * n + j);
-                    }
-                    for (; j < n; j++) inv[i * n + j] -= f * inv[k * n + j];
-                }
+            return (Matrix<E>) (Object) fromDoubleArray(inv, n, n);
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            // Square case for Complexes: LU based
+            LUResult<E> lu = lu(a);
+            int dim = n;
+            Complex[] invData = new Complex[dim * dim];
+            for (int j = 0; j < dim; j++) {
+                Complex[] e = new Complex[dim];
+                for (int i=0; i<dim; i++) e[i] = (i==j) ? Complex.ONE : Complex.ZERO;
+                Vector<E> b = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(e), ring);
+                Vector<E> x = solve(lu, b);
+                for (int i = 0; i < dim; i++) invData[i * dim + j] = (Complex) x.get(i);
             }
+            return (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(dim, dim, invData), this, ring);
         }
-        return (Matrix<E>) (Object) fromDoubleArray(inv, n, n);
+        throw new UnsupportedOperationException("NativeSIMD inverse failed for ring: " + ring);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public LUResult<E> lu(Matrix<E> a) {
-        if (isComplexRing(a.getScalarRing())) throw new UnsupportedOperationException("SIMD LU not yet implemented for Complex.");
+        Ring<E> ring = a.getScalarRing();
         int n = a.rows();
-        double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
-        double[] lData = new double[n * n];
-        double[] uData = new double[n * n];
-        double[] p = new double[n];
-        for (int i = 0; i < n; i++) { p[i] = i; lData[i * n + i] = 1.0; }
+        int m = a.cols();
         
-        for (int k = 0; k < n; k++) {
-            int max = k;
-            for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
-            if (k != max) {
-                for (int j = 0; j < n; j++) {
-                    double t = data[k * n + j]; data[k * n + j] = data[max * n + j]; data[max * n + j] = t;
+        if (isRealRing(ring)) {
+            double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+            double[] lData = new double[n * n];
+            double[] uData = new double[n * n];
+            double[] p = new double[n];
+            for (int i = 0; i < n; i++) { p[i] = i; lData[i * n + i] = 1.0; }
+            
+            for (int k = 0; k < Math.min(n, m); k++) {
+                int max = k;
+                for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
+                if (k != max) {
+                    for (int j = 0; j < m; j++) {
+                        double t = data[k * m + j]; data[k * m + j] = data[max * m + j]; data[max * m + j] = t;
+                    }
+                    double t = p[k]; p[k] = p[max]; p[max] = t;
                 }
-                double t = p[k]; p[k] = p[max]; p[max] = t;
-            }
-            uData[k * n + k] = data[k * n + k];
-            for (int i = k + 1; i < n; i++) {
-                lData[i * n + k] = data[i * n + k] / uData[k * n + k];
-                uData[k * n + i] = data[k * n + i];
-                for (int j = k + 1; j < n; j++) data[i * n + j] -= lData[i * n + k] * data[k * n + j];
-            }
-        }
-        
-        return (LUResult<E>) (Object) new LUResult<Real>(
-            fromDoubleArray(lData, n, n),
-            fromDoubleArray(uData, n, n),
-            org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p)
-        );
-    }
-
-    @Override
-    public QRResult<E> qr(Matrix<E> a) {
-        if (isComplexRing(a.getScalarRing())) throw new UnsupportedOperationException("SIMD QR not yet implemented for Complex.");
-        int m = a.rows();
-        int n = a.cols();
-        @SuppressWarnings("unchecked")
-        double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
-        double[] q = new double[m * m];
-        for (int i = 0; i < m; i++) q[i * m + i] = 1.0;
-        
-        for (int k = 0; k < Math.min(m, n); k++) {
-            double norm = 0;
-            for (int i = k; i < m; i++) norm += data[i * n + k] * data[i * n + k];
-            norm = Math.sqrt(norm);
-            double v0 = data[k * n + k] + (data[k * n + k] >= 0 ? norm : -norm);
-            double vNorm = v0 * v0 + norm * norm - data[k * n + k] * data[k * n + k];
-            vNorm = Math.sqrt(vNorm);
-            if (vNorm > 1e-15) {
-                double[] v = new double[m - k];
-                v[0] = v0 / vNorm;
-                for (int i = 1; i < m - k; i++) v[i] = data[(k + i) * n + k] / vNorm;
                 
-                for (int j = k; j < n; j++) {
-                    double dot = 0;
-                    for (int i = 0; i < m - k; i++) dot += v[i] * data[(k + i) * n + j];
-                    for (int i = 0; i < m - k; i++) data[(k + i) * n + j] -= 2 * dot * v[i];
+                uData[k * n + k] = data[k * n + k];
+                for (int i = k + 1; i < n; i++) {
+                    if (Math.abs(uData[k * n + k]) > 1e-18) {
+                        lData[i * n + k] = data[i * n + k] / uData[k * n + k];
+                        for (int j = k + 1; j < m; j++) data[i * m + j] -= lData[i * n + k] * data[k * m + j];
+                    }
                 }
-                for (int j = 0; j < m; j++) {
-                    double dot = 0;
-                    for (int i = 0; i < m - k; i++) dot += v[i] * q[(k + i) * m + j];
-                    for (int i = 0; i < m - k; i++) q[(k + i) * m + j] -= 2 * dot * v[i];
+                for (int j = k + 1; j < m; j++) uData[k * n + j] = data[k * n + j];
+            }
+            
+            return (LUResult<E>) (Object) new LUResult<Real>(
+                fromDoubleArray(lData, n, n),
+                fromDoubleArray(uData, n, n),
+                org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(p)
+            );
+        } else if (isComplexRing(ring)) {
+            Complex[] data = new Complex[n * m];
+            for (int i=0; i<n; i++) for (int j=0; j<m; j++) data[i*m + j] = (Complex) a.get(i, j);
+            
+            Complex[] lData = new Complex[n * n];
+            Complex[] uData = new Complex[n * n];
+            Complex[] p = new Complex[n];
+            for (int i = 0; i < n; i++) { 
+                p[i] = Complex.of(i); 
+                for (int j=0; j<n; j++) {
+                    lData[i*n + j] = (i == j) ? Complex.ONE : Complex.ZERO;
+                    uData[i*n + j] = Complex.ZERO;
                 }
             }
+            
+            for (int k = 0; k < Math.min(n, m); k++) {
+                int max = k;
+                for (int i = k + 1; i < n; i++) if (data[i * m + k].abs() > data[max * m + k].abs()) max = i;
+                if (k != max) {
+                    for (int j = 0; j < m; j++) {
+                        Complex t = data[k * m + j]; data[k * m + j] = data[max * m + j]; data[max * m + j] = t;
+                    }
+                    Complex t = p[k]; p[k] = p[max]; p[max] = t;
+                }
+                
+                uData[k * n + k] = data[k * m + k];
+                for (int i = k + 1; i < n; i++) {
+                    if (uData[k * n + k].abs() > 1e-18) {
+                        lData[i * n + k] = data[i * m + k].divide(uData[k * n + k]);
+                        for (int j = k + 1; j < m; j++) {
+                            data[i * m + j] = data[i * m + j].subtract(lData[i * n + k].multiply(data[k * m + j]));
+                        }
+                    }
+                }
+                for (int j = k + 1; j < m; j++) uData[k * n + j] = data[k * m + j];
+            }
+            
+            Matrix<E> L = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, lData), this, ring);
+            Matrix<E> U = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(n, n, uData), this, ring);
+            Vector<E> P = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(p), ring);
+
+            return new LUResult<>(L, U, P);
         }
-        
-        double[] rData = new double[m * n];
-        for (int i = 0; i < m; i++) for (int j = i; j < n; j++) rData[i * n + j] = data[i * n + j];
-        
-        @SuppressWarnings("unchecked")
-        QRResult<E> result = (QRResult<E>) (Object) new QRResult<Real>(
-            fromDoubleArray(q, m, m).transpose(),
-            fromDoubleArray(rData, m, n)
-        );
-        return result;
+        throw new UnsupportedOperationException("NativeSIMD LU failed or not available for ring: " + ring);
     }
 
     @Override
-    public SVDResult<E> svd(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD SVD not yet implemented for Complex.");
+    @SuppressWarnings("unchecked")
+    public QRResult<E> qr(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
         int m = a.rows();
         int n = a.cols();
-        boolean transposed = false;
-        @SuppressWarnings("unchecked")
-        Matrix<Real> target = (Matrix<Real>) (Object) a;
-        if (m < n) { transposed = true; target = target.transpose(); int t = m; m = n; n = t; }
         
-        double[] data = toMatrixDoubleArray(target);
-        org.ejml.data.DMatrixRMaj ejmlA = new org.ejml.data.DMatrixRMaj(m, n, true, data);
-        var svdEjml = org.ejml.dense.row.factory.DecompositionFactory_DDRM.svd(m, n, true, true, false);
-        if (!svdEjml.decompose(ejmlA)) throw new RuntimeException("SVD decomposition failed");
-        
-        Matrix<Real> U = fromDoubleArray(svdEjml.getU(null, false).data, m, m);
-        Matrix<Real> V = fromDoubleArray(svdEjml.getV(null, false).data, n, n);
-        double[] s = svdEjml.getSingularValues();
-        
-        @SuppressWarnings("unchecked")
-        SVDResult<E> res1 = (SVDResult<E>) (Object) new SVDResult<Real>(V, org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(s), U);
-        if (transposed) return res1;
-        @SuppressWarnings("unchecked")
-        SVDResult<E> res2 = (SVDResult<E>) (Object) new SVDResult<Real>(U, org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(s), V);
-        return res2;
+        if (isRealRing(ring)) {
+            double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+            double[] q = new double[m * m];
+            for (int i = 0; i < m; i++) q[i * m + i] = 1.0;
+            
+            for (int k = 0; k < Math.min(m, n); k++) {
+                double norm = 0;
+                for (int i = k; i < m; i++) norm += data[i * n + k] * data[i * n + k];
+                norm = Math.sqrt(norm);
+                double v0 = data[k * n + k] + (data[k * n + k] >= 0 ? norm : -norm);
+                double vNorm = v0 * v0 + norm * norm - data[k * n + k] * data[k * n + k];
+                vNorm = Math.sqrt(vNorm);
+                if (vNorm > 1e-15) {
+                    double[] v = new double[m - k];
+                    v[0] = v0 / vNorm;
+                    for (int i = 1; i < m - k; i++) v[i] = data[(k + i) * n + k] / vNorm;
+                    
+                    for (int j = k; j < n; j++) {
+                        double dot = 0;
+                        for (int i = 0; i < m - k; i++) dot += v[i] * data[(k + i) * n + j];
+                        for (int i = 0; i < m - k; i++) data[(k + i) * n + j] -= 2 * dot * v[i];
+                    }
+                    for (int j = 0; j < m; j++) {
+                        double dot = 0;
+                        for (int i = 0; i < m - k; i++) dot += v[i] * q[(k + i) * m + j];
+                        for (int i = 0; i < m - k; i++) q[(k + i) * m + j] -= 2 * dot * v[i];
+                    }
+                }
+            }
+            
+            double[] rData = new double[m * n];
+            for (int i = 0; i < m; i++) for (int j = i; j < n; j++) rData[i * n + j] = data[i * n + j];
+            
+            QRResult<E> result = (QRResult<E>) (Object) new QRResult<Real>(
+                fromDoubleArray(q, m, m).transpose(),
+                fromDoubleArray(rData, m, n)
+            );
+            return result;
+        } else if (isComplexRing(ring)) {
+            org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
+            var qrEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.qr(m, n);
+            if (!qrEjml.decompose(ejmlA)) throw new RuntimeException("QR decomposition failed");
+            
+            Matrix<E> Q = fromEJMLComplex(qrEjml.getQ(null, false));
+            Matrix<E> R = fromEJMLComplex(qrEjml.getR(null, false));
+            return new QRResult<>(Q, R);
+        }
+        throw new UnsupportedOperationException("NativeSIMD QR failed for ring: " + ring);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public SVDResult<E> svd(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        int m = a.rows();
+        int n = a.cols();
+        
+        if (isRealRing(ring)) {
+            boolean transposed = false;
+            Matrix<Real> target = (Matrix<Real>) (Object) a;
+            if (m < n) { transposed = true; target = target.transpose(); int t = m; m = n; n = t; }
+            
+            double[] data = toMatrixDoubleArray(target);
+            org.ejml.data.DMatrixRMaj ejmlA = new org.ejml.data.DMatrixRMaj(m, n, true, data);
+            var svdEjml = org.ejml.dense.row.factory.DecompositionFactory_DDRM.svd(m, n, true, true, false);
+            if (!svdEjml.decompose(ejmlA)) throw new RuntimeException("SVD decomposition failed");
+            
+            Matrix<Real> U = fromDoubleArray(svdEjml.getU(null, false).data, m, m);
+            Matrix<Real> V = fromDoubleArray(svdEjml.getV(null, false).data, n, n);
+            double[] sValues = svdEjml.getSingularValues();
+            Vector<Real> S = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(sValues);
+            
+            if (transposed) return (SVDResult<E>) (Object) new SVDResult<>(V, S, U);
+            return (SVDResult<E>) (Object) new SVDResult<>(U, S, V);
+        } else if (isComplexRing(ring)) {
+            org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
+            var svdEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.svd(m, n, true, true, false);
+            if (!svdEjml.decompose(ejmlA)) throw new RuntimeException("Complex SVD decomposition failed");
+            
+            Matrix<E> U = fromEJMLComplex(svdEjml.getU(null, false));
+            Matrix<E> V = fromEJMLComplex(svdEjml.getV(null, false));
+            double[] sValues = svdEjml.getSingularValues();
+            Complex[] csValues = new Complex[sValues.length];
+            for (int i=0; i<sValues.length; i++) csValues[i] = Complex.of(sValues[i]);
+            Vector<E> S = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(csValues), ring);
+            
+            return new SVDResult<>(U, S, V);
+        }
+        throw new UnsupportedOperationException("NativeSIMD SVD failed for ring: " + ring);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public CholeskyResult<E> cholesky(Matrix<E> a) {
-        if (isComplex(a)) throw new UnsupportedOperationException("SIMD Cholesky not yet implemented for Complex.");
+        Ring<E> ring = a.getScalarRing();
         int n = a.rows();
-        @SuppressWarnings("unchecked")
-        double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
-        double[] l = new double[n * n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j <= i; j++) {
-                double sum = 0;
-                for (int k = 0; k < j; k++) sum += l[i * n + k] * l[j * n + k];
-                if (i == j) {
-                    double val = data[i * n + i] - sum;
-                    if (val <= 0) throw new ArithmeticException("Matrix is not positive definite");
-                    l[i * n + i] = Math.sqrt(val);
-                } else {
-                    l[i * n + j] = (data[i * n + j] - sum) / l[j * n + j];
-                }
+        
+        if (isRealRing(ring)) {
+            double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+            org.ejml.data.DMatrixRMaj ejmlA = new org.ejml.data.DMatrixRMaj(n, n, true, data);
+            var cholEjml = org.ejml.dense.row.factory.DecompositionFactory_DDRM.chol(n, true);
+            if (!cholEjml.decompose(ejmlA)) throw new RuntimeException("Cholesky decomposition failed");
+            
+            Matrix<Real> L = fromDoubleArray(cholEjml.getT(null).data, n, n);
+            return (CholeskyResult<E>) (Object) new CholeskyResult<>(L);
+        } else if (isComplexRing(ring)) {
+            org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
+            var cholEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.chol(n, true);
+            if (!cholEjml.decompose(ejmlA)) throw new RuntimeException("Complex Cholesky decomposition failed");
+            
+            Matrix<E> L = fromEJMLComplex(cholEjml.getT(null));
+            return new CholeskyResult<>(L);
+        }
+        throw new UnsupportedOperationException("NativeSIMD Cholesky failed for ring: " + ring);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public EigenResult<E> eigen(Matrix<E> a) {
+        Ring<E> ring = a.getScalarRing();
+        int n = a.rows();
+        
+        if (isRealRing(ring)) {
+            double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
+            org.ejml.data.DMatrixRMaj ejmlA = new org.ejml.data.DMatrixRMaj(n, n, true, data);
+            var eigenEjml = org.ejml.dense.row.factory.DecompositionFactory_DDRM.eig(n, true, true);
+            if (!eigenEjml.decompose(ejmlA)) throw new RuntimeException("Eigen decomposition failed");
+            
+            Complex[] values = new Complex[n];
+            Matrix<Real>[] vectors = new Matrix[n];
+            for (int i = 0; i < n; i++) {
+                org.ejml.data.Complex_F64 val = eigenEjml.getEigenvalue(i);
+                values[i] = Complex.of(val.real, val.imaginary);
+                vectors[i] = fromDoubleArray(eigenEjml.getEigenVector(i).data, n, 1);
+            }
+            return (EigenResult<E>) (Object) new EigenResult<Real>(values, vectors);
+        } else if (isComplexRing(ring)) {
+            org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
+            var eigenEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.eig(n, true);
+            if (!eigenEjml.decompose(ejmlA)) throw new RuntimeException("Complex Eigen decomposition failed");
+            
+            Complex[] values = new Complex[n];
+            Matrix<E>[] vectors = new Matrix[n];
+            for (int i = 0; i < n; i++) {
+                org.ejml.data.Complex_F64 val = eigenEjml.getEigenvalue(i);
+                values[i] = Complex.of(val.real, val.imaginary);
+                vectors[i] = fromEJMLComplex(eigenEjml.getEigenVector(i));
+            }
+            return new EigenResult<>(values, vectors);
+        }
+        throw new UnsupportedOperationException("NativeSIMD Eigen failed for ring: " + ring);
+    }
+
+    private org.ejml.data.ZMatrixRMaj toEJMLComplex(Matrix<E> a) {
+        int r = a.rows(), c = a.cols();
+        org.ejml.data.ZMatrixRMaj ejml = new org.ejml.data.ZMatrixRMaj(r, c);
+        for (int i=0; i<r; i++) {
+            for (int j=0; j<c; j++) {
+                Complex val = (Complex) a.get(i, j);
+                ejml.set(i, j, val.real(), val.imaginary());
             }
         }
-        @SuppressWarnings("unchecked")
-        CholeskyResult<E> result = (CholeskyResult<E>) (Object) new CholeskyResult<Real>(fromDoubleArray(l, n, n));
-        return result;
+        return ejml;
+    }
+
+    private Matrix<E> fromEJMLComplex(org.ejml.data.ZMatrixRMaj ejml) {
+        int r = ejml.numRows, c = ejml.numCols;
+        Complex[] data = new Complex[r * c];
+        for (int i=0; i<r; i++) {
+            for (int j=0; j<c; j++) {
+                data[i*c + j] = Complex.of(ejml.getReal(i, j), ejml.getImag(i, j));
+            }
+        }
+        return (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(r, c, data), this, Complexes.getInstance());
     }
 
     private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {

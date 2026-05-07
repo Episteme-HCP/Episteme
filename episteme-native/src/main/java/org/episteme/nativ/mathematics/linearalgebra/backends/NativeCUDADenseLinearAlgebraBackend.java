@@ -385,10 +385,10 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
     private MemorySegment malloc(long size, ResourceTracker tracker) {
         try (Arena temp = Arena.ofConfined()) {
             MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUDA_MALLOC.invokeExact(p, size));
+            checkCuda((int) NativeSafe.invoke(CUDA_MALLOC, p, size));
             MemorySegment d = p.get(ValueLayout.ADDRESS, 0);
             return tracker.track(d, ptr -> {
-                try { checkCuda((int) CUDA_FREE.invokeExact(ptr.address())); } catch (Throwable t) { logger.error("Failed to free GPU memory: {}", t.getMessage()); }
+                try { checkCuda((int) NativeSafe.invoke(CUDA_FREE, ptr.address())); } catch (Throwable t) { logger.error("Failed to free GPU memory: {}", t.getMessage()); }
             });
         } catch (Throwable t) { throw new RuntimeException("CUDA malloc failed", t); }
     }
@@ -1330,7 +1330,7 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             if (CUDA_GET_ERROR_STRING == null) throw new RuntimeException("CUDA Error " + result);
             try (Arena temp = Arena.ofConfined()) {
                 MemorySegment pStr = temp.allocate(ValueLayout.ADDRESS);
-                int status = (int) CUDA_GET_ERROR_STRING.invokeExact(result, pStr);
+                int status = (int) NativeSafe.invoke(CUDA_GET_ERROR_STRING, result, pStr);
                 String msg = (status == 0) ? pStr.get(ValueLayout.ADDRESS, 0).reinterpret(1024).getString(0) : "Unknown CUDA Error";
                 logger.error("CUDA Error {}: {}", result, msg);
                 throw new RuntimeException("CUDA Error " + result + ": " + msg);

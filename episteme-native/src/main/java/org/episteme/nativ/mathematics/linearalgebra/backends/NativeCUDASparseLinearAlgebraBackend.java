@@ -998,11 +998,11 @@ public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> imp
         if (!IS_AVAILABLE) throw new IllegalStateException("CUDA not available");
         try (Arena temp = Arena.ofConfined()) {
             MemorySegment ptr = temp.allocate(ValueLayout.ADDRESS);
-            checkCuda((int) CUDA_MALLOC.invokeExact(ptr, size));
+            checkCuda((int) NativeSafe.invoke(CUDA_MALLOC, ptr, size));
             MemorySegment d = ptr.get(ValueLayout.ADDRESS, 0);
             if (d.address() == 0) throw new RuntimeException("cudaMalloc returned NULL address");
             return tracker.track(d, p -> {
-                try { checkCuda((int) CUDA_FREE.invokeExact(p)); } catch (Throwable t) { logger.error("Failed to free GPU memory: {}", t.getMessage()); }
+                try { checkCuda((int) NativeSafe.invoke(CUDA_FREE, p)); } catch (Throwable t) { logger.error("Failed to free GPU memory: {}", t.getMessage()); }
             });
         } catch (Throwable t) {
             throw new RuntimeException("GPU Allocation failed for size " + size, t);
@@ -1046,7 +1046,7 @@ public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> imp
         if (result != 0) {
             if (CUDA_GET_ERROR_STRING == null) throw new RuntimeException("CUDA Error " + result);
             try {
-                MemorySegment seg = (MemorySegment) CUDA_GET_ERROR_STRING.invokeExact(result);
+                MemorySegment seg = (MemorySegment) NativeSafe.invoke(CUDA_GET_ERROR_STRING, result);
                 String msg = seg.reinterpret(1024).getString(0);
                 logger.error("CUDA Error {}: {}", result, msg);
                 throw new RuntimeException("CUDA Error " + result + ": " + msg);
