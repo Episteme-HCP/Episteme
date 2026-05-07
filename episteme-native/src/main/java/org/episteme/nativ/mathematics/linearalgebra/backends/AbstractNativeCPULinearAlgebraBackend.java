@@ -1750,7 +1750,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                         float[] res = vSeg.toArray(ValueLayout.JAVA_FLOAT);
                         org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[dim];
                         for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(res[i]);
-                        return (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Reals.getInstance());
+                        return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(resData), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.real.Real>) org.episteme.core.mathematics.sets.Reals.getInstance());
                     }
                 }
             } else {
@@ -1775,7 +1775,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                          float[] res = vSeg.toArray(ValueLayout.JAVA_FLOAT);
                          org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[dim];
                          for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(res[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(res[2*i+1]));
-                         return (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                         return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(resData), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) org.episteme.core.mathematics.sets.Complexes.getInstance());
                      }
                  }
              } else {
@@ -1787,7 +1787,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                          double[] res = vSeg.toArray(ValueLayout.JAVA_DOUBLE);
                          org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[dim];
                          for (int i=0; i<dim; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(res[2*i], res[2*i+1]);
-                         return (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(resData), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                         return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(resData), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) org.episteme.core.mathematics.sets.Complexes.getInstance());
                      }
                  }
              }
