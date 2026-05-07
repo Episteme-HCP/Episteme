@@ -1422,29 +1422,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
             return (EigenResult<E>) (Object) new EigenResult<Real>(V, D);
         } else if (isComplexRing(ring)) {
-            org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
-            var eigenEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.eig(n, true, false);
-            if (!eigenEjml.decompose(ejmlA)) throw new RuntimeException("Complex Eigen decomposition failed");
-            
-            Complex[] values = new Complex[n];
-            Matrix<E>[] vectors = new Matrix[n];
-            for (int i = 0; i < n; i++) {
-                org.ejml.data.Complex_F64 val = eigenEjml.getEigenvalue(i);
-                values[i] = Complex.of(val.real, val.imaginary);
-                vectors[i] = fromEJMLComplex(eigenEjml.getEigenVector(i));
-            }
-
-            Complex[] vVals = new Complex[n];
-            Complex[][] vData = new Complex[n][n];
-            for (int j = 0; j < n; j++) {
-                vVals[j] = values[j];
-                for (int i = 0; i < n; i++) {
-                    vData[i][j] = (Complex) vectors[j].get(i, 0);
-                }
-            }
-            Matrix<E> V = (Matrix<E>)(Object) Matrix.of(vData, (Ring<Complex>) (Object) ring);
-            Vector<E> D = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(vVals), (Ring<Complex>) (Object) ring);
-            return new EigenResult<>(V, D);
+            throw new UnsupportedOperationException("Complex Eigen decomposition not supported by EJML 0.43 for SIMD backend");
         }
         throw new UnsupportedOperationException("NativeSIMD Eigen failed for ring: " + ring);
     }
