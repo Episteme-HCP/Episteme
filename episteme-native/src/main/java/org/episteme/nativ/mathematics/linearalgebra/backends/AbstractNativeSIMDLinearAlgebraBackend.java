@@ -1451,7 +1451,8 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mResResult = org.episteme.core.mathematics.linearalgebra.Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) mResResult;
     }
 
     private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexSubtract(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> b) {
@@ -1460,7 +1461,8 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mResResult = org.episteme.core.mathematics.linearalgebra.Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) mResResult;
     }
 
     private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexMultiply(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> b) {
@@ -1478,7 +1480,8 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             }
         }
         @SuppressWarnings("unchecked")
-        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) (Object) a.getScalarRing());
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mRes = org.episteme.core.mathematics.linearalgebra.Matrix.of(res, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) (Object) a.getScalarRing());
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) mRes;
     }
 
     private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexScale(org.episteme.core.mathematics.numbers.complex.Complex s, org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a) {
@@ -1487,7 +1490,8 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mResResult = org.episteme.core.mathematics.linearalgebra.Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) mResResult;
     }
 
     private Complex executeComplexTrace(Matrix<Complex> a) {
@@ -1504,7 +1508,8 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
+        org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> mResResult = org.episteme.core.mathematics.linearalgebra.Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) mResResult;
     }
 
     private org.episteme.core.mathematics.linearalgebra.Vector<E> executeComplexVectorAdd(org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
