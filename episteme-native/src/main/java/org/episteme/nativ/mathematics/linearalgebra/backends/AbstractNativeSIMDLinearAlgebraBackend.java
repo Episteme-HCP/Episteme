@@ -1423,7 +1423,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             return (EigenResult<E>) (Object) new EigenResult<Real>(V, D);
         } else if (isComplexRing(ring)) {
             org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
-            var eigenEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.eig(n, true);
+            var eigenEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.eig(n, true, false);
             if (!eigenEjml.decompose(ejmlA)) throw new RuntimeException("Complex Eigen decomposition failed");
             
             Complex[] values = new Complex[n];
