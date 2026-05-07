@@ -135,6 +135,7 @@ public class NativeFFMLoader {
             } else if (libName.equals("openblas")) {
                 variants.add("openblas");
                 variants.add("libopenblas.so.3");
+                variants.add("libopenblas.so.0");
             }
         }
 
