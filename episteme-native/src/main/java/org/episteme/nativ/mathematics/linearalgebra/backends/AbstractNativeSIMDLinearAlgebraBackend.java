@@ -1234,7 +1234,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             
             for (int k = 0; k < Math.min(n, m); k++) {
                 int max = k;
-                for (int i = k + 1; i < n; i++) if (data[i * m + k].abs() > data[max * m + k].abs()) max = i;
+                for (int i = k + 1; i < n; i++) if (data[i * m + k].abs().compareTo(data[max * m + k].abs()) > 0) max = i;
                 if (k != max) {
                     for (int j = 0; j < m; j++) {
                         Complex t = data[k * m + j]; data[k * m + j] = data[max * m + j]; data[max * m + j] = t;
@@ -1244,7 +1244,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 
                 uData[k * n + k] = data[k * m + k];
                 for (int i = k + 1; i < n; i++) {
-                    if (uData[k * n + k].abs() > 1e-18) {
+                    if (uData[k * n + k].abs().doubleValue() > 1e-18) {
                         lData[i * n + k] = data[i * m + k].divide(uData[k * n + k]);
                         for (int j = k + 1; j < m; j++) {
                             data[i * m + j] = data[i * m + j].subtract(lData[i * n + k].multiply(data[k * m + j]));
