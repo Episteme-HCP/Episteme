@@ -65,10 +65,11 @@ public class MPFRTranscendentalTest {
             
             // sin(pi/4)^2 + cos(pi/4)^2 should be 1.0
             Real one = s.multiply(s).add(c.multiply(c));
-            logger.info("sin^2 + cos^2 = {}", one);
+            String oneStr = one.toString();
+            logger.info("sin^2 + cos^2 = {}", oneStr);
             
             assertThat(one.doubleValue()).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-15));
-            assertTrue(one.toString().startsWith("1.0000000000"), "Identity sin^2 + cos^2 = 1 should hold at high precision");
+            assertThat(oneStr).as("Identity sin^2 + cos^2 = 1 should hold at high precision").startsWith("1.0000000000");
             
             return null;
         });
@@ -85,10 +86,11 @@ public class MPFRTranscendentalTest {
             
             // sqrt(2) * sqrt(2) = 2
             Real res = sqrtTwo.multiply(sqrtTwo);
-            logger.info("sqrt(2)^2 = {}", res);
+            String resStr = res.toString();
+            logger.info("sqrt(2)^2 = {}", resStr);
             
             assertThat(res.doubleValue()).isCloseTo(2.0, org.assertj.core.data.Offset.offset(1e-15));
-            assertTrue(res.toString().startsWith("2.0000000000"), "sqrt(2)^2 should be 2.0 at high precision");
+            assertThat(resStr).as("sqrt(2)^2 should be 2.0 at high precision").startsWith("2.0000000000");
             
             return null;
         });
