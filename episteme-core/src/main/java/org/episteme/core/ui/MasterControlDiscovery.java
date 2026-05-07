@@ -87,7 +87,7 @@ public class MasterControlDiscovery {
 
             groupedProviders
                     .computeIfAbsent(type, k -> new TreeMap<>(java.text.Collator.getInstance()))
-                    .computeIfAbsent(provider.getCategory(), c -> new ArrayList<>())
+                    .computeIfAbsent(provider.getCategory() == null ? "General" : provider.getCategory(), c -> new ArrayList<>())
                     .add(provider);
         }
         return groupedProviders;
@@ -124,6 +124,25 @@ public class MasterControlDiscovery {
                     scanJar(file, suffix, results, processed, tccl);
                 }
             }
+        }
+
+        // --- DEVELOPMENT HEURISTIC: Scan sibling module target/classes ---
+        try {
+            java.io.File root = new java.io.File(System.getProperty("user.dir"));
+            java.io.File[] modules = root.listFiles(java.io.File::isDirectory);
+            if (modules != null) {
+                for (java.io.File module : modules) {
+                    java.io.File targetClasses = new java.io.File(module, "target/classes");
+                    if (targetClasses.exists() && targetClasses.isDirectory()) {
+                        if (!allPaths.contains(targetClasses.getAbsolutePath())) {
+                            logger.info("Found dev module path: {}", targetClasses.getAbsolutePath());
+                            scanDirectory(targetClasses, "", suffix, results, processed, tccl);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Development heuristic scan failed: {}", e.getMessage());
         }
 
         results.sort(Comparator.comparing((ClassInfo c) -> c.simpleName)

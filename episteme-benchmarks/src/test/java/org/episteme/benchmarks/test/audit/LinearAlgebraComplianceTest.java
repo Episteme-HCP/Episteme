@@ -101,12 +101,19 @@ public class LinearAlgebraComplianceTest {
                 }
                 if (!matches) continue;
             }
+            
+            // Dynamic filtering based on mode and capabilities
+            if (!isProviderSuitableForMode(prov, mode)) continue;
+
             ComplianceResult res = new ComplianceResult();
             res.providerName = prov.getName();
             res.environment = prov.getEnvironmentInfo();
             res.available = prov.isAvailable();
             
             if (prov.isAvailable()) {
+                // Verify Zero Fallback Policy
+                verifyZeroFallback(prov, res);
+
                 try {
                     if (mode == PrecisionMode.EXACT) {
                         @SuppressWarnings("unchecked")
@@ -123,7 +130,6 @@ public class LinearAlgebraComplianceTest {
                     }
                 } catch (Throwable t) {
                     System.err.println("[AuditEngine] Critical failure during audit of " + prov.getName() + ": " + t.getMessage());
-                    t.printStackTrace();
                     res.status.put("CRITICAL", "❌ " + t.getClass().getSimpleName());
                 }
             }
@@ -174,7 +180,7 @@ public class LinearAlgebraComplianceTest {
         switch (mode) {
             case FAST -> { matrixSize = 8; reportFileName = "LINEAR_ALGEBRA_AUDIT_FAST_" + timestamp + ".md"; org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.fast()); }
             case EXACT -> { 
-                matrixSize = 6; 
+                matrixSize = 12; 
                 reportFileName = "LINEAR_ALGEBRA_AUDIT_EXACT_" + timestamp + ".md"; 
                 org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.exact());
                 // Force precision well beyond 64-bit double limit for accurate audit
@@ -187,7 +193,7 @@ public class LinearAlgebraComplianceTest {
     private void runExactAudit(ComplianceResult res, LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> ref) {
         @SuppressWarnings("unchecked")
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
-        double tolerance = 1e-28; // Standard EXACT precision tolerance
+        double tolerance = 1e-28; 
         
         if (prov.isCompatible(rbRing)) {
             LinearAlgebraAuditSuite.runFullAudit(prov, ref, matrixSize, (op, test) -> auditOp(res, op, test), rbRing, "RB:", tolerance);
@@ -369,7 +375,7 @@ public class LinearAlgebraComplianceTest {
         sb.append("\n");
  
         // --- Detailed Category Tables ---
-        List<String> categories = Arrays.asList("Arithmetic", "Solvers", "Decompositions", "Rect:", "Tri:", "Vec:", "Func:", "Sparse:");
+        List<String> categories = Arrays.asList("Fallback", "Arithmetic", "Solvers", "Decompositions", "Rect:", "Tri:", "Vec:", "Func:", "Sparse:");
         Map<String, Set<String>> catToOps = new LinkedHashMap<>();
         for (String cat : categories) catToOps.put(cat, new TreeSet<>());
  
@@ -401,24 +407,29 @@ public class LinearAlgebraComplianceTest {
             
             List<String> baseOps = new ArrayList<>(entry.getValue());
             String realPrefix = (mode == PrecisionMode.EXACT) ? "RB:" : "R:";
+            if (catName.equals("Fallback")) realPrefix = "Fallback:";
             
             // Build header: Reals then Complexes
             sb.append("| Provider |");
             for (String op : baseOps) sb.append(" ").append(realPrefix).append(op).append(" |");
-            for (String op : baseOps) sb.append(" C:").append(op).append(" |");
-            sb.append("\n| :--- |").append(" :---: |".repeat(baseOps.size() * 2)).append("\n");
+            if (!catName.equals("Fallback")) {
+                for (String op : baseOps) sb.append(" C:").append(op).append(" |");
+            }
+            sb.append("\n| :--- |").append(" :---: |".repeat(baseOps.size() * (catName.equals("Fallback") ? 1 : 2))).append("\n");
  
             for (var r : results) {
                 sb.append("| ").append(r.providerName).append(" |");
-                // Real domain
+                // Real domain (or Fallback domain)
                 for (String op : baseOps) {
                     String status = r.status.getOrDefault(realPrefix + op, r.available ? OpStatus.UNSUPPORTED.toString() : OpStatus.DISABLED.toString());
                     sb.append(" ").append(status).append(" |");
                 }
-                // Complex domain
-                for (String op : baseOps) {
-                    String status = r.status.getOrDefault("C:" + op, r.available ? OpStatus.UNSUPPORTED.toString() : OpStatus.DISABLED.toString());
-                    sb.append(" ").append(status).append(" |");
+                // Complex domain (skip for Fallback)
+                if (!catName.equals("Fallback")) {
+                    for (String op : baseOps) {
+                        String status = r.status.getOrDefault("C:" + op, r.available ? OpStatus.UNSUPPORTED.toString() : OpStatus.DISABLED.toString());
+                        sb.append(" ").append(status).append(" |");
+                    }
                 }
                 sb.append("\n");
             }
@@ -462,6 +473,59 @@ public class LinearAlgebraComplianceTest {
             reportGenerated = true;
         } catch (IOException e) { 
             System.err.println("[AuditEngine] Failed to write report: " + e.getMessage());
+        }
+    }
+    private boolean isProviderSuitableForMode(LinearAlgebraProvider<?> prov, PrecisionMode mode) {
+        if (!prov.isAvailable()) return false;
+        
+        // Use MathContext to check if provider scores high for the current mode
+        org.episteme.core.mathematics.context.MathContext original = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        try {
+            switch (mode) {
+                case EXACT -> {
+                    org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.exact());
+                    double score = prov.score(org.episteme.core.technical.algorithm.OperationContext.DEFAULT);
+                    // High precision providers should have score > 1000 in exact mode
+                    return score > 1000.0;
+                }
+                case NORMAL -> {
+                    org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.normal());
+                    // Any provider supporting double or Real is suitable for NORMAL
+                    return prov.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance()) || 
+                           prov.getName().contains("Standard");
+                }
+                case FAST -> {
+                    return true; // All providers are candidates for FAST
+                }
+            }
+        } finally {
+            org.episteme.core.mathematics.context.MathContext.setCurrent(original);
+        }
+        return false;
+    }
+
+    private void verifyZeroFallback(LinearAlgebraProvider<?> prov, ComplianceResult res) {
+        // Critical methods that MUST be overridden to avoid Generic/Default fallbacks
+        String[] criticalMethods = {
+            "lu", "qr", "cholesky", "eigen", "svd", 
+            "solve", "inverse", "determinant", "solveTriangular"
+        };
+        
+        Class<?> clazz = prov.getClass();
+        for (String methodName : criticalMethods) {
+            boolean overridden = false;
+            // Check for both E and generic Matrix/Vector types
+            for (java.lang.reflect.Method m : clazz.getMethods()) {
+                if (m.getName().equals(methodName) && m.getDeclaringClass() != LinearAlgebraProvider.class) {
+                    overridden = true;
+                    break;
+                }
+            }
+            if (!overridden) {
+                res.status.put("Fallback:" + methodName, "⚠️ DEFAULT");
+            } else {
+                res.status.put("Fallback:" + methodName, "✅ NATIVE");
+            }
         }
     }
 }

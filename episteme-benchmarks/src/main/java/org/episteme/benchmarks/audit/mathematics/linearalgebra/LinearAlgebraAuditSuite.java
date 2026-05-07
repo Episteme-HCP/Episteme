@@ -217,7 +217,7 @@ public class LinearAlgebraAuditSuite {
 
     private static <E> Matrix<E> randomSPDMatrix(int n, LinearAlgebraProvider<E> p, Ring<E> ring, Random rand) {
         Matrix<E> A = randomMatrix(n, n, p, ring, rand);
-        Matrix<E> At = p.transpose(A);
+        Matrix<E> At = adjoint(A, p, ring);
         Matrix<E> res = p.multiply(A, At);
         // Diagonal boost to ensure SPD
         E boost = ring.add(ring.one(), ring.one());
@@ -239,5 +239,25 @@ public class LinearAlgebraAuditSuite {
             storage.set(i, randomElement(ring, rand, isComplex));
         }
         return new GenericVector<>(storage, p, ring);
+    }
+
+    private static <E> Matrix<E> adjoint(Matrix<E> A, LinearAlgebraProvider<E> p, Ring<E> ring) {
+        Matrix<E> T = p.transpose(A);
+        if (!(ring instanceof org.episteme.core.mathematics.sets.Complexes)) return T;
+        
+        MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(T.rows(), T.cols(), ring, 1.0);
+        for (int i = 0; i < T.rows(); i++) {
+            for (int j = 0; j < T.cols(); j++) {
+                E val = T.get(i, j);
+                if (val instanceof Complex c) {
+                    @SuppressWarnings("unchecked")
+                    E conj = (E) c.conjugate();
+                    storage.set(i, j, conj);
+                } else {
+                    storage.set(i, j, val);
+                }
+            }
+        }
+        return new GenericMatrix<>(storage, p, ring);
     }
 }
