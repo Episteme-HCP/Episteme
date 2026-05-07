@@ -2228,7 +2228,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             NativeSafe.invoke(MPFR_INIT2, denom, prec);
             NativeSafe.invoke(MPFR_MUL, denom, normA, normB, 0);
             
-            if (NativeSafe.invoke(MPFR_ZERO_P, denom) != 0) return createScalar(0.0, a);
+            if ((int) NativeSafe.invoke(MPFR_ZERO_P, denom) != 0) return createScalar(0.0, a);
             
             // cosTheta = dotR / denom
             MemorySegment cosTheta = arena.allocate(MPFR_LAYOUT); track(tracker, cosTheta);
@@ -2243,8 +2243,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             NativeSafe.invoke(MPFR_SET_SI, one, 1L, 0);
             NativeSafe.invoke(MPFR_SET_SI, minusOne, -1L, 0);
             
-            if (NativeSafe.invoke(MPFR_CMP, cosTheta, one) > 0) NativeSafe.invoke(MPFR_SET, cosTheta, one, 0);
-            if (NativeSafe.invoke(MPFR_CMP, cosTheta, minusOne) < 0) NativeSafe.invoke(MPFR_SET, cosTheta, minusOne, 0);
+            if ((int) NativeSafe.invoke(MPFR_CMP, cosTheta, one) > 0) NativeSafe.invoke(MPFR_SET, cosTheta, one, 0);
+            if ((int) NativeSafe.invoke(MPFR_CMP, cosTheta, minusOne) < 0) NativeSafe.invoke(MPFR_SET, cosTheta, minusOne, 0);
             
             // angle = acos(cosTheta)
             MemorySegment angleRes = arena.allocate(MPFR_LAYOUT); track(tracker, angleRes);
