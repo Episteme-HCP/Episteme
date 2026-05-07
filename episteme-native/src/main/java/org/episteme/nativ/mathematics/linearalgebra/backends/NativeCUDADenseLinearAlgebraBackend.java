@@ -388,7 +388,7 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             checkCuda((int) CUDA_MALLOC.invokeExact(p, size));
             MemorySegment d = p.get(ValueLayout.ADDRESS, 0);
             return tracker.track(d, ptr -> {
-                try { checkCuda((int) CUDA_FREE.invokeExact(ptr)); } catch (Throwable t) { logger.error("Failed to free GPU memory: {}", t.getMessage()); }
+                try { checkCuda((int) CUDA_FREE.invokeExact(ptr.address())); } catch (Throwable t) { logger.error("Failed to free GPU memory: {}", t.getMessage()); }
             });
         } catch (Throwable t) { throw new RuntimeException("CUDA malloc failed", t); }
     }
