@@ -843,6 +843,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 float[] bd = toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
                 float[] rd = new float[ad.length];
                 for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+                org.episteme.core.mathematics.numbers.complex.Complex[] resData = new org.episteme.core.mathematics.numbers.complex.Complex[a.rows() * a.cols()];
+                for (int i=0; i<resData.length; i++) resData[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(rd[2*i+1]));
                 org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(a.rows(), a.cols(), (E[])resData), this, ring);
                 return result;
             }
@@ -850,6 +852,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             double[] bd = toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
             double[] rd = new double[ad.length];
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
+            E[] resData = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), a.rows() * a.cols());
+            for (int i=0; i<resData.length; i++) resData[i] = (E) org.episteme.core.mathematics.numbers.complex.Complex.of(rd[2*i], rd[2*i+1]);
             org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(a.rows(), a.cols(), resData), this, ring);
             return result;
         }
