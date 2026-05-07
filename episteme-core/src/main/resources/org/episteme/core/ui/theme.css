@@ -18,7 +18,11 @@
 
 /* Labels */
 .label {
-    -fx-text-fill: #2c2c2c !important; color: #2c2c2c !important;
+    -fx-text-fill: #1a1a1a !important; color: #1a1a1a !important;
+}
+
+.text-dark {
+    -fx-text-fill: #1a1a1a !important;
 }
 
 .header-label {
@@ -26,7 +30,7 @@
     font-size: 24px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: #e65100;
+    -fx-text-fill: #bf360c !important;
 }
 
 .header-title {
@@ -34,7 +38,7 @@
     font-size: 18px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #01579b !important;
 }
 
 .header-label-white {
@@ -46,7 +50,7 @@
 }
 
 .description-label {
-    -fx-text-fill: #555555 !important; color: #555555 !important;
+    -fx-text-fill: #37474f !important; color: #37474f !important;
     -fx-font-style: italic;
     font-style: italic;
 }
@@ -245,8 +249,8 @@
 .description-label {
     -fx-font-size: 12px;
     font-size: 12px;
-    -fx-text-fill: #7f8c8d !important;
-    color: #7f8c8d !important;
+    -fx-text-fill: #37474f !important;
+    color: #37474f !important;
 }
 
 /* Dark viewer backgrounds (ONLY for content areas like sky/space, NOT for panels) */
@@ -352,6 +356,16 @@
     -fx-background-color: #ff9800; background: #ff9800;
     background-color: #ff9800;
     -fx-text-fill: white !important; color: white !important;
+}
+
+.status-connected {
+    -fx-text-fill: #1b5e20 !important;
+    -fx-font-weight: bold;
+}
+
+.status-disconnected {
+    -fx-text-fill: #b71c1c !important;
+    -fx-font-weight: bold;
 }
 
 /* TitledPane & Accordion Fixes */

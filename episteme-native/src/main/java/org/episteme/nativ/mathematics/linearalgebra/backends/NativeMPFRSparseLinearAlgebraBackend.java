@@ -1947,10 +1947,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         e1Data[0] = beta;
         Vector<E> e1 = Vector.of(e1Data, ring);
         
-        // Use GenericQR for small Hessenberg system solve as Native Dense doesn't override qr() yet.
+        // Use Native Dense QR solve
         if (hMat == null || e1 == null) throw new NullPointerException("hMat or e1 is null in solveSmallAndCheck");
-        QRResult<E> qr = GenericQR.decompose(hMat, (Field<E>) ring, (LinearAlgebraProvider<E>) SHARED_DENSE);
-        Vector<E> y = GenericQR.solve(qr, e1, (Field<E>) ring, (LinearAlgebraProvider<E>) SHARED_DENSE);
+        @SuppressWarnings("unchecked")
+        LinearAlgebraProvider<E> dense = (LinearAlgebraProvider<E>) SHARED_DENSE;
+        QRResult<E> qr = dense.qr(hMat);
+        Vector<E> y = dense.solve(qr, e1);
         
         for (int j = 0; j < k; j++) {
             MemorySegment vj = V.asSlice(j * n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize());

@@ -643,6 +643,10 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 tol = f.zero();
             }
 
+            if (a.rows() < 100) {
+                return GenericLU.solve(GenericLU.decompose(a, f, this), b, f, this);
+            }
+
             return bicgstab(a, b, org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.zeros(b.dimension(), f), tol, config.getMaxIterations());
         }
         // Rectangular solve

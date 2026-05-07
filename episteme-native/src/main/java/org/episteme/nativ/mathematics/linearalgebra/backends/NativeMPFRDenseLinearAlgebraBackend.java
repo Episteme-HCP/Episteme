@@ -1150,13 +1150,54 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             throw new RuntimeException("MPFR LU failed", t);
         }
     }
+    @Override
+    public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
+        if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
+        // LU solve: L*U*x = P*b -> L*y = P*b, U*x = y
+        Matrix<E> l = lu.getL();
+        Matrix<E> u = lu.getU();
+        Vector<E> p = lu.getP();
+        int n = l.rows();
+        
+        // Permute b
+        Object[] pbData = new Object[n];
+        for (int i = 0; i < n; i++) {
+            int pIdx = (int) getRealValue(p.get(i));
+            pbData[i] = b.get(pIdx);
+        }
+        Vector<E> pb = Vector.of(pbData, b.getScalarRing());
+        
+        // Solve L*y = pb (unit lower)
+        Vector<E> y = solveTriangular(l, pb, false, false, true);
+        // Solve U*x = y (upper)
+        return solveTriangular(u, y, true, false, false);
+    }
 
+    @Override
+    public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
+        if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
+        // QR solve: Q*R*x = b -> R*x = Q^T * b
+        Matrix<E> q = qr.getQ();
+        Matrix<E> r = qr.getR();
+        
+        // Q is orthogonal (unitary), so Q^T * b = conjugateTranspose(Q) * b
+        // For real matrices, Q^T * b.
+        Vector<E> qtB = multiply(transpose(q), b); 
+        
+        // Solve R*x = qtB (upper)
+        return solveTriangular(r, qtB, true, false, false);
+    }
 
-
-
-
-
-
+    @Override
+    public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
+        if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
+        // Cholesky solve: L*L^T*x = b -> L*y = b, L^T*x = y
+        Matrix<E> l = cholesky.getL();
+        // Solve L*y = b (lower)
+        Vector<E> y = solveTriangular(l, b, false, false, false);
+        // Solve L^T*x = y (transposed lower)
+        return solveTriangular(l, y, false, true, false);
+    }
 
 
     @SuppressWarnings("unchecked")
@@ -1431,7 +1472,70 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     }
                 }
             } else {
-                throw new UnsupportedOperationException("Transposed solveTriangular not yet implemented in MPFR Dense");
+                // Transposed substitution
+                if (upper) {
+                    // (U^T) * x = b -> Forward substitution
+                    for (int i = 0; i < n; i++) {
+                        NativeSafe.invoke(MPFR_SET, sumR, getMPFRVector(h_B, i, 0, isComplex), rnd);
+                        if (isComplex) NativeSafe.invoke(MPFR_SET, sumI, getMPFRVector(h_B, i, 1, isComplex), rnd);
+                        
+                        for (int j = 0; j < i; j++) {
+                            // sum -= A[j,i] * X[j]
+                            if (isComplex) {
+                                // conjugate if transpose means Hermitian? usually transpose means just transpose for solveTriangular
+                                // but if we want parity with BLAS/LAPACK, it depends on 'trans' param ('T' or 'C')
+                                // Let's assume standard transpose for now.
+                                complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker);
+                            } else {
+                                NativeSafe.invoke(MPFR_MUL, termR, getMPFR(h_A, j, i, n, 0, false), getMPFRVector(h_X, j, 0, false), rnd);
+                                NativeSafe.invoke(MPFR_SUB, sumR, sumR, termR, rnd);
+                            }
+                        }
+                        
+                        MemorySegment xiR = getMPFRVector(h_X, i, 0, isComplex);
+                        MemorySegment xiI = isComplex ? getMPFRVector(h_X, i, 1, true) : null;
+                        
+                        if (!unit) {
+                            if (isComplex) {
+                                complexDivide(xiR, xiI, sumR, sumI, getMPFR(h_A, i, i, n, 0, true), getMPFR(h_A, i, i, n, 1, true), (int) prec, arena, tracker);
+                            } else {
+                                NativeSafe.invoke(MPFR_DIV, xiR, sumR, getMPFR(h_A, i, i, n, 0, false), rnd);
+                            }
+                        } else {
+                            NativeSafe.invoke(MPFR_SET, xiR, sumR, rnd);
+                            if (isComplex) NativeSafe.invoke(MPFR_SET, xiI, sumI, rnd);
+                        }
+                    }
+                } else {
+                    // (L^T) * x = b -> Backward substitution
+                    for (int i = n - 1; i >= 0; i--) {
+                        NativeSafe.invoke(MPFR_SET, sumR, getMPFRVector(h_B, i, 0, isComplex), rnd);
+                        if (isComplex) NativeSafe.invoke(MPFR_SET, sumI, getMPFRVector(h_B, i, 1, isComplex), rnd);
+                        
+                        for (int j = i + 1; j < n; j++) {
+                            if (isComplex) {
+                                complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker);
+                            } else {
+                                NativeSafe.invoke(MPFR_MUL, termR, getMPFR(h_A, j, i, n, 0, false), getMPFRVector(h_X, j, 0, false), rnd);
+                                NativeSafe.invoke(MPFR_SUB, sumR, sumR, termR, rnd);
+                            }
+                        }
+                        
+                        MemorySegment xiR = getMPFRVector(h_X, i, 0, isComplex);
+                        MemorySegment xiI = isComplex ? getMPFRVector(h_X, i, 1, true) : null;
+                        
+                        if (!unit) {
+                            if (isComplex) {
+                                complexDivide(xiR, xiI, sumR, sumI, getMPFR(h_A, i, i, n, 0, true), getMPFR(h_A, i, i, n, 1, true), (int) prec, arena, tracker);
+                            } else {
+                                NativeSafe.invoke(MPFR_DIV, xiR, sumR, getMPFR(h_A, i, i, n, 0, false), rnd);
+                            }
+                        } else {
+                            NativeSafe.invoke(MPFR_SET, xiR, sumR, rnd);
+                            if (isComplex) NativeSafe.invoke(MPFR_SET, xiI, sumI, rnd);
+                        }
+                    }
+                }
             }
             
             return backToVector_internal(h_X, n, arena, A.getScalarRing(), isComplex);
