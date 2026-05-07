@@ -1160,10 +1160,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         int n = l.rows();
         
         // Permute b
-        Object[] pbData = new Object[n];
+        java.util.List<E> pbData = new java.util.ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             int pIdx = (int) getRealValue(p.get(i));
-            pbData[i] = b.get(pIdx);
+            pbData.add(b.get(pIdx));
         }
         Vector<E> pb = Vector.of(pbData, b.getScalarRing());
         

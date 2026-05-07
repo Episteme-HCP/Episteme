@@ -1512,17 +1512,17 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 throw new UnsupportedOperationException("Transposed triangular solve not yet optimized for Sparse MPFR");
             }
 
-            Object[] resArr = new Object[n];
+            java.util.List<E> resList = new java.util.ArrayList<>(n);
             for (int i = 0; i < n; i++) {
                 if (isComplex) {
                     Real re = readMPFR(h_x.asSlice(i * 2 * layoutSize, MPFR_LAYOUT), arena);
                     Real im = readMPFR(h_x.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), arena);
-                    resArr[i] = (E) (Object) Complex.of(re, im);
+                    resList.add((E) (Object) Complex.of(re, im));
                 } else {
-                    resArr[i] = (E) (Object) readMPFR(h_x.asSlice(i * layoutSize, MPFR_LAYOUT), arena);
+                    resList.add((E) (Object) readMPFR(h_x.asSlice(i * layoutSize, MPFR_LAYOUT), arena));
                 }
             }
-            return Vector.of(java.util.Arrays.asList((E[])resArr), ring);
+            return Vector.of(resList, ring);
         } catch (Throwable t) {
             throw new RuntimeException("Sparse MPFR triangular solve failed", t);
         }
@@ -1945,7 +1945,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         E[] e1Data = (E[]) java.lang.reflect.Array.newInstance(elemClass, k + 1);
         java.util.Arrays.fill(e1Data, isComplex ? (E)Complex.ZERO : ring.zero());
         e1Data[0] = beta;
-        Vector<E> e1 = Vector.of(e1Data, ring);
+        Vector<E> e1 = Vector.of(java.util.Arrays.asList(e1Data), ring);
         
         // Use Native Dense QR solve
         if (hMat == null || e1 == null) throw new NullPointerException("hMat or e1 is null in solveSmallAndCheck");
@@ -2014,20 +2014,18 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
 
     private Vector<E> backToVector(MemorySegment h_x, int n, boolean isComplex, Ring<E> ring, Arena arena) throws Throwable {
-        E[] resultArr = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n);
+        java.util.List<E> resultList = new java.util.ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             if (isComplex) {
                 Real re = readMPFR(h_x.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
                 Real im = readMPFR(h_x.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
-                resultArr[i] = (E) (Object) Complex.of(re, im);
+                resultList.add((E) (Object) Complex.of(re, im));
             } else {
                 Real res = readMPFR(h_x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), arena);
-                resultArr[i] = castScalar(res, ring);
+                resultList.add(castScalar(res, ring));
             }
         }
-        @SuppressWarnings("unchecked")
-        Vector<E> resVec = Vector.of((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(resultArr), ring);
-        return resVec;
+        return Vector.of(resultList, ring);
     }
 
 

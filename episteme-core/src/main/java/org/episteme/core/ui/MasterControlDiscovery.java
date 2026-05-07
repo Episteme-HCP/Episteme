@@ -65,6 +65,15 @@ public class MasterControlDiscovery {
         } catch (Throwable e) {
             logger.error("Error loading providers via SPI", e);
         }
+        
+        // Diagnostic output to root
+        try {
+            java.nio.file.Files.writeString(java.nio.file.Path.of("discovery_diag.txt"), 
+                "Discovered Viewers: " + results.size() + "\n" +
+                results.stream().map(v -> v.getClass().getName()).collect(java.util.stream.Collectors.joining("\n")),
+                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (Exception ex) {}
+        
         return results;
     }
 
