@@ -764,7 +764,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
     }
 
     @Override
-    public E trace(Matrix<E> A) {
+    public E trace(org.episteme.core.mathematics.linearalgebra.Matrix<E> A) {
         if (A.rows() != A.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = A.rows();
         Ring<E> ring = A.getScalarRing();

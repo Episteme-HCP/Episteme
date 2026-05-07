@@ -74,6 +74,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     private static final MethodHandle SDOT_HANDLE;
     private static final MethodHandle SNRM2_HANDLE;
     private static final MethodHandle SSCAL_HANDLE;
+    private static final MethodHandle SGESV_HANDLE;
+    private static final MethodHandle SGETRF_HANDLE;
 
     // Complex Double (Z)
     private static final MethodHandle ZGEMM_HANDLE;
@@ -81,6 +83,14 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     private static final MethodHandle ZDOTC_HANDLE;
     private static final MethodHandle ZNRM2_HANDLE;
     private static final MethodHandle ZSCAL_HANDLE;
+    private static final MethodHandle ZGESV_HANDLE;
+    private static final MethodHandle ZGETRF_HANDLE;
+    private static final MethodHandle ZGETRI_HANDLE;
+    private static final MethodHandle ZHEEV_HANDLE;
+    private static final MethodHandle ZPOTRF_HANDLE;
+    private static final MethodHandle ZGEQRF_HANDLE;
+    private static final MethodHandle ZUNGQR_HANDLE;
+    private static final MethodHandle ZGESVD_HANDLE;
 
     // Complex Float (C)
     private static final MethodHandle CGEMM_HANDLE;
@@ -88,6 +98,14 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     private static final MethodHandle CDOTC_HANDLE;
     private static final MethodHandle CNRM2_HANDLE;
     private static final MethodHandle CSCAL_HANDLE;
+    private static final MethodHandle CGESV_HANDLE;
+    private static final MethodHandle CGETRF_HANDLE;
+    private static final MethodHandle CGETRI_HANDLE;
+    private static final MethodHandle CHEEV_HANDLE;
+    private static final MethodHandle CPOTRF_HANDLE;
+    private static final MethodHandle CGEQRF_HANDLE;
+    private static final MethodHandle CUNGQR_HANDLE;
+    private static final MethodHandle CGESVD_HANDLE;
     
     private static final boolean AVAILABLE;
 
@@ -117,9 +135,9 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         MethodHandle dgesvd = null;
         MethodHandle dgels = null;
 
-        MethodHandle sgemm = null, sgemv = null, sdot = null, snrm2 = null, sscal = null;
-        MethodHandle zgemm = null, zgemv = null, zdotc = null, znrm2 = null, zscal = null;
-        MethodHandle cgemm = null, cgemv = null, cdotc = null, cnrm2 = null, cscal = null;
+        MethodHandle sgemm = null, sgemv = null, sdot = null, snrm2 = null, sscal = null, sgesv = null, sgetrf = null;
+        MethodHandle zgemm = null, zgemv = null, zdotc = null, znrm2 = null, zscal = null, zgesv = null, zgetrf = null, zgetri = null, zheev = null, zpotrf = null, zgeqrf = null, zungqr = null, zgesvd = null;
+        MethodHandle cgemm = null, cgemv = null, cdotc = null, cnrm2 = null, cscal = null, cgesv = null, cgetrf = null, cgetri = null, cheev = null, cpotrf = null, cgeqrf = null, cungqr = null, cgesvd = null;
         
         boolean avail = false;
 
@@ -236,8 +254,47 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
                 avail = (dgemm != null || dgemv != null);
                 
-                // LAPACKE S/Z/C variants
-                NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "sgesv_", "lapack_sgesv").ifPresent(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT)));
+                // --- Single Precision (S) LAPACK ---
+                sgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "sgesv_", "lapack_sgesv")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                sgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgetrf", "sgetrf", "sgetrf_", "lapack_sgetrf")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+
+                // --- Complex Double (Z) LAPACK ---
+                zgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "zgesv_", "lapack_zgesv")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                zgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetrf", "zgetrf", "zgetrf_", "lapack_zgetrf")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                zgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetri", "zgetri", "zgetri_", "lapack_zgetri")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                zheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zheev", "zheev", "zheev_", "lapack_zheev")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                zpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zpotrf", "zpotrf", "zpotrf_", "lapack_zpotrf")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                zgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgeqrf", "zgeqrf", "zgeqrf_", "lapack_zgeqrf")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                zungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zungqr", "zungqr", "zungqr_", "lapack_zungqr")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                zgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesvd", "zgesvd", "zgesvd_", "lapack_zgesvd")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+
+                // --- Complex Float (C) LAPACK ---
+                cgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "cgesv_", "lapack_cgesv")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                cgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetrf", "cgetrf", "cgetrf_", "lapack_cgetrf")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                cgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetri", "cgetri", "cgetri_", "lapack_cgetri")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                cheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cheev", "cheev", "cheev_", "lapack_cheev")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                cpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cpotrf", "cpotrf", "cpotrf_", "lapack_cpotrf")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                cgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgeqrf", "cgeqrf", "cgeqrf_", "lapack_cgeqrf")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                cungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cungqr", "cungqr", "cungqr_", "lapack_cungqr")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                cgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesvd", "cgesvd", "cgesvd_", "lapack_cgesvd")
+                    .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
             }
         } catch (Throwable t) {
             logger.log(System.Logger.Level.DEBUG, "Native CPU initialization failed: " + t.getMessage());
@@ -262,23 +319,36 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         DGESVD_HANDLE = dgesvd;
         DGELS_HANDLE = dgels;
 
-        SGEMM_HANDLE = sgemm;
-        SGEMV_HANDLE = sgemv;
-        SDOT_HANDLE = sdot;
-        SNRM2_HANDLE = snrm2;
-        SSCAL_HANDLE = sscal;
+        SGESV_HANDLE = sgesv;
+        SGETRF_HANDLE = sgetrf;
 
         ZGEMM_HANDLE = zgemm;
         ZGEMV_HANDLE = zgemv;
         ZDOTC_HANDLE = zdotc;
         ZNRM2_HANDLE = znrm2;
         ZSCAL_HANDLE = zscal;
+        ZGESV_HANDLE = zgesv;
+        ZGETRF_HANDLE = zgetrf;
+        ZGETRI_HANDLE = zgetri;
+        ZHEEV_HANDLE = zheev;
+        ZPOTRF_HANDLE = zpotrf;
+        ZGEQRF_HANDLE = zgeqrf;
+        ZUNGQR_HANDLE = zungqr;
+        ZGESVD_HANDLE = zgesvd;
 
         CGEMM_HANDLE = cgemm;
         CGEMV_HANDLE = cgemv;
         CDOTC_HANDLE = cdotc;
         CNRM2_HANDLE = cnrm2;
         CSCAL_HANDLE = cscal;
+        CGESV_HANDLE = cgesv;
+        CGETRF_HANDLE = cgetrf;
+        CGETRI_HANDLE = cgetri;
+        CHEEV_HANDLE = cheev;
+        CPOTRF_HANDLE = cpotrf;
+        CGEQRF_HANDLE = cgeqrf;
+        CUNGQR_HANDLE = cungqr;
+        CGESVD_HANDLE = cgesvd;
         
         // Broadened availability check
         AVAILABLE = avail;
@@ -472,6 +542,21 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     public int dgesvd(byte jobu, byte jobvt, int m, int n, DoubleBuffer A, int lda, DoubleBuffer S, DoubleBuffer U, int ldu, DoubleBuffer VT, int ldvt, DoubleBuffer superb) {
         if (!AVAILABLE || DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesvd not available");
         return (int) NativeSafe.invoke(DGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
+    }
+
+    public int zgeqrf(int m, int n, DoubleBuffer A, int lda, DoubleBuffer tau) {
+        if (!AVAILABLE || ZGEQRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK zgeqrf not available");
+        return (int) NativeSafe.invoke(ZGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), n, MemorySegment.ofBuffer(tau));
+    }
+
+    public int zungqr(int m, int n, int k, DoubleBuffer A, int lda, DoubleBuffer tau) {
+        if (!AVAILABLE || ZUNGQR_HANDLE == null) throw new UnsupportedOperationException("LAPACK zungqr not available");
+        return (int) NativeSafe.invoke(ZUNGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+    }
+
+    public int zgesvd(byte jobu, byte jobvt, int m, int n, DoubleBuffer A, int lda, DoubleBuffer S, DoubleBuffer U, int ldu, DoubleBuffer VT, int ldvt, DoubleBuffer superb) {
+        if (!AVAILABLE || ZGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACK zgesvd not available");
+        return (int) NativeSafe.invoke(ZGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
     }
 
     public int dgels(char trans, int m, int n, int nrhs, DoubleBuffer A, int lda, DoubleBuffer B, int ldb) {
@@ -779,9 +864,9 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
         Ring<E> ring = a.getScalarRing();
+        int rows = a.rows();
+        int cols = a.cols();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            int rows = a.rows();
-            int cols = a.cols();
             double[] ad = toDoubleArray((Matrix<Real>)(Object)a);
             double[] bd = toDoubleArray((Matrix<Real>)(Object)b);
             double[] rd = new double[ad.length];
@@ -789,6 +874,14 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             @SuppressWarnings("unchecked")
             Matrix<E> result = (Matrix<E>)(Object) RealDoubleMatrix.of(rd, rows, cols);
             return result;
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            double[] ad = toComplexDoubleArray((Matrix<Complex>)(Object)a);
+            double[] bd = toComplexDoubleArray((Matrix<Complex>)(Object)b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+            E[] resData = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
+            for (int i=0; i<rows*cols; i++) resData[i] = (E) Complex.of(rd[2*i], rd[2*i+1]);
+            return new GenericMatrix<>(new DenseMatrixStorage<>(rows, cols, resData), this, ring);
         }
         throw new UnsupportedOperationException("Unsupported ring type for NativeCPU subtract: " + ring.getClass().getName());
     }
@@ -920,13 +1013,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public Matrix<E> inverse(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int n = a.rows();
+        int m = a.cols();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
             if (!AVAILABLE) throw new UnsupportedOperationException(getName() + ": inverse() not available");
-            int m = a.rows();
-            int n = a.cols();
-            if (m != n) {
-                return pseudoInverse(a);
-            }
+            if (n != m) return pseudoInverse(a);
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
@@ -940,8 +1031,68 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] invData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 return (Matrix<E>)(Object) RealDoubleMatrix.of(invData, n, n);
             }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZGETRF_HANDLE == null || ZGETRI_HANDLE == null) throw new UnsupportedOperationException("ZGETRF/ZGETRI not available");
+            if (n != m) return pseudoInverse(a);
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                
+                int info = (int) NativeSafe.invoke(ZGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
+                if (info != 0) throw new ArithmeticException("Matrix is singular or zgetrf failed: " + info);
+                
+                info = (int) NativeSafe.invoke(ZGETRI_HANDLE, LAPACK_ROW_MAJOR, n, aSeg, n, ipiv);
+                if (info != 0) throw new ArithmeticException("zgetri failed: " + info);
+                
+                double[] invData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                Complex[] complexRes = new Complex[n * n];
+                for (int i=0; i<n*n; i++) complexRes[i] = Complex.of(invData[2*i], invData[2*i+1]);
+                return new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexRes), this, ring);
+            }
         }
         throw new UnsupportedOperationException("NativeCPU inverse failed or not available");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square for solve()");
+        if (a.rows() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+
+        Ring<E> ring = a.getScalarRing();
+        int n = a.rows();
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (DGESV_HANDLE == null) throw new UnsupportedOperationException("DGESV not available");
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<Real>)(Object)b));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                
+                int info = (int) NativeSafe.invoke(DGESV_HANDLE, LAPACK_ROW_MAJOR, n, 1, aSeg, n, ipiv, bSeg, 1);
+                if (info < 0) throw new IllegalArgumentException("DGESV: Illegal value at " + (-info));
+                if (info > 0) throw new ArithmeticException("DGESV: Matrix is singular (U(" + info + "," + info + ") is zero)");
+                
+                double[] res = bSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                return (Vector<E>)(Object) RealDoubleVector.of(res);
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZGESV_HANDLE == null) throw new UnsupportedOperationException("ZGESV not available");
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
+                MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<Complex>)(Object)b));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                
+                int info = (int) NativeSafe.invoke(ZGESV_HANDLE, LAPACK_ROW_MAJOR, n, 1, aSeg, n, ipiv, bSeg, 1);
+                if (info < 0) throw new IllegalArgumentException("ZGESV: Illegal value at " + (-info));
+                if (info > 0) throw new ArithmeticException("ZGESV: Matrix is singular");
+                
+                double[] res = bSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                Complex[] complexRes = new Complex[n];
+                for (int i=0; i<n; i++) complexRes[i] = Complex.of(res[2*i], res[2*i+1]);
+                return Vector.of(java.util.Arrays.asList(complexRes), (Ring<Complex>)(Object)ring);
+            }
+        }
+        throw new UnsupportedOperationException("Unsupported ring for NativeCPU solve: " + ring.getClass().getName());
     }
 
     @SuppressWarnings("unchecked")
@@ -973,9 +1124,9 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public Matrix<E> transpose(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int m = a.rows();
+        int n = a.cols();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            int m = a.rows();
-            int n = a.cols();
             double[] data = toDoubleArray((Matrix<Real>)(Object)a);
             double[] res = new double[n * m];
             
@@ -990,8 +1141,20 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
             }
             return (Matrix<E>)(Object) RealDoubleMatrix.of(res, n, m);
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            double[] data = toComplexDoubleArray((Matrix<Complex>)(Object)a);
+            double[] resData = new double[2 * n * m];
+            for (int i=0; i<m; i++) {
+                for (int j=0; j<n; j++) {
+                    resData[2*(j*m + i)] = data[2*(i*n + j)];
+                    resData[2*(j*m + i) + 1] = data[2*(i*n + j) + 1];
+                }
+            }
+            Complex[] complexRes = new Complex[n * m];
+            for (int i=0; i<n*m; i++) complexRes[i] = Complex.of(resData[2*i], resData[2*i+1]);
+            return new GenericMatrix<>(new DenseMatrixStorage<>(n, m, complexRes), this, ring);
         }
-        throw new UnsupportedOperationException("NativeCPU transpose failed or not available");
+        throw new UnsupportedOperationException("NativeCPU transpose failed or not available for ring " + ring.getClass().getName());
     }
 
 
@@ -999,32 +1162,42 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            if (!AVAILABLE || DGETRF_HANDLE == null || a.rows() != a.cols()) throw new UnsupportedOperationException(getName() + ": determinant not available");
-
-            int n = a.rows();
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
-                
                 int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
-                if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-                if (info > 0) return ring.zero(); // Singular matrix
+                if (info < 0) throw new IllegalArgumentException("DGETRF: Illegal value at " + (-info));
+                if (info > 0) return ring.zero();
                 
-                double[] luData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 double det = 1.0;
+                double[] luData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 for (int i = 0; i < n; i++) {
                     det *= luData[i * n + i];
+                    if (ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != (i + 1)) det = -det;
                 }
+                return (E) Real.of(det);
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZGETRF_HANDLE == null) throw new UnsupportedOperationException("ZGETRF not available");
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                int info = (int) NativeSafe.invoke(ZGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
+                if (info < 0) throw new IllegalArgumentException("ZGETRF: Illegal value at " + (-info));
+                if (info > 0) return ring.zero();
                 
-                int swaps = 0;
+                Complex det = Complex.ONE;
+                double[] luData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 for (int i = 0; i < n; i++) {
-                    if (ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != (i + 1)) {
-                        swaps++;
-                    }
+                    Complex diag = Complex.of(luData[2*(i * n + i)], luData[2*(i * n + i) + 1]);
+                    det = det.multiply(diag);
+                    if (ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != (i + 1)) det = det.negate();
                 }
-                if (swaps % 2 != 0) det = -det;
-                return createScalar(det, a);
+                return (E) det;
             }
         }
         throw new UnsupportedOperationException("NativeCPU determinant failed or not available");
@@ -1034,55 +1207,96 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int n = a.rows();
+        int m = a.cols();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            if (AVAILABLE && a.rows() == a.cols()) {
-                int n = a.rows();
-                try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
-                    MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
-                    
-                    int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
-                    if (info < 0) throw new IllegalArgumentException("Illegal argument to dgetrf: " + info);
-                    
-                    double[] luArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                    double[] lData = new double[n * n];
-                    double[] uData = new double[n * n];
-                    
-                    for (int i = 0; i < n; i++) {
-                        for (int j = 0; j < n; j++) {
-                            double val = luArr[i * n + j];
-                            if (i > j) {
-                                lData[i * n + j] = val;
-                                uData[i * n + j] = 0.0;
-                            } else if (i == j) {
-                                lData[i * n + j] = 1.0;
-                                uData[i * n + j] = val;
-                            } else {
-                                lData[i * n + j] = 0.0;
-                                uData[i * n + j] = val;
-                            }
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(n, m));
+                int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, m, aSeg, Math.max(n, m), ipiv);
+                if (info < 0) throw new IllegalArgumentException("DGETRF failed: " + info);
+                
+                double[] luArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                double[] lData = new double[n * n];
+                double[] uData = new double[n * n];
+                
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        double val = luArr[i * n + j];
+                        if (i > j) {
+                            lData[i * n + j] = val;
+                            uData[i * n + j] = 0.0;
+                        } else if (i == j) {
+                            lData[i * n + j] = 1.0;
+                            uData[i * n + j] = val;
+                        } else {
+                            lData[i * n + j] = 0.0;
+                            uData[i * n + j] = val;
                         }
                     }
-                    
-                    double[] pData = new double[n];
-                    if (n > 0) {
-                        for (int i = 0; i < n; i++) pData[i] = i;
-                        for (int i = 0; i < n; i++) {
-                            int ip = ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) - 1;
-                            if (ip != i) {
-                                double tmp = pData[i];
-                                pData[i] = pData[ip];
-                                pData[ip] = tmp;
-                            }
-                        }
-                    }
-                    
-                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
-                        (Matrix<E>)(Object) RealDoubleMatrix.of(lData, n, n),
-                        (Matrix<E>)(Object) RealDoubleMatrix.of(uData, n, n),
-                        (Vector<E>)(Object) RealDoubleVector.of(pData)
-                    );
                 }
+                
+                double[] pData = new double[n];
+                for (int i = 0; i < n; i++) pData[i] = i;
+                for (int i = 0; i < Math.min(n, m); i++) {
+                    int ip = ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) - 1;
+                    if (ip != i) {
+                        double tmp = pData[i];
+                        pData[i] = pData[ip];
+                        pData[ip] = tmp;
+                    }
+                }
+                
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
+                    (Matrix<E>)(Object) RealDoubleMatrix.of(lData, n, n),
+                    (Matrix<E>)(Object) RealDoubleMatrix.of(uData, n, n),
+                    (Vector<E>)(Object) RealDoubleVector.of(pData)
+                );
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZGETRF_HANDLE == null) throw new UnsupportedOperationException("ZGETRF not available");
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
+                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(n, m));
+                int info = (int) NativeSafe.invoke(ZGETRF_HANDLE, LAPACK_ROW_MAJOR, n, m, aSeg, Math.max(n, m), ipiv);
+                if (info < 0) throw new IllegalArgumentException("ZGETRF failed: " + info);
+                
+                double[] luArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                Complex[] lData = new Complex[n * n];
+                Complex[] uData = new Complex[n * n];
+                
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        Complex val = Complex.of(luArr[2*(i * n + j)], luArr[2*(i * n + j) + 1]);
+                        if (i > j) {
+                            lData[i * n + j] = val;
+                            uData[i * n + j] = Complex.ZERO;
+                        } else if (i == j) {
+                            lData[i * n + j] = Complex.ONE;
+                            uData[i * n + j] = val;
+                        } else {
+                            lData[i * n + j] = Complex.ZERO;
+                            uData[i * n + j] = val;
+                        }
+                    }
+                }
+                
+                Complex[] pData = new Complex[n];
+                for (int i = 0; i < n; i++) pData[i] = Complex.of(i);
+                for (int i = 0; i < Math.min(n, m); i++) {
+                    int ip = ipiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) - 1;
+                    if (ip != i) {
+                        Complex tmp = pData[i];
+                        pData[i] = pData[ip];
+                        pData[ip] = tmp;
+                    }
+                }
+                
+                Matrix<E> L = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, lData), this, ring);
+                Matrix<E> U = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, uData), this, ring);
+                Vector<E> P = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(pData), ring);
+
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(L, U, P);
             }
         }
         throw new UnsupportedOperationException("NativeCPU LU failed or not available");
@@ -1092,28 +1306,52 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            if (AVAILABLE && a.rows() == a.cols()) {
-                int n = a.rows();
-                try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
-                    MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
-                    
-                    int info = (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
-                    if (info < 0) throw new IllegalArgumentException("Illegal argument to dsyev: " + info);
-                    if (info > 0) throw new ArithmeticException("Eigenvalue decomposition failed to converge");
-                    
-                    double[] wData = wSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                    double[] evData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                    
-                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
-                        (Matrix<E>)(Object) RealDoubleMatrix.of(evData, n, n),
-                        (Vector<E>)(Object) RealDoubleVector.of(wData)
-                    );
-                }
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
+                MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+                
+                int info = (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
+                if (info < 0) throw new IllegalArgumentException("DSYEV failed: " + info);
+                if (info > 0) throw new ArithmeticException("Eigenvalue decomposition failed to converge");
+                
+                double[] wData = wSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                double[] vData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
+                    (Matrix<E>)(Object) RealDoubleMatrix.of(vData, n, n),
+                    (Vector<E>)(Object) RealDoubleVector.of(wData)
+                );
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZHEEV_HANDLE == null) throw new UnsupportedOperationException("ZHEEV not available");
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
+                MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+                
+                int info = (int) NativeSafe.invoke(ZHEEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
+                if (info < 0) throw new IllegalArgumentException("ZHEEV failed: " + info);
+                if (info > 0) throw new ArithmeticException("ZHEEV failed to converge");
+                
+                double[] wData = wSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                double[] vArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                
+                Complex[] complexV = new Complex[n * n];
+                for (int i=0; i<n*n; i++) complexV[i] = Complex.of(vArr[2*i], vArr[2*i+1]);
+                
+                Complex[] complexW = new Complex[n];
+                for (int i=0; i<n; i++) complexW[i] = Complex.of(wData[i]); // Eigenvalues of Hermitian are real
+                
+                Matrix<E> V = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexV), this, ring);
+                Vector<E> W = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(complexW), ring);
+
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(V, W);
             }
         }
-        throw new UnsupportedOperationException("NativeCPU Eigen failed or not available");
+        throw new UnsupportedOperationException("NativeCPU eigen failed or not available");
     }
 
 
@@ -1124,30 +1362,48 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
-            if (AVAILABLE && a.rows() == a.cols()) {
-                int n = a.rows();
-                try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
-                    
-                    int info = (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, n);
-                    if (info < 0) throw new IllegalArgumentException("Illegal argument to dpotrf: " + info);
-                    if (info > 0) throw new ArithmeticException("Matrix is not positive definite (info=" + info + ")");
-                    
-                    double[] data = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                    // Zero out upper part
-                    for (int i = 0; i < n; i++) {
-                        for (int j = i + 1; j < n; j++) {
-                            data[i * n + j] = 0.0;
-                        }
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
+                int info = (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, n);
+                if (info < 0) throw new IllegalArgumentException("DPOTRF failed: " + info);
+                if (info > 0) throw new ArithmeticException("Matrix is not positive definite (info=" + info + ")");
+                
+                double[] lArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                RealDoubleMatrix L = RealDoubleMatrix.direct(n, n);
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j <= i; j++) {
+                        L.set(i, j, Real.of(lArr[i * n + j]));
                     }
-                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
-                        (Matrix<E>)(Object) RealDoubleMatrix.of(data, n, n)
-                    );
                 }
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>((Matrix<E>)(Object)L);
+            }
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZPOTRF_HANDLE == null) throw new UnsupportedOperationException("ZPOTRF not available");
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
+                int info = (int) NativeSafe.invoke(ZPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, n);
+                if (info < 0) throw new IllegalArgumentException("ZPOTRF failed: " + info);
+                if (info > 0) throw new ArithmeticException("Matrix is not positive definite");
+                
+                double[] lArr = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
+                Complex[] complexL = new Complex[n * n];
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j <= i; j++) {
+                        complexL[i * n + j] = Complex.of(lArr[2*(i * n + j)], lArr[2*(i * n + j) + 1]);
+                    }
+                    for (int j = i + 1; j < n; j++) {
+                        complexL[i * n + j] = Complex.ZERO;
+                    }
+                }
+                Matrix<E> L = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexL), this, ring);
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(L);
             }
         }
-        throw new UnsupportedOperationException("NativeCPU Cholesky failed or not available");
+        throw new UnsupportedOperationException("NativeCPU cholesky failed or not available");
     }
     @Override
     @SuppressWarnings("unchecked")
@@ -1547,23 +1803,22 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int m = a.rows();
+        int n = a.cols();
+        int k = Math.min(m, n);
+
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
             if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException(getName() + ": QR not available");
-            int m = a.rows();
-            int n = a.cols();
-            int k = Math.min(m, n);
 
-            RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); // Used temporarily to hold A
+            RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); 
             qMat.getBuffer().put(toDoubleArray((Matrix<Real>)(Object)a));
             qMat.getBuffer().position(0);
 
             DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 8)
                 .order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
 
-            // 1. DGEQRF
             int info = dgeqrf(m, n, qMat.getBuffer(), n, tau);
             if (info == 0) {
-                // 2. Extract R
                 double[] rData = new double[k * n];
                 double[] aFactored = qMat.toDoubleArray();
                 for (int i = 0; i < k; i++) {
@@ -1573,7 +1828,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
                 Matrix<E> R = (Matrix<E>)(Object) RealDoubleMatrix.of(rData, k, n);
 
-                // 3. DORGQR (Economy Q: m x k)
                 info = dorgqr(m, k, k, qMat.getBuffer(), n, tau);
                 if (info == 0) {
                     double[] qDataFull = qMat.toDoubleArray();
@@ -1584,11 +1838,53 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                         }
                     }
                     Matrix<E> Q = (Matrix<E>)(Object) RealDoubleMatrix.of(qDataEconomy, m, k);
-
                     return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
                 }
             }
             throw new ArithmeticException("Native QR failed with info: " + info);
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZGEQRF_HANDLE == null || ZUNGQR_HANDLE == null) throw new UnsupportedOperationException("ZGEQRF/ZUNGQR not available");
+            
+            double[] aData = toComplexDoubleArray((Matrix<Complex>)(Object)a);
+            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 16).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            aBuf.put(aData); aBuf.flip();
+
+            DoubleBuffer tau = java.nio.ByteBuffer.allocateDirect(k * 16).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+
+            int info = zgeqrf(m, n, aBuf, n, tau);
+            if (info == 0) {
+                double[] rDataArr = new double[2 * k * n];
+                aBuf.get(rDataArr);
+                aBuf.flip();
+                
+                Complex[] complexR = new Complex[k * n];
+                for (int i = 0; i < k; i++) {
+                    for (int j = 0; j < n; j++) {
+                        if (j >= i) {
+                            complexR[i * n + j] = Complex.of(rDataArr[2*(i * n + j)], rDataArr[2*(i * n + j) + 1]);
+                        } else {
+                            complexR[i * n + j] = Complex.ZERO;
+                        }
+                    }
+                }
+                Matrix<E> R = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(k, n, complexR), this, ring);
+
+                info = zungqr(m, k, k, aBuf, n, tau);
+                if (info == 0) {
+                    double[] qDataArr = new double[2 * m * n];
+                    aBuf.get(qDataArr);
+                    
+                    Complex[] complexQ = new Complex[m * k];
+                    for (int i = 0; i < m; i++) {
+                        for (int j = 0; j < k; j++) {
+                            complexQ[i * k + j] = Complex.of(qDataArr[2*(i * n + j)], qDataArr[2*(i * n + j) + 1]);
+                        }
+                    }
+                    Matrix<E> Q = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, k, complexQ), this, ring);
+                    return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
+                }
+            }
+            throw new ArithmeticException("Native ZQR failed with info: " + info);
         }
         throw new UnsupportedOperationException("NativeCPU QR failed or not available");
     }
@@ -1597,10 +1893,10 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
+        int m = a.rows();
+        int n = a.cols();
         if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
             if (AVAILABLE) {
-                int m = a.rows();
-                int n = a.cols();
                 if (DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACKE dgesvd not available");
                 
                 boolean transposed = false;
@@ -1649,7 +1945,60 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
             }
-            throw new UnsupportedOperationException(getName() + ": svd() not available");
+        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+            if (ZGESVD_HANDLE == null) throw new UnsupportedOperationException("ZGESVD not available");
+            
+            boolean transposed = false;
+            Matrix<Complex> workA = (Matrix<Complex>)(Object)a;
+            if (m < n) {
+                transposed = true;
+                workA = workA.transpose();
+                int tmp = m; m = n; n = tmp;
+            }
+            int k = Math.min(m, n);
+            double[] aData = toComplexDoubleArray(workA);
+            
+            DoubleBuffer aBuf = java.nio.ByteBuffer.allocateDirect(m * n * 16).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            aBuf.put(aData); aBuf.flip();
+            
+            DoubleBuffer sBuf = java.nio.ByteBuffer.allocateDirect(k * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer uBuf = java.nio.ByteBuffer.allocateDirect(m * m * 16).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer vtBuf = java.nio.ByteBuffer.allocateDirect(n * n * 16).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            DoubleBuffer superb = java.nio.ByteBuffer.allocateDirect(Math.max(1, k - 1) * 8).order(java.nio.ByteOrder.nativeOrder()).asDoubleBuffer();
+            
+            int info = zgesvd((byte)'A', (byte)'A', m, n, aBuf, n, sBuf, uBuf, m, vtBuf, n, superb);
+            if (info != 0) throw new RuntimeException("zgesvd failed with info: " + info);
+            
+            double[] sArr = new double[k];
+            sBuf.get(sArr);
+            double[] uArr = new double[2 * m * m];
+            uBuf.get(uArr);
+            double[] vtArr = new double[2 * n * n];
+            vtBuf.get(vtArr);
+            
+            Complex[] complexU = new Complex[m * m];
+            for (int i=0; i<m*m; i++) complexU[i] = Complex.of(uArr[2*i], uArr[2*i+1]);
+            
+            Complex[] complexS = new Complex[k];
+            for (int i=0; i<k; i++) complexS[i] = Complex.of(sArr[i]);
+            
+            // VT is ConjTransposed? LAPACK ZGESVD returns VT. V = VT^H
+            Complex[] complexV = new Complex[n * n];
+            for (int i=0; i<n; i++) {
+                for (int j=0; j<n; j++) {
+                    // V(i,j) = VT(j,i).conjugate()
+                    complexV[i * n + j] = Complex.of(vtArr[2*(j * n + i)], -vtArr[2*(j * n + i) + 1]);
+                }
+            }
+            
+            Matrix<E> U = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, m, complexU), this, ring);
+            Vector<E> S = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(complexS), ring);
+            Matrix<E> V = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexV), this, ring);
+
+            if (transposed) {
+                return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(V, S, U);
+            }
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
         }
         throw new UnsupportedOperationException("NativeCPU SVD failed or not available");
     }

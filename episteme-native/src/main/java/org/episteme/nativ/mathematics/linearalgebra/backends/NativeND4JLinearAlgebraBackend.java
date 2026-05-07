@@ -570,7 +570,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     }
 
     @Override
-    public Real trace(Matrix<Real> a) {
+    public Real trace(org.episteme.core.mathematics.linearalgebra.Matrix<Real> a) {
         System.out.println("[DEBUG] ND4J trace() called");
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         // ND4J doesn't have a direct trace() on INDArray in all versions, 
