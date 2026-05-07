@@ -229,11 +229,6 @@ public final class NativeRealBig extends Real {
 
             String digits = strPtr.reinterpret(bufSize).getString(0);
             long exp = (C_LONG.byteSize() == 4) ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
-            try {
-                java.nio.file.Files.writeString(java.nio.file.Paths.get("/home/admin/episteme_diag.log"), 
-                    "[NativeRealBig] MPFR digits: " + (digits.length() > 50 ? digits.substring(0, 50) + "..." : digits) + ", exp: " + exp + "\n",
-                    java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
-            } catch (Exception e) {}
             
             if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
             
