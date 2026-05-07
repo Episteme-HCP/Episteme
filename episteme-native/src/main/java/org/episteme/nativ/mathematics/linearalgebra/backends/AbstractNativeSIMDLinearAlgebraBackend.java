@@ -1106,7 +1106,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 for (int i=0; i<k; i++) {
                     for (int j=0; j<k; j++) complexSInv[i*k+j] = (i==j) ? Complex.of(sInvData[i]) : Complex.ZERO;
                 }
-                Sinv = (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(k, k, complexSInv), this, ring);
+                Sinv = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(k, k, complexSInv), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
             }
 
             Matrix<E> V_Sinv = V.multiply(Sinv);

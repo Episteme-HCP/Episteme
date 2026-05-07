@@ -1292,9 +1292,9 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     }
                 }
                 
-                Matrix<E> L = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, lData), this, ring);
-                Matrix<E> U = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, uData), this, ring);
-                Vector<E> P = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(pData), ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> L = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, lData), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> U = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, uData), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> P = (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(pData), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object) ring);
 
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(L, U, P);
             }
@@ -1345,8 +1345,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 Complex[] complexW = new Complex[n];
                 for (int i=0; i<n; i++) complexW[i] = Complex.of(wData[i]); // Eigenvalues of Hermitian are real
                 
-                Matrix<E> V = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexV), this, ring);
-                Vector<E> W = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(complexW), ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> V = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, complexV), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> W = (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(complexW), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object) ring);
 
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(V, W);
             }
@@ -1399,7 +1399,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                         complexL[i * n + j] = Complex.ZERO;
                     }
                 }
-                Matrix<E> L = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexL), this, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> L = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, complexL), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(L);
             }
         }
@@ -1867,7 +1867,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                         }
                     }
                 }
-                Matrix<E> R = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(k, n, complexR), this, ring);
+                org.episteme.core.mathematics.linearalgebra.Matrix<E> R = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(k, n, complexR), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
 
                 info = zungqr(m, k, k, aBuf, n, tau);
                 if (info == 0) {
@@ -1880,7 +1880,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                             complexQ[i * k + j] = Complex.of(qDataArr[2*(i * n + j)], qDataArr[2*(i * n + j) + 1]);
                         }
                     }
-                    Matrix<E> Q = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, k, complexQ), this, ring);
+                    org.episteme.core.mathematics.linearalgebra.Matrix<E> Q = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(m, k, complexQ), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
                     return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(Q, R);
                 }
             }
@@ -1991,9 +1991,9 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
             }
             
-            Matrix<E> U = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(m, m, complexU), this, ring);
-            Vector<E> S = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(complexS), ring);
-            Matrix<E> V = (Matrix<E>)(Object) new GenericMatrix<>(new DenseMatrixStorage<>(n, n, complexV), this, ring);
+            org.episteme.core.mathematics.linearalgebra.Matrix<E> U = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(m, m, complexU), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
+            org.episteme.core.mathematics.linearalgebra.Vector<E> S = (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(complexS), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object) ring);
+            org.episteme.core.mathematics.linearalgebra.Matrix<E> V = (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(n, n, complexV), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
 
             if (transposed) {
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(V, S, U);
