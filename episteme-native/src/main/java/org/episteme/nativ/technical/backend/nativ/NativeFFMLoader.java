@@ -152,16 +152,16 @@ public class NativeFFMLoader {
                 currentMapped = System.mapLibraryName(variant);
             }
             
-            logger.debug("[NativeFFMLoader] Attempting bare lookup for variant: {}", variant);
+            System.err.println("[NativeFFMLoader] Attempting bare lookup for variant: " + variant);
             try {
                 if (!variant.contains(".") && !variant.contains("/") && !variant.contains("\\")) {
                     SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
                     LOADED_LIBS.put(libName, lookup);
-                    logger.info("[NativeFFMLoader] Successfully loaded {} from system path", variant);
+                    System.err.println("[NativeFFMLoader] Successfully loaded " + variant + " from system path");
                     return Optional.of(lookup);
                 }
             } catch (Throwable t) {
-                logger.debug("[NativeFFMLoader] System lookup failed for {}: {}", variant, t.getMessage());
+                System.err.println("[NativeFFMLoader] System lookup failed for " + variant + ": " + t.getMessage());
                 FAILURE_CAUSES.put(variant, t.toString());
             }
 
