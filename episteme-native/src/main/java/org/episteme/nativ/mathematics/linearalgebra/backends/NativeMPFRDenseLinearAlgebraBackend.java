@@ -504,35 +504,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         return Vector.of(java.util.Arrays.asList(res), a.getScalarRing());
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public E angle(Vector<E> a, Vector<E> b) {
-        E d = dot(a, b);
-        E nA = norm(a);
-        E nB = norm(b);
-        
-        Ring<E> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
-            try {
-                E denom = field.multiply(nA, nB);
-                if (isZero(denom, ring)) return createScalar(0.0, (Object)a);
-                
-                E cosTheta = field.divide(d, denom);
-                Real cosReal = getReal(cosTheta);
-                Real angleReal = cosReal.max(Real.of(-1.0)).min(Real.of(1.0)).acos();
-                return castScalar(angleReal, ring);
-            } catch (Exception e) {
-                return createScalar(0.0, (Object)a);
-            }
-        }
-
-        double dotVal = getRealValue(d);
-        double nAVal = getRealValue(nA);
-        double nBVal = getRealValue(nB);
-        
-        if (nAVal == 0 || nBVal == 0) return createScalar(0.0, (Object)a);
-        return createScalar(Math.acos(Math.max(-1.0, Math.min(1.0, dotVal / (nAVal * nBVal)))), (Object)a);
-    }
 
     @Override
     @SuppressWarnings("unchecked")
