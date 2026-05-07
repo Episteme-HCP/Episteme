@@ -223,12 +223,18 @@ public class NativeFFMLoader {
         if (lookup == null) return Optional.empty();
         for (String name : names) {
             Optional<MemorySegment> segment = lookup.find(name);
-            if (segment.isPresent()) return segment;
+            if (segment.isPresent()) {
+                System.err.println("[NativeFFMLoader] Found symbol: " + name);
+                return segment;
+            }
             
             String[] variants = {"_" + name, name + "_", "__" + name};
             for (String v : variants) {
                 segment = lookup.find(v);
-                if (segment.isPresent()) return segment;
+                if (segment.isPresent()) {
+                    System.err.println("[NativeFFMLoader] Found symbol (variant): " + v);
+                    return segment;
+                }
             }
         }
         return Optional.empty();

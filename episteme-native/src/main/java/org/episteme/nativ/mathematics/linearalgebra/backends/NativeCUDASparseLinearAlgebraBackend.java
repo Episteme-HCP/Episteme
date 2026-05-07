@@ -378,8 +378,8 @@ public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> imp
             MemorySegment d_B = malloc((long) k * n * 8, tracker);
             MemorySegment d_C = malloc((long) m * n * 8, tracker);
 
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, MemorySegment.ofBuffer(A), (long) m * k * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
-            checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, MemorySegment.ofBuffer(B), (long) k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_A, NativeSafe.ensureNative(A, arena), (long) m * k * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
+            checkCuda((int) CUDA_MEMCPY.invokeExact(d_B, NativeSafe.ensureNative(B, arena), (long) k * n * 8, CUDA_MEMCPY_HOST_TO_DEVICE));
 
             MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0);
             MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0);
@@ -387,12 +387,15 @@ public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> imp
             MemorySegment handle = createCublasHandle(tracker);
             checkCublas((int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, alpha, d_B, n, d_A, k, beta, d_C, n));
 
-            checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofBuffer(C), d_C, (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+            MemorySegment hostC = NativeSafe.ensureNative(C, arena);
+            checkCuda((int) CUDA_MEMCPY.invokeExact(hostC, d_C, (long) m * n * 8, CUDA_MEMCPY_DEVICE_TO_HOST));
+            NativeSafe.copyBack(hostC, C);
         } catch (Throwable t) {
             logger.error("cuBLAS DGEMM failed: {}", t.getMessage());
             throw new RuntimeException("Matrix multiply failed", t);
         }
     }
+
 
     @Override
     public void selectDevice(int deviceId) {}
@@ -1023,24 +1026,27 @@ public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> imp
     @Override
     public void copyToGPU(long d_ptr, DoubleBuffer hostBuf, long sizeBytes) {
         if (d_ptr == 0) throw new IllegalArgumentException("Cannot copy to NULL GPU pointer");
-        try {
-            MemorySegment h_seg = MemorySegment.ofBuffer(hostBuf);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_seg = NativeSafe.ensureNative(hostBuf, arena);
             checkCuda((int) CUDA_MEMCPY.invokeExact(MemorySegment.ofAddress(d_ptr), h_seg, sizeBytes, CUDA_MEMCPY_HOST_TO_DEVICE));
         } catch (Throwable t) {
             throw new RuntimeException("GPU Copy H2D failed", t);
         }
     }
 
+
     @Override
     public void copyFromGPU(long d_ptr, DoubleBuffer hostBuf, long sizeBytes) {
         if (d_ptr == 0) throw new IllegalArgumentException("Cannot copy from NULL GPU pointer");
-        try {
-            MemorySegment h_seg = MemorySegment.ofBuffer(hostBuf);
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment h_seg = NativeSafe.ensureNative(hostBuf, arena);
             checkCuda((int) CUDA_MEMCPY.invokeExact(h_seg, MemorySegment.ofAddress(d_ptr), sizeBytes, CUDA_MEMCPY_DEVICE_TO_HOST));
+            NativeSafe.copyBack(h_seg, hostBuf);
         } catch (Throwable t) {
             throw new RuntimeException("GPU Copy D2H failed", t);
         }
     }
+
 
     private static void checkCuda(int result) {
         if (result != 0) {

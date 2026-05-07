@@ -220,16 +220,17 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
                 // LAPACKE (Standard C interface names and variants)
                 // Windows OpenBLAS often uses dgesv_ or lapack_dgesv
-                dgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "dgesv_", "lapack_dgesv")
+                dgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "lapack_dgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 
-                dgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetrf", "dgetrf", "dgetrf_", "lapack_dgetrf")
+                dgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetrf", "dgetrf", "lapack_dgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                dgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetri", "dgetri", "dgetri_", "lapack_dgetri")
+                dgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetri", "dgetri", "lapack_dgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "dsyev", "dsyev_", "lapack_dsyev");
+                Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "dsyev", "lapack_dsyev");
+
                 if (s_dsyev.isPresent()) {
                     FunctionDescriptor dsyevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, 
@@ -238,16 +239,16 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     dsyev = linker.downcallHandle(s_dsyev.get(), dsyevDesc);
                 }
 
-                dpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dpotrf", "dpotrf", "dpotrf_", "lapack_dpotrf")
+                dpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dpotrf", "dpotrf", "lapack_dpotrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-                dgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgeqrf", "dgeqrf", "dgeqrf_", "lapack_dgeqrf")
+                dgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgeqrf", "dgeqrf", "lapack_dgeqrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                dorgqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dorgqr", "dorgqr", "dorgqr_", "lapack_dorgqr")
+                dorgqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dorgqr", "dorgqr", "lapack_dorgqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                Optional<MemorySegment> s_dgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesvd", "dgesvd", "dgesvd_", "lapack_dgesvd");
+                Optional<MemorySegment> s_dgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesvd", "dgesvd", "lapack_dgesvd");
                 if (s_dgesvd.isPresent()) {
                     dgesvd = linker.downcallHandle(s_dgesvd.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 }
@@ -255,46 +256,47 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 avail = (dgemm != null || dgemv != null);
                 
                 // --- Single Precision (S) LAPACK ---
-                sgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "sgesv_", "lapack_sgesv")
+                sgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "lapack_sgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                sgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgetrf", "sgetrf", "sgetrf_", "lapack_sgetrf")
+                sgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgetrf", "sgetrf", "lapack_sgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                 // --- Complex Double (Z) LAPACK ---
-                zgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "zgesv_", "lapack_zgesv")
+                zgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "lapack_zgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetrf", "zgetrf", "zgetrf_", "lapack_zgetrf")
+                zgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetrf", "zgetrf", "lapack_zgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetri", "zgetri", "zgetri_", "lapack_zgetri")
+                zgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetri", "zgetri", "lapack_zgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zheev", "zheev", "zheev_", "lapack_zheev")
+                zheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zheev", "zheev", "lapack_zheev")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zpotrf", "zpotrf", "zpotrf_", "lapack_zpotrf")
+                zpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zpotrf", "zpotrf", "lapack_zpotrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgeqrf", "zgeqrf", "zgeqrf_", "lapack_zgeqrf")
+                zgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgeqrf", "zgeqrf", "lapack_zgeqrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zungqr", "zungqr", "zungqr_", "lapack_zungqr")
+                zungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zungqr", "zungqr", "lapack_zungqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesvd", "zgesvd", "zgesvd_", "lapack_zgesvd")
+                zgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesvd", "zgesvd", "lapack_zgesvd")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                 // --- Complex Float (C) LAPACK ---
-                cgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "cgesv_", "lapack_cgesv")
+                cgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "lapack_cgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetrf", "cgetrf", "cgetrf_", "lapack_cgetrf")
+                cgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetrf", "cgetrf", "lapack_cgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetri", "cgetri", "cgetri_", "lapack_cgetri")
+                cgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetri", "cgetri", "lapack_cgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cheev", "cheev", "cheev_", "lapack_cheev")
+                cheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cheev", "cheev", "lapack_cheev")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cpotrf", "cpotrf", "cpotrf_", "lapack_cpotrf")
+                cpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cpotrf", "cpotrf", "lapack_cpotrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgeqrf", "cgeqrf", "cgeqrf_", "lapack_cgeqrf")
+                cgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgeqrf", "cgeqrf", "lapack_cgeqrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cungqr", "cungqr", "cungqr_", "lapack_cungqr")
+                cungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cungqr", "cungqr", "lapack_cungqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesvd", "cgesvd", "cgesvd_", "lapack_cgesvd")
+                cgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesvd", "cgesvd", "lapack_cgesvd")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+
             }
         } catch (Throwable t) {
             logger.log(System.Logger.Level.DEBUG, "Native CPU initialization failed: " + t.getMessage());
@@ -485,89 +487,288 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                      DoubleBuffer C, int ldc,
                      double alpha, double beta) {
         if (!AVAILABLE || DGEMM_HANDLE == null) throw new UnsupportedOperationException("BLAS native library not found");
-        NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
-                alpha, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb, beta, MemorySegment.ofBuffer(C), ldc);
+        if (A.isDirect() && B.isDirect() && C.isDirect()) {
+            NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
+                    alpha, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb, beta, MemorySegment.ofBuffer(C), ldc);
+            return;
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment bSeg = NativeSafe.ensureNative(B, arena);
+            MemorySegment cSeg = NativeSafe.ensureNative(C, arena);
+            NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k,
+                    alpha, aSeg, lda, bSeg, ldb, beta, cSeg, ldc);
+            NativeSafe.copyBack(cSeg, C);
+        }
     }
+
 
     public void dgemv(int m, int n, double alpha, DoubleBuffer A, int lda, DoubleBuffer x, int incx, double beta, DoubleBuffer y, int incy) {
         if (!AVAILABLE || DGEMV_HANDLE == null) throw new UnsupportedOperationException("CBLAS dgemv not available");
-        NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, alpha, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(x), incx, beta, MemorySegment.ofBuffer(y), incy);
+        if (A.isDirect() && x.isDirect() && y.isDirect()) {
+            NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, alpha, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(x), incx, beta, MemorySegment.ofBuffer(y), incy);
+            return;
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment xSeg = NativeSafe.ensureNative(x, arena);
+            MemorySegment ySeg = NativeSafe.ensureNative(y, arena);
+            NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, alpha, aSeg, lda, xSeg, incx, beta, ySeg, incy);
+            NativeSafe.copyBack(ySeg, y);
+        }
     }
+
 
     public double ddot(int n, DoubleBuffer x, int incx, DoubleBuffer y, int incy) {
         if (!AVAILABLE || DDOT_HANDLE == null) throw new UnsupportedOperationException("CBLAS ddot not available");
-        return (double) NativeSafe.invoke(DDOT_HANDLE, n, MemorySegment.ofBuffer(x), incx, MemorySegment.ofBuffer(y), incy);
+        if (x.isDirect() && y.isDirect()) {
+            return (double) NativeSafe.invoke(DDOT_HANDLE, n, MemorySegment.ofBuffer(x), incx, MemorySegment.ofBuffer(y), incy);
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            return (double) NativeSafe.invoke(DDOT_HANDLE, n, NativeSafe.ensureNative(x, arena), incx, NativeSafe.ensureNative(y, arena), incy);
+        }
     }
+
 
     public double dnrm2(int n, DoubleBuffer x, int incx) {
         if (!AVAILABLE || DNRM2_HANDLE == null) throw new UnsupportedOperationException("CBLAS dnrm2 not available");
-        return (double) NativeSafe.invoke(DNRM2_HANDLE, n, MemorySegment.ofBuffer(x), incx);
+        if (x.isDirect()) return (double) NativeSafe.invoke(DNRM2_HANDLE, n, MemorySegment.ofBuffer(x), incx);
+        try (Arena arena = Arena.ofConfined()) {
+            return (double) NativeSafe.invoke(DNRM2_HANDLE, n, NativeSafe.ensureNative(x, arena), incx);
+        }
     }
+
+
 
     public void dscal(int n, double alpha, DoubleBuffer x, int incx) {
         if (!AVAILABLE || DSCAL_HANDLE == null) throw new UnsupportedOperationException("CBLAS dscal not available");
-        NativeSafe.invoke(DSCAL_HANDLE, n, alpha, MemorySegment.ofBuffer(x), incx);
+        if (x.isDirect()) {
+            NativeSafe.invoke(DSCAL_HANDLE, n, alpha, MemorySegment.ofBuffer(x), incx);
+            return;
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment xSeg = NativeSafe.ensureNative(x, arena);
+            NativeSafe.invoke(DSCAL_HANDLE, n, alpha, xSeg, incx);
+            NativeSafe.copyBack(xSeg, x);
+        }
     }
+
+
 
     public int dgetrf(int m, int n, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv) {
         if (!AVAILABLE || DGETRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgetrf not available");
-        return (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
+        if (A.isDirect() && ipiv.isDirect()) {
+            return (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment ipivSeg = NativeSafe.ensureNative(ipiv, arena);
+            int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, m, n, aSeg, lda, ipivSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(ipivSeg, ipiv);
+            return info;
+        }
     }
+
+
 
     public int dgetri(int n, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv) {
         if (!AVAILABLE || DGETRI_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgetri not available");
-        return (int) NativeSafe.invoke(DGETRI_HANDLE, LAPACK_ROW_MAJOR, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
+        if (A.isDirect() && ipiv.isDirect()) {
+            return (int) NativeSafe.invoke(DGETRI_HANDLE, LAPACK_ROW_MAJOR, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment ipivSeg = NativeSafe.ensureNative(ipiv, arena);
+            int info = (int) NativeSafe.invoke(DGETRI_HANDLE, LAPACK_ROW_MAJOR, n, aSeg, lda, ipivSeg);
+            NativeSafe.copyBack(aSeg, A);
+            return info;
+        }
     }
+
+
 
     public int dgesv(int n, int nrhs, DoubleBuffer A, int lda, java.nio.IntBuffer ipiv, DoubleBuffer B, int ldb) {
         if (!AVAILABLE || DGESV_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesv not available");
-        return (int) NativeSafe.invoke(DGESV_HANDLE, LAPACK_ROW_MAJOR, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv), MemorySegment.ofBuffer(B), ldb);
+        if (A.isDirect() && ipiv.isDirect() && B.isDirect()) {
+            return (int) NativeSafe.invoke(DGESV_HANDLE, LAPACK_ROW_MAJOR, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(ipiv), MemorySegment.ofBuffer(B), ldb);
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment ipivSeg = NativeSafe.ensureNative(ipiv, arena);
+            MemorySegment bSeg = NativeSafe.ensureNative(B, arena);
+            int info = (int) NativeSafe.invoke(DGESV_HANDLE, LAPACK_ROW_MAJOR, n, nrhs, aSeg, lda, ipivSeg, bSeg, ldb);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(ipivSeg, ipiv);
+            NativeSafe.copyBack(bSeg, B);
+            return info;
+        }
     }
+
+
 
     public int dsyev(int n, DoubleBuffer A, int lda, DoubleBuffer W) {
         if (!AVAILABLE || DSYEV_HANDLE == null) throw new UnsupportedOperationException("LAPACK dsyev not available");
-        return (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, MemorySegment.ofBuffer(A), n, MemorySegment.ofBuffer(W));
+        if (A.isDirect() && W.isDirect()) {
+            return (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(W));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment wSeg = NativeSafe.ensureNative(W, arena);
+            int info = (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, lda, wSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(wSeg, W);
+            return info;
+        }
     }
+
+
 
     public int dpotrf(int n, DoubleBuffer A, int lda) {
         if (!AVAILABLE || DPOTRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dpotrf not available");
-        return (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, MemorySegment.ofBuffer(A), lda);
+        if (A.isDirect()) {
+            return (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, MemorySegment.ofBuffer(A), lda);
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            int info = (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, lda);
+            NativeSafe.copyBack(aSeg, A);
+            return info;
+        }
     }
+
+
 
     public int dgeqrf(int m, int n, DoubleBuffer A, int lda, DoubleBuffer tau) {
         if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgeqrf not available");
-        return (int) NativeSafe.invoke(DGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), n, MemorySegment.ofBuffer(tau));
+        if (A.isDirect() && tau.isDirect()) {
+            return (int) NativeSafe.invoke(DGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment tauSeg = NativeSafe.ensureNative(tau, arena);
+            int info = (int) NativeSafe.invoke(DGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, aSeg, lda, tauSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(tauSeg, tau);
+            return info;
+        }
     }
+
+
 
     public int dorgqr(int m, int n, int k, DoubleBuffer A, int lda, DoubleBuffer tau) {
         if (!AVAILABLE || DORGQR_HANDLE == null) throw new UnsupportedOperationException("LAPACK dorgqr not available");
-        return (int) NativeSafe.invoke(DORGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        if (A.isDirect() && tau.isDirect()) {
+            return (int) NativeSafe.invoke(DORGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment tauSeg = NativeSafe.ensureNative(tau, arena);
+            int info = (int) NativeSafe.invoke(DORGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, aSeg, lda, tauSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(tauSeg, tau);
+            return info;
+        }
     }
+
+
 
     public int dgesvd(byte jobu, byte jobvt, int m, int n, DoubleBuffer A, int lda, DoubleBuffer S, DoubleBuffer U, int ldu, DoubleBuffer VT, int ldvt, DoubleBuffer superb) {
         if (!AVAILABLE || DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgesvd not available");
-        return (int) NativeSafe.invoke(DGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
+        if (A.isDirect() && S.isDirect() && U.isDirect() && VT.isDirect() && superb.isDirect()) {
+            return (int) NativeSafe.invoke(DGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment sSeg = NativeSafe.ensureNative(S, arena);
+            MemorySegment uSeg = NativeSafe.ensureNative(U, arena);
+            MemorySegment vtSeg = NativeSafe.ensureNative(VT, arena);
+            MemorySegment supSeg = NativeSafe.ensureNative(superb, arena);
+            int info = (int) NativeSafe.invoke(DGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, aSeg, lda, sSeg, uSeg, ldu, vtSeg, ldvt, supSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(sSeg, S);
+            NativeSafe.copyBack(uSeg, U);
+            NativeSafe.copyBack(vtSeg, VT);
+            NativeSafe.copyBack(supSeg, superb);
+            return info;
+        }
     }
+
+
 
     public int zgeqrf(int m, int n, DoubleBuffer A, int lda, DoubleBuffer tau) {
         if (!AVAILABLE || ZGEQRF_HANDLE == null) throw new UnsupportedOperationException("LAPACK zgeqrf not available");
-        return (int) NativeSafe.invoke(ZGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), n, MemorySegment.ofBuffer(tau));
+        if (A.isDirect() && tau.isDirect()) {
+            return (int) NativeSafe.invoke(ZGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment tauSeg = NativeSafe.ensureNative(tau, arena);
+            int info = (int) NativeSafe.invoke(ZGEQRF_HANDLE, LAPACK_ROW_MAJOR, m, n, aSeg, lda, tauSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(tauSeg, tau);
+            return info;
+        }
     }
+
+
 
     public int zungqr(int m, int n, int k, DoubleBuffer A, int lda, DoubleBuffer tau) {
         if (!AVAILABLE || ZUNGQR_HANDLE == null) throw new UnsupportedOperationException("LAPACK zungqr not available");
-        return (int) NativeSafe.invoke(ZUNGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        if (A.isDirect() && tau.isDirect()) {
+            return (int) NativeSafe.invoke(ZUNGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(tau));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment tauSeg = NativeSafe.ensureNative(tau, arena);
+            int info = (int) NativeSafe.invoke(ZUNGQR_HANDLE, LAPACK_ROW_MAJOR, m, n, k, aSeg, lda, tauSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(tauSeg, tau);
+            return info;
+        }
     }
+
+
 
     public int zgesvd(byte jobu, byte jobvt, int m, int n, DoubleBuffer A, int lda, DoubleBuffer S, DoubleBuffer U, int ldu, DoubleBuffer VT, int ldvt, DoubleBuffer superb) {
         if (!AVAILABLE || ZGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACK zgesvd not available");
-        return (int) NativeSafe.invoke(ZGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
+        if (A.isDirect() && S.isDirect() && U.isDirect() && VT.isDirect() && superb.isDirect()) {
+            return (int) NativeSafe.invoke(ZGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(S), MemorySegment.ofBuffer(U), ldu, MemorySegment.ofBuffer(VT), ldvt, MemorySegment.ofBuffer(superb));
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment sSeg = NativeSafe.ensureNative(S, arena);
+            MemorySegment uSeg = NativeSafe.ensureNative(U, arena);
+            MemorySegment vtSeg = NativeSafe.ensureNative(VT, arena);
+            MemorySegment supSeg = NativeSafe.ensureNative(superb, arena);
+            int info = (int) NativeSafe.invoke(ZGESVD_HANDLE, LAPACK_ROW_MAJOR, jobu, jobvt, m, n, aSeg, lda, sSeg, uSeg, ldu, vtSeg, ldvt, supSeg);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(sSeg, S);
+            NativeSafe.copyBack(uSeg, U);
+            NativeSafe.copyBack(vtSeg, VT);
+            NativeSafe.copyBack(supSeg, superb);
+            return info;
+        }
     }
+
+
 
     public int dgels(char trans, int m, int n, int nrhs, DoubleBuffer A, int lda, DoubleBuffer B, int ldb) {
         if (!AVAILABLE || DGELS_HANDLE == null) throw new UnsupportedOperationException("LAPACK dgels not available");
-        return (int) NativeSafe.invoke(DGELS_HANDLE, LAPACK_ROW_MAJOR, (byte) trans, m, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb);
+        if (A.isDirect() && B.isDirect()) {
+            return (int) NativeSafe.invoke(DGELS_HANDLE, LAPACK_ROW_MAJOR, (byte) trans, m, n, nrhs, MemorySegment.ofBuffer(A), lda, MemorySegment.ofBuffer(B), ldb);
+        }
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment aSeg = NativeSafe.ensureNative(A, arena);
+            MemorySegment bSeg = NativeSafe.ensureNative(B, arena);
+            int info = (int) NativeSafe.invoke(DGELS_HANDLE, LAPACK_ROW_MAJOR, (byte) trans, m, n, nrhs, aSeg, lda, bSeg, ldb);
+            NativeSafe.copyBack(aSeg, A);
+            NativeSafe.copyBack(bSeg, B);
+            return info;
+        }
     }
+
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -2080,4 +2281,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             return (Matrix<E>) RealDoubleMatrix.of(data, rows, cols);
         }
     }
+
+    }
 }
+
+
