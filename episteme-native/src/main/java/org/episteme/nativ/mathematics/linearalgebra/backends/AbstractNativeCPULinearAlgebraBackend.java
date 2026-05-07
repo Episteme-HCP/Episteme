@@ -319,6 +319,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         DGESVD_HANDLE = dgesvd;
         DGELS_HANDLE = dgels;
 
+        SGEMM_HANDLE = sgemm;
+        SGEMV_HANDLE = sgemv;
+        SDOT_HANDLE = sdot;
+        SNRM2_HANDLE = snrm2;
+        SSCAL_HANDLE = sscal;
         SGESV_HANDLE = sgesv;
         SGETRF_HANDLE = sgetrf;
 
