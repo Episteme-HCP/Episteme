@@ -1405,7 +1405,22 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 values[i] = Complex.of(val.real, val.imaginary);
                 vectors[i] = fromDoubleArray(eigenEjml.getEigenVector(i).data, n, 1);
             }
-            return (EigenResult<E>) (Object) new EigenResult<Real>(values, vectors);
+
+            // Combine vectors into a single matrix
+            Real[][] vData = new Real[n][n];
+            for (int j = 0; j < n; j++) {
+                for (int i = 0; i < n; i++) {
+                    vData[i][j] = (Real) vectors[j].get(i, 0);
+                }
+            }
+            Matrix<Real> V = Matrix.of(vData, (Ring<Real>) ring);
+            
+            // Values (simplified to Real for now, or use a complex vector if E allows)
+            Real[] dData = new Real[n];
+            for (int i = 0; i < n; i++) dData[i] = Real.of(values[i].real());
+            Vector<Real> D = Vector.of(java.util.Arrays.asList(dData), (Ring<Real>) ring);
+
+            return (EigenResult<E>) (Object) new EigenResult<Real>(V, D);
         } else if (isComplexRing(ring)) {
             org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
             var eigenEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.eig(n, true);
@@ -1418,7 +1433,18 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 values[i] = Complex.of(val.real, val.imaginary);
                 vectors[i] = fromEJMLComplex(eigenEjml.getEigenVector(i));
             }
-            return new EigenResult<>(values, vectors);
+
+            Complex[] vVals = new Complex[n];
+            Complex[][] vData = new Complex[n][n];
+            for (int j = 0; j < n; j++) {
+                vVals[j] = values[j];
+                for (int i = 0; i < n; i++) {
+                    vData[i][j] = (Complex) vectors[j].get(i, 0);
+                }
+            }
+            Matrix<E> V = (Matrix<E>)(Object) Matrix.of(vData, (Ring<Complex>) (Object) ring);
+            Vector<E> D = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(vVals), (Ring<Complex>) (Object) ring);
+            return new EigenResult<>(V, D);
         }
         throw new UnsupportedOperationException("NativeSIMD Eigen failed for ring: " + ring);
     }
@@ -1443,7 +1469,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 data[i*c + j] = Complex.of(ejml.getReal(i, j), ejml.getImag(i, j));
             }
         }
-        return (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(r, c, data), this, Complexes.getInstance());
+        return (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(r, c, data), (LinearAlgebraProvider<Complex>)(Object)this, org.episteme.core.mathematics.sets.Complexes.getInstance());
     }
 
     private Matrix<Real> fromDoubleArray(double[] data, int rows, int cols) {
