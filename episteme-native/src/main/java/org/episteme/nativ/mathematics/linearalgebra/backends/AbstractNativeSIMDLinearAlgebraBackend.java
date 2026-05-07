@@ -1445,25 +1445,25 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
     // --- Complex Helpers (Internal Fallback) ---
 
-    private Matrix<Complex> executeComplexAdd(Matrix<Complex> a, Matrix<Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexAdd(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).add(b.get(i, j));
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
     }
 
-    private Matrix<Complex> executeComplexSubtract(Matrix<Complex> a, Matrix<Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexSubtract(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = a.get(i, j).subtract(b.get(i, j));
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
     }
 
-    private Matrix<Complex> executeComplexMultiply(Matrix<Complex> a, Matrix<Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexMultiply(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         int rows = a.rows();
         int cols = b.cols();
         int kSize = a.cols();
@@ -1478,17 +1478,16 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             }
         }
         @SuppressWarnings("unchecked")
-        Matrix<Complex> result = Matrix.of(res, (Ring<Complex>) (Object) a.getScalarRing());
-        return result;
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) (Object) a.getScalarRing());
     }
 
-    private Matrix<Complex> executeComplexScale(Complex s, Matrix<Complex> a) {
+    private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexScale(org.episteme.core.mathematics.numbers.complex.Complex s, org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a) {
         Complex[][] res = new Complex[a.rows()][a.cols()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[i][j] = s.multiply(a.get(i, j));
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
     }
 
     private Complex executeComplexTrace(Matrix<Complex> a) {
@@ -1499,16 +1498,16 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         return sum;
     }
 
-    private Matrix<Complex> executeComplexTranspose(Matrix<Complex> a) {
+    private org.episteme.core.mathematics.linearalgebra.Matrix<E> executeComplexTranspose(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a) {
         Complex[][] res = new Complex[a.cols()][a.rows()];
         for (int i = 0; i < a.rows(); i++) for (int j = 0; j < a.cols(); j++) res[j][i] = a.get(i, j);
 
         @SuppressWarnings("unchecked")
         Ring<Complex> ring = (Ring<Complex>) (Object) a.getScalarRing();
-        return Matrix.of(res, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) org.episteme.core.mathematics.linearalgebra.Matrix.<org.episteme.core.mathematics.numbers.complex.Complex>of(res, ring);
     }
 
-    private Vector<Complex> executeComplexVectorAdd(Vector<Complex> a, Vector<Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> executeComplexVectorAdd(org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         int n = a.dimension();
         double[] aData = toComplexDoubleArray(a);
         double[] bData = toComplexDoubleArray(b);
@@ -1530,7 +1529,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.<org.episteme.core.mathematics.numbers.complex.Complex>of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
     }
 
-    private Vector<Complex> executeComplexVectorSubtract(Vector<Complex> a, Vector<Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> executeComplexVectorSubtract(org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         int n = a.dimension();
         double[] aData = toComplexDoubleArray(a);
         double[] bData = toComplexDoubleArray(b);
@@ -1551,7 +1550,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.<org.episteme.core.mathematics.numbers.complex.Complex>of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
     }
 
-    private Vector<Complex> executeComplexVectorScale(Vector<Complex> v, Complex s) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> executeComplexVectorScale(org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> v, org.episteme.core.mathematics.numbers.complex.Complex s) {
         int n = v.dimension();
         double[] cData = new double[2 * n];
         double sre = s.real(), sim = s.imaginary();
@@ -1638,7 +1637,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         return Complex.of(Math.sqrt(executeComplexVectorDot(a, a).real()), 0);
     }
 
-    private Vector<Complex> executeComplexMatVec(Matrix<Complex> a, Vector<Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> executeComplexMatVec(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         int m = a.rows();
         int n = a.cols();
         double[] bData = toComplexDoubleArray(b);
