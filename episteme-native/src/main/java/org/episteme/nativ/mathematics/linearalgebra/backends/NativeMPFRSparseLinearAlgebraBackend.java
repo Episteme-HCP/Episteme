@@ -1297,6 +1297,10 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (a.rows() == a.cols()) {
+            // Check if triangular first for better precision
+            if (isLowerTriangular(a)) return solveTriangular(a, b, false, false, false);
+            if (isUpperTriangular(a)) return solveTriangular(a, b, true, false, false);
+
             // Square system
             org.episteme.core.mathematics.context.NumericalConfiguration config = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration();
             E tol = createScalar(config.getEpsilonDouble(), b);
@@ -1311,6 +1315,246 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             // Underdetermined: x = A^T (A A^T)^-1 b (minimum norm solution)
             Matrix<E> at = transpose(a);
             return multiply(at, solve(multiply(a, at), b));
+        }
+    }
+
+    private boolean isLowerTriangular(Matrix<E> a) {
+        if (a.rows() != a.cols()) return false;
+        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa) {
+            int[] rowPtr = sa.getRowPointers();
+            int[] colIdx = sa.getColIndices();
+            for (int i = 0; i < sa.rows(); i++) {
+                for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
+                    if (colIdx[k] > i) return false;
+                }
+            }
+            return true;
+        }
+        for (int i = 0; i < a.rows(); i++) {
+            for (int j = i + 1; j < a.cols(); j++) {
+                if (!isZero(a.get(i, j), a.getScalarRing())) return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isUpperTriangular(Matrix<E> a) {
+        if (a.rows() != a.cols()) return false;
+        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa) {
+            int[] rowPtr = sa.getRowPointers();
+            int[] colIdx = sa.getColIndices();
+            for (int i = 0; i < sa.rows(); i++) {
+                for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
+                    if (colIdx[k] < i) return false;
+                }
+            }
+            return true;
+        }
+        for (int i = 0; i < a.rows(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (!isZero(a.get(i, j), a.getScalarRing())) return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+        if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
+        ensureAlive();
+        int n = A.rows();
+        if (n != A.cols() || n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = toSparse(A);
+        int prec = (int) getPrecision();
+        boolean isComplex = isComplex(sa);
+        Ring<E> ring = sa.getScalarRing();
+
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment h_vals = initNativeValues(sa.getValues(), prec, arena, tracker, isComplex);
+            MemorySegment h_b = initVector(b.toMatrix(), arena, tracker, prec, isComplex);
+            MemorySegment h_x = arena.allocate(MPFR_LAYOUT, n * (isComplex ? 2 : 1));
+            for (int i = 0; i < n * (isComplex ? 2 : 1); i++) {
+                NativeSafe.invoke(MPFR_INIT2, h_x.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            }
+            trackArray(tracker, h_x, n * (isComplex ? 2 : 1));
+
+            int[] rowPtr = sa.getRowPointers();
+            int[] colIdx = sa.getColIndices();
+            long layoutSize = MPFR_LAYOUT.byteSize();
+            int stride = isComplex ? 2 : 1;
+
+            MemorySegment sumR = arena.allocate(MPFR_LAYOUT); track(tracker, sumR);
+            MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) track(tracker, sumI);
+            MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
+            MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
+            MemorySegment diagR = arena.allocate(MPFR_LAYOUT); track(tracker, diagR);
+            MemorySegment diagI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) track(tracker, diagI);
+
+            NativeSafe.invoke(MPFR_INIT2, sumR, prec);
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, prec);
+            NativeSafe.invoke(MPFR_INIT2, t1, prec);
+            NativeSafe.invoke(MPFR_INIT2, t2, prec);
+            NativeSafe.invoke(MPFR_INIT2, diagR, prec);
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, diagI, prec);
+
+            if (!transpose) {
+                if (!upper) {
+                    // Forward substitution (Lower)
+                    for (int i = 0; i < n; i++) {
+                        NativeSafe.invoke(MPFR_SET, sumR, h_b.asSlice(i * stride * layoutSize, MPFR_LAYOUT), 0);
+                        if (isComplex) NativeSafe.invoke(MPFR_SET, sumI, h_b.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), 0);
+
+                        NativeSafe.invoke(MPFR_SET_D, diagR, 1.0, 0);
+                        if (isComplex) NativeSafe.invoke(MPFR_SET_D, diagI, 0.0, 0);
+
+                        for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
+                            int j = colIdx[k];
+                            if (j < i) {
+                                // sum -= A[i,j] * x[j]
+                                MemorySegment valR = h_vals.asSlice(k * stride * layoutSize, MPFR_LAYOUT);
+                                MemorySegment xjR = h_x.asSlice(j * stride * layoutSize, MPFR_LAYOUT);
+                                
+                                if (isComplex) {
+                                    MemorySegment valI = h_vals.asSlice((k * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                                    MemorySegment xjI = h_x.asSlice((j * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                                    
+                                    // (valR + i*valI)*(xjR + i*xjI) = (valR*xjR - valI*xjI) + i(valR*xjI + valI*xjR)
+                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
+                                    NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                                    NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+                                    
+                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
+                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
+                                    NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                                    NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                } else {
+                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                    NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+                                }
+                            } else if (j == i) {
+                                NativeSafe.invoke(MPFR_SET, diagR, h_vals.asSlice(k * stride * layoutSize, MPFR_LAYOUT), 0);
+                                if (isComplex) NativeSafe.invoke(MPFR_SET, diagI, h_vals.asSlice((k * 2 + 1) * layoutSize, MPFR_LAYOUT), 0);
+                            }
+                        }
+                        
+                        if (!unit) {
+                            // x[i] = sum / A[i,i]
+                            if (isComplex) {
+                                complexDiv(sumR, sumI, diagR, diagI, h_x.asSlice(i * 2 * layoutSize, MPFR_LAYOUT), h_x.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), prec, arena);
+                            } else {
+                                NativeSafe.invoke(MPFR_DIV, h_x.asSlice(i * layoutSize, MPFR_LAYOUT), sumR, diagR, 0);
+                            }
+                        } else {
+                            NativeSafe.invoke(MPFR_SET, h_x.asSlice(i * stride * layoutSize, MPFR_LAYOUT), sumR, 0);
+                            if (isComplex) NativeSafe.invoke(MPFR_SET, h_x.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), sumI, 0);
+                        }
+                    }
+                } else {
+                    // Backward substitution (Upper)
+                    for (int i = n - 1; i >= 0; i--) {
+                        NativeSafe.invoke(MPFR_SET, sumR, h_b.asSlice(i * stride * layoutSize, MPFR_LAYOUT), 0);
+                        if (isComplex) NativeSafe.invoke(MPFR_SET, sumI, h_b.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), 0);
+
+                        NativeSafe.invoke(MPFR_SET_D, diagR, 1.0, 0);
+                        if (isComplex) NativeSafe.invoke(MPFR_SET_D, diagI, 0.0, 0);
+
+                        for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
+                            int j = colIdx[k];
+                            if (j > i) {
+                                MemorySegment valR = h_vals.asSlice(k * stride * layoutSize, MPFR_LAYOUT);
+                                MemorySegment xjR = h_x.asSlice(j * stride * layoutSize, MPFR_LAYOUT);
+                                
+                                if (isComplex) {
+                                    MemorySegment valI = h_vals.asSlice((k * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                                    MemorySegment xjI = h_x.asSlice((j * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                                    
+                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
+                                    NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                                    NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+                                    
+                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
+                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
+                                    NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                                    NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                } else {
+                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                    NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+                                }
+                            } else if (j == i) {
+                                NativeSafe.invoke(MPFR_SET, diagR, h_vals.asSlice(k * stride * layoutSize, MPFR_LAYOUT), 0);
+                                if (isComplex) NativeSafe.invoke(MPFR_SET, diagI, h_vals.asSlice((k * 2 + 1) * layoutSize, MPFR_LAYOUT), 0);
+                            }
+                        }
+                        
+                        if (!unit) {
+                            if (isComplex) {
+                                complexDiv(sumR, sumI, diagR, diagI, h_x.asSlice(i * 2 * layoutSize, MPFR_LAYOUT), h_x.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), prec, arena);
+                            } else {
+                                NativeSafe.invoke(MPFR_DIV, h_x.asSlice(i * layoutSize, MPFR_LAYOUT), sumR, diagR, 0);
+                            }
+                        } else {
+                            NativeSafe.invoke(MPFR_SET, h_x.asSlice(i * stride * layoutSize, MPFR_LAYOUT), sumR, 0);
+                            if (isComplex) NativeSafe.invoke(MPFR_SET, h_x.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), sumI, 0);
+                        }
+                    }
+                }
+            } else {
+                // Transposed solve A^T x = b
+                // For sparse CSR, A^T solve is less efficient unless we have CSC.
+                // We'll use the provided Matrix transpose fallback if needed, 
+                // but here we can implement it by treating rows as columns.
+                throw new UnsupportedOperationException("Transposed triangular solve not yet optimized for Sparse MPFR");
+            }
+
+            Object[] resArr = new Object[n];
+            for (int i = 0; i < n; i++) {
+                if (isComplex) {
+                    Real re = readMPFR(h_x.asSlice(i * 2 * layoutSize, MPFR_LAYOUT), arena);
+                    Real im = readMPFR(h_x.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), arena);
+                    resArr[i] = (E) (Object) Complex.of(re, im);
+                } else {
+                    resArr[i] = (E) (Object) readMPFR(h_x.asSlice(i * layoutSize, MPFR_LAYOUT), arena);
+                }
+            }
+            return Vector.of(java.util.Arrays.asList((E[])resArr), ring);
+        } catch (Throwable t) {
+            throw new RuntimeException("Sparse MPFR triangular solve failed", t);
+        }
+    }
+
+    private void complexDiv(MemorySegment aR, MemorySegment aI, MemorySegment bR, MemorySegment bI, MemorySegment resR, MemorySegment resI, int prec, Arena arena) throws Throwable {
+        // (aR + i*aI) / (bR + i*bI) = [(aR*bR + aI*bI) / (bR^2 + bI^2)] + i[(aI*bR - aR*bI) / (bR^2 + bI^2)]
+        MemorySegment d2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, d2, prec);
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+
+        try {
+            // d2 = bR^2 + bI^2
+            NativeSafe.invoke(MPFR_MUL, t1, bR, bR, 0);
+            NativeSafe.invoke(MPFR_MUL, t2, bI, bI, 0);
+            NativeSafe.invoke(MPFR_ADD, d2, t1, t2, 0);
+
+            // resR = (aR*bR + aI*bI) / d2
+            NativeSafe.invoke(MPFR_MUL, t1, aR, bR, 0);
+            NativeSafe.invoke(MPFR_MUL, t2, aI, bI, 0);
+            NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+            NativeSafe.invoke(MPFR_DIV, resR, t1, d2, 0);
+
+            // resI = (aI*bR - aR*bI) / d2
+            NativeSafe.invoke(MPFR_MUL, t1, aI, bR, 0);
+            NativeSafe.invoke(MPFR_MUL, t2, aR, bI, 0);
+            NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+            NativeSafe.invoke(MPFR_DIV, resI, t1, d2, 0);
+        } finally {
+            NativeSafe.invoke(MPFR_CLEAR, d2);
+            NativeSafe.invoke(MPFR_CLEAR, t1);
+            NativeSafe.invoke(MPFR_CLEAR, t2);
         }
     }
 
@@ -1952,25 +2196,65 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     @Override
     @SuppressWarnings("unchecked")
     public E angle(Vector<E> a, Vector<E> b) {
-        E d = dot(a, b);
-        E nA = norm(a);
-        E nB = norm(b);
-        Ring<E> ring = a.getScalarRing();
-        try {
-            if (ring instanceof org.episteme.core.mathematics.structures.rings.Field<E> field) {
-                E denom = field.multiply(nA, nB);
-                if (denom instanceof org.episteme.core.mathematics.numbers.real.Real r && r.doubleValue() == 0.0) return createScalar(0.0, a);
-                if (denom instanceof Complex c && c.real() == 0.0 && c.imaginary() == 0.0) return createScalar(0.0, a);
-                E cosTheta = field.divide(d, denom);
-                double cosVal = getRealValue(cosTheta);
-                return createScalar(Math.acos(Math.max(-1.0, Math.min(1.0, cosVal))), a);
-            }
-            double dotVal = getRealValue(d);
-            double nAVal = getRealValue(nA);
-            double nBVal = getRealValue(nB);
-            if (nAVal == 0 || nBVal == 0) return createScalar(0.0, a);
-            return createScalar(Math.acos(Math.max(-1.0, Math.min(1.0, dotVal / (nAVal * nBVal)))), a);
-        } catch (Exception e) {
+        if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
+        ensureAlive();
+        if (a.dimension() != b.dimension()) throw new IllegalArgumentException("Vector dimensions must match");
+        
+        int prec = (int) getPrecision();
+        boolean isComplex = isComplex(a);
+        
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment dotR = arena.allocate(MPFR_LAYOUT); track(tracker, dotR);
+            MemorySegment dotI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) track(tracker, dotI);
+            
+            NativeSafe.invoke(MPFR_INIT2, dotR, prec);
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, dotI, prec);
+            
+            // dot(a, b)
+            E d = dot(a, b);
+            setMPFR_internal(dotR, dotI, d, arena);
+            
+            MemorySegment normA = arena.allocate(MPFR_LAYOUT); track(tracker, normA);
+            MemorySegment normB = arena.allocate(MPFR_LAYOUT); track(tracker, normB);
+            NativeSafe.invoke(MPFR_INIT2, normA, prec);
+            NativeSafe.invoke(MPFR_INIT2, normB, prec);
+            
+            setMPFR_internal(normA, null, getRealPart(norm(a)), arena);
+            setMPFR_internal(normB, null, getRealPart(norm(b)), arena);
+            
+            // denom = normA * normB
+            MemorySegment denom = arena.allocate(MPFR_LAYOUT); track(tracker, denom);
+            NativeSafe.invoke(MPFR_INIT2, denom, prec);
+            NativeSafe.invoke(MPFR_MUL, denom, normA, normB, 0);
+            
+            if (NativeSafe.invoke(MPFR_ZERO_P, denom) != 0) return createScalar(0.0, a);
+            
+            // cosTheta = dotR / denom
+            MemorySegment cosTheta = arena.allocate(MPFR_LAYOUT); track(tracker, cosTheta);
+            NativeSafe.invoke(MPFR_INIT2, cosTheta, prec);
+            NativeSafe.invoke(MPFR_DIV, cosTheta, dotR, denom, 0);
+            
+            // Clamp to [-1, 1]
+            MemorySegment one = arena.allocate(MPFR_LAYOUT); track(tracker, one);
+            MemorySegment minusOne = arena.allocate(MPFR_LAYOUT); track(tracker, minusOne);
+            NativeSafe.invoke(MPFR_INIT2, one, prec);
+            NativeSafe.invoke(MPFR_INIT2, minusOne, prec);
+            NativeSafe.invoke(MPFR_SET_SI, one, 1L, 0);
+            NativeSafe.invoke(MPFR_SET_SI, minusOne, -1L, 0);
+            
+            if (NativeSafe.invoke(MPFR_CMP, cosTheta, one) > 0) NativeSafe.invoke(MPFR_SET, cosTheta, one, 0);
+            if (NativeSafe.invoke(MPFR_CMP, cosTheta, minusOne) < 0) NativeSafe.invoke(MPFR_SET, cosTheta, minusOne, 0);
+            
+            // angle = acos(cosTheta)
+            MemorySegment angleRes = arena.allocate(MPFR_LAYOUT); track(tracker, angleRes);
+            NativeSafe.invoke(MPFR_INIT2, angleRes, prec);
+            NativeSafe.invoke(MPFR_ACOS, angleRes, cosTheta, 0);
+            
+            Real res = readMPFR(angleRes, arena);
+            return createScalar(res, a);
+        } catch (Throwable t) {
+            logger.error("Native MPFR angle failed: {}", t.getMessage());
             return createScalar(0.0, a);
         }
     }
