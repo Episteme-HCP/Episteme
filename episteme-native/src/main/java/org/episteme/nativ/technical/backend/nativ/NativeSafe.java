@@ -7,6 +7,7 @@ package org.episteme.nativ.technical.backend.nativ;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,4 +165,68 @@ public class NativeSafe {
             throw new RuntimeException("Scavenging failed for " + origin, t);
         }
     }
+
+    /**
+     * Ensures that a buffer is native (direct) for FFM boundary calls.
+     * If the buffer is on-heap, it is copied to a new native segment in the provided arena.
+     */
+    public static MemorySegment ensureNative(java.nio.Buffer buffer, Arena arena) {
+        if (buffer == null) return MemorySegment.NULL;
+        if (buffer.isDirect()) {
+            return MemorySegment.ofBuffer(buffer);
+        } else {
+            if (buffer instanceof java.nio.DoubleBuffer db) {
+                double[] array = new double[db.remaining()];
+                int pos = db.position();
+                db.get(array);
+                db.position(pos);
+                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, array);
+            } else if (buffer instanceof java.nio.IntBuffer ib) {
+                int[] array = new int[ib.remaining()];
+                int pos = ib.position();
+                ib.get(array);
+                ib.position(pos);
+                return arena.allocateFrom(ValueLayout.JAVA_INT, array);
+            } else if (buffer instanceof java.nio.FloatBuffer fb) {
+                float[] array = new float[fb.remaining()];
+                int pos = fb.position();
+                fb.get(array);
+                fb.position(pos);
+                return arena.allocateFrom(ValueLayout.JAVA_FLOAT, array);
+            } else if (buffer instanceof java.nio.LongBuffer lb) {
+                long[] array = new long[lb.remaining()];
+                int pos = lb.position();
+                lb.get(array);
+                lb.position(pos);
+                return arena.allocateFrom(ValueLayout.JAVA_LONG, array);
+            }
+            throw new UnsupportedOperationException("Unsupported buffer type for native conversion: " + buffer.getClass());
+        }
+    }
+
+    /**
+     * Copies data back from a native segment to a heap buffer if necessary.
+     */
+    public static void copyBack(MemorySegment nativeSeg, java.nio.Buffer buffer) {
+        if (buffer == null || buffer.isDirect()) return;
+        int pos = buffer.position();
+        if (buffer instanceof java.nio.DoubleBuffer db) {
+            double[] array = nativeSeg.toArray(ValueLayout.JAVA_DOUBLE);
+            db.put(array);
+            db.position(pos);
+        } else if (buffer instanceof java.nio.IntBuffer ib) {
+            int[] array = nativeSeg.toArray(ValueLayout.JAVA_INT);
+            ib.put(array);
+            ib.position(pos);
+        } else if (buffer instanceof java.nio.FloatBuffer fb) {
+            float[] array = nativeSeg.toArray(ValueLayout.JAVA_FLOAT);
+            fb.put(array);
+            fb.position(pos);
+        } else if (buffer instanceof java.nio.LongBuffer lb) {
+            long[] array = nativeSeg.toArray(ValueLayout.JAVA_LONG);
+            lb.put(array);
+            lb.position(pos);
+        }
+    }
 }
+
