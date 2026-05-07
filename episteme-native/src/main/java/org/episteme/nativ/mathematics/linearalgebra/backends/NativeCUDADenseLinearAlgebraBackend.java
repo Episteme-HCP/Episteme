@@ -1328,9 +1328,10 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
     private static void checkCuda(int result) {
         if (result != 0) {
             if (CUDA_GET_ERROR_STRING == null) throw new RuntimeException("CUDA Error " + result);
-            try {
-                MemorySegment seg = (MemorySegment) CUDA_GET_ERROR_STRING.invokeExact(result);
-                String msg = seg.reinterpret(1024).getString(0);
+            try (Arena temp = Arena.ofConfined()) {
+                MemorySegment pStr = temp.allocate(ValueLayout.ADDRESS);
+                int status = (int) CUDA_GET_ERROR_STRING.invokeExact(result, pStr);
+                String msg = (status == 0) ? pStr.get(ValueLayout.ADDRESS, 0).reinterpret(1024).getString(0) : "Unknown CUDA Error";
                 logger.error("CUDA Error {}: {}", result, msg);
                 throw new RuntimeException("CUDA Error " + result + ": " + msg);
             } catch (Throwable t) { throw new RuntimeException("CUDA Error " + result, t); }
