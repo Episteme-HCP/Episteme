@@ -309,10 +309,10 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
                 
                 // Create cuBLAS handle
                 if (CUBLAS_CREATE != null) {
-                    int status = (int) CUBLAS_CREATE.invokeExact(p);
+                    int status = (int) NativeSafe.invoke(CUBLAS_CREATE, p);
                     if (status == 0) {
                         staticCublasHandle = p.get(ValueLayout.ADDRESS, 0).reinterpret(0);
-                        staticCublasHandle = MemorySegment.ofAddress(staticCublasHandle.address()); // Ensure it's not tied to temp arena if needed, but FFM handles are usually just addresses
+                        staticCublasHandle = MemorySegment.ofAddress(staticCublasHandle.address()); 
                     } else {
                         System.err.println("[CUDA-Init] ABORT: Failed to create cuBLAS handle. Status: " + status);
                         return;
@@ -322,7 +322,7 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
                 // Create cuSolver handle
                 if (USE_CUSOLVER && CUSOLVER_CREATE != null) {
                     try {
-                        int status = (int) CUSOLVER_CREATE.invokeExact(p);
+                        int status = (int) NativeSafe.invoke(CUSOLVER_CREATE, p);
                         if (status == 0) {
                             staticCusolverHandle = p.get(ValueLayout.ADDRESS, 0).reinterpret(0);
                             staticCusolverHandle = MemorySegment.ofAddress(staticCusolverHandle.address());
@@ -335,6 +335,7 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
                         USE_CUSOLVER = false;
                     }
                 }
+
             }
 
             IS_AVAILABLE = true;
@@ -370,15 +371,16 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             int devId = 0;
             MemorySegment pCtx = arena.allocate(ValueLayout.ADDRESS);
             long ctxHandle = 0;
-            if (CU_CTX_GET_CURRENT != null && (int)CU_CTX_GET_CURRENT.invokeExact(pCtx) == 0) {
+            if (CU_CTX_GET_CURRENT != null && (int) NativeSafe.invoke(CU_CTX_GET_CURRENT, pCtx) == 0) {
                 ctxHandle = pCtx.get(ValueLayout.ADDRESS, 0).address();
             }
             MemorySegment pDev = arena.allocate(ValueLayout.JAVA_INT);
-            if (CU_CTX_GET_DEVICE != null && (int)CU_CTX_GET_DEVICE.invokeExact(pDev) == 0) {
+            if (CU_CTX_GET_DEVICE != null && (int) NativeSafe.invoke(CU_CTX_GET_DEVICE, pDev) == 0) {
                 devId = pDev.get(ValueLayout.JAVA_INT, 0);
             }
             return org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext.fromNative(ctxHandle, devId);
-        } catch (Throwable t) {
+        }
+ catch (Throwable t) {
             return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext(null, null);
         }
     }
@@ -425,22 +427,23 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) rows * cols * 8, tracker);
             MemorySegment d_C = malloc((long) rows * cols * 8, tracker);
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) rows * cols * 8));
+            
+            MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) rows * cols * 8));
+            
             MemorySegment handle = createCublasHandle(tracker);
-            // cuBLAS GEAM: C = alpha * op(A) + beta * op(B)
-            // A (Row-Major R x C) == A_cm (Column-Major C x R) => lda = cols
-            // We want At (Row-Major C x R) == At_cm (Column-Major R x C) => ldc = rows
-            // Transpose A_cm (C x R) into At_cm (R x C)
-            checkCublas((int) CUBLAS_DGEAM.invokeExact(handle, 1, 0, rows, cols, 
+            checkCublas((int) NativeSafe.invoke(CUBLAS_DGEAM, handle, 1, 0, rows, cols, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_A, cols, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0), d_A, cols, 
                 d_C, rows));
+            
             double[] result = new double[rows * cols];
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) rows * cols);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(host, d_C.address(), (long) rows * cols * 8));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, host, d_C.address(), (long) rows * cols * 8));
             MemorySegment.copy(host, ValueLayout.JAVA_DOUBLE, 0, result, 0, rows * cols);
             return toMatrix(result, cols, rows);
         } catch (Throwable t) { throw new RuntimeException("CUDA transpose failed", t); }
+
     }
 
     private Matrix<E> transposeComplex(Matrix<E> a) {
@@ -449,20 +452,24 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) rows * cols * 16, tracker);
             MemorySegment d_C = malloc((long) rows * cols * 16, tracker);
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a)), (long) rows * cols * 16));
+            
+            MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) rows * cols * 16));
+            
             MemorySegment handle = createCublasHandle(tracker);
-            // Same logic as double geam but for complex ZGEAM
-            checkCublas((int) CUBLAS_ZGEAM.invokeExact(handle, 1, 0, rows, cols, 
+            checkCublas((int) NativeSafe.invoke(CUBLAS_ZGEAM, handle, 1, 0, rows, cols, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_A, cols, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0), d_A, cols, 
                 d_C, rows));
+            
             double[] result = new double[rows * cols * 2];
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) rows * cols * 2);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(host, d_C.address(), (long) rows * cols * 16));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, host, d_C.address(), (long) rows * cols * 16));
             MemorySegment.copy(host, ValueLayout.JAVA_DOUBLE, 0, result, 0, rows * cols * 2);
             return toMatrixComplex(result, cols, rows);
         } catch (Throwable t) { throw new RuntimeException("CUDA complex transpose failed", t); }
     }
+
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
@@ -478,27 +485,32 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             MemorySegment d_C = malloc((long) m * n * elementSize, tracker);
             
             if (isFloat) {
-                checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) m * k * 4));
-                checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_B.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b)), (long) k * n * 4));
+                MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment hostB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) m * k * 4));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_B.address(), hostB, (long) k * n * 4));
                 MemorySegment handle = createCublasHandle(tracker);
-                checkCublas((int) CUBLAS_SGEMM.invokeExact(handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f), d_C, n));
+                checkCublas((int) NativeSafe.invoke(CUBLAS_SGEMM, handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f), d_C, n));
                 float[] h_C = new float[m * n];
                 MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
-                checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(segC, d_C.address(), (long) m * n * 4));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, segC, d_C.address(), (long) m * n * 4));
                 MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, h_C, 0, m * n);
                 return fromFloatArray(h_C, m, n);
             } else {
-                checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) m * k * 8));
-                checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_B.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b)), (long) k * n * 8));
+                MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                MemorySegment hostB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) m * k * 8));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_B.address(), hostB, (long) k * n * 8));
                 MemorySegment handle = createCublasHandle(tracker);
-                checkCublas((int) CUBLAS_DGEMM.invokeExact(handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0), d_C, n));
+                checkCublas((int) NativeSafe.invoke(CUBLAS_DGEMM, handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0), d_C, n));
                 double[] h_C = new double[m * n];
                 MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
-                checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(segC, d_C.address(), (long) m * n * 8));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, segC, d_C.address(), (long) m * n * 8));
                 MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
                 return toMatrix(h_C, m, n);
             }
         } catch (Throwable t) { throw new RuntimeException("CUDA multiply failed", t); }
+
     }
 
     private Matrix<E> multiplyComplex(Matrix<E> a, Matrix<E> b) {
@@ -508,16 +520,23 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             MemorySegment d_A = malloc((long) m * k * 16, tracker);
             MemorySegment d_B = malloc((long) k * n * 16, tracker);
             MemorySegment d_C = malloc((long) m * n * 16, tracker);
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a)), (long) m * k * 16));
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_B.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(b)), (long) k * n * 16));
+            
+            MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a));
+            MemorySegment hostB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(b));
+            
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) m * k * 16));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_B.address(), hostB, (long) k * n * 16));
+            
             MemorySegment handle = createCublasHandle(tracker);
-            checkCublas((int) CUBLAS_ZGEMM.invokeExact(handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0), d_C, n));
+            checkCublas((int) NativeSafe.invoke(CUBLAS_ZGEMM, handle, 0, 0, n, m, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_B, n, d_A, k, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0), d_C, n));
+            
             double[] resultData = new double[m * n * 2];
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(host, d_C.address(), (long) m * n * 16));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, host, d_C.address(), (long) m * n * 16));
             MemorySegment.copy(host, ValueLayout.JAVA_DOUBLE, 0, resultData, 0, m * n * 2);
             return toMatrixComplex(resultData, m, n);
         } catch (Throwable t) { throw new RuntimeException("CUDA complex multiply failed", t); }
+
     }
 
     @Override public Matrix<E> add(Matrix<E> a, Matrix<E> b) { if (isComplex(a)) return geamComplex(a, b, org.episteme.core.mathematics.numbers.complex.Complex.ONE, org.episteme.core.mathematics.numbers.complex.Complex.ONE); return geam(a, b, 1.0, 1.0); }
@@ -530,18 +549,27 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) m * n * 8, tracker);
             MemorySegment d_C = malloc((long) m * n * 8, tracker);
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) m * n * 8));
+            
+            MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) m * n * 8));
+            
             MemorySegment d_B = (b != null) ? malloc((long) m * n * 8, tracker) : d_A;
-            if (b != null) checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_B.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b)), (long) m * n * 8));
+            if (b != null) {
+                MemorySegment hostB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_B.address(), hostB, (long) m * n * 8));
+            }
+            
             MemorySegment handle = createCublasHandle(tracker);
-            checkCublas((int) CUBLAS_DGEAM.invokeExact(handle, 0, 0, n, m, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, alphaVal), d_A, n, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, betaVal), d_B, n, d_C, n));
+            checkCublas((int) NativeSafe.invoke(CUBLAS_DGEAM, handle, 0, 0, n, m, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, alphaVal), d_A, n, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, betaVal), d_B, n, d_C, n));
+            
             double[] h_C = new double[m * n];
             MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(segC, d_C.address(), (long) m * n * 8));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, segC, d_C.address(), (long) m * n * 8));
             MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, h_C, 0, m * n);
             return toMatrix(h_C, m, n);
         } catch (Throwable t) { throw new RuntimeException("CUDA GEAM failed", t); }
     }
+
 
     private Matrix<E> geamComplex(Matrix<E> a, Matrix<E> b, org.episteme.core.mathematics.numbers.complex.Complex alpha, org.episteme.core.mathematics.numbers.complex.Complex beta) {
         int m = a.rows(); int n = a.cols();
@@ -550,19 +578,28 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             MemorySegment d_A = malloc((long) m * n * 16, tracker);
             MemorySegment d_B = malloc((long) m * n * 16, tracker);
             MemorySegment d_C = malloc((long) m * n * 16, tracker);
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a)), (long) m * n * 16));
-            if (b != null) checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_B.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(b)), (long) m * n * 16));
+            
+            MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) m * n * 16));
+            
+            if (b != null) {
+                MemorySegment hostB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(b));
+                checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_B.address(), hostB, (long) m * n * 16));
+            }
+            
             MemorySegment handle = createCublasHandle(tracker);
-            checkCublas((int) CUBLAS_ZGEAM.invokeExact(handle, 0, 0, n, m, 
+            checkCublas((int) NativeSafe.invoke(CUBLAS_ZGEAM, handle, 0, 0, n, m, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, alpha.getReal().doubleValue(), alpha.getImaginary().doubleValue()), d_A, n, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, beta.getReal().doubleValue(), beta.getImaginary().doubleValue()), d_B, n, d_C, n));
+            
             double[] resultData = new double[m * n * 2];
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(host, d_C.address(), (long) m * n * 16));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, host, d_C.address(), (long) m * n * 16));
             MemorySegment.copy(host, ValueLayout.JAVA_DOUBLE, 0, resultData, 0, m * n * 2);
             return toMatrixComplex(resultData, m, n);
         } catch (Throwable t) { throw new RuntimeException("CUDA complex GEAM failed", t); }
     }
+
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> x) {
@@ -586,13 +623,19 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) n * 8, tracker);
             MemorySegment d_B = malloc((long) n * 8, tracker);
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(a)), (long) n * 8));
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_B.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b)), (long) n * 8));
+            
+            MemorySegment hostA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(a));
+            MemorySegment hostB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b));
+            
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_A.address(), hostA, (long) n * 8));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_B.address(), hostB, (long) n * 8));
+            
             MemorySegment handle = createCublasHandle(tracker);
             MemorySegment result = arena.allocate(ValueLayout.JAVA_DOUBLE);
-            checkCublas((int) CUBLAS_DDOT.invokeExact(handle, n, d_A, 1, d_B, 1, result));
+            checkCublas((int) NativeSafe.invoke(CUBLAS_DDOT, handle, n, d_A, 1, d_B, 1, result));
             return (E) Real.of(result.get(ValueLayout.JAVA_DOUBLE, 0));
         } catch (Throwable t) { throw new RuntimeException("CUDA dot failed", t); }
+
     }
 
     @Override
@@ -602,12 +645,16 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_V = malloc((long) n * 8, tracker);
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(d_V.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(v)), (long) n * 8));
+            
+            MemorySegment hostV = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(v));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, d_V.address(), hostV, (long) n * 8));
+            
             MemorySegment handle = createCublasHandle(tracker);
             MemorySegment result = arena.allocate(ValueLayout.JAVA_DOUBLE);
-            checkCublas((int) CUBLAS_DNRM2.invokeExact(handle, n, d_V, 1, result));
+            checkCublas((int) NativeSafe.invoke(CUBLAS_DNRM2, handle, n, d_V, 1, result));
             return toScalar(result.get(ValueLayout.JAVA_DOUBLE, 0), v);
         } catch (Throwable t) { throw new RuntimeException("CUDA norm failed", t); }
+
     }
 
     @Override
@@ -656,24 +703,38 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             MemorySegment segB = malloc((long) n * n * 8, tracker);
             MemorySegment segIpiv = malloc((long) n * 4, tracker);
             MemorySegment segInfo = malloc((long) 4, tracker);
-            double[] h_A = toDoubleArray(a); double[] h_At = new double[n * n];
+            
+            double[] h_A = toDoubleArray(a); 
+            double[] h_At = new double[n * n];
             for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) h_At[c * n + r] = h_A[r * n + c];
-            double[] identity = new double[n * n]; for (int i = 0; i < n; i++) identity[i * n + i] = 1.0;
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(segA.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 8));
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(segB.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, identity), (long) n * n * 8));
+            
+            double[] identity = new double[n * n]; 
+            for (int i = 0; i < n; i++) identity[i * n + i] = 1.0;
+            
+            MemorySegment hostAt = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At);
+            MemorySegment hostId = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, identity);
+            
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, segA.address(), hostAt, (long) n * n * 8));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, segB.address(), hostId, (long) n * n * 8));
+            
             MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
-            checkCusolver((int) CUSOLVER_DGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_DGETRF_BUFFER_SIZE, handle, n, n, segA, n, p_Lwork));
+            
             MemorySegment segWork = malloc((long) p_Lwork.get(ValueLayout.JAVA_INT, 0) * 8, tracker);
-            checkCusolver((int) CUSOLVER_DGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
-            checkCusolver((int) CUSOLVER_DGETRS.invokeExact(handle, 0, n, n, segA, n, segIpiv, segB, n, segInfo));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_DGETRF, handle, n, n, segA, n, segWork, segIpiv, segInfo));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_DGETRS, handle, 0, n, n, segA, n, segIpiv, segB, n, segInfo));
+            
             double[] resData = new double[n * n];
             MemorySegment hostB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(hostB, segB.address(), (long) n * n * 8));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, hostB, segB.address(), (long) n * n * 8));
             MemorySegment.copy(hostB, ValueLayout.JAVA_DOUBLE, 0, resData, 0, n * n);
-            double[] h_Res = new double[n * n]; for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) h_Res[r * n + c] = resData[c * n + r];
+            
+            double[] h_Res = new double[n * n]; 
+            for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) h_Res[r * n + c] = resData[c * n + r];
             return toMatrix(h_Res, n, n);
         } catch (Throwable t) { throw new RuntimeException("CUDA inverse failed", t); }
     }
+
 
     private Matrix<E> inverseComplex(Matrix<E> a) {
         int n = a.rows();
@@ -684,24 +745,38 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             MemorySegment segB = malloc((long) n * n * 16, tracker);
             MemorySegment segIpiv = malloc((long) n * 4, tracker);
             MemorySegment segInfo = malloc((long) 4, tracker);
-            double[] h_A = toComplexDoubleArray(a); double[] h_At = new double[n * n * 2];
+            
+            double[] h_A = toComplexDoubleArray(a); 
+            double[] h_At = new double[n * n * 2];
             for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) { h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2]; h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1]; }
-            double[] identity = new double[n * n * 2]; for (int i = 0; i < n; i++) identity[(i * n + i) * 2] = 1.0;
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(segA.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16));
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(segB.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, identity), (long) n * n * 16));
+            
+            double[] identity = new double[n * n * 2]; 
+            for (int i = 0; i < n; i++) identity[(i * n + i) * 2] = 1.0;
+            
+            MemorySegment hostAt = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At);
+            MemorySegment hostId = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, identity);
+            
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, segA.address(), hostAt, (long) n * n * 16));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, segB.address(), hostId, (long) n * n * 16));
+            
             MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
-            checkCusolver((int) CUSOLVER_ZGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_ZGETRF_BUFFER_SIZE, handle, n, n, segA, n, p_Lwork));
+            
             MemorySegment segWork = malloc((long) p_Lwork.get(ValueLayout.JAVA_INT, 0) * 16, tracker);
-            checkCusolver((int) CUSOLVER_ZGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
-            checkCusolver((int) CUSOLVER_ZGETRS.invokeExact(handle, 0, n, n, segA, n, segIpiv, segB, n, segInfo));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_ZGETRF, handle, n, n, segA, n, segWork, segIpiv, segInfo));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_ZGETRS, handle, 0, n, n, segA, n, segIpiv, segB, n, segInfo));
+            
             double[] resData = new double[n * n * 2];
             MemorySegment hostB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(hostB, segB.address(), (long) n * n * 16));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, hostB, segB.address(), (long) n * n * 16));
             MemorySegment.copy(hostB, ValueLayout.JAVA_DOUBLE, 0, resData, 0, n * n * 2);
-            double[] h_Res = new double[n * n * 2]; for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) { h_Res[(r * n + c) * 2] = resData[(c * n + r) * 2]; h_Res[(r * n + c) * 2 + 1] = resData[(c * n + r) * 2 + 1]; }
+            
+            double[] h_Res = new double[n * n * 2]; 
+            for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) { h_Res[(r * n + c) * 2] = resData[(c * n + r) * 2]; h_Res[(r * n + c) * 2 + 1] = resData[(c * n + r) * 2 + 1]; }
             return toMatrixComplex(h_Res, n, n);
         } catch (Throwable t) { throw new RuntimeException("CUDA complex inverse failed", t); }
     }
+
 
     @Override
     public E determinant(Matrix<E> a) {
@@ -714,22 +789,35 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             MemorySegment segA = malloc((long) n * n * 8, tracker);
             MemorySegment segIpiv = malloc((long) n * 4, tracker);
             MemorySegment segInfo = malloc((long) 4, tracker);
-            double[] h_A = toDoubleArray(a); double[] h_At = new double[n * n];
+            
+            double[] h_A = toDoubleArray(a); 
+            double[] h_At = new double[n * n];
             for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) h_At[c * n + r] = h_A[r * n + c];
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(segA.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 8));
+            
+            MemorySegment hostAt = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At);
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, segA.address(), hostAt, (long) n * n * 8));
+            
             MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
-            checkCusolver((int) CUSOLVER_DGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_DGETRF_BUFFER_SIZE, handle, n, n, segA, n, p_Lwork));
+            
             MemorySegment segWork = malloc((long) p_Lwork.get(ValueLayout.JAVA_INT, 0) * 8, tracker);
-            checkCusolver((int) CUSOLVER_DGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_DGETRF, handle, n, n, segA, n, segWork, segIpiv, segInfo));
+            
             double[] h_LU = new double[n * n];
             MemorySegment hostLU = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(hostLU, segA.address(), (long) n * n * 8));
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, hostLU, segA.address(), (long) n * n * 8));
             MemorySegment.copy(hostLU, ValueLayout.JAVA_DOUBLE, 0, h_LU, 0, n * n);
-            int[] h_Ipiv = new int[n];
+            
+            int[] ipiv = new int[n];
             MemorySegment hostIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(hostIpiv, segIpiv.address(), (long) n * 4));
-            MemorySegment.copy(hostIpiv, ValueLayout.JAVA_INT, 0, h_Ipiv, 0, n);
-            double det = 1.0; for (int i = 0; i < n; i++) { det *= h_LU[i * n + i]; if (h_Ipiv[i] != i + 1) det = -det; }
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, hostIpiv, segIpiv.address(), (long) n * 4));
+            MemorySegment.copy(hostIpiv, ValueLayout.JAVA_INT, 0, ipiv, 0, n);
+            
+            double det = 1.0;
+            for (int i = 0; i < n; i++) {
+                det *= h_LU[i * n + i];
+                if (ipiv[i] != (i + 1)) det = -det;
+            }
             return (E) Real.of(det);
         } catch (Throwable t) { throw new RuntimeException("CUDA determinant failed", t); }
     }
@@ -742,26 +830,36 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
             MemorySegment segA = malloc((long) n * n * 16, tracker);
             MemorySegment segIpiv = malloc((long) n * 4, tracker);
             MemorySegment segInfo = malloc((long) 4, tracker);
-            double[] h_A = toComplexDoubleArray(a); double[] h_At = new double[n * n * 2];
+            
+            double[] h_A = toComplexDoubleArray(a); 
+            double[] h_At = new double[n * n * 2];
             for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) { h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2]; h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1]; }
-            checkCuda((int) CUDA_MEMCPY_H_TO_D.invokeExact(segA.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16));
+            
+            MemorySegment hostAt = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At);
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_H_TO_D, segA.address(), hostAt, (long) n * n * 16));
+            
             MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
-            checkCusolver((int) CUSOLVER_ZGETRF_BUFFER_SIZE.invokeExact(handle, n, n, segA, n, p_Lwork));
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_ZGETRF_BUFFER_SIZE, handle, n, n, segA, n, p_Lwork));
+            
             MemorySegment segWork = malloc((long) p_Lwork.get(ValueLayout.JAVA_INT, 0) * 16, tracker);
-            checkCusolver((int) CUSOLVER_ZGETRF.invokeExact(handle, n, n, segA, n, segWork, segIpiv, segInfo));
-            double[] h_QR = new double[n * n * 2];
-            MemorySegment hostQR = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(hostQR, segA.address(), (long) n * n * 16));
-            MemorySegment.copy(hostQR, ValueLayout.JAVA_DOUBLE, 0, h_QR, 0, n * n * 2);
-            int[] h_Ipiv = new int[n];
+            checkCusolver((int) NativeSafe.invoke(CUSOLVER_ZGETRF, handle, n, n, segA, n, segWork, segIpiv, segInfo));
+            
+            double[] h_LU = new double[n * n * 2];
+            MemorySegment hostLU = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, hostLU, segA.address(), (long) n * n * 16));
+            MemorySegment.copy(hostLU, ValueLayout.JAVA_DOUBLE, 0, h_LU, 0, n * n * 2);
+            
+            int[] ipiv = new int[n];
             MemorySegment hostIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
-            checkCuda((int) CUDA_MEMCPY_D_TO_H.invokeExact(hostIpiv, segIpiv.address(), (long) n * 4));
-            MemorySegment.copy(hostIpiv, ValueLayout.JAVA_INT, 0, h_Ipiv, 0, n);
+            checkCuda((int) NativeSafe.invoke(CUDA_MEMCPY_D_TO_H, hostIpiv, segIpiv.address(), (long) n * 4));
+            MemorySegment.copy(hostIpiv, ValueLayout.JAVA_INT, 0, ipiv, 0, n);
+            
             org.episteme.core.mathematics.numbers.complex.Complex det = org.episteme.core.mathematics.numbers.complex.Complex.ONE;
-            for (int i = 0; i < n; i++) det = det.multiply(org.episteme.core.mathematics.numbers.complex.Complex.of(h_QR[(i * n + i) * 2], h_QR[(i * n + i) * 2 + 1]));
-            int swaps = 0; for (int i = 0; i < n; i++) if (h_Ipiv[i] != (i + 1)) swaps++;
-            if (swaps % 2 != 0) det = det.negate();
-            return (E) (Object) det;
+            for (int i = 0; i < n; i++) {
+                det = det.multiply(org.episteme.core.mathematics.numbers.complex.Complex.of(h_LU[i * n * 2 + i * 2], h_LU[i * n * 2 + i * 2 + 1]));
+                if (ipiv[i] != (i + 1)) det = det.negate();
+            }
+            return (E) det;
         } catch (Throwable t) { throw new RuntimeException("CUDA complex determinant failed", t); }
     }
 

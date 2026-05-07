@@ -616,12 +616,16 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
                 values[i] = getRealValue((E) valsObj[i]);
             }
         } else {
-            // Conversion to sparse is necessary if it's not already
-            return toVector(toDoubleVec(multiply(a, x)), a.getScalarRing()); // Fallback to dense multiply if absolutely needed
+            // Use dense matrix-vector multiply from this provider (which will convert a to dense if needed)
+            // But we must avoid recursion. multiply(a, x) calls multiplyCSR.
+            // We should use a dense fallback here.
+            return multiplyDense(a, x);
         }
+
 
         double[] xData = toDoubleVec(x);
         double[] yData = new double[rows];
+
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             cl_mem memPtr = tracker.track(clCreateBuffer(staticContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null), CL::clReleaseMemObject);
@@ -1328,7 +1332,25 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
         }
     }
 
+    private Vector<E> multiplyDense(Matrix<E> a, Vector<E> x) {
+        int rows = a.rows();
+        int cols = a.cols();
+        double[] dataA = toDoubleArray(a);
+        double[] dataX = toDoubleVec(x);
+        double[] dataY = new double[rows];
+
+        DoubleBuffer da = DoubleBuffer.wrap(dataA);
+        DoubleBuffer dx = DoubleBuffer.wrap(dataX);
+        DoubleBuffer dy = DoubleBuffer.wrap(dataY);
+
+        matrixMultiply(da, dx, dy, rows, 1, cols);
+        dy.rewind();
+        dy.get(dataY);
+        return toVector(dataY, a.getScalarRing());
+    }
+
     private Complex getComplexValue(E val) {
+
         if (val == null) return Complex.ZERO;
         if (val instanceof Complex c) return c;
         if (val instanceof Real r) return Complex.of(r.doubleValue());

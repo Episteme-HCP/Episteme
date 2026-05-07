@@ -2281,8 +2281,4 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             return (Matrix<E>) RealDoubleMatrix.of(data, rows, cols);
         }
     }
-
-    }
 }
-
-

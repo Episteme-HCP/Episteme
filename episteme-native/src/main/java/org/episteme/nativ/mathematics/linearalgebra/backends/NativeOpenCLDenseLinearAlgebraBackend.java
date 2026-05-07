@@ -508,6 +508,7 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
             return fromFloatArray(fc, m, n, a);
         }
 
+
         double[] h_A = toDoubleArray(a);
         double[] h_B = toDoubleArray(b);
         double[] h_C = new double[m * n];
@@ -561,11 +562,13 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
 
     @SuppressWarnings("unchecked")
     private Matrix<E> fromDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
-        E[] elements = (E[]) java.lang.reflect.Array.newInstance(reference.get(0, 0).getClass(), data.length);
         Ring<E> ring = reference.getScalarRing();
+        Class<?> componentType = ring.zero().getClass();
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(componentType, data.length);
         for(int i=0; i<data.length; i++) elements[i] = castScalar(data[i], ring);
         return new DenseMatrix<E>(elements, rows, cols, ring);
     }
+
 
     @Override
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
@@ -1414,13 +1417,15 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
 
     @SuppressWarnings("unchecked")
     private Matrix<E> fromComplexDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
-        E[] elements = (E[]) java.lang.reflect.Array.newInstance(reference.get(0, 0).getClass(), rows * cols);
         Ring<E> ring = reference.getScalarRing();
+        Class<?> componentType = ring.zero().getClass();
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(componentType, rows * cols);
         for (int i = 0; i < rows * cols; i++) {
             elements[i] = castComplex(data[i * 2], data[i * 2 + 1], ring);
         }
         return new DenseMatrix<E>(elements, rows, cols, ring);
     }
+
 
     private E castScalar(double val, Ring<E> ring) {
         Object zero = ring.zero();
@@ -1518,17 +1523,22 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
 
     @SuppressWarnings("unchecked")
     private Vector<E> toVector(double[] d, Matrix<E> reference) {
-        E[] elements = (E[]) java.lang.reflect.Array.newInstance(reference.get(0, 0).getClass(), d.length);
-        for(int i = 0; i < d.length; i++) elements[i] = (E) Real.of(d[i]);
-        return new DenseVector<>(java.util.Arrays.asList(elements), reference.getScalarRing());
+        Ring<E> ring = reference.getScalarRing();
+        Class<?> componentType = ring.zero().getClass();
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(componentType, d.length);
+        for(int i = 0; i < d.length; i++) elements[i] = castScalar(d[i], ring);
+        return new DenseVector<>(java.util.Arrays.asList(elements), ring);
     }
 
     @SuppressWarnings("unchecked")
     private Vector<E> toVector(double[] d, Vector<E> reference) {
-        E[] elements = (E[]) java.lang.reflect.Array.newInstance(reference.get(0).getClass(), d.length);
-        for(int i = 0; i < d.length; i++) elements[i] = (E) Real.of(d[i]);
-        return new DenseVector<>(java.util.Arrays.asList(elements), reference.getScalarRing());
+        Ring<E> ring = reference.getScalarRing();
+        Class<?> componentType = ring.zero().getClass();
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(componentType, d.length);
+        for(int i = 0; i < d.length; i++) elements[i] = castScalar(d[i], ring);
+        return new DenseVector<>(java.util.Arrays.asList(elements), ring);
     }
+
 
     private double[] matVecMul(double[] a, double[] b, int rows, int cols) {
         // Mv = treat b as nx1 matrix and use GPU matmul
@@ -1662,8 +1672,16 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
 
     @SuppressWarnings("unchecked")
     private Matrix<E> fromFloatArray(float[] data, int rows, int cols, Matrix<E> reference) {
-        return (Matrix<E>) (Object) new org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealFloatMatrix(rows, cols, data);
+        Ring<E> ring = reference.getScalarRing();
+        if (ring.zero() instanceof RealFloat) {
+            return (Matrix<E>) (Object) new org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealFloatMatrix(rows, cols, data);
+        }
+        Class<?> componentType = ring.zero().getClass();
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(componentType, data.length);
+        for(int i=0; i<data.length; i++) elements[i] = castScalar(data[i], ring);
+        return new DenseMatrix<E>(elements, rows, cols, ring);
     }
+
 
     public void shutdown() {
         if (initialized) {
