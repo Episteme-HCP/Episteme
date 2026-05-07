@@ -156,6 +156,13 @@
                         <arg>jdk.incubator.vector</arg>
                         <arg>-Xpkginfo:always</arg>
                     </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <excludes>
                         <!-- Medical/Consultation files remain in episteme-social -->
                      </excludes>
