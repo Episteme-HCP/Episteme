@@ -296,14 +296,16 @@ public class LinearAlgebraComplianceTest {
             var iterator = loader.iterator();
             while (iterator.hasNext()) {
                 try {
+                    System.out.println("[AuditEngine] ServiceLoader: Attempting next...");
                     LinearAlgebraProvider<?> p = iterator.next();
+                    System.out.println("[AuditEngine] ServiceLoader: Found " + p.getName());
                     if (!excludeFilter.isEmpty() && p.getName().contains(excludeFilter)) {
-                        System.out.println("[AuditEngine] Skipping excluded provider: " + p.getName());
+                        System.out.println("[AuditEngine] ServiceLoader: Skipping excluded provider: " + p.getName());
                         continue;
                     }
                     providers.put(p.getName(), p);
                 } catch (Throwable t) {
-                    System.err.println("[AuditEngine] Skipping broken provider: " + t.getMessage());
+                    System.err.println("[AuditEngine] ServiceLoader: Skipping broken provider: " + t.getMessage());
                 }
             }
         } catch (Throwable t) {
@@ -312,10 +314,13 @@ public class LinearAlgebraComplianceTest {
         
         // 2. Backend discovery (Including native/GPU backends even if hardware is missing)
         try {
+            System.out.println("[AuditEngine] BackendDiscovery: Starting...");
             for (Backend b : BackendDiscovery.getInstance().getProviders()) {
+                System.out.println("[AuditEngine] BackendDiscovery: Checking backend " + b.getName() + " (" + b.getClass().getSimpleName() + ")");
                 try {
                     for (var ap : b.getAlgorithmProviders()) {
                         if (ap instanceof LinearAlgebraProvider<?> p) {
+                            System.out.println("[AuditEngine] BackendDiscovery: Found provider " + p.getName() + " from backend " + b.getName());
                             if (!excludeFilter.isEmpty() && p.getName().contains(excludeFilter)) continue;
                             providers.put(p.getName(), p);
                         }
