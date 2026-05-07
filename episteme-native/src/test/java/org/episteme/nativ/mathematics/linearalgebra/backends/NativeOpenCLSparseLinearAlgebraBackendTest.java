@@ -1,0 +1,25 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+package org.episteme.nativ.mathematics.linearalgebra.backends;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Automated baseline test for NativeOpenCLSparseLinearAlgebraBackend.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.2
+ */
+public class NativeOpenCLSparseLinearAlgebraBackendTest {
+
+    @Test
+    public void testClassPresence() {
+        // Ensure class is reachable
+        assertNotNull(NativeOpenCLSparseLinearAlgebraBackend.class);
+    }
+}

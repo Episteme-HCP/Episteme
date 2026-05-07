@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package org.episteme.computing.common;
+
+option java_multiple_files = true;
+option java_package = "org.episteme.server.server.proto.common";
+option java_outer_classname = "CommonTypesProto";
+
+// Numerical Context for precision and backend governance
+message NumericalContext {
+  enum FloatPrecision {
+    FLOAT = 0;
+    DOUBLE = 1;
+  }
+  enum IntPrecision {
+    INT = 0;
+    LONG = 1;
+  }
+  enum RealPrecision {
+    FAST = 0;
+    NORMAL = 1;
+    EXACT = 2;
+  }
+  
+  FloatPrecision float_precision = 1;
+  IntPrecision int_precision = 2;
+  RealPrecision real_precision = 3;
+  string backend_id = 4;
+  int32 math_context_precision = 5;
+  int32 math_context_rounding_mode = 6; // Mapping to java.math.RoundingMode ordinal
+}

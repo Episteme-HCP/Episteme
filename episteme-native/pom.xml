@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.silveremartin-dev</groupId>
+        <artifactId>episteme-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>episteme-native</artifactId>
+    <name>Episteme Native</name>
+    <description>Native library integration via Project Panama (FFM API)</description>
+
+    <properties>
+        <cuda.exclude.1>**/_NONE_/**</cuda.exclude.1>
+        <cuda.exclude.2>**/_NONE_/**</cuda.exclude.2>
+        <cuda.exclude.3>**/_NONE_/**</cuda.exclude.3>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.silveremartin-dev</groupId>
+            <artifactId>episteme-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.silveremartin-dev</groupId>
+            <artifactId>episteme-natural</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- Native AI Backends -->
+        
+        <!-- ONNX Runtime for Java -->
+        <dependency>
+            <groupId>com.microsoft.onnxruntime</groupId>
+            <artifactId>onnxruntime</artifactId>
+        </dependency>
+
+        <!-- DeepLearning4J / ND4J -->
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>1.0.0-M2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j2-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-api</artifactId>
+            <version>${nd4j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j2-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native-platform</artifactId>
+            <version>${nd4j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j2-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Apache Arrow (Native) -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>arrow</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+
+        <!-- JOCL (OpenCL) -->
+        <dependency>
+            <groupId>org.jocl</groupId>
+            <artifactId>jocl</artifactId>
+        </dependency>
+
+        
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>fftw</artifactId>
+            <version>3.3.10-${javacpp.version}</version>
+        </dependency>
+                
+        <!-- AutoService for SPI generation -->
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test Dependencies (EJML for verification) -->
+        <dependency>
+            <groupId>org.ejml</groupId>
+            <artifactId>ejml-all</artifactId>
+        </dependency>
+
+        <!-- HDF5 Native Library -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>hdf5</artifactId>
+            <version>${hdf5.version}</version>
+        </dependency>
+
+        <!-- JavaCV / OpenCV for Vision -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>opencv</artifactId>
+        </dependency>
+
+        <!-- Jzy3d 3D Plotting API (Native JOGL Hardware Accelerated) -->
+        <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-core</artifactId>
+            <version>2.2.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-native-jogl-javafx</artifactId>
+            <version>2.2.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-native-jogl-awt</artifactId>
+            <version>2.2.2-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- IMPORTANT: Ensure your IDE is configured for Java 25 for this module -->
+                    <release>${maven.compiler.release}</release>
+                    <fork>true</fork>
+                    <compilerArgs>
+                        <arg>--add-modules</arg>
+                        <arg>jdk.incubator.vector</arg>
+                        <arg>-Xpkginfo:always</arg>
+                    </compilerArgs>
+                    <excludes>
+                        <exclude>${cuda.exclude.1}</exclude>
+                        <exclude>${cuda.exclude.2}</exclude>
+                        <exclude>${cuda.exclude.3}</exclude>
+                        <exclude>module-info.java</exclude>
+                    </excludes>
+                    <testExcludes>
+                        <exclude>${cuda.exclude.1}</exclude>
+                        <exclude>${cuda.exclude.2}</exclude>
+                        <exclude>${cuda.exclude.3}</exclude>
+                    </testExcludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                    <argLine>--add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+                    <systemPropertyVariables>
+                        <episteme.benchmark.skip>true</episteme.benchmark.skip>
+                        <episteme.nd4j.skip>false</episteme.nd4j.skip>
+                        <episteme.jblas.skip>false</episteme.jblas.skip>
+                        <org.jblas.util.LibraryLoader.deletedll>false</org.jblas.util.LibraryLoader.deletedll>
+                        <java.awt.headless>true</java.awt.headless>
+                    </systemPropertyVariables>
+                    <environmentVariables>
+                        <AWT_TOOLKIT>headless</AWT_TOOLKIT>
+                    </environmentVariables>
+                    <excludes>
+                        <exclude>${cuda.exclude.1}</exclude>
+                        <exclude>${cuda.exclude.2}</exclude>
+                        <exclude>${cuda.exclude.3}</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <profiles>
+        <!-- JCuda profiles for supported architectures -->
+        <profile>
+            <id>jcuda-linux-x86_64</id>
+            <activation>
+                <os>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <cuda.exclude.1>none</cuda.exclude.1>
+                <cuda.exclude.2>none</cuda.exclude.2>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcublas</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcusparse</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda-natives</artifactId>
+                    <version>${jcuda.version}</version>
+                    <classifier>linux-x86_64</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jcuda-windows-x86_64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <cuda.exclude.1>none</cuda.exclude.1>
+                <cuda.exclude.2>none</cuda.exclude.2>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcublas</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcusparse</artifactId>
+                    <version>${jcuda.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jcuda</groupId>
+                    <artifactId>jcuda-natives</artifactId>
+                    <version>${jcuda.version}</version>
+                    <classifier>windows-x86_64</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <!-- Profile for systems with OpenBLAS installed -->
+        <profile>
+            <id>openblas</id>
+            <properties>
+                <blas.library>openblas</blas.library>
+            </properties>
+        </profile>
+        <profile>
+            <id>optimal</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>openblas-platform</artifactId>
+                    <version>${openblas.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>benchmark</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>openblas-platform</artifactId>
+                    <version>${openblas.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>arrow-platform</artifactId>
+                    <version>${arrow.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>fftw-platform</artifactId>
+                    <version>3.3.10-${javacpp.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>hdf5-platform</artifactId>
+                    <version>${hdf5.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>javacv-platform</artifactId>
+                    <version>${javacpp.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>opencv-platform</artifactId>
+                    <version>${opencv.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <!-- Profile for systems with Intel MKL installed -->
+        <profile>
+            <id>mkl</id>
+            <properties>
+                <blas.library>mkl_rt</blas.library>
+            </properties>
+        </profile>
+        <!-- Exclude CUDA sources on platforms without jcuda (macOS, aarch64) -->
+        <profile>
+            <id>no-cuda</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <cuda.exclude.1>**/*CUDA*</cuda.exclude.1>
+                <cuda.exclude.2>**/*Cuda*</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
+            </properties>
+        </profile>
+        <profile>
+            <id>no-cuda-arm</id>
+            <activation>
+                <os>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <cuda.exclude.1>**/*CUDA*</cuda.exclude.1>
+                <cuda.exclude.2>**/*Cuda*</cuda.exclude.2>
+                <cuda.exclude.3>org/episteme/nativ/technical/backend/gpu/cuda/**</cuda.exclude.3>
+            </properties>
+        </profile>
+    </profiles>
+</project>

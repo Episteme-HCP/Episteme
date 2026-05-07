@@ -1,0 +1,18 @@
+[
+  {
+    "location": "Paris-Simulation",
+    "description": "Cloudy",
+    "temperature": 15.0,
+    "humidity": 60,
+    "windSpeed": 5.0,
+    "solarIrradiance": 200.0
+  },
+  {
+    "location": "NewYork-Simulation",
+    "description": "Sunny",
+    "temperature": 22.0,
+    "humidity": 45,
+    "windSpeed": 3.0,
+    "solarIrradiance": 800.0
+  }
+]

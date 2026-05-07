@@ -1,0 +1,68 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+package org.episteme.core.media.vision.backends;
+
+import org.episteme.core.media.vision.ImageOp;
+import org.episteme.core.media.VisionBackend;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.core.technical.backend.cpu.CPUBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import com.google.auto.service.AutoService;
+import java.awt.image.BufferedImage;
+
+/**
+ * Basic VisionAlgorithmProvider using standard Java AWT (BufferedImage).
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ */
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, CPUBackend.class})
+public class JavaAWTVisionBackend implements VisionBackend, CPUBackend {
+
+    @Override
+    public BufferedImage apply(BufferedImage image, ImageOp<BufferedImage> op) {
+        return op.process(image);
+    }
+
+    @Override
+    public BufferedImage createImage(Object data, int width, int height) {
+        if (data instanceof int[]) {
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            img.setRGB(0, 0, width, height, (int[]) data, 0, width);
+            return img;
+        }
+        throw new IllegalArgumentException("Unsupported data type for JavaAWTVisionBackend");
+    }
+
+    @Override public String getType() { return "vision"; }
+    @Override public String getId() { return "java-awt-vision"; }
+    @Override public String getBackendName() { return "Java AWT Vision Backend"; }
+    @Override public String getName() { return getBackendName(); }
+    @Override public String getDescription() { return "Standard Computer Vision backend using Java AWT BufferedImages for platform-independent image processing."; }
+    @Override public boolean isAvailable() { return true; }
+    @Override public int getPriority() { return 10; }
+    
+    @Override 
+    public Object createBackend() { 
+        return this; // Stateless service
+    }
+
+    @Override
+    public void shutdown() {
+        // No-op for standard Java AWT backend
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        return HardwareAccelerator.CPU;
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
+    }
+}

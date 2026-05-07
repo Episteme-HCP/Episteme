@@ -1,0 +1,248 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.episteme.core.distributed;
+
+import org.episteme.core.technical.backend.distributed.DistributedContext;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.nio.DoubleBuffer;
+import java.nio.ByteBuffer;
+
+/**
+ * Local implementation of DistributedContext using ForkJoinPool.
+ * <p>
+ * This serves as the default "distributed" context, running tasks in parallel
+ * on the local machine.
+ * </p>
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class LocalDistributedContext implements DistributedContext {
+
+    private static final org.episteme.core.util.Logger LOG = org.episteme.core.util.Logger
+            .getLogger(LocalDistributedContext.class);
+
+    private final ForkJoinPool pool;
+
+    public LocalDistributedContext() {
+        this.pool = ForkJoinPool.commonPool();
+    }
+
+    public LocalDistributedContext(int parallelism) {
+        this.pool = (parallelism == ForkJoinPool.getCommonPoolParallelism()) ? 
+                    ForkJoinPool.commonPool() : new ForkJoinPool(parallelism);
+        LOG.debug(() -> String.format("LocalDistributedContext initialized with parallelism=%d (CommonPool: %b)", 
+                  pool.getParallelism(), pool == ForkJoinPool.commonPool()));
+    }
+
+    @Override
+    public <T extends Serializable> Future<T> submit(Callable<T> task) {
+        if (task == null) throw new IllegalArgumentException("Task cannot be null");
+        // Capture current MathContext
+        org.episteme.core.mathematics.context.MathContext capturedContext = org.episteme.core.mathematics.context.MathContext
+                .getCurrent();
+
+        // Wrap task to propagate context
+        Callable<T> wrappedTask = () -> {
+            org.episteme.core.mathematics.context.MathContext oldContext = org.episteme.core.mathematics.context.MathContext
+                    .getCurrent();
+            try {
+                org.episteme.core.mathematics.context.MathContext.setCurrent(capturedContext);
+                LOG.debug(() -> "Executing task with context: " + capturedContext);
+                return task.call();
+            } finally {
+                org.episteme.core.mathematics.context.MathContext.setCurrent(oldContext);
+            }
+        };
+
+        return pool.submit(wrappedTask);
+    }
+
+    @Override
+    public <T extends Serializable> List<Future<T>> invokeAll(List<Callable<T>> tasks) {
+        if (tasks == null || tasks.isEmpty()) return java.util.Collections.emptyList();
+        // Capture current MathContext
+        org.episteme.core.mathematics.context.MathContext capturedContext = org.episteme.core.mathematics.context.MathContext
+                .getCurrent();
+
+        // Wrap all tasks to propagate context
+        List<Callable<T>> wrappedTasks = tasks.stream()
+                .map(task -> (Callable<T>) () -> {
+                    org.episteme.core.mathematics.context.MathContext oldContext = org.episteme.core.mathematics.context.MathContext
+                            .getCurrent();
+                    try {
+                        org.episteme.core.mathematics.context.MathContext.setCurrent(capturedContext);
+                        return task.call();
+                    } finally {
+                        org.episteme.core.mathematics.context.MathContext.setCurrent(oldContext);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        try {
+            return pool.invokeAll(wrappedTasks).stream()
+                    .map(f -> (Future<T>) f)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            throw new RuntimeException("Wait for parallel tasks execution interrupted", e);
+        }
+    }
+
+    @Override
+    public int getParallelism() {
+        return pool.getParallelism();
+    }
+
+    @Override
+    public void shutdown() {
+        if (pool != ForkJoinPool.commonPool()) {
+            pool.shutdown();
+        }
+    }
+
+    private final java.util.concurrent.ConcurrentHashMap<Long, Object> localMemory = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @Override
+    public void put(DoubleBuffer source, int targetRank, long offset) {
+        if (source == null) return;
+        // Create a copy of the source buffer to ensure data stability
+        DoubleBuffer copy = DoubleBuffer.allocate(source.remaining());
+        int pos = source.position();
+        try {
+            copy.put(source);
+            copy.flip();
+            localMemory.put(offset, copy);
+        } finally {
+            source.position(pos); // Restore original position
+        }
+    }
+
+    @Override
+    public void get(DoubleBuffer target, int sourceRank, long offset) {
+        Object sourceObj = localMemory.get(offset);
+        if (sourceObj instanceof DoubleBuffer) {
+            DoubleBuffer source = (DoubleBuffer) sourceObj;
+            int pos = source.position();
+            target.put(source);
+            source.position(pos); // Restore original position
+        } else {
+            // Fill with zeros if not found
+            int remaining = target.remaining();
+            for (int i = 0; i < remaining; i++) {
+                target.put(0.0);
+            }
+        }
+    }
+
+    @Override
+    public void put(ByteBuffer source, int targetRank, long offset) {
+        if (source == null) return;
+        ByteBuffer copy = ByteBuffer.allocate(source.remaining());
+        int pos = source.position();
+        try {
+            copy.put(source);
+            copy.flip();
+            localMemory.put(offset, copy);
+        } finally {
+            source.position(pos);
+        }
+    }
+
+    @Override
+    public void get(ByteBuffer target, int sourceRank, long offset) {
+        Object sourceObj = localMemory.get(offset);
+        if (sourceObj instanceof ByteBuffer) {
+            ByteBuffer source = (ByteBuffer) sourceObj;
+            int pos = source.position();
+            target.put(source);
+            source.position(pos);
+        }
+    }
+
+    @Override
+    public void fence() {
+        // No-op for local memory, but we could use this as a hint to clear 
+        // older entries if memory is tight.
+        if (localMemory.size() > 1000) {
+            localMemory.clear(); // Simple eviction for simulation
+        }
+    }
+
+    @Override
+    public void broadcast(DoubleBuffer buffer, int root) {
+        // In a local context (single node), broadcast is a no-op as the data is already present.
+    }
+
+    @Override
+    public void broadcast(ByteBuffer buffer, int root) {
+        // Local no-op
+    }
+
+    @Override
+    public void allGather(DoubleBuffer sendBuffer, DoubleBuffer recvBuffer) {
+        // In a local context, AllGather effectively copies sendBuffer to recvBuffer
+        if (recvBuffer.remaining() < sendBuffer.remaining()) {
+             throw new IllegalArgumentException("Receive buffer too small for local AllGather");
+        }
+        
+        // Save position/limit
+        int sendPos = sendBuffer.position();
+        // int recvPos = recvBuffer.position(); // Unused
+        
+        // Copy data
+        recvBuffer.put(sendBuffer);
+        
+        // Restore positions (optional, but good practice for "simulating" independent buffers)
+        // However, for typical AllGather usage, recvBuffer is expected to be filled.
+        // We leave recvBuffer at its new position.
+        sendBuffer.position(sendPos);
+    }
+
+    @Override
+    public void allGather(ByteBuffer sendBuffer, ByteBuffer recvBuffer) {
+        if (recvBuffer.remaining() < sendBuffer.remaining()) {
+            throw new IllegalArgumentException("Receive buffer too small for local AllGather");
+        }
+        int sendPos = sendBuffer.position();
+        recvBuffer.put(sendBuffer);
+        sendBuffer.position(sendPos);
+    }
+
+    @Override
+    public void barrier() {
+        // No-op for single threaded/local context
+    }
+}
+
+
