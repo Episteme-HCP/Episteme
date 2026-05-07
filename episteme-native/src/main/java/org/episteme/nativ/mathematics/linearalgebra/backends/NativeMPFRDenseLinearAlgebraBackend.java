@@ -839,7 +839,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 }
             }
             @SuppressWarnings("unchecked")
-            Vector<E> result = (Vector<E>) (Object) new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(list), (LinearAlgebraProvider<E>) this, ring);
+            org.episteme.core.mathematics.linearalgebra.Vector<E> result = (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<E>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<E>(list), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E>) this, ring);
             return result;
         } catch (Throwable t) {
             throw new RuntimeException("MPFR backToVector failed", t);
@@ -1048,7 +1048,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 }
             }
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(storage, (LinearAlgebraProvider<E>) this, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(storage, (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E>) this, ring);
     }
     
     private static void clearMPFRArray(MemorySegment mat, int count) {

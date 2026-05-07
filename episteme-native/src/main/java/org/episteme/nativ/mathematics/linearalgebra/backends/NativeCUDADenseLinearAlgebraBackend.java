@@ -1115,7 +1115,7 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
                 }
             }
 
-            return new LUResult<>(toMatrixComplex(lData, m, n), toMatrixComplex(uData, m, n), toVector(pData));
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E>(toMatrixComplex(lData, m, n), toMatrixComplex(uData, m, n), toVector(pData));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex LU failed", t); }
     }
 
@@ -1282,7 +1282,7 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
         Ring<E> ring = (Ring<E>) (Object) org.episteme.core.mathematics.sets.Reals.getInstance();
         E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for(int i=0; i<data.length; i++) elements[i] = castScalar(data[i], ring);
-        return new DenseMatrix<>(elements, rows, cols, ring);
+        return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(elements, rows, cols, ring);
     }
     
     @SuppressWarnings("unchecked")

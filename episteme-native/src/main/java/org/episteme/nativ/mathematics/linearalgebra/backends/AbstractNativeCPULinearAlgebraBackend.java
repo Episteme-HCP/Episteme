@@ -594,7 +594,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         throw new UnsupportedOperationException("Unsupported ring type for NativeCPU multiply: " + ring.getClass().getName());
     }
 
-    private Vector<org.episteme.core.mathematics.numbers.real.Real> multiplyRealFloat(Matrix<org.episteme.core.mathematics.numbers.real.Real> a, Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> multiplyRealFloat(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.Real> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (AVAILABLE && SGEMV_HANDLE != null) {
             int m = a.rows();
             int n = a.cols();
@@ -606,13 +606,13 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 float[] result = rSeg.toArray(ValueLayout.JAVA_FLOAT);
                 org.episteme.core.mathematics.numbers.real.Real[] res = new org.episteme.core.mathematics.numbers.real.Real[m];
                 for (int i=0; i<m; i++) res[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(result[i]);
-                return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Reals.getInstance());
+                return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.<org.episteme.core.mathematics.numbers.real.Real>of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Reals.getInstance());
             }
         }
         throw new UnsupportedOperationException("NativeCPU multiplyRealFloat failed or not available");
     }
 
-    private Vector<org.episteme.core.mathematics.numbers.complex.Complex> multiplyComplexFloat(Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> multiplyComplexFloat(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         if (AVAILABLE && CGEMV_HANDLE != null) {
             int m = a.rows();
             int n = a.cols();
@@ -626,13 +626,13 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 float[] result = rSeg.toArray(ValueLayout.JAVA_FLOAT);
                 org.episteme.core.mathematics.numbers.complex.Complex[] res = new org.episteme.core.mathematics.numbers.complex.Complex[m];
                 for (int i=0; i<m; i++) res[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2*i+1]));
-                return Vector.of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
+                return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.<org.episteme.core.mathematics.numbers.complex.Complex>of(java.util.Arrays.asList(res), org.episteme.core.mathematics.sets.Complexes.getInstance());
             }
         }
         throw new UnsupportedOperationException("NativeCPU multiplyComplexFloat failed or not available");
     }
 
-    private Vector<Real> multiplyReal(Matrix<Real> a, Vector<Real> b) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> multiplyReal(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.real.Real> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> b) {
         if (AVAILABLE && DGEMV_HANDLE != null) {
             int m = a.rows();
             int n = a.cols();
@@ -646,8 +646,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 
                 double[] result = rSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 @SuppressWarnings("unchecked")
-                Vector<Real> res = (Vector<Real>)(Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
-                return res;
+                org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> resVal = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
+                return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) resVal;
             }
         }
         
@@ -663,11 +663,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             rd[i] = sum;
         }
         @SuppressWarnings("unchecked")
-        Vector<Real> res = (Vector<Real>)(Object) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(rd);
-        return res;
+        org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> resVal = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(rd);
+        return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) resVal;
     }
 
-    private Vector<Complex> multiplyComplex(Matrix<Complex> a, Vector<Complex> b) {
+    private org.episteme.core.mathematics.linearalgebra.Vector<E> multiplyComplex(org.episteme.core.mathematics.linearalgebra.Matrix<org.episteme.core.mathematics.numbers.complex.Complex> a, org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.complex.Complex> b) {
         if (AVAILABLE && ZGEMV_HANDLE != null) {
             int m = a.rows();
             int n = a.cols();
