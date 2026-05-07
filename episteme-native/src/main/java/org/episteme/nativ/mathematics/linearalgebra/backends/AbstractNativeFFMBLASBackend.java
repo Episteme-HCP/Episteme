@@ -178,6 +178,11 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         }
         
         LOOKUP = lib.orElse(null);
+        try {
+            java.nio.file.Files.writeString(java.nio.file.Paths.get("/home/admin/episteme_diag.log"), 
+                "[FFM-BLAS] LOOKUP initialized: " + (LOOKUP != null) + "\n",
+                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+        } catch (Exception e) {}
         
         Optional<SymbolLookup> lapackLib = NativeFFMLoader.loadLibrary("lapacke", arena);
         if (lapackLib.isEmpty()) {
