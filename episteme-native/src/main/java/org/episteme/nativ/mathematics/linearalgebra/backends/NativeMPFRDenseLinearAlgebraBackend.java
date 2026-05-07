@@ -1621,12 +1621,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         Matrix<E> at = transpose(a);
         Matrix<E> ata = multiply(at, a);
         org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen = eigen(ata);
-        Vector<E> sValues = eigen.getValues();
+        Vector<E> sValues = eigen.getEigenvalues();
         int n = sValues.dimension();
         Object[] sigma = new Object[n];
         for (int i = 0; i < n; i++) sigma[i] = (E) (Object) ((Real) sValues.get(i)).sqrt();
         Vector<E> s = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(sigma)), (LinearAlgebraProvider<E>) this, a.getScalarRing());
-        Matrix<E> v = eigen.getVectors();
+        Matrix<E> v = eigen.getEigenvectors();
         return new SVDResult<>(v, s, v); 
     }
 
