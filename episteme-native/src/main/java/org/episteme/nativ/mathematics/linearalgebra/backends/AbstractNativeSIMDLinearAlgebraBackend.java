@@ -1169,11 +1169,11 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             for (int j = 0; j < dim; j++) {
                 Complex[] e = new Complex[dim];
                 for (int i=0; i<dim; i++) e[i] = (i==j) ? Complex.ONE : Complex.ZERO;
-                Vector<E> b = (Vector<E>)(Object) Vector.of(java.util.Arrays.asList(e), ring);
-                Vector<E> x = solve(lu, b);
-                for (int i = 0; i < dim; i++) invData[i * dim + j] = (Complex) x.get(i);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> b = (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(e), (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object) ring);
+                org.episteme.core.mathematics.linearalgebra.Vector<E> x = solve(lu, b);
+                for (int i = 0; i < dim; i++) invData[i * dim + j] = (org.episteme.core.mathematics.numbers.complex.Complex) x.get(i);
             }
-            return (Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(dim, dim, invData), this, ring);
+            return (org.episteme.core.mathematics.linearalgebra.Matrix<E>)(Object) new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<org.episteme.core.mathematics.numbers.complex.Complex>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<org.episteme.core.mathematics.numbers.complex.Complex>(dim, dim, invData), (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)this, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)ring);
         }
         throw new UnsupportedOperationException("NativeSIMD inverse failed for ring: " + ring);
     }
