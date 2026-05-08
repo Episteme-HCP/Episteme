@@ -1772,21 +1772,53 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 NativeSafe.invoke(MPFR_SQRT, normX, normX, rnd);
 
                 MemorySegment akkR = getMPFR(h_A, k, k, n, 0, isComplex);
-                if ((int) NativeSafe.invoke(MPFR_CMP_SI, akkR, 0L) < 0) NativeSafe.invoke(MPFR_NEG, s, normX, rnd);
-                else NativeSafe.invoke(MPFR_SET, s, normX, rnd);
+                MemorySegment akkI = isComplex ? getMPFR(h_A, k, k, n, 1, true) : null;
 
-                for (int i = 0; i < m; i++) {
-                    if (i < k) {
-                        NativeSafe.invoke(MPFR_SET_UI, v.asSlice(i * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), 0L, rnd);
-                        if (isComplex) NativeSafe.invoke(MPFR_SET_UI, v.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), 0L, rnd);
-                    } else if (i == k) {
-                        NativeSafe.invoke(MPFR_ADD, v.asSlice(i * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), akkR, s, rnd);
-                        if (isComplex) NativeSafe.invoke(MPFR_SET, v.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), getMPFR(h_A, k, k, n, 1, true), rnd);
+                if (isComplex) {
+                    MemorySegment magXk = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, magXk, (int) prec);
+                    complexMagnitude(magXk, akkR, akkI, (int) prec, arena, tracker);
+                    
+                    MemorySegment sR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
+                    MemorySegment sI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
+
+                    if ((int) NativeSafe.invoke(MPFR_ZERO_P, magXk) == 0) {
+                        NativeSafe.invoke(MPFR_SET, sR, normX, rnd);
+                        NativeSafe.invoke(MPFR_SET_UI, sI, 0L, rnd);
                     } else {
-                        NativeSafe.invoke(MPFR_SET, v.asSlice(i * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), getMPFR(h_A, i, k, n, 0, isComplex), rnd);
-                        if (isComplex) NativeSafe.invoke(MPFR_SET, v.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), getMPFR(h_A, i, k, n, 1, isComplex), rnd);
+                        NativeSafe.invoke(MPFR_DIV, sR, akkR, magXk, rnd);
+                        NativeSafe.invoke(MPFR_MUL, sR, sR, normX, rnd);
+                        NativeSafe.invoke(MPFR_DIV, sI, akkI, magXk, rnd);
+                        NativeSafe.invoke(MPFR_MUL, sI, sI, normX, rnd);
+                    }
+
+                    for (int i = 0; i < m; i++) {
+                        if (i < k) {
+                            NativeSafe.invoke(MPFR_SET_UI, v.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), 0L, rnd);
+                            NativeSafe.invoke(MPFR_SET_UI, v.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), 0L, rnd);
+                        } else if (i == k) {
+                            NativeSafe.invoke(MPFR_ADD, v.asSlice(k * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), akkR, sR, rnd);
+                            NativeSafe.invoke(MPFR_ADD, v.asSlice((k * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), akkI, sI, rnd);
+                        } else {
+                            NativeSafe.invoke(MPFR_SET, v.asSlice(i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), getMPFR(h_A, i, k, n, 0, true), rnd);
+                            NativeSafe.invoke(MPFR_SET, v.asSlice((i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), getMPFR(h_A, i, k, n, 1, true), rnd);
+                        }
+                    }
+                    NativeSafe.invoke(MPFR_CLEAR, magXk); NativeSafe.invoke(MPFR_CLEAR, sR); NativeSafe.invoke(MPFR_CLEAR, sI);
+                } else {
+                    if ((int) NativeSafe.invoke(MPFR_CMP_SI, akkR, 0L) < 0) NativeSafe.invoke(MPFR_NEG, s, normX, rnd);
+                    else NativeSafe.invoke(MPFR_SET, s, normX, rnd);
+
+                    for (int i = 0; i < m; i++) {
+                        if (i < k) {
+                            NativeSafe.invoke(MPFR_SET_UI, v.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), 0L, rnd);
+                        } else if (i == k) {
+                            NativeSafe.invoke(MPFR_ADD, v.asSlice(k * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), akkR, s, rnd);
+                        } else {
+                            NativeSafe.invoke(MPFR_SET, v.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), getMPFR(h_A, i, k, n, 0, false), rnd);
+                        }
                     }
                 }
+
 
                 NativeSafe.invoke(MPFR_SET_UI, hVal, 0L, rnd);
                 for (int i = k; i < m; i++) {
