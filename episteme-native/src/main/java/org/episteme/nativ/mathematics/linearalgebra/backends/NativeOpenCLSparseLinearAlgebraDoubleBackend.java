@@ -70,7 +70,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             vecAddKernel = tryCreateKernel(program, "vec_add");
             vecScaleKernel = tryCreateKernel(program, "vec_scale");
             saxpyKernel = tryCreateKernel(program, "saxpy");
-            dotPartialKernel = tryCreateKernel(program, "dot_partial");
+            dotPartialKernel = tryCreateKernel(program, "vec_dot_partial");
 
             initialized = (spmvKernel != null);
             if (initialized) {
