@@ -50,6 +50,8 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
     private cl_kernel complexVecScaleKernel;
     private cl_kernel dotPartialKernel;
     private cl_kernel complexDotPartialKernel;
+    private cl_kernel saxpyKernel;
+    private cl_kernel complexSaxpyKernel;
     
     private volatile boolean initialized = false;
 
@@ -77,6 +79,8 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             complexVecScaleKernel = tryCreateKernel(program, "complex_vec_scale_float");
             dotPartialKernel = tryCreateKernel(program, "vec_dot_partial_float");
             complexDotPartialKernel = tryCreateKernel(program, "complex_dot_partial_float");
+            saxpyKernel = tryCreateKernel(program, "saxpy_float");
+            complexSaxpyKernel = tryCreateKernel(program, "complex_saxpy_float");
 
             initialized = (spmvKernel != null);
             if (initialized) {
@@ -324,6 +328,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             cl_kernel currentAdd = isComplex ? complexVecAddKernel : vecAddKernel;
             cl_kernel currentSub = isComplex ? complexVecSubKernel : vecSubKernel;
             cl_kernel currentScale = isComplex ? complexVecScaleKernel : vecScaleKernel;
+            cl_kernel currentSaxpy = isComplex ? complexSaxpyKernel : saxpyKernel;
 
             // r = b - Ax
             computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mX, mV, isComplex);
@@ -349,9 +354,9 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
                     rhoF = rn;
                 }
 
-                gpuSaxpy(queue, currentSub, currentScale, n, mV, mP, isComplex ? omega : omegaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mV, mP, isComplex ? omega.negate() : -omegaF, isComplex);
                 gpuScale(queue, currentScale, mP, beta, n, isComplex);
-                gpuAdd(queue, currentAdd, mR, mP, n, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mR, mP, isComplex ? Complex.ONE : 1.0f, isComplex);
 
                 computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mP, mV, isComplex);
                 Object dotV = gpuDot(queue, currentDot, mR0, mV, mTemp, n, isComplex);
@@ -362,7 +367,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
                 }
 
                 clEnqueueCopyBuffer(queue, mR, mS, 0, 0, (long)Sizeof.cl_float * elemSize * n, 0, null, null);
-                gpuSaxpy(queue, currentSub, currentScale, n, mV, mS, isComplex ? alpha : alphaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mV, mS, isComplex ? alpha.negate() : -alphaF, isComplex);
 
                 computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mS, mT, isComplex);
                 Object tDotS = gpuDot(queue, currentDot, mT, mS, mTemp, n, isComplex);
@@ -374,11 +379,11 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
                     omegaF = (Float)tDotS / (Float)tDotT;
                 }
 
-                gpuSaxpy(queue, currentAdd, currentScale, n, mP, mX, isComplex ? alpha : alphaF, isComplex);
-                gpuSaxpy(queue, currentAdd, currentScale, n, mS, mX, isComplex ? omega : omegaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mP, mX, isComplex ? alpha : alphaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mS, mX, isComplex ? omega : omegaF, isComplex);
 
                 clEnqueueCopyBuffer(queue, mS, mR, 0, 0, (long)Sizeof.cl_float * elemSize * n, 0, null, null);
-                gpuSaxpy(queue, currentSub, currentScale, n, mT, mR, isComplex ? omega : omegaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mT, mR, isComplex ? omega.negate() : -omegaF, isComplex);
 
                 Object resNorm = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
                 double normVal = isComplex ? ((Complex)resNorm).abs().doubleValue() : (Float)resNorm;
@@ -428,22 +433,19 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         }
     }
 
-    private void gpuSaxpy(cl_command_queue queue, cl_kernel opKernel, cl_kernel scaleKernel, int n, cl_mem mX, cl_mem mY, Object alpha, boolean isComplex) {
-        // We don't have a single saxpy kernel for all ops, so we use scale and add/sub
-        // Better: implement saxpy_float in kernels.
-        // For now, let's just do: temp = alpha * x; y = y +/- temp
-        // Actually, let's just use the default element-wise kernels since we are in FAST mode.
-        // Optimization: implement real saxpy in kernels.
-        
-        // Temporarily, let's use a simpler approach: y = y + alpha * x
-        // I'll add saxpy_float to kernels.
-        gpuScale(queue, scaleKernel, mX, alpha, n, isComplex); // mX = alpha * mX (Wait! This modifies mX!)
-        // This is bad because mX is used later.
-        // I MUST add a saxpy kernel.
+    private void gpuSaxpy(cl_command_queue queue, cl_kernel k, int n, cl_mem x, cl_mem y, Object alpha, boolean isComplex) {
+        clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(x));
+        clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(y));
+        if (isComplex) {
+            Complex c = (Complex) alpha;
+            clSetKernelArg(k, 2, Sizeof.cl_float2, Pointer.to(new float[]{c.getReal().floatValue(), c.getImaginary().floatValue()}));
+        } else {
+            float a = ((Number) alpha).floatValue();
+            clSetKernelArg(k, 2, Sizeof.cl_float, Pointer.to(new float[]{a}));
+        }
+        clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+        clEnqueueNDRangeKernel(queue, k, 1, null, new long[]{n}, null, 0, null, null);
     }
-    
-    // I will add saxpy_float to kernels. For now, I'll use a temp buffer.
-    // Actually, I'll just add saxpy_float to OpenCLKernels.java now.
 
     private void gpuScale(cl_command_queue queue, cl_kernel k, cl_mem a, Object s, int n, boolean isComplex) {
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(a));
@@ -568,6 +570,8 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             if (complexVecScaleKernel != null) clReleaseKernel(complexVecScaleKernel);
             if (dotPartialKernel != null) clReleaseKernel(dotPartialKernel);
             if (complexDotPartialKernel != null) clReleaseKernel(complexDotPartialKernel);
+            if (saxpyKernel != null) clReleaseKernel(saxpyKernel);
+            if (complexSaxpyKernel != null) clReleaseKernel(complexSaxpyKernel);
             clReleaseProgram(program);
             program = null;
         }
