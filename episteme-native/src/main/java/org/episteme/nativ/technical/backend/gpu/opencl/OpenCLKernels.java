@@ -258,5 +258,20 @@ public final class OpenCLKernels {
         "        }\n" +
         "        y[row] = dot;\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void complex_spmv_csr_double(int num_rows, __global const int* ptr, __global const int* indices, __global const double2* values, __global const double2* x, __global double2* y) {\n" +
+        "    int row = get_global_id(0);\n" +
+        "    if (row < num_rows) {\n" +
+        "        double2 dot = (double2)(0.0, 0.0);\n" +
+        "        int start = ptr[row];\n" +
+        "        int end = ptr[row+1];\n" +
+        "        for (int j = start; j < end; j++) {\n" +
+        "            double2 av = values[j];\n" +
+        "            double2 xv = x[indices[j]];\n" +
+        "            dot.x += av.x * xv.x - av.y * xv.y;\n" +
+        "            dot.y += av.x * xv.y + av.y * xv.x;\n" +
+        "        }\n" +
+        "        y[row] = dot;\n" +
+        "    }\n" +
         "}\n";
 }

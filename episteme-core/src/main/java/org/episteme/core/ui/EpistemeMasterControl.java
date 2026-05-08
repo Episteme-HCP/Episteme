@@ -75,6 +75,7 @@ public class EpistemeMasterControl extends Application {
     }
 
     private Stage primaryStage;
+    private int selectedIndex = 0;
 
     @Override
     public void start(Stage stage) {
@@ -102,14 +103,8 @@ public class EpistemeMasterControl extends Application {
     }
 
     private void refreshUI() {
-        int selectedIndex = 0;
         if (primaryStage.getScene() != null) {
-            try {
-                TabPane currentPane = (TabPane) ((StackPane) primaryStage.getScene().getRoot()).getChildren().get(0);
-                selectedIndex = currentPane.getSelectionModel().getSelectedIndex();
-            } catch (Exception e) {
-                // Ignore layout changes
-            }
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         }
 
         TabPane tabPane = new TabPane();
@@ -325,18 +320,7 @@ public class EpistemeMasterControl extends Application {
         grid.setHgap(30);
         grid.setVgap(25);
 
-        // --- Compute Mode ---
-        ComboBox<org.episteme.core.mathematics.context.ComputeMode> modeBox = new ComboBox<>();
-        modeBox.getItems().addAll(org.episteme.core.mathematics.context.ComputeMode.values());
-        modeBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getComputeMode());
-        modeBox.setOnAction(e -> {
-            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().applyComputeMode(modeBox.getValue());
-            Episteme.savePreferences();
-            refreshUI(); // Update UI to reflect mode change
-        });
-        VBox modeInfo = createInfoBox(i18n.get("mastercontrol.computing.mode", "Compute Mode"),
-                i18n.get("mastercontrol.computing.desc.mode",
-                        "AUTO prefers GPU, otherwise uses CPU if unavailable."));
+
 
         // --- Float Precision ---
         ComboBox<org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision> floatBox = new ComboBox<>();
@@ -446,10 +430,24 @@ public class EpistemeMasterControl extends Application {
         VBox itersInfo = createInfoBox(i18n.get("mastercontrol.computing.iterations", "LA Max Iterations"),
                 i18n.get("mastercontrol.computing.desc.iterations", "Maximum iterations for iterative solvers (e.g. GMRES)"));
 
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
-        grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning")), tuningBox, tuningInfo);
-        grid.addRow(2, createHeaderLabel(i18n.get("mastercontrol.computing.threads", "Max Threads")), threadsSpinner, threadsInfo);
-        grid.addRow(3, createHeaderLabel(i18n.get("mastercontrol.computing.gpu", "GPU Support")), gpuVal);
+        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning")), tuningBox, tuningInfo);
+        grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.threads", "Max Threads")), threadsSpinner, threadsInfo);
+        
+        // --- GPU Section ---
+        grid.addRow(2, createHeaderLabel(i18n.get("mastercontrol.computing.gpu", "GPU Support")), gpuVal);
+        
+        ComboBox<org.episteme.core.mathematics.context.ComputeMode> modeBox = new ComboBox<>();
+        modeBox.getItems().addAll(org.episteme.core.mathematics.context.ComputeMode.values());
+        modeBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getComputeMode());
+        modeBox.setOnAction(e -> {
+            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().applyComputeMode(modeBox.getValue());
+            Episteme.savePreferences();
+        });
+        
+        Label modeDesc = new Label(i18n.get("mastercontrol.computing.desc.mode_alt", "Determines where calculations are performed"));
+        modeDesc.getStyleClass().add("description-label");
+        
+        grid.addRow(3, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeDesc);
         grid.addRow(4, new Separator());
         grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")), floatBox, floatInfo);
         grid.addRow(6, createHeaderLabel(i18n.get("mastercontrol.computing.int_precision", "Integer Precision")), intBox, intInfo);
@@ -1073,21 +1071,6 @@ public class EpistemeMasterControl extends Application {
         grid.setHgap(35); grid.setVgap(12);
         grid.setPadding(new Insets(10, 0, 10, 0));
 
-        // Compute Mode Combo (Copy from computing tab)
-        ComboBox<org.episteme.core.mathematics.context.ComputeMode> modeBox = new ComboBox<>();
-        modeBox.getItems().addAll(org.episteme.core.mathematics.context.ComputeMode.values());
-        modeBox.setValue(Episteme.getComputeMode());
-        modeBox.setOnAction(e -> {
-            Episteme.setComputeMode(modeBox.getValue());
-            Episteme.savePreferences();
-        });
-        
-        VBox modeInfo = createInfoBox(
-            i18n.get("mastercontrol.computing.mode", "Compute Mode"), 
-            i18n.get("mastercontrol.computing.mode.desc", "Determines where calculations are performed."));
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
-        
         box.getChildren().addAll(header, grid);
 
         // Drivers List (CPU, CUDA, OpenCL)
@@ -1714,12 +1697,15 @@ public class EpistemeMasterControl extends Application {
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
-                    setStyle("-fx-background-color: transparent;");
+                    getStyleClass().removeAll("zebra-row-odd", "zebra-row-even");
                 } else {
+                    getStyleClass().removeAll("zebra-row-odd", "zebra-row-even");
+                    getStyleClass().add(getIndex() % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
+                    
                     VBox box = new VBox(2);
                     box.setPadding(new Insets(5));
                     Label name = new Label(item.name);
-                    name.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
+                    name.getStyleClass().add("font-bold");
                     Label desc = new Label(item.description);
                     desc.getStyleClass().add("description-label");
                     box.getChildren().addAll(name, desc);
@@ -1867,6 +1853,17 @@ public class EpistemeMasterControl extends Application {
         });
 
         grid.addRow(row, nameLabel, statusLabel, descLabel, deactivateBox);
+        
+        // Zebra striping
+        if (row % 2 == 0) {
+            grid.getChildren().stream()
+                .filter(n -> GridPane.getRowIndex(n) != null && GridPane.getRowIndex(n) == row)
+                .forEach(n -> n.getStyleClass().add("zebra-row-even"));
+        } else {
+            grid.getChildren().stream()
+                .filter(n -> GridPane.getRowIndex(n) != null && GridPane.getRowIndex(n) == row)
+                .forEach(n -> n.getStyleClass().add("zebra-row-odd"));
+        }
     }
 
 

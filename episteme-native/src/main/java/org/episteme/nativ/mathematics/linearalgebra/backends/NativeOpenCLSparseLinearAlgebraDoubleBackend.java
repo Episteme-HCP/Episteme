@@ -44,6 +44,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
     
     private cl_program program;
     private cl_kernel spmvKernel;
+    private cl_kernel complexSpmvKernel;
     private cl_kernel vecAddKernel;
     private cl_kernel vecScaleKernel;
     private cl_kernel saxpyKernel;
@@ -65,6 +66,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             clBuildProgram(program, 0, null, null, null, null);
             
             spmvKernel = tryCreateKernel(program, "spmv_csr_double");
+            complexSpmvKernel = tryCreateKernel(program, "complex_spmv_csr_double");
             vecAddKernel = tryCreateKernel(program, "vec_add");
             vecScaleKernel = tryCreateKernel(program, "vec_scale");
             saxpyKernel = tryCreateKernel(program, "saxpy");
@@ -113,6 +115,8 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
     public Vector<E> multiply(Matrix<E> a, Vector<E> x) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Sparse Double Backend not available");
         
+        if (isComplex(a)) return multiplyComplex(a, x);
+        
         SparseMatrix<E> sa = ensureSparse(a);
         int rows = sa.rows();
         int cols = sa.cols();
@@ -150,6 +154,42 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             clEnqueueReadBuffer(queue, memY, CL_TRUE, 0, (long)Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
             
             return fromDoubleArray(yData, sa.getScalarRing());
+        }
+    }
+
+    private Vector<E> multiplyComplex(Matrix<E> a, Vector<E> x) {
+        SparseMatrix<E> sa = ensureSparse(a);
+        int rows = sa.rows();
+        int cols = sa.cols();
+        int nnz = sa.getNnz();
+        
+        int[] rowPtr = sa.getRowPointers();
+        int[] colIndices = sa.getColIndices();
+        double[] values = toComplexDoubleArray(sa);
+        double[] xData = toComplexDoubleVec(x);
+        double[] yData = new double[rows * 2];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memPtr = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (rows + 1), Pointer.to(rowPtr), null), CL::clReleaseMemObject);
+            cl_mem memInd = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIndices), null), CL::clReleaseMemObject);
+            cl_mem memVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
+            cl_mem memX = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * cols, Pointer.to(xData), null), CL::clReleaseMemObject);
+            cl_mem memY = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * 2 * rows, null, null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(complexSpmvKernel, 0, Sizeof.cl_int, Pointer.to(new int[]{rows}));
+            clSetKernelArg(complexSpmvKernel, 1, Sizeof.cl_mem, Pointer.to(memPtr));
+            clSetKernelArg(complexSpmvKernel, 2, Sizeof.cl_mem, Pointer.to(memInd));
+            clSetKernelArg(complexSpmvKernel, 3, Sizeof.cl_mem, Pointer.to(memVal));
+            clSetKernelArg(complexSpmvKernel, 4, Sizeof.cl_mem, Pointer.to(memX));
+            clSetKernelArg(complexSpmvKernel, 5, Sizeof.cl_mem, Pointer.to(memY));
+            
+            clEnqueueNDRangeKernel(queue, complexSpmvKernel, 1, null, new long[]{rows}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memY, CL_TRUE, 0, (long)Sizeof.cl_double * 2 * rows, Pointer.to(yData), 0, null, null);
+            
+            return fromComplexDoubleArray(yData, sa.getScalarRing());
         }
     }
 
@@ -532,6 +572,53 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
         return 0.0;
     }
 
+    private double[] toComplexDoubleArray(SparseMatrix<E> m) {
+        int nnz = m.getNnz();
+        double[] data = new double[nnz * 2];
+        Object[] vals = m.getValues();
+        for (int i = 0; i < nnz; i++) {
+            E val = (E) vals[i];
+            if (val instanceof Complex cv) {
+                data[i * 2] = cv.real();
+                data[i * 2 + 1] = cv.imaginary();
+            } else {
+                data[i * 2] = getRealValue(val);
+                data[i * 2 + 1] = 0.0;
+            }
+        }
+        return data;
+    }
+
+    private double[] toComplexDoubleVec(Vector<E> v) {
+        int n = v.dimension();
+        double[] data = new double[n * 2];
+        for (int i = 0; i < n; i++) {
+            E val = v.get(i);
+            if (val instanceof Complex cv) {
+                data[i * 2] = cv.real();
+                data[i * 2 + 1] = cv.imaginary();
+            } else {
+                data[i * 2] = getRealValue(val);
+                data[i * 2 + 1] = 0.0;
+            }
+        }
+        return data;
+    }
+
+    private Vector<E> fromComplexDoubleArray(double[] data, Ring<E> ring) {
+        int n = data.length / 2;
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n);
+        for (int i = 0; i < n; i++) {
+            elements[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), null, ring);
+    }
+
+    private boolean isComplex(Matrix<E> m) {
+        return m.getScalarRing().zero() instanceof Complex;
+    }
+
     private static cl_kernel tryCreateKernel(cl_program program, String name) {
         try {
             return clCreateKernel(program, name, null);
@@ -545,6 +632,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
     public void close() {
         if (program != null) {
             if (spmvKernel != null) clReleaseKernel(spmvKernel);
+            if (complexSpmvKernel != null) clReleaseKernel(complexSpmvKernel);
             if (vecAddKernel != null) clReleaseKernel(vecAddKernel);
             if (vecScaleKernel != null) clReleaseKernel(vecScaleKernel);
             if (saxpyKernel != null) clReleaseKernel(saxpyKernel);

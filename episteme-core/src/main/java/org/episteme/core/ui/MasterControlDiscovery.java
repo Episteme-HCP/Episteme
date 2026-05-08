@@ -137,15 +137,19 @@ public class MasterControlDiscovery {
 
         // --- DEVELOPMENT HEURISTIC: Scan sibling module target/classes ---
         try {
-            java.io.File root = new java.io.File(System.getProperty("user.dir"));
-            java.io.File[] modules = root.listFiles(java.io.File::isDirectory);
-            if (modules != null) {
-                for (java.io.File module : modules) {
-                    java.io.File targetClasses = new java.io.File(module, "target/classes");
-                    if (targetClasses.exists() && targetClasses.isDirectory()) {
-                        if (!allPaths.contains(targetClasses.getAbsolutePath())) {
-                            logger.info("Found dev module path: {}", targetClasses.getAbsolutePath());
-                            scanDirectory(targetClasses, "", suffix, results, processed, tccl);
+            java.io.File current = new java.io.File(System.getProperty("user.dir"));
+            java.io.File parent = current.getParentFile();
+            if (parent != null && (new java.io.File(parent, "pom.xml")).exists()) {
+                logger.info("Dev mode: Scanning siblings in {}", parent.getAbsolutePath());
+                java.io.File[] modules = parent.listFiles(java.io.File::isDirectory);
+                if (modules != null) {
+                    for (java.io.File module : modules) {
+                        java.io.File targetClasses = new java.io.File(module, "target/classes");
+                        if (targetClasses.exists() && targetClasses.isDirectory()) {
+                            if (!allPaths.contains(targetClasses.getAbsolutePath())) {
+                                logger.info("Found sibling dev module: {}", module.getName());
+                                scanDirectory(targetClasses, "", suffix, results, processed, tccl);
+                            }
                         }
                     }
                 }

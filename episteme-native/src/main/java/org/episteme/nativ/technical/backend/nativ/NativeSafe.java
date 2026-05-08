@@ -99,8 +99,15 @@ public class NativeSafe {
                     } else {
                         coercedArgs[i] = arg;
                     }
-                } else if (expected == MemorySegment.class && arg instanceof MemorySegment) {
-                    coercedArgs[i] = arg;
+                } else if (expected == MemorySegment.class) {
+                    if (arg instanceof MemorySegment) {
+                        coercedArgs[i] = arg;
+                    } else if (arg instanceof Long val) {
+                        coercedArgs[i] = MemorySegment.ofAddress(val);
+                        coerced = true;
+                    } else {
+                        coercedArgs[i] = arg;
+                    }
                 } else {
                     coercedArgs[i] = arg;
                 }
