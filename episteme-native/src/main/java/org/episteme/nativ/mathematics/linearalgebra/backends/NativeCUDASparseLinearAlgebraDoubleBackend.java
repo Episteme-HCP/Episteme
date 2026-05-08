@@ -38,7 +38,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
     @Override public String getNativeLibraryName() { return "cuda"; }
     
     private static final int CUDA_R_64F = 1; // Double precision in CUDA
-    private static final int CUSPARSE_INDEX_32BIT = 1;
+    private static final int CUSPARSE_INDEX_32BIT = 2; // CUSPARSE_INDEX_32I
     private static final int CUSPARSE_INDEX_BASE_ZERO = 0;
     private static final int CUSPARSE_SPMM_ALG_DEFAULT = 0;
     private static final int CUSPARSE_ORDER_ROW = 2;
