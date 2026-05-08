@@ -166,14 +166,14 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
 
     private Matrix<E> fromFloatArray(float[] data, int rows, int cols, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
-        for (int i = 0; i < data.length; i++) values[i] = (E) RealFloat.create(data[i]);
+        for (int i = 0; i < data.length; i++) values[i] = (E) (Object) RealFloat.create(data[i]);
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(values, rows, cols, ring);
     }
 
     private Matrix<E> fromComplexFloatArray(float[] data, int rows, int cols, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
         for (int i = 0; i < rows * cols; i++) {
-            values[i] = (E) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
+            values[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(values, rows, cols, ring);
     }
