@@ -303,9 +303,9 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             cl_command_queue queue = OpenCLManager.getCommandQueue();
 
             cl_mem mPtr = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null), CL::clReleaseMemObject);
-            cl_mem mInd = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null), CL::clReleaseMemObject);
-            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
-            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * n, Pointer.to(bData), null), CL::clReleaseMemObject);
+            cl_mem mInd = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null), CL::clReleaseMemObject);
+            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
+            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * n, Pointer.to(bData), null), CL::clReleaseMemObject);
             
             cl_mem mX = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_float * elemSize * n, null, null), CL::clReleaseMemObject);
             if (x0 != null) {
