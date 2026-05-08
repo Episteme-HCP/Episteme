@@ -50,7 +50,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring.zero() instanceof RealFloat;
+        Object zero = ring.zero();
+        return zero instanceof RealFloat || (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex c && c.getReal() instanceof RealFloat);
     }
 
     @Override public String getId() { return "cuda-dense-float"; }
@@ -61,6 +62,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        if (isComplex(a)) return multiplyComplex(a, b);
+        
         int m = a.rows(); int k = a.cols(); int n = b.cols();
         
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -91,6 +94,29 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         }
     }
 
+    private Matrix<E> multiplyComplex(Matrix<E> a, Matrix<E> b) {
+        int m = a.rows(); int k = a.cols(); int n = b.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * k * 8, tracker);
+            MemorySegment d_B = malloc((long) k * n * 8, tracker);
+            MemorySegment d_C = malloc((long) m * n * 8, tracker);
+            float[] hA = toComplexFloatArray(a);
+            float[] hB = toComplexFloatArray(b);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, hA), (long) m * k * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_FLOAT, hB), (long) k * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_CGEMM, handle, 0, 0, n, m, k, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, new float[]{1.0f, 0.0f}), d_B, n, d_A, k, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, new float[]{0.0f, 0.0f}), d_C, n));
+            float[] result = new float[m * n * 2];
+            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC, d_C, (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n * 2);
+            return fromComplexFloatArray(result, m, n, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
     private MemorySegment malloc(long size, ResourceTracker tracker) {
         try (Arena temp = Arena.ofConfined()) {
             MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
@@ -110,6 +136,10 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         if (status != 0) throw new RuntimeException("cuBLAS error: " + status);
     }
 
+    private boolean isComplex(Matrix<E> m) {
+        return m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
     private float[] toFloatArray(Matrix<E> m) {
         int rows = m.rows(); int cols = m.cols();
         float[] data = new float[rows * cols];
@@ -121,9 +151,30 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         return data;
     }
 
+    private float[] toComplexFloatArray(Matrix<E> m) {
+        int rows = m.rows(); int cols = m.cols();
+        float[] data = new float[rows * cols * 2];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) m.get(i, j);
+                data[(i * cols + j) * 2] = ((Number) c.real()).floatValue();
+                data[(i * cols + j) * 2 + 1] = ((Number) c.imaginary()).floatValue();
+            }
+        }
+        return data;
+    }
+
     private Matrix<E> fromFloatArray(float[] data, int rows, int cols, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) values[i] = (E) RealFloat.create(data[i]);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(values, rows, cols, ring);
+    }
+
+    private Matrix<E> fromComplexFloatArray(float[] data, int rows, int cols, Ring<E> ring) {
+        E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
+        for (int i = 0; i < rows * cols; i++) {
+            values[i] = (E) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
+        }
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(values, rows, cols, ring);
     }
 

@@ -268,6 +268,77 @@ public final class OpenCLKernels {
         "        }\n" +
         "        y[row] = dot;\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void complex_spmv_csr_float(int num_rows, __global const int* ptr, __global const int* indices, __global const float2* values, __global const float2* x, __global float2* y) {\n" +
+        "    int row = get_global_id(0);\n" +
+        "    if (row < num_rows) {\n" +
+        "        float2 dot = (float2)(0.0f, 0.0f);\n" +
+        "        int start = ptr[row];\n" +
+        "        int end = ptr[row+1];\n" +
+        "        for (int j = start; j < end; j++) {\n" +
+        "            float2 av = values[j];\n" +
+        "            float2 xv = x[indices[j]];\n" +
+        "            dot.x += av.x * xv.x - av.y * xv.y;\n" +
+        "            dot.y += av.x * xv.y + av.y * xv.x;\n" +
+        "        }\n" +
+        "        y[row] = dot;\n" +
+        "    }\n" +
+        "}\n";
+
+    public static final String DENSE_FLOAT_COMPLEX_KERNELS =
+        "__kernel void complexMatrixMultiplyFloat(__global const float2 *a, __global const float2 *b, __global float2 *c, const int m, const int n, const int k) {\n" +
+        "    int row = get_global_id(1); int col = get_global_id(0);\n" +
+        "    if (row < m && col < n) {\n" +
+        "        float2 sum = (float2)(0.0f, 0.0f);\n" +
+        "        for (int i = 0; i < k; i++) {\n" +
+        "            float2 av = a[row*k+i];\n" +
+        "            float2 bv = b[i*n+col];\n" +
+        "            sum.x += av.x * bv.x - av.y * bv.y;\n" +
+        "            sum.y += av.x * bv.y + av.y * bv.x;\n" +
+        "        }\n" +
+        "        c[row*n+col] = sum;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void complex_vec_add_float(__global const float2 *a, __global const float2 *b, __global float2 *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) { c[i].x = a[i].x + b[i].x; c[i].y = a[i].y + b[i].y; }\n" +
+        "}\n" +
+        "__kernel void complex_vec_sub_float(__global const float2 *a, __global const float2 *b, __global float2 *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) { c[i].x = a[i].x - b[i].x; c[i].y = a[i].y - b[i].y; }\n" +
+        "}\n" +
+        "__kernel void complex_vec_scale_float(__global const float2 *a, const float2 s, __global float2 *c, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) {\n" +
+        "        float2 av = a[i];\n" +
+        "        c[i].x = av.x * s.x - av.y * s.y;\n" +
+        "        c[i].y = av.x * s.y + av.y * s.x;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void vec_dot_partial_float(__global const float *a, __global const float *b, __global float *partial_sums, const int n, __local float *local_sums) {\n" +
+        "    int local_id = get_local_id(0); int group_id = get_group_id(0); int local_size = get_local_size(0); int i = get_global_id(0);\n" +
+        "    float val = (i < n) ? a[i] * b[i] : 0.0f;\n" +
+        "    local_sums[local_id] = val; barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    for (int stride = local_size / 2; stride > 0; stride /= 2) {\n" +
+        "        if (local_id < stride) local_sums[local_id] += local_sums[local_id + stride];\n" +
+        "        barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "    if (local_id == 0) partial_sums[group_id] = local_sums[0];\n" +
+        "}\n" +
+        "__kernel void complex_dot_partial_float(__global const float2 *a, __global const float2 *b, __global float2 *partial_sums, const int n, __local float2 *local_sums) {\n" +
+        "    int local_id = get_local_id(0); int group_id = get_group_id(0); int local_size = get_local_size(0); int i = get_global_id(0);\n" +
+        "    float2 val = (float2)(0.0f, 0.0f);\n" +
+        "    if (i < n) {\n" +
+        "        float2 av = a[i]; float2 bv = b[i];\n" +
+        "        val.x = av.x * bv.x + av.y * bv.y;\n" +
+        "        val.y = av.y * bv.x - av.x * bv.y;\n" +
+        "    }\n" +
+        "    local_sums[local_id] = val; barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    for (int stride = local_size / 2; stride > 0; stride /= 2) {\n" +
+        "        if (local_id < stride) {\n" +
+        "            local_sums[local_id].x += local_sums[local_id + stride].x;\n" +
+        "            local_sums[local_id].y += local_sums[local_id + stride].y;\n" +
+        "        }\n" +
+        "        barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "    if (local_id == 0) partial_sums[group_id] = local_sums[0];\n" +
         "}\n";
 
     public static final String SPARSE_DOUBLE_KERNELS =

@@ -1991,10 +1991,170 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             MemorySegment h_ip1i_R = hLocalR.asSlice(((i + 1) * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
             
             if (isComplex) {
-                // Complex Givens is more involved, for now we simplify or throw if complex least squares is needed
-                // But GMRES H is usually real or handled as real-pairs.
-                // However, our GMRES is generic.
-                throw new UnsupportedOperationException("Native Complex Hessenberg solve not yet implemented in Sparse MPFR");
+                // Complex Givens
+                // We want G = [ c,  s ; -conj(s), conj(c) ] such that G * [a; b] = [r; 0]
+                // Pick r = sqrt(|a|^2 + |b|^2), c = conj(a)/r, s = conj(b)/r
+                
+                MemorySegment aR = hLocalR.asSlice((i * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment aI = hLocalI.asSlice((i * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment bR = hLocalR.asSlice(((i + 1) * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment bI = hLocalI.asSlice(((i + 1) * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                
+                MemorySegment r = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, r, prec);
+                MemorySegment cR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, cR, prec);
+                MemorySegment cI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, cI, prec);
+                MemorySegment sR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR, prec);
+                MemorySegment sI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sI, prec);
+                
+                MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
+                MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+                
+                // r = sqrt(aR^2 + aI^2 + bR^2 + bI^2)
+                NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, aI, aI, 0);
+                NativeSafe.invoke(MPFR_ADD, r, t1, t2, 0);
+                NativeSafe.invoke(MPFR_MUL, t1, bR, bR, 0);
+                NativeSafe.invoke(MPFR_ADD, r, r, t1, 0);
+                NativeSafe.invoke(MPFR_MUL, t2, bI, bI, 0);
+                NativeSafe.invoke(MPFR_ADD, r, r, t2, 0);
+                NativeSafe.invoke(MPFR_SQRT, r, r, 0);
+                
+                if ((int)NativeSafe.invoke(MPFR_ZERO_P, r) == 0) {
+                    // c = conj(a)/r
+                    NativeSafe.invoke(MPFR_DIV, cR, aR, r, 0);
+                    NativeSafe.invoke(MPFR_DIV, cI, aI, r, 0);
+                    NativeSafe.invoke(MPFR_NEG, cI, cI, 0);
+                    
+                    // s = conj(b)/r
+                    NativeSafe.invoke(MPFR_DIV, sR, bR, r, 0);
+                    NativeSafe.invoke(MPFR_DIV, sI, bI, r, 0);
+                    NativeSafe.invoke(MPFR_NEG, sI, sI, 0);
+                    
+                    // Apply to H: 
+                    // [ h1_new ] = [ c,  s ] * [ h1 ]
+                    // [ h2_new ] = [ -conj(s), conj(c) ] * [ h2 ]
+                    for (int j = i; j < cols; j++) {
+                        MemorySegment h1R = hLocalR.asSlice((i * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                        MemorySegment h1I = hLocalI.asSlice((i * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                        MemorySegment h2R = hLocalR.asSlice(((i + 1) * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                        MemorySegment h2I = hLocalI.asSlice(((i + 1) * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                        
+                        MemorySegment t1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
+                        MemorySegment t1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1I, prec);
+                        MemorySegment t2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2R, prec);
+                        MemorySegment t2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2I, prec);
+                        
+                        NativeSafe.invoke(MPFR_SET, t1R, h1R, 0);
+                        NativeSafe.invoke(MPFR_SET, t1I, h1I, 0);
+                        NativeSafe.invoke(MPFR_SET, t2R, h2R, 0);
+                        NativeSafe.invoke(MPFR_SET, t2I, h2I, 0);
+                        
+                        // h1_new = c*t1 + s*t2
+                        // h1R = cR*t1R - cI*t1I + sR*t2R - sI*t2I
+                        // h1I = cR*t1I + cI*t1R + sR*t2I + sI*t2R
+                        
+                        MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
+                        MemorySegment tmp2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
+                        
+                        // Real part of h1
+                        NativeSafe.invoke(MPFR_MUL, h1R, cR, t1R, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, cI, t1I, 0);
+                        NativeSafe.invoke(MPFR_SUB, h1R, h1R, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, sR, t2R, 0);
+                        NativeSafe.invoke(MPFR_ADD, h1R, h1R, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, sI, t2I, 0);
+                        NativeSafe.invoke(MPFR_SUB, h1R, h1R, tmp1, 0);
+                        
+                        // Imaginary part of h1
+                        NativeSafe.invoke(MPFR_MUL, h1I, cR, t1I, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, cI, t1R, 0);
+                        NativeSafe.invoke(MPFR_ADD, h1I, h1I, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, sR, t2I, 0);
+                        NativeSafe.invoke(MPFR_ADD, h1I, h1I, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, sI, t2R, 0);
+                        NativeSafe.invoke(MPFR_ADD, h1I, h1I, tmp1, 0);
+                        
+                        // h2_new = -conj(s)*t1 + conj(c)*t2
+                        // conj(s) = sR - i*sI, so -conj(s) = -sR + i*sI
+                        // conj(c) = cR - i*cI
+                        
+                        // Real part of h2: (-sR)*t1R - (sI)*t1I + (cR)*t2R - (-cI)*t2I
+                        //                = -sR*t1R - sI*t1I + cR*t2R + cI*t2I
+                        NativeSafe.invoke(MPFR_MUL, h2R, sR, t1R, 0);
+                        NativeSafe.invoke(MPFR_NEG, h2R, h2R, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, sI, t1I, 0);
+                        NativeSafe.invoke(MPFR_SUB, h2R, h2R, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, cR, t2R, 0);
+                        NativeSafe.invoke(MPFR_ADD, h2R, h2R, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, cI, t2I, 0);
+                        NativeSafe.invoke(MPFR_ADD, h2R, h2R, tmp1, 0);
+                        
+                        // Imaginary part of h2: (-sR)*t1I + (sI)*t1R + (cR)*t2I + (-cI)*t2R
+                        //                     = -sR*t1I + sI*t1R + cR*t2I - cI*t2R
+                        NativeSafe.invoke(MPFR_MUL, h2I, sR, t1I, 0);
+                        NativeSafe.invoke(MPFR_NEG, h2I, h2I, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, sI, t1R, 0);
+                        NativeSafe.invoke(MPFR_ADD, h2I, h2I, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, cR, t2I, 0);
+                        NativeSafe.invoke(MPFR_ADD, h2I, h2I, tmp1, 0);
+                        NativeSafe.invoke(MPFR_MUL, tmp1, cI, t2R, 0);
+                        NativeSafe.invoke(MPFR_SUB, h2I, h2I, tmp1, 0);
+                    }
+                    
+                    // Apply to g: g(i) = c*g(i) + s*g(i+1), g(i+1) = -conj(s)*g(i) + conj(c)*g(i+1)
+                    MemorySegment g1R = gR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                    MemorySegment g1I = gI.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                    MemorySegment g2R = gR.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                    MemorySegment g2I = gI.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                    
+                    MemorySegment t1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
+                    MemorySegment t1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1I, prec);
+                    MemorySegment t2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2R, prec);
+                    MemorySegment t2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2I, prec);
+                    
+                    NativeSafe.invoke(MPFR_SET, t1R, g1R, 0);
+                    NativeSafe.invoke(MPFR_SET, t1I, g1I, 0);
+                    NativeSafe.invoke(MPFR_SET, t2R, g2R, 0);
+                    NativeSafe.invoke(MPFR_SET, t2I, g2I, 0);
+                    
+                    MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
+                    
+                    // g1_new
+                    NativeSafe.invoke(MPFR_MUL, g1R, cR, t1R, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, cI, t1I, 0);
+                    NativeSafe.invoke(MPFR_SUB, g1R, g1R, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, sR, t2R, 0);
+                    NativeSafe.invoke(MPFR_ADD, g1R, g1R, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, sI, t2I, 0);
+                    NativeSafe.invoke(MPFR_SUB, g1R, g1R, tmp1, 0);
+                    
+                    NativeSafe.invoke(MPFR_MUL, g1I, cR, t1I, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, cI, t1R, 0);
+                    NativeSafe.invoke(MPFR_ADD, g1I, g1I, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, sR, t2I, 0);
+                    NativeSafe.invoke(MPFR_ADD, g1I, g1I, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, sI, t2R, 0);
+                    NativeSafe.invoke(MPFR_ADD, g1I, g1I, tmp1, 0);
+                    
+                    // g2_new
+                    NativeSafe.invoke(MPFR_MUL, g2R, sR, t1R, 0);
+                    NativeSafe.invoke(MPFR_NEG, g2R, g2R, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, sI, t1I, 0);
+                    NativeSafe.invoke(MPFR_SUB, g2R, g2R, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, cR, t2R, 0);
+                    NativeSafe.invoke(MPFR_ADD, g2R, g2R, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, cI, t2I, 0);
+                    NativeSafe.invoke(MPFR_ADD, g2R, g2R, tmp1, 0);
+                    
+                    NativeSafe.invoke(MPFR_MUL, g2I, sR, t1I, 0);
+                    NativeSafe.invoke(MPFR_NEG, g2I, g2I, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, sI, t1R, 0);
+                    NativeSafe.invoke(MPFR_ADD, g2I, g2I, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, cR, t2I, 0);
+                    NativeSafe.invoke(MPFR_ADD, g2I, g2I, tmp1, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp1, cI, t2R, 0);
+                    NativeSafe.invoke(MPFR_SUB, g2I, g2I, tmp1, 0);
+                }
             } else {
                 // Real Givens
                 // c = a / sqrt(a^2 + b^2), s = b / sqrt(a^2 + b^2)
@@ -2063,34 +2223,107 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         
         // Back-substitution to solve Ry = g'
         MemorySegment yR = arena.allocate(MPFR_LAYOUT, cols);
+        MemorySegment yI = isComplex ? arena.allocate(MPFR_LAYOUT, cols) : null;
+        
         for (int i = cols - 1; i >= 0; i--) {
             NativeSafe.invoke(MPFR_INIT2, yR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
-            MemorySegment sum = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sum, prec);
-            NativeSafe.invoke(MPFR_SET_ZERO, sum, 0);
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, yI.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
+            
+            MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, prec);
+            MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null; 
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, prec);
+            
+            NativeSafe.invoke(MPFR_SET_ZERO, sumR, 0);
+            if (isComplex) NativeSafe.invoke(MPFR_SET_ZERO, sumI, 0);
             
             for (int j = i + 1; j < cols; j++) {
-                MemorySegment h_ij = hLocalR.asSlice((i * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                MemorySegment y_j = yR.asSlice(j * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                MemorySegment term = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, term, prec);
-                NativeSafe.invoke(MPFR_MUL, term, h_ij, y_j, 0);
-                NativeSafe.invoke(MPFR_ADD, sum, sum, term, 0);
+                MemorySegment h_ij_R = hLocalR.asSlice((i * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment y_j_R = yR.asSlice(j * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                
+                MemorySegment termR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, termR, prec);
+                
+                if (isComplex) {
+                    MemorySegment h_ij_I = hLocalI.asSlice((i * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                    MemorySegment y_j_I = yI.asSlice(j * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                    MemorySegment termI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, termI, prec);
+                    
+                    // Complex mul: (hR + i*hI)*(yR + i*yI) = (hR*yR - hI*yI) + i*(hR*yI + hI*yR)
+                    MemorySegment tmp = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp, prec);
+                    
+                    NativeSafe.invoke(MPFR_MUL, termR, h_ij_R, y_j_R, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp, h_ij_I, y_j_I, 0);
+                    NativeSafe.invoke(MPFR_SUB, termR, termR, tmp, 0);
+                    
+                    NativeSafe.invoke(MPFR_MUL, termI, h_ij_R, y_j_I, 0);
+                    NativeSafe.invoke(MPFR_MUL, tmp, h_ij_I, y_j_R, 0);
+                    NativeSafe.invoke(MPFR_ADD, termI, termI, tmp, 0);
+                    
+                    NativeSafe.invoke(MPFR_ADD, sumR, sumR, termR, 0);
+                    NativeSafe.invoke(MPFR_ADD, sumI, sumI, termI, 0);
+                } else {
+                    NativeSafe.invoke(MPFR_MUL, termR, h_ij_R, y_j_R, 0);
+                    NativeSafe.invoke(MPFR_ADD, sumR, sumR, termR, 0);
+                }
             }
             
-            MemorySegment g_i = gR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-            MemorySegment diag = hLocalR.asSlice((i * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-            MemorySegment res = yR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            MemorySegment g_i_R = gR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            MemorySegment diagR = hLocalR.asSlice((i * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+            MemorySegment resR = yR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
             
-            NativeSafe.invoke(MPFR_SUB, res, g_i, sum, 0);
-            NativeSafe.invoke(MPFR_DIV, res, res, diag, 0);
+            if (isComplex) {
+                MemorySegment g_i_I = gI.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment diagI = hLocalI.asSlice((i * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                MemorySegment resI = yI.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                
+                MemorySegment numR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, numR, prec);
+                MemorySegment numI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, numI, prec);
+                NativeSafe.invoke(MPFR_SUB, numR, g_i_R, sumR, 0);
+                NativeSafe.invoke(MPFR_SUB, numI, g_i_I, sumI, 0);
+                
+                // Complex div: (numR + i*numI) / (diagR + i*diagI)
+                // = [ (numR*diagR + numI*diagI) + i*(numI*diagR - numR*diagI) ] / (diagR^2 + diagI^2)
+                
+                MemorySegment den = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, den, prec);
+                MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
+                MemorySegment tmp2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
+                
+                NativeSafe.invoke(MPFR_MUL, tmp1, diagR, diagR, 0);
+                NativeSafe.invoke(MPFR_MUL, tmp2, diagI, diagI, 0);
+                NativeSafe.invoke(MPFR_ADD, den, tmp1, tmp2, 0);
+                
+                // resR = (numR*diagR + numI*diagI) / den
+                NativeSafe.invoke(MPFR_MUL, tmp1, numR, diagR, 0);
+                NativeSafe.invoke(MPFR_MUL, tmp2, numI, diagI, 0);
+                NativeSafe.invoke(MPFR_ADD, resR, tmp1, tmp2, 0);
+                NativeSafe.invoke(MPFR_DIV, resR, resR, den, 0);
+                
+                // resI = (numI*diagR - numR*diagI) / den
+                NativeSafe.invoke(MPFR_MUL, tmp1, numI, diagR, 0);
+                NativeSafe.invoke(MPFR_MUL, tmp2, numR, diagI, 0);
+                NativeSafe.invoke(MPFR_SUB, resI, tmp1, tmp2, 0);
+                NativeSafe.invoke(MPFR_DIV, resI, resI, den, 0);
+            } else {
+                NativeSafe.invoke(MPFR_SUB, resR, g_i_R, sumR, 0);
+                NativeSafe.invoke(MPFR_DIV, resR, resR, diagR, 0);
+            }
         }
         
         // x = x0 + V * y
         for (int j = 0; j < cols; j++) {
             MemorySegment vj = V.asSlice(j * n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize(), n * (isComplex ? 2 : 1) * MPFR_LAYOUT.byteSize());
             MemorySegment yj_R = yR.asSlice(j * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-            Real yjVal = readMPFR(yj_R, arena);
-            E scalar = castScalar(yjVal, ring);
-            axpy_internal(h_x, scalar, vj, n, prec, arena, tracker, isComplex);
+            
+            if (isComplex) {
+                MemorySegment yj_I = yI.asSlice(j * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
+                Real yjValR = readMPFR(yj_R, arena);
+                Real yjValI = readMPFR(yj_I, arena);
+                E scalar = castComplex(yjValR, yjValI, ring);
+                axpy_internal(h_x, scalar, vj, n, prec, arena, tracker, isComplex);
+            } else {
+                Real yjVal = readMPFR(yj_R, arena);
+                E scalar = castScalar(yjVal, ring);
+                axpy_internal(h_x, scalar, vj, n, prec, arena, tracker, isComplex);
+            }
         }
     }
 
