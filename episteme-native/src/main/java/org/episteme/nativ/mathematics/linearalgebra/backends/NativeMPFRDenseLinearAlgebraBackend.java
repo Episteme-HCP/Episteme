@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
+import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 
 
 /**
@@ -153,6 +155,18 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     private boolean isFloatRing(Ring<?> ring) {
         if (ring == null) return false;
         return ring.getClass().getName().contains("Reals"); 
+    }
+
+    private Matrix<E> createMatrix(int rows, int cols, Ring<E> ring) {
+        return new GenericMatrix<>(new DenseMatrixStorage<>(rows, cols, ring.zero()), this, ring);
+    }
+
+    private void setColumn(Matrix<E> m, int col, Vector<E> v) {
+        int rows = m.rows();
+        MatrixStorage<E> storage = m.getStorage();
+        for (int i = 0; i < rows; i++) {
+            storage.set(i, col, v.get(i));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1713,16 +1727,68 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     @SuppressWarnings("unchecked")
     public SVDResult<E> svd(Matrix<E> a) {
         if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
-        Matrix<E> at = transpose(a);
-        Matrix<E> ata = multiply(at, a);
-        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen = eigen(ata);
-        Vector<E> sValues = eigen.getEigenvalues();
-        int n = sValues.dimension();
-        Object[] sigma = new Object[n];
-        for (int i = 0; i < n; i++) sigma[i] = (E) (Object) ((Real) sValues.get(i)).sqrt();
-        Vector<E> s = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(sigma)), (LinearAlgebraProvider<E>) this, a.getScalarRing());
-        Matrix<E> v = eigen.getEigenvectors();
-        return new SVDResult<>(v, s, v); 
+        int m = a.rows();
+        int n = a.cols();
+        
+        if (m >= n) {
+            Matrix<E> at = transpose(a);
+            Matrix<E> ata = multiply(at, a);
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen = eigen(ata);
+            Vector<E> sValues = eigen.getEigenvalues();
+            Matrix<E> v = eigen.getEigenvectors();
+            
+            // s_i = sqrt(lambda_i)
+            E[] sigma = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), n);
+            for (int i = 0; i < n; i++) {
+                E val = sValues.get(i);
+                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : Complex.of(((Complex)val).real().sqrt(), Real.ZERO));
+            }
+            Vector<E> s = Vector.of(java.util.Arrays.asList(sigma), a.getScalarRing());
+            
+            // U = A * V * Sigma^-1
+            Matrix<E> u = createMatrix(m, n, a.getScalarRing());
+            for (int i = 0; i < n; i++) {
+                Vector<E> vi = v.getColumn(i);
+                Vector<E> avi = multiply(a, vi);
+                E si = sigma[i];
+                double sVal = getRealValue(si);
+                if (sVal > 1e-30) {
+                    setColumn(u, i, multiply(avi, createScalar(1.0 / sVal, a)));
+                } else {
+                    setColumn(u, i, avi);
+                }
+            }
+            return new SVDResult<>(u, s, v);
+        } else {
+            // m < n: use AA^T
+            Matrix<E> at = transpose(a);
+            Matrix<E> aat = multiply(a, at);
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen = eigen(aat);
+            Vector<E> sValues = eigen.getEigenvalues();
+            Matrix<E> u = eigen.getEigenvectors();
+            
+            E[] sigma = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), m);
+            for (int i = 0; i < m; i++) {
+                E val = sValues.get(i);
+                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : Complex.of(((Complex)val).real().sqrt(), Real.ZERO));
+            }
+            Vector<E> s = Vector.of(java.util.Arrays.asList(sigma), a.getScalarRing());
+            
+            // V = A^T * U * Sigma^-1
+            Matrix<E> v = createMatrix(n, m, a.getScalarRing());
+            for (int i = 0; i < m; i++) {
+                Vector<E> ui = u.getColumn(i);
+                Vector<E> atui = multiply(at, ui);
+                E si = sigma[i];
+                double sVal = getRealValue(si);
+                if (sVal > 1e-30) {
+                    setColumn(v, i, multiply(atui, createScalar(1.0 / sVal, a)));
+                } else {
+                    setColumn(v, i, atui);
+                }
+            }
+            return new SVDResult<>(u, s, v);
+        }
     }
 
     @Override
