@@ -219,8 +219,8 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         double[] data = new double[vals.length * 2];
         for (int i = 0; i < vals.length; i++) {
             Complex c = (Complex) vals[i];
-            data[i * 2] = c.real().doubleValue();
-            data[i * 2 + 1] = c.imaginary().doubleValue();
+            data[i * 2] = ((Number) c.real()).doubleValue();
+            data[i * 2 + 1] = ((Number) c.imaginary()).doubleValue();
         }
         return data;
     }
@@ -230,8 +230,8 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         double[] data = new double[dim * 2];
         for (int i = 0; i < dim; i++) {
             Complex c = (Complex) v.get(i);
-            data[i * 2] = c.real().doubleValue();
-            data[i * 2 + 1] = c.imaginary().doubleValue();
+            data[i * 2] = ((Number) c.real()).doubleValue();
+            data[i * 2 + 1] = ((Number) c.imaginary()).doubleValue();
         }
         return data;
     }
