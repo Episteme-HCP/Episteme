@@ -252,6 +252,18 @@ public final class OpenCLKernels {
         "__kernel void transposeFloat(__global const float *a, __global float *b, const int rows, const int cols) {\n" +
         "    int r = get_global_id(1); int c = get_global_id(0);\n" +
         "    if (r < rows && c < cols) b[c * rows + r] = a[r * cols + c];\n" +
+        "}\n" +
+        "__kernel void saxpy_float(__global const float *x, __global float *y, const float alpha, const int n) {\n" +
+        "    int i = get_global_id(0);\n" +
+        "    if (i < n) y[i] = alpha * x[i] + y[i];\n" +
+        "}\n" +
+        "__kernel void complex_saxpy_float(__global const float2 *x, __global float2 *y, const float2 alpha, const int n) {\n" +
+        "    int i = get_global_id(0);\n" +
+        "    if (i < n) {\n" +
+        "        float2 xv = x[i]; float2 yv = y[i];\n" +
+        "        y[i].x = yv.x + alpha.x * xv.x - alpha.y * xv.y;\n" +
+        "        y[i].y = yv.y + alpha.x * xv.y + alpha.y * xv.x;\n" +
+        "    }\n" +
         "}\n";
     
     // TODO: Add more float kernels as needed (Sparse, etc.)
