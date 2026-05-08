@@ -38,13 +38,11 @@ import java.util.prefs.Preferences;
 public class ThemeManager {
 
     private static ThemeManager instance;
-    private final Preferences prefs;
-    private static final String PREF_THEME = "app_theme";
-    private String currentTheme;
+    private final Preferences prefs = Preferences.userNodeForPackage(ThemeManager.class);
+    private String currentTheme = "Dark";
 
     private ThemeManager() {
-        prefs = Preferences.userNodeForPackage(ThemeManager.class);
-        currentTheme = prefs.get(PREF_THEME, "Modena");
+        currentTheme = prefs.get("visual_theme", "Dark");
     }
 
     public static synchronized ThemeManager getInstance() {
@@ -60,7 +58,7 @@ public class ThemeManager {
 
     public void setTheme(String theme) {
         this.currentTheme = theme;
-        prefs.put(PREF_THEME, theme);
+        prefs.put("visual_theme", theme);
     }
 
     public boolean isDarkTheme() {
@@ -87,31 +85,31 @@ public class ThemeManager {
             scene.getStylesheets().add(themeCss.toExternalForm());
         }
 
-        if ("Caspian".equalsIgnoreCase(currentTheme)) {
-            javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_CASPIAN);
-        } else if ("HighContrast".equalsIgnoreCase(currentTheme) || "High Contrast".equalsIgnoreCase(currentTheme)) {
+        if ("High Contrast".equalsIgnoreCase(currentTheme) || "HighContrast".equalsIgnoreCase(currentTheme)) {
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
-             java.net.URL hcCss = ThemeManager.class.getResource("/org/episteme/core/ui/high-contrast.css");
-             if (hcCss != null) {
-                 scene.getStylesheets().add(hcCss.toExternalForm());
-             }
+            java.net.URL hcCss = ThemeManager.class.getResource("/org/episteme/core/ui/high-contrast.css");
+            if (hcCss != null) {
+                scene.getStylesheets().add(hcCss.toExternalForm());
+            }
         } else if ("Dark".equalsIgnoreCase(currentTheme)) {
              javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
-             scene.getRoot().setStyle(
-                    "-fx-base: #2b2b2b; " +
-                            "-fx-background: #1e1e1e; " +
-                            "-fx-control-inner-background: #3c3c3c; " +
-                            "-fx-text-fill: #e0e0e0;");
-             return; // Avoid clearing style below
+             java.net.URL darkCss = ThemeManager.class.getResource("/org/episteme/core/ui/dark.css");
+             if (darkCss != null) {
+                 scene.getStylesheets().add(darkCss.toExternalForm());
+             }
+        } else if ("Caspian".equalsIgnoreCase(currentTheme)) {
+            javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_CASPIAN);
         } else {
-            // Default Modena
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
         }
         
-        // Clear manual dark mode styles if not in Dark mode
-        if (!"Dark".equalsIgnoreCase(currentTheme)) {
-            scene.getRoot().setStyle("");
-        }
+        // Ensure theme.css is always loaded last for shared overrides
+        scene.getStylesheets().remove(themeCss.toExternalForm()); // Avoid duplicates
+        scene.getStylesheets().add(themeCss.toExternalForm());
+    }
+
+    private boolean isHighContrast() {
+        return "High Contrast".equalsIgnoreCase(currentTheme) || "HighContrast".equalsIgnoreCase(currentTheme);
     }
 
     /**

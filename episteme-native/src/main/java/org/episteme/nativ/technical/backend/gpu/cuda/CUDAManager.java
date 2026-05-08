@@ -118,19 +118,16 @@ public final class CUDAManager {
                 MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
                 
                 if (CUBLAS_CREATE != null && (int) NativeSafe.invoke(CUBLAS_CREATE, p) == 0) {
-                    cublasHandle = p.get(ValueLayout.ADDRESS, 0).reinterpret(0);
-                    cublasHandle = MemorySegment.ofAddress(cublasHandle.address());
+                    cublasHandle = p.get(ValueLayout.ADDRESS, 0);
                 }
-
+                
                 if (CUSPARSE_CREATE != null && (int) NativeSafe.invoke(CUSPARSE_CREATE, p) == 0) {
-                    cusparseHandle = p.get(ValueLayout.ADDRESS, 0).reinterpret(0);
-                    cusparseHandle = MemorySegment.ofAddress(cusparseHandle.address());
+                    cusparseHandle = p.get(ValueLayout.ADDRESS, 0);
                 }
-
+                
                 if (useCusolver && CUSOLVER_CREATE != null) {
                     if ((int) NativeSafe.invoke(CUSOLVER_CREATE, p) == 0) {
-                        cusolverHandle = p.get(ValueLayout.ADDRESS, 0).reinterpret(0);
-                        cusolverHandle = MemorySegment.ofAddress(cusolverHandle.address());
+                        cusolverHandle = p.get(ValueLayout.ADDRESS, 0);
                     } else {
                         useCusolver = false;
                     }

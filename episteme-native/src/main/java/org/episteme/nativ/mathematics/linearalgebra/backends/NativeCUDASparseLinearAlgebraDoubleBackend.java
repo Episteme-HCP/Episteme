@@ -131,7 +131,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MALLOC, p, size));
             MemorySegment d = p.get(ValueLayout.ADDRESS, 0);
             return tracker.track(d, ptr -> {
-                try { NativeSafe.invoke(CUDAManager.CUDA_FREE, ptr.address()); } catch (Throwable t) {}
+                try { NativeSafe.invoke(CUDAManager.CUDA_FREE, ptr); } catch (Throwable t) {}
             });
         } catch (Throwable t) { throw new RuntimeException("CUDA malloc failed", t); }
     }

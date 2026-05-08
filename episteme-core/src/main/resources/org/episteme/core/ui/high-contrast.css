@@ -1,93 +1,31 @@
-/* High Contrast Theme for Episteme Dashboard */
-
 .root {
-    -fx-base: #000000;
-    -fx-background: #000000;
-    -fx-control-inner-background: #000000;
+    -fx-base: black;
+    -fx-background: black;
+    -fx-control-inner-background: black;
     -fx-text-base-color: #FFFF00;
-    /* Yellow text on black */
-    -fx-accent: #FFFFFF;
+    -fx-accent: #00FF00;
     -fx-focus-color: #FFFF00;
 }
 
 .label {
-    -fx-text-fill: #FFFF00;
+    -fx-text-fill: #FFFF00 !important;
 }
 
 .button {
-    -fx-background-color: #000000;
-    -fx-text-fill: #FFFF00;
     -fx-border-color: #FFFF00;
     -fx-border-width: 2px;
 }
 
-.button:hover {
-    -fx-background-color: #FFFF00;
-    -fx-text-fill: #000000;
+.header-label-box, .header-title {
+    -fx-text-fill: #00FF00 !important;
 }
 
-.tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: #000000;
+.zebra-row-odd {
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #333300;
+    -fx-border-width: 0 0 1 0;
 }
 
-.tab {
-    -fx-background-color: #000000;
-    -fx-border-color: #FFFF00;
-    -fx-border-width: 1px;
-}
-
-.tab:selected {
-    -fx-background-color: #FFFF00;
-}
-
-.tab:selected .tab-label {
-    -fx-text-fill: #000000;
-}
-
-.list-view {
-    -fx-background-color: #000000;
-    -fx-border-color: #FFFF00;
-}
-
-.list-cell {
-    -fx-text-fill: #FFFF00;
-}
-
-.list-cell:selected {
-    -fx-background-color: #FFFF00;
-    -fx-text-fill: #000000;
-}
-
-.text-area {
-    -fx-control-inner-background: #000000;
-    -fx-text-fill: #FFFF00;
-    -fx-border-color: #FFFF00;
-}
-
-.separator .line {
-    -fx-border-color: #FFFF00;
-    -fx-border-width: 1px;
-}
-
-.titled-pane>.title {
-    -fx-background-color: #000000;
-    -fx-text-fill: #FFFF00;
-    -fx-border-color: #FFFF00;
-}
-
-.titled-pane>.content {
-    -fx-background-color: #000000;
-    -fx-border-color: #FFFF00;
-}
-
-/* New classes for readability */
-.dashboard-subtitle,
-.dashboard-description,
-.dashboard-help,
-.header-title {
-    -fx-text-fill: #FFFF00;
-}
-
-.row-even {
-    -fx-background-color: #000000;
+.zebra-row-even {
+    -fx-background-color: black;
 }
