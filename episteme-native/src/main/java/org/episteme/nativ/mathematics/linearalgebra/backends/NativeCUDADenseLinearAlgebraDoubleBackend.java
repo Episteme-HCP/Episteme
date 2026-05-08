@@ -121,9 +121,9 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             
             MemorySegment handle = CUDAManager.getCublasHandle();
             checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DGEAM, handle, 1, 0, cols, rows, 
-                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_A, cols, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_A, rows, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0), d_A, rows, 
-                d_C, rows));
+                d_C, cols));
             
             double[] result = new double[rows * cols];
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) rows * cols);
@@ -144,9 +144,9 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             
             MemorySegment handle = CUDAManager.getCublasHandle();
             checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_ZGEAM, handle, 1, 0, cols, rows, 
-                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_A, cols, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_A, rows, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0), d_A, rows, 
-                d_C, rows));
+                d_C, cols));
             
             double[] result = new double[rows * cols * 2];
             MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) rows * cols * 2);
