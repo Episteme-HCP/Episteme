@@ -201,7 +201,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
 
     private Vector<E> toVector(float[] data, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
-        for (int i = 0; i < data.length; i++) values[i] = (E) RealFloat.create(data[i]);
+        for (int i = 0; i < data.length; i++) values[i] = (E) (Object) RealFloat.create(data[i]);
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), null, ring);
     }
 
@@ -235,7 +235,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         int dim = data.length / 2;
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), dim);
         for (int i = 0; i < dim; i++) {
-            values[i] = (E) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
+            values[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), null, ring);
     }

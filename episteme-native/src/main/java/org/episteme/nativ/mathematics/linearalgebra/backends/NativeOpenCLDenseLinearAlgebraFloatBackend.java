@@ -367,7 +367,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         Ring<E> ring = reference.getScalarRing();
         E[] elements = (E[]) new FieldElement[data.length];
         for (int i = 0; i < data.length; i++) {
-            elements[i] = (E) RealFloat.create(data[i]);
+            elements[i] = (E) (Object) RealFloat.create(data[i]);
         }
         return new DenseMatrix<>(elements, rows, cols, ring);
     }
@@ -376,7 +376,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         Ring<E> ring = reference.getScalarRing();
         E[] elements = (E[]) new FieldElement[rows * cols];
         for (int i = 0; i < rows * cols; i++) {
-            elements[i] = (E) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
+            elements[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
         return new DenseMatrix<>(elements, rows, cols, ring);
     }

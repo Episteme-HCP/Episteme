@@ -354,9 +354,9 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
                     rhoF = rn;
                 }
 
-                gpuSaxpy(queue, currentSaxpy, n, mV, mP, isComplex ? omega.negate() : -omegaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mV, mP, isComplex ? (Object) omega.negate() : (Object) Float.valueOf(-omegaF), isComplex);
                 gpuScale(queue, currentScale, mP, beta, n, isComplex);
-                gpuSaxpy(queue, currentSaxpy, n, mR, mP, isComplex ? Complex.ONE : 1.0f, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mR, mP, isComplex ? (Object) Complex.ONE : (Object) 1.0f, isComplex);
 
                 computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mP, mV, isComplex);
                 Object dotV = gpuDot(queue, currentDot, mR0, mV, mTemp, n, isComplex);
@@ -367,7 +367,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
                 }
 
                 clEnqueueCopyBuffer(queue, mR, mS, 0, 0, (long)Sizeof.cl_float * elemSize * n, 0, null, null);
-                gpuSaxpy(queue, currentSaxpy, n, mV, mS, isComplex ? alpha.negate() : -alphaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mV, mS, isComplex ? (Object) alpha.negate() : (Object) Float.valueOf(-alphaF), isComplex);
 
                 computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mS, mT, isComplex);
                 Object tDotS = gpuDot(queue, currentDot, mT, mS, mTemp, n, isComplex);
@@ -379,11 +379,11 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
                     omegaF = (Float)tDotS / (Float)tDotT;
                 }
 
-                gpuSaxpy(queue, currentSaxpy, n, mP, mX, isComplex ? alpha : alphaF, isComplex);
-                gpuSaxpy(queue, currentSaxpy, n, mS, mX, isComplex ? omega : omegaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mP, mX, isComplex ? (Object) alpha : (Object) Float.valueOf(alphaF), isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mS, mX, isComplex ? (Object) omega : (Object) Float.valueOf(omegaF), isComplex);
 
                 clEnqueueCopyBuffer(queue, mS, mR, 0, 0, (long)Sizeof.cl_float * elemSize * n, 0, null, null);
-                gpuSaxpy(queue, currentSaxpy, n, mT, mR, isComplex ? omega.negate() : -omegaF, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mT, mR, isComplex ? (Object) omega.negate() : (Object) Float.valueOf(-omegaF), isComplex);
 
                 Object resNorm = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
                 double normVal = isComplex ? ((Complex)resNorm).abs().doubleValue() : (Float)resNorm;
@@ -506,7 +506,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<E> storage = 
             new org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage<>(data.length, ring.zero());
         for (int i = 0; i < data.length; i++) {
-            if (data[i] != 0.0f) storage.set(i, (E) RealFloat.create(data[i]));
+            if (data[i] != 0.0f) storage.set(i, (E) (Object) RealFloat.create(data[i]));
         }
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, ring);
     }
@@ -538,7 +538,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         int n = data.length / 2;
         E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n);
         for (int i = 0; i < n; i++) {
-            elements[i] = (E) Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
+            elements[i] = (E) (Object) Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
             new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), null, ring);
