@@ -170,7 +170,8 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
     }
 
     public boolean isExplicitlyDisabled() {
-        return Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.opencl.disabled") || 
                Boolean.getBoolean("episteme.backend.gpu.disabled") ||
                Boolean.getBoolean("episteme.backend.lbm.disabled") ||
                Boolean.getBoolean("episteme.backend.lbm-opencl.disabled");

@@ -57,8 +57,15 @@ public interface Backend {
      * @return true if explicitly disabled
      */
     default boolean isExplicitlyDisabled() {
+        if (Boolean.getBoolean("episteme.backend.native.disabled")) {
+            return true;
+        }
         String id = getId();
-        return id != null && Boolean.getBoolean("episteme.backend.disable." + id);
+        if (id == null) return false;
+        
+        return Boolean.getBoolean("episteme.backend.disable." + id) || 
+               Boolean.getBoolean("episteme.backend." + id + ".disabled") ||
+               Boolean.getBoolean("episteme.backend.all.disabled");
     }
 
     /**

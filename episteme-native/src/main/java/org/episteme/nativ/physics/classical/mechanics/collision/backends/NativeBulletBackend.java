@@ -60,15 +60,20 @@ public class NativeBulletBackend implements NativeCollisionProvider, MechanicsBa
     private static final boolean IS_AVAILABLE_FLAG;
 
     static {
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean backendDisabled = Boolean.getBoolean("episteme.backend.bullet.disabled");
+
         Linker linker = Linker.nativeLinker();
         SymbolLookup lookup = null;
         java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
 
-        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("bullet_capi", arena);
-        if (lib.isEmpty()) {
-            lib = NativeFFMLoader.loadLibrary("bulletc", arena);
+        if (!globalDisabled && !backendDisabled) {
+            Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("bullet_capi", arena);
+            if (lib.isEmpty()) {
+                lib = NativeFFMLoader.loadLibrary("bulletc", arena);
+            }
+            lookup = lib.orElse(null);
         }
-        lookup = lib.orElse(null);
 
         if (lookup != null) {
             DETECT_SPHERES = NativeFFMLoader.findSymbol(lookup, "bt_detect_sphere_collisions")
@@ -124,7 +129,7 @@ public class NativeBulletBackend implements NativeCollisionProvider, MechanicsBa
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE_FLAG;
+        return IS_AVAILABLE_FLAG && !isExplicitlyDisabled();
     }
 
     @Override

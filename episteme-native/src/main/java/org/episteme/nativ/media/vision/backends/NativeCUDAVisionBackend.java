@@ -85,6 +85,7 @@ public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, Nativ
     @Override public String getDescription() { return "GPU-accelerated image processing using NVIDIA CUDA."; }
     @Override
     public boolean isAvailable() {
+        if (isExplicitlyDisabled()) return false;
         if (!initialized) initCUDA();
         return initialized;
     }

@@ -14,8 +14,8 @@ import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.vision.VisionAlgorithmProvider;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLManager;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import java.awt.image.BufferedImage;
 import java.nio.DoubleBuffer;
 
@@ -34,7 +34,7 @@ import java.nio.DoubleBuffer;
 @AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, VisionAlgorithmProvider.class, GPUBackend.class, NativeBackend.class})
 public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
 
-    private final NativeOpenCLSparseLinearAlgebraBackend<Real> backend = new NativeOpenCLSparseLinearAlgebraBackend<>();
+    // No longer depends on a specific linear algebra backend
 
     @Override
     public boolean isLoaded() {
@@ -51,7 +51,21 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
     @Override public String getDescription() { return "GPU-accelerated image processing using OpenCL."; }
     @Override
     public boolean isAvailable() {
-        return backend.isAvailable();
+        if (isExplicitlyDisabled()) return false;
+        try {
+            OpenCLManager.ensureInitialized();
+            return OpenCLManager.isInitialized();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+               Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.vision.disabled") ||
+               Boolean.getBoolean("episteme.backend.vision-opencl.disabled");
     }
 
     @Override
@@ -96,7 +110,9 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return backend.createContext();
+        OpenCLManager.ensureInitialized();
+        if (!OpenCLManager.isInitialized()) return null;
+        return new OpenCLExecutionContext(OpenCLManager.getContext(), OpenCLManager.getCommandQueue(), OpenCLManager.getDevice());
     }
 
     public SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {

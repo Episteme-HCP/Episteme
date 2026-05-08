@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>> implements SparseLinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDASparseLinearAlgebraFloatBackend.class);
+
+    @Override public boolean isLoaded() { return isAvailable(); }
+    @Override public String getNativeLibraryName() { return "cuda"; }
     
     private static final int CUDA_R_32F = 0; // Float precision in CUDA
     private static final int CUSPARSE_INDEX_32BIT = 1;
@@ -43,6 +46,14 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         return CUDAManager.isAvailable();
     }
 
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.cuda.disabled") || 
+               Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra-cuda.disabled");
+    }
+
     @Override
     public boolean isCompatible(Ring<?> ring) {
         return ring.zero() instanceof RealFloat;
@@ -51,13 +62,12 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
     @Override public String getId() { return "cuda-sparse-float"; }
     @Override public String getName() { return "Native CUDA Sparse Linear Algebra Float Backend"; }
     @Override public int getPriority() { return 110; }
+    @Override public void shutdown() {}
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> x) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        if (!(a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) throw new IllegalArgumentException("Matrix must be sparse");
-        
-        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>) a;
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = ensureSparse(a);
         int m = sa.rows();
         int k = sa.cols();
         int nnz = sa.getNnz();
@@ -70,16 +80,16 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_x = malloc((long)k * 4, tracker);
             MemorySegment d_y = malloc((long)m * 4, tracker);
 
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, 1));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, 1));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(sa)), (long)nnz * 4, 1));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(x)), (long)k * 4, 1));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(sa)), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(x)), (long)k * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
 
             spmv_internal(m, k, nnz, d_rowPtr, d_colIdx, d_val, d_x, d_y, arena, tracker);
 
             float[] h_y = new float[m];
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m);
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY, d_y, (long) m * 4, 2));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY, d_y, (long) m * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segY, ValueLayout.JAVA_FLOAT, 0, h_y, 0, m);
 
             return toVector(h_y, (Ring<E>) sa.getScalarRing());
@@ -149,6 +159,17 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         return data;
     }
 
+    private org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> ensureSparse(Matrix<E> A) {
+        if (A instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix) return (org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>) A;
+        int rows = A.rows(); int cols = A.cols(); Ring<E> ring = A.getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(rows, cols, ring.zero());
+        for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) {
+            E val = A.get(i, j);
+            if (val != null && !ring.zero().equals(val)) storage.set(i, j, val);
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, ring);
+    }
+
     private Vector<E> toVector(float[] data, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) values[i] = (E) RealFloat.create(data[i]);
@@ -158,4 +179,55 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
     @Override public void close() {}
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.GPU; }
     @Override public String getType() { return "math"; }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext();
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[] getDevices() {
+        if (!isAvailable()) return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[0];
+        return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[]{
+            new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo(
+                "CUDA Device", 0, 0, "CUDA")
+        };
+    }
+
+    @Override
+    public void selectDevice(int deviceId) {}
+
+    @Override
+    public long allocateGPUMemory(long sizeBytes) {
+        try (Arena temp = Arena.ofConfined()) {
+            MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MALLOC, p, sizeBytes));
+            return p.get(ValueLayout.ADDRESS, 0).address();
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public void copyToGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, MemorySegment.ofAddress(gpuHandle), MemorySegment.ofBuffer(hostBuffer), sizeBytes, CUDAManager.CUDA_MEMCPY_H_TO_D));
+    }
+
+    @Override
+    public void copyFromGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, MemorySegment.ofBuffer(hostBuffer), MemorySegment.ofAddress(gpuHandle), sizeBytes, CUDAManager.CUDA_MEMCPY_D_TO_H));
+    }
+
+    @Override
+    public void freeGPUMemory(long gpuHandle) {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_FREE, MemorySegment.ofAddress(gpuHandle)));
+    }
+
+    @Override
+    public void synchronize() {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_DEVICE_SYNCHRONIZE));
+    }
+
+    @Override
+    public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
+        throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not implemented in sparse backend");
+    }
 }

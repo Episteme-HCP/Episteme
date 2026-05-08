@@ -17,7 +17,11 @@ import org.slf4j.LoggerFactory;
  */
 public final class CUDAManager {
     private static final Logger logger = LoggerFactory.getLogger(CUDAManager.class);
-    private static final Arena SHARED_ARENA = Arena.ofShared();
+    public static final int CUDA_MEMCPY_H_TO_D = 1;
+    public static final int CUDA_MEMCPY_D_TO_H = 2;
+    public static final int CUDA_MEMCPY_D_TO_D = 3;
+
+    private static final Arena managerArena = Arena.ofShared();
     private static final Linker LINKER = Linker.nativeLinker();
 
     private static boolean initialized = false;
@@ -97,11 +101,11 @@ public final class CUDAManager {
         initialized = true;
 
         try {
-            cudaLookup = NativeFFMLoader.loadLibrary("cuda", SHARED_ARENA).orElse(null);
-            cudartLookup = NativeFFMLoader.loadLibrary("cudart", SHARED_ARENA).orElse(null);
-            cublasLookup = NativeFFMLoader.loadLibrary("cublas", SHARED_ARENA).orElse(null);
-            cusparseLookup = NativeFFMLoader.loadLibrary("cusparse", SHARED_ARENA).orElse(null);
-            cusolverLookup = NativeFFMLoader.loadLibrary("cusolver", SHARED_ARENA).orElse(null);
+            cudaLookup = NativeFFMLoader.loadLibrary("cuda", managerArena).orElse(null);
+            cudartLookup = NativeFFMLoader.loadLibrary("cudart", managerArena).orElse(null);
+            cublasLookup = NativeFFMLoader.loadLibrary("cublas", managerArena).orElse(null);
+            cusparseLookup = NativeFFMLoader.loadLibrary("cusparse", managerArena).orElse(null);
+            cusolverLookup = NativeFFMLoader.loadLibrary("cusolver", managerArena).orElse(null);
 
             if (cudaLookup == null && cudartLookup == null) {
                 logger.warn("CUDA libraries not found. CUDA backends will be unavailable.");
@@ -269,5 +273,23 @@ public final class CUDAManager {
         return NativeFFMLoader.findSymbol(lookup, name)
             .map(s -> LINKER.downcallHandle(s, desc))
             .orElse(null);
+    }
+
+    public static void shutdown() {
+        synchronized (CUDAManager.class) {
+            if (cublasHandle != null) {
+                try { NativeSafe.invoke(CUBLAS_DESTROY, cublasHandle); } catch (Throwable t) { logger.warn("Failed to destroy cuBLAS handle", t); }
+                cublasHandle = null;
+            }
+            if (cusparseHandle != null) {
+                try { NativeSafe.invoke(CUSPARSE_DESTROY, cusparseHandle); } catch (Throwable t) { logger.warn("Failed to destroy cuSPARSE handle", t); }
+                cusparseHandle = null;
+            }
+            if (cusolverHandle != null) {
+                try { NativeSafe.invoke(CUSOLVER_DESTROY, cusolverHandle); } catch (Throwable t) { logger.warn("Failed to destroy cuSolver handle", t); }
+                cusolverHandle = null;
+            }
+            initialized = false;
+        }
     }
 }

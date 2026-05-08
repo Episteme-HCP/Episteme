@@ -26,13 +26,27 @@ public class NativeND4JCUDASparseTensorBackend implements TensorBackend {
     private static boolean available = false;
 
     static {
-        try {
-            Class.forName("org.nd4j.linalg.factory.Nd4j");
-            org.nd4j.linalg.factory.Nd4jBackend backend = org.nd4j.linalg.factory.Nd4j.getBackend();
-            available = backend != null && backend.getClass().getName().contains("CudaBackend");
-        } catch (Throwable t) {
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean nd4jDisabled = Boolean.getBoolean("episteme.backend.nd4j.disabled");
+
+        if (!globalDisabled && !nd4jDisabled) {
+            try {
+                Class.forName("org.nd4j.linalg.factory.Nd4j");
+                org.nd4j.linalg.factory.Nd4jBackend backend = org.nd4j.linalg.factory.Nd4j.getBackend();
+                available = backend != null && backend.getClass().getName().contains("CudaBackend");
+            } catch (Throwable t) {
+                available = false;
+            }
+        } else {
             available = false;
         }
+    }
+
+    @Override
+    public boolean isAvailable() {
+        if (Boolean.getBoolean("episteme.backend.native.disabled")) return false;
+        if (Boolean.getBoolean("episteme.backend.nd4j.disabled")) return false;
+        return available;
     }
 
     @Override
@@ -76,10 +90,6 @@ public class NativeND4JCUDASparseTensorBackend implements TensorBackend {
         return new CUDAExecutionContext(null, null);
     }
 
-    @Override
-    public boolean isAvailable() {
-        return available;
-    }
 
     @Override
     public String getId() {

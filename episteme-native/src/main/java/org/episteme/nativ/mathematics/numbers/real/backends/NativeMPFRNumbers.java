@@ -99,7 +99,8 @@ public final class NativeMPFRNumbers {
         if (initAttempted) return;
         initAttempted = true;
 
-        if (Boolean.getBoolean("episteme.backend.mpfr.disabled") || 
+        if (Boolean.getBoolean("episteme.backend.native.disabled") ||
+            Boolean.getBoolean("episteme.backend.mpfr.disabled") || 
             (Boolean.getBoolean("episteme.backend.mpfr-dense.disabled") && Boolean.getBoolean("episteme.backend.mpfr-sparse.disabled"))) {
             logger.info("Native MPFR: Disabled by system property.");
             return;

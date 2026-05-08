@@ -43,8 +43,15 @@ public class ODEBackend implements NativeCollisionProvider, MechanicsBackend, CP
 
     private static synchronized void ensureInitialized() {
         if (IS_INITIALIZED) return;
-        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("ode", Arena.global());
-        IS_AVAILABLE = lib.isPresent();
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean backendDisabled = Boolean.getBoolean("episteme.backend.ode.disabled");
+
+        if (!globalDisabled && !backendDisabled) {
+            Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("ode", Arena.global());
+            IS_AVAILABLE = lib.isPresent();
+        } else {
+            IS_AVAILABLE = false;
+        }
         IS_INITIALIZED = true;
     }
 

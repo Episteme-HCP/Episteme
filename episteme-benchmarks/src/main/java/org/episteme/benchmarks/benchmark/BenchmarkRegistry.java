@@ -207,10 +207,22 @@ public class BenchmarkRegistry {
         // Strict separation: Do not mix Sparse providers in Dense benchmarks
         boolean isProviderSparse = p.getAlgorithmType().toLowerCase().contains("sparse");
         boolean isBenchmarkDense = base.getDomain().toLowerCase().contains("dense");
-        
+
         if (isProviderSparse && isBenchmarkDense) {
              System.out.println("[DEBUG]     - Skipping Sparse provider " + p.getName() + " for Dense benchmark " + base.getNameBase());
              return; 
+        }
+
+        // EXACT mode filtering: only include if provider is capable of high precision
+        if (mode == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            String name = p.getName().toUpperCase();
+            String className = p.getClass().getName().toUpperCase();
+            boolean isHighPrecision = name.contains("MPFR") || name.contains("BIG") || name.contains("EXACT") ||
+                                     className.contains("MPFR") || className.contains("BIG") || className.contains("EXACT");
+            if (!isHighPrecision) {
+                System.out.println("[DEBUG]     - Skipping EXACT mode for low-precision provider: " + p.getName());
+                return;
+            }
         }
         
         RunnableBenchmark rb = new RunnableBenchmark() {

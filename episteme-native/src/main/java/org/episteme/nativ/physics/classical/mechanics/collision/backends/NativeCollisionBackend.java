@@ -57,23 +57,34 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
     private static final boolean IS_AVAILABLE;
 
     static {
-        java.lang.foreign.Linker linker = java.lang.foreign.Linker.nativeLinker();
-        java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
-        java.util.Optional<java.lang.foreign.SymbolLookup> lib = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.loadLibrary("episteme-native", arena);
-        
-        if (lib.isPresent()) {
-            java.lang.foreign.SymbolLookup lookup = lib.get();
-            DETECT_SPHERES = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "detect_sphere_collisions")
-                .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.of(java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS))).orElse(null);
-            RESOLVE_COLLISIONS = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "resolve_sphere_collisions")
-                .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.ofVoid(java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT))).orElse(null);
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean collisionDisabled = Boolean.getBoolean("episteme.backend.collision.disabled");
+
+        if (!globalDisabled && !collisionDisabled) {
+            java.lang.foreign.Linker linker = java.lang.foreign.Linker.nativeLinker();
+            java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
+            java.util.Optional<java.lang.foreign.SymbolLookup> lib = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.loadLibrary("episteme-native", arena);
             
-            DETECT_SPHERES_F = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "detect_sphere_collisions_f")
-                .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.of(java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS))).orElse(null);
-            RESOLVE_COLLISIONS_F = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "resolve_sphere_collisions_f")
-                .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.ofVoid(java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT))).orElse(null);
-            
-            IS_AVAILABLE = DETECT_SPHERES != null && DETECT_SPHERES_F != null;
+            if (lib.isPresent()) {
+                java.lang.foreign.SymbolLookup lookup = lib.get();
+                DETECT_SPHERES = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "detect_sphere_collisions")
+                    .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.of(java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS))).orElse(null);
+                RESOLVE_COLLISIONS = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "resolve_sphere_collisions")
+                    .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.ofVoid(java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT))).orElse(null);
+                
+                DETECT_SPHERES_F = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "detect_sphere_collisions_f")
+                    .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.of(java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS))).orElse(null);
+                RESOLVE_COLLISIONS_F = org.episteme.nativ.technical.backend.nativ.NativeFFMLoader.findSymbol(lookup, "resolve_sphere_collisions_f")
+                    .map(s -> linker.downcallHandle(s, java.lang.foreign.FunctionDescriptor.ofVoid(java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT, java.lang.foreign.ValueLayout.ADDRESS, java.lang.foreign.ValueLayout.JAVA_INT))).orElse(null);
+                
+                IS_AVAILABLE = DETECT_SPHERES != null && DETECT_SPHERES_F != null;
+            } else {
+                DETECT_SPHERES = null;
+                RESOLVE_COLLISIONS = null;
+                DETECT_SPHERES_F = null;
+                RESOLVE_COLLISIONS_F = null;
+                IS_AVAILABLE = false;
+            }
         } else {
             DETECT_SPHERES = null;
             RESOLVE_COLLISIONS = null;
@@ -81,6 +92,13 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
             RESOLVE_COLLISIONS_F = null;
             IS_AVAILABLE = false;
         }
+    }
+
+    @Override
+    public boolean isAvailable() {
+        if (Boolean.getBoolean("episteme.backend.native.disabled")) return false;
+        if (Boolean.getBoolean("episteme.backend.collision.disabled")) return false;
+        return IS_AVAILABLE;
     }
 
     @Override

@@ -87,6 +87,7 @@ public class NativeCPUTensorBackend implements TensorProvider, CPUBackend, Nativ
 
     @Override
     public boolean isAvailable() {
+        if (isExplicitlyDisabled()) return false;
         ensureInitialized();
         return IS_AVAILABLE;
     }

@@ -43,22 +43,31 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
     private static final MethodHandle MH_PROCESS_IMAGE;
 
     static {
-        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary(LIB_NAME, Arena.global());
-        if (lib.isPresent()) {
-            LOOKUP = lib.get();
-            FunctionDescriptor desc = FunctionDescriptor.ofVoid(
-                    ValueLayout.ADDRESS,
-                    ValueLayout.JAVA_INT,
-                    ValueLayout.JAVA_INT,
-                    ValueLayout.JAVA_INT
-            );
-            
-            Optional<MemorySegment> symbol = NativeFFMLoader.findSymbol(LOOKUP, "process_image");
-            if (symbol.isPresent()) {
-                MH_PROCESS_IMAGE = LINKER.downcallHandle(symbol.get(), desc);
-                IS_AVAILABLE = true;
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean backendDisabled = Boolean.getBoolean("episteme.backend.vision-cbinding.disabled");
+
+        if (!globalDisabled && !backendDisabled) {
+            Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary(LIB_NAME, Arena.global());
+            if (lib.isPresent()) {
+                LOOKUP = lib.get();
+                FunctionDescriptor desc = FunctionDescriptor.ofVoid(
+                        ValueLayout.ADDRESS,
+                        ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT
+                );
+                
+                Optional<MemorySegment> symbol = NativeFFMLoader.findSymbol(LOOKUP, "process_image");
+                if (symbol.isPresent()) {
+                    MH_PROCESS_IMAGE = LINKER.downcallHandle(symbol.get(), desc);
+                    IS_AVAILABLE = true;
+                } else {
+                    System.err.println("[DEBUG] NativeCPUCBindingVisionBackend: Symbol 'process_image' not found in library.");
+                    MH_PROCESS_IMAGE = null;
+                    IS_AVAILABLE = false;
+                }
             } else {
-                System.err.println("[DEBUG] NativeCPUCBindingVisionBackend: Symbol 'process_image' not found in library.");
+                LOOKUP = null;
                 MH_PROCESS_IMAGE = null;
                 IS_AVAILABLE = false;
             }
@@ -106,7 +115,7 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE;
+        return IS_AVAILABLE && !isExplicitlyDisabled();
     }
 
     @Override
