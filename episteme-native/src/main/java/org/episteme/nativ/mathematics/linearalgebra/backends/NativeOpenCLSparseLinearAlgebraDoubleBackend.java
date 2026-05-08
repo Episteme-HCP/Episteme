@@ -45,10 +45,16 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
     private cl_program program;
     private cl_kernel spmvKernel;
     private cl_kernel complexSpmvKernel;
-    private cl_kernel vecAddKernel;
-    private cl_kernel vecScaleKernel;
     private cl_kernel saxpyKernel;
+    private cl_kernel complexSaxpyKernel;
+    private cl_kernel vecAddKernel;
+    private cl_kernel complexVecAddKernel;
+    private cl_kernel vecSubKernel;
+    private cl_kernel complexVecSubKernel;
+    private cl_kernel vecScaleKernel;
+    private cl_kernel complexVecScaleKernel;
     private cl_kernel dotPartialKernel;
+    private cl_kernel complexDotPartialKernel;
     
     private volatile boolean initialized = false;
 
@@ -68,9 +74,15 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             spmvKernel = tryCreateKernel(program, "spmv_csr_double");
             complexSpmvKernel = tryCreateKernel(program, "complex_spmv_csr_double");
             vecAddKernel = tryCreateKernel(program, "vec_add");
+            complexVecAddKernel = tryCreateKernel(program, "complex_vec_add");
+            vecSubKernel = tryCreateKernel(program, "vec_sub");
+            complexVecSubKernel = tryCreateKernel(program, "complex_vec_sub");
             vecScaleKernel = tryCreateKernel(program, "vec_scale");
+            complexVecScaleKernel = tryCreateKernel(program, "complex_vec_scale");
             saxpyKernel = tryCreateKernel(program, "saxpy");
+            complexSaxpyKernel = tryCreateKernel(program, "complex_saxpy");
             dotPartialKernel = tryCreateKernel(program, "vec_dot_partial");
+            complexDotPartialKernel = tryCreateKernel(program, "complex_dot_partial");
 
             initialized = (spmvKernel != null);
             if (initialized) {
@@ -143,14 +155,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             cl_mem memX = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * cols, Pointer.to(xData), null), CL::clReleaseMemObject);
             cl_mem memY = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * rows, null, null), CL::clReleaseMemObject);
             
-            clSetKernelArg(spmvKernel, 0, Sizeof.cl_int, Pointer.to(new int[]{rows}));
-            clSetKernelArg(spmvKernel, 1, Sizeof.cl_mem, Pointer.to(memPtr));
-            clSetKernelArg(spmvKernel, 2, Sizeof.cl_mem, Pointer.to(memInd));
-            clSetKernelArg(spmvKernel, 3, Sizeof.cl_mem, Pointer.to(memVal));
-            clSetKernelArg(spmvKernel, 4, Sizeof.cl_mem, Pointer.to(memX));
-            clSetKernelArg(spmvKernel, 5, Sizeof.cl_mem, Pointer.to(memY));
-            
-            clEnqueueNDRangeKernel(queue, spmvKernel, 1, null, new long[]{rows}, null, 0, null, null);
+            computeSpmv(queue, spmvKernel, rows, memPtr, memInd, memVal, memX, memY);
             clEnqueueReadBuffer(queue, memY, CL_TRUE, 0, (long)Sizeof.cl_double * rows, Pointer.to(yData), 0, null, null);
             
             return fromDoubleArray(yData, sa.getScalarRing());
@@ -179,14 +184,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             cl_mem memX = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * 2 * cols, Pointer.to(xData), null), CL::clReleaseMemObject);
             cl_mem memY = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * 2 * rows, null, null), CL::clReleaseMemObject);
             
-            clSetKernelArg(complexSpmvKernel, 0, Sizeof.cl_int, Pointer.to(new int[]{rows}));
-            clSetKernelArg(complexSpmvKernel, 1, Sizeof.cl_mem, Pointer.to(memPtr));
-            clSetKernelArg(complexSpmvKernel, 2, Sizeof.cl_mem, Pointer.to(memInd));
-            clSetKernelArg(complexSpmvKernel, 3, Sizeof.cl_mem, Pointer.to(memVal));
-            clSetKernelArg(complexSpmvKernel, 4, Sizeof.cl_mem, Pointer.to(memX));
-            clSetKernelArg(complexSpmvKernel, 5, Sizeof.cl_mem, Pointer.to(memY));
-            
-            clEnqueueNDRangeKernel(queue, complexSpmvKernel, 1, null, new long[]{rows}, null, 0, null, null);
+            computeSpmv(queue, complexSpmvKernel, rows, memPtr, memInd, memVal, memX, memY);
             clEnqueueReadBuffer(queue, memY, CL_TRUE, 0, (long)Sizeof.cl_double * 2 * rows, Pointer.to(yData), 0, null, null);
             
             return fromComplexDoubleArray(yData, sa.getScalarRing());
@@ -219,10 +217,14 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
 
         int[] rowPtr = sa.getRowPointers();
         int[] colIdx = sa.getColIndices();
-        double[] values = new double[nnz];
-        Object[] valsObj = sa.getValues();
-        for (int i = 0; i < nnz; i++) values[i] = getRealValue((E) valsObj[i]);
-        double[] bData = toDoubleVec(b);
+        boolean isComplex = isComplex(a);
+        double[] values = isComplex ? toComplexDoubleArray(sa) : new double[nnz];
+        if (!isComplex) {
+            Object[] valsObj = sa.getValues();
+            for (int i = 0; i < nnz; i++) values[i] = getRealValue((E) valsObj[i]);
+        }
+        double[] bData = isComplex ? toComplexDoubleVec(b) : toDoubleVec(b);
+        int elemSize = isComplex ? 2 : 1;
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             cl_context context = OpenCLManager.getContext();
@@ -230,50 +232,62 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
 
             cl_mem mPtr = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null), CL::clReleaseMemObject);
             cl_mem mInd = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null), CL::clReleaseMemObject);
-            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
-            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(bData), null), CL::clReleaseMemObject);
+            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * elemSize * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
+            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * elemSize * n, Pointer.to(bData), null), CL::clReleaseMemObject);
             
-            cl_mem mX = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
+            cl_mem mX = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
             if (x0 != null) {
-                 double[] x0Data = toDoubleVec(x0);
-                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(x0Data), 0, null, null);
+                 double[] x0Data = isComplex ? toComplexDoubleVec(x0) : toDoubleVec(x0);
+                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * elemSize * n, Pointer.to(x0Data), 0, null, null);
             } else {
-                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(new double[n]), 0, null, null);
+                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * elemSize * n, Pointer.to(new double[n * elemSize]), 0, null, null);
             }
             
-            cl_mem mR = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mP = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mAp = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mTemp = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
+            cl_mem mR = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mP = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mAp = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mTemp = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+
+            cl_kernel currentSpmv = isComplex ? complexSpmvKernel : spmvKernel;
+            cl_kernel currentDot = isComplex ? complexDotPartialKernel : dotPartialKernel;
+            cl_kernel currentSaxpy = isComplex ? complexSaxpyKernel : saxpyKernel;
+            cl_kernel currentAdd = isComplex ? complexVecAddKernel : vecAddKernel;
+            cl_kernel currentScale = isComplex ? complexVecScaleKernel : vecScaleKernel;
 
             // r = b - Ax (initial)
-            computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mX, mAp);
-            clEnqueueCopyBuffer(queue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-            computeSaxpy(queue, saxpyKernel, n, mAp, mR, -1.0);
-            clEnqueueCopyBuffer(queue, mR, mP, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+            computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mX, mAp);
+            clEnqueueCopyBuffer(queue, mB, mR, 0, 0, (long)Sizeof.cl_double * elemSize * n, 0, null, null);
+            gpuSaxpy(queue, currentSaxpy, n, mAp, mR, isComplex ? Complex.of(-1, 0) : -1.0);
+            clEnqueueCopyBuffer(queue, mR, mP, 0, 0, (long)Sizeof.cl_double * elemSize * n, 0, null, null);
             
-            double rsOld = gpuDot(queue, dotPartialKernel, mR, mR, mTemp, n);
-
+            Object rsOld = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
+            double tolSq = tol * tol;
+            
             for (int i = 0; i < maxIterations; i++) {
-                computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mP, mAp);
-                double pAp = gpuDot(queue, dotPartialKernel, mP, mAp, mTemp, n);
-                double alpha = rsOld / pAp;
-
-                computeSaxpy(queue, saxpyKernel, n, mP, mX, alpha);
-                computeSaxpy(queue, saxpyKernel, n, mAp, mR, -alpha);
-
-                double rsNew = gpuDot(queue, dotPartialKernel, mR, mR, mTemp, n);
-                if (Math.sqrt(rsNew) < tol) break;
-
-                double beta = rsNew / rsOld;
-                gpuScale(queue, vecScaleKernel, mP, beta, n);
-                gpuAdd(queue, vecAddKernel, mR, mP, n); 
+                computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mP, mAp);
+                Object pAp = gpuDot(queue, currentDot, mP, mAp, mTemp, n, isComplex);
+                
+                Object alpha = isComplex ? ((Complex)rsOld).divide((Complex)pAp) : ((Double)rsOld) / ((Double)pAp);
+                
+                gpuSaxpy(queue, currentSaxpy, n, mP, mX, alpha);
+                gpuSaxpy(queue, currentSaxpy, n, mAp, mR, isComplex ? ((Complex)alpha).negate() : -((Double)alpha));
+                
+                Object rsNew = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
+                if (isComplex) {
+                    if (((Complex)rsNew).abs() < tolSq) break;
+                } else {
+                    if ((Double)rsNew < tolSq) break;
+                }
+                
+                Object beta = isComplex ? ((Complex)rsNew).divide((Complex)rsOld) : ((Double)rsNew) / ((Double)rsOld);
+                gpuScale(queue, currentScale, mP, beta, n, isComplex);
+                gpuAdd(queue, currentAdd, mR, mP, n, isComplex);
                 rsOld = rsNew;
             }
-
-            double[] xRes = new double[n];
-            clEnqueueReadBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(xRes), 0, null, null);
-            return fromDoubleVec(xRes, sa.getScalarRing());
+            
+            double[] res = new double[n * elemSize];
+            clEnqueueReadBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * elemSize * n, Pointer.to(res), 0, null, null);
+            return isComplex ? fromComplexDoubleArray(res, sa.getScalarRing()) : fromDoubleArray(res, sa.getScalarRing());
         } catch (Exception e) {
             throw new RuntimeException("OpenCL CG solver failure", e);
         }
@@ -289,10 +303,14 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
 
         int[] rowPtr = sa.getRowPointers();
         int[] colIdx = sa.getColIndices();
-        double[] values = new double[nnz];
-        Object[] valsObj = sa.getValues();
-        for (int i = 0; i < nnz; i++) values[i] = getRealValue((E) valsObj[i]);
-        double[] bData = toDoubleVec(b);
+        boolean isComplex = isComplex(a);
+        double[] values = isComplex ? toComplexDoubleArray(sa) : new double[nnz];
+        if (!isComplex) {
+            Object[] valsObj = sa.getValues();
+            for (int i = 0; i < nnz; i++) values[i] = getRealValue((E) valsObj[i]);
+        }
+        double[] bData = isComplex ? toComplexDoubleVec(b) : toDoubleVec(b);
+        int elemSize = isComplex ? 2 : 1;
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             cl_context context = OpenCLManager.getContext();
@@ -300,68 +318,96 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
 
             cl_mem mPtr = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null), CL::clReleaseMemObject);
             cl_mem mInd = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null), CL::clReleaseMemObject);
-            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
-            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(bData), null), CL::clReleaseMemObject);
+            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * elemSize * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
+            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * elemSize * n, Pointer.to(bData), null), CL::clReleaseMemObject);
             
-            cl_mem mX = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
+            cl_mem mX = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
             if (x0 != null) {
-                 double[] x0Data = toDoubleVec(x0);
-                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(x0Data), 0, null, null);
+                 double[] x0Data = isComplex ? toComplexDoubleVec(x0) : toDoubleVec(x0);
+                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * elemSize * n, Pointer.to(x0Data), 0, null, null);
             } else {
-                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(new double[n]), 0, null, null);
+                 clEnqueueWriteBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * elemSize * n, Pointer.to(new double[n * elemSize]), 0, null, null);
             }
             
-            cl_mem mR = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mR0 = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mP = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mV = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mS = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mT = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            cl_mem mTemp = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
-            
+            cl_mem mR = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mR0 = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mP = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mV = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mS = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mT = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+            cl_mem mTemp = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * elemSize * n, null, null), CL::clReleaseMemObject);
+
+            cl_kernel currentSpmv = isComplex ? complexSpmvKernel : spmvKernel;
+            cl_kernel currentDot = isComplex ? complexDotPartialKernel : dotPartialKernel;
+            cl_kernel currentSaxpy = isComplex ? complexSaxpyKernel : saxpyKernel;
+            cl_kernel currentAdd = isComplex ? complexVecAddKernel : vecAddKernel;
+            cl_kernel currentSub = isComplex ? complexVecSubKernel : vecSubKernel;
+            cl_kernel currentScale = isComplex ? complexVecScaleKernel : vecScaleKernel;
+
             // r = b - Ax
-            computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mX, mV);
-            clEnqueueCopyBuffer(queue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-            computeSaxpy(queue, saxpyKernel, n, mV, mR, -1.0);
-            clEnqueueCopyBuffer(queue, mR, mR0, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
+            computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mX, mV);
+            clEnqueueCopyBuffer(queue, mB, mR, 0, 0, (long)Sizeof.cl_double * elemSize * n, 0, null, null);
+            gpuSaxpy(queue, currentSaxpy, n, mV, mR, isComplex ? Complex.of(-1, 0) : -1.0);
+            clEnqueueCopyBuffer(queue, mR, mR0, 0, 0, (long)Sizeof.cl_double * elemSize * n, 0, null, null);
             
-            double rho = 1, alpha = 1, omega = 1;
+            Complex rho = Complex.of(1, 0);
+            Complex alpha = Complex.of(1, 0);
+            Complex omega = Complex.of(1, 0);
             
+            double rhoReal = 1, alphaReal = 1, omegaReal = 1;
+
             for (int i = 0; i < maxIterations; i++) {
-                double rhoNext = gpuDot(queue, dotPartialKernel, mR0, mR, mTemp, n);
-                double beta = (rhoNext / rho) * (alpha / omega);
-                rho = rhoNext;
-
-                computeSaxpy(queue, saxpyKernel, n, mV, mP, -omega);
-                gpuScale(queue, vecScaleKernel, mP, beta, n);
-                gpuAdd(queue, vecAddKernel, mR, mP, n);
-
-                computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mP, mV);
-                alpha = rho / gpuDot(queue, dotPartialKernel, mR0, mV, mTemp, n);
-
-                clEnqueueCopyBuffer(queue, mR, mS, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-                computeSaxpy(queue, saxpyKernel, n, mV, mS, -alpha);
-
-                if (Math.sqrt(gpuDot(queue, dotPartialKernel, mS, mS, mTemp, n)) < tol) {
-                    computeSaxpy(queue, saxpyKernel, n, mP, mX, alpha);
-                    break;
+                Object rhoNext = gpuDot(queue, currentDot, mR0, mR, mTemp, n, isComplex);
+                
+                Object beta;
+                if (isComplex) {
+                    beta = ((Complex)rhoNext).divide(rho).multiply(alpha.divide(omega));
+                    rho = (Complex)rhoNext;
+                } else {
+                    double rn = (Double)rhoNext;
+                    beta = (rn / rhoReal) * (alphaReal / omegaReal);
+                    rhoReal = rn;
                 }
 
-                computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mS, mT);
-                omega = gpuDot(queue, dotPartialKernel, mS, mT, mTemp, n) / gpuDot(queue, dotPartialKernel, mT, mT, mTemp, n);
+                gpuSaxpy(queue, currentSaxpy, n, mV, mP, isComplex ? ((Complex)omega).negate() : -omegaReal);
+                gpuScale(queue, currentScale, mP, beta, n, isComplex);
+                gpuAdd(queue, currentAdd, mR, mP, n, isComplex);
 
-                computeSaxpy(queue, saxpyKernel, n, mP, mX, alpha);
-                computeSaxpy(queue, saxpyKernel, n, mS, mX, omega);
+                computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mP, mV);
+                Object dotV = gpuDot(queue, currentDot, mR0, mV, mTemp, n, isComplex);
+                if (isComplex) {
+                    alpha = rho.divide((Complex)dotV);
+                } else {
+                    alphaReal = rhoReal / (Double)dotV;
+                }
 
-                clEnqueueCopyBuffer(queue, mS, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-                computeSaxpy(queue, saxpyKernel, n, mT, mR, -omega);
+                clEnqueueCopyBuffer(queue, mR, mS, 0, 0, (long)Sizeof.cl_double * elemSize * n, 0, null, null);
+                gpuSaxpy(queue, currentSaxpy, n, mV, mS, isComplex ? ((Complex)alpha).negate() : -alphaReal);
 
-                if (Math.sqrt(gpuDot(queue, dotPartialKernel, mR, mR, mTemp, n)) < tol) break;
+                computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mS, mT);
+                Object tDotS = gpuDot(queue, currentDot, mT, mS, mTemp, n, isComplex);
+                Object tDotT = gpuDot(queue, currentDot, mT, mT, mTemp, n, isComplex);
+                
+                if (isComplex) {
+                    omega = ((Complex)tDotS).divide((Complex)tDotT);
+                } else {
+                    omegaReal = (Double)tDotS / (Double)tDotT;
+                }
+
+                gpuSaxpy(queue, currentSaxpy, n, mP, mX, isComplex ? alpha : alphaReal);
+                gpuSaxpy(queue, currentSaxpy, n, mS, mX, isComplex ? omega : omegaReal);
+
+                clEnqueueCopyBuffer(queue, mS, mR, 0, 0, (long)Sizeof.cl_double * elemSize * n, 0, null, null);
+                gpuSaxpy(queue, currentSaxpy, n, mT, mR, isComplex ? ((Complex)omega).negate() : -omegaReal);
+
+                Object resNorm = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
+                double normVal = isComplex ? ((Complex)resNorm).abs() : (Double)resNorm;
+                if (normVal < tol * tol) break;
             }
-
-            double[] xRes = new double[n];
-            clEnqueueReadBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(xRes), 0, null, null);
-            return fromDoubleVec(xRes, sa.getScalarRing());
+            
+            double[] res = new double[n * elemSize];
+            clEnqueueReadBuffer(queue, mX, CL_TRUE, 0, (long)Sizeof.cl_double * elemSize * n, Pointer.to(res), 0, null, null);
+            return isComplex ? fromComplexDoubleArray(res, sa.getScalarRing()) : fromDoubleArray(res, sa.getScalarRing());
         } catch (Exception e) {
             throw new RuntimeException("OpenCL BiCGSTAB failure", e);
         }
@@ -370,11 +416,13 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
     @Override
     public Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Sparse Double Backend not available");
+        // GMRES is real only for now in this backend, falling back to super for complex
+        if (isComplex(a)) return SparseLinearAlgebraProvider.super.gmres(a, b, x0, tolerance, maxIterations, restarts);
+        
         SparseMatrix<E> sa = ensureSparse(a);
         double tol = getRealValue(tolerance);
         int n = sa.rows();
         
-        // Ported GMRES logic
         double[] bArr = toDoubleVec(b);
         int nnz = sa.getNnz();
         int[] rowPtr = sa.getRowPointers();
@@ -411,12 +459,12 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             for (int restart = 0; restart < restarts; restart++) {
                 computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mX, mAx);
                 clEnqueueCopyBuffer(queue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-                computeSaxpy(queue, saxpyKernel, n, mAx, mR, -1.0);
+                gpuSaxpy(queue, saxpyKernel, n, mAx, mR, -1.0);
 
-                double residualNorm = Math.sqrt(gpuDot(queue, dotPartialKernel, mR, mR, mTemp, n));
+                double residualNorm = Math.sqrt((Double)gpuDot(queue, dotPartialKernel, mR, mR, mTemp, n, false));
                 if (residualNorm < tol) break;
 
-                gpuScale(queue, vecScaleKernel, mR, 1.0 / residualNorm, n);
+                gpuScale(queue, vecScaleKernel, mR, 1.0 / residualNorm, n, false);
                 clEnqueueCopyBuffer(queue, mR, mV[0], 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
 
                 double[][] H = new double[maxIterations + 1][maxIterations];
@@ -426,23 +474,23 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
                     computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mV[j], mV[j+1]);
 
                     for (int i = 0; i <= j; i++) {
-                        H[i][j] = gpuDot(queue, dotPartialKernel, mV[i], mV[j+1], mTemp, n);
-                        computeSaxpy(queue, saxpyKernel, n, mV[i], mV[j+1], -H[i][j]);
+                        H[i][j] = (Double)gpuDot(queue, dotPartialKernel, mV[i], mV[j+1], mTemp, n, false);
+                        gpuSaxpy(queue, saxpyKernel, n, mV[i], mV[j+1], -H[i][j]);
                     }
-                    H[j+1][j] = Math.sqrt(gpuDot(queue, dotPartialKernel, mV[j+1], mV[j+1], mTemp, n));
+                    H[j+1][j] = Math.sqrt((Double)gpuDot(queue, dotPartialKernel, mV[j+1], mV[j+1], mTemp, n, false));
                     if (H[j+1][j] < 1e-18) break; 
-                    gpuScale(queue, vecScaleKernel, mV[j+1], 1.0 / H[j+1][j], n);
+                    gpuScale(queue, vecScaleKernel, mV[j+1], 1.0 / H[j+1][j], n, false);
                 }
 
                 double[] y = solveHessenbergSystem(H, residualNorm, jLimit);
                 for (int i = 0; i < y.length; i++) {
-                    computeSaxpy(queue, saxpyKernel, n, mV[i], mX, y[i]);
+                    gpuSaxpy(queue, saxpyKernel, n, mV[i], mX, y[i]);
                 }
                 
                 computeSpmv(queue, spmvKernel, n, mPtr, mInd, mVal, mX, mAx);
                 clEnqueueCopyBuffer(queue, mB, mR, 0, 0, (long)Sizeof.cl_double * n, 0, null, null);
-                computeSaxpy(queue, saxpyKernel, n, mAx, mR, -1.0);
-                if (Math.sqrt(gpuDot(queue, dotPartialKernel, mR, mR, mTemp, n)) < tol) break;
+                gpuSaxpy(queue, saxpyKernel, n, mAx, mR, -1.0);
+                if (Math.sqrt((Double)gpuDot(queue, dotPartialKernel, mR, mR, mTemp, n, false)) < tol) break;
             }
 
             double[] xRes = new double[n];
@@ -499,35 +547,61 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
         clEnqueueNDRangeKernel(queue, k, 1, null, new long[]{n}, null, 0, null, null);
     }
 
-    private void computeSaxpy(cl_command_queue queue, cl_kernel k, int n, cl_mem mX, cl_mem mY, double alpha) {
+    private void gpuSaxpy(cl_command_queue queue, cl_kernel k, int n, cl_mem mX, cl_mem mY, Object alpha) {
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(mX));
         clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(mY));
-        clSetKernelArg(k, 2, Sizeof.cl_double, Pointer.to(new double[]{alpha}));
+        if (alpha instanceof Complex c) {
+            clSetKernelArg(k, 2, Sizeof.cl_double * 2, Pointer.to(new double[]{c.real(), c.imaginary()}));
+        } else {
+            clSetKernelArg(k, 2, Sizeof.cl_double, Pointer.to(new double[]{((Number)alpha).doubleValue()}));
+        }
         clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
         clEnqueueNDRangeKernel(queue, k, 1, null, new long[]{n}, null, 0, null, null);
     }
 
-    private double gpuDot(cl_command_queue queue, cl_kernel k, cl_mem a, cl_mem b, cl_mem mTemp, int n) {
+    private Object gpuDot(cl_command_queue queue, cl_kernel k, cl_mem a, cl_mem b, cl_mem mTemp, int n, boolean isComplex) {
+        int localSize = 128;
+        int numGroups = (n + localSize - 1) / localSize;
+        int elemSize = isComplex ? 2 : 1;
+        
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(a));
         clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(b));
         clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(mTemp));
         clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
-        clEnqueueNDRangeKernel(queue, k, 1, null, new long[]{n}, null, 0, null, null);
-        double[] partial = new double[n];
-        clEnqueueReadBuffer(queue, mTemp, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(partial), 0, null, null);
-        double sum = 0; for(double d : partial) sum += d;
-        return sum;
+        clSetKernelArg(k, 4, (long) localSize * Sizeof.cl_double * elemSize, null);
+        
+        clEnqueueNDRangeKernel(queue, k, 1, null, new long[]{(long) numGroups * localSize}, new long[]{localSize}, 0, null, null);
+        
+        double[] partial = new double[numGroups * elemSize];
+        clEnqueueReadBuffer(queue, mTemp, CL_TRUE, 0, (long)Sizeof.cl_double * elemSize * numGroups, Pointer.to(partial), 0, null, null);
+        
+        if (isComplex) {
+            double resR = 0, resI = 0;
+            for (int i = 0; i < numGroups; i++) {
+                resR += partial[i * 2];
+                resI += partial[i * 2 + 1];
+            }
+            return Complex.of(resR, resI);
+        } else {
+            double sum = 0; for(double d : partial) sum += d;
+            return sum;
+        }
     }
 
-    private void gpuScale(cl_command_queue queue, cl_kernel k, cl_mem a, double s, int n) {
+    private void gpuScale(cl_command_queue queue, cl_kernel k, cl_mem a, Object s, int n, boolean isComplex) {
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(a));
-        clSetKernelArg(k, 1, Sizeof.cl_double, Pointer.to(new double[]{s}));
+        if (isComplex) {
+            Complex c = (Complex) s;
+            clSetKernelArg(k, 1, Sizeof.cl_double * 2, Pointer.to(new double[]{c.real(), c.imaginary()}));
+        } else {
+            clSetKernelArg(k, 1, Sizeof.cl_double, Pointer.to(new double[]{((Number)s).doubleValue()}));
+        }
         clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(a));
         clSetKernelArg(k, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
         clEnqueueNDRangeKernel(queue, k, 1, null, new long[]{n}, null, 0, null, null);
     }
 
-    private void gpuAdd(cl_command_queue queue, cl_kernel k, cl_mem x, cl_mem y, int n) {
+    private void gpuAdd(cl_command_queue queue, cl_kernel k, cl_mem x, cl_mem y, int n, boolean isComplex) {
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(x));
         clSetKernelArg(k, 1, Sizeof.cl_mem, Pointer.to(y));
         clSetKernelArg(k, 2, Sizeof.cl_mem, Pointer.to(y));
@@ -634,9 +708,15 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             if (spmvKernel != null) clReleaseKernel(spmvKernel);
             if (complexSpmvKernel != null) clReleaseKernel(complexSpmvKernel);
             if (vecAddKernel != null) clReleaseKernel(vecAddKernel);
+            if (complexVecAddKernel != null) clReleaseKernel(complexVecAddKernel);
+            if (vecSubKernel != null) clReleaseKernel(vecSubKernel);
+            if (complexVecSubKernel != null) clReleaseKernel(complexVecSubKernel);
             if (vecScaleKernel != null) clReleaseKernel(vecScaleKernel);
+            if (complexVecScaleKernel != null) clReleaseKernel(complexVecScaleKernel);
             if (saxpyKernel != null) clReleaseKernel(saxpyKernel);
+            if (complexSaxpyKernel != null) clReleaseKernel(complexSaxpyKernel);
             if (dotPartialKernel != null) clReleaseKernel(dotPartialKernel);
+            if (complexDotPartialKernel != null) clReleaseKernel(complexDotPartialKernel);
             clReleaseProgram(program);
             program = null;
         }

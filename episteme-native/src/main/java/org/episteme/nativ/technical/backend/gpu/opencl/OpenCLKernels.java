@@ -54,8 +54,15 @@ public final class OpenCLKernels {
         "__kernel void vec_scale(__global const double *a, const double s, __global double *c, const int n) {\n" +
         "    int i = get_global_id(0); if (i < n) c[i] = a[i] * s;\n" +
         "}\n" +
-        "__kernel void vec_dot_partial(__global const double *a, __global const double *b, __global double *out, const int n) {\n" +
-        "    int i = get_global_id(0); if (i < n) out[i] = a[i] * b[i];\n" +
+        "__kernel void vec_dot_partial(__global const double *a, __global const double *b, __global double *partial_sums, const int n, __local double *local_sums) {\n" +
+        "    int local_id = get_local_id(0); int group_id = get_group_id(0); int local_size = get_local_size(0); int i = get_global_id(0);\n" +
+        "    double val = (i < n) ? a[i] * b[i] : 0.0;\n" +
+        "    local_sums[local_id] = val; barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    for (int stride = local_size / 2; stride > 0; stride /= 2) {\n" +
+        "        if (local_id < stride) local_sums[local_id] += local_sums[local_id + stride];\n" +
+        "        barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "    if (local_id == 0) partial_sums[group_id] = local_sums[0];\n" +
         "}\n" +
         "__kernel void gaussElimPhase1(__global double *a, const int n, const int k) {\n" +
         "    int i = get_global_id(0) + k + 1;\n" +
@@ -149,6 +156,13 @@ public final class OpenCLKernels {
         "    }\n" +
         "}\n" +
         "typedef struct { double r; double i; } double2_custom;\n" +
+        "__kernel void complex_saxpy(__global const double2_custom *x, __global double2_custom *y, const double2_custom alpha, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) {\n" +
+        "        double2_custom xv = x[i]; double2_custom yv = y[i];\n" +
+        "        y[i].r = yv.r + alpha.r * xv.r - alpha.i * xv.i;\n" +
+        "        y[i].i = yv.i + alpha.r * xv.i + alpha.i * xv.r;\n" +
+        "    }\n" +
+        "}\n" +
         "__kernel void complexMatrixMultiply(__global const double2_custom *a, __global const double2_custom *b, __global double2_custom *c, const int m, const int n, const int k) {\n" +
         "    int row = get_global_id(1); int col = get_global_id(0);\n" +
         "    if (row < m && col < n) {\n" +
@@ -175,13 +189,23 @@ public final class OpenCLKernels {
         "        c[i].i = av.r * s.i + av.i * s.r;\n" +
         "    }\n" +
         "}\n" +
-        "__kernel void complexVecDotPartial(__global const double2_custom *a, __global const double2_custom *b, __global double2_custom *out, const int n) {\n" +
-        "    int i = get_global_id(0); if (i < n) {\n" +
-        "        double2_custom av = a[i];\n" +
-        "        double2_custom bv = b[i];\n" +
-        "        out[i].r = av.r * bv.r + av.i * bv.i;\n" +
-        "        out[i].i = av.i * bv.r - av.r * bv.i;\n" +
+        "__kernel void complex_dot_partial(__global const double2_custom *a, __global const double2_custom *b, __global double2_custom *partial_sums, const int n, __local double2_custom *local_sums) {\n" +
+        "    int local_id = get_local_id(0); int group_id = get_group_id(0); int local_size = get_local_size(0); int i = get_global_id(0);\n" +
+        "    double2_custom val = {0.0, 0.0};\n" +
+        "    if (i < n) {\n" +
+        "        double2_custom av = a[i]; double2_custom bv = b[i];\n" +
+        "        val.r = av.r * bv.r + av.i * bv.i;\n" +
+        "        val.i = av.i * bv.r - av.r * bv.i;\n" +
         "    }\n" +
+        "    local_sums[local_id] = val; barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    for (int stride = local_size / 2; stride > 0; stride /= 2) {\n" +
+        "        if (local_id < stride) {\n" +
+        "            local_sums[local_id].r += local_sums[local_id + stride].r;\n" +
+        "            local_sums[local_id].i += local_sums[local_id + stride].i;\n" +
+        "        }\n" +
+        "        barrier(CLK_LOCAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "    if (local_id == 0) partial_sums[group_id] = local_sums[0];\n" +
         "}\n" +
         "__kernel void hestenes_jacobi_dot(__global const double *a, int m, int n, int i_col, int j_col, __global double *out_dot) {\n" +
         "    if (get_global_id(0) == 0) {\n" +
