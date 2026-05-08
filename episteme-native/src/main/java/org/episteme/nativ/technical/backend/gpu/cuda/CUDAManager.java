@@ -61,11 +61,19 @@ public final class CUDAManager {
     public static MethodHandle CUBLAS_DGEMM;
     public static MethodHandle CUBLAS_SGEMM;
     public static MethodHandle CUBLAS_ZGEMM;
+    public static MethodHandle CUBLAS_CGEMM;
     public static MethodHandle CUBLAS_DGEAM;
     public static MethodHandle CUBLAS_ZGEAM;
+    public static MethodHandle CUBLAS_CGEAM;
     public static MethodHandle CUBLAS_DDOT;
+    public static MethodHandle CUBLAS_SDOT;
+    public static MethodHandle CUBLAS_CDOT;
     public static MethodHandle CUBLAS_DAXPY;
+    public static MethodHandle CUBLAS_SAXPY;
+    public static MethodHandle CUBLAS_CAXPY;
     public static MethodHandle CUBLAS_DSCAL;
+    public static MethodHandle CUBLAS_SSCAL;
+    public static MethodHandle CUBLAS_CSCAL;
     public static MethodHandle CUBLAS_STATUS_GET_STRING;
 
     // --- cuSPARSE ---
@@ -92,6 +100,12 @@ public final class CUDAManager {
     public static MethodHandle CUSOLVER_ZGETRF_BUFFER_SIZE;
     public static MethodHandle CUSOLVER_ZGETRF;
     public static MethodHandle CUSOLVER_ZGETRS;
+    public static MethodHandle CUSOLVER_SGETRF_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_SGETRF;
+    public static MethodHandle CUSOLVER_SGETRS;
+    public static MethodHandle CUSOLVER_CGETRF_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_CGETRF;
+    public static MethodHandle CUSOLVER_CGETRS;
     public static MethodHandle CUSOLVER_STATUS_GET_STRING;
 
     private CUDAManager() {}
@@ -186,6 +200,13 @@ public final class CUDAManager {
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT
         ));
+        CUBLAS_CGEMM = lookup(cublasLookup, "cublasCgemm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+        ));
         CUBLAS_DGEAM = lookup(cublasLookup, "cublasDgeam", FunctionDescriptor.of(ValueLayout.JAVA_INT,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
@@ -200,11 +221,30 @@ public final class CUDAManager {
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
             ValueLayout.JAVA_INT
         ));
+        CUBLAS_CGEAM = lookup(cublasLookup, "cublasCgeam", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            ValueLayout.JAVA_INT
+        ));
         CUBLAS_DDOT = lookup(cublasLookup, "cublasDdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUBLAS_SDOT = lookup(cublasLookup, "cublasSdot_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUBLAS_CDOT = lookup(cublasLookup, "cublasCdotu_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUBLAS_DAXPY = lookup(cublasLookup, "cublasDaxpy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_SAXPY = lookup(cublasLookup, "cublasSaxpy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_CAXPY = lookup(cublasLookup, "cublasCaxpy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_DSCAL = lookup(cublasLookup, "cublasDscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_SSCAL = lookup(cublasLookup, "cublasSscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_CSCAL = lookup(cublasLookup, "cublasCscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_STATUS_GET_STRING = lookup(cublasLookup, "cublasGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
@@ -241,6 +281,18 @@ public final class CUDAManager {
         CUSOLVER_ZGETRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnZgetrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUSOLVER_ZGETRF = lookup(cusolverLookup, "cusolverDnZgetrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
         CUSOLVER_ZGETRS = lookup(cusolverLookup, "cusolverDnZgetrs", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_SGETRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnSgetrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_SGETRF = lookup(cusolverLookup, "cusolverDnSgetrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_SGETRS = lookup(cusolverLookup, "cusolverDnSgetrs", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CGETRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnCgetrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CGETRF = lookup(cusolverLookup, "cusolverDnCgetrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_CGETRS = lookup(cusolverLookup, "cusolverDnCgetrs", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUSOLVER_STATUS_GET_STRING = lookup(cusolverLookup, "cusolverGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
     }
