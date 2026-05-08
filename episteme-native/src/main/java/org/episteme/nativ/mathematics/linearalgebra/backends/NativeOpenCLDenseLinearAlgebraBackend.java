@@ -50,6 +50,7 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> implements LinearAlgebraProvider<E>, NativeBackend, GPUBackend {
 

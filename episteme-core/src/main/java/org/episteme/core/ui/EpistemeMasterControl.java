@@ -538,8 +538,6 @@ public class EpistemeMasterControl extends Application {
                 descLabel.getStyleClass().add("description-label");
                 descLabel.setWrapText(true);
                 descLabel.setMaxWidth(400);
-                
-                String stateText = p.isAvailable() ? "Available" : "Not Available";
                 Label stateLabel = new Label(p.isAvailable() ? i18n.get("master.available", "Available") : i18n.get("master.not_available", "N/A"));
                 stateLabel.getStyleClass().add(p.isAvailable() ? "status-label-available" : "status-label-unavailable");
 

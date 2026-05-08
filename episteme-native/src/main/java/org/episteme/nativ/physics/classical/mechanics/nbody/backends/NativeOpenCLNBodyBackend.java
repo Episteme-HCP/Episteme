@@ -262,7 +262,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         "}\n";
 
 
-    private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
+    private final NativeOpenCLSparseLinearAlgebraBackend<Real> backend = new NativeOpenCLSparseLinearAlgebraBackend<>();
     private boolean initialized = false;
     private cl_program program;
     private cl_kernel kernel;     // O(N²) brute-force

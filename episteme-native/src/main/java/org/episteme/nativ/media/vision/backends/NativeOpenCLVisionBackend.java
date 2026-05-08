@@ -14,6 +14,7 @@ import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
 import org.episteme.core.media.vision.VisionAlgorithmProvider;
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
 import java.awt.image.BufferedImage;
 import java.nio.DoubleBuffer;
@@ -29,10 +30,11 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, VisionAlgorithmProvider.class, GPUBackend.class, NativeBackend.class})
 public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
 
-    private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
+    private final NativeOpenCLSparseLinearAlgebraBackend<Real> backend = new NativeOpenCLSparseLinearAlgebraBackend<>();
 
     @Override
     public boolean isLoaded() {

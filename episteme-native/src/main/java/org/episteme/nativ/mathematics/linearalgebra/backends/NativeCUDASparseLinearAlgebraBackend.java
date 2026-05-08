@@ -50,6 +50,7 @@ import java.util.stream.IntStream;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class, org.episteme.core.technical.algorithm.AlgorithmProvider.class})
 public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> implements SparseLinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     

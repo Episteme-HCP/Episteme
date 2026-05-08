@@ -413,7 +413,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> normalize(Vector<E> a) {
         E n = norm(a);
         if (n == null) return a;
@@ -427,7 +426,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> cross(Vector<E> a, Vector<E> b) {
         if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
         Ring<E> r = a.getScalarRing();
@@ -462,7 +460,6 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> projection(Vector<E> a, Vector<E> b) {
         E dAB = dot(a, b);
         E dBB = dot(b, b);
