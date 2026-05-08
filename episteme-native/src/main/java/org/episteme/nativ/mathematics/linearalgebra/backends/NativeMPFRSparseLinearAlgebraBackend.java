@@ -2317,7 +2317,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 MemorySegment yj_I = yI.asSlice(j * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                 Real yjValR = readMPFR(yj_R, arena);
                 Real yjValI = readMPFR(yj_I, arena);
-                E scalar = castComplex(yjValR, yjValI, ring);
+                E scalar = castScalar(Complex.of(yjValR, yjValI), ring);
                 axpy_internal(h_x, scalar, vj, n, prec, arena, tracker, isComplex);
             } else {
                 Real yjVal = readMPFR(yj_R, arena);
