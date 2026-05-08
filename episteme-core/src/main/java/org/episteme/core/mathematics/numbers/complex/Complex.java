@@ -143,6 +143,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
             return new Complex(org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO), 
                                org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO));
         }
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.FAST) {
+            return new Complex(org.episteme.core.mathematics.numbers.real.RealFloat.create(0.0f), 
+                               org.episteme.core.mathematics.numbers.real.RealFloat.create(0.0f));
+        }
         return ZERO;
     }
 
@@ -179,6 +183,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
         if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
             return new Complex(org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ONE), 
                                org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO));
+        }
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.FAST) {
+            return new Complex(org.episteme.core.mathematics.numbers.real.RealFloat.create(1.0f), 
+                               org.episteme.core.mathematics.numbers.real.RealFloat.create(0.0f));
         }
         return ONE;
     }
