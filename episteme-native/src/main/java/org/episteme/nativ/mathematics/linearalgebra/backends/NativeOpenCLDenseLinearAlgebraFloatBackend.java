@@ -1,0 +1,288 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+package org.episteme.nativ.mathematics.linearalgebra.backends;
+
+import org.jocl.*;
+import static org.jocl.CL.*;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.real.RealFloat;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.ComputeBackend;
+import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.gpu.GPUBackend;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLManager;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLKernels;
+import com.google.auto.service.AutoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
+import org.episteme.core.mathematics.structures.rings.FieldElement;
+
+import java.util.List;
+import java.util.Arrays;
+
+/**
+ * OpenCL implementation of Dense Linear Algebra Provider for Float precision.
+ */
+@SuppressWarnings({"unchecked", "rawtypes"})
+@AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
+public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E>> implements LinearAlgebraProvider<E>, NativeBackend, GPUBackend {
+
+    private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLDenseLinearAlgebraFloatBackend.class);
+    
+    private cl_program program;
+    private cl_kernel matMulKernel;
+    private cl_kernel vecAddKernel;
+    private cl_kernel vecSubKernel;
+    private cl_kernel vecScaleKernel;
+    private cl_kernel transposeKernel;
+    
+    private volatile boolean initialized = false;
+
+    private synchronized void ensureInitialized() {
+        if (initialized) return;
+        
+        OpenCLManager.ensureInitialized();
+        if (!OpenCLManager.isInitialized()) return;
+
+        try {
+            cl_context context = OpenCLManager.getContext();
+            program = clCreateProgramWithSource(context, 1, new String[]{OpenCLKernels.DENSE_FLOAT_KERNELS}, null, null);
+            clBuildProgram(program, 0, null, null, null, null);
+            
+            matMulKernel = tryCreateKernel(program, "matrixMultiplyFloat");
+            vecAddKernel = tryCreateKernel(program, "vec_add_float");
+            vecSubKernel = tryCreateKernel(program, "vec_sub_float");
+            vecScaleKernel = tryCreateKernel(program, "vec_scale_float");
+            transposeKernel = tryCreateKernel(program, "transposeFloat");
+
+            initialized = (matMulKernel != null);
+            if (initialized) {
+                logger.info("Native OpenCL Dense Float Backend initialized successfully.");
+            }
+        } catch (Throwable t) {
+            logger.error("Failed to initialize OpenCL Float Backend: {}", t.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isAvailable() {
+        if (isExplicitlyDisabled()) return false;
+        ensureInitialized();
+        return initialized;
+    }
+
+    @Override
+    public boolean isCompatible(Ring<?> ring) {
+        return ring.zero() instanceof RealFloat;
+    }
+
+    @Override
+    public String getId() { return "opencl-dense-float"; }
+
+    @Override
+    public String getName() { return "Native OpenCL Dense Float Backend"; }
+
+    @Override
+    public int getPriority() { return 110; }
+
+    @Override
+    public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        
+        int m = a.rows();
+        int k = a.cols();
+        int n = b.cols();
+        
+        float[] fa = toFloatArray(a);
+        float[] fb = toFloatArray(b);
+        float[] fc = new float[m * n];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * m * k, Pointer.to(fa), null), CL::clReleaseMemObject);
+            cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * k * n, Pointer.to(fb), null), CL::clReleaseMemObject);
+            cl_mem memC = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_float * m * n, null, null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+            clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+            
+            clEnqueueNDRangeKernel(queue, matMulKernel, 2, null, new long[]{n, m}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float * m * n, Pointer.to(fc), 0, null, null);
+            
+            return fromFloatArray(fc, m, n, a);
+        }
+    }
+
+    @Override
+    public Matrix<E> transpose(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        int rows = a.rows();
+        int cols = a.cols();
+        float[] src = toFloatArray(a);
+        float[] dst = new float[rows * cols];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * rows * cols, Pointer.to(src), null), CL::clReleaseMemObject);
+            cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_float * rows * cols, null, null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(transposeKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(transposeKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(transposeKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{rows}));
+            clSetKernelArg(transposeKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{cols}));
+            
+            clEnqueueNDRangeKernel(queue, transposeKernel, 2, null, new long[]{cols, rows}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memB, CL_TRUE, 0, (long)Sizeof.cl_float * rows * cols, Pointer.to(dst), 0, null, null);
+            
+            return fromFloatArray(dst, cols, rows, a);
+        }
+    }
+
+    @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        return elementWise(a, b, vecAddKernel);
+    }
+
+    @Override
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        return elementWise(a, b, vecSubKernel);
+    }
+
+    private Matrix<E> elementWise(Matrix<E> a, Matrix<E> b, cl_kernel kernel) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        int n = a.rows() * a.cols();
+        float[] fa = toFloatArray(a);
+        float[] fb = toFloatArray(b);
+        float[] fc = new float[n];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * n, Pointer.to(fa), null), CL::clReleaseMemObject);
+            cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * n, Pointer.to(fb), null), CL::clReleaseMemObject);
+            cl_mem memC = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_float * n, null, null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(kernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(kernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            
+            clEnqueueNDRangeKernel(queue, kernel, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float * n, Pointer.to(fc), 0, null, null);
+            
+            return fromFloatArray(fc, a.rows(), a.cols(), a);
+        }
+    }
+
+    @Override
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        int n = a.rows() * a.cols();
+        float[] fa = toFloatArray(a);
+        float s = ((Number) scalar).floatValue();
+        float[] fc = new float[n];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * n, Pointer.to(fa), null), CL::clReleaseMemObject);
+            cl_mem memC = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_float * n, null, null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(vecScaleKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(vecScaleKernel, 1, Sizeof.cl_float, Pointer.to(new float[]{s}));
+            clSetKernelArg(vecScaleKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(vecScaleKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            
+            clEnqueueNDRangeKernel(queue, vecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float * n, Pointer.to(fc), 0, null, null);
+            
+            return fromFloatArray(fc, a.rows(), a.cols(), a);
+        }
+    }
+
+    // Fallbacks for more complex operations on Float precision
+    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return LinearAlgebraProvider.super.solve(a, b); }
+    @Override public Matrix<E> inverse(Matrix<E> a) { return LinearAlgebraProvider.super.inverse(a); }
+    @Override public E determinant(Matrix<E> a) { return LinearAlgebraProvider.super.determinant(a); }
+    @Override public E trace(Matrix<E> a) { return LinearAlgebraProvider.super.trace(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { return LinearAlgebraProvider.super.lu(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) { return LinearAlgebraProvider.super.qr(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) { return LinearAlgebraProvider.super.svd(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) { return LinearAlgebraProvider.super.cholesky(a); }
+    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { return LinearAlgebraProvider.super.eigen(a); }
+
+    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.add(a, b); }
+    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.subtract(a, b); }
+    @Override public Vector<E> multiply(Vector<E> v, E s) { return LinearAlgebraProvider.super.multiply(v, s); }
+    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { return LinearAlgebraProvider.super.multiply(a, b); }
+    @Override public E dot(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.dot(a, b); }
+    @Override public E norm(Vector<E> a) { return LinearAlgebraProvider.super.norm(a); }
+
+    // Helpers
+    private float[] toFloatArray(Matrix<E> m) {
+        int rows = m.rows();
+        int cols = m.cols();
+        float[] data = new float[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i * cols + j] = ((Number) m.get(i, j)).floatValue();
+            }
+        }
+        return data;
+    }
+
+    private Matrix<E> fromFloatArray(float[] data, int rows, int cols, Matrix<E> reference) {
+        Ring<E> ring = reference.getScalarRing();
+        E[] elements = (E[]) new FieldElement[data.length];
+        for (int i = 0; i < data.length; i++) {
+            elements[i] = (E) RealFloat.create(data[i]);
+        }
+        return new DenseMatrix<>(elements, rows, cols, ring);
+    }
+
+    private static cl_kernel tryCreateKernel(cl_program program, String name) {
+        try {
+            return clCreateKernel(program, name, null);
+        } catch (Throwable t) {
+            logger.warn("Failed to create OpenCL kernel '{}': {}", name, t.getMessage());
+            return null;
+        }
+    }
+
+    @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.GPU; }
+    @Override public String getType() { return "math"; }
+
+    @Override
+    public void close() {
+        if (program != null) {
+            clReleaseKernel(matMulKernel);
+            clReleaseKernel(vecAddKernel);
+            clReleaseKernel(vecSubKernel);
+            clReleaseKernel(vecScaleKernel);
+            clReleaseKernel(transposeKernel);
+            clReleaseProgram(program);
+            program = null;
+        }
+    }
+}

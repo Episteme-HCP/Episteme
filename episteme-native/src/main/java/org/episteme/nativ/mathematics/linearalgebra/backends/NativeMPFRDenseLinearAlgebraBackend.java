@@ -428,12 +428,29 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
                 NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                 
+                // Pre-allocate temporary segments for complexMultiply to avoid allocations inside the loop
+                MemorySegment tR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
+                MemorySegment tI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tI, (int) prec);
+                MemorySegment tE = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tE, (int) prec);
+                tracker.track(tR, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                tracker.track(tI, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+                tracker.track(tE, s -> NativeSafe.invoke(MPFR_CLEAR, s));
+
                 for (int i = 0; i < n; i++) {
                     MemorySegment vR = h_V.asSlice((long) i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment vI = h_V.asSlice((long) (i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment resR = h_Res.asSlice((long) i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment resI = h_Res.asSlice((long) (i * 2 + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
-                    complexMultiply(resR, resI, vR, vI, sR, sI, (int) prec, arena, tracker);
+                    
+                    // Manual complex multiply to reuse tR, tI, tE
+                    NativeSafe.invoke(MPFR_MUL, tR, vR, sR, 0);
+                    NativeSafe.invoke(MPFR_MUL, tE, vI, sI, 0);
+                    NativeSafe.invoke(MPFR_SUB, tR, tR, tE, 0);
+                    NativeSafe.invoke(MPFR_MUL, tI, vR, sI, 0);
+                    NativeSafe.invoke(MPFR_MUL, tE, vI, sR, 0);
+                    NativeSafe.invoke(MPFR_ADD, tI, tI, tE, 0);
+                    NativeSafe.invoke(MPFR_SET, resR, tR, 0);
+                    NativeSafe.invoke(MPFR_SET, resI, tI, 0);
                 }
             } else {
                 String valStr = (scalar instanceof Real rs) ? rs.bigDecimalValue().toPlainString() : scalar.toString();
@@ -560,8 +577,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     if (isComplex) {
                         MemorySegment sumR = getMPFR(h_C, i, j, n, 0, true);
                         MemorySegment sumI = getMPFR(h_C, i, j, n, 1, true);
-                        NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, rnd);
-                        NativeSafe.invoke(MPFR_SET_STR, sumI, arena.allocateFrom("0"), 10, rnd);
+                        NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, rnd);
+                        NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, rnd);
 
                         for (int l = 0; l < k; l++) {
                             MemorySegment ar = getMPFR(h_A, i, l, k, 0, true);
@@ -583,7 +600,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         }
                     } else {
                         MemorySegment sum = getMPFR(h_C, i, j, n, 0, false);
-                        NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, rnd);
+                        NativeSafe.invoke(MPFR_SET_UI, sum, 0L, rnd);
 
                         for (int l = 0; l < k; l++) {
                             MemorySegment a1 = getMPFR(h_A, i, l, k, 0, false);

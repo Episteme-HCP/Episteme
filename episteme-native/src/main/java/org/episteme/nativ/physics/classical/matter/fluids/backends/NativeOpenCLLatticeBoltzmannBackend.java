@@ -9,7 +9,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.natural.physics.classical.matter.fluids.LatticeBoltzmannProvider;
 import com.google.auto.service.AutoService;
 import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLManager;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 
 import static org.jocl.CL.*;
@@ -142,7 +142,7 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
     "    }\n" +
     "}\n";
 
-    private final NativeOpenCLSparseLinearAlgebraBackend<Real> backend = new NativeOpenCLSparseLinearAlgebraBackend<>();
+    // No longer depends on a specific linear algebra backend
     private boolean initialized = false;
     private cl_program program;
     private cl_kernel kernelDouble;
@@ -160,7 +160,24 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
 
     @Override
     public boolean isAvailable() {
-        return backend.isAvailable();
+        if (isExplicitlyDisabled()) return false;
+        try {
+            OpenCLManager.ensureInitialized();
+            return OpenCLManager.isInitialized();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+               Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.lbm.disabled") ||
+               Boolean.getBoolean("episteme.backend.lbm-opencl.disabled");
+    }
+
+    public String getId() {
+        return "lbm-opencl";
     }
 
     @Override
@@ -175,15 +192,13 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
 
     public synchronized void initialize() {
         if (initialized) return;
-        if (!backend.isAvailable()) throw new IllegalStateException("OpenCL not available");
-
         try {
-            OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-            if (ctx == null) {
+            OpenCLManager.ensureInitialized();
+            if (!OpenCLManager.isInitialized()) {
                 LOGGER.severe("OpenCL context could not be created during LBM initialization.");
                 return;
             }
-            cl_context context = ctx.getContext();
+            cl_context context = OpenCLManager.getContext();
 
             // Create Program
             program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE + KERNEL_SOURCE_FLOAT}, null, null);
@@ -246,10 +261,10 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
             }
         }
         
-        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-        if (ctx == null) return;
-        cl_context context = ctx.getContext();
-        cl_command_queue queue = ctx.getCommandQueue();
+        OpenCLManager.ensureInitialized();
+        if (!OpenCLManager.isInitialized()) return;
+        cl_context context = OpenCLManager.getContext();
+        cl_command_queue queue = OpenCLManager.getCommandQueue();
         
         cl_mem memF = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * fFlat.length, Pointer.to(fFlat), null);
         cl_mem memFNew = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_float * fFlat.length, null, null);
@@ -302,13 +317,13 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
             }
         }
         
-        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-        if (ctx == null) {
+        OpenCLManager.ensureInitialized();
+        if (!OpenCLManager.isInitialized()) {
             LOGGER.warning("OpenCL context not available for LBM evolution.");
             return;
         }
-        cl_context context = ctx.getContext();
-        cl_command_queue queue = ctx.getCommandQueue();
+        cl_context context = OpenCLManager.getContext();
+        cl_command_queue queue = OpenCLManager.getCommandQueue();
         
         // Allocate
         cl_mem memF = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * fFlat.length, Pointer.to(fFlat), null);
@@ -379,37 +394,68 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
 
     @Override
     public DeviceInfo[] getDevices() {
-        return backend.getDevices();
+        if (!isAvailable()) return new DeviceInfo[0];
+        // Simplified device listing
+        return new DeviceInfo[]{new GPUBackend.DeviceInfo("OpenCL Default Device", 0, 0, "Generic")};
     }
 
     @Override
     public void selectDevice(int deviceId) {
-        backend.selectDevice(deviceId);
+        // No-op for now
     }
 
     @Override
     public long allocateGPUMemory(long sizeBytes) {
-        return backend.allocateGPUMemory(sizeBytes);
+        OpenCLManager.ensureInitialized();
+        return clCreateBuffer(OpenCLManager.getContext(), CL_MEM_READ_WRITE, sizeBytes, null, null).getNativePointer();
     }
 
     @Override
     public void copyToGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
-        backend.copyToGPU(gpuHandle, hostBuffer, sizeBytes);
+        OpenCLManager.ensureInitialized();
+        cl_mem mem = new cl_mem();
+        try {
+            java.lang.reflect.Field field = cl_mem.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            field.setLong(mem, gpuHandle);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        clEnqueueWriteBuffer(OpenCLManager.getCommandQueue(), mem, CL_TRUE, 0, sizeBytes, Pointer.to(hostBuffer), 0, null, null);
     }
 
     @Override
     public void copyFromGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
-        backend.copyFromGPU(gpuHandle, hostBuffer, sizeBytes);
+        OpenCLManager.ensureInitialized();
+        cl_mem mem = new cl_mem();
+        try {
+            java.lang.reflect.Field field = cl_mem.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            field.setLong(mem, gpuHandle);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        clEnqueueReadBuffer(OpenCLManager.getCommandQueue(), mem, CL_TRUE, 0, sizeBytes, Pointer.to(hostBuffer), 0, null, null);
     }
 
     @Override
     public void freeGPUMemory(long gpuHandle) {
-        backend.freeGPUMemory(gpuHandle);
+        cl_mem mem = new cl_mem();
+        try {
+            java.lang.reflect.Field field = cl_mem.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            field.setLong(mem, gpuHandle);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        clReleaseMemObject(mem);
     }
 
     @Override
     public void synchronize() {
-        backend.synchronize();
+        if (OpenCLManager.isInitialized()) {
+            clFinish(OpenCLManager.getCommandQueue());
+        }
     }
 
     @Override
@@ -419,6 +465,7 @@ public class NativeOpenCLLatticeBoltzmannBackend implements LatticeBoltzmannProv
 
     @Override
     public ExecutionContext createContext() {
-        return backend.createContext();
+        OpenCLManager.ensureInitialized();
+        return new OpenCLExecutionContext(OpenCLManager.getContext(), OpenCLManager.getCommandQueue(), OpenCLManager.getDevice());
     }
 }

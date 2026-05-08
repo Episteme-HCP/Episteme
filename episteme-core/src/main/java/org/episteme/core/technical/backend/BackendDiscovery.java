@@ -63,6 +63,10 @@ public class BackendDiscovery {
 
     private List<Backend> cachedProviders;
 
+    public synchronized void refresh() {
+        cachedProviders = null;
+    }
+
     public synchronized List<Backend> getProviders() {
         if (cachedProviders == null) {
             cachedProviders = new ArrayList<>();

@@ -10,7 +10,7 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.analysis.fft.FFTProvider;
 import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLManager;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 
@@ -63,27 +63,40 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         "    outImag[k] = sumImag;\n" +
         "}\n";
 
-    private final NativeOpenCLSparseLinearAlgebraBackend<Real> backend = new NativeOpenCLSparseLinearAlgebraBackend<>();
+    // No longer depends on a specific linear algebra backend
     private boolean initialized = false;
     private cl_program program;
     private cl_kernel kernel;
 
     @Override
     public boolean isAvailable() {
-        return backend.isAvailable();
+        if (isExplicitlyDisabled()) return false;
+        try {
+            OpenCLManager.ensureInitialized();
+            return OpenCLManager.isInitialized();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+               Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.fft.disabled") ||
+               Boolean.getBoolean("episteme.backend.fft-opencl.disabled");
+    }
+
+    public String getId() {
+        return "fft-opencl";
     }
 
     public synchronized void initialize() {
         if (initialized) return;
-        if (!backend.isAvailable()) throw new IllegalStateException("OpenCL not available");
+        OpenCLManager.ensureInitialized();
+        if (!OpenCLManager.isInitialized()) throw new IllegalStateException("OpenCL not available");
 
         try (ResourceTracker tracker = new ResourceTracker()) {
-            OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-            if (ctx == null) {
-                logger.error("OpenCL context could not be created during FFT initialization.");
-                return;
-            }
-            cl_context context = ctx.getContext();
+            cl_context context = OpenCLManager.getContext();
 
             // Create Program
             program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE}, null, null);
@@ -147,9 +160,8 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
 
     @Override
     public void synchronize() {
-        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-        if (ctx != null && ctx.getCommandQueue() != null) {
-            CL.clFinish(ctx.getCommandQueue());
+        if (OpenCLManager.isInitialized()) {
+            CL.clFinish(OpenCLManager.getCommandQueue());
         }
     }
 
@@ -158,7 +170,8 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
 
     @Override
     public ExecutionContext createContext() {
-        return backend.createContext();
+        OpenCLManager.ensureInitialized();
+        return new OpenCLExecutionContext(OpenCLManager.getContext(), OpenCLManager.getCommandQueue(), OpenCLManager.getDevice());
     }
 
     /** Minimum FFT size where GPU outperforms CPU. */
@@ -199,15 +212,13 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         int n = real.length;
         if (imag == null) imag = new double[n]; // Handle pure real input
         
-        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-        if (ctx == null) {
+        OpenCLManager.ensureInitialized();
+        if (!OpenCLManager.isInitialized()) {
             logger.warn("OpenCL context not available for FFT execution.");
             return null;
         }
-        cl_context context = ctx.getContext();
-        cl_command_queue queue = ctx.getCommandQueue();
-        
-        if (context == null || queue == null) return null;
+        cl_context context = OpenCLManager.getContext();
+        cl_command_queue queue = OpenCLManager.getCommandQueue();
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             // Allocate Input/Output
