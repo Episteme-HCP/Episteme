@@ -221,9 +221,9 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             cl_command_queue queue = OpenCLManager.getCommandQueue();
 
             cl_mem mPtr = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * (n + 1), Pointer.to(rowPtr), null), CL::clReleaseMemObject);
-            cl_mem mInd = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null), CL::clReleaseMemObject);
-            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
-            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * n, Pointer.to(bData), null), CL::clReleaseMemObject);
+            cl_mem mInd = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_int * nnz, Pointer.to(colIdx), null), CL::clReleaseMemObject);
+            cl_mem mVal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * nnz, Pointer.to(values), null), CL::clReleaseMemObject);
+            cl_mem mB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * elemSize * n, Pointer.to(bData), null), CL::clReleaseMemObject);
             
             cl_mem mX = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_float * elemSize * n, null, null), CL::clReleaseMemObject);
             if (x0 != null) {
@@ -243,6 +243,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             cl_kernel currentAdd = isComplex ? complexVecAddKernel : vecAddKernel;
             cl_kernel currentSub = isComplex ? complexVecSubKernel : vecSubKernel;
             cl_kernel currentScale = isComplex ? complexVecScaleKernel : vecScaleKernel;
+            cl_kernel currentSaxpy = isComplex ? complexSaxpyKernel : saxpyKernel;
 
             // r = b - Ax
             computeSpmv(queue, currentSpmv, n, mPtr, mInd, mVal, mX, mAp, isComplex);
@@ -259,8 +260,8 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
                 
                 Object alpha = isComplex ? ((Complex)rsOld).divide((Complex)pAp) : ((Float)rsOld) / ((Float)pAp);
                 
-                gpuSaxpy(queue, currentAdd, currentScale, n, mP, mX, alpha, isComplex);
-                gpuSaxpy(queue, currentSub, currentScale, n, mAp, mR, alpha, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mP, mX, alpha, isComplex);
+                gpuSaxpy(queue, currentSaxpy, n, mAp, mR, isComplex ? (Object) ((Complex)alpha).negate() : (Object) Float.valueOf(-((Float)alpha)), isComplex);
                 
                 Object rsNew = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
                 if (isComplex) {
