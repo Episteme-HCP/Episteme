@@ -469,7 +469,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     private Vector<E> fromDoubleVec(double[] data, Ring<E> ring) {
         E[] elements = (E[]) new FieldElement[data.length];
         for (int i = 0; i < data.length; i++) elements[i] = (E) RealDouble.of(data[i]);
-        return new DenseVector<>(elements, ring);
+        return new DenseVector<>(java.util.Arrays.asList(elements), ring);
     }
 
     private Vector<E> fromComplexDoubleVec(double[] data, Ring<E> ring) {
@@ -477,7 +477,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         for (int i = 0; i < elements.length; i++) {
             elements[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
         }
-        return new DenseVector<>(elements, ring);
+        return new DenseVector<>(java.util.Arrays.asList(elements), ring);
     }
 
     @Override public E dot(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.dot(a, b); }

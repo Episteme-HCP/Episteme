@@ -410,7 +410,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             // Build S as a vector of singular values
             E[] sVals = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), sArr.length);
             for (int i = 0; i < sArr.length; i++) sVals[i] = (E) RealFloat.create(sArr[i]);
-            Vector<E> S = new DenseVector<>(sVals, ring);
+            Vector<E> S = new DenseVector<>(java.util.Arrays.asList(sVals), ring);
             
             // Build U and V as identity placeholders (full extraction requires ormqr)
             Matrix<E> U_mat = DenseMatrix.identity(m, ring);
@@ -592,7 +592,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     private Vector<E> fromFloatVec(float[] data, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) values[i] = (E) (Object) RealFloat.create(data[i]);
-        return new DenseVector<>(values, ring);
+        return new DenseVector<>(java.util.Arrays.asList(values), ring);
     }
 
     private Vector<E> fromComplexFloatVec(float[] data, Ring<E> ring) {
@@ -601,7 +601,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         for (int i = 0; i < n; i++) {
             values[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
-        return new DenseVector<>(values, ring);
+        return new DenseVector<>(java.util.Arrays.asList(values), ring);
     }
 
     private float[] toFloatArray(Vector<E> v) {
