@@ -360,8 +360,13 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             // Simplified: return one matrix for now, or implement full Q/R extraction.
             // I'll implement full extraction.
             Ring<E> ring = (Ring<E>) a.getScalarRing();
-            Matrix<E> Q = DenseMatrix.identity(m, ring);
-            Matrix<E> R = DenseMatrix.create(m, n, ring);
+            // Build Q as identity placeholder
+            E[] flatQ = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * m);
+            for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatQ[i * m + j] = (i == j) ? (E) RealFloat.ONE : ring.zero();
+            Matrix<E> Q = new DenseMatrix<>(flatQ, m, m, ring);
+            E[] flatR = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * n);
+            java.util.Arrays.fill(flatR, ring.zero());
+            Matrix<E> R = new DenseMatrix<>(flatR, m, n, ring);
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     if (i <= j) R.set(i, j, (E) RealFloat.create(result[i * n + j]));
@@ -413,8 +418,12 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             Vector<E> S = new DenseVector<>(java.util.Arrays.asList(sVals), ring);
             
             // Build U and V as identity placeholders (full extraction requires ormqr)
-            Matrix<E> U_mat = DenseMatrix.identity(m, ring);
-            Matrix<E> V_mat = DenseMatrix.identity(n, ring);
+            E[] flatU = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * m);
+            for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatU[i * m + j] = (i == j) ? (E) RealFloat.ONE : ring.zero();
+            Matrix<E> U_mat = new DenseMatrix<>(flatU, m, m, ring);
+            E[] flatV = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) flatV[i * n + j] = (i == j) ? (E) RealFloat.ONE : ring.zero();
+            Matrix<E> V_mat = new DenseMatrix<>(flatV, n, n, ring);
             return new SVDResult<>(U_mat, S, V_mat);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float SVD failed", t);
@@ -459,7 +468,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segB.address(), d_B.address(), (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segB, ValueLayout.JAVA_FLOAT, 0, result, 0, n);
             
-            return fromFloatArray(result, (Ring<E>) a.getScalarRing());
+            return fromFloatVec(result, (Ring<E>) a.getScalarRing());
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float solve failed", t);
         }
@@ -470,12 +479,14 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
-        
-        DenseMatrix<E> identity = DenseMatrix.identity(n, (Ring<E>) a.getScalarRing());
+        // Build identity matrix manually
+        Ring<E> ring = (Ring<E>) a.getScalarRing();
+        E[] flatId = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
+        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) flatId[i * n + j] = (i == j) ? (E) RealFloat.ONE : ring.zero();
+        Matrix<E> identity = new DenseMatrix<>(flatId, n, n, ring);
         return solve(a, identity);
     }
 
-    @Override
     public Matrix<E> solve(Matrix<E> a, Matrix<E> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         if (isComplex(a)) return solveComplex(a, b);
