@@ -605,7 +605,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     }
 
     private float[] toFloatArray(Vector<E> v) {
-        int n = v.size();
+        int n = v.dimension();
         float[] data = new float[n];
         for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).floatValue();
         return data;
