@@ -274,7 +274,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
                 
                 Object rsNew = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
                 if (isComplex) {
-                    if (((Complex)rsNew).abs() < tolSq) break;
+                    if (((Complex)rsNew).abs().doubleValue() < tolSq) break;
                 } else {
                     if ((Double)rsNew < tolSq) break;
                 }
@@ -401,7 +401,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
                 gpuSaxpy(queue, currentSaxpy, n, mT, mR, isComplex ? ((Complex)omega).negate() : -omegaReal);
 
                 Object resNorm = gpuDot(queue, currentDot, mR, mR, mTemp, n, isComplex);
-                double normVal = isComplex ? ((Complex)resNorm).abs() : (Double)resNorm;
+                double normVal = isComplex ? ((Complex)resNorm).abs().doubleValue() : (Double)resNorm;
                 if (normVal < tol * tol) break;
             }
             
