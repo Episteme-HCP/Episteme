@@ -286,8 +286,8 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Complex c = (Complex) m.get(i, j);
-                data[(i * cols + j) * 2] = c.real();
-                data[(i * cols + j) * 2 + 1] = c.imaginary();
+                data[(i * cols + j) * 2] = ((Number) c.real()).doubleValue();
+                data[(i * cols + j) * 2 + 1] = ((Number) c.imaginary()).doubleValue();
             }
         }
         return data;
