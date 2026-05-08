@@ -40,12 +40,12 @@ import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final Logger logger = LoggerFactory.getLogger("org.episteme.core.mathematics.NativeDiagnostics");
-    private static final boolean AVAILABLE = NativeMPFRNumbers.AVAILABLE;
+    private static final boolean AVAILABLE = NativeMPFRNumbers.isAvailable();
 
     // Redundant handles removed, using NativeMPFRNumbers
 
     @Override public boolean isAvailable() { return AVAILABLE && !isExplicitlyDisabled(); }
-    @Override public String getId() { return "native-mpfr-dense"; }
+    @Override public String getId() { return "mpfr-dense"; }
     @Override public String getName() { return "Native MPFR Dense Linear Algebra Backend"; }
     @Override public String getDescription() { return "High-performance Arbitrary Precision Linear Algebra backend using libmpfr bound via Project Panama."; }
     
@@ -83,7 +83,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     // Explicitly check for disabled backend
     @Override
     public boolean isExplicitlyDisabled() {
-        return "true".equalsIgnoreCase(System.getProperty("episteme.backend.mpfr.disabled"));
+        String id = getId();
+        return (id != null && Boolean.getBoolean("episteme.backend." + id + ".disabled")) || 
+               Boolean.getBoolean("episteme.backend.mpfr.disabled") ||
+               Boolean.getBoolean("episteme.backend.disable." + id);
     }
 
     @Override

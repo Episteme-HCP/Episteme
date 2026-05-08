@@ -157,6 +157,11 @@ public final class RealFloat extends Real {
     }
 
     @Override
+    public boolean isFast() {
+        return true;
+    }
+
+    @Override
     public double doubleValue() {
         return value;
     }

@@ -38,65 +38,151 @@ public final class NativeMPFRNumbers {
     }
     
     // MPFR Function Handles
-    public static final MethodHandle MPFR_EXP;
-    public static final MethodHandle MPFR_LOG;
-    public static final MethodHandle MPFR_LOG10;
-    public static final MethodHandle MPFR_SIN;
-    public static final MethodHandle MPFR_COS;
-    public static final MethodHandle MPFR_TAN;
-    public static final MethodHandle MPFR_ASIN;
-    public static final MethodHandle MPFR_ACOS;
-    public static final MethodHandle MPFR_ATAN;
-    public static final MethodHandle MPFR_ATAN2;
-    public static final MethodHandle MPFR_SINH;
-    public static final MethodHandle MPFR_COSH;
-    public static final MethodHandle MPFR_TANH;
-    public static final MethodHandle MPFR_ASINH;
-    public static final MethodHandle MPFR_ACOSH;
-    public static final MethodHandle MPFR_ATANH;
-    public static final MethodHandle MPFR_CBRT;
-    public static final MethodHandle MPFR_SQRT;
-    public static final MethodHandle MPFR_HYPOT;
-    public static final MethodHandle MPFR_POW;
+    public static MethodHandle MPFR_EXP;
+    public static MethodHandle MPFR_LOG;
+    public static MethodHandle MPFR_LOG10;
+    public static MethodHandle MPFR_SIN;
+    public static MethodHandle MPFR_COS;
+    public static MethodHandle MPFR_TAN;
+    public static MethodHandle MPFR_ASIN;
+    public static MethodHandle MPFR_ACOS;
+    public static MethodHandle MPFR_ATAN;
+    public static MethodHandle MPFR_ATAN2;
+    public static MethodHandle MPFR_SINH;
+    public static MethodHandle MPFR_COSH;
+    public static MethodHandle MPFR_TANH;
+    public static MethodHandle MPFR_ASINH;
+    public static MethodHandle MPFR_ACOSH;
+    public static MethodHandle MPFR_ATANH;
+    public static MethodHandle MPFR_CBRT;
+    public static MethodHandle MPFR_SQRT;
+    public static MethodHandle MPFR_HYPOT;
+    public static MethodHandle MPFR_POW;
     
     // Arithmetic Handles
-    public static final MethodHandle MPFR_ADD;
-    public static final MethodHandle MPFR_SUB;
-    public static final MethodHandle MPFR_MUL;
-    public static final MethodHandle MPFR_DIV;
-    public static final MethodHandle MPFR_NEG;
-    public static final MethodHandle MPFR_ABS;
-    public static final MethodHandle MPFR_CMP;
-    public static final MethodHandle MPFR_SET;
-    public static final MethodHandle MPFR_SET_UI;
-    public static final MethodHandle MPFR_SET_SI;
-    public static final MethodHandle MPFR_CMP_ABS;
-    public static final MethodHandle MPFR_SET_D;
-    public static final MethodHandle MPFR_CONST_PI;
-    public static final MethodHandle MPFR_ZERO_P;
-    public static final MethodHandle MPFR_NAN_P;
-    public static final MethodHandle MPFR_INF_P;
-    public static final MethodHandle MPFR_NUMBER_P;
-    public static final MethodHandle MPFR_CMP_SI;
-    public static final MethodHandle MPFR_SET_INF;
-    public static final MethodHandle MPFR_SET_NAN;
-    public static final MethodHandle MPFR_SET_ZERO;
+    public static MethodHandle MPFR_ADD;
+    public static MethodHandle MPFR_SUB;
+    public static MethodHandle MPFR_MUL;
+    public static MethodHandle MPFR_DIV;
+    public static MethodHandle MPFR_NEG;
+    public static MethodHandle MPFR_ABS;
+    public static MethodHandle MPFR_CMP;
+    public static MethodHandle MPFR_SET;
+    public static MethodHandle MPFR_SET_UI;
+    public static MethodHandle MPFR_SET_SI;
+    public static MethodHandle MPFR_CMP_ABS;
+    public static MethodHandle MPFR_SET_D;
+    public static MethodHandle MPFR_CONST_PI;
+    public static MethodHandle MPFR_ZERO_P;
+    public static MethodHandle MPFR_NAN_P;
+    public static MethodHandle MPFR_INF_P;
+    public static MethodHandle MPFR_NUMBER_P;
+    public static MethodHandle MPFR_CMP_SI;
+    public static MethodHandle MPFR_SET_INF;
+    public static MethodHandle MPFR_SET_NAN;
+    public static MethodHandle MPFR_SET_ZERO;
 
     public static final MemoryLayout MPFR_LAYOUT;
     
     // Core MPFR management
-    public static final MethodHandle MPFR_INIT2;
-    public static final MethodHandle MPFR_CLEAR;
-    public static final MethodHandle MPFR_SET_STR;
-    public static final MethodHandle MPFR_GET_STR;
-    public static final MethodHandle MPFR_FREE_STR;
-    public static final MethodHandle MPFR_GET_D;
+    public static MethodHandle MPFR_INIT2;
+    public static MethodHandle MPFR_CLEAR;
+    public static MethodHandle MPFR_SET_STR;
+    public static MethodHandle MPFR_GET_STR;
+    public static MethodHandle MPFR_FREE_STR;
+    public static MethodHandle MPFR_GET_D;
 
-    public static final boolean AVAILABLE;
+    private static boolean initAttempted = false;
+    private static boolean AVAILABLE = false;
+
+    public static synchronized void ensureInitialized() {
+        if (initAttempted) return;
+        initAttempted = true;
+
+        if (Boolean.getBoolean("episteme.backend.mpfr.disabled") || 
+            (Boolean.getBoolean("episteme.backend.mpfr-dense.disabled") && Boolean.getBoolean("episteme.backend.mpfr-sparse.disabled"))) {
+            logger.info("Native MPFR: Disabled by system property.");
+            return;
+        }
+
+        try {
+            Optional<SymbolLookup> mpfrLookup = NativeFFMLoader.loadLibrary("mpfr", Arena.global());
+            if (mpfrLookup.isPresent()) {
+                SymbolLookup mpfr = mpfrLookup.get();
+                
+                // One-arg functions: (rop, op, rnd)
+                FunctionDescriptor oneArg = FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT);
+                MPFR_EXP = lookup(mpfr, "mpfr_exp", oneArg);
+                MPFR_LOG = lookup(mpfr, "mpfr_log", oneArg);
+                MPFR_LOG10 = lookup(mpfr, "mpfr_log10", oneArg);
+                MPFR_SIN = lookup(mpfr, "mpfr_sin", oneArg);
+                MPFR_COS = lookup(mpfr, "mpfr_cos", oneArg);
+                MPFR_TAN = lookup(mpfr, "mpfr_tan", oneArg);
+                MPFR_ASIN = lookup(mpfr, "mpfr_asin", oneArg);
+                MPFR_ACOS = lookup(mpfr, "mpfr_acos", oneArg);
+                MPFR_ATAN = lookup(mpfr, "mpfr_atan", oneArg);
+                MPFR_SINH = lookup(mpfr, "mpfr_sinh", oneArg);
+                MPFR_COSH = lookup(mpfr, "mpfr_cosh", oneArg);
+                MPFR_TANH = lookup(mpfr, "mpfr_tanh", oneArg);
+                MPFR_ASINH = lookup(mpfr, "mpfr_asinh", oneArg);
+                MPFR_ACOSH = lookup(mpfr, "mpfr_acosh", oneArg);
+                MPFR_ATANH = lookup(mpfr, "mpfr_atanh", oneArg);
+                MPFR_CBRT = lookup(mpfr, "mpfr_cbrt", oneArg);
+                MPFR_SQRT = lookup(mpfr, "mpfr_sqrt", oneArg);
+                
+                // Two-arg functions: (rop, op1, op2, rnd)
+                FunctionDescriptor twoArg = FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, ADDRESS, JAVA_INT);
+                MPFR_ATAN2 = lookup(mpfr, "mpfr_atan2", twoArg);
+                MPFR_HYPOT = lookup(mpfr, "mpfr_hypot", twoArg);
+                MPFR_POW = lookup(mpfr, "mpfr_pow", twoArg);
+
+                // Arithmetic functions: (rop, op1, op2, rnd)
+                MPFR_ADD = lookup(mpfr, "mpfr_add", twoArg);
+                MPFR_SUB = lookup(mpfr, "mpfr_sub", twoArg);
+                MPFR_MUL = lookup(mpfr, "mpfr_mul", twoArg);
+                MPFR_DIV = lookup(mpfr, "mpfr_div", twoArg);
+
+                // Arithmetic functions: (rop, op, rnd)
+                MPFR_NEG = lookup(mpfr, "mpfr_neg", oneArg);
+                MPFR_ABS = lookup(mpfr, "mpfr_abs", oneArg);
+
+                // Comparison: (op1, op2)
+                MPFR_CMP = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS));
+
+                // Set functions
+                MPFR_SET = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT));
+                MPFR_SET_UI = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG, JAVA_INT));
+                MPFR_SET_SI = lookup(mpfr, "mpfr_set_si", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG, JAVA_INT));
+                MPFR_SET_D = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(JAVA_INT, ADDRESS, ValueLayout.JAVA_DOUBLE, JAVA_INT));
+
+                // Misc/Analysis
+                MPFR_CMP_ABS = lookup(mpfr, "mpfr_cmpabs", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS));
+                MPFR_ZERO_P = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                MPFR_NAN_P = lookup(mpfr, "mpfr_nan_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                MPFR_INF_P = lookup(mpfr, "mpfr_inf_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                MPFR_NUMBER_P = lookup(mpfr, "mpfr_number_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
+                MPFR_CMP_SI = lookup(mpfr, "mpfr_cmp_si", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG));
+                MPFR_CONST_PI = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(JAVA_INT, ADDRESS, JAVA_INT));
+                MPFR_SET_INF = lookup(mpfr, "mpfr_set_inf", FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT));
+                MPFR_SET_NAN = lookup(mpfr, "mpfr_set_nan", FunctionDescriptor.ofVoid(ADDRESS));
+                MPFR_SET_ZERO = lookup(mpfr, "mpfr_set_zero", FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT));
+                MPFR_GET_D = lookup(mpfr, "mpfr_get_d", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ADDRESS, JAVA_INT));
+                
+                // Management functions
+                MPFR_INIT2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ADDRESS, C_LONG));
+                MPFR_CLEAR = lookup(mpfr, "mpfr_clear", FunctionDescriptor.ofVoid(ADDRESS));
+                MPFR_SET_STR = lookup(mpfr, "mpfr_set_str", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT, JAVA_INT));
+                MPFR_GET_STR = lookup(mpfr, "mpfr_get_str", FunctionDescriptor.of(ADDRESS, ADDRESS, ADDRESS, JAVA_INT, ValueLayout.JAVA_LONG, ADDRESS, JAVA_INT));
+                MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ADDRESS));
+                
+                AVAILABLE = MPFR_INIT2 != null && MPFR_EXP != null && MPFR_LOG != null && MPFR_SIN != null && MPFR_COS != null;
+            }
+        } catch (Throwable t) {
+            logger.warn("Failed to initialize Native MPFR Numbers: {}", t.getMessage());
+        }
+    }
 
     static {
-        boolean available = false;
-        
         // Define layout dynamically based on C_LONG size
         if (C_LONG.byteSize() == 8) {
             MPFR_LAYOUT = MemoryLayout.structLayout(
@@ -115,105 +201,6 @@ public final class NativeMPFRNumbers {
                 ADDRESS.withName("d")         // offset 16 (8 bytes)
             ).withName("__mpfr_struct_32");
         }
-
-        MethodHandle exp = null, log = null, log10 = null, sin = null, cos = null, tan = null;
-        MethodHandle asin = null, acos = null, atan = null, atan2 = null;
-        MethodHandle sinh = null, cosh = null, tanh = null, asinh = null, acosh = null, atanh = null;
-        MethodHandle cbrt = null, sqrt = null, hypot = null, pow = null;
-        MethodHandle add = null, sub = null, mul = null, div = null, neg = null, abs = null, cmp = null;
-        MethodHandle set = null, set_ui = null, set_si = null, cmp_abs = null, zero_p = null, set_d = null, const_pi = null;
-        MethodHandle nan_p = null, inf_p = null, number_p = null, cmp_si = null;
-        MethodHandle set_inf = null, set_nan = null, set_zero = null;
-        MethodHandle get_d = null;
-        MethodHandle init2 = null, clear = null, setStr = null, getStr = null, freeStr = null;
-
-        try {
-            Optional<SymbolLookup> mpfrLookup = NativeFFMLoader.loadLibrary("mpfr", Arena.global());
-            if (mpfrLookup.isPresent()) {
-                SymbolLookup mpfr = mpfrLookup.get();
-                
-                // One-arg functions: (rop, op, rnd)
-                FunctionDescriptor oneArg = FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT);
-                exp = lookup(mpfr, "mpfr_exp", oneArg);
-                log = lookup(mpfr, "mpfr_log", oneArg);
-                log10 = lookup(mpfr, "mpfr_log10", oneArg);
-                sin = lookup(mpfr, "mpfr_sin", oneArg);
-                cos = lookup(mpfr, "mpfr_cos", oneArg);
-                tan = lookup(mpfr, "mpfr_tan", oneArg);
-                asin = lookup(mpfr, "mpfr_asin", oneArg);
-                acos = lookup(mpfr, "mpfr_acos", oneArg);
-                atan = lookup(mpfr, "mpfr_atan", oneArg);
-                sinh = lookup(mpfr, "mpfr_sinh", oneArg);
-                cosh = lookup(mpfr, "mpfr_cosh", oneArg);
-                tanh = lookup(mpfr, "mpfr_tanh", oneArg);
-                asinh = lookup(mpfr, "mpfr_asinh", oneArg);
-                acosh = lookup(mpfr, "mpfr_acosh", oneArg);
-                atanh = lookup(mpfr, "mpfr_atanh", oneArg);
-                cbrt = lookup(mpfr, "mpfr_cbrt", oneArg);
-                sqrt = lookup(mpfr, "mpfr_sqrt", oneArg);
-                
-                // Two-arg functions: (rop, op1, op2, rnd)
-                FunctionDescriptor twoArg = FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, ADDRESS, JAVA_INT);
-                atan2 = lookup(mpfr, "mpfr_atan2", twoArg);
-                hypot = lookup(mpfr, "mpfr_hypot", twoArg);
-                pow = lookup(mpfr, "mpfr_pow", twoArg);
-
-                // Arithmetic functions: (rop, op1, op2, rnd)
-                add = lookup(mpfr, "mpfr_add", twoArg);
-                sub = lookup(mpfr, "mpfr_sub", twoArg);
-                mul = lookup(mpfr, "mpfr_mul", twoArg);
-                div = lookup(mpfr, "mpfr_div", twoArg);
-
-                // Arithmetic functions: (rop, op, rnd)
-                neg = lookup(mpfr, "mpfr_neg", oneArg);
-                abs = lookup(mpfr, "mpfr_abs", oneArg);
-
-                // Comparison: (op1, op2)
-                cmp = lookup(mpfr, "mpfr_cmp", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS));
-
-                // Set functions
-                set = lookup(mpfr, "mpfr_set", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT));
-                set_ui = lookup(mpfr, "mpfr_set_ui", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG, JAVA_INT));
-                set_si = lookup(mpfr, "mpfr_set_si", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG, JAVA_INT));
-                set_d = lookup(mpfr, "mpfr_set_d", FunctionDescriptor.of(JAVA_INT, ADDRESS, ValueLayout.JAVA_DOUBLE, JAVA_INT));
-
-                // Misc/Analysis
-                cmp_abs = lookup(mpfr, "mpfr_cmpabs", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS));
-                zero_p = lookup(mpfr, "mpfr_zero_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
-                nan_p = lookup(mpfr, "mpfr_nan_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
-                inf_p = lookup(mpfr, "mpfr_inf_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
-                number_p = lookup(mpfr, "mpfr_number_p", FunctionDescriptor.of(JAVA_INT, ADDRESS));
-                cmp_si = lookup(mpfr, "mpfr_cmp_si", FunctionDescriptor.of(JAVA_INT, ADDRESS, C_LONG));
-                const_pi = lookup(mpfr, "mpfr_const_pi", FunctionDescriptor.of(JAVA_INT, ADDRESS, JAVA_INT));
-                set_inf = lookup(mpfr, "mpfr_set_inf", FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT));
-                set_nan = lookup(mpfr, "mpfr_set_nan", FunctionDescriptor.ofVoid(ADDRESS));
-                set_zero = lookup(mpfr, "mpfr_set_zero", FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT));
-                get_d = lookup(mpfr, "mpfr_get_d", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ADDRESS, JAVA_INT));
-                
-                // Management functions
-                init2 = lookup(mpfr, "mpfr_init2", FunctionDescriptor.ofVoid(ADDRESS, C_LONG));
-                clear = lookup(mpfr, "mpfr_clear", FunctionDescriptor.ofVoid(ADDRESS));
-                setStr = lookup(mpfr, "mpfr_set_str", FunctionDescriptor.of(JAVA_INT, ADDRESS, ADDRESS, JAVA_INT, JAVA_INT));
-                getStr = lookup(mpfr, "mpfr_get_str", FunctionDescriptor.of(ADDRESS, ADDRESS, ADDRESS, JAVA_INT, ValueLayout.JAVA_LONG, ADDRESS, JAVA_INT));
-                freeStr = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ADDRESS));
-                
-                available = init2 != null && exp != null && log != null && sin != null && cos != null;
-            }
-        } catch (Throwable t) {
-            logger.warn("Failed to initialize Native MPFR Numbers: {}", t.getMessage());
-        }
-        
-        MPFR_EXP = exp; MPFR_LOG = log; MPFR_LOG10 = log10; MPFR_SIN = sin; MPFR_COS = cos; MPFR_TAN = tan;
-        MPFR_ASIN = asin; MPFR_ACOS = acos; MPFR_ATAN = atan; MPFR_ATAN2 = atan2;
-        MPFR_SINH = sinh; MPFR_COSH = cosh; MPFR_TANH = tanh; MPFR_ASINH = asinh; MPFR_ACOSH = acosh; MPFR_ATANH = atanh;
-        MPFR_CBRT = cbrt; MPFR_SQRT = sqrt; MPFR_HYPOT = hypot; MPFR_POW = pow;
-        MPFR_ADD = add; MPFR_SUB = sub; MPFR_MUL = mul; MPFR_DIV = div; MPFR_NEG = neg; MPFR_ABS = abs; MPFR_CMP = cmp;
-        MPFR_SET = set; MPFR_SET_UI = set_ui; MPFR_SET_SI = set_si; MPFR_CMP_ABS = cmp_abs; MPFR_ZERO_P = zero_p; MPFR_SET_D = set_d; MPFR_CONST_PI = const_pi;
-        MPFR_NAN_P = nan_p; MPFR_INF_P = inf_p; MPFR_NUMBER_P = number_p; MPFR_CMP_SI = cmp_si;
-        MPFR_SET_INF = set_inf; MPFR_SET_NAN = set_nan; MPFR_SET_ZERO = set_zero;
-        MPFR_GET_D = get_d;
-        MPFR_INIT2 = init2; MPFR_CLEAR = clear; MPFR_SET_STR = setStr; MPFR_GET_STR = getStr; MPFR_FREE_STR = freeStr;
-        AVAILABLE = available;
     }
 
     public static MethodHandle lookup(SymbolLookup lookup, String name, FunctionDescriptor desc) {
@@ -221,6 +208,7 @@ public final class NativeMPFRNumbers {
     }
 
     public static boolean isAvailable() {
+        ensureInitialized();
         return AVAILABLE;
     }
 
@@ -230,6 +218,7 @@ public final class NativeMPFRNumbers {
      * Centralized mpfr_sqrt implementation with safety checks.
      */
     public static int sqrt(MemorySegment rop, MemorySegment op, int rnd) {
+        ensureInitialized();
         if (!AVAILABLE) throw new IllegalStateException("MPFR not available");
         try {
             return (int) MPFR_SQRT.invokeExact(rop, op, rnd);
@@ -242,6 +231,8 @@ public final class NativeMPFRNumbers {
      * Universal comparison utility for mpfr_t.
      */
     public static int compare(MemorySegment op1, MemorySegment op2) {
+        ensureInitialized();
+        if (!AVAILABLE) throw new IllegalStateException("MPFR not available");
         try {
             return (int) MPFR_CMP.invokeExact(op1, op2);
         } catch (Throwable t) {
@@ -253,12 +244,8 @@ public final class NativeMPFRNumbers {
      * Returns a native constant by name at the specified precision.
      */
     public static org.episteme.nativ.mathematics.numbers.real.NativeRealBig getConstant(String name, long precision) {
+        ensureInitialized();
         if (!AVAILABLE) return null;
-        
-        // This is a circular dependency back to NativeRealBig.
-        // We use reflection or a helper to avoid it if NativeRealBig is in same package.
-        // But here it is in parent package. 
-        // We'll use the constructor directly.
         
         org.episteme.nativ.mathematics.numbers.real.NativeRealBig res = org.episteme.nativ.mathematics.numbers.real.NativeRealBig.createEmpty(precision);
         

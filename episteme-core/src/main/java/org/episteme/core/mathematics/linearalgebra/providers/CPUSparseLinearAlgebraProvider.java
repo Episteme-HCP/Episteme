@@ -149,6 +149,9 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
         if (context.hasHint(OperationContext.Hint.DENSE)) return -1.0;
         double base = getPriority();
         if (context.hasHint(OperationContext.Hint.SPARSE)) base += 20.0;
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            base += 1000.0;
+        }
         return base;
     }
 

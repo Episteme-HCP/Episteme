@@ -30,4 +30,9 @@ public class NativeFFMBLASRealBackend extends AbstractNativeFFMBLASBackend<Real>
     public boolean isCompatible(Ring<?> ring) {
         return ring instanceof Reals;
     }
+
+    @Override
+    public String getId() {
+        return "ffm-blas-real";
+    }
 }

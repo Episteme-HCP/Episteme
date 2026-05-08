@@ -32,6 +32,6 @@ public class NativeCPULinearAlgebraComplexBackend extends AbstractNativeCPULinea
 
     @Override
     public String getId() {
-        return "native-cpu-complex";
+        return "cpu-complex";
     }
 }

@@ -30,4 +30,9 @@ public class NativeFFMBLASComplexBackend extends AbstractNativeFFMBLASBackend<Co
     public boolean isCompatible(Ring<?> ring) {
         return ring instanceof Complexes;
     }
+
+    @Override
+    public String getId() {
+        return "ffm-blas-complex";
+    }
 }

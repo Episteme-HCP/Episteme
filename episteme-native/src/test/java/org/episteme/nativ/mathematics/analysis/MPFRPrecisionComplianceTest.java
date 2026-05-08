@@ -10,9 +10,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.AVAILABLE;
-
-
+import org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -32,7 +30,7 @@ public class MPFRPrecisionComplianceTest {
 
     @Test
     public void testHighPrecisionExp() {
-        if (!AVAILABLE) {
+        if (!NativeMPFRNumbers.isAvailable()) {
             logger.warn("MPFR not available, skipping precision test.");
             return;
         }
@@ -51,7 +49,7 @@ public class MPFRPrecisionComplianceTest {
 
     @Test
     public void testHighPrecisionLog() {
-        if (!AVAILABLE) return;
+        if (!NativeMPFRNumbers.isAvailable()) return;
         MathContext.exact().compute(() -> {
             Real x = Real.of("2.0");
             Real logX = x.log();
@@ -65,7 +63,7 @@ public class MPFRPrecisionComplianceTest {
 
     @Test
     public void testHighPrecisionSinCos() {
-        if (!AVAILABLE) return;
+        if (!NativeMPFRNumbers.isAvailable()) return;
         MathContext.exact().compute(() -> {
             Real pi = Real.piE();
             Real x = pi.divide(Real.of(4)); // 45 degrees
@@ -85,7 +83,7 @@ public class MPFRPrecisionComplianceTest {
 
     @Test
     public void testHighPrecisionPow() {
-        if (!AVAILABLE) return;
+        if (!NativeMPFRNumbers.isAvailable()) return;
         MathContext.exact().compute(() -> {
             Real base = Real.of("2.0");
             Real exponent = Real.of("0.5");
@@ -100,7 +98,7 @@ public class MPFRPrecisionComplianceTest {
 
     @Test
     public void testHighPrecisionAtan2() {
-        if (!AVAILABLE) return;
+        if (!NativeMPFRNumbers.isAvailable()) return;
         MathContext.exact().compute(() -> {
             Real y = Real.of("1.0");
             Real x = Real.of("1.0");

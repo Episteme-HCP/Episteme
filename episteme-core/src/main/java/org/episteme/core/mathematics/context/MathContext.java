@@ -233,6 +233,13 @@ public final class MathContext {
     }
 
     /**
+     * Returns true if the precision is NORMAL.
+     */
+    public boolean isNormalPrecision() {
+        return realPrecision == RealPrecision.NORMAL;
+    }
+
+    /**
      * Returns true if the precision is NORMAL or EXACT.
      */
     public boolean isDoubleOrHigherPrecision() {

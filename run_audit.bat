@@ -1,0 +1,1 @@
+mvn test -pl episteme-benchmarks -Dtest=LinearAlgebraComplianceTest -Dorg.episteme.test.precision=exact -Dorg.episteme.test.provider.filter=mpfr -Dorg.episteme.test.provider.exclude=distributed,strassen,carma,colt,commons,ejml,jblas -Depisteme.native.skip.openblas=true -Depisteme.backend.disable.nd4j=true -Depisteme.native.skip.cuda=true -Depisteme.native.skip.opencl=true

@@ -50,120 +50,20 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     
     private static final Logger logger = LoggerFactory.getLogger(AbstractNativeFFMBLASBackend.class);
 
-    private static final SymbolLookup LOOKUP;
-    private static final SymbolLookup LAPACK_LOOKUP;
-    private static final boolean IS_AVAILABLE;
-    private static final Linker LINKER = NativeFFMLoader.getLinker();
+    private static SymbolLookup LOOKUP;
+    private static SymbolLookup LAPACK_LOOKUP;
+    private static boolean IS_AVAILABLE = false;
+    private static boolean initAttempted = false;
 
-    // CBLAS Layout Constants
-    private static final int CblasRowMajor = 101;
-    private static final int CblasNoTrans = 111;
-
-    // BLAS Method Handles
-    private static MethodHandle SGEMM;
-    private static MethodHandle DGEMM;
-    private static MethodHandle CGEMM;
-    private static MethodHandle ZGEMM;
-    
-    private static MethodHandle SGEMV;
-    private static MethodHandle DGEMV;
-    private static MethodHandle CGEMV;
-    private static MethodHandle ZGEMV;
-
-    private static MethodHandle SDOT;
-    private static MethodHandle DDOT;
-    private static MethodHandle CDOTC;
-    private static MethodHandle ZDOTC;
-
-    private static MethodHandle SAXPY;
-    private static MethodHandle DAXPY;
-    private static MethodHandle CAXPY;
-    private static MethodHandle ZAXPY;
-
-    private static MethodHandle SNRM2;
-    private static MethodHandle DNRM2;
-    private static MethodHandle SCNRM2;
-    private static MethodHandle DZNRM2;
-
-    private static MethodHandle SSCAL;
-    private static MethodHandle DSCAL;
-    private static MethodHandle CSCAL;
-    private static MethodHandle ZSCAL;
-
-
-
-    private static MethodHandle STRSM;
-    private static MethodHandle DTRSM;
-    private static MethodHandle CTRSM;
-    private static MethodHandle ZTRSM;
-    
-    // LAPACK Method Handles
-    private static MethodHandle SGESV;
-    private static MethodHandle DGESV;
-    private static MethodHandle CGESV;
-    private static MethodHandle ZGESV;
-
-    private static MethodHandle SGETRF;
-    private static MethodHandle DGETRF;
-    private static MethodHandle CGETRF;
-    private static MethodHandle ZGETRF;
-
-    private static MethodHandle SGETRI;
-    private static MethodHandle DGETRI;
-    private static MethodHandle CGETRI;
-    private static MethodHandle ZGETRI;
-
-    private static MethodHandle SGETRS;
-    private static MethodHandle DGETRS;
-    private static MethodHandle CGETRS;
-    private static MethodHandle ZGETRS;
-
-    private static MethodHandle SGEQRF;
-    private static MethodHandle DGEQRF;
-    private static MethodHandle CGEQRF;
-    private static MethodHandle ZGEQRF;
-
-    private static MethodHandle SORGQR;
-    private static MethodHandle DORGQR;
-    private static MethodHandle CUNGQR;
-    private static MethodHandle ZUNGQR;
-
-    private static MethodHandle SGESVD;
-    private static MethodHandle DGESVD;
-    private static MethodHandle CGESVD;
-    private static MethodHandle ZGESVD;
-
-    private static MethodHandle SPOTRF;
-    private static MethodHandle DPOTRF;
-    private static MethodHandle CPOTRF;
-    private static MethodHandle ZPOTRF;
-
-    private static MethodHandle SPOTRS;
-    private static MethodHandle DPOTRS;
-    private static MethodHandle CPOTRS;
-    private static MethodHandle ZPOTRS;
-
-    private static MethodHandle SSYEV;
-    private static MethodHandle DSYEV;
-    private static MethodHandle CHEEV;
-    private static MethodHandle ZHEEV;
-
-    private static MethodHandle SGELS;
-    private static MethodHandle DGELS;
-    private static MethodHandle CGELS;
-    private static MethodHandle ZGELS;
-    
-    private static final int LAPACK_ROW_MAJOR = 101;
-
-    private static Optional<MemorySegment> findLapackSymbol(String... names) {
-        Optional<MemorySegment> sym = NativeFFMLoader.findSymbol(LOOKUP, names);
-        if (sym.isEmpty() && LAPACK_LOOKUP != null) {
-            sym = NativeFFMLoader.findSymbol(LAPACK_LOOKUP, names);
+    private static synchronized void ensureInitialized() {
+        if (initAttempted) return;
+        initAttempted = true;
+        
+        if (Boolean.getBoolean("episteme.native.skip.openblas") || Boolean.getBoolean("episteme.backend.ffm-blas.disabled")) {
+            logger.info("FFM: Skipping BLAS/LAPACK initialization as requested by system property.");
+            return;
         }
-        return sym;
-    }
 
-    static {
         Arena arena = Arena.global();
         Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("openblas", arena);
         if (lib.isEmpty()) {
@@ -178,11 +78,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         }
         
         LOOKUP = lib.orElse(null);
-        try {
-            java.nio.file.Files.writeString(java.nio.file.Paths.get("/home/admin/episteme_diag.log"), 
-                "[FFM-BLAS] LOOKUP initialized: " + (LOOKUP != null) + "\n",
-                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
-        } catch (Exception e) {}
         
         Optional<SymbolLookup> lapackLib = NativeFFMLoader.loadLibrary("lapacke", arena);
         if (lapackLib.isEmpty()) {
@@ -192,7 +87,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         
         boolean available = false;
 
-        if (LOOKUP != null && !Boolean.getBoolean("episteme.backend.disable.ffm-blas")) {
+        if (LOOKUP != null) {
             try {
                 // --- SINGLE PRECISION (FLOAT) ---
                 FunctionDescriptor sgemmDesc = FunctionDescriptor.ofVoid(
@@ -441,7 +336,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 ZPOTRS = findLapackSymbol("LAPACKE_zpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
 
                 // Eigen
-                // Eigen
                 FunctionDescriptor syevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE,
                         ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
@@ -512,9 +406,138 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         IS_AVAILABLE = available;
     }
 
+    private static final Linker LINKER = NativeFFMLoader.getLinker();
+
+    // CBLAS Layout Constants
+    private static final int CblasRowMajor = 101;
+    private static final int CblasNoTrans = 111;
+
+    // BLAS Method Handles
+    private static MethodHandle SGEMM;
+    private static MethodHandle DGEMM;
+    private static MethodHandle CGEMM;
+    private static MethodHandle ZGEMM;
+    
+    private static MethodHandle SGEMV;
+    private static MethodHandle DGEMV;
+    private static MethodHandle CGEMV;
+    private static MethodHandle ZGEMV;
+
+    private static MethodHandle SDOT;
+    private static MethodHandle DDOT;
+    private static MethodHandle CDOTC;
+    private static MethodHandle ZDOTC;
+
+    private static MethodHandle SAXPY;
+    private static MethodHandle DAXPY;
+    private static MethodHandle CAXPY;
+    private static MethodHandle ZAXPY;
+
+    private static MethodHandle SNRM2;
+    private static MethodHandle DNRM2;
+    private static MethodHandle SCNRM2;
+    private static MethodHandle DZNRM2;
+
+    private static MethodHandle SSCAL;
+    private static MethodHandle DSCAL;
+    private static MethodHandle CSCAL;
+    private static MethodHandle ZSCAL;
+
+    private static MethodHandle STRSM;
+    private static MethodHandle DTRSM;
+    private static MethodHandle CTRSM;
+    private static MethodHandle ZTRSM;
+    
+    // LAPACK Method Handles
+    private static MethodHandle SGESV;
+    private static MethodHandle DGESV;
+    private static MethodHandle CGESV;
+    private static MethodHandle ZGESV;
+
+    private static MethodHandle SGETRF;
+    private static MethodHandle DGETRF;
+    private static MethodHandle CGETRF;
+    private static MethodHandle ZGETRF;
+
+    private static MethodHandle SGETRI;
+    private static MethodHandle DGETRI;
+    private static MethodHandle CGETRI;
+    private static MethodHandle ZGETRI;
+
+    private static MethodHandle SGETRS;
+    private static MethodHandle DGETRS;
+    private static MethodHandle CGETRS;
+    private static MethodHandle ZGETRS;
+
+    private static MethodHandle SGEQRF;
+    private static MethodHandle DGEQRF;
+    private static MethodHandle CGEQRF;
+    private static MethodHandle ZGEQRF;
+
+    private static MethodHandle SORGQR;
+    private static MethodHandle DORGQR;
+    private static MethodHandle CUNGQR;
+    private static MethodHandle ZUNGQR;
+
+    private static MethodHandle SGESVD;
+    private static MethodHandle DGESVD;
+    private static MethodHandle CGESVD;
+    private static MethodHandle ZGESVD;
+
+    private static MethodHandle SPOTRF;
+    private static MethodHandle DPOTRF;
+    private static MethodHandle CPOTRF;
+    private static MethodHandle ZPOTRF;
+
+    private static MethodHandle SPOTRS;
+    private static MethodHandle DPOTRS;
+    private static MethodHandle CPOTRS;
+    private static MethodHandle ZPOTRS;
+
+    private static MethodHandle SSYEV;
+    private static MethodHandle DSYEV;
+    private static MethodHandle CHEEV;
+    private static MethodHandle ZHEEV;
+
+    private static MethodHandle SGELS;
+    private static MethodHandle DGELS;
+    private static MethodHandle CGELS;
+    private static MethodHandle ZGELS;
+    
+    private static final int LAPACK_ROW_MAJOR = 101;
+
+    private static Optional<MemorySegment> findLapackSymbol(String... names) {
+        Optional<MemorySegment> sym = NativeFFMLoader.findSymbol(LOOKUP, names);
+        if (sym.isEmpty() && LAPACK_LOOKUP != null) {
+            sym = NativeFFMLoader.findSymbol(LAPACK_LOOKUP, names);
+        }
+        return sym;
+    }
+
     @Override
     public boolean isLoaded() {
+        ensureInitialized();
         return IS_AVAILABLE;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        if (isExplicitlyDisabled()) return false;
+        ensureInitialized();
+        return IS_AVAILABLE;
+    }
+
+    @Override
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.ffm-blas.disabled") || 
+               Boolean.getBoolean("episteme.native.skip.openblas") ||
+               (getId() != null && Boolean.getBoolean("episteme.backend." + getId() + ".disabled"));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getId() {
+        return "ffm-blas";
     }
 
     @Override
@@ -1039,10 +1062,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": not available");
     }
 
-    @Override
-    public boolean isAvailable() {
-        return IS_AVAILABLE && !isExplicitlyDisabled();
-    }
 
     @Override
     public int getPriority() {
@@ -1076,10 +1095,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         return score;
     }
 
-    @Override
-    public String getId() {
-        return "blas";
-    }
 
     @Override
     public String getType() {
@@ -1544,9 +1559,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     @SuppressWarnings("unchecked")
     private E castScalar(Object val, Ring<E> ring) {
         if (val == null) return ring.zero();
-        String ringName = ring.getClass().getName();
-        boolean isComplexRing = ringName.contains("Complexes");
-        boolean isRealRing = ringName.contains("Reals");
         
         if (isComplexRing(ring)) {
             if (val instanceof Complex) return (E) val;

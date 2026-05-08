@@ -95,9 +95,14 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
 
     private static volatile boolean initialized = false;
     private static volatile boolean initAttempted = false;
+    private static boolean supportsDouble = false;
 
     private static final String KERNEL_SOURCE =
+        "#ifdef cl_khr_fp64\n" +
         "#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n" +
+        "#elif defined(cl_amd_fp64)\n" +
+        "#pragma OPENCL EXTENSION cl_amd_fp64 : enable\n" +
+        "#endif\n" +
         "__kernel void matrixMultiply(__global const double *a, __global const double *b, __global double *c, const int m, const int n, const int k) {\n" +
         "    int row = get_global_id(1); int col = get_global_id(0);\n" +
         "    if (row < m && col < n) {\n" +
@@ -350,10 +355,9 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
             cl_device_id device = devices[0];
             
             System.err.println("[OpenCL-Init] Verifying extensions...");
-            if (!verifyExtensions(device)) {
-                logger.warn("OpenCL device does not support cl_khr_fp64 extension. Backend will be disabled.");
-                System.err.println("[OpenCL-Init] ABORT: No fp64 support.");
-                return;
+            supportsDouble = verifyExtensions(device);
+            if (!supportsDouble) {
+                logger.warn("OpenCL device does not support double precision. Some operations might be limited or disabled.");
             }
 
             OpenCLHolder.contextProperties = new cl_context_properties();
@@ -368,42 +372,48 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
             clBuildProgram(OpenCLHolder.program, 0, null, null, null, null);
             
             System.err.println("[OpenCL-Init] Creating kernels...");
-            OpenCLHolder.matMulKernel = clCreateKernel(OpenCLHolder.program, "matrixMultiply", null);
-            OpenCLHolder.matMulFloatKernel = clCreateKernel(OpenCLHolder.program, "matrixMultiplyFloat", null);
-            OpenCLHolder.vecAddKernel = clCreateKernel(OpenCLHolder.program, "vec_add", null);
-            OpenCLHolder.vecAddFloatKernel = clCreateKernel(OpenCLHolder.program, "vec_add_float", null);
-            OpenCLHolder.vecSubKernel = clCreateKernel(OpenCLHolder.program, "vec_sub", null);
-            OpenCLHolder.vecSubFloatKernel = clCreateKernel(OpenCLHolder.program, "vec_sub_float", null);
-            OpenCLHolder.vecScaleKernel = clCreateKernel(OpenCLHolder.program, "vec_scale", null);
-            OpenCLHolder.vecScaleFloatKernel = clCreateKernel(OpenCLHolder.program, "vec_scale_float", null);
-            OpenCLHolder.vecDotKernel = clCreateKernel(OpenCLHolder.program, "vec_dot", null);
-            OpenCLHolder.vecNormKernel = clCreateKernel(OpenCLHolder.program, "vec_norm", null);
-            OpenCLHolder.transposeKernel = clCreateKernel(OpenCLHolder.program, "transpose", null);
-            OpenCLHolder.transposeFloatKernel = clCreateKernel(OpenCLHolder.program, "transposeFloat", null);
-            OpenCLHolder.normalizeRowKernel = clCreateKernel(OpenCLHolder.program, "normalizeRow", null);
-            OpenCLHolder.gaussJordanKernel = clCreateKernel(OpenCLHolder.program, "gaussJordan", null);
-            OpenCLHolder.normalizeRowInvKernel = clCreateKernel(OpenCLHolder.program, "normalizeRowInv", null);
-            OpenCLHolder.gaussJordanInvKernel = clCreateKernel(OpenCLHolder.program, "gaussJordanInv", null);
-            OpenCLHolder.gaussElimPhase1Kernel = clCreateKernel(OpenCLHolder.program, "gaussElimPhase1", null);
-            OpenCLHolder.gaussElimPhase1WithBKernel = clCreateKernel(OpenCLHolder.program, "gaussElimPhase1WithB", null);
-            OpenCLHolder.swapRowsKernel = clCreateKernel(OpenCLHolder.program, "swapRows", null);
-            OpenCLHolder.luDecomposeStepKernel = clCreateKernel(OpenCLHolder.program, "lu_decompose_step", null);
-            OpenCLHolder.choleskyDecomposeStepKernel = clCreateKernel(OpenCLHolder.program, "cholesky_decompose_step", null);
-            OpenCLHolder.qrHouseholderApplyKernel = clCreateKernel(OpenCLHolder.program, "qr_householder_apply", null);
-            OpenCLHolder.complexMatMulKernel = clCreateKernel(OpenCLHolder.program, "complexMatrixMultiply", null);
-            OpenCLHolder.complexVecAddKernel = clCreateKernel(OpenCLHolder.program, "complex_vec_add", null);
-            OpenCLHolder.complexVecSubKernel = clCreateKernel(OpenCLHolder.program, "complex_vec_sub", null);
-            OpenCLHolder.complexVecScaleKernel = clCreateKernel(OpenCLHolder.program, "complex_vec_scale", null);
-            OpenCLHolder.complexVecDotPartialKernel = clCreateKernel(OpenCLHolder.program, "complexVecDotPartial", null);
-            OpenCLHolder.vecDotPartialKernel = clCreateKernel(OpenCLHolder.program, "vec_dot_partial", null);
-            OpenCLHolder.hestenesDotKernel = clCreateKernel(OpenCLHolder.program, "hestenes_jacobi_dot", null);
-            OpenCLHolder.hestenesApplyKernel = clCreateKernel(OpenCLHolder.program, "hestenes_jacobi_apply", null);
+            OpenCLHolder.matMulKernel = tryCreateKernel(OpenCLHolder.program, "matrixMultiply");
+            OpenCLHolder.matMulFloatKernel = tryCreateKernel(OpenCLHolder.program, "matrixMultiplyFloat");
+            OpenCLHolder.vecAddKernel = tryCreateKernel(OpenCLHolder.program, "vec_add");
+            OpenCLHolder.vecAddFloatKernel = tryCreateKernel(OpenCLHolder.program, "vec_add_float");
+            OpenCLHolder.vecSubKernel = tryCreateKernel(OpenCLHolder.program, "vec_sub");
+            OpenCLHolder.vecSubFloatKernel = tryCreateKernel(OpenCLHolder.program, "vec_sub_float");
+            OpenCLHolder.vecScaleKernel = tryCreateKernel(OpenCLHolder.program, "vec_scale");
+            OpenCLHolder.vecScaleFloatKernel = tryCreateKernel(OpenCLHolder.program, "vec_scale_float");
+            OpenCLHolder.vecDotKernel = tryCreateKernel(OpenCLHolder.program, "vec_dot");
+            OpenCLHolder.vecNormKernel = tryCreateKernel(OpenCLHolder.program, "vec_norm");
+            OpenCLHolder.transposeKernel = tryCreateKernel(OpenCLHolder.program, "transpose");
+            OpenCLHolder.transposeFloatKernel = tryCreateKernel(OpenCLHolder.program, "transposeFloat");
+            OpenCLHolder.normalizeRowKernel = tryCreateKernel(OpenCLHolder.program, "normalizeRow");
+            OpenCLHolder.gaussJordanKernel = tryCreateKernel(OpenCLHolder.program, "gaussJordan");
+            OpenCLHolder.normalizeRowInvKernel = tryCreateKernel(OpenCLHolder.program, "normalizeRowInv");
+            OpenCLHolder.gaussJordanInvKernel = tryCreateKernel(OpenCLHolder.program, "gaussJordanInv");
+            OpenCLHolder.gaussElimPhase1Kernel = tryCreateKernel(OpenCLHolder.program, "gaussElimPhase1");
+            OpenCLHolder.gaussElimPhase1WithBKernel = tryCreateKernel(OpenCLHolder.program, "gaussElimPhase1WithB");
+            OpenCLHolder.swapRowsKernel = tryCreateKernel(OpenCLHolder.program, "swapRows");
+            OpenCLHolder.luDecomposeStepKernel = tryCreateKernel(OpenCLHolder.program, "lu_decompose_step");
+            OpenCLHolder.choleskyDecomposeStepKernel = tryCreateKernel(OpenCLHolder.program, "cholesky_decompose_step");
+            OpenCLHolder.qrHouseholderApplyKernel = tryCreateKernel(OpenCLHolder.program, "qr_householder_apply");
+            OpenCLHolder.complexMatMulKernel = tryCreateKernel(OpenCLHolder.program, "complexMatrixMultiply");
+            OpenCLHolder.complexVecAddKernel = tryCreateKernel(OpenCLHolder.program, "complex_vec_add");
+            OpenCLHolder.complexVecSubKernel = tryCreateKernel(OpenCLHolder.program, "complex_vec_sub");
+            OpenCLHolder.complexVecScaleKernel = tryCreateKernel(OpenCLHolder.program, "complex_vec_scale");
+            OpenCLHolder.complexVecDotPartialKernel = tryCreateKernel(OpenCLHolder.program, "complexVecDotPartial");
+            OpenCLHolder.vecDotPartialKernel = tryCreateKernel(OpenCLHolder.program, "vec_dot_partial");
+            OpenCLHolder.hestenesDotKernel = tryCreateKernel(OpenCLHolder.program, "hestenes_jacobi_dot");
+            OpenCLHolder.hestenesApplyKernel = tryCreateKernel(OpenCLHolder.program, "hestenes_jacobi_apply");
 
-            // Verify all critical kernels are created
-            if (OpenCLHolder.vecDotPartialKernel == null || OpenCLHolder.matMulKernel == null) {
-                logger.error("Critical OpenCL kernels could not be created. Check if kernels are present in source.");
+            // Verify critical kernels: at least float kernels must exist for basic availability
+            if (OpenCLHolder.matMulFloatKernel == null || OpenCLHolder.vecAddFloatKernel == null) {
+                logger.error("Critical float kernels could not be created. OpenCL backend disabled.");
                 initialized = false;
                 return;
+            }
+            
+            // If double is supported, double kernels are also critical
+            if (supportsDouble && OpenCLHolder.matMulKernel == null) {
+                 logger.warn("Double precision reported supported but double kernels failed to create. Disabling double support.");
+                 supportsDouble = false;
             }
 
 
@@ -427,7 +437,17 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
         }
     }
 
-    @Override public boolean isAvailable() { if (!initAttempted) init(); return initialized; }
+    @Override
+    public boolean isAvailable() { 
+        if (isExplicitlyDisabled()) return false;
+        if (!initAttempted) init(); 
+        return initialized; 
+    }
+
+    @Override
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.opencl.disabled") || GPUBackend.super.isExplicitlyDisabled();
+    }
     @Override public boolean isLoaded() { return initialized; }
     @Override
     public String getName() {
@@ -438,6 +458,13 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         if (ring == null) return false;
         Object zero = ring.zero();
+        
+        // If ring is double-based and device doesn't support fp64, we are not compatible
+        if (!supportsDouble) {
+             if (zero instanceof RealDouble) return false;
+             if (zero instanceof Real r && !r.isFast()) return false;
+        }
+
         return zero instanceof Real || zero instanceof Complex;
     }
 
@@ -1767,5 +1794,14 @@ public class NativeOpenCLDenseLinearAlgebraBackend<E extends FieldElement<E>> im
         if (val instanceof Real r) return Complex.of(r.doubleValue());
         if (val instanceof Number n) return Complex.of(n.doubleValue());
         return Complex.of(getRealValue(val));
+    }
+
+    private static cl_kernel tryCreateKernel(cl_program program, String name) {
+        try {
+            return clCreateKernel(program, name, null);
+        } catch (Throwable t) {
+            logger.warn("Failed to create OpenCL kernel '{}': {}", name, t.getMessage());
+            return null;
+        }
     }
 }

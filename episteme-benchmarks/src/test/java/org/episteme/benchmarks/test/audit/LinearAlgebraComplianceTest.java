@@ -89,54 +89,88 @@ public class LinearAlgebraComplianceTest {
         List<String> filterList = (filter != null && !filter.isEmpty()) 
             ? Arrays.asList(filter.toLowerCase().split(",")) 
             : null;
- 
-        for (LinearAlgebraProvider<?> prov : providers) {
-            if (filterList != null) {
-                boolean matches = false;
-                for (String f : filterList) {
-                    if (prov.getName().toLowerCase().contains(f.trim())) {
-                        matches = true;
-                        break;
+
+        String exclude = System.getProperty("org.episteme.test.provider.exclude");
+        List<String> excludeList = (exclude != null && !exclude.isEmpty())
+            ? Arrays.asList(exclude.toLowerCase().split(","))
+            : null;
+
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+        try {
+            for (LinearAlgebraProvider<?> prov : providers) {
+                String provName = prov.getName().toLowerCase();
+                if (filterList != null) {
+                    boolean matches = false;
+                    for (String f : filterList) {
+                        if (provName.contains(f.trim())) {
+                            matches = true;
+                            break;
+                        }
+                    }
+                    if (!matches) continue;
+                }
+                
+                if (excludeList != null) {
+                    boolean excluded = false;
+                    for (String e : excludeList) {
+                        if (provName.contains(e.trim())) {
+                            excluded = true;
+                            break;
+                        }
+                    }
+                    if (excluded) continue;
+                }
+                
+                // Dynamic filtering based on mode and capabilities
+                if (!isProviderSuitableForMode(prov, mode)) continue;
+
+                ComplianceResult res = new ComplianceResult();
+                res.providerName = prov.getName();
+                res.environment = prov.getEnvironmentInfo();
+                res.available = prov.isAvailable();
+                
+                if (prov.isAvailable()) {
+                    // Verify Zero Fallback Policy
+                    verifyZeroFallback(prov, res);
+
+                    java.util.concurrent.Future<?> future = executor.submit(() -> {
+                        try {
+                            if (mode == PrecisionMode.EXACT) {
+                                @SuppressWarnings("unchecked")
+                                LinearAlgebraProvider<RealBig> castedProv = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) prov;
+                                @SuppressWarnings("unchecked")
+                                LinearAlgebraProvider<RealBig> castedRef = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) referenceProvider;
+                                runExactAudit(res, castedProv, castedRef);
+                            } else {
+                                @SuppressWarnings("unchecked")
+                                LinearAlgebraProvider<Real> castedProv = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) prov;
+                                @SuppressWarnings("unchecked")
+                                LinearAlgebraProvider<Real> castedRef = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) referenceProvider;
+                                runStandardAudit(res, castedProv, castedRef);
+                            }
+                        } catch (Throwable t) {
+                            throw new RuntimeException(t);
+                        }
+                    });
+
+                    try {
+                        future.get(300, java.util.concurrent.TimeUnit.SECONDS);
+                    } catch (java.util.concurrent.TimeoutException e) {
+                        future.cancel(true);
+                        System.err.println("[AuditEngine] TIMEOUT (300s) during audit of " + prov.getName());
+                        res.status.put("CRITICAL", "❌ TIMEOUT");
+                    } catch (Throwable t) {
+                        System.err.println("[AuditEngine] Critical failure during audit of " + prov.getName() + ": " + t.getMessage());
+                        res.status.put("CRITICAL", "❌ " + t.getClass().getSimpleName());
                     }
                 }
-                if (!matches) continue;
+                results.add(res);
+                globalResults.add(res);
             }
-            
-            // Dynamic filtering based on mode and capabilities
-            if (!isProviderSuitableForMode(prov, mode)) continue;
-
-            ComplianceResult res = new ComplianceResult();
-            res.providerName = prov.getName();
-            res.environment = prov.getEnvironmentInfo();
-            res.available = prov.isAvailable();
-            
-            if (prov.isAvailable()) {
-                // Verify Zero Fallback Policy
-                verifyZeroFallback(prov, res);
-
-                try {
-                    if (mode == PrecisionMode.EXACT) {
-                        @SuppressWarnings("unchecked")
-                        LinearAlgebraProvider<RealBig> castedProv = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) prov;
-                        @SuppressWarnings("unchecked")
-                        LinearAlgebraProvider<RealBig> castedRef = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) referenceProvider;
-                        runExactAudit(res, castedProv, castedRef);
-                    } else {
-                        @SuppressWarnings("unchecked")
-                        LinearAlgebraProvider<Real> castedProv = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) prov;
-                        @SuppressWarnings("unchecked")
-                        LinearAlgebraProvider<Real> castedRef = (LinearAlgebraProvider<Real>) (LinearAlgebraProvider<?>) referenceProvider;
-                        runStandardAudit(res, castedProv, castedRef);
-                    }
-                } catch (Throwable t) {
-                    System.err.println("[AuditEngine] Critical failure during audit of " + prov.getName() + ": " + t.getMessage());
-                    res.status.put("CRITICAL", "❌ " + t.getClass().getSimpleName());
-                }
-            }
-            results.add(res);
-            globalResults.add(res);
+        } finally {
+            executor.shutdownNow();
         }
- 
+
         BenchmarkReporter reporter = new BenchmarkReporter("Universal Linear Algebra Compliance Audit (Mode: " + mode + ")");
         reporter.addMetadata("Mode", mode.toString());
         reporter.addMetadata("Reference", referenceProvider.getName());
@@ -462,10 +496,11 @@ public class LinearAlgebraComplianceTest {
             System.out.println("[AuditEngine] Report generated at: " + docsPath.toAbsolutePath());
             
             // Also write to reports/ directory
-            Path reportsPath = Paths.get(System.getProperty("user.dir")).resolve("reports").resolve("la_compliance_report_" + activeMode.toString().toLowerCase() + ".md");
-            if (!reportsPath.getParent().toFile().exists()) {
-                reportsPath = Paths.get(System.getProperty("user.dir")).getParent().resolve("reports").resolve("la_compliance_report_" + activeMode.toString().toLowerCase() + ".md");
+            Path projectRoot = Paths.get(System.getProperty("user.dir"));
+            if (projectRoot.getFileName().toString().equals("episteme-benchmarks")) {
+                projectRoot = projectRoot.getParent();
             }
+            Path reportsPath = projectRoot.resolve("reports").resolve("la_compliance_report_" + activeMode.toString().toLowerCase() + ".md");
             if (!reportsPath.getParent().toFile().exists()) java.nio.file.Files.createDirectories(reportsPath.getParent());
             
             java.nio.file.Files.writeString(reportsPath, sb.toString());
@@ -485,17 +520,20 @@ public class LinearAlgebraComplianceTest {
                 case EXACT -> {
                     org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.exact());
                     double score = prov.score(org.episteme.core.technical.algorithm.OperationContext.DEFAULT);
-                    // High precision providers should have score > 1000 in exact mode
-                    return score > 1000.0;
+                    // High precision providers should have score >= 1000 in exact mode
+                    return score >= 1000.0;
                 }
                 case NORMAL -> {
                     org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.normal());
                     // Any provider supporting double or Real is suitable for NORMAL
-                    return prov.isCompatible(org.episteme.core.mathematics.sets.Reals.getInstance()) || 
-                           prov.getName().contains("Standard");
+                    // But we exclude MPFR from NORMAL to keep it clean if desired, or keep it.
+                    // For now, allow everything that is available.
+                    return true;
                 }
                 case FAST -> {
-                    return true; // All providers are candidates for FAST
+                    // Exclude high-precision-only providers from FAST mode to avoid noise
+                    double score = prov.score(org.episteme.core.technical.algorithm.OperationContext.DEFAULT);
+                    return score < 1000.0; 
                 }
             }
         } finally {

@@ -355,8 +355,9 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
 
     @Override
     public boolean isAvailable() { 
+        if (isExplicitlyDisabled()) return false;
         ensureInitialized(); 
-        return IS_AVAILABLE && !isExplicitlyDisabled(); 
+        return IS_AVAILABLE; 
     }
 
     @Override public String getId() { return "cuda-dense"; }
@@ -1587,7 +1588,7 @@ public class NativeCUDADenseLinearAlgebraBackend<E extends FieldElement<E>> impl
 
     @Override
     public boolean isExplicitlyDisabled() {
-        return Boolean.getBoolean("org.episteme.backend.cuda.disabled") || GPUBackend.super.isExplicitlyDisabled();
+        return Boolean.getBoolean("episteme.backend.cuda.disabled") || GPUBackend.super.isExplicitlyDisabled();
     }
     private double getRealValue(Object val) {
         if (val == null) return 0.0;

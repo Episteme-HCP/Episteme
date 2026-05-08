@@ -101,31 +101,44 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         return "linear algebra";
     }
 
-    private static final boolean IS_AVAILABLE;
-    static {
-        boolean avail = false;
-        if (!Boolean.getBoolean("episteme.backend.disable.nd4j")) {
+    private static boolean initialized = false;
+    private static boolean initAttempted = false;
+    private static boolean IS_AVAILABLE = false;
+
+    private static synchronized void init() {
+        if (initAttempted) return;
+        initAttempted = true;
+        if (!Boolean.getBoolean("episteme.backend.nd4j.disabled") && !Boolean.getBoolean("episteme.backend.disable.nd4j")) {
             try {
                 Class.forName("org.nd4j.linalg.factory.Nd4j");
                 // Test actual ND4J initialization
                 org.nd4j.linalg.factory.Nd4j.zeros(1);
-                avail = true;
+                IS_AVAILABLE = true;
+                initialized = true;
             } catch (Throwable th) {
                 logger.error("[ND4J] Initialization failed: {}: {}", th.getClass().getSimpleName(), th.getMessage(), th);
                 System.err.println("[ND4J] Initialization failed: " + th.getClass().getSimpleName() + ": " + th.getMessage());
             }
         }
-        IS_AVAILABLE = avail;
     }
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE && !isExplicitlyDisabled();
+        if (isExplicitlyDisabled()) return false;
+        if (!initAttempted) init();
+        return IS_AVAILABLE;
     }
 
     @Override
     public String getId() {
         return "nd4j";
+    }
+
+    @Override
+    public boolean isExplicitlyDisabled() {
+        String id = getId();
+        return (id != null && Boolean.getBoolean("episteme.backend." + id + ".disabled")) || 
+               Boolean.getBoolean("episteme.backend.disable." + id);
     }
 
     @Override
