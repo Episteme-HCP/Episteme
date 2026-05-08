@@ -32,6 +32,6 @@ public class NativeCPULinearAlgebraRealBackend extends AbstractNativeCPULinearAl
 
     @Override
     public String getId() {
-        return "native-cpu-real";
+        return "cpu-real";
     }
 }

@@ -218,6 +218,15 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    public double score(org.episteme.core.technical.algorithm.OperationContext context) {
+        double base = getPriority();
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            base += 1000.0;
+        }
+        return base;
+    }
+
+    @Override
     public Object createBackend() {
         return this;
     }

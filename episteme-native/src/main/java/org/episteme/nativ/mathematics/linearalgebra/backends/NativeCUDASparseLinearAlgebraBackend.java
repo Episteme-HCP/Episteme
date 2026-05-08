@@ -55,7 +55,21 @@ public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> imp
     
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE && !isExplicitlyDisabled();
+        if (isExplicitlyDisabled()) return false;
+        ensureInitialized();
+        return IS_AVAILABLE;
+    }
+
+    @Override
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.cuda-sparse.disabled") || 
+               Boolean.getBoolean("episteme.backend.cuda.disabled") || 
+               GPUBackend.super.isExplicitlyDisabled();
+    }
+
+    @Override
+    public String getId() {
+        return "cuda-sparse";
     }
 
     @Override
@@ -186,9 +200,7 @@ public class NativeCUDASparseLinearAlgebraBackend<E extends FieldElement<E>> imp
     private static final int CUDA_MEMCPY_DEVICE_TO_HOST = 2;
     private static final int CUDA_MEMCPY_DEVICE_TO_DEVICE = 3;
 
-    static {
-        ensureInitialized();
-    }
+    // Removed forced static initialization to avoid hangs during discovery.
 
 
     @Override

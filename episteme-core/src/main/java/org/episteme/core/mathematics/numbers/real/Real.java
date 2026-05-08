@@ -302,6 +302,9 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     public abstract boolean isNaN();
 
     public abstract boolean isInfinite();
+    
+    public boolean isFast() { return false; }
+    public boolean isHighPrecision() { return false; }
 
     public boolean isPositive() {
         return sign() > 0;

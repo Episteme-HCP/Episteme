@@ -138,7 +138,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
 
     @Override
     public String getId() {
-        return "opencl";
+        return "opencl-sparse";
     }
 
     @Override
@@ -193,8 +193,16 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
 
     @Override
     public boolean isAvailable() {
+        if (isExplicitlyDisabled()) return false;
         ensureInitialized();
-        return cachedAvailability != null && cachedAvailability && !isExplicitlyDisabled();
+        return cachedAvailability != null && cachedAvailability;
+    }
+
+    @Override
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.opencl-sparse.disabled") || 
+               Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+               GPUBackend.super.isExplicitlyDisabled();
     }
 
     @Override

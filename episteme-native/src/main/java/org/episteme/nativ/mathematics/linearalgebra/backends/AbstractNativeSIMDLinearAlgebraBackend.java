@@ -228,7 +228,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
     @Override
     public String getId() {
-        return "simd";
+        return "simd-" + (ring instanceof Reals ? "real" : "complex");
     }
 
     @Override
@@ -249,6 +249,14 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         } catch (NoClassDefFoundError | Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public boolean isExplicitlyDisabled() {
+        String id = getId();
+        return (id != null && Boolean.getBoolean("episteme.backend." + id + ".disabled")) || 
+               Boolean.getBoolean("episteme.backend.simd.disabled") ||
+               Boolean.getBoolean("episteme.backend.disable." + id);
     }
 
     @Override
@@ -310,8 +318,6 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     public int getPriority() {
         return 90; // Higher than standard CPU, lower than BLAS
     }
-
-
 
     @Override
     public String getName() {

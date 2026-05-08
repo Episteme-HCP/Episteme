@@ -355,6 +355,11 @@ public final class RealBig extends Real {
     }
 
     @Override
+    public boolean isHighPrecision() {
+        return true;
+    }
+
+    @Override
     public double doubleValue() {
         return value == null ? Double.NaN : value.doubleValue();
     }

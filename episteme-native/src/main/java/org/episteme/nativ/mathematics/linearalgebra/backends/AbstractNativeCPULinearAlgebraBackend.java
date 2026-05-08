@@ -392,12 +392,15 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @Override
     public boolean isExplicitlyDisabled() {
         String id = getId();
-        return id != null && (Boolean.getBoolean("episteme.backend.disable." + id) || Boolean.getBoolean("episteme.linearalgebra.disable." + id));
+        return (id != null && Boolean.getBoolean("episteme.backend." + id + ".disabled")) || 
+               Boolean.getBoolean("episteme.backend.cpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.disable." + id) || 
+               Boolean.getBoolean("episteme.linearalgebra.disable." + id);
     }
 
     @Override
     public String getId() {
-        return "native-cpu-" + (ring instanceof Complexes ? "complex" : "real");
+        return "cpu-" + (ring instanceof Complexes ? "complex" : "real");
     }
 
     @Override

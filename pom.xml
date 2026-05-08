@@ -809,6 +809,12 @@
             <argLine>${argLine} --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
             <systemPropertyVariables>
               <episteme.benchmark.skip>true</episteme.benchmark.skip>
+              <org.episteme.test.precision>${org.episteme.test.precision}</org.episteme.test.precision>
+              <org.episteme.test.provider.filter>${org.episteme.test.provider.filter}</org.episteme.test.provider.filter>
+              <org.episteme.test.provider.exclude>${org.episteme.test.provider.exclude}</org.episteme.test.provider.exclude>
+              <episteme.native.skip.cuda>${episteme.native.skip.cuda}</episteme.native.skip.cuda>
+              <episteme.native.skip.opencl>${episteme.native.skip.opencl}</episteme.native.skip.opencl>
+              <episteme.backend.disable.nd4j>${episteme.backend.disable.nd4j}</episteme.backend.disable.nd4j>
             </systemPropertyVariables>
           </configuration>
         </plugin>
