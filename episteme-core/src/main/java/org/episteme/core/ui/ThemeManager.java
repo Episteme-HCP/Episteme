@@ -104,8 +104,11 @@ public class ThemeManager {
         }
         
         // Ensure theme.css is always loaded last for shared overrides
-        scene.getStylesheets().remove(themeCss.toExternalForm()); // Avoid duplicates
-        scene.getStylesheets().add(themeCss.toExternalForm());
+        if (themeCss != null) {
+            String themeUrl = themeCss.toExternalForm();
+            scene.getStylesheets().remove(themeUrl); // Avoid duplicates
+            scene.getStylesheets().add(themeUrl);
+        }
     }
 
     private boolean isHighContrast() {
