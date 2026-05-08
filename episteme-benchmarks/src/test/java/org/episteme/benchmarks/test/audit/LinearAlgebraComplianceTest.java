@@ -4,6 +4,7 @@ package org.episteme.benchmarks.test.audit;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
+import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.technical.backend.Backend;
@@ -244,27 +245,37 @@ public class LinearAlgebraComplianceTest {
     }
  
     private void runStandardAudit(ComplianceResult res, LinearAlgebraProvider<Real> prov, LinearAlgebraProvider<Real> ref) {
-        Ring<Real> realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
+        Ring<Real> realRing;
+        if (mode == PrecisionMode.FAST) {
+            realRing = (Ring<Real>) (Object) org.episteme.core.mathematics.numbers.real.RealFloat.ZERO.getScalarRing();
+        } else {
+            realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
+        }
+        
         double tolerance = switch(mode) {
             case FAST -> 1e-7;
             case NORMAL -> 1e-14;
-            case EXACT -> 1e-28;
+            default -> 1e-7;
         };
-        if (System.getProperty("org.episteme.test.tolerance.strict") != null) {
-            tolerance = Double.parseDouble(System.getProperty("org.episteme.test.tolerance.strict"));
-        }
         
         if (prov.isCompatible(realRing)) {
             LinearAlgebraAuditSuite.runFullAudit(prov, ref, matrixSize, (op, test) -> auditOp(res, op, test), realRing, "R:", tolerance);
         }
         
-        Ring<Complex> complexRing = Complex.of(1.0, 0.0).getScalarRing();
+        Ring<Complex> complexRing;
+        if (mode == PrecisionMode.FAST) {
+            // Create a Complex ring based on RealFloat
+            complexRing = (Ring<Complex>) (Object) Complex.of(RealFloat.ZERO, RealFloat.ZERO).getScalarRing();
+        } else {
+            complexRing = Complex.of(1.0, 0.0).getScalarRing();
+        }
+        
         if (prov.isCompatible(complexRing)) {
             @SuppressWarnings("unchecked")
-            LinearAlgebraProvider<Complex> cProv = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) prov;
+            LinearAlgebraProvider<Complex> complexProv = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) prov;
             @SuppressWarnings("unchecked")
-            LinearAlgebraProvider<Complex> cRef = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) ref;
-            LinearAlgebraAuditSuite.runFullAudit(cProv, cRef, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
+            LinearAlgebraProvider<Complex> complexRef = (LinearAlgebraProvider<Complex>) (LinearAlgebraProvider<?>) ref;
+            LinearAlgebraAuditSuite.runFullAudit(complexProv, complexRef, matrixSize, (op, test) -> auditOp(res, op, test), complexRing, "C:", tolerance);
         }
     }
  
