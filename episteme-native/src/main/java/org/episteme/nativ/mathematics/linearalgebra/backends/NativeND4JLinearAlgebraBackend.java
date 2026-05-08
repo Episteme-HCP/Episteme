@@ -20,7 +20,6 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.technical.backend.HardwareAccelerator;
-import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -101,7 +100,6 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
         return "linear algebra";
     }
 
-    private static boolean initialized = false;
     private static boolean initAttempted = false;
     private static boolean IS_AVAILABLE = false;
 
@@ -114,7 +112,6 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
                 // Test actual ND4J initialization
                 org.nd4j.linalg.factory.Nd4j.zeros(1);
                 IS_AVAILABLE = true;
-                initialized = true;
             } catch (Throwable th) {
                 logger.error("[ND4J] Initialization failed: {}: {}", th.getClass().getSimpleName(), th.getMessage(), th);
                 System.err.println("[ND4J] Initialization failed: " + th.getClass().getSimpleName() + ": " + th.getMessage());

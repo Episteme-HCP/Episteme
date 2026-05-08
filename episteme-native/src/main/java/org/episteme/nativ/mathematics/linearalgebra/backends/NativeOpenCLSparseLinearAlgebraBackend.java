@@ -46,6 +46,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> implements NativeBackend, SparseLinearAlgebraProvider<E>, GPUBackend {
 
@@ -765,12 +766,14 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
         return data;
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<E> fromDoubleArray(double[] data, int rows, int cols, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for(int i=0; i<data.length; i++) values[i] = castScalar(data[i], ring);
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(values, rows, cols, ring);
     }
 
+    @SuppressWarnings("unchecked")
     private Matrix<E> fromFloatArray(float[] data, int rows, int cols, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for(int i=0; i<data.length; i++) values[i] = (E) RealFloat.create(data[i]);
@@ -789,6 +792,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
         return toSparseVector(data, ring);
     }
 
+    @SuppressWarnings("unchecked")
     private Vector<E> toRealVector(double[] data) {
         return toVector(data, (Ring<E>) Reals.getInstance());
     }
@@ -825,6 +829,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
         return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E>(storage, ring);
     }
 
+    @SuppressWarnings("unchecked")
     private E castScalar(double val, Ring<E> ring) {
         Object zero = ring.zero();
         if (zero instanceof RealFloat) return (E) RealFloat.create((float) val);
@@ -837,7 +842,7 @@ public class NativeOpenCLSparseLinearAlgebraBackend<E extends FieldElement<E>> i
     public E trace(Matrix<E> A) {
         if (A.rows() != A.cols()) throw new IllegalArgumentException("Matrix must be square");
         int n = A.rows();
-        org.episteme.core.mathematics.structures.rings.Ring<E> ring = (org.episteme.core.mathematics.structures.rings.Ring<E>) A.getScalarRing();
+        org.episteme.core.mathematics.structures.rings.Ring<E> ring = A.getScalarRing();
         E sum = ring.zero();
         for (int i = 0; i < n; i++) {
             sum = ring.add(sum, A.get(i, i));
