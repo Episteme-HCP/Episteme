@@ -129,7 +129,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             
             E[] values = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), m);
             for (int i = 0; i < m; i++) values[i] = (E) RealDouble.of(result[i]);
-            return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(values, (Ring<E>) a.getScalarRing());
+            return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(values), (Ring<E>) a.getScalarRing());
         } catch (Throwable t) { throw new RuntimeException(t); }
     }
 
@@ -157,7 +157,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             
             E[] values = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), m);
             for (int i = 0; i < m; i++) values[i] = (E) Complex.of(result[i * 2], result[i * 2 + 1]);
-            return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(values, (Ring<E>) a.getScalarRing());
+            return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(values), (Ring<E>) a.getScalarRing());
         } catch (Throwable t) { throw new RuntimeException(t); }
     }
 
