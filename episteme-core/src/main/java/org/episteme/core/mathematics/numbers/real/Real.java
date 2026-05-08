@@ -62,15 +62,25 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     /** The real number 0 */
     public static Real zeroE() { 
-        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
-            RealConstants.BIG_ZERO : RealConstants.DOUBLE_ZERO; 
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            return RealConstants.BIG_ZERO;
+        }
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.FAST) {
+            return RealFloat.create(0.0f);
+        }
+        return RealConstants.DOUBLE_ZERO; 
     }
     public static final Real ZERO = RealConstants.ZERO;
 
     /** The real number 1 */
     public static Real oneE() { 
-        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
-            RealConstants.BIG_ONE : RealConstants.DOUBLE_ONE; 
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            return RealConstants.BIG_ONE;
+        }
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.FAST) {
+            return RealFloat.create(1.0f);
+        }
+        return RealConstants.DOUBLE_ONE; 
     }
     public static final Real ONE = RealConstants.ONE;
 

@@ -2035,7 +2035,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                         
                         // h_ip1j = -s*t1 + c*t2
                         NativeSafe.invoke(MPFR_MUL, tmp1, s, t1, 0);
-                        NativeSafe.invoke(MPFR_NEG, tmp1, tmp1);
+                        NativeSafe.invoke(MPFR_NEG, tmp1, tmp1, 0);
                         NativeSafe.invoke(MPFR_MUL, tmp2, c, t2, 0);
                         NativeSafe.invoke(MPFR_ADD, h_ip1j, tmp1, tmp2, 0);
                     }
@@ -2054,7 +2054,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     NativeSafe.invoke(MPFR_ADD, g_i, tmp1, tmp2, 0);
                     
                     NativeSafe.invoke(MPFR_MUL, tmp1, s, t1, 0);
-                    NativeSafe.invoke(MPFR_NEG, tmp1, tmp1);
+                    NativeSafe.invoke(MPFR_NEG, tmp1, tmp1, 0);
                     NativeSafe.invoke(MPFR_MUL, tmp2, c, t2, 0);
                     NativeSafe.invoke(MPFR_ADD, g_ip1, tmp1, tmp2, 0);
                 }
