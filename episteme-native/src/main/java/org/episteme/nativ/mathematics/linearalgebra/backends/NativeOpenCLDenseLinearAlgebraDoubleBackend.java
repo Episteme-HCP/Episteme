@@ -444,14 +444,14 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     }
 
     private double[] toDoubleVec(Vector<E> v) {
-        int n = v.size();
+        int n = v.dimension();
         double[] data = new double[n];
         for (int i = 0; i < n; i++) data[i] = getRealValue(v.get(i));
         return data;
     }
 
     private double[] toComplexDoubleVec(Vector<E> v) {
-        int n = v.size();
+        int n = v.dimension();
         double[] data = new double[n * 2];
         for (int i = 0; i < n; i++) {
             E val = v.get(i);
