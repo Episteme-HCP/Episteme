@@ -46,11 +46,17 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
     private static MethodHandle MA_DECODER_GET_LENGTH;
 
     static {
-        // Load standalone miniaudio library from /libs
-        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("miniaudio", Arena.global());
-        if (lib.isEmpty()) {
-            // Also try 'portaudio' as alternative if miniaudio is not bundled
-            lib = NativeFFMLoader.loadLibrary("portaudio", Arena.global());
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean backendDisabled = Boolean.getBoolean("episteme.backend.native-audio.disabled");
+        
+        Optional<SymbolLookup> lib = Optional.empty();
+        if (!globalDisabled && !backendDisabled) {
+            // Load standalone miniaudio library from /libs
+            lib = NativeFFMLoader.loadLibrary("miniaudio", Arena.global());
+            if (lib.isEmpty()) {
+                // Also try 'portaudio' as alternative if miniaudio is not bundled
+                lib = NativeFFMLoader.loadLibrary("portaudio", Arena.global());
+            }
         }
 
         boolean avail = false;
@@ -118,7 +124,7 @@ public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUB
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE_FLAG;
+        return IS_AVAILABLE_FLAG && !isExplicitlyDisabled();
     }
 
     @Override

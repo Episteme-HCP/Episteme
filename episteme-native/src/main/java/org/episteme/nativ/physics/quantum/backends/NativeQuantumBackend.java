@@ -88,6 +88,7 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
 
     @Override
     public boolean isAvailable() {
+        if (isExplicitlyDisabled()) return false;
         ensureInitialized();
         return LOOKUP != null;
     }

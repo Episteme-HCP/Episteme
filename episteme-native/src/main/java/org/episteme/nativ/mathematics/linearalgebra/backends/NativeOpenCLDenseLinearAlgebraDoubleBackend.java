@@ -39,6 +39,8 @@ import java.util.Arrays;
 @SuppressWarnings({"unchecked", "rawtypes"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<E>> implements LinearAlgebraProvider<E>, NativeBackend, GPUBackend {
+    @Override public boolean isLoaded() { return isAvailable(); }
+    @Override public String getNativeLibraryName() { return "opencl"; }
 
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLDenseLinearAlgebraDoubleBackend.class);
     
@@ -87,6 +89,14 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         return initialized;
     }
 
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+               Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra-opencl.disabled");
+    }
+
     @Override
     public boolean isCompatible(Ring<?> ring) {
         Object zero = ring.zero();
@@ -99,8 +109,8 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public String getName() { return "Native OpenCL Dense Double Backend"; }
 
-    @Override
-    public int getPriority() { return 105; }
+    @Override public int getPriority() { return 105; }
+    @Override public void shutdown() { close(); }
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
@@ -354,14 +364,56 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public void close() {
         if (program != null) {
-            clReleaseKernel(matMulKernel);
-            clReleaseKernel(vecAddKernel);
-            clReleaseKernel(vecSubKernel);
-            clReleaseKernel(vecScaleKernel);
-            clReleaseKernel(transposeKernel);
-            clReleaseKernel(complexMatMulKernel);
+            if (matMulKernel != null) clReleaseKernel(matMulKernel);
+            if (vecAddKernel != null) clReleaseKernel(vecAddKernel);
+            if (vecSubKernel != null) clReleaseKernel(vecSubKernel);
+            if (vecScaleKernel != null) clReleaseKernel(vecScaleKernel);
+            if (transposeKernel != null) clReleaseKernel(transposeKernel);
+            if (complexMatMulKernel != null) clReleaseKernel(complexMatMulKernel);
             clReleaseProgram(program);
             program = null;
         }
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        OpenCLManager.ensureInitialized();
+        return new org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext(
+            OpenCLManager.getContext(), OpenCLManager.getCommandQueue(), OpenCLManager.getDevice());
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[] getDevices() {
+        if (!isAvailable()) return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[0];
+        return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[]{
+            new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo(
+                "OpenCL Device", 0, 0, "OpenCL")
+        };
+    }
+
+    @Override
+    public void selectDevice(int deviceId) {}
+
+    @Override
+    public long allocateGPUMemory(long sizeBytes) {
+        return 0; // Not implemented for OpenCL yet
+    }
+
+    @Override
+    public void copyToGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {}
+
+    @Override
+    public void copyFromGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {}
+
+    @Override
+    public void freeGPUMemory(long gpuHandle) {}
+
+    @Override
+    public void synchronize() {}
+
+    @Override
+    public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
+        ensureInitialized();
+        // Fallback or implementation
     }
 }

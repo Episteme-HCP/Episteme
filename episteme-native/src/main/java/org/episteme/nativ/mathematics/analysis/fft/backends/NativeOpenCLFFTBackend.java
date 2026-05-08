@@ -80,7 +80,8 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
     }
 
     public boolean isExplicitlyDisabled() {
-        return Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.opencl.disabled") || 
                Boolean.getBoolean("episteme.backend.gpu.disabled") ||
                Boolean.getBoolean("episteme.backend.fft.disabled") ||
                Boolean.getBoolean("episteme.backend.fft-opencl.disabled");

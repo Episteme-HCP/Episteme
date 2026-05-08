@@ -20,12 +20,14 @@ public class OpenCLExecutionContext implements ExecutionContext {
 
     private final cl_context context;
     private final cl_command_queue commandQueue;
+    private final cl_device_id device;
 
-    public OpenCLExecutionContext(cl_context context, cl_command_queue commandQueue) {
+    public OpenCLExecutionContext(cl_context context, cl_command_queue commandQueue, cl_device_id device) {
         if (context == null) throw new IllegalArgumentException("OpenCL context cannot be null");
         if (commandQueue == null) throw new IllegalArgumentException("OpenCL command queue cannot be null");
         this.context = context;
         this.commandQueue = commandQueue;
+        this.device = device;
     }
 
     public cl_context getContext() {
@@ -34,6 +36,10 @@ public class OpenCLExecutionContext implements ExecutionContext {
 
     public cl_command_queue getCommandQueue() {
         return commandQueue;
+    }
+
+    public cl_device_id getDevice() {
+        return device;
     }
 
     @Override

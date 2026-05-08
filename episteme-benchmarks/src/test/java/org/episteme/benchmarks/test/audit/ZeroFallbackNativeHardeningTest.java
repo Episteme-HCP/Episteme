@@ -46,6 +46,10 @@ public class ZeroFallbackNativeHardeningTest {
         System.clearProperty("episteme.backend.mpfr-sparse.disabled");
         System.clearProperty("episteme.backend.mpfr.disabled");
         System.clearProperty("episteme.backend.nd4j.disabled");
+        System.clearProperty("episteme.backend.gpu.disabled");
+        System.clearProperty("episteme.backend.opencl.disabled");
+        System.clearProperty("episteme.backend.cuda.disabled");
+        System.clearProperty("episteme.backend.native.disabled");
     }
 
     @Test
@@ -61,6 +65,8 @@ public class ZeroFallbackNativeHardeningTest {
         System.setProperty("episteme.backend.simd-complex.disabled", "true");
         System.setProperty("episteme.backend.mpfr.disabled", "true");
         System.setProperty("episteme.backend.nd4j.disabled", "true");
+        System.setProperty("episteme.backend.gpu.disabled", "true");
+        System.setProperty("episteme.backend.native.disabled", "true");
 
         // Refresh discovery to apply properties
         BackendDiscovery.getInstance().refresh();

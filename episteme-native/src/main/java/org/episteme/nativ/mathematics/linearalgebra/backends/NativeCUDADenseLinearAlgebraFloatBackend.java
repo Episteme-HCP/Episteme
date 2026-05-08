@@ -30,11 +30,22 @@ import org.slf4j.LoggerFactory;
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>> implements LinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDADenseLinearAlgebraFloatBackend.class);
+
+    @Override public boolean isLoaded() { return isAvailable(); }
+    @Override public String getNativeLibraryName() { return "cuda"; }
     
     @Override
     public boolean isAvailable() {
         if (isExplicitlyDisabled()) return false;
         return CUDAManager.isAvailable();
+    }
+
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.cuda.disabled") || 
+               Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra-cuda.disabled");
     }
 
     @Override
@@ -45,6 +56,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override public String getId() { return "cuda-dense-float"; }
     @Override public String getName() { return "Native CUDA Dense Linear Algebra Float Backend"; }
     @Override public int getPriority() { return 115; }
+    @Override public void shutdown() {}
 
     @Override
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
@@ -60,8 +72,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             float[] hA = toFloatArray(a);
             float[] hB = toFloatArray(b);
             
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY_H_TO_D, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hA), (long) m * k * 4));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY_H_TO_D, d_B.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hB), (long) k * n * 4));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hA), (long) m * k * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hB), (long) k * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCublasHandle();
             checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SGEMM, handle, 0, 0, n, m, k, 
@@ -70,7 +82,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             
             float[] result = new float[m * n];
             MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY_D_TO_H, segC, d_C.address(), (long) m * n * 4));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC, d_C.address(), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
             
             return fromFloatArray(result, m, n, (Ring<E>) a.getScalarRing());
@@ -118,4 +130,55 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override public void close() {}
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.GPU; }
     @Override public String getType() { return "math"; }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext();
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[] getDevices() {
+        if (!isAvailable()) return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[0];
+        return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[]{
+            new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo(
+                "CUDA Device", 0, 0, "CUDA")
+        };
+    }
+
+    @Override
+    public void selectDevice(int deviceId) {}
+
+    @Override
+    public long allocateGPUMemory(long sizeBytes) {
+        try (Arena temp = Arena.ofConfined()) {
+            MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MALLOC, p, sizeBytes));
+            return p.get(ValueLayout.ADDRESS, 0).address();
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public void copyToGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, MemorySegment.ofAddress(gpuHandle), MemorySegment.ofBuffer(hostBuffer), sizeBytes, CUDAManager.CUDA_MEMCPY_H_TO_D));
+    }
+
+    @Override
+    public void copyFromGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, MemorySegment.ofBuffer(hostBuffer), MemorySegment.ofAddress(gpuHandle), sizeBytes, CUDAManager.CUDA_MEMCPY_D_TO_H));
+    }
+
+    @Override
+    public void freeGPUMemory(long gpuHandle) {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_FREE, MemorySegment.ofAddress(gpuHandle)));
+    }
+
+    @Override
+    public void synchronize() {
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_DEVICE_SYNCHRONIZE));
+    }
+
+    @Override
+    public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
+        throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not implemented in float backend");
+    }
 }

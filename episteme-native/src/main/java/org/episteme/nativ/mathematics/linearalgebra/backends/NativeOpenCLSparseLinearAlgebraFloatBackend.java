@@ -32,6 +32,8 @@ import org.episteme.core.mathematics.structures.rings.FieldElement;
 @SuppressWarnings({"unchecked", "rawtypes"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<E>> implements SparseLinearAlgebraProvider<E>, NativeBackend, GPUBackend {
+    @Override public boolean isLoaded() { return isAvailable(); }
+    @Override public String getNativeLibraryName() { return "opencl"; }
 
     private static final Logger logger = LoggerFactory.getLogger(NativeOpenCLSparseLinearAlgebraFloatBackend.class);
     
@@ -69,6 +71,14 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         return initialized;
     }
 
+    public boolean isExplicitlyDisabled() {
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+               Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra.disabled") ||
+               Boolean.getBoolean("episteme.backend.linear-algebra-opencl.disabled");
+    }
+
     @Override
     public boolean isCompatible(Ring<?> ring) {
         return ring.zero() instanceof RealFloat;
@@ -80,18 +90,14 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
     @Override
     public String getName() { return "Native OpenCL Sparse Float Backend"; }
 
-    @Override
-    public int getPriority() { return 110; }
+    @Override public int getPriority() { return 110; }
+    @Override public void shutdown() { close(); }
 
     @Override
     public Vector<E> multiply(Matrix<E> a, Vector<E> x) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Sparse Float Backend not available");
         
-        if (!(a instanceof SparseMatrix)) {
-             return SparseLinearAlgebraProvider.super.multiply(a, x);
-        }
-
-        SparseMatrix<E> sa = (SparseMatrix<E>) a;
+        SparseMatrix<E> sa = ensureSparse(a);
         int rows = sa.rows();
         int cols = sa.cols();
         int nnz = sa.getNnz();
@@ -160,4 +166,58 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
 
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.GPU; }
     @Override public String getType() { return "math"; }
+
+    private SparseMatrix<E> ensureSparse(Matrix<E> a) {
+        if (a instanceof SparseMatrix) return (SparseMatrix<E>) a;
+        Ring<E> r = a.getScalarRing();
+        SparseMatrix<E> s = SparseMatrix.zeros(a.rows(), a.cols(), r);
+        for (int i = 0; i < a.rows(); i++) {
+            for (int j = 0; j < a.cols(); j++) {
+                E val = a.get(i, j);
+                if (!val.equals(r.zero())) s.set(i, j, val);
+            }
+        }
+        return s;
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.ExecutionContext createContext() {
+        OpenCLManager.ensureInitialized();
+        return new org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext(
+            OpenCLManager.getContext(), OpenCLManager.getCommandQueue(), OpenCLManager.getDevice());
+    }
+
+    @Override
+    public org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[] getDevices() {
+        if (!isAvailable()) return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[0];
+        return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[]{
+            new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo(
+                "OpenCL Device", 0, 0, "OpenCL")
+        };
+    }
+
+    @Override
+    public void selectDevice(int deviceId) {}
+
+    @Override
+    public long allocateGPUMemory(long sizeBytes) {
+        return 0;
+    }
+
+    @Override
+    public void copyToGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {}
+
+    @Override
+    public void copyFromGPU(long gpuHandle, java.nio.DoubleBuffer hostBuffer, long sizeBytes) {}
+
+    @Override
+    public void freeGPUMemory(long gpuHandle) {}
+
+    @Override
+    public void synchronize() {}
+
+    @Override
+    public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
+        throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not implemented in sparse backend");
+    }
 }

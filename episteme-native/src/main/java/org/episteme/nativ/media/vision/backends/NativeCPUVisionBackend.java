@@ -71,7 +71,7 @@ public class NativeCPUVisionBackend implements VisionBackend, CPUBackend, Native
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE;
+        return IS_AVAILABLE && !isExplicitlyDisabled();
     }
 
     @Override

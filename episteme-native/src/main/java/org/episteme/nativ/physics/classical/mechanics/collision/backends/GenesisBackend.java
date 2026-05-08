@@ -48,8 +48,15 @@ public class GenesisBackend implements NativeCollisionProvider, MechanicsBackend
 
     private static synchronized void ensureInitialized() {
         if (IS_INITIALIZED) return;
-        Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("GenesisC", Arena.global());
-        IS_AVAILABLE = lib.isPresent();
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean backendDisabled = Boolean.getBoolean("episteme.backend.genesis.disabled");
+        
+        if (!globalDisabled && !backendDisabled) {
+            Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("GenesisC", Arena.global());
+            IS_AVAILABLE = lib.isPresent();
+        } else {
+            IS_AVAILABLE = false;
+        }
         IS_INITIALIZED = true;
     }
 

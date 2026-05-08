@@ -163,6 +163,7 @@ public class NativeFFTBackend implements FFTProvider, CPUBackend, NativeBackend 
 
     @Override
     public boolean isAvailable() {
+        if (isExplicitlyDisabled()) return false;
         ensureInitialized();
         return available;
     }

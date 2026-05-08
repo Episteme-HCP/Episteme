@@ -40,11 +40,16 @@ public class NativeJavaCVMediaBackend implements AudioBackend, VideoBackend, Vis
 
     static {
         boolean available = false;
-        try {
-            Loader.load(org.bytedeco.opencv.global.opencv_core.class);
-            available = true;
-        } catch (Throwable t) {
-            System.err.println("Warning: NativeJavaCVMediaBackend initialization failed: " + t.getMessage());
+        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean backendDisabled = Boolean.getBoolean("episteme.backend.native-javacv-media.disabled");
+
+        if (!globalDisabled && !backendDisabled) {
+            try {
+                Loader.load(org.bytedeco.opencv.global.opencv_core.class);
+                available = true;
+            } catch (Throwable t) {
+                System.err.println("Warning: NativeJavaCVMediaBackend initialization failed: " + t.getMessage());
+            }
         }
         IS_AVAILABLE = available;
     }
@@ -81,7 +86,7 @@ public class NativeJavaCVMediaBackend implements AudioBackend, VideoBackend, Vis
 
     @Override
     public boolean isAvailable() {
-        return IS_AVAILABLE;
+        return IS_AVAILABLE && !isExplicitlyDisabled();
     }
 
     @Override

@@ -297,7 +297,8 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     }
 
     public boolean isExplicitlyDisabled() {
-        return Boolean.getBoolean("episteme.backend.opencl.disabled") || 
+        return Boolean.getBoolean("episteme.backend.native.disabled") ||
+               Boolean.getBoolean("episteme.backend.opencl.disabled") || 
                Boolean.getBoolean("episteme.backend.gpu.disabled") ||
                Boolean.getBoolean("episteme.backend.nbody.disabled") ||
                Boolean.getBoolean("episteme.backend.nbody-opencl.disabled");
@@ -385,9 +386,9 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
                     }
                 }
             }
-            return deviceList.toArray(new GPUBackend.DeviceInfo[0]);
+            return deviceList.toArray(new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[0]);
         } catch (Exception e) {
-            return new GPUBackend.DeviceInfo[]{new GPUBackend.DeviceInfo("Unknown OpenCL Device", 0, 0, "Generic")};
+            return new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo[]{new org.episteme.core.technical.backend.gpu.GPUBackend.DeviceInfo("Unknown OpenCL Device", 0, 0, "Generic")};
         }
     }
 
@@ -505,22 +506,29 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
             cl_context context = OpenCLManager.getContext();
             cl_command_queue queue = OpenCLManager.getCommandQueue();
             
-            cl_mem memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * p.length, Pointer.to(p), null);
-            cl_mem memV = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_float * n * 3, null, null);
-            cl_mem memF = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_float * forces.length, null, null);
-            
-            clSetKernelArg(kernelFloat, 0, Sizeof.cl_mem, Pointer.to(memP));
-            clSetKernelArg(kernelFloat, 1, Sizeof.cl_mem, Pointer.to(memV));
-            clSetKernelArg(kernelFloat, 2, Sizeof.cl_mem, Pointer.to(memF));
-            clSetKernelArg(kernelFloat, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
-            clSetKernelArg(kernelFloat, 4, Sizeof.cl_float, Pointer.to(new float[]{0.0f}));
-            clSetKernelArg(kernelFloat, 5, Sizeof.cl_float, Pointer.to(new float[]{G}));
-            clEnqueueNDRangeKernel(queue, kernelFloat, 1, null, new long[]{n}, null, 0, null, null);
-            clEnqueueReadBuffer(queue, memF, CL_TRUE, 0, Sizeof.cl_float * forces.length, Pointer.to(forces), 0, null, null);
-        } finally {
-            clReleaseMemObject(memP);
-            clReleaseMemObject(memV);
-            clReleaseMemObject(memF);
+            cl_mem memP = null;
+            cl_mem memV = null;
+            cl_mem memF = null;
+            try {
+                memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * p.length, Pointer.to(p), null);
+                memV = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_float * n * 3, null, null);
+                memF = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_float * forces.length, null, null);
+                
+                clSetKernelArg(kernelFloat, 0, Sizeof.cl_mem, Pointer.to(memP));
+                clSetKernelArg(kernelFloat, 1, Sizeof.cl_mem, Pointer.to(memV));
+                clSetKernelArg(kernelFloat, 2, Sizeof.cl_mem, Pointer.to(memF));
+                clSetKernelArg(kernelFloat, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(kernelFloat, 4, Sizeof.cl_float, Pointer.to(new float[]{0.0f}));
+                clSetKernelArg(kernelFloat, 5, Sizeof.cl_float, Pointer.to(new float[]{G}));
+                clEnqueueNDRangeKernel(queue, kernelFloat, 1, null, new long[]{n}, null, 0, null, null);
+                clEnqueueReadBuffer(queue, memF, CL_TRUE, 0, Sizeof.cl_float * forces.length, Pointer.to(forces), 0, null, null);
+            } finally {
+                if (memP != null) clReleaseMemObject(memP);
+                if (memV != null) clReleaseMemObject(memV);
+                if (memF != null) clReleaseMemObject(memF);
+            }
+        } catch (Exception e) {
+            logger.error("Error computing forces", e);
         }
     }
 
@@ -659,11 +667,15 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         cl_context context = OpenCLManager.getContext();
         cl_command_queue queue = OpenCLManager.getCommandQueue();
 
-        cl_mem memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * p.length, Pointer.to(p), null);
-        cl_mem memV = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * v.length, Pointer.to(v), null);
-        cl_mem memF = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * n * 3, null, null);
+        cl_mem memP = null;
+        cl_mem memV = null;
+        cl_mem memF = null;
         
         try {
+            memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * p.length, Pointer.to(p), null);
+            memV = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * v.length, Pointer.to(v), null);
+            memF = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_double * n * 3, null, null);
+
             clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memP));
             clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memV));
             clSetKernelArg(kernel, 2, Sizeof.cl_mem, Pointer.to(memF));
@@ -687,9 +699,9 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
                 velocities[i*3+2] = v[i*3+2];
             }
         } finally {
-            clReleaseMemObject(memP);
-            clReleaseMemObject(memV);
-            clReleaseMemObject(memF);
+            if (memP != null) clReleaseMemObject(memP);
+            if (memV != null) clReleaseMemObject(memV);
+            if (memF != null) clReleaseMemObject(memF);
         }
     }
 

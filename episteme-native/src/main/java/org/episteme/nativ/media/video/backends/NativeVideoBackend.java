@@ -54,7 +54,7 @@ public class NativeVideoBackend implements VideoBackend, CPUBackend, NativeBacke
 
     @Override
     public boolean isAvailable() {
-        return true;
+        return !isExplicitlyDisabled();
     }
 
     @Override

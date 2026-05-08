@@ -56,8 +56,10 @@ public class NativeOpenCLSparseLinearAlgebraBackendTest {
             }
 
             RealFloat[][] dataA = {{RealFloat.create(1.0f), RealFloat.create(0.0f)}, {RealFloat.create(0.0f), RealFloat.create(2.0f)}};
-            Matrix<RealFloat> a = Matrix.of(dataA, RealFloat.RING);
-            Vector<RealFloat> x = Vector.of(new RealFloat[]{RealFloat.create(10.0f), RealFloat.create(20.0f)}, RealFloat.RING);
+            Matrix<RealFloat> a = org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix.fromDense(
+                java.util.List.of(java.util.List.of(dataA[0]), java.util.List.of(dataA[1])), RealFloat.RING);
+            Vector<RealFloat> x = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.of(
+                java.util.List.of(RealFloat.create(10.0f), RealFloat.create(20.0f)), RealFloat.RING);
 
             Vector<RealFloat> y = backend.multiply(a, x);
             
@@ -76,8 +78,10 @@ public class NativeOpenCLSparseLinearAlgebraBackendTest {
             }
 
             RealDouble[][] dataA = {{RealDouble.of(1.0), RealDouble.of(0.0)}, {RealDouble.of(0.0), RealDouble.of(2.0)}};
-            Matrix<RealDouble> a = Matrix.of(dataA, RealDouble.RING);
-            Vector<RealDouble> x = Vector.of(new RealDouble[]{RealDouble.of(10.0), RealDouble.of(20.0)}, RealDouble.RING);
+            Matrix<RealDouble> a = org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix.fromDense(
+                java.util.List.of(java.util.List.of(dataA[0]), java.util.List.of(dataA[1])), RealDouble.RING);
+            Vector<RealDouble> x = org.episteme.core.mathematics.linearalgebra.vectors.SparseVector.of(
+                java.util.List.of(RealDouble.of(10.0), RealDouble.of(20.0)), RealDouble.RING);
 
             Vector<RealDouble> y = backend.multiply(a, x);
             
