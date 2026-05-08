@@ -540,14 +540,14 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     }
 
     private float[] toFloatVec(Vector<E> v) {
-        int n = v.size();
+        int n = v.dimension();
         float[] data = new float[n];
         for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).floatValue();
         return data;
     }
 
     private float[] toComplexFloatVec(Vector<E> v) {
-        int n = v.size();
+        int n = v.dimension();
         float[] data = new float[n * 2];
         for (int i = 0; i < n; i++) {
             org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
