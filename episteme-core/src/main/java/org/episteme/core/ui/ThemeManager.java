@@ -27,29 +27,23 @@ import javafx.scene.Scene;
 import java.util.prefs.Preferences;
 
 /**
- * Global Theme Manager for Episteme Applications.
- * Ensures consistent look and feel across all modules (Core, Natural, Social,
- * Killer Apps).
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Manages the application-wide visual theme.
+ * Standardizes the use of CSS files and provides high-performance theme switching.
  */
 public class ThemeManager {
+    private static final ThemeManager INSTANCE = new ThemeManager();
+    private static final Preferences PREFS = Preferences.userNodeForPackage(ThemeManager.class);
+    private static final String PREF_THEME = "ui_theme";
 
-    private static ThemeManager instance;
-    private final Preferences prefs = Preferences.userNodeForPackage(ThemeManager.class);
-    private String currentTheme = "Dark";
+    private String currentTheme;
 
     private ThemeManager() {
-        currentTheme = prefs.get("visual_theme", "Dark");
+        // Default to Dark mode for professional aesthetics
+        currentTheme = PREFS.get(PREF_THEME, "Dark");
     }
 
-    public static synchronized ThemeManager getInstance() {
-        if (instance == null) {
-            instance = new ThemeManager();
-        }
-        return instance;
+    public static ThemeManager getInstance() {
+        return INSTANCE;
     }
 
     public String getCurrentTheme() {
@@ -58,22 +52,19 @@ public class ThemeManager {
 
     public void setTheme(String theme) {
         this.currentTheme = theme;
-        prefs.put("visual_theme", theme);
-    }
-
-    public boolean isDarkTheme() {
-        return "Dark".equalsIgnoreCase(currentTheme);
+        PREFS.put(PREF_THEME, theme);
     }
 
     /**
-     * Applies the current theme to the given Scene.
+     * Applies the current theme to the specified Scene.
      */
     public void applyTheme(Scene scene) {
-        if (scene == null)
-            return;
+        if (scene == null) return;
 
+        // Clear existing stylesheets to avoid stacking and performance degradation
         scene.getStylesheets().clear();
-        // Always load main.css as base if available
+
+        // Base styling (Always loaded)
         java.net.URL mainCss = ThemeManager.class.getResource("/org/episteme/core/ui/main.css");
         if (mainCss != null) {
             scene.getStylesheets().add(mainCss.toExternalForm());
@@ -122,4 +113,3 @@ public class ThemeManager {
         // Implementation can be added if locale affects theme (e.g. text direction)
     }
 }
-
