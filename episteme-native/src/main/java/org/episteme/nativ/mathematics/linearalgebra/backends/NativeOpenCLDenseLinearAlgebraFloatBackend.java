@@ -297,8 +297,8 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         int n = a.rows() * a.cols();
         float[] fa = toComplexFloatArray(a);
         org.episteme.core.mathematics.numbers.complex.Complex sc = (org.episteme.core.mathematics.numbers.complex.Complex) scalar;
-        float sr = ((Number) sc.real()).floatValue();
-        float si = ((Number) sc.imaginary()).floatValue();
+        float sr = sc.getReal().floatValue();
+        float si = sc.getImaginary().floatValue();
         float[] fc = new float[n * 2];
         try (ResourceTracker tracker = new ResourceTracker()) {
             cl_context context = OpenCLManager.getContext();
@@ -356,8 +356,8 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) m.get(i, j);
-                data[(i * cols + j) * 2] = ((Number) c.real()).floatValue();
-                data[(i * cols + j) * 2 + 1] = ((Number) c.imaginary()).floatValue();
+                data[(i * cols + j) * 2] = c.getReal().floatValue();
+                data[(i * cols + j) * 2 + 1] = c.getImaginary().floatValue();
             }
         }
         return data;
