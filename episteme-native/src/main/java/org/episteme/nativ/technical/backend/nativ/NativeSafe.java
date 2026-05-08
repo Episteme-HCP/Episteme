@@ -28,6 +28,7 @@ public class NativeSafe {
      */
     public static Object invoke(MethodHandle handle, Object... args) {
         if (handle == null) {
+            logger.error("Attempted to invoke a null MethodHandle. This usually means a native symbol lookup failed.");
             throw new IllegalStateException("Attempted to invoke a null native handle. Library might not be loaded.");
         }
         

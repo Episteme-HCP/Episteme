@@ -158,6 +158,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
 
     @Override
     public Matrix<E> inverse(Matrix<E> a) {
+        if (isComplex(a)) return inverseComplex(a);
         if (!CUDAManager.isUseCusolver()) throw new UnsupportedOperationException("cuSolver not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -194,6 +195,55 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) h_Res[r * n + c] = resData[c * n + r];
             return toMatrix(h_Res, n, n, (Ring<E>) a.getScalarRing());
         } catch (Throwable t) { throw new RuntimeException("CUDA inverse failed", t); }
+    }
+
+    private Matrix<E> inverseComplex(Matrix<E> a) {
+        if (!CUDAManager.isUseCusolver()) throw new UnsupportedOperationException("cuSolver not available");
+        int n = a.rows();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment handle = CUDAManager.getCusolverHandle();
+            MemorySegment segA = malloc((long) n * n * 16, tracker);
+            MemorySegment segB = malloc((long) n * n * 16, tracker);
+            MemorySegment segIpiv = malloc((long) n * 4, tracker);
+            MemorySegment segInfo = malloc((long) 4, tracker);
+            
+            double[] h_A = toComplexDoubleArray(a);
+            double[] h_At = new double[n * n * 2];
+            for (int r = 0; r < n; r++) {
+                for (int c = 0; c < n; c++) {
+                    h_At[(c * n + r) * 2] = h_A[(r * n + c) * 2];
+                    h_At[(c * n + r) * 2 + 1] = h_A[(r * n + c) * 2 + 1];
+                }
+            }
+            
+            double[] identity = new double[n * n * 2];
+            for (int i = 0; i < n; i++) identity[(i * n + i) * 2] = 1.0;
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, h_At), (long) n * n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segB, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, identity), (long) n * n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment p_Lwork = arena.allocate(ValueLayout.JAVA_INT);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_ZGETRF_BUFFER_SIZE, handle, n, n, segA, n, p_Lwork));
+            
+            MemorySegment segWork = malloc((long) p_Lwork.get(ValueLayout.JAVA_INT, 0) * 16, tracker);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_ZGETRF, handle, n, n, segA, n, segWork, segIpiv, segInfo));
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_ZGETRS, handle, 0, n, n, segA, n, segIpiv, segB, n, segInfo));
+            
+            double[] resData = new double[n * n * 2];
+            MemorySegment hostB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostB, segB, (long) n * n * 16, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostB, ValueLayout.JAVA_DOUBLE, 0, resData, 0, n * n * 2);
+            
+            double[] h_Res = new double[n * n * 2];
+            for (int r = 0; r < n; r++) {
+                for (int c = 0; c < n; c++) {
+                    h_Res[(r * n + c) * 2] = resData[(c * n + r) * 2];
+                    h_Res[(r * n + c) * 2 + 1] = resData[(c * n + r) * 2 + 1];
+                }
+            }
+            return toMatrixComplex(h_Res, n, n, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex inverse failed", t); }
     }
 
     private MemorySegment malloc(long size, ResourceTracker tracker) {
