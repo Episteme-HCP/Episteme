@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, NativeBackend.class, CPUBackend.class, AudioAlgorithmProvider.class})
 public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUBackend { 
 
