@@ -60,6 +60,125 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     @Override public String getId() { return "cuda-dense-double"; }
     @Override public String getName() { return "Native CUDA Dense Linear Algebra Double Backend"; }
     @Override public int getPriority() { return 105; }
+    
+    @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        return combine(a, b, 1.0, 1.0);
+    }
+
+    @Override
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        return combine(a, b, 1.0, -1.0);
+    }
+
+    @Override
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        double s = ((Number)scalar).doubleValue();
+        return combine(a, a, s, 0.0);
+    }
+
+    private Matrix<E> combine(Matrix<E> a, Matrix<E> b, double alpha, double beta) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int m = a.rows();
+        int n = a.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 8, tracker);
+            MemorySegment d_B = malloc((long) m * n * 8, tracker);
+            MemorySegment d_C = malloc((long) m * n * 8, tracker);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b)), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DGEAM, handle, 0, 0, n, m, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, alpha), d_A, n, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, beta), d_B, n, d_C, n));
+            
+            double[] result = new double[m * n];
+            MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC.address(), d_C.address(), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segC, ValueLayout.JAVA_DOUBLE, 0, result, 0, m * n);
+            return toMatrix(result, m, n, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        if (isComplex(a)) return multiplyComplex(a, b);
+        int m = a.rows();
+        int n = a.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 8, tracker);
+            MemorySegment d_X = malloc((long) n * 8, tracker);
+            MemorySegment d_Y = malloc((long) m * 8, tracker);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_X.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DGEMV, handle, 1, n, m, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_A, n, d_X, 1, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0), d_Y, 1));
+            
+            double[] result = new double[m];
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, m);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY.address(), d_Y.address(), (long) m * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, m);
+            
+            E[] values = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), m);
+            for (int i = 0; i < m; i++) values[i] = (E) RealDouble.of(result[i]);
+            return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(values, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    private Vector<E> multiplyComplex(Matrix<E> a, Vector<E> b) {
+        int m = a.rows();
+        int n = a.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 16, tracker);
+            MemorySegment d_X = malloc((long) n * 16, tracker);
+            MemorySegment d_Y = malloc((long) m * 16, tracker);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a)), (long) m * n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_X.address(), arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleVec(b)), (long) n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_ZGEMV, handle, 1, n, m, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_A, n, d_X, 1, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0), d_Y, 1));
+            
+            double[] result = new double[m * 2];
+            MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY.address(), d_Y.address(), (long) m * 16, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segY, ValueLayout.JAVA_DOUBLE, 0, result, 0, m * 2);
+            
+            E[] values = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), m);
+            for (int i = 0; i < m; i++) values[i] = (E) Complex.of(result[i * 2], result[i * 2 + 1]);
+            return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(values, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    private double[] toDoubleVec(Vector<E> v) {
+        int n = v.size();
+        double[] data = new double[n];
+        for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).doubleValue();
+        return data;
+    }
+
+    private double[] toComplexDoubleVec(Vector<E> v) {
+        int n = v.size();
+        double[] data = new double[n * 2];
+        for (int i = 0; i < n; i++) {
+            Complex c = (Complex) v.get(i);
+            data[i * 2] = ((Number) c.real()).doubleValue();
+            data[i * 2 + 1] = ((Number) c.imaginary()).doubleValue();
+        }
+        return data;
+    }
+
     @Override public void shutdown() {}
 
     @Override

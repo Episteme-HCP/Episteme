@@ -264,6 +264,60 @@ public final class OpenCLKernels {
         "        y[i].x = yv.x + alpha.x * xv.x - alpha.y * xv.y;\n" +
         "        y[i].y = yv.y + alpha.x * xv.y + alpha.y * xv.x;\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void vec_dot_float(__global const float *a, __global const float *b, __global float *result, const int n) {\n" +
+        "    int row = get_global_id(0);\n" +
+        "    if (row == 0) {\n" +
+        "        float sum = 0;\n" +
+        "        for (int i = 0; i < n; i++) sum += a[i] * b[i];\n" +
+        "        result[0] = sum;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void vec_norm_float(__global const float *a, __global float *result, const int n) {\n" +
+        "    int row = get_global_id(0);\n" +
+        "    if (row == 0) {\n" +
+        "        float sum = 0;\n" +
+        "        for (int i = 0; i < n; i++) sum += a[i] * a[i];\n" +
+        "        result[0] = sqrt(sum);\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void gaussElimPhase1Float(__global float *a, const int n, const int k) {\n" +
+        "    int i = get_global_id(0) + k + 1;\n" +
+        "    if (i < n) {\n" +
+        "        float factor = a[i*n + k] / a[k*n + k];\n" +
+        "        for (int j = k + 1; j < n; j++) a[i*n + j] -= factor * a[k*n + j];\n" +
+        "        a[i*n + k] = 0.0f;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void gaussJordanFloat(__global float *a, const int rows, const int cols, const int k) {\n" +
+        "    int i = get_global_id(0);\n" +
+        "    if (i < rows && i != k) {\n" +
+        "        float pivot = a[k * cols + k];\n" +
+        "        if (fabs(pivot) < 1e-7f) return;\n" +
+        "        float factor = a[i * cols + k] / pivot;\n" +
+        "        for (int j = k + 1; j < cols; j++) a[i * cols + j] -= factor * a[k * cols + j];\n" +
+        "        a[i * cols + k] = 0.0f;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void normalizeRowFloat(__global float *a, const int rows, const int cols, const int k) {\n" +
+        "    int j = get_global_id(0) + k + 1;\n" +
+        "    float pivot = a[k * cols + k];\n" +
+        "    if (j < cols) a[k * cols + j] /= pivot;\n" +
+        "    if (j == k + 1) a[k * cols + k] = 1.0f;\n" +
+        "}\n" +
+        "__kernel void normalizeRowInvFloat(__global float *a, __global float *inv, const int n, const int k) {\n" +
+        "    int j = get_global_id(0);\n" +
+        "    if (j < n) {\n" +
+        "        float pivot = a[k * n + k];\n" +
+        "        inv[k * n + j] /= pivot;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void gaussJordanInvFloat(__global float *a, __global float *inv, const int n, const int k) {\n" +
+        "    int i = get_global_id(0);\n" +
+        "    if (i < n && i != k) {\n" +
+        "        float factor = a[i * n + k];\n" +
+        "        for (int j = 0; j < n; j++) inv[i * n + j] -= factor * inv[k * n + j];\n" +
+        "    }\n" +
         "}\n";
     
     // TODO: Add more float kernels as needed (Sparse, etc.)

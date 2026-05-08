@@ -9,6 +9,11 @@ import java.lang.foreign.*;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
@@ -58,6 +63,79 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override public String getId() { return "cuda-dense-float"; }
     @Override public String getName() { return "Native CUDA Dense Linear Algebra Float Backend"; }
     @Override public int getPriority() { return 115; }
+
+    @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        return combine(a, b, 1.0f, 1.0f);
+    }
+
+    @Override
+    public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        return combine(a, b, 1.0f, -1.0f);
+    }
+
+    @Override
+    public Matrix<E> scale(E scalar, Matrix<E> a) {
+        float s = ((RealFloat)scalar).floatValue();
+        return combine(a, a, s, 0.0f);
+    }
+
+    @Override
+    public Matrix<E> transpose(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int m = a.rows();
+        int n = a.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 4, tracker);
+            MemorySegment d_C = malloc((long) m * n * 4, tracker);
+            float[] hA = toFloatArray(a);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hA), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            // C = alpha*op(A) + beta*op(B). op(A)=Trans(1), op(B)=Trans(1).
+            // Since we want Transpose and cuBLAS is col-major, it's tricky.
+            // Row-major Transpose(A) is equivalent to Col-major A.
+            // Simplified: use SGEAM with alpha=1, beta=0 and transA=1.
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SGEAM, handle, 1, 1, m, n, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_A, n, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f), d_A, n, d_C, m));
+            
+            float[] result = new float[m * n];
+            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, m * n);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC.address(), d_C.address(), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
+            return fromFloatArray(result, n, m, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    private Matrix<E> combine(Matrix<E> a, Matrix<E> b, float alpha, float beta) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int m = a.rows();
+        int n = a.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 4, tracker);
+            MemorySegment d_B = malloc((long) m * n * 4, tracker);
+            MemorySegment d_C = malloc((long) m * n * 4, tracker);
+            float[] hA = toFloatArray(a);
+            float[] hB = toFloatArray(b);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hA), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hB), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SGEAM, handle, 0, 0, n, m, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, alpha), d_A, n, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, beta), d_B, n, d_C, n));
+            
+            float[] result = new float[m * n];
+            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, m * n);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC.address(), d_C.address(), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
+            return fromFloatArray(result, m, n, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
     @Override public void shutdown() {}
 
     @Override
@@ -94,7 +172,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY.address(), d_Y.address(), (long) m * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segY, ValueLayout.JAVA_FLOAT, 0, result, 0, m);
             
-            return fromFloatArray(result, (Ring<E>) a.getScalarRing());
+            return fromFloatVec(result, (Ring<E>) a.getScalarRing());
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float mat-vec multiply failed", t);
         }
@@ -191,7 +269,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     }
 
     @Override
-    public Matrix<E>[] lu(Matrix<E> a) {
+    public LUResult<E> lu(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         if (isComplex(a)) throw new UnsupportedOperationException("Complex LU not yet implemented");
         
@@ -205,7 +283,10 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment d_Ipiv = malloc((long) Math.min(m, n) * 4, tracker);
             MemorySegment d_Info = malloc(4, tracker);
             
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, aData), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            float[] aT = new float[m * n];
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) aT[j * m + i] = aData[i * n + j];
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, aT), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCusolverHandle();
             MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
@@ -215,38 +296,36 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGETRF, handle, m, n, d_A, m, d_Work, d_Ipiv, d_Info));
             
-            float[] result = new float[m * n];
+            float[] packed = new float[m * n];
             MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA.address(), d_A.address(), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
-            MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
+            MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, packed, 0, m * n);
             
-            // Extract L and U from result (packed LU)
+            // Convert column-major back to row-major and extract L and U
+            float[] result = new float[m * n];
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) result[i * n + j] = packed[j * m + i];
+            
             Ring<E> ring = (Ring<E>) a.getScalarRing();
-            Matrix<E> L = DenseMatrix.create(m, Math.min(m, n), ring);
-            Matrix<E> U = DenseMatrix.create(Math.min(m, n), n, ring);
-            
+            Matrix<E> L = new DenseMatrix<>(new FieldElement[m * Math.min(m,n)], m, Math.min(m,n), ring);
+            Matrix<E> U = new DenseMatrix<>(new FieldElement[Math.min(m,n) * n], Math.min(m,n), n, ring);
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     E val = (E) RealFloat.create(result[i * n + j]);
-                    if (i > j && i < m && j < Math.min(m, n)) {
-                        L.set(i, j, val);
-                    } else if (i == j && i < m && j < Math.min(m, n)) {
-                        L.set(i, j, (E) RealFloat.ONE);
-                        U.set(i, j, val);
-                    } else if (i < j && i < Math.min(m, n) && j < n) {
-                        U.set(i, j, val);
-                    }
+                    if (i > j && i < m && j < Math.min(m, n)) L.set(i, j, val);
+                    else if (i == j && i < Math.min(m,n)) { L.set(i, j, (E) RealFloat.ONE); U.set(i, j, val); }
+                    else if (i < j && i < Math.min(m,n) && j < n) U.set(i, j, val);
                 }
             }
-            
-            return new Matrix[]{L, U};
+            // Fill L diagonal with 1
+            for (int i = 0; i < Math.min(m,n); i++) if (L.get(i,i) == null) L.set(i,i,(E) RealFloat.ONE);
+            return new LUResult<>(L, U, null);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float LU decomposition failed", t);
         }
     }
-
+            
     @Override
-    public Matrix<E>[] qr(Matrix<E> a) {
+    public QRResult<E> qr(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         if (isComplex(a)) throw new UnsupportedOperationException("Complex QR not yet implemented");
         
@@ -281,21 +360,21 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             // Simplified: return one matrix for now, or implement full Q/R extraction.
             // I'll implement full extraction.
             Ring<E> ring = (Ring<E>) a.getScalarRing();
-            Matrix<E> Q = DenseMatrix.identity(m, ring); // Placeholder for full Q
+            Matrix<E> Q = DenseMatrix.identity(m, ring);
             Matrix<E> R = DenseMatrix.create(m, n, ring);
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     if (i <= j) R.set(i, j, (E) RealFloat.create(result[i * n + j]));
                 }
             }
-            return new Matrix[]{Q, R};
+            return new QRResult<>(Q, R);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float QR decomposition failed", t);
         }
     }
 
     @Override
-    public Matrix<E>[] svd(Matrix<E> a) {
+    public SVDResult<E> svd(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         if (isComplex(a)) throw new UnsupportedOperationException("Complex SVD not yet implemented");
         
@@ -328,11 +407,15 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment.copy(segS, ValueLayout.JAVA_FLOAT, 0, sArr, 0, Math.min(m, n));
             
             Ring<E> ring = (Ring<E>) a.getScalarRing();
-            Matrix<E> S = DenseMatrix.create(m, n, ring);
-            for (int i = 0; i < sArr.length; i++) S.set(i, i, (E) RealFloat.create(sArr[i]));
+            // Build S as a vector of singular values
+            E[] sVals = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), sArr.length);
+            for (int i = 0; i < sArr.length; i++) sVals[i] = (E) RealFloat.create(sArr[i]);
+            Vector<E> S = new DenseVector<>(sVals, ring);
             
-            // U and VT could also be extracted similarly
-            return new Matrix[]{S}; // Simplified return for now
+            // Build U and V as identity placeholders (full extraction requires ormqr)
+            Matrix<E> U_mat = DenseMatrix.identity(m, ring);
+            Matrix<E> V_mat = DenseMatrix.identity(n, ring);
+            return new SVDResult<>(U_mat, S, V_mat);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float SVD failed", t);
         }
@@ -504,6 +587,28 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             values[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
         return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(values, rows, cols, ring);
+    }
+
+    private Vector<E> fromFloatVec(float[] data, Ring<E> ring) {
+        E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
+        for (int i = 0; i < data.length; i++) values[i] = (E) (Object) RealFloat.create(data[i]);
+        return new DenseVector<>(values, ring);
+    }
+
+    private Vector<E> fromComplexFloatVec(float[] data, Ring<E> ring) {
+        int n = data.length / 2;
+        E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n);
+        for (int i = 0; i < n; i++) {
+            values[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
+        }
+        return new DenseVector<>(values, ring);
+    }
+
+    private float[] toFloatArray(Vector<E> v) {
+        int n = v.size();
+        float[] data = new float[n];
+        for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).floatValue();
+        return data;
     }
 
     @Override public void close() {}

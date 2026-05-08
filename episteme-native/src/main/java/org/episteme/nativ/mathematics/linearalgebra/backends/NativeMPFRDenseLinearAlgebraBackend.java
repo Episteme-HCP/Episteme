@@ -1741,7 +1741,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             E[] sigma = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), n);
             for (int i = 0; i < n; i++) {
                 E val = sValues.get(i);
-                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : Complex.of(((Complex)val).real().sqrt(), Real.ZERO));
+                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO));
             }
             Vector<E> s = Vector.of(java.util.Arrays.asList(sigma), a.getScalarRing());
             
@@ -1770,7 +1770,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             E[] sigma = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), m);
             for (int i = 0; i < m; i++) {
                 E val = sValues.get(i);
-                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : Complex.of(((Complex)val).real().sqrt(), Real.ZERO));
+                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO));
             }
             Vector<E> s = Vector.of(java.util.Arrays.asList(sigma), a.getScalarRing());
             

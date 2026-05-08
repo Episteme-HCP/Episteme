@@ -49,6 +49,12 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     private cl_kernel vecSubKernel;
     private cl_kernel vecScaleKernel;
     private cl_kernel transposeKernel;
+    private cl_kernel dotKernel;
+    private cl_kernel normKernel;
+    private cl_kernel gaussJordanKernel;
+    private cl_kernel normalizeRowKernel;
+    private cl_kernel normalizeRowInvKernel;
+    private cl_kernel gaussJordanInvKernel;
     
     private cl_kernel complexMatMulKernel;
     private cl_kernel complexVecAddKernel;
@@ -74,6 +80,12 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             vecSubKernel = tryCreateKernel(program, "vec_sub_float");
             vecScaleKernel = tryCreateKernel(program, "vec_scale_float");
             transposeKernel = tryCreateKernel(program, "transposeFloat");
+            dotKernel = tryCreateKernel(program, "vec_dot_float");
+            normKernel = tryCreateKernel(program, "vec_norm_float");
+            gaussJordanKernel = tryCreateKernel(program, "gaussJordanFloat");
+            normalizeRowKernel = tryCreateKernel(program, "normalizeRowFloat");
+            normalizeRowInvKernel = tryCreateKernel(program, "normalizeRowInvFloat");
+            gaussJordanInvKernel = tryCreateKernel(program, "gaussJordanInvFloat");
             
             complexMatMulKernel = tryCreateKernel(program, "complexMatrixMultiplyFloat");
             complexVecAddKernel = tryCreateKernel(program, "complex_vec_add_float");
@@ -317,8 +329,96 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     }
 
     // Fallbacks for more complex operations on Float precision
-    @Override public Vector<E> solve(Matrix<E> a, Vector<E> b) { return LinearAlgebraProvider.super.solve(a, b); }
-    @Override public Matrix<E> inverse(Matrix<E> a) { return LinearAlgebraProvider.super.inverse(a); }
+    @Override
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.solve(a, b);
+        
+        int n = a.rows();
+        int m = n + 1; // Augmented matrix
+        float[] fa = toFloatArray(a);
+        float[] fb = toFloatVec(b);
+        float[] augmented = new float[n * m];
+        for (int i = 0; i < n; i++) {
+            System.arraycopy(fa, i * n, augmented, i * m, n);
+            augmented[i * m + n] = fb[i];
+        }
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * n * m, Pointer.to(augmented), null), CL::clReleaseMemObject);
+            
+            for (int k = 0; k < n; k++) {
+                clSetKernelArg(normalizeRowKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(normalizeRowKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(normalizeRowKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                clSetKernelArg(normalizeRowKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(queue, normalizeRowKernel, 1, null, new long[]{m - k - 1}, null, 0, null, null);
+                
+                clSetKernelArg(gaussJordanKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussJordanKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                clSetKernelArg(gaussJordanKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(queue, gaussJordanKernel, 1, null, new long[]{n}, null, 0, null, null);
+            }
+            
+            float[] result = new float[n * m];
+            clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_float * n * m, Pointer.to(result), 0, null, null);
+            float[] sol = new float[n];
+            for (int i = 0; i < n; i++) sol[i] = result[i * m + n];
+            return fromFloatVec(sol, (Ring<E>) a.getScalarRing());
+        }
+    }
+
+    @Override
+    public Matrix<E> inverse(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.inverse(a);
+        
+        int n = a.rows();
+        float[] fa = toFloatArray(a);
+        float[] identity = new float[n * n];
+        for (int i = 0; i < n; i++) identity[i * n + i] = 1.0f;
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * n * n, Pointer.to(fa), null), CL::clReleaseMemObject);
+            cl_mem memInv = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * n * n, Pointer.to(identity), null), CL::clReleaseMemObject);
+            
+            for (int k = 0; k < n; k++) {
+                clSetKernelArg(normalizeRowInvKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(normalizeRowInvKernel, 1, Sizeof.cl_mem, Pointer.to(memInv));
+                clSetKernelArg(normalizeRowInvKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(normalizeRowInvKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(queue, normalizeRowInvKernel, 1, null, new long[]{n}, null, 0, null, null);
+                
+                clSetKernelArg(normalizeRowKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(normalizeRowKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(normalizeRowKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(normalizeRowKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(queue, normalizeRowKernel, 1, null, new long[]{n - k - 1}, null, 0, null, null);
+                
+                clSetKernelArg(gaussJordanInvKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussJordanInvKernel, 1, Sizeof.cl_mem, Pointer.to(memInv));
+                clSetKernelArg(gaussJordanInvKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanInvKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(queue, gaussJordanInvKernel, 1, null, new long[]{n}, null, 0, null, null);
+                
+                clSetKernelArg(gaussJordanKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(gaussJordanKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                clSetKernelArg(gaussJordanKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                clEnqueueNDRangeKernel(queue, gaussJordanKernel, 1, null, new long[]{n}, null, 0, null, null);
+            }
+            
+            float[] res = new float[n * n];
+            clEnqueueReadBuffer(queue, memInv, CL_TRUE, 0, (long)Sizeof.cl_float * n * n, Pointer.to(res), 0, null, null);
+            return fromFloatArray(res, n, n, a);
+        }
+    }
+
     @Override public E determinant(Matrix<E> a) { return LinearAlgebraProvider.super.determinant(a); }
     @Override public E trace(Matrix<E> a) { return LinearAlgebraProvider.super.trace(a); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) { return LinearAlgebraProvider.super.lu(a); }
@@ -330,7 +430,64 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     @Override public Vector<E> add(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.add(a, b); }
     @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.subtract(a, b); }
     @Override public Vector<E> multiply(Vector<E> v, E s) { return LinearAlgebraProvider.super.multiply(v, s); }
-    @Override public Vector<E> multiply(Matrix<E> a, Vector<E> b) { return LinearAlgebraProvider.super.multiply(a, b); }
+    @Override
+    public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        if (isComplex(a)) return multiplyComplex(a, b);
+        
+        int m = a.rows();
+        int k = a.cols();
+        
+        float[] fa = toFloatArray(a);
+        float[] fb = toFloatVec(b);
+        float[] fc = new float[m];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * m * k, Pointer.to(fa), null), CL::clReleaseMemObject);
+            cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float * k, Pointer.to(fb), null), CL::clReleaseMemObject);
+            cl_mem memC = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_float * m, null, null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(matMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(matMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(matMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(matMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+            clSetKernelArg(matMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{1})); // n=1
+            clSetKernelArg(matMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+            
+            clEnqueueNDRangeKernel(queue, matMulKernel, 2, null, new long[]{1, m}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float * m, Pointer.to(fc), 0, null, null);
+            
+            return fromFloatVec(fc, (Ring<E>) a.getScalarRing());
+        }
+    }
+
+    private Vector<E> multiplyComplex(Matrix<E> a, Vector<E> b) {
+        int m = a.rows();
+        int k = a.cols();
+        float[] fa = toComplexFloatArray(a);
+        float[] fb = toComplexFloatVec(b);
+        float[] fc = new float[m * 2];
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float2 * m * k, Pointer.to(fa), null), CL::clReleaseMemObject);
+            cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_float2 * k, Pointer.to(fb), null), CL::clReleaseMemObject);
+            cl_mem memC = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_float2 * m, null, null), CL::clReleaseMemObject);
+            clSetKernelArg(complexMatMulKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(complexMatMulKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(complexMatMulKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(complexMatMulKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+            clSetKernelArg(complexMatMulKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{1}));
+            clSetKernelArg(complexMatMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
+            clEnqueueNDRangeKernel(queue, complexMatMulKernel, 2, null, new long[]{1, m}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float2 * m, Pointer.to(fc), 0, null, null);
+            return fromComplexFloatVec(fc, (Ring<E>) a.getScalarRing());
+        }
+    }
+
     @Override public E dot(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.dot(a, b); }
     @Override public E norm(Vector<E> a) { return LinearAlgebraProvider.super.norm(a); }
 
@@ -382,6 +539,38 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         return new DenseMatrix<>(elements, rows, cols, ring);
     }
 
+    private float[] toFloatVec(Vector<E> v) {
+        int n = v.size();
+        float[] data = new float[n];
+        for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).floatValue();
+        return data;
+    }
+
+    private float[] toComplexFloatVec(Vector<E> v) {
+        int n = v.size();
+        float[] data = new float[n * 2];
+        for (int i = 0; i < n; i++) {
+            org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
+            data[i * 2] = c.getReal().floatValue();
+            data[i * 2 + 1] = c.getImaginary().floatValue();
+        }
+        return data;
+    }
+
+    private Vector<E> fromFloatVec(float[] data, Ring<E> ring) {
+        E[] elements = (E[]) new FieldElement[data.length];
+        for (int i = 0; i < data.length; i++) elements[i] = (E) (Object) RealFloat.create(data[i]);
+        return new DenseVector<>(elements, ring);
+    }
+
+    private Vector<E> fromComplexFloatVec(float[] data, Ring<E> ring) {
+        E[] elements = (E[]) new FieldElement[data.length / 2];
+        for (int i = 0; i < elements.length; i++) {
+            elements[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
+        }
+        return new DenseVector<>(elements, ring);
+    }
+
     private static cl_kernel tryCreateKernel(cl_program program, String name) {
         try {
             return clCreateKernel(program, name, null);
@@ -402,6 +591,12 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             if (vecSubKernel != null) clReleaseKernel(vecSubKernel);
             if (vecScaleKernel != null) clReleaseKernel(vecScaleKernel);
             if (transposeKernel != null) clReleaseKernel(transposeKernel);
+            if (dotKernel != null) clReleaseKernel(dotKernel);
+            if (normKernel != null) clReleaseKernel(normKernel);
+            if (gaussJordanKernel != null) clReleaseKernel(gaussJordanKernel);
+            if (normalizeRowKernel != null) clReleaseKernel(normalizeRowKernel);
+            if (normalizeRowInvKernel != null) clReleaseKernel(normalizeRowInvKernel);
+            if (gaussJordanInvKernel != null) clReleaseKernel(gaussJordanInvKernel);
             if (complexMatMulKernel != null) clReleaseKernel(complexMatMulKernel);
             if (complexVecAddKernel != null) clReleaseKernel(complexVecAddKernel);
             if (complexVecSubKernel != null) clReleaseKernel(complexVecSubKernel);
