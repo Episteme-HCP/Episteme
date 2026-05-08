@@ -157,8 +157,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) m.get(i, j);
-                data[(i * cols + j) * 2] = ((Number) c.real()).floatValue();
-                data[(i * cols + j) * 2 + 1] = ((Number) c.imaginary()).floatValue();
+                data[(i * cols + j) * 2] = c.getReal().floatValue();
+                data[(i * cols + j) * 2 + 1] = c.getImaginary().floatValue();
             }
         }
         return data;

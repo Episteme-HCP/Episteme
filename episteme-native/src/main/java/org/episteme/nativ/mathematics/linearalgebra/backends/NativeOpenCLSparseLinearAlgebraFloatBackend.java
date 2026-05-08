@@ -449,7 +449,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         clSetKernelArg(k, 0, Sizeof.cl_mem, Pointer.to(a));
         if (isComplex) {
             Complex c = (Complex) s;
-            clSetKernelArg(k, 1, Sizeof.cl_float2, Pointer.to(new float[]{c.real().floatValue(), c.imaginary().floatValue()}));
+            clSetKernelArg(k, 1, Sizeof.cl_float2, Pointer.to(new float[]{c.getReal().floatValue(), c.getImaginary().floatValue()}));
         } else {
             clSetKernelArg(k, 1, Sizeof.cl_float, Pointer.to(new float[]{((Number)s).floatValue()}));
         }
@@ -515,8 +515,8 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         Object[] vals = m.getValues();
         for (int i = 0; i < nnz; i++) {
             Complex c = (Complex) vals[i];
-            data[i * 2] = c.real().floatValue();
-            data[i * 2 + 1] = c.imaginary().floatValue();
+            data[i * 2] = c.getReal().floatValue();
+            data[i * 2 + 1] = c.getImaginary().floatValue();
         }
         return data;
     }
@@ -526,8 +526,8 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         float[] data = new float[n * 2];
         for (int i = 0; i < n; i++) {
             Complex c = (Complex) v.get(i);
-            data[i * 2] = c.real().floatValue();
-            data[i * 2 + 1] = c.imaginary().floatValue();
+            data[i * 2] = c.getReal().floatValue();
+            data[i * 2 + 1] = c.getImaginary().floatValue();
         }
         return data;
     }

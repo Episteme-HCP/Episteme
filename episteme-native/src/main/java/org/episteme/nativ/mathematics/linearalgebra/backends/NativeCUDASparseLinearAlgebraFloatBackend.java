@@ -214,8 +214,8 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         float[] data = new float[vals.length * 2];
         for (int i = 0; i < vals.length; i++) {
             org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) vals[i];
-            data[i * 2] = ((Number) c.real()).floatValue();
-            data[i * 2 + 1] = ((Number) c.imaginary()).floatValue();
+            data[i * 2] = c.getReal().floatValue();
+            data[i * 2 + 1] = c.getImaginary().floatValue();
         }
         return data;
     }
@@ -225,8 +225,8 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         float[] data = new float[dim * 2];
         for (int i = 0; i < dim; i++) {
             org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
-            data[i * 2] = ((Number) c.real()).floatValue();
-            data[i * 2 + 1] = ((Number) c.imaginary()).floatValue();
+            data[i * 2] = c.getReal().floatValue();
+            data[i * 2 + 1] = c.getImaginary().floatValue();
         }
         return data;
     }
