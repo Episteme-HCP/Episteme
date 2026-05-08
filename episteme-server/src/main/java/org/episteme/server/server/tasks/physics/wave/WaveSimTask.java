@@ -20,6 +20,7 @@ import com.google.auto.service.AutoService;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@SuppressWarnings("rawtypes")
 @AutoService(DistributedTask.class)
 public class WaveSimTask implements DistributedTask<WaveSimTask, WaveSimTask> {
 

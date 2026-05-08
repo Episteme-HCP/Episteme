@@ -23,6 +23,7 @@ import org.episteme.core.technical.algorithm.AlgorithmManager;
  * Linear Algebra Provider that forces the use of the Standard (Naive/Recursive) algorithm.
  * Intended for benchmarking and comparison purposes.
  */
+@SuppressWarnings("rawtypes")
 @AutoService({LinearAlgebraProvider.class})
 public class StandardLinearAlgebraProvider<E> extends CPUDenseLinearAlgebraProvider<E> {
 

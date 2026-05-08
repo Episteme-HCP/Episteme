@@ -19,6 +19,7 @@ import java.util.List;
 /**
  * Geopolitical Engine Distributed Task.
  */
+@SuppressWarnings("rawtypes")
 @AutoService(DistributedTask.class)
 public class GeopoliticalEngineTask implements DistributedTask<GeopoliticalEngineTask, GeopoliticalEngineTask> {
 
