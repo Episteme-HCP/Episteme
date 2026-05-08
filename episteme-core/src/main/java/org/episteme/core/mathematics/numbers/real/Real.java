@@ -151,14 +151,13 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
             return value > 0 ? positiveInfinityE() : negativeInfinityE();
         }
 
-        switch (MathContext.getCurrent().getRealPrecision()) {
-            case FAST:
-                return RealFloat.create((float) value);
-            case EXACT:
-                return AlgorithmManager.getProvider(RealProvider.class).create(BigDecimal.valueOf(value));
-            case NORMAL:
-            default:
-                return RealDouble.create(value);
+        MathContext.RealPrecision precision = MathContext.getCurrent().getRealPrecision();
+        if (precision == MathContext.RealPrecision.FAST) {
+            return RealFloat.create((float) value);
+        } else if (precision == MathContext.RealPrecision.EXACT) {
+            return AlgorithmManager.getProvider(RealProvider.class).create(BigDecimal.valueOf(value));
+        } else {
+            return RealDouble.create(value);
         }
     }
 
@@ -182,14 +181,13 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
             return value > 0 ? POSITIVE_INFINITY : NEGATIVE_INFINITY;
         }
 
-        switch (MathContext.getCurrent().getRealPrecision()) {
-            case FAST:
-                return RealFloat.create(value);
-            case EXACT:
-                return AlgorithmManager.getProvider(RealProvider.class).create(BigDecimal.valueOf(value));
-            case NORMAL:
-            default:
-                return RealDouble.create(value);
+        MathContext.RealPrecision precision = MathContext.getCurrent().getRealPrecision();
+        if (precision == MathContext.RealPrecision.FAST) {
+            return RealFloat.create(value);
+        } else if (precision == MathContext.RealPrecision.EXACT) {
+            return AlgorithmManager.getProvider(RealProvider.class).create(BigDecimal.valueOf(value));
+        } else {
+            return RealDouble.create(value);
         }
     }
 
@@ -211,7 +209,8 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
                 return ONE;
         }
 
-        switch (MathContext.getCurrent().getRealPrecision()) {
+        MathContext.RealPrecision precision = MathContext.getCurrent().getRealPrecision();
+        switch (precision) {
             case FAST:
                 return RealFloat.create(value.floatValue());
             case EXACT:
@@ -235,14 +234,13 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         if (v.equalsIgnoreCase("Infinity") || v.equalsIgnoreCase("+Infinity")) return Real.POSITIVE_INFINITY;
         if (v.equalsIgnoreCase("-Infinity")) return Real.NEGATIVE_INFINITY;
 
-        switch (MathContext.getCurrent().getRealPrecision()) {
-            case FAST:
-                return RealFloat.create(Float.parseFloat(v));
-            case EXACT:
-                return AlgorithmManager.getProvider(RealProvider.class).of(v);
-            case NORMAL:
-            default:
-                return RealDouble.create(Double.parseDouble(v));
+        MathContext.RealPrecision precision = MathContext.getCurrent().getRealPrecision();
+        if (precision == MathContext.RealPrecision.FAST) {
+            return RealFloat.create(Float.parseFloat(v));
+        } else if (precision == MathContext.RealPrecision.EXACT) {
+            return AlgorithmManager.getProvider(RealProvider.class).of(v);
+        } else {
+            return RealDouble.create(Double.parseDouble(v));
         }
     }
 
