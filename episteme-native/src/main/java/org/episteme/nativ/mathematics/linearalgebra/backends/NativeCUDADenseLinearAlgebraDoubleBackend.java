@@ -162,14 +162,14 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     }
 
     private double[] toDoubleVec(Vector<E> v) {
-        int n = v.size();
+        int n = v.dimension();
         double[] data = new double[n];
         for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).doubleValue();
         return data;
     }
 
     private double[] toComplexDoubleVec(Vector<E> v) {
-        int n = v.size();
+        int n = v.dimension();
         double[] data = new double[n * 2];
         for (int i = 0; i < n; i++) {
             Complex c = (Complex) v.get(i);
