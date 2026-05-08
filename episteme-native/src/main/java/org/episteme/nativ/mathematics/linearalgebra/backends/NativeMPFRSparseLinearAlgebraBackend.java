@@ -647,17 +647,17 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
 
         for (int i = 0; i < sa.rows(); i++) {
-            NativeSafe.invoke(MPFR_SET_D, sumR, 0.0, 0);
-            if (isComplex) NativeSafe.invoke(MPFR_SET_D, sumI, 0.0, 0);
+            NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
+            if (isComplex) NativeSafe.invoke(MPFR_SET_UI, sumI, 0L, 0);
             
             for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
                 int col = colIdx[k];
-                MemorySegment valR = h_vals.asSlice(k * stride * layoutSize, MPFR_LAYOUT);
+                MemorySegment valR = h_vals.asSlice(k * stride * layoutSize, layoutSize);
                 
                 if (isComplex) {
-                    MemorySegment valI = h_vals.asSlice((k * 2 + 1) * layoutSize, MPFR_LAYOUT);
-                    MemorySegment bR = h_b.asSlice(col * 2 * layoutSize, MPFR_LAYOUT);
-                    MemorySegment bI = h_b.asSlice((col * 2 + 1) * layoutSize, MPFR_LAYOUT);
+                    MemorySegment valI = h_vals.asSlice((k * 2 + 1) * layoutSize, layoutSize);
+                    MemorySegment bR = h_b.asSlice(col * 2 * layoutSize, layoutSize);
+                    MemorySegment bI = h_b.asSlice((col * 2 + 1) * layoutSize, layoutSize);
                     
                     NativeSafe.invoke(MPFR_MUL, t1, valR, bR, 0);
                     NativeSafe.invoke(MPFR_MUL, t2, valI, bI, 0);
@@ -669,13 +669,13 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
                     NativeSafe.invoke(MPFR_ADD, sumI, sumI, t1, 0);
                 } else {
-                    MemorySegment bval = h_b.asSlice(col * layoutSize, MPFR_LAYOUT);
+                    MemorySegment bval = h_b.asSlice(col * layoutSize, layoutSize);
                     NativeSafe.invoke(MPFR_MUL, t1, valR, bval, 0);
                     NativeSafe.invoke(MPFR_ADD, sumR, sumR, t1, 0);
                 }
             }
-            NativeSafe.invoke(MPFR_SET, res.asSlice(i * stride * layoutSize, MPFR_LAYOUT), sumR, 0);
-            if (isComplex) NativeSafe.invoke(MPFR_SET, res.asSlice((i * 2 + 1) * layoutSize, MPFR_LAYOUT), sumI, 0);
+            NativeSafe.invoke(MPFR_SET, res.asSlice(i * stride * layoutSize, layoutSize), sumR, 0);
+            if (isComplex) NativeSafe.invoke(MPFR_SET, res.asSlice((i * 2 + 1) * layoutSize, layoutSize), sumI, 0);
         }
     }
 
@@ -761,7 +761,14 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
                     Object val = vals[k];
                     if (isComplex) {
-                        setMPFR_internal(valR, valI, val, arena);
+                        // Use a more direct way to set values if possible, but here we still need setMPFR_internal 
+                        // unless we pre-allocate the entire values array once.
+                        // However, we can avoid some overhead if the value is already a NativeRealBig or Complex
+                        if (val instanceof Complex c) {
+                             setMPFR_internal(valR, valI, c, arena);
+                        } else {
+                             setMPFR_internal(valR, valI, val, arena);
+                        }
                         
                         // (valR + i*valI)*(sR + i*sI) = (valR*sR - valI*sI) + i(valR*sI + valI*sR)
                         NativeSafe.invoke(MPFR_MUL, t1, valR, sR, 0);

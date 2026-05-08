@@ -51,63 +51,64 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
     private static final System.Logger logger = System.getLogger(AbstractNativeCPULinearAlgebraBackend.class.getName());
 
-    private static final MethodHandle DGEMM_HANDLE;
-    private static final MethodHandle DGEMV_HANDLE;
-    private static final MethodHandle DDOT_HANDLE;
-    private static final MethodHandle DNRM2_HANDLE;
-    private static final MethodHandle DSCAL_HANDLE;
+    private static MethodHandle DGEMM_HANDLE;
+    private static MethodHandle DGEMV_HANDLE;
+    private static MethodHandle DDOT_HANDLE;
+    private static MethodHandle DNRM2_HANDLE;
+    private static MethodHandle DSCAL_HANDLE;
     
     // LAPACK (via LAPACKE interface)
-    private static final MethodHandle DGESV_HANDLE;
-    private static final MethodHandle DGETRF_HANDLE;
-    private static final MethodHandle DGETRI_HANDLE;
-    private static final MethodHandle DSYEV_HANDLE;
-    private static final MethodHandle DPOTRF_HANDLE;
-    private static final MethodHandle DGEQRF_HANDLE;
-    private static final MethodHandle DORGQR_HANDLE;
-    private static final MethodHandle DGESVD_HANDLE;
-    private static final MethodHandle DGELS_HANDLE;
+    private static MethodHandle DGESV_HANDLE;
+    private static MethodHandle DGETRF_HANDLE;
+    private static MethodHandle DGETRI_HANDLE;
+    private static MethodHandle DSYEV_HANDLE;
+    private static MethodHandle DPOTRF_HANDLE;
+    private static MethodHandle DGEQRF_HANDLE;
+    private static MethodHandle DORGQR_HANDLE;
+    private static MethodHandle DGESVD_HANDLE;
+    private static MethodHandle DGELS_HANDLE;
 
     // Single Precision (S)
-    private static final MethodHandle SGEMM_HANDLE;
-    private static final MethodHandle SGEMV_HANDLE;
-    private static final MethodHandle SDOT_HANDLE;
-    private static final MethodHandle SNRM2_HANDLE;
-    private static final MethodHandle SSCAL_HANDLE;
-    private static final MethodHandle SGESV_HANDLE;
-    private static final MethodHandle SGETRF_HANDLE;
+    private static MethodHandle SGEMM_HANDLE;
+    private static MethodHandle SGEMV_HANDLE;
+    private static MethodHandle SDOT_HANDLE;
+    private static MethodHandle SNRM2_HANDLE;
+    private static MethodHandle SSCAL_HANDLE;
+    private static MethodHandle SGESV_HANDLE;
+    private static MethodHandle SGETRF_HANDLE;
 
     // Complex Double (Z)
-    private static final MethodHandle ZGEMM_HANDLE;
-    private static final MethodHandle ZGEMV_HANDLE;
-    private static final MethodHandle ZDOTC_HANDLE;
-    private static final MethodHandle ZNRM2_HANDLE;
-    private static final MethodHandle ZSCAL_HANDLE;
-    private static final MethodHandle ZGESV_HANDLE;
-    private static final MethodHandle ZGETRF_HANDLE;
-    private static final MethodHandle ZGETRI_HANDLE;
-    private static final MethodHandle ZHEEV_HANDLE;
-    private static final MethodHandle ZPOTRF_HANDLE;
-    private static final MethodHandle ZGEQRF_HANDLE;
-    private static final MethodHandle ZUNGQR_HANDLE;
-    private static final MethodHandle ZGESVD_HANDLE;
+    private static MethodHandle ZGEMM_HANDLE;
+    private static MethodHandle ZGEMV_HANDLE;
+    private static MethodHandle ZDOTC_HANDLE;
+    private static MethodHandle ZNRM2_HANDLE;
+    private static MethodHandle ZSCAL_HANDLE;
+    private static MethodHandle ZGESV_HANDLE;
+    private static MethodHandle ZGETRF_HANDLE;
+    private static MethodHandle ZGETRI_HANDLE;
+    private static MethodHandle ZHEEV_HANDLE;
+    private static MethodHandle ZPOTRF_HANDLE;
+    private static MethodHandle ZGEQRF_HANDLE;
+    private static MethodHandle ZUNGQR_HANDLE;
+    private static MethodHandle ZGESVD_HANDLE;
 
     // Complex Float (C)
-    private static final MethodHandle CGEMM_HANDLE;
-    private static final MethodHandle CGEMV_HANDLE;
-    private static final MethodHandle CDOTC_HANDLE;
-    private static final MethodHandle CNRM2_HANDLE;
-    private static final MethodHandle CSCAL_HANDLE;
-    private static final MethodHandle CGESV_HANDLE;
-    private static final MethodHandle CGETRF_HANDLE;
-    private static final MethodHandle CGETRI_HANDLE;
-    private static final MethodHandle CHEEV_HANDLE;
-    private static final MethodHandle CPOTRF_HANDLE;
-    private static final MethodHandle CGEQRF_HANDLE;
-    private static final MethodHandle CUNGQR_HANDLE;
-    private static final MethodHandle CGESVD_HANDLE;
+    private static MethodHandle CGEMM_HANDLE;
+    private static MethodHandle CGEMV_HANDLE;
+    private static MethodHandle CDOTC_HANDLE;
+    private static MethodHandle CNRM2_HANDLE;
+    private static MethodHandle CSCAL_HANDLE;
+    private static MethodHandle CGESV_HANDLE;
+    private static MethodHandle CGETRF_HANDLE;
+    private static MethodHandle CGETRI_HANDLE;
+    private static MethodHandle CHEEV_HANDLE;
+    private static MethodHandle CPOTRF_HANDLE;
+    private static MethodHandle CGEQRF_HANDLE;
+    private static MethodHandle CUNGQR_HANDLE;
+    private static MethodHandle CGESVD_HANDLE;
     
-    private static final boolean AVAILABLE;
+    private static boolean AVAILABLE = false;
+    private static boolean initAttempted = false;
 
     public static final int CblasRowMajor = 101;
     public static final int CblasColMajor = 102;
@@ -118,31 +119,21 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     public static final int LAPACK_ROW_MAJOR = 101;
     public static final int LAPACK_COL_MAJOR = 102;
 
-    static {
-        MethodHandle dgemm = null;
-        MethodHandle dgemv = null;
-        MethodHandle ddot = null;
-        MethodHandle dnrm2 = null;
-        MethodHandle dscal = null;
-        
-        MethodHandle dgesv = null;
-        MethodHandle dgetrf = null;
-        MethodHandle dgetri = null;
-        MethodHandle dsyev = null;
-        MethodHandle dpotrf = null;
-        MethodHandle dgeqrf = null;
-        MethodHandle dorgqr = null;
-        MethodHandle dgesvd = null;
-        MethodHandle dgels = null;
+    private static synchronized void ensureInitialized() {
+        if (initAttempted) return;
+        initAttempted = true;
 
-        MethodHandle sgemm = null, sgemv = null, sdot = null, snrm2 = null, sscal = null, sgesv = null, sgetrf = null;
-        MethodHandle zgemm = null, zgemv = null, zdotc = null, znrm2 = null, zscal = null, zgesv = null, zgetrf = null, zgetri = null, zheev = null, zpotrf = null, zgeqrf = null, zungqr = null, zgesvd = null;
-        MethodHandle cgemm = null, cgemv = null, cdotc = null, cnrm2 = null, cscal = null, cgesv = null, cgetrf = null, cgetri = null, cheev = null, cpotrf = null, cgeqrf = null, cungqr = null, cgesvd = null;
-        
+        if (Boolean.getBoolean("episteme.backend.cpu.disabled") || 
+            Boolean.getBoolean("episteme.backend.cpu-real.disabled") ||
+            Boolean.getBoolean("episteme.backend.cpu-complex.disabled")) {
+            logger.log(System.Logger.Level.INFO, "Native CPU-BLAS initialization skipped as requested by system property.");
+            return;
+        }
+
         boolean avail = false;
-
         try {
             Linker linker = NativeFFMLoader.getLinker();
+            if (linker == null) return;
             List<SymbolLookup> lookups = new ArrayList<>();
             
             // Try common libraries
@@ -164,7 +155,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             
             Optional<MemorySegment> dgemmTarget = lookup.find("cblas_dgemm");
             if (dgemmTarget.isPresent()) {
-                dgemm = linker.downcallHandle(dgemmTarget.get(), FunctionDescriptor.ofVoid(
+                DGEMM_HANDLE = linker.downcallHandle(dgemmTarget.get(), FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                     ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
@@ -174,7 +165,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 
                 MemorySegment mvSymbol = lookup.find("cblas_dgemv").orElse(null);
                 if (mvSymbol != null) {
-                    dgemv = linker.downcallHandle(mvSymbol, FunctionDescriptor.ofVoid(
+                    DGEMV_HANDLE = linker.downcallHandle(mvSymbol, FunctionDescriptor.ofVoid(
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS,
                         ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
@@ -183,50 +174,49 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
                 
                 // Level 1 BLAS
-                ddot = lookup.find("cblas_ddot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                dnrm2 = lookup.find("cblas_dnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                DDOT_HANDLE = lookup.find("cblas_ddot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                DNRM2_HANDLE = lookup.find("cblas_dnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-                dscal = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                DSCAL_HANDLE = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // --- Single Precision (S) ---
-                sgemm = lookup.find("cblas_sgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                SGEMM_HANDLE = lookup.find("cblas_sgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                     ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                sgemv = lookup.find("cblas_sgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                SGEMV_HANDLE = lookup.find("cblas_sgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                sdot = lookup.find("cblas_sdot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                snrm2 = lookup.find("cblas_snrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                sscal = lookup.find("cblas_sscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                SDOT_HANDLE = lookup.find("cblas_sdot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                SNRM2_HANDLE = lookup.find("cblas_snrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                SSCAL_HANDLE = lookup.find("cblas_sscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // --- Complex Double (Z) ---
-                zgemm = lookup.find("cblas_zgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                ZGEMM_HANDLE = lookup.find("cblas_zgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zgemv = lookup.find("cblas_zgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                ZGEMV_HANDLE = lookup.find("cblas_zgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zdotc = lookup.find("cblas_zdotc_sub").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                znrm2 = lookup.find("cblas_dznrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zscal = lookup.find("cblas_zscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                ZDOTC_HANDLE = lookup.find("cblas_zdotc_sub").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                ZNRM2_HANDLE = lookup.find("cblas_dznrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                ZSCAL_HANDLE = lookup.find("cblas_zscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // --- Complex Float (C) ---
-                cgemm = lookup.find("cblas_cgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                CGEMM_HANDLE = lookup.find("cblas_cgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cgemv = lookup.find("cblas_cgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                CGEMV_HANDLE = lookup.find("cblas_cgemv").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cdotc = lookup.find("cblas_cdotc_sub").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cnrm2 = lookup.find("cblas_scnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cscal = lookup.find("cblas_cscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                CDOTC_HANDLE = lookup.find("cblas_cdotc_sub").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
+                CNRM2_HANDLE = lookup.find("cblas_scnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+                CSCAL_HANDLE = lookup.find("cblas_cscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // LAPACKE (Standard C interface names and variants)
-                // Windows OpenBLAS often uses dgesv_ or lapack_dgesv
-                dgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "lapack_dgesv")
+                DGESV_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "lapack_dgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 
-                dgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetrf", "dgetrf", "lapack_dgetrf")
+                DGETRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetrf", "dgetrf", "lapack_dgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
-                dgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetri", "dgetri", "lapack_dgetri")
+                DGETRI_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgetri", "dgetri", "lapack_dgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 
                 Optional<MemorySegment> s_dsyev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dsyev", "dsyev", "lapack_dsyev");
@@ -236,65 +226,65 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, 
                         ValueLayout.JAVA_INT, java.lang.foreign.AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                         java.lang.foreign.AddressLayout.ADDRESS);
-                    dsyev = linker.downcallHandle(s_dsyev.get(), dsyevDesc);
+                    DSYEV_HANDLE = linker.downcallHandle(s_dsyev.get(), dsyevDesc);
                 }
 
-                dpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dpotrf", "dpotrf", "lapack_dpotrf")
+                DPOTRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dpotrf", "dpotrf", "lapack_dpotrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
-                dgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgeqrf", "dgeqrf", "lapack_dgeqrf")
+                DGEQRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgeqrf", "dgeqrf", "lapack_dgeqrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
-                dorgqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dorgqr", "dorgqr", "lapack_dorgqr")
+                DORGQR_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dorgqr", "dorgqr", "lapack_dorgqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                 Optional<MemorySegment> s_dgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesvd", "dgesvd", "lapack_dgesvd");
                 if (s_dgesvd.isPresent()) {
-                    dgesvd = linker.downcallHandle(s_dgesvd.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+                    DGESVD_HANDLE = linker.downcallHandle(s_dgesvd.get(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
                 }
 
-                avail = (dgemm != null || dgemv != null);
+                avail = (DGEMM_HANDLE != null || DGEMV_HANDLE != null);
                 
                 // --- Single Precision (S) LAPACK ---
-                sgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "lapack_sgesv")
+                SGESV_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgesv", "sgesv", "lapack_sgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                sgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgetrf", "sgetrf", "lapack_sgetrf")
+                SGETRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_sgetrf", "sgetrf", "lapack_sgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                 // --- Complex Double (Z) LAPACK ---
-                zgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "lapack_zgesv")
+                ZGESV_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesv", "zgesv", "lapack_zgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetrf", "zgetrf", "lapack_zgetrf")
+                ZGETRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetrf", "zgetrf", "lapack_zgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetri", "zgetri", "lapack_zgetri")
+                ZGETRI_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgetri", "zgetri", "lapack_zgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zheev", "zheev", "lapack_zheev")
+                ZHEEV_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zheev", "zheev", "lapack_zheev")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zpotrf", "zpotrf", "lapack_zpotrf")
+                ZPOTRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zpotrf", "zpotrf", "lapack_zpotrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                zgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgeqrf", "zgeqrf", "lapack_zgeqrf")
+                ZGEQRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgeqrf", "zgeqrf", "lapack_zgeqrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zungqr", "zungqr", "lapack_zungqr")
+                ZUNGQR_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zungqr", "zungqr", "lapack_zungqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                zgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesvd", "zgesvd", "lapack_zgesvd")
+                ZGESVD_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_zgesvd", "zgesvd", "lapack_zgesvd")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
                 // --- Complex Float (C) LAPACK ---
-                cgesv = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "lapack_cgesv")
+                CGESV_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesv", "cgesv", "lapack_cgesv")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cgetrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetrf", "cgetrf", "lapack_cgetrf")
+                CGETRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetrf", "cgetrf", "lapack_cgetrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cgetri = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetri", "cgetri", "lapack_cgetri")
+                CGETRI_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgetri", "cgetri", "lapack_cgetri")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cheev = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cheev", "cheev", "lapack_cheev")
+                CHEEV_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cheev", "cheev", "lapack_cheev")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cpotrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cpotrf", "cpotrf", "lapack_cpotrf")
+                CPOTRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cpotrf", "cpotrf", "lapack_cpotrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
-                cgeqrf = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgeqrf", "cgeqrf", "lapack_cgeqrf")
+                CGEQRF_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgeqrf", "cgeqrf", "lapack_cgeqrf")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cungqr = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cungqr", "cungqr", "lapack_cungqr")
+                CUNGQR_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cungqr", "cungqr", "lapack_cungqr")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
-                cgesvd = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesvd", "cgesvd", "lapack_cgesvd")
+                CGESVD_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_cgesvd", "cgesvd", "lapack_cgesvd")
                     .map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
 
             }
@@ -302,64 +292,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             logger.log(System.Logger.Level.DEBUG, "Native CPU initialization failed: " + t.getMessage());
         }
         
-        if (!avail) {
-            logger.log(System.Logger.Level.DEBUG, "No valid native handles found.");
-        }
-        
-        DGEMM_HANDLE = dgemm;
-        DGEMV_HANDLE = dgemv;
-        DDOT_HANDLE = ddot;
-        DNRM2_HANDLE = dnrm2;
-        DSCAL_HANDLE = dscal;
-        DGESV_HANDLE = dgesv;
-        DGETRF_HANDLE = dgetrf;
-        DGETRI_HANDLE = dgetri;
-        DSYEV_HANDLE = dsyev;
-        DPOTRF_HANDLE = dpotrf;
-        DGEQRF_HANDLE = dgeqrf;
-        DORGQR_HANDLE = dorgqr;
-        DGESVD_HANDLE = dgesvd;
-        DGELS_HANDLE = dgels;
-
-        SGEMM_HANDLE = sgemm;
-        SGEMV_HANDLE = sgemv;
-        SDOT_HANDLE = sdot;
-        SNRM2_HANDLE = snrm2;
-        SSCAL_HANDLE = sscal;
-        SGESV_HANDLE = sgesv;
-        SGETRF_HANDLE = sgetrf;
-
-        ZGEMM_HANDLE = zgemm;
-        ZGEMV_HANDLE = zgemv;
-        ZDOTC_HANDLE = zdotc;
-        ZNRM2_HANDLE = znrm2;
-        ZSCAL_HANDLE = zscal;
-        ZGESV_HANDLE = zgesv;
-        ZGETRF_HANDLE = zgetrf;
-        ZGETRI_HANDLE = zgetri;
-        ZHEEV_HANDLE = zheev;
-        ZPOTRF_HANDLE = zpotrf;
-        ZGEQRF_HANDLE = zgeqrf;
-        ZUNGQR_HANDLE = zungqr;
-        ZGESVD_HANDLE = zgesvd;
-
-        CGEMM_HANDLE = cgemm;
-        CGEMV_HANDLE = cgemv;
-        CDOTC_HANDLE = cdotc;
-        CNRM2_HANDLE = cnrm2;
-        CSCAL_HANDLE = cscal;
-        CGESV_HANDLE = cgesv;
-        CGETRF_HANDLE = cgetrf;
-        CGETRI_HANDLE = cgetri;
-        CHEEV_HANDLE = cheev;
-        CPOTRF_HANDLE = cpotrf;
-        CGEQRF_HANDLE = cgeqrf;
-        CUNGQR_HANDLE = cungqr;
-        CGESVD_HANDLE = cgesvd;
-        
-        // Broadened availability check
         AVAILABLE = avail;
-
         if (AVAILABLE) {
             logger.log(System.Logger.Level.INFO, "Native CPU-BLAS Backend initialized. SVD support: {0}, Eigen support: {1}, LAPACK support: {2}", 
                 DGESVD_HANDLE != null, DSYEV_HANDLE != null, DGESV_HANDLE != null);
@@ -376,6 +309,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
     @Override
     public boolean isLoaded() {
+        ensureInitialized();
         return AVAILABLE;
     }
 
@@ -386,7 +320,9 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
     @Override
     public boolean isAvailable() {
-        return AVAILABLE && !isExplicitlyDisabled();
+        if (isExplicitlyDisabled()) return false;
+        ensureInitialized();
+        return AVAILABLE;
     }
 
     @Override

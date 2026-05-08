@@ -77,6 +77,7 @@ public class NativeDiscovery {
         String envCudaPath = System.getenv("CUDA_PATH");
         if (envCudaPath != null) {
             searchPaths.add(envCudaPath + java.io.File.separator + "bin");
+            searchPaths.add(envCudaPath + java.io.File.separator + "bin" + java.io.File.separator + "x64");
             searchPaths.add(envCudaPath + java.io.File.separator + "lib64");
         }
 

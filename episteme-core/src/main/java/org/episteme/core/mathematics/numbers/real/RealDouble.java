@@ -36,6 +36,8 @@ public final class RealDouble extends Real {
 
     private final double value;
 
+    public static final org.episteme.core.mathematics.structures.rings.Ring<RealDouble> RING = (org.episteme.core.mathematics.structures.rings.Ring<RealDouble>) (Object) org.episteme.core.mathematics.sets.Reals.getInstance();
+
     private RealDouble(double value) {
         this.value = value;
     }

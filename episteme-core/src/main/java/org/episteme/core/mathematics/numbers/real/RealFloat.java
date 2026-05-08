@@ -37,6 +37,8 @@ public final class RealFloat extends Real {
 
     private final float value;
 
+    public static final org.episteme.core.mathematics.structures.rings.Ring<RealFloat> RING = (org.episteme.core.mathematics.structures.rings.Ring<RealFloat>) (Object) org.episteme.core.mathematics.sets.Reals.getInstance();
+
     private RealFloat(float value) {
         this.value = value;
     }

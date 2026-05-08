@@ -11,7 +11,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.nativ.mathematics.analysis.fft.backends.NativeFFTBackend;
 import org.episteme.nativ.mathematics.analysis.fft.backends.NativeOpenCLFFTBackend;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraDoubleBackend;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,7 @@ public class NativeHardeningStressTest {
     @Test
     public void testOpenCLGMRESStress() {
         logger.info("Starting OpenCL GMRES Stress Test ({} iterations)...", ITERATIONS);
-        try (NativeOpenCLSparseLinearAlgebraBackend<Real> backend = new NativeOpenCLSparseLinearAlgebraBackend<>()) {
+        try (NativeOpenCLSparseLinearAlgebraDoubleBackend<Real> backend = new NativeOpenCLSparseLinearAlgebraDoubleBackend<>()) {
             if (!backend.isAvailable()) {
                 logger.warn("OpenCL Sparse Backend not available, skipping stress test.");
                 return;
