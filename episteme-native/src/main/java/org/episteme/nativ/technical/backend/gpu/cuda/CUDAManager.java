@@ -186,14 +186,14 @@ public final class CUDAManager {
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT
         ));
-        CUBLAS_DGEAM = lookup(cublasLookup, "cublasDgeam_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+        CUBLAS_DGEAM = lookup(cublasLookup, "cublasDgeam", FunctionDescriptor.of(ValueLayout.JAVA_INT,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
             ValueLayout.JAVA_INT
         ));
-        CUBLAS_ZGEAM = lookup(cublasLookup, "cublasZgeam_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+        CUBLAS_ZGEAM = lookup(cublasLookup, "cublasZgeam", FunctionDescriptor.of(ValueLayout.JAVA_INT,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
