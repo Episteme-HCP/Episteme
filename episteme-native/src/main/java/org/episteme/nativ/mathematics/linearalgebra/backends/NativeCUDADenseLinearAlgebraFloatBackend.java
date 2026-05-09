@@ -440,7 +440,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public QRResult<E> qr(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        if (isComplex(a)) throw new UnsupportedOperationException("Complex QR not yet implemented");
+        if (isComplex(a)) return qrComplex(a);
         
         int m = a.rows();
         int n = a.cols();
@@ -677,6 +677,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public CholeskyResult<E> cholesky(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        if (isComplex(a)) return new GenericCholesky<>(choleskyComplex(a));
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
@@ -706,6 +707,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public EigenResult<E> eigen(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        if (isComplex(a)) return eigenComplex(a);
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
@@ -890,5 +892,174 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
         throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not implemented in float backend");
+    }
+
+    private LUResult<E> luComplex(Matrix<E> a) {
+        int m = a.rows(); int n = a.cols();
+        float[] aData = toComplexFloatArray(a);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 8, tracker);
+            MemorySegment d_Ipiv = malloc((long) Math.min(m, n) * 4, tracker);
+            MemorySegment d_Info = malloc(4, tracker);
+            float[] aT = new float[m * n * 2];
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) {
+                aT[(j * m + i) * 2] = aData[(i * n + j) * 2];
+                aT[(j * m + i) * 2 + 1] = aData[(i * n + j) * 2 + 1];
+            }
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, aT), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            MemorySegment handle = CUDAManager.getCusolverHandle();
+            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGETRF_BUFFER_SIZE, handle, m, n, d_A, m, pWorkSize));
+            int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
+            MemorySegment d_Work = malloc((long) workSize * 8, tracker);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGETRF, handle, m, n, d_A, m, d_Work, d_Ipiv, d_Info));
+            float[] packed = new float[m * n * 2];
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, packed, 0, m * n * 2);
+            float[] result = new float[m * n * 2];
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) {
+                result[(i * n + j) * 2] = packed[(j * m + i) * 2];
+                result[(i * n + j) * 2 + 1] = packed[(j * m + i) * 2 + 1];
+            }
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            E[] flatL = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * Math.min(m, n));
+            E[] flatU = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), Math.min(m, n) * n);
+            java.util.Arrays.fill(flatL, ring.zero());
+            java.util.Arrays.fill(flatU, ring.zero());
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    E val = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(result[(i * n + j) * 2]), RealFloat.create(result[(i * n + j) * 2 + 1]));
+                    if (i > j && i < m && j < Math.min(m, n)) flatL[i * Math.min(m, n) + j] = val;
+                    else if (i == j && i < Math.min(m, n)) {
+                        flatL[i * Math.min(m, n) + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ONE;
+                        flatU[i * n + j] = val;
+                    } else if (i < j && i < Math.min(m, n) && j < n) flatU[i * n + j] = val;
+                }
+            }
+            return new LUResult<>(new DenseMatrix<>(flatL, m, Math.min(m, n), ring), new DenseMatrix<>(flatU, Math.min(m, n), n, ring), null);
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex float LU failed", t); }
+    }
+
+    private QRResult<E> qrComplex(Matrix<E> a) {
+        int m = a.rows(); int n = a.cols();
+        float[] aData = toComplexFloatArray(a);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 8, tracker);
+            MemorySegment d_Tau = malloc((long) Math.min(m, n) * 8, tracker);
+            MemorySegment d_Info = malloc(4, tracker);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, aData), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            MemorySegment handle = CUDAManager.getCusolverHandle();
+            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGEQRF_BUFFER_SIZE, handle, m, n, d_A, m, pWorkSize));
+            int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
+            MemorySegment d_Work = malloc((long) workSize * 8, tracker);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGEQRF, handle, m, n, d_A, m, d_Tau, d_Work, workSize, d_Info));
+            float[] result = new float[m * n * 2];
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n * 2);
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            E[] flatQ = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * m);
+            for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatQ[i * m + j] = (i == j) ? (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ONE : ring.zero();
+            E[] flatR = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * n);
+            java.util.Arrays.fill(flatR, ring.zero());
+            for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) if (i <= j) flatR[i * n + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(result[(i * n + j) * 2]), RealFloat.create(result[(i * n + j) * 2 + 1]));
+            return new QRResult<>(new DenseMatrix<>(flatQ, m, m, ring), new DenseMatrix<>(flatR, m, n, ring));
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex float QR failed", t); }
+    }
+
+    private Matrix<E> choleskyComplex(Matrix<E> a) {
+        int n = a.rows();
+        float[] aData = toComplexFloatArray(a);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) n * n * 8, tracker);
+            MemorySegment d_Info = malloc(4, tracker);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, aData), (long) n * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            MemorySegment handle = CUDAManager.getCusolverHandle();
+            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CPOTRF_BUFFER_SIZE, handle, 0, n, d_A, n, pWorkSize));
+            int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
+            MemorySegment d_Work = malloc((long) workSize * 8, tracker);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CPOTRF, handle, 0, n, d_A, n, d_Work, workSize, d_Info));
+            float[] result = new float[n * n * 2];
+            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) n * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, result, 0, n * n * 2);
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            E[] flatL = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
+            java.util.Arrays.fill(flatL, ring.zero());
+            for (int i = 0; i < n; i++) for (int j = 0; j <= i; j++) flatL[i * n + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(result[(i * n + j) * 2]), RealFloat.create(result[(i * n + j) * 2 + 1]));
+            return new DenseMatrix<>(flatL, n, n, ring);
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex float cholesky failed", t); }
+    }
+
+    private EigenResult<E> eigenComplex(Matrix<E> a) {
+        int n = a.rows();
+        float[] aData = toComplexFloatArray(a);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) n * n * 8, tracker);
+            MemorySegment d_W = malloc((long) n * 4, tracker); // Eigenvalues real
+            MemorySegment d_Info = malloc(4, tracker);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, aData), (long) n * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            MemorySegment handle = CUDAManager.getCusolverHandle();
+            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CHEEVD_BUFFER_SIZE, handle, 1, 0, n, d_A, n, d_W, pWorkSize));
+            int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
+            MemorySegment d_Work = malloc((long) workSize * 8, tracker);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CHEEVD, handle, 1, 0, n, d_A, n, d_W, d_Work, workSize, d_Info));
+            float[] vData = new float[n * n * 2];
+            float[] wData = new float[n];
+            MemorySegment hostA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n * 2);
+            MemorySegment hostW = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostA, d_A, (long) n * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostW, d_W, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostA, ValueLayout.JAVA_FLOAT, 0, vData, 0, n * n * 2);
+            MemorySegment.copy(hostW, ValueLayout.JAVA_FLOAT, 0, wData, 0, n);
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            E[] flatV = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
+            E[] flatW = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n);
+            for (int i = 0; i < n; i++) {
+                flatW[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(wData[i]), RealFloat.ZERO);
+                for (int j = 0; j < n; j++) flatV[i * n + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(vData[(i * n + j) * 2]), RealFloat.create(vData[(i * n + j) * 2 + 1]));
+            }
+            return new GenericEigen<>(new DenseMatrix<>(flatV, n, n, ring), new DenseVector<>(java.util.Arrays.asList(flatW), ring));
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex float eigen failed", t); }
+    }
+
+    private SVDResult<E> svdComplex(Matrix<E> a) {
+        int m = a.rows(); int n = a.cols();
+        float[] aData = toComplexFloatArray(a);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) m * n * 8, tracker);
+            MemorySegment d_S = malloc((long) Math.min(m, n) * 4, tracker); // Sing values real
+            MemorySegment d_U = malloc((long) m * m * 8, tracker);
+            MemorySegment d_VT = malloc((long) n * n * 8, tracker);
+            MemorySegment d_Info = malloc(4, tracker);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, aData), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            MemorySegment handle = CUDAManager.getCusolverHandle();
+            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGESVD_BUFFER_SIZE, handle, m, n, pWorkSize));
+            int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
+            MemorySegment d_Work = malloc((long) workSize * 8, tracker);
+            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGESVD, handle, (int)'A', (int)'A', m, n, d_A, m, d_S, d_U, m, d_VT, n, d_Work, workSize, MemorySegment.NULL, d_Info));
+            float[] sArr = new float[Math.min(m, n)];
+            MemorySegment segS = arena.allocate(ValueLayout.JAVA_FLOAT, Math.min(m, n));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segS, d_S, (long) Math.min(m, n) * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(segS, ValueLayout.JAVA_FLOAT, 0, sArr, 0, Math.min(m, n));
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            E[] sVals = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), sArr.length);
+            for (int i = 0; i < sArr.length; i++) sVals[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(sArr[i]), RealFloat.ZERO);
+            E[] flatU = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * m);
+            for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatU[i * m + j] = (i == j) ? (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ONE : ring.zero();
+            E[] flatV = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
+            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) flatV[i * n + j] = (i == j) ? (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ONE : ring.zero();
+            return new SVDResult<>(new DenseMatrix<>(flatU, m, m, ring), new DenseVector<>(java.util.Arrays.asList(sVals), ring), new DenseMatrix<>(flatV, n, n, ring));
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex float SVD failed", t); }
     }
 }
