@@ -526,6 +526,5 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not implemented in sparse backend");
     }
 
-    private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof Complex; }
     private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
 }

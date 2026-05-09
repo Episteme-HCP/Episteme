@@ -511,6 +511,5 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not supported in float backend");
     }
 
-    private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof Complex; }
     private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
 }
