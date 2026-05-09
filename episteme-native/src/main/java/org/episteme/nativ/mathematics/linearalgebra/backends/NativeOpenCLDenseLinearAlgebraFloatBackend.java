@@ -176,7 +176,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             clEnqueueNDRangeKernel(queue, matMulKernel, 2, null, new long[]{n, m}, null, 0, null, null);
             clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float * m * n, Pointer.to(fc), 0, null, null);
             
-            return fromFloatArray(fc, m, n, a);
+            return fromFloatArray(fc, m, n, a.getScalarRing());
         }
     }
 
@@ -226,7 +226,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             clEnqueueNDRangeKernel(queue, transposeKernel, 2, null, new long[]{cols, rows}, null, 0, null, null);
             clEnqueueReadBuffer(queue, memB, CL_TRUE, 0, (long)Sizeof.cl_float * rows * cols, Pointer.to(dst), 0, null, null);
             
-            return fromFloatArray(dst, cols, rows, a);
+            return fromFloatArray(dst, cols, rows, a.getScalarRing());
         }
     }
 
@@ -267,7 +267,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             clEnqueueNDRangeKernel(queue, kernel, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float * n, Pointer.to(fc), 0, null, null);
             
-            return fromFloatArray(fc, a.rows(), a.cols(), a);
+            return fromFloatArray(fc, a.rows(), a.cols(), a.getScalarRing());
         }
     }
 
@@ -316,7 +316,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             clEnqueueNDRangeKernel(queue, vecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float * n, Pointer.to(fc), 0, null, null);
             
-            return fromFloatArray(fc, a.rows(), a.cols(), a);
+            return fromFloatArray(fc, a.rows(), a.cols(), a.getScalarRing());
         }
     }
 
@@ -429,7 +429,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             
             float[] res = new float[n * n];
             clEnqueueReadBuffer(queue, memInv, CL_TRUE, 0, (long)Sizeof.cl_float * n * n, Pointer.to(res), 0, null, null);
-            return fromFloatArray(res, n, n, a);
+            return fromFloatArray(res, n, n, a.getScalarRing());
         }
     }
 
@@ -671,7 +671,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         var svd = svd(a);
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(svd.S(), svd.V());
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(svd.V(), svd.S());
     }
 
     @Override
@@ -847,6 +847,24 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             for (int j = 0; j < cols; j++) {
                 data[i * cols + j] = ((Number) m.get(i, j)).floatValue();
             }
+        }
+        return data;
+    }
+
+    private float[] toFloatVec(Vector<E> v) {
+        int n = v.dimension();
+        float[] data = new float[n];
+        for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).floatValue();
+        return data;
+    }
+
+    private float[] toComplexFloatVec(Vector<E> v) {
+        int n = v.dimension();
+        float[] data = new float[n * 2];
+        for (int i = 0; i < n; i++) {
+            org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
+            data[i * 2] = c.getReal().floatValue();
+            data[i * 2 + 1] = c.getImaginary().floatValue();
         }
         return data;
     }
