@@ -1984,7 +1984,29 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         }
         setMPFR_internal(gR.asSlice(0, MPFR_LAYOUT), (isComplex && gI != null) ? gI.asSlice(0, MPFR_LAYOUT) : null, beta, arena);
         
-        // Apply Givens rotations to transform H to upper triangular R
+        // Use a dedicated local arena for temporaries to avoid overwhelming the main arena
+        try (Arena localArena = Arena.ofConfined()) {
+            // Pre-allocate common temporaries
+            MemorySegment r_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, r_tmp, prec);
+            MemorySegment cR_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, cR_tmp, prec);
+            MemorySegment cI_tmp = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, cI_tmp, prec);
+            MemorySegment sR_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR_tmp, prec);
+            MemorySegment sI_tmp = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sI_tmp, prec);
+            
+            MemorySegment t1R = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
+            MemorySegment t1I = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, t1I, prec);
+            MemorySegment t2R = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2R, prec);
+            MemorySegment t2I = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, t2I, prec);
+            
+            MemorySegment tmp1 = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
+            MemorySegment tmp2 = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
+
+            // Apply Givens rotations to transform H to upper triangular R
         for (int i = 0; i < cols; i++) {
             // Elimination of H[i+1][i] using H[i][i]
             MemorySegment h_ii_R = hLocalR.asSlice((i * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
@@ -2000,14 +2022,15 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 MemorySegment bR = hLocalR.asSlice(((i + 1) * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                 MemorySegment bI = hLocalI.asSlice(((i + 1) * cols + i) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                 
-                MemorySegment r = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, r, prec);
-                MemorySegment cR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, cR, prec);
-                MemorySegment cI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, cI, prec);
-                MemorySegment sR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR, prec);
-                MemorySegment sI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sI, prec);
+                // Use pre-allocated temps
+                MemorySegment r = r_tmp;
+                MemorySegment cR = cR_tmp;
+                MemorySegment cI = cI_tmp;
+                MemorySegment sR = sR_tmp;
+                MemorySegment sI = sI_tmp;
                 
-                MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
-                MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+                MemorySegment t1 = t1R;
+                MemorySegment t2 = t2R;
                 
                 // r = sqrt(aR^2 + aI^2 + bR^2 + bI^2)
                 NativeSafe.invoke(MPFR_MUL, t1, aR, aR, 0);
@@ -2039,22 +2062,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                         MemorySegment h2R = hLocalR.asSlice(((i + 1) * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                         MemorySegment h2I = hLocalI.asSlice(((i + 1) * cols + j) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                         
-                        MemorySegment t1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
-                        MemorySegment t1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1I, prec);
-                        MemorySegment t2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2R, prec);
-                        MemorySegment t2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2I, prec);
-                        
+                        // Use pre-allocated temps
                         NativeSafe.invoke(MPFR_SET, t1R, h1R, 0);
                         NativeSafe.invoke(MPFR_SET, t1I, h1I, 0);
                         NativeSafe.invoke(MPFR_SET, t2R, h2R, 0);
                         NativeSafe.invoke(MPFR_SET, t2I, h2I, 0);
-                        
-                        // h1_new = c*t1 + s*t2
-                        // h1R = cR*t1R - cI*t1I + sR*t2R - sI*t2I
-                        // h1I = cR*t1I + cI*t1R + sR*t2I + sI*t2R
-                        
-                        MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
-                        MemorySegment tmp2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
                         
                         // Real part of h1
                         NativeSafe.invoke(MPFR_MUL, h1R, cR, t1R, 0);
@@ -2107,17 +2119,10 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     MemorySegment g2R = gR.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     MemorySegment g2I = gI.asSlice((i + 1) * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
                     
-                    MemorySegment t1R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
-                    MemorySegment t1I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1I, prec);
-                    MemorySegment t2R = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2R, prec);
-                    MemorySegment t2I = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2I, prec);
-                    
                     NativeSafe.invoke(MPFR_SET, t1R, g1R, 0);
                     NativeSafe.invoke(MPFR_SET, t1I, g1I, 0);
                     NativeSafe.invoke(MPFR_SET, t2R, g2R, 0);
                     NativeSafe.invoke(MPFR_SET, t2I, g2I, 0);
-                    
-                    MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
                     
                     // g1_new
                     NativeSafe.invoke(MPFR_MUL, g1R, cR, t1R, 0);
@@ -2187,8 +2192,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                         NativeSafe.invoke(MPFR_SET, t2, h_ip1j, 0);
                         
                         // h_ij = c*t1 + s*t2
-                        MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
-                        MemorySegment tmp2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
                         NativeSafe.invoke(MPFR_MUL, tmp1, c, t1, 0);
                         NativeSafe.invoke(MPFR_MUL, tmp2, s, t2, 0);
                         NativeSafe.invoke(MPFR_ADD, h_ij, tmp1, tmp2, 0);
@@ -2207,8 +2210,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     NativeSafe.invoke(MPFR_SET, t1, g_i, 0);
                     NativeSafe.invoke(MPFR_SET, t2, g_ip1, 0);
                     
-                    MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
-                    MemorySegment tmp2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
                     NativeSafe.invoke(MPFR_MUL, tmp1, c, t1, 0);
                     NativeSafe.invoke(MPFR_MUL, tmp2, s, t2, 0);
                     NativeSafe.invoke(MPFR_ADD, g_i, tmp1, tmp2, 0);
@@ -2284,8 +2285,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 // = [ (numR*diagR + numI*diagI) + i*(numI*diagR - numR*diagI) ] / (diagR^2 + diagI^2)
                 
                 MemorySegment den = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, den, prec);
-                MemorySegment tmp1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
-                MemorySegment tmp2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
                 
                 NativeSafe.invoke(MPFR_MUL, tmp1, diagR, diagR, 0);
                 NativeSafe.invoke(MPFR_MUL, tmp2, diagI, diagI, 0);
@@ -2325,7 +2324,21 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 axpy_internal(h_x, scalar, vj, n, prec, arena, tracker, isComplex);
             }
         }
+        
+        // Cleanup local MPFR resources
+        NativeSafe.invoke(MPFR_CLEAR, r_tmp);
+        NativeSafe.invoke(MPFR_CLEAR, cR_tmp);
+        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, cI_tmp);
+        NativeSafe.invoke(MPFR_CLEAR, sR_tmp);
+        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, sI_tmp);
+        NativeSafe.invoke(MPFR_CLEAR, t1R);
+        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, t1I);
+        NativeSafe.invoke(MPFR_CLEAR, t2R);
+        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, t2I);
+        NativeSafe.invoke(MPFR_CLEAR, tmp1);
+        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, tmp2);
     }
+}
 
     private int compare(E a, E b) {
         if (a instanceof Real rA && b instanceof Real rB) {

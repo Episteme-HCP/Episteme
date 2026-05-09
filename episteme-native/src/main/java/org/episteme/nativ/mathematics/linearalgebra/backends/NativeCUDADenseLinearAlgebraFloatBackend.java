@@ -9,6 +9,7 @@ import java.lang.foreign.*;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
@@ -146,7 +147,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatVec(b)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_CDOT, CUDAManager.getCublasHandle(), n, d_A, 1, d_B, 1, d_Res));
-            return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(d_Res.get(ValueLayout.JAVA_FLOAT, 0)), RealFloat.create(d_Res.get(ValueLayout.JAVA_FLOAT, 4)));
+            return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.create(d_Res.getAtIndex(ValueLayout.JAVA_FLOAT, 0)), org.episteme.core.mathematics.numbers.real.RealFloat.create(d_Res.getAtIndex(ValueLayout.JAVA_FLOAT, 1)));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float dot failed", t); }
     }
 
@@ -168,8 +169,17 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     }
 
     private E normComplex(Vector<E> a) {
-        // cuBLAS Scnrm2 computes norm of complex vector
-        throw new UnsupportedOperationException("Complex norm not yet implemented for CUDA Float");
+        int n = a.dimension();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) n * 8, tracker);
+            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_FLOAT);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatVec(a)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SCNRM2, CUDAManager.getCublasHandle(), n, d_A, 1, d_Res));
+            return (E) org.episteme.core.mathematics.numbers.real.RealFloat.create(d_Res.get(ValueLayout.JAVA_FLOAT, 0));
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex float norm failed", t); }
     }
 
     private Matrix<E> combine(Matrix<E> a, Matrix<E> b, float alpha, float beta) {
@@ -639,7 +649,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     }
 
     @Override
-    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean lower, boolean unitDiagonal) {
+    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -650,10 +660,10 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b)), (long) n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCublasHandle();
-            // Side=LEFT(0), Fill=L/U, Trans=N(0), Diag=NONUNIT(0)/UNIT(1)
-            int uplo = lower ? 0 : 1;
-            int diag = unitDiagonal ? 1 : 0;
-            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_STRSM, handle, 0, uplo, 0, diag, n, 1, 
+            int uplo = upper ? 1 : 0;
+            int trans = transpose ? 1 : 0;
+            int diag = unit ? 1 : 0;
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_STRSM, handle, 0, uplo, trans, diag, n, 1, 
                 arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_A, n, d_B, n));
             
             float[] result = new float[n];
@@ -665,7 +675,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     }
 
     @Override
-    public Matrix<E> cholesky(Matrix<E> a) {
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -689,12 +699,12 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             
             // Mask upper triangle to get L
             for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) result[i * n + j] = 0;
-            return fromFloatArray(result, n, n, (Ring<E>) a.getScalarRing());
-        } catch (Throwable t) { throw new RuntimeException("CUDA float Cholesky failed", t); }
+            return new GenericCholesky<>(fromFloatArray(result, n, n, a));
+        } catch (Throwable t) { throw new RuntimeException("CUDA float cholesky failed", t); }
     }
 
     @Override
-    public Matrix<E> eigen(Matrix<E> a) {
+    public EigenResult<E> eigen(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -713,12 +723,16 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SSYEVD, handle, 1, 0, n, d_A, n, d_W, d_Work, workSize, d_Info));
             
-            float[] result = new float[n * n];
+            float[] vData = new float[n * n];
+            float[] wData = new float[n];
             MemorySegment hostA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n);
+            MemorySegment hostW = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostA, d_A, (long) n * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
-            MemorySegment.copy(hostA, ValueLayout.JAVA_FLOAT, 0, result, 0, n * n);
-            return fromFloatArray(result, n, n, (Ring<E>) a.getScalarRing());
-        } catch (Throwable t) { throw new RuntimeException("CUDA float Eigen failed", t); }
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostW, d_W, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostA, ValueLayout.JAVA_FLOAT, 0, vData, 0, n * n);
+            MemorySegment.copy(hostW, ValueLayout.JAVA_FLOAT, 0, wData, 0, n);
+            return new GenericEigen<>(fromFloatArray(vData, n, n, a), fromFloatVec(Vector.of(wData, a.getScalarRing())));
+        } catch (Throwable t) { throw new RuntimeException("CUDA float eigen failed", t); }
     }
 
     private void checkCusolver(int status) {
@@ -746,6 +760,10 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
 
     private boolean isComplex(Matrix<E> m) {
         return m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+    }
+
+    private boolean isComplex(Vector<E> v) {
+        return v.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     private float[] toFloatArray(Matrix<E> m) {

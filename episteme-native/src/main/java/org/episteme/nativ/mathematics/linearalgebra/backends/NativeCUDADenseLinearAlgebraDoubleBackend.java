@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandle;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealDouble;
 import org.episteme.core.mathematics.numbers.complex.Complex;
@@ -240,9 +241,8 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleVec(a)), (long) n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleVec(b)), (long) n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
-            // Note: cublasZdotu_v2 for double complex
-            // MethodHandle should be updated in CUDAManager if needed, but using CDOT as reference
-            throw new UnsupportedOperationException("Complex dot not yet implemented for CUDA Double");
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_ZDOTU, CUDAManager.getCublasHandle(), n, d_A, 1, d_B, 1, d_Res));
+            return (E) Complex.of(d_Res.getAtIndex(ValueLayout.JAVA_DOUBLE, 0), d_Res.getAtIndex(ValueLayout.JAVA_DOUBLE, 1));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex double dot failed", t); }
     }
 
@@ -264,7 +264,17 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     }
 
     private E normComplex(Vector<E> a) {
-        throw new UnsupportedOperationException("Complex norm not yet implemented for CUDA Double");
+        int n = a.dimension();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) n * 16, tracker);
+            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_DOUBLE);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleVec(a)), (long) n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DZNRM2, CUDAManager.getCublasHandle(), n, d_A, 1, d_Res));
+            return (E) RealDouble.of(d_Res.get(ValueLayout.JAVA_DOUBLE, 0));
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex double norm failed", t); }
     }
 
     @Override public void shutdown() {}
@@ -669,7 +679,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     }
 
     @Override
-    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean lower, boolean unitDiagonal) {
+    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -680,9 +690,10 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCublasHandle();
-            int uplo = lower ? 0 : 1;
-            int diag = unitDiagonal ? 1 : 0;
-            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DTRSM, handle, 0, uplo, 0, diag, n, 1, 
+            int uplo = upper ? 1 : 0;
+            int trans = transpose ? 1 : 0;
+            int diag = unit ? 1 : 0;
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DTRSM, handle, 0, uplo, trans, diag, n, 1, 
                 arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_A, n, d_B, n));
             
             double[] result = new double[n];
@@ -697,7 +708,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     }
 
     @Override
-    public Matrix<E> cholesky(Matrix<E> a) {
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -720,12 +731,12 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             MemorySegment.copy(hostA, ValueLayout.JAVA_DOUBLE, 0, result, 0, n * n);
             
             for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) result[i * n + j] = 0;
-            return toMatrix(result, n, n, (Ring<E>) a.getScalarRing());
-        } catch (Throwable t) { throw new RuntimeException("CUDA double Cholesky failed", t); }
+            return new GenericCholesky<>(fromDoubleArray(result, n, n, a));
+        } catch (Throwable t) { throw new RuntimeException("CUDA double cholesky failed", t); }
     }
 
     @Override
-    public Matrix<E> eigen(Matrix<E> a) {
+    public EigenResult<E> eigen(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -743,12 +754,16 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_DSYEVD, handle, 1, 0, n, d_A, n, d_W, d_Work, workSize, d_Info));
             
-            double[] result = new double[n * n];
+            double[] vData = new double[n * n];
+            double[] wData = new double[n];
             MemorySegment hostA = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
+            MemorySegment hostW = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostA, d_A, (long) n * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
-            MemorySegment.copy(hostA, ValueLayout.JAVA_DOUBLE, 0, result, 0, n * n);
-            return toMatrix(result, n, n, (Ring<E>) a.getScalarRing());
-        } catch (Throwable t) { throw new RuntimeException("CUDA double Eigen failed", t); }
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostW, d_W, (long) n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostA, ValueLayout.JAVA_DOUBLE, 0, vData, 0, n * n);
+            MemorySegment.copy(hostW, ValueLayout.JAVA_DOUBLE, 0, wData, 0, n);
+            return new GenericEigen<>(fromDoubleArray(vData, n, n, a), fromDoubleVec(Vector.of(wData, a.getScalarRing())));
+        } catch (Throwable t) { throw new RuntimeException("CUDA double eigen failed", t); }
     }
 
     private double[] toDoubleArray(Matrix<E> m) {
@@ -788,6 +803,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     }
 
     private boolean isComplex(Matrix<E> a) { return a.getScalarRing().zero() instanceof Complex; }
+    private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
 
     @Override public void close() {}
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.GPU; }

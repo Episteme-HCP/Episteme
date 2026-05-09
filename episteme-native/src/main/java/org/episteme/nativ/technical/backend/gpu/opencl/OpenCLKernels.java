@@ -226,7 +226,7 @@ public final class OpenCLKernels {
         "    }\n" +
         "    if (row < n) {\n" +
         "        double vi = v[row * n + i_col]; double vj = v[row * n + j_col];\n" +
-        "        "        v[row * n + i_col] = cos_v * vi + sin_v * vj;\n" +
+        "        v[row * n + i_col] = cos_v * vi + sin_v * vj;\n" +
         "        v[row * n + j_col] = -sin_v * vi + cos_v * vj;\n" +
         "    }\n" +
         "}\n" +

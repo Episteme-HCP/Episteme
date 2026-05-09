@@ -32,6 +32,7 @@ import org.episteme.core.technical.backend.Operation;
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.FloatVector;
 import jdk.incubator.vector.VectorSpecies;
+import jdk.incubator.vector.VectorOperators;
 import static jdk.incubator.vector.VectorOperators.*;
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealFloatVector;
@@ -1200,7 +1201,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             
             for (int k = 0; k < Math.min(n, m); k++) {
                 int max = k;
-                for (int i = k + 1; i < n; i++) if (Math.abs(data[i * n + k]) > Math.abs(data[max * n + k])) max = i;
+                for (int i = k + 1; i < n; i++) if (Math.abs(data[i * m + k]) > Math.abs(data[max * m + k])) max = i;
                 if (k != max) {
                     for (int j = 0; j < m; j++) {
                         double t = data[k * m + j]; data[k * m + j] = data[max * m + j]; data[max * m + j] = t;
@@ -1208,12 +1209,12 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                     double t = p[k]; p[k] = p[max]; p[max] = t;
                 }
                 
-                uData[k * n + k] = data[k * n + k];
+                uData[k * n + k] = data[k * m + k];
                 double pivot = uData[k * n + k];
                 if (Math.abs(pivot) > 1e-18) {
                     var species = getDoubleSpecies();
                     for (int i = k + 1; i < n; i++) {
-                        double factor = data[i * n + k] / pivot;
+                        double factor = data[i * m + k] / pivot;
                         lData[i * n + k] = factor;
                         int j = k + 1;
                         for (; j + species.length() <= m; j += species.length()) {
@@ -1224,7 +1225,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                         for (; j < m; j++) data[i * m + j] -= factor * data[k * m + j];
                     }
                 }
-                for (int j = k + 1; j < m; j++) uData[k * n + j] = data[k * n + j];
+                for (int j = k + 1; j < m; j++) uData[k * n + j] = data[k * m + j];
             }
             
             return (LUResult<E>) (Object) new LUResult<Real>(

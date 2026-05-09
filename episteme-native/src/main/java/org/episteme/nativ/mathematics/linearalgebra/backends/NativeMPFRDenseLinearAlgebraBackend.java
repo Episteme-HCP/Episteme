@@ -700,23 +700,76 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
     // --- Transcendental Operations (MPFR) ---
 
-    @Override public Matrix<E> exp(Matrix<E> m) { return applyMPFR(m, MPFR_EXP); }
-    @Override public Matrix<E> log(Matrix<E> m) { return applyMPFR(m, MPFR_LOG); }
-    @Override public Matrix<E> log10(Matrix<E> m) { return applyMPFR(m, MPFR_LOG10); }
-    @Override public Matrix<E> sin(Matrix<E> m) { return applyMPFR(m, MPFR_SIN); }
-    @Override public Matrix<E> cos(Matrix<E> m) { return applyMPFR(m, MPFR_COS); }
-    @Override public Matrix<E> tan(Matrix<E> m) { return applyMPFR(m, MPFR_TAN); }
-    @Override public Matrix<E> asin(Matrix<E> m) { return applyMPFR(m, MPFR_ASIN); }
-    @Override public Matrix<E> acos(Matrix<E> m) { return applyMPFR(m, MPFR_ACOS); }
-    @Override public Matrix<E> atan(Matrix<E> m) { return applyMPFR(m, MPFR_ATAN); }
-    @Override public Matrix<E> sinh(Matrix<E> m) { return applyMPFR(m, MPFR_SINH); }
-    @Override public Matrix<E> cosh(Matrix<E> m) { return applyMPFR(m, MPFR_COSH); }
-    @Override public Matrix<E> tanh(Matrix<E> m) { return applyMPFR(m, MPFR_TANH); }
-    @Override public Matrix<E> asinh(Matrix<E> m) { return applyMPFR(m, MPFR_ASINH); }
-    @Override public Matrix<E> acosh(Matrix<E> m) { return applyMPFR(m, MPFR_ACOSH); }
-    @Override public Matrix<E> atanh(Matrix<E> m) { return applyMPFR(m, MPFR_ATANH); }
-    @Override public Matrix<E> sqrt(Matrix<E> m) { return applyMPFR(m, MPFR_SQRT); }
-    @Override public Matrix<E> cbrt(Matrix<E> m) { return applyMPFR(m, MPFR_CBRT); }
+    @Override public Matrix<E> exp(Matrix<E> m) { return applyTranscendental(m, "exp", MPFR_EXP); }
+    @Override public Matrix<E> log(Matrix<E> m) { return applyTranscendental(m, "log", MPFR_LOG); }
+    @Override public Matrix<E> log10(Matrix<E> m) { return applyTranscendental(m, "log10", MPFR_LOG10); }
+    @Override public Matrix<E> sin(Matrix<E> m) { return applyTranscendental(m, "sin", MPFR_SIN); }
+    @Override public Matrix<E> cos(Matrix<E> m) { return applyTranscendental(m, "cos", MPFR_COS); }
+    @Override public Matrix<E> tan(Matrix<E> m) { return applyTranscendental(m, "tan", MPFR_TAN); }
+    @Override public Matrix<E> asin(Matrix<E> m) { return applyTranscendental(m, "asin", MPFR_ASIN); }
+    @Override public Matrix<E> acos(Matrix<E> m) { return applyTranscendental(m, "acos", MPFR_ACOS); }
+    @Override public Matrix<E> atan(Matrix<E> m) { return applyTranscendental(m, "atan", MPFR_ATAN); }
+    @Override public Matrix<E> sinh(Matrix<E> m) { return applyTranscendental(m, "sinh", MPFR_SINH); }
+    @Override public Matrix<E> cosh(Matrix<E> m) { return applyTranscendental(m, "cosh", MPFR_COSH); }
+    @Override public Matrix<E> tanh(Matrix<E> m) { return applyTranscendental(m, "tanh", MPFR_TANH); }
+    @Override public Matrix<E> asinh(Matrix<E> m) { return applyTranscendental(m, "asinh", MPFR_ASINH); }
+    @Override public Matrix<E> acosh(Matrix<E> m) { return applyTranscendental(m, "acosh", MPFR_ACOSH); }
+    @Override public Matrix<E> atanh(Matrix<E> m) { return applyTranscendental(m, "atanh", MPFR_ATANH); }
+    @Override public Matrix<E> sqrt(Matrix<E> m) { return applyTranscendental(m, "sqrt", MPFR_SQRT); }
+    @Override public Matrix<E> cbrt(Matrix<E> m) { return applyTranscendental(m, "cbrt", MPFR_CBRT); }
+
+    private Matrix<E> applyTranscendental(Matrix<E> m, String op, MethodHandle realFunc) {
+        int rows = m.rows();
+        int cols = m.cols();
+        boolean isComplex = ((Object)m.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (isComplex) {
+            return applyMPFRComplex(m, op);
+        }
+        return applyMPFR(m, realFunc);
+    }
+
+    private Matrix<E> applyMPFRComplex(Matrix<E> m, String op) {
+        int rows = m.rows();
+        int cols = m.cols();
+        long prec = getPrecision();
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment h_A = initMatrix(m, arena, tracker, prec, true);
+            MemorySegment h_C = allocateMatrix(rows, cols, arena, tracker, prec, true);
+            
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    MemorySegment aR = getMPFR(h_A, i, j, cols, 0, true);
+                    MemorySegment aI = getMPFR(h_A, i, j, cols, 1, true);
+                    MemorySegment resR = getMPFR(h_C, i, j, cols, 0, true);
+                    MemorySegment resI = getMPFR(h_C, i, j, cols, 1, true);
+                    
+                    switch (op.toLowerCase()) {
+                        case "exp" -> complexExp(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "log" -> complexLog(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "log10" -> complexLog10(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "sin" -> complexSin(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "cos" -> complexCos(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "tan" -> complexTan(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "asin" -> complexAsin(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "acos" -> complexAcos(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "atan" -> complexAtan(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "sinh" -> complexSinh(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "cosh" -> complexCosh(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "tanh" -> complexTanh(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "sqrt" -> complexSqrt(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "cbrt" -> complexCbrt(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "asinh" -> complexAsinh(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "acosh" -> complexAcosh(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        case "atanh" -> complexAtanh(resR, resI, aR, aI, (int) prec, arena, tracker);
+                        default -> throw new UnsupportedOperationException("Op " + op + " not implemented for complex dense");
+                    }
+                }
+            }
+            return backToMatrix_internal(h_C, rows, cols, arena, m.getScalarRing(), true);
+        } catch (Throwable t) {
+            throw new RuntimeException("MPFR complex transcendental failed: " + op, t);
+        }
+    }
 
     @Override
     public Matrix<E> pow(Matrix<E> m, E exponent) {
@@ -1712,7 +1765,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             }
             
             Object[] evData = new Object[n];
-            for (int i = 0; i < n; i++) evData[i] = (E) (Object) readMPFR(getMPFR(h_A, i, i, n, 0, isComplex), null, arena);
+            for (int i = 0; i < n; i++) {
+                Real val = readMPFR(getMPFR(h_A, i, i, n, 0, isComplex), null, arena);
+                evData[i] = isComplex ? (E) (Object) Complex.of(val, Real.ZERO) : (E) (Object) val;
+            }
             Vector<E> values = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(evData)), (LinearAlgebraProvider<E>) this, a.getScalarRing());
             Matrix<E> vectors = backToMatrix_internal(h_V, n, n, arena, a.getScalarRing(), isComplex);
             
@@ -1741,9 +1797,17 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             
             // s_i = sqrt(lambda_i)
             List<E> sigmaList = new java.util.ArrayList<>(n);
+            boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof Complex;
             for (int i = 0; i < n; i++) {
                 E val = sValues.get(i);
-                sigmaList.add((E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO)));
+                if (val instanceof Real r) {
+                    Real sqrtR = r.sqrt();
+                    sigmaList.add(isComplex ? (E)(Object)Complex.of(sqrtR, Real.ZERO) : (E)(Object)sqrtR);
+                } else if (val instanceof Complex c) {
+                    sigmaList.add((E)(Object)c.sqrt());
+                } else {
+                    sigmaList.add(val); // Fallback
+                }
             }
             Vector<E> s = Vector.of(sigmaList, a.getScalarRing());
             
@@ -1770,9 +1834,17 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             Matrix<E> u = eigen.getEigenvectors();
             
             List<E> sigmaList = new java.util.ArrayList<>(m);
+            boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof Complex;
             for (int i = 0; i < m; i++) {
                 E val = sValues.get(i);
-                sigmaList.add((E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO)));
+                if (val instanceof Real r) {
+                    Real sqrtR = r.sqrt();
+                    sigmaList.add(isComplex ? (E)(Object)Complex.of(sqrtR, Real.ZERO) : (E)(Object)sqrtR);
+                } else if (val instanceof Complex c) {
+                    sigmaList.add((E)(Object)c.sqrt());
+                } else {
+                    sigmaList.add(val); // Fallback
+                }
             }
             Vector<E> s = Vector.of(sigmaList, a.getScalarRing());
             
