@@ -70,22 +70,22 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
         for (int i = 0; i < rows.size(); i++) for (int j = 0; j < rows.get(i).size(); j++) storage.set(i, j, rows.get(i).get(j));
     }
 
-    public DenseMatrix(E[] flatData, int rows, int cols, Ring<E> ring) {
-        this(new DenseMatrixStorage<>(rows, cols, flatData), ring);
+    public DenseMatrix(E[] flatData, int rows, int cols, LinearAlgebraProvider<E> provider, Ring<E> ring) {
+        this(new DenseMatrixStorage<>(rows, cols, flatData), provider, ring);
     }
 
     // Internal constructor
-    public DenseMatrix(MatrixStorage<E> storage, Ring<E> ring) {
-        super(storage, org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
+    public DenseMatrix(MatrixStorage<E> storage, LinearAlgebraProvider<E> provider, Ring<E> ring) {
+        super(storage, provider, ring);
         this.storage = storage;
         this.ring = ring;
-        // Explicit validation: Ensure storage is intended for Dense usage
-        // We accept DenseMatrixStorage OR RealDoubleMatrixStorage (which is Dense
-        // optimized)
-        // We reject SparseMatrixStorage
         if (storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage) {
             throw new IllegalArgumentException("Cannot create DenseMatrix with Sparse storage");
         }
+    }
+
+    public DenseMatrix(MatrixStorage<E> storage, Ring<E> ring) {
+        this(storage, org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
     }
 
     public Object[] getRawData() {

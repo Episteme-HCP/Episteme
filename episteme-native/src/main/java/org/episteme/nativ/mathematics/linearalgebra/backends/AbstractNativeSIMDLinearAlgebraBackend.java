@@ -229,6 +229,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
     @Override
     public String getId() {
+        if (ring == null) return "simd-unknown";
         return "simd-" + (ring instanceof Reals ? "real" : "complex");
     }
 
@@ -304,8 +305,8 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             res = ring instanceof Complexes || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         }
         
-        System.out.println(String.format("[DEBUG] Backend %s isCompatible(%s)? %b (this.ring=%s)", 
-            getName(), ring.getClass().getSimpleName(), res, this.ring.getClass().getSimpleName()));
+        logger.debug("Backend {} isCompatible({})? {} (this.ring={})",
+            getName(), ring.getClass().getSimpleName(), res, this.ring.getClass().getSimpleName());
         return res;
     }
 

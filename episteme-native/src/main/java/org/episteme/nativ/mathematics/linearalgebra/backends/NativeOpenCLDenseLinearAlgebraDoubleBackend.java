@@ -62,6 +62,9 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     private cl_kernel luStepKernel;
     private cl_kernel choleskyStepKernel;
     private cl_kernel qrHouseholderKernel;
+    private cl_kernel complexVecAddKernel;
+    private cl_kernel complexVecSubKernel;
+    private cl_kernel complexVecScaleKernel;
     private cl_kernel jacobiDotKernel;
     private cl_kernel jacobiApplyKernel;
     
@@ -96,6 +99,9 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             luStepKernel = tryCreateKernel(program, "lu_decompose_step");
             choleskyStepKernel = tryCreateKernel(program, "cholesky_decompose_step");
             qrHouseholderKernel = tryCreateKernel(program, "qr_householder_apply");
+            complexVecAddKernel = tryCreateKernel(program, "complex_vec_add");
+            complexVecSubKernel = tryCreateKernel(program, "complex_vec_sub");
+            complexVecScaleKernel = tryCreateKernel(program, "complex_vec_scale");
             jacobiDotKernel = tryCreateKernel(program, "hestenes_jacobi_dot");
             jacobiApplyKernel = tryCreateKernel(program, "hestenes_jacobi_apply");
             
@@ -234,11 +240,13 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
 
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        if (isComplex(a)) return elementWiseComplex(a, b, complexVecAddKernel);
         return elementWise(a, b, vecAddKernel);
     }
 
     @Override
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
+        if (isComplex(a)) return elementWiseComplex(a, b, complexVecSubKernel);
         return elementWise(a, b, vecSubKernel);
     }
 
@@ -272,6 +280,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        if (isComplex(a)) return scaleComplex(scalar, a);
         int n = a.rows() * a.cols();
         double[] da = toDoubleArray(a);
         double s = getRealValue(scalar);
@@ -293,6 +302,49 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * n, Pointer.to(dc), 0, null, null);
             
             return fromDoubleArray(dc, a.rows(), a.cols(), a);
+        }
+    }
+
+    private Matrix<E> elementWiseComplex(Matrix<E> a, Matrix<E> b, cl_kernel kernel) {
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        int n = a.rows() * a.cols();
+        double[] da = toComplexDoubleArray(a);
+        double[] db = toComplexDoubleArray(b);
+        double[] dc = new double[n * 2];
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * 2, Pointer.to(da), null), CL::clReleaseMemObject);
+            cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * 2, Pointer.to(db), null), CL::clReleaseMemObject);
+            cl_mem memC = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n * 2, null, null), CL::clReleaseMemObject);
+            clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(kernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(kernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(queue, kernel, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * n * 2, Pointer.to(dc), 0, null, null);
+            return fromComplexDoubleArray(dc, a.rows(), a.cols(), a);
+        }
+    }
+
+    private Matrix<E> scaleComplex(E scalar, Matrix<E> a) {
+        int n = a.rows() * a.cols();
+        double[] da = toComplexDoubleArray(a);
+        double sr = getRealValue(scalar);
+        double si = (scalar instanceof Complex c) ? c.imaginary() : 0.0;
+        double[] dc = new double[n * 2];
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * 2, Pointer.to(da), null), CL::clReleaseMemObject);
+            cl_mem memC = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * n * 2, null, null), CL::clReleaseMemObject);
+            clSetKernelArg(complexVecScaleKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(complexVecScaleKernel, 1, Sizeof.cl_double * 2, Pointer.to(new double[]{sr, si}));
+            clSetKernelArg(complexVecScaleKernel, 2, Sizeof.cl_mem, Pointer.to(memC));
+            clSetKernelArg(complexVecScaleKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clEnqueueNDRangeKernel(queue, complexVecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_double * n * 2, Pointer.to(dc), 0, null, null);
+            return fromComplexDoubleArray(dc, a.rows(), a.cols(), a);
         }
     }
 
