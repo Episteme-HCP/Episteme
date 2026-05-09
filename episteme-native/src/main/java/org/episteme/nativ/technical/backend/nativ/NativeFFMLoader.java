@@ -108,6 +108,7 @@ public class NativeFFMLoader {
             if (libName.equals("cuda")) {
                 variants.add("nvcuda");
             } else if (libName.startsWith("cu")) {
+                // Try major versions 13, 12, 11
                 variants.add(libName + "64_13");
                 variants.add(libName + "64_12");
                 variants.add(libName + "64_11");
@@ -116,6 +117,8 @@ public class NativeFFMLoader {
                     variants.add("cudart64_120");
                     variants.add("cudart64_110");
                 }
+            } else if (libName.equals("opencl")) {
+                variants.add("OpenCL");
             } else if (libName.equals("vlc")) {
                 variants.add("libvlc"); 
                 variants.add("libvlccore"); 

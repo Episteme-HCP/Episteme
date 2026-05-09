@@ -156,12 +156,12 @@ public class EpistemeMasterControl extends Application {
 
         if (primaryStage.getScene() == null) {
             Scene scene = new Scene(root, 1100, 750);
-            applyCurrentTheme(scene); // Apply to new scene
+            applyCurrentTheme(scene);
             primaryStage.setScene(scene);
         } else {
             Scene scene = primaryStage.getScene();
             scene.setRoot(root);
-            applyCurrentTheme(scene); // Re-apply theme to ensure styles match
+            applyCurrentTheme(scene);
         }
 
         primaryStage.setTitle(i18n.get("app.title", "Episteme Master Control"));
@@ -314,13 +314,10 @@ public class EpistemeMasterControl extends Application {
 
         Label title = new Label(i18n.get("mastercontrol.computing.title", "Computing Management"));
         title.getStyleClass().add("header-label");
- // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
 
         GridPane grid = new GridPane();
         grid.setHgap(30);
         grid.setVgap(25);
-
-
 
         // --- Float Precision ---
         ComboBox<org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision> floatBox = new ComboBox<>();
@@ -375,10 +372,6 @@ public class EpistemeMasterControl extends Application {
         boolean gpuAvail = org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
                 .anyMatch(p -> (p.getId().toLowerCase().contains("cuda") || p.getId().toLowerCase().contains("opencl")) && p.isAvailable());
 
-        Label gpuVal = new Label(gpuAvail ? i18n.get("mastercontrol.libraries.available", "Available")
-                : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        gpuVal.getStyleClass().add(gpuAvail ? "status-connected" : "status-disconnected");
-
         // --- GPU Auto-Tuning Mode ---
         ComboBox<org.episteme.core.technical.algorithm.AutoTuningManager.Mode> tuningBox = new ComboBox<>();
         tuningBox.getItems().addAll(org.episteme.core.technical.algorithm.AutoTuningManager.Mode.values());
@@ -388,6 +381,25 @@ public class EpistemeMasterControl extends Application {
         });
         VBox tuningInfo = createInfoBox(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning Mode"),
                 i18n.get("mastercontrol.computing.desc.autotuning", "ON (Force Tuning), OFF (Standard Priorities), AUTO (Learning)"));
+
+        // --- GPU Backend Selection ---
+        ComboBox<String> gpuBackendBox = new ComboBox<>();
+        gpuBackendBox.getItems().addAll("AUTO", "CPU", "OpenCL", "CUDA");
+        gpuBackendBox.setValue(PREFS.get("computing_gpu_backend", "AUTO"));
+        gpuBackendBox.setPrefWidth(150);
+        gpuBackendBox.setOnAction(e -> {
+            PREFS.set("computing_gpu_backend", gpuBackendBox.getValue());
+            Episteme.savePreferences();
+        });
+        
+        Label gpuStatus = new Label(gpuAvail ? i18n.get("mastercontrol.libraries.available", "Available")
+                : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
+        gpuStatus.getStyleClass().add(gpuAvail ? "status-connected" : "status-disconnected");
+        HBox gpuRow = new HBox(10, gpuBackendBox, gpuStatus);
+        gpuRow.setAlignment(Pos.CENTER_LEFT);
+
+        VBox gpuBackendInfo = createInfoBox(i18n.get("mastercontrol.computing.gpu_backend", "GPU Backend"),
+                i18n.get("mastercontrol.computing.desc.gpu_backend", "Select the preferred acceleration API."));
 
         // --- Parallel Threads ---
         Spinner<Integer> threadsSpinner = new Spinner<>(1, 256, org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMaxThreads());
@@ -399,8 +411,8 @@ public class EpistemeMasterControl extends Application {
                 Episteme.savePreferences();
             }
         });
-        VBox threadsInfo = createInfoBox(i18n.get("mastercontrol.computing.threads", "Max Parallel Threads"),
-                i18n.get("mastercontrol.computing.desc.threads", "Max CPU threads for parallel algorithms"));
+        VBox threadsInfo = createInfoBox(i18n.get("mastercontrol.computing.threads", "Parallel Threads"),
+                i18n.get("mastercontrol.computing.desc.threads", "Maximum threads for parallel operations."));
 
         // --- Linear Algebra Epsilon ---
         TextField epsilonField = new TextField(String.valueOf(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getEpsilonDouble()));
@@ -414,7 +426,7 @@ public class EpistemeMasterControl extends Application {
                 epsilonField.setText(String.valueOf(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getEpsilonDouble()));
             }
         });
-        VBox epsilonInfo = createInfoBox(i18n.get("mastercontrol.computing.epsilon", "LA Epsilon (Double)"),
+        VBox epsilonInfo = createInfoBox(i18n.get("mastercontrol.computing.epsilon", "LA Epsilon"),
                 i18n.get("mastercontrol.computing.desc.epsilon", "Tolerance for linear algebra convergence"));
 
         // --- Max Iterations ---
@@ -428,36 +440,19 @@ public class EpistemeMasterControl extends Application {
             }
         });
         VBox itersInfo = createInfoBox(i18n.get("mastercontrol.computing.iterations", "LA Max Iterations"),
-                i18n.get("mastercontrol.computing.desc.iterations", "Maximum iterations for iterative solvers (e.g. GMRES)"));
+                i18n.get("mastercontrol.computing.desc.iterations", "Maximum iterations for iterative solvers"));
 
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning")), tuningBox, tuningInfo);
-        grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.threads", "Max Threads")), threadsSpinner, threadsInfo);
-        
-        // --- GPU Section ---
-        grid.addRow(2, createHeaderLabel(i18n.get("mastercontrol.computing.gpu", "GPU Support")), gpuVal);
-        
-        ComboBox<org.episteme.core.mathematics.context.ComputeMode> modeBox = new ComboBox<>();
-        modeBox.getItems().addAll(org.episteme.core.mathematics.context.ComputeMode.values());
-        modeBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getComputeMode());
-        modeBox.setOnAction(e -> {
-            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().applyComputeMode(modeBox.getValue());
-            Episteme.savePreferences();
-        });
-        
-        Label modeDesc = new Label(i18n.get("mastercontrol.computing.desc.mode_alt", "Determines where calculations are performed"));
-        modeDesc.getStyleClass().add("description-label");
-        
-        grid.addRow(3, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeDesc);
-        grid.addRow(4, new Separator());
-        grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")), floatBox, floatInfo);
-        grid.addRow(6, createHeaderLabel(i18n.get("mastercontrol.computing.int_precision", "Integer Precision")), intBox, intInfo);
-        grid.addRow(7, createHeaderLabel(i18n.get("mastercontrol.computing.precision", "Decimal Precision")), precSpinner, precInfo);
-        grid.addRow(8, createHeaderLabel(i18n.get("mastercontrol.computing.rounding", "Rounding Mode")), roundBox, roundInfo);
-        grid.addRow(9, new Separator());
-        grid.addRow(10, createHeaderLabel(i18n.get("mastercontrol.computing.epsilon", "LA Epsilon")), epsilonField, epsilonInfo);
-        grid.addRow(11, createHeaderLabel(i18n.get("mastercontrol.computing.iterations", "LA Max Iterations")), itersSpinner, itersInfo);
+        grid.addRow(0, tuningInfo, tuningBox);
+        grid.addRow(1, gpuBackendInfo, gpuRow);
+        grid.addRow(2, threadsInfo, threadsSpinner);
+        grid.addRow(3, new Separator(), new Separator());
+        grid.addRow(4, floatInfo, floatBox);
+        grid.addRow(5, intInfo, intBox);
+        grid.addRow(6, precInfo, precSpinner);
+        grid.addRow(7, roundInfo, roundBox);
+        grid.addRow(8, epsilonInfo, epsilonField);
+        grid.addRow(9, itersInfo, itersSpinner);
 
-        // Linear Algebra provider selection is handled transparently by Factory/ComputeMode
         ScrollPane scroll = new ScrollPane(grid);
         scroll.setFitToWidth(true);
         scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
@@ -529,15 +524,24 @@ public class EpistemeMasterControl extends Application {
 
             int r = 0;
             for (org.episteme.core.technical.algorithm.AlgorithmProvider p : providers) {
+                // Zebra background
+                javafx.scene.layout.Region rowBg = new javafx.scene.layout.Region();
+                rowBg.getStyleClass().add(r % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
+                grid.add(rowBg, 0, r, 3, 1);
+
                 Label nameLabel = new Label(p.getName());
                 nameLabel.getStyleClass().addAll("font-bold", "text-dark");
+                nameLabel.setPadding(new Insets(5, 10, 5, 10));
 
                 Label descLabel = new Label(p.description());
                 descLabel.getStyleClass().add("description-label");
                 descLabel.setWrapText(true);
                 descLabel.setMaxWidth(400);
+                descLabel.setPadding(new Insets(5, 10, 5, 10));
+
                 Label stateLabel = new Label(p.isAvailable() ? i18n.get("master.available", "Available") : i18n.get("master.not_available", "N/A"));
                 stateLabel.getStyleClass().add(p.isAvailable() ? "status-label-available" : "status-label-unavailable");
+                stateLabel.setPadding(new Insets(5, 10, 5, 10));
 
                 grid.addRow(r++, nameLabel, stateLabel, descLabel);
             }
@@ -1049,8 +1053,31 @@ public class EpistemeMasterControl extends Application {
         
         box.getChildren().addAll(header, grid); 
         
-        // Append list
+        // Append list (SPI discovered)
         box.getChildren().add(createBackendCategory(i18n, BackendDiscovery.TYPE_MATH, "", ""));
+        
+        // --- EXTRA Math Engines (Manual Discovery) ---
+        String[][] mathEngines = {
+            {"EJML", "org.ejml.EjmlParameters", "Efficient Java Matrix Library"},
+            {"Colt", "cern.colt.Version", "CERN High Performance Scientific Computing"},
+            {"MTJ", "no.uib.cipr.matrix.Matrix", "Matrix Toolkits Java"},
+            {"Commons Math", "org.apache.commons.math3.util.Precision", "Apache Commons Mathematics Library"},
+            {"JAMA", "Jama.Matrix", "Java Matrix Package"},
+            {"Deep Java Library (DJL)", "ai.djl.engine.Engine", "Agnostic Deep Learning Framework"},
+            {"DL4J", "org.deeplearning4j.nn.api.Model", "Deep Learning for Java"}
+        };
+        
+        GridPane manualGrid = new GridPane();
+        manualGrid.setHgap(35); manualGrid.setVgap(12);
+        int rManual = 0;
+        for (String[] eng : mathEngines) {
+            if (isClassAvailable(eng[1])) {
+                addManualBackendRow(manualGrid, rManual++, eng[0], eng[2], i18n);
+            }
+        }
+        if (rManual > 0) {
+            box.getChildren().add(manualGrid);
+        }
         
         // Linear Algebra providers hidden as per user request (internal details)
         
@@ -1212,7 +1239,7 @@ public class EpistemeMasterControl extends Application {
         backendBox.setConverter(new javafx.util.StringConverter<PlottingBackend>() {
             @Override
             public String toString(PlottingBackend object) {
-                if (object == null) return "Auto";
+                if (object == null) return "AUTO";
                 return object.getName();
             }
             @Override
@@ -1536,14 +1563,6 @@ public class EpistemeMasterControl extends Application {
     }
 
 
-    private boolean isClassAvailable(String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
 
     private Tab createThemesTab(I18N i18n) {
         VBox content = new VBox(20);
@@ -1586,7 +1605,9 @@ public class EpistemeMasterControl extends Application {
 
     private void applyDashboardTheme(String theme) {
         ThemeManager.getInstance().setTheme(theme);
-        refreshUI();
+        if (primaryStage.getScene() != null) {
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+        }
     }
 
     private Tab createAppsTab(I18N i18n) {
@@ -1829,40 +1850,81 @@ public class EpistemeMasterControl extends Application {
         launch(args);
     }
     private void addBackendRow(GridPane grid, int row, org.episteme.core.technical.backend.Backend provider, I18N i18n) {
+        String id = provider.getId().toLowerCase();
         String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
         String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
         boolean available = provider.isAvailable();
 
+        // Zebra background region
+        javafx.scene.layout.Region rowBg = new javafx.scene.layout.Region();
+        rowBg.getStyleClass().add(row % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
+        grid.add(rowBg, 0, row, 5, 1); // Span 5 columns
+
         Label nameLabel = new Label(name);
         nameLabel.getStyleClass().addAll("font-bold", "text-dark");
-
-        Label descLabel = new Label(providerDesc);
-        descLabel.getStyleClass().add("description-label");
-        descLabel.setWrapText(true);
-        descLabel.setMaxWidth(400);
+        nameLabel.setPadding(new Insets(5, 10, 5, 10));
 
         Label statusLabel = new Label(available
                 ? i18n.get("mastercontrol.libraries.available", "Available")
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
         statusLabel.getStyleClass().add(available ? "status-label-available" : "status-label-unavailable");
+        statusLabel.setPadding(new Insets(5, 10, 5, 10));
 
-        CheckBox deactivateBox = new CheckBox(i18n.get("mastercontrol.libraries.deactivate", "Deactivate"));
-        deactivateBox.setSelected(PREFS.isBackendDeactivated(provider.getId()));
-        deactivateBox.setOnAction(e -> {
-            PREFS.setBackendDeactivated(provider.getId(), deactivateBox.isSelected());
-        });
+        Label descLabel = new Label(providerDesc);
+        descLabel.getStyleClass().add("description-label");
+        descLabel.setWrapText(true);
+        descLabel.setMaxWidth(450);
+        descLabel.setPadding(new Insets(5, 10, 5, 10));
 
-        grid.addRow(row, nameLabel, statusLabel, descLabel, deactivateBox);
+        // Core system libraries should not be deactivated
+        boolean isFixed = id.contains("cpu-dense") || id.contains("cpu-sparse") || id.contains("core") || id.contains("standard");
         
-        // Zebra striping
-        if (row % 2 == 0) {
-            grid.getChildren().stream()
-                .filter(n -> GridPane.getRowIndex(n) != null && GridPane.getRowIndex(n) == row)
-                .forEach(n -> n.getStyleClass().add("zebra-row-even"));
+        if (!isFixed) {
+            CheckBox deactivateBox = new CheckBox(i18n.get("mastercontrol.libraries.deactivate", "Deactivate"));
+            deactivateBox.setSelected(PREFS.isBackendDeactivated(provider.getId()));
+            deactivateBox.setPadding(new Insets(5, 10, 5, 10));
+            deactivateBox.setOnAction(e -> {
+                PREFS.setBackendDeactivated(provider.getId(), deactivateBox.isSelected());
+            });
+            grid.addRow(row, nameLabel, statusLabel, descLabel, deactivateBox);
         } else {
-            grid.getChildren().stream()
-                .filter(n -> GridPane.getRowIndex(n) != null && GridPane.getRowIndex(n) == row)
-                .forEach(n -> n.getStyleClass().add("zebra-row-odd"));
+            Label fixedLabel = new Label(i18n.get("master.system_lib", "System Core"));
+            fixedLabel.getStyleClass().add("font-italic");
+            fixedLabel.setPadding(new Insets(5, 10, 5, 10));
+            grid.addRow(row, nameLabel, statusLabel, descLabel, fixedLabel);
+        }
+    }
+
+    private void addManualBackendRow(GridPane grid, int row, String name, String desc, I18N i18n) {
+        javafx.scene.layout.Region rowBg = new javafx.scene.layout.Region();
+        rowBg.getStyleClass().add(row % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
+        grid.add(rowBg, 0, row, 5, 1);
+
+        Label nameLabel = new Label(name);
+        nameLabel.getStyleClass().addAll("font-bold", "text-dark");
+        nameLabel.setPadding(new Insets(5, 10, 5, 10));
+
+        Label statusLabel = new Label(i18n.get("mastercontrol.libraries.available", "Available"));
+        statusLabel.getStyleClass().add("status-label-available");
+        statusLabel.setPadding(new Insets(5, 10, 5, 10));
+
+        Label descLabel = new Label(desc);
+        descLabel.getStyleClass().add("description-label");
+        descLabel.setPadding(new Insets(5, 10, 5, 10));
+
+        Label fixedLabel = new Label(i18n.get("master.external_lib", "External Lib"));
+        fixedLabel.getStyleClass().add("font-italic");
+        fixedLabel.setPadding(new Insets(5, 10, 5, 10));
+
+        grid.addRow(row, nameLabel, statusLabel, descLabel, fixedLabel);
+    }
+
+    private boolean isClassAvailable(String className) {
+        try {
+            Class.forName(className, false, getClass().getClassLoader());
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 

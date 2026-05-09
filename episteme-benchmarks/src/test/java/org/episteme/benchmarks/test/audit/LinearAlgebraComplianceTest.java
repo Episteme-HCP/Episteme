@@ -247,7 +247,7 @@ public class LinearAlgebraComplianceTest {
     private void runStandardAudit(ComplianceResult res, LinearAlgebraProvider<Real> prov, LinearAlgebraProvider<Real> ref) {
         Ring<Real> realRing;
         if (mode == PrecisionMode.FAST) {
-            realRing = (Ring<Real>) (Object) org.episteme.core.mathematics.numbers.real.RealFloat.ZERO.getScalarRing();
+            realRing = (Ring<Real>) (Object) org.episteme.core.mathematics.numbers.real.Real.zeroE().getScalarRing();
         } else {
             realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
         }
@@ -265,7 +265,8 @@ public class LinearAlgebraComplianceTest {
         Ring<Complex> complexRing;
         if (mode == PrecisionMode.FAST) {
             // Create a Complex ring based on RealFloat
-            complexRing = (Ring<Complex>) (Object) Complex.of(RealFloat.ZERO, RealFloat.ZERO).getScalarRing();
+            org.episteme.core.mathematics.numbers.real.Real zf = org.episteme.core.mathematics.numbers.real.Real.zeroE();
+            complexRing = (Ring<Complex>) (Object) Complex.of(zf, zf).getScalarRing();
         } else {
             complexRing = Complex.of(1.0, 0.0).getScalarRing();
         }
