@@ -52,10 +52,18 @@ public class RealDoubleVector extends DenseVector<Real> implements AutoCloseable
         return new RealDoubleVector(storage);
     }
 
+    public static RealDoubleVector of(RealDoubleVectorStorage storage, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider) {
+        return new RealDoubleVector(storage, provider);
+    }
+
     // Constructors
 
     protected RealDoubleVector(RealDoubleVectorStorage storage) {
         super(storage, Reals.getInstance());
+    }
+
+    public RealDoubleVector(RealDoubleVectorStorage storage, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider) {
+        super(storage, provider, Reals.getInstance());
     }
 
     public RealDoubleVectorStorage getRealStorage() {

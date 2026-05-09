@@ -76,11 +76,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
         if (ring == null) return false;
         Object zero = ring.zero();
-        boolean isReal = ring instanceof org.episteme.core.mathematics.sets.Reals || 
-                         zero instanceof org.episteme.core.mathematics.numbers.real.Real;
-        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes || 
-                         zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
-        return isReal || isComplex;
+        // Compatible with any Real or Complex based on Real
+        return zero instanceof org.episteme.core.mathematics.numbers.real.Real || 
+               (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex c && 
+                c.getReal() instanceof org.episteme.core.mathematics.numbers.real.Real);
     }
 
     
@@ -178,36 +177,32 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     @SuppressWarnings("unchecked")
     private E castScalar(Object val, Ring<E> ring) {
         if (val == null) return ring.zero();
-        String ringName = ring.getClass().getName();
-        boolean isComplexRing = ringName.contains("Complexes");
-        boolean isRealRing = ringName.contains("Reals");
+        Object zero = ring.zero();
         
-        if (isComplexRing) {
-            if (val instanceof Complex) return (E) val;
+        if (zero instanceof Complex) {
+            if (val instanceof Complex c) return (E) c;
             if (val instanceof Real r) return (E) Complex.of(r);
             if (val instanceof Number n) return (E) Complex.of(n.doubleValue());
         }
-        if (isRealRing) {
-            if (val instanceof Real) return (E) val;
+        if (zero instanceof Real) {
+            if (val instanceof Real r) return (E) r;
             if (val instanceof Complex c) return (E) c.getReal();
             if (val instanceof Number n) return (E) Real.of(n.doubleValue());
         }
         
-        if (val instanceof Real r) {
-            if (ring.zero() instanceof Double) return (E) Double.valueOf(r.doubleValue());
-            if (ring.zero() instanceof Float) return (E) Float.valueOf(r.floatValue());
-            return (E) r;
-        }
-        if (val instanceof Complex c) {
-            if (ring.zero() instanceof Double) return (E) Double.valueOf(c.real());
-            if (ring.zero() instanceof Float) return (E) Float.valueOf((float)c.real());
-            return (E) c;
-        }
+        // Fallback for standard Java numbers if the ring uses them
         if (val instanceof Number n) {
-            if (ring.zero() instanceof Double) return (E) Double.valueOf(n.doubleValue());
-            if (ring.zero() instanceof Float) return (E) Float.valueOf(n.floatValue());
+            if (zero instanceof Double) return (E) Double.valueOf(n.doubleValue());
+            if (zero instanceof Float) return (E) Float.valueOf(n.floatValue());
+            if (zero instanceof Long) return (E) Long.valueOf(n.longValue());
+            if (zero instanceof Integer) return (E) Integer.valueOf(n.intValue());
         }
-        return (E) val;
+        
+        try {
+            return (E) val;
+        } catch (ClassCastException e) {
+            return ring.zero();
+        }
     }
 
     private boolean isZero(Object obj, Ring<?> ring) {
@@ -271,12 +266,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
 
     private static long getPrecision() {
-        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
-        int digits = ctx.getJavaMathContext().getPrecision();
-        if (digits <= 0) digits = 256; 
-        long prec = (long) (digits * 3.322) + 1;
-        diag("[MPFR-DIAG] Requested Precision: " + prec + " bits (from " + digits + " digits)");
-        return prec;
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().getPrecisionBits();
     }
 
     @Override
@@ -1086,6 +1076,30 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         }
     }
 
+    @Override
+    public Matrix<E> conjugateTranspose(Matrix<E> a) {
+        int m = a.rows();
+        int n = a.cols();
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (!isComplex) return transpose(a);
+        
+        long prec = getPrecision();
+        try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
+            MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
+            MemorySegment h_C = allocateMatrix(n, m, arena, tracker, prec, isComplex);
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    NativeSafe.invoke(MPFR_SET, getMPFR(h_C, j, i, m, 0, true), getMPFR(h_A, i, j, n, 0, true), 0);
+                    NativeSafe.invoke(MPFR_NEG, getMPFR(h_C, j, i, m, 1, true), getMPFR(h_A, i, j, n, 1, true), 0);
+                }
+            }
+            return backToMatrix_internal(h_C, n, m, arena, a.getScalarRing(), isComplex);
+        } catch (Throwable t) {
+            logger.error("MPFR conjugateTranspose failed: {}", t.getMessage(), t);
+            throw new RuntimeException("MPFR conjugateTranspose failed", t);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private Matrix<E> backToMatrix_internal(MemorySegment h_Mat, int rows, int cols, Arena arena, org.episteme.core.mathematics.structures.rings.Ring<E> ring, boolean isComplex) throws Throwable {
         org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
@@ -1285,7 +1299,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         
         // Q is orthogonal (unitary), so Q^T * b = conjugateTranspose(Q) * b
         // For real matrices, Q^T * b.
-        Vector<E> qtB = multiply(transpose(q), b); 
+        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        Vector<E> qtB = multiply(isComplex ? conjugateTranspose(q) : transpose(q), b); 
         
         // Solve R*x = qtB (upper)
         return solveTriangular(r, qtB, true, false, false);

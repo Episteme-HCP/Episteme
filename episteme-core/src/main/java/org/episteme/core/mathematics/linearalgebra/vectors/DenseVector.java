@@ -49,13 +49,17 @@ public class DenseVector<E> extends GenericVector<E> {
     }
 
     // Internal constructor using storage directly
-    protected DenseVector(org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage,
-            Ring<E> ring) {
-        super(storage, org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
-        // explicit validation
+    public DenseVector(org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage,
+            org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider, Ring<E> ring) {
+        super(storage, provider, ring);
         if (storage instanceof org.episteme.core.mathematics.linearalgebra.vectors.storage.SparseVectorStorage) {
             throw new IllegalArgumentException("Cannot create DenseVector with Sparse storage");
         }
+    }
+
+    protected DenseVector(org.episteme.core.mathematics.linearalgebra.vectors.storage.VectorStorage<E> storage,
+            Ring<E> ring) {
+        this(storage, org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
     }
 
     // Removed manual createStorage methods in favor of VectorFactory
