@@ -15,6 +15,9 @@ import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.io.UserPreferences;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.ui.Viewer;
+import org.episteme.core.mathematics.context.NumericalConfiguration;
+import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.mathematics.context.ComputeMode;
 
 import java.util.*;
 
@@ -746,6 +749,14 @@ public class EpistemeMasterControl extends Application {
         String name; Locale locale;
         LocaleItem(String n, Locale l) { name = n; locale = l; }
         @Override public String toString() { return name; }
+    }
+
+    private void showStatus(String message, boolean error) {
+        Alert alert = new Alert(error ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION);
+        alert.setTitle("System Status");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.show();
     }
 
     public static void main(String[] args) { launch(args); }
