@@ -681,7 +681,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public CholeskyResult<E> cholesky(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        if (isComplex(a)) return new GenericCholesky<>(choleskyComplex(a));
+        if (isComplex(a)) return new CholeskyResult<>(choleskyComplex(a));
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
@@ -704,7 +704,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             
             // Mask upper triangle to get L
             for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) result[i * n + j] = 0;
-            return new GenericCholesky<>(fromFloatArray(result, n, n, a));
+            return new CholeskyResult<>(fromFloatArray(result, n, n, (Ring<E>) a.getScalarRing()));
         } catch (Throwable t) { throw new RuntimeException("CUDA float cholesky failed", t); }
     }
 
@@ -737,7 +737,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostW, d_W, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostA, ValueLayout.JAVA_FLOAT, 0, vData, 0, n * n);
             MemorySegment.copy(hostW, ValueLayout.JAVA_FLOAT, 0, wData, 0, n);
-            return new GenericEigen<>(fromFloatArray(vData, n, n, a), fromFloatVec(Vector.of(wData, a.getScalarRing())));
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            return new EigenResult<>(fromFloatArray(vData, n, n, ring), fromFloatVec(wData, ring));
         } catch (Throwable t) { throw new RuntimeException("CUDA float eigen failed", t); }
     }
 
@@ -895,7 +896,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
 
     @Override
     public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
-        throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not implemented in float backend");
+        throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not supported in float backend");
     }
 
     private LUResult<E> luComplex(Matrix<E> a) {
@@ -1031,7 +1032,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 flatW[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(wData[i]), RealFloat.ZERO);
                 for (int j = 0; j < n; j++) flatV[i * n + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(vData[(i * n + j) * 2]), RealFloat.create(vData[(i * n + j) * 2 + 1]));
             }
-            return new GenericEigen<>(new DenseMatrix<>(flatV, n, n, this, ring), new DenseVector<>(java.util.Arrays.asList(flatW), ring).withProvider(this));
+            return new EigenResult<>(new DenseMatrix<>(flatV, n, n, ring), new DenseVector<>(java.util.Arrays.asList(flatW), ring));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float eigen failed", t); }
     }
 

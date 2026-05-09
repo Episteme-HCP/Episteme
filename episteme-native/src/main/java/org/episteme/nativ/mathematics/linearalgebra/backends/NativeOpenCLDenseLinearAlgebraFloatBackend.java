@@ -899,17 +899,17 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     }
 
     private Vector<E> fromFloatVec(float[] data, Ring<E> ring) {
-        E[] elements = (E[]) new FieldElement[data.length];
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) elements[i] = (E) (Object) RealFloat.create(data[i]);
-        return new DenseVector<>(java.util.Arrays.asList(elements), (LinearAlgebraProvider<E>) this, ring);
+        return new DenseVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), (LinearAlgebraProvider<E>) this, ring);
     }
 
     private Vector<E> fromComplexFloatVec(float[] data, Ring<E> ring) {
-        E[] elements = (E[]) new FieldElement[data.length / 2];
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length / 2);
         for (int i = 0; i < elements.length; i++) {
             elements[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
-        return new DenseVector<>(java.util.Arrays.asList(elements), (LinearAlgebraProvider<E>) this, ring);
+        return new DenseVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), (LinearAlgebraProvider<E>) this, ring);
     }
 
     private static cl_kernel tryCreateKernel(cl_program program, String name) {
