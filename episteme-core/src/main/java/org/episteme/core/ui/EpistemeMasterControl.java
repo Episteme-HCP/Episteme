@@ -335,7 +335,7 @@ public class EpistemeMasterControl extends Application {
             i18n.get("mastercontrol.algorithms.desc", "Configuration and availability of specific scientific algorithm implementations.")
         );
 
-        content.getChildren().addAll(header, createBackendCategory(i18n, BackendDiscovery.TYPE_ALGORITHM, "", ""));
+        content.getChildren().addAll(header, createBackendCategory(i18n, BackendDiscovery.TYPE_MATH, "", ""));
         return new Tab(i18n.get("mastercontrol.tab.algorithms", "Algorithms"), scroll);
     }
 
@@ -382,7 +382,7 @@ public class EpistemeMasterControl extends Application {
         status.getStyleClass().add(provider.isAvailable() ? "status-label-available" : "status-label-unavailable");
         status.setPadding(new Insets(8, 10, 8, 10));
 
-        Label info = new Label(provider.getInfo());
+        Label info = new Label(provider.getDescription());
         info.getStyleClass().add("description-label");
         info.setPadding(new Insets(8, 10, 8, 10));
         info.setWrapText(true);
