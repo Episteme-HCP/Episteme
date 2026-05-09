@@ -131,6 +131,9 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
     default Matrix<E> transpose(Matrix<E> a) {
         throw new UnsupportedOperationException(getName() + " does not support transpose()");
     }
+    default Matrix<E> conjugateTranspose(Matrix<E> a) {
+        throw new UnsupportedOperationException(getName() + " does not support conjugateTranspose()");
+    }
     /**
      * Solves the triangular system Ax = b.
      * @param A the triangular matrix

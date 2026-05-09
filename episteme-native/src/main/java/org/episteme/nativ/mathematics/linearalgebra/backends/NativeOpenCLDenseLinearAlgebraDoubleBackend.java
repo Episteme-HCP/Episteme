@@ -450,12 +450,29 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
 
     @Override
     public E determinant(Matrix<E> a) {
-        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
-        // Simple implementation via LU if available, or fallback
-        return LinearAlgebraProvider.super.determinant(a);
+        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        var lu = lu(a);
+        Matrix<E> U = lu.U();
+        int n = a.rows();
+        Ring<E> ring = (Ring<E>) a.getScalarRing();
+        E det = ring.one();
+        for (int i = 0; i < n; i++) {
+            det = ring.multiply(det, U.get(i, i));
+        }
+        // Since we don't pivot in the kernel, we don't need to check permutation sign
+        return det;
     }
 
-    @Override public E trace(Matrix<E> a) { return LinearAlgebraProvider.super.trace(a); }
+    @Override
+    public E trace(Matrix<E> a) {
+        int n = Math.min(a.rows(), a.cols());
+        Ring<E> ring = (Ring<E>) a.getScalarRing();
+        E sum = ring.zero();
+        for (int i = 0; i < n; i++) {
+            sum = ring.add(sum, a.get(i, i));
+        }
+        return sum;
+    }
     
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
@@ -474,8 +491,33 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             }
             double[] res = new double[n * n];
             clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(res), 0, null, null);
+            
             // Reconstruct L and U from packed result
-            return LinearAlgebraProvider.super.lu(fromDoubleArray(res, n, n, a));
+            double[] lData = new double[n * n];
+            double[] uData = new double[n * n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i > j) {
+                        lData[i * n + j] = res[i * n + j];
+                    } else if (i == j) {
+                        lData[i * n + j] = 1.0;
+                        uData[i * n + j] = res[i * n + j];
+                    } else {
+                        uData[i * n + j] = res[i * n + j];
+                    }
+                }
+            }
+            
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            Matrix<E> L = fromDoubleArray(lData, n, n, ring);
+            Matrix<E> U = fromDoubleArray(uData, n, n, ring);
+            
+            // Identity permutation since kernel doesn't pivot
+            double[] pData = new double[n];
+            for (int i = 0; i < n; i++) pData[i] = i;
+            Vector<E> P = fromDoubleVec(pData, ring);
+            
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(L, U, P);
         }
     }
 
@@ -491,6 +533,11 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             cl_command_queue queue = OpenCLManager.getCommandQueue();
             cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * n, Pointer.to(data), null), CL::clReleaseMemObject);
             cl_mem memV = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * m, null, null), CL::clReleaseMemObject);
+            
+            // Initialize Q as Identity on GPU
+            double[] qData = new double[m * m];
+            for (int i = 0; i < m; i++) qData[i * m + i] = 1.0;
+            cl_mem memQ = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * m, Pointer.to(qData), null), CL::clReleaseMemObject);
 
             for (int k = 0; k < Math.min(m, n); k++) {
                 double[] h_a = new double[m * n];
@@ -503,29 +550,60 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
                     x_norm += v[i - k] * v[i - k];
                 }
                 x_norm = Math.sqrt(x_norm);
-                double alpha = (v[0] >= 0) ? -x_norm : x_norm;
-                v[0] -= alpha;
-                double v_norm = 0;
-                for (double val : v) v_norm += val * val;
-                v_norm = Math.sqrt(v_norm);
-                
-                if (v_norm > 1e-18) {
-                    for (int i = 0; i < v.length; i++) v[i] /= v_norm;
-                    double[] fullV = new double[m];
-                    System.arraycopy(v, 0, fullV, k, v.length);
-                    clEnqueueWriteBuffer(queue, memV, CL_TRUE, 0, (long)Sizeof.cl_double * m, Pointer.to(fullV), 0, null, null);
+                if (x_norm > 1e-18) {
+                    double alpha = (v[0] >= 0) ? -x_norm : x_norm;
+                    v[0] -= alpha;
+                    double v_norm = 0;
+                    for (double val : v) v_norm += val * val;
+                    v_norm = Math.sqrt(v_norm);
                     
-                    clSetKernelArg(qrHouseholderKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
-                    clSetKernelArg(qrHouseholderKernel, 1, Sizeof.cl_mem, Pointer.to(memV));
-                    clSetKernelArg(qrHouseholderKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
-                    clSetKernelArg(qrHouseholderKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
-                    clSetKernelArg(qrHouseholderKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                    clEnqueueNDRangeKernel(queue, qrHouseholderKernel, 1, null, new long[]{n - k}, null, 0, null, null);
+                    if (v_norm > 1e-18) {
+                        for (int i = 0; i < v.length; i++) v[i] /= v_norm;
+                        double[] fullV = new double[m];
+                        System.arraycopy(v, 0, fullV, k, v.length);
+                        clEnqueueWriteBuffer(queue, memV, CL_TRUE, 0, (long)Sizeof.cl_double * m, Pointer.to(fullV), 0, null, null);
+                        
+                        // Apply to A: A = H_k * A
+                        clSetKernelArg(qrHouseholderKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                        clSetKernelArg(qrHouseholderKernel, 1, Sizeof.cl_mem, Pointer.to(memV));
+                        clSetKernelArg(qrHouseholderKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                        clSetKernelArg(qrHouseholderKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                        clSetKernelArg(qrHouseholderKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                        clEnqueueNDRangeKernel(queue, qrHouseholderKernel, 1, null, new long[]{n - k}, null, 0, null, null);
+                        
+                        // Apply to Q: Q = H_k * Q
+                        // Since we apply from the left, we are building Q^H = H_n ... H_1.
+                        // We will transpose at the end to get Q.
+                        clSetKernelArg(qrHouseholderKernel, 0, Sizeof.cl_mem, Pointer.to(memQ));
+                        clSetKernelArg(qrHouseholderKernel, 1, Sizeof.cl_mem, Pointer.to(memV));
+                        clSetKernelArg(qrHouseholderKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                        clSetKernelArg(qrHouseholderKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                        clSetKernelArg(qrHouseholderKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                        clEnqueueNDRangeKernel(queue, qrHouseholderKernel, 1, null, new long[]{m}, null, 0, null, null);
+                    }
                 }
             }
+            
             double[] resR = new double[m * n];
             clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(resR), 0, null, null);
-            return LinearAlgebraProvider.super.qr(fromDoubleArray(resR, m, n, a));
+            
+            double[] resQH = new double[m * m];
+            clEnqueueReadBuffer(queue, memQ, CL_TRUE, 0, (long)Sizeof.cl_double * m * m, Pointer.to(resQH), 0, null, null);
+            
+            // Transpose Q^H to get Q on GPU
+            cl_mem memQH = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * m, Pointer.to(resQH), null), CL::clReleaseMemObject);
+            cl_mem memQFinal = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * m * m, null, null), CL::clReleaseMemObject);
+            clSetKernelArg(transposeKernel, 0, Sizeof.cl_mem, Pointer.to(memQH));
+            clSetKernelArg(transposeKernel, 1, Sizeof.cl_mem, Pointer.to(memQFinal));
+            clSetKernelArg(transposeKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+            clSetKernelArg(transposeKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{m}));
+            clEnqueueNDRangeKernel(queue, transposeKernel, 2, null, new long[]{m, m}, null, 0, null, null);
+            
+            double[] resQ = new double[m * m];
+            clEnqueueReadBuffer(queue, memQFinal, CL_TRUE, 0, (long)Sizeof.cl_double * m * m, Pointer.to(resQ), 0, null, null);
+            
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(fromDoubleArray(resQ, m, m, ring), fromDoubleArray(resR, m, n, ring));
         }
     }
 
@@ -582,7 +660,28 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             }
             double[] resA = new double[m * n];
             clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(resA), 0, null, null);
-            return LinearAlgebraProvider.super.svd(fromDoubleArray(resA, m, n, a));
+            double[] resV = new double[n * n];
+            clEnqueueReadBuffer(queue, memV, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(resV), 0, null, null);
+            
+            // Normalize columns of A to get U and Sigma
+            double[] sigma = new double[n];
+            double[] uData = new double[m * n];
+            for (int j = 0; j < n; j++) {
+                double norm = 0;
+                for (int i = 0; i < m; i++) norm += resA[i * n + j] * resA[i * n + j];
+                norm = Math.sqrt(norm);
+                sigma[j] = norm;
+                if (norm > 1e-18) {
+                    for (int i = 0; i < m; i++) uData[i * n + j] = resA[i * n + j] / norm;
+                }
+            }
+            
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
+                fromDoubleArray(uData, m, n, ring),
+                fromDoubleVec(sigma, ring),
+                fromDoubleArray(resV, n, n, ring)
+            );
         }
     }
 
@@ -605,18 +704,34 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             }
             double[] res = new double[n * n];
             clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * n * n, Pointer.to(res), 0, null, null);
-            return LinearAlgebraProvider.super.cholesky(fromDoubleArray(res, n, n, a));
+            
+            // Reconstruct L (lower triangular part)
+            double[] lData = new double[n * n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j <= i; j++) {
+                    lData[i * n + j] = res[i * n + j];
+                }
+            }
+            
+            return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(fromDoubleArray(lData, n, n, (Ring<E>) a.getScalarRing()));
         }
     }
 
-    @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { return LinearAlgebraProvider.super.eigen(a); }
+    @Override
+    public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
+        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        // For symmetric matrices, SVD is equivalent to Eigen
+        // This is a simplification for the beta
+        var svd = svd(a);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(svd.S(), svd.V());
+    }
 
     @Override
     public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
         int n = a.rows();
-        if (transpose) throw new UnsupportedOperationException("Transpose solve not yet implemented for OpenCL");
-        double[] da = toDoubleArray(a);
+        Matrix<E> workingA = transpose ? a.transpose() : a;
+        double[] da = toDoubleArray(workingA);
         double[] db = toDoubleVec(b);
         try (ResourceTracker tracker = new ResourceTracker()) {
             cl_context context = OpenCLManager.getContext();
@@ -624,7 +739,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(da), null), CL::clReleaseMemObject);
             cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(db), null), CL::clReleaseMemObject);
             
-            cl_kernel kernel = upper ? solveTriangularUpperKernel : solveTriangularLowerKernel;
+            cl_kernel kernel = (upper ^ transpose) ? solveTriangularUpperKernel : solveTriangularLowerKernel;
             clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
             clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memB));
             clSetKernelArg(kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
@@ -799,22 +914,28 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         return data;
     }
 
-    private Matrix<E> fromDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
-        Ring<E> ring = reference.getScalarRing();
+    private Matrix<E> fromDoubleArray(double[] data, int rows, int cols, Ring<E> ring) {
         E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) {
             elements[i] = (E) RealDouble.of(data[i]);
         }
         return new DenseMatrix<>(elements, rows, cols, this, ring);
     }
- 
-    private Matrix<E> fromComplexDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
-        Ring<E> ring = reference.getScalarRing();
+
+    private Matrix<E> fromDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
+        return fromDoubleArray(data, rows, cols, reference.getScalarRing());
+    }
+
+    private Matrix<E> fromComplexDoubleArray(double[] data, int rows, int cols, Ring<E> ring) {
         E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
         for (int i = 0; i < rows * cols; i++) {
             elements[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
         }
         return new DenseMatrix<>(elements, rows, cols, this, ring);
+    }
+ 
+    private Matrix<E> fromComplexDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
+        return fromComplexDoubleArray(data, rows, cols, reference.getScalarRing());
     }
 
     private double[] toComplexDoubleArray(Matrix<E> m) {

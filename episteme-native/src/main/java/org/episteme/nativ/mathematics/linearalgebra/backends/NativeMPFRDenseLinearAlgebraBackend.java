@@ -1299,7 +1299,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         
         // Q is orthogonal (unitary), so Q^T * b = conjugateTranspose(Q) * b
         // For real matrices, Q^T * b.
-        boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        boolean isComplex = ((Object)q.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         Vector<E> qtB = multiply(isComplex ? conjugateTranspose(q) : transpose(q), b); 
         
         // Solve R*x = qtB (upper)
@@ -1956,7 +1956,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     MemorySegment sR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
                     MemorySegment sI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
 
-                    if ((int) NativeSafe.invoke(MPFR_ZERO_P, magXk) == 0) {
+                    if ((int) NativeSafe.invoke(MPFR_ZERO_P, magXk) != 0) {
                         NativeSafe.invoke(MPFR_SET, sR, normX, rnd);
                         NativeSafe.invoke(MPFR_SET_UI, sI, 0L, rnd);
                     } else {
