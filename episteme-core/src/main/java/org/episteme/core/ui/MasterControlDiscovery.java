@@ -116,11 +116,14 @@ public class MasterControlDiscovery {
         }
 
         List<ClassInfo> results = new ArrayList<>();
+        ClassLoader loader = MasterControlDiscovery.class.getClassLoader();
+
         for (ClassInfo info : allDiscoveredClasses) {
+            // 1. Name-based matching (Legacy)
             boolean matchesSuffix = info.simpleName.endsWith(suffix) && !info.simpleName.equals(suffix);
             
             // Flexible matching for loaders and readers
-            if ("Loader".equals(suffix) && info.simpleName.endsWith("Reader")) {
+            if ("Loader".equals(suffix) && (info.simpleName.endsWith("Reader") || info.simpleName.endsWith("Writer"))) {
                 matchesSuffix = true;
             }
             
@@ -130,33 +133,28 @@ public class MasterControlDiscovery {
             }
             
             boolean isDeviceRequested = "Device".equals(suffix);
+            boolean isViewerRequested = "Viewer".equals(suffix);
+            boolean isAppRequested = "App".equals(suffix);
 
-            if (matchesSuffix || isDeviceRequested) {
-                try {
-                    Class<?> cls = Class.forName(info.fullName, false, MasterControlDiscovery.class.getClassLoader());
-                    if (!Modifier.isAbstract(cls.getModifiers()) && !Modifier.isInterface(cls.getModifiers())
-                            && Modifier.isPublic(cls.getModifiers())) {
-
-                        if (isDeviceRequested) {
-                            if (!org.episteme.core.device.Device.class.isAssignableFrom(cls)) {
-                                if (!matchesSuffix)
-                                    continue;
-                            }
-                        }
-
-                        if ("Loader".equals(suffix)) {
-                            if (!org.episteme.core.io.ResourceIO.class.isAssignableFrom(cls)) {
-                                if (!info.simpleName.endsWith("Loader") && !info.simpleName.endsWith("Reader")) {
-                                    continue;
-                                }
-                            }
-                        }
-
-                        results.add(info);
-                    }
-                } catch (Throwable t) {
-                    // Ignore
+            // 2. Reflection-based interface matching (Robust)
+            boolean implementsInterface = false;
+            try {
+                Class<?> cls = Class.forName(info.fullName, false, loader);
+                if (Modifier.isAbstract(cls.getModifiers()) || Modifier.isInterface(cls.getModifiers()) || !Modifier.isPublic(cls.getModifiers())) {
+                    continue;
                 }
+
+                if (isViewerRequested && org.episteme.core.ui.Viewer.class.isAssignableFrom(cls)) implementsInterface = true;
+                if (isAppRequested && org.episteme.core.ui.App.class.isAssignableFrom(cls)) implementsInterface = true;
+                if (isDeviceRequested && org.episteme.core.device.Device.class.isAssignableFrom(cls)) implementsInterface = true;
+                if ("Loader".equals(suffix) && org.episteme.core.io.ResourceIO.class.isAssignableFrom(cls)) implementsInterface = true;
+
+            } catch (Throwable t) {
+                // Ignore if class cannot be loaded (dependencies might be missing)
+            }
+
+            if (matchesSuffix || implementsInterface) {
+                results.add(info);
             }
         }
 
@@ -290,29 +288,44 @@ public class MasterControlDiscovery {
 
     private void addClassLoaderPaths(Set<String> paths, ClassLoader cl) {
         if (cl == null) return;
-        logger.debug("Scanning ClassLoader: {}", cl.getClass().getName());
         
+        // 1. System property classpath
+        String cp = System.getProperty("java.class.path");
+        if (cp != null) {
+            for (String p : cp.split(java.io.File.pathSeparator)) {
+                paths.add(new java.io.File(p).getAbsolutePath());
+            }
+        }
+
+        // 2. ManagementFactory (more robust for modern JDKs)
+        try {
+            String mcp = java.lang.management.ManagementFactory.getRuntimeMXBean().getClassPath();
+            if (mcp != null) {
+                for (String p : mcp.split(java.io.File.pathSeparator)) {
+                    paths.add(new java.io.File(p).getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {}
+
+        // 3. URLClassLoader fallback
         if (cl instanceof java.net.URLClassLoader) {
             for (java.net.URL url : ((java.net.URLClassLoader) cl).getURLs()) {
                 if ("file".equals(url.getProtocol())) {
                     try {
-                        String p = new java.io.File(url.toURI()).getAbsolutePath();
-                        paths.add(p);
-                        logger.debug("Found URL path: {}", p);
+                        paths.add(new java.io.File(url.toURI()).getAbsolutePath());
                     } catch (Exception e) { /* ignore */ }
                 }
             }
         }
-        // Heuristic to find classpath entries in modern Java / Maven
+        
+        // 4. Resource-based discovery (very robust for discovering JARs containing specific packages)
         try {
-            // Search for various Episteme package markers to find module roots
-            String[] markers = {"org/episteme", "org/episteme/core", "org/episteme/natural", "org/episteme/native", "org/episteme/benchmarks"};
+            String[] markers = {"org/episteme", "META-INF/services/org.episteme.core.ui.Viewer", "org/episteme/core", "org/episteme/natural", "org/episteme/native"};
             for (String marker : markers) {
                 java.util.Enumeration<java.net.URL> resources = cl.getResources(marker);
                 while (resources.hasMoreElements()) {
                     java.net.URL url = resources.nextElement();
                     String p = url.toString();
-                    logger.trace("Marker '{}' found at: {}", marker, p);
                     
                     String cleanPath = null;
                     if (p.startsWith("jar:file:")) {
@@ -320,7 +333,6 @@ public class MasterControlDiscovery {
                         if (cleanPath.contains("!")) cleanPath = cleanPath.substring(0, cleanPath.indexOf("!"));
                     } else if (p.startsWith("file:")) {
                         cleanPath = p.substring(5);
-                        // Extract root path (before the package structure)
                         if (cleanPath.contains("/" + marker)) {
                             cleanPath = cleanPath.substring(0, cleanPath.indexOf("/" + marker));
                         }
@@ -329,18 +341,11 @@ public class MasterControlDiscovery {
                     if (cleanPath != null) {
                         try {
                             cleanPath = java.net.URLDecoder.decode(cleanPath, "UTF-8");
-                            // Fix Windows path issues (leading slash)
                             if (cleanPath.startsWith("/") && cleanPath.contains(":") && cleanPath.substring(1, 3).matches("[A-Z]:")) {
                                 cleanPath = cleanPath.substring(1);
                             }
-                            
                             java.io.File f = new java.io.File(cleanPath);
-                            if (f.exists()) {
-                                String absolute = f.getAbsolutePath();
-                                if (paths.add(absolute)) {
-                                    logger.debug("Added discovered Episteme path: {}", absolute);
-                                }
-                            }
+                            if (f.exists()) paths.add(f.getAbsolutePath());
                         } catch (Exception e) { /* ignore */ }
                     }
                 }

@@ -507,8 +507,8 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
     }
 
     @Override
-    public void matrixMultiply(java.nio.FloatBuffer A, java.nio.FloatBuffer B, java.nio.FloatBuffer C, int m, int n, int k) {
-        throw new UnsupportedOperationException("Matrix multiply for FloatBuffer not implemented in sparse backend");
+    public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
+        throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not supported in float backend");
     }
 
     private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof Complex; }

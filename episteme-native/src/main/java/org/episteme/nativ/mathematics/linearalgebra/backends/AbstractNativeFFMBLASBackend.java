@@ -967,7 +967,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         return svd.V().multiply(sInv).multiply(conjugateTranspose(svd.U()));
     }
 
-    private Matrix<E> conjugateTranspose(Matrix<E> m) {
+    public Matrix<E> conjugateTranspose(Matrix<E> m) {
         Matrix<E> mt = m.transpose();
         if (isComplex(m)) {
             return mt.map(val -> {

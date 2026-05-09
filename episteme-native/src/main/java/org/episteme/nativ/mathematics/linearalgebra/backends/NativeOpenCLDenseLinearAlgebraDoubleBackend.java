@@ -723,7 +723,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         // For symmetric matrices, SVD is equivalent to Eigen
         // This is a simplification for the beta
         var svd = svd(a);
-        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(svd.S(), svd.V());
+        return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(svd.V(), svd.S());
     }
 
     @Override
