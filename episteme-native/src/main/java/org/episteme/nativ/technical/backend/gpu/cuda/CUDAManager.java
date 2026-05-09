@@ -66,6 +66,7 @@ public final class CUDAManager {
     public static MethodHandle CUBLAS_DGEMV;
     public static MethodHandle CUBLAS_CGEMV;
     public static MethodHandle CUBLAS_ZGEMV;
+    public static MethodHandle CUBLAS_SGEAM;
     public static MethodHandle CUBLAS_DGEAM;
     public static MethodHandle CUBLAS_ZGEAM;
     public static MethodHandle CUBLAS_CGEAM;
@@ -248,6 +249,14 @@ public final class CUDAManager {
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT
+        ));
+        
+        CUBLAS_SGEAM = lookup(cublasLookup, "cublasSgeam", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            ValueLayout.JAVA_INT
         ));
         
         CUBLAS_DGEAM = lookup(cublasLookup, "cublasDgeam", FunctionDescriptor.of(ValueLayout.JAVA_INT,
