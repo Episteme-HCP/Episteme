@@ -199,7 +199,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             clSetKernelArg(complexMatMulKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{k}));
             clEnqueueNDRangeKernel(queue, complexMatMulKernel, 2, null, new long[]{n, m}, null, 0, null, null);
             clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float2 * m * n, Pointer.to(fc), 0, null, null);
-            return fromComplexFloatArray(fc, m, n, a);
+            return fromComplexFloatArray(fc, m, n, (Ring<E>) a.getScalarRing());
         }
     }
 
@@ -288,7 +288,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             clSetKernelArg(kernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(queue, kernel, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float2 * n, Pointer.to(fc), 0, null, null);
-            return fromComplexFloatArray(fc, a.rows(), a.cols(), a);
+            return fromComplexFloatArray(fc, a.rows(), a.cols(), (Ring<E>) a.getScalarRing());
         }
     }
 
@@ -338,7 +338,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
             clSetKernelArg(complexVecScaleKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
             clEnqueueNDRangeKernel(queue, complexVecScaleKernel, 1, null, new long[]{n}, null, 0, null, null);
             clEnqueueReadBuffer(queue, memC, CL_TRUE, 0, (long)Sizeof.cl_float2 * n, Pointer.to(fc), 0, null, null);
-            return fromComplexFloatArray(fc, a.rows(), a.cols(), a);
+            return fromComplexFloatArray(fc, a.rows(), a.cols(), (Ring<E>) a.getScalarRing());
         }
     }
 
