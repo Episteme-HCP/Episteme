@@ -128,6 +128,8 @@ public final class CUDAManager {
     public static MethodHandle CUSOLVER_DGEQRF;
     
     // SVD
+    public static MethodHandle CUSOLVER_SGESVD_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_SGESVD;
     public static MethodHandle CUSOLVER_DGESVD_BUFFER_SIZE;
     public static MethodHandle CUSOLVER_DGESVD;
     public static MethodHandle CUSOLVER_ZGEQRF_BUFFER_SIZE;
