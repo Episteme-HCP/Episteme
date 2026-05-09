@@ -821,7 +821,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     @Override
     public CholeskyResult<E> cholesky(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        if (isComplex(a)) return new GenericCholesky<>(choleskyComplex(a));
+        if (isComplex(a)) return new CholeskyResult<>(choleskyComplex(a));
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
@@ -843,7 +843,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             MemorySegment.copy(hostA, ValueLayout.JAVA_DOUBLE, 0, result, 0, n * n);
             
             for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) result[i * n + j] = 0;
-            return new GenericCholesky<>(fromDoubleArray(result, n, n, a));
+            return new CholeskyResult<>(toMatrix(result, n, n, (Ring<E>) a.getScalarRing()));
         } catch (Throwable t) { throw new RuntimeException("CUDA double cholesky failed", t); }
     }
 
@@ -875,7 +875,8 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostW, d_W, (long) n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostA, ValueLayout.JAVA_DOUBLE, 0, vData, 0, n * n);
             MemorySegment.copy(hostW, ValueLayout.JAVA_DOUBLE, 0, wData, 0, n);
-            return new GenericEigen<>(fromDoubleArray(vData, n, n, a), fromDoubleVec(Vector.of(wData, a.getScalarRing())));
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            return new EigenResult<>(toMatrix(vData, n, n, ring), toVector(wData, ring));
         } catch (Throwable t) { throw new RuntimeException("CUDA double eigen failed", t); }
     }
 
@@ -928,6 +929,12 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
         for (int i = 0; i < rows * cols; i++) values[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
         return new DenseMatrix<>(values, rows, cols, this, ring);
+    }
+
+    private Vector<E> toVector(double[] data, Ring<E> ring) {
+        E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
+        for (int i = 0; i < data.length; i++) values[i] = (E) RealDouble.of(data[i]);
+        return new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(values), ring);
     }
 
     private SVDResult<E> svdComplex(Matrix<E> a) {
@@ -1102,42 +1109,10 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
                 flatW[i] = (E) Complex.of(wData[i], 0.0);
                 for (int j = 0; j < n; j++) flatV[i * n + j] = (E) Complex.of(vData[(i * n + j) * 2], vData[(i * n + j) * 2 + 1]);
             }
-            return new GenericEigen<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(flatV, n, n, this, ring), new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(flatW), ring).withProvider(this));
+            return new EigenResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(flatV, n, n, this, ring), new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(java.util.Arrays.asList(flatW), ring));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex double eigen failed", t); }
     }
 
-    private SVDResult<E> svdComplex(Matrix<E> a) {
-        int m = a.rows(); int n = a.cols();
-        double[] aData = toComplexDoubleArray(a);
-        try (ResourceTracker tracker = new ResourceTracker()) {
-            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-            MemorySegment d_A = malloc((long) m * n * 16, tracker);
-            MemorySegment d_S = malloc((long) Math.min(m, n) * 8, tracker);
-            MemorySegment d_U = malloc((long) m * m * 16, tracker);
-            MemorySegment d_VT = malloc((long) n * n * 16, tracker);
-            MemorySegment d_Info = malloc(4, tracker);
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, aData), (long) m * n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
-            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_ZGESVD_BUFFER_SIZE, handle, m, n, pWorkSize));
-            int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
-            MemorySegment d_Work = malloc((long) workSize * 16, tracker);
-            checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_ZGESVD, handle, (int)'A', (int)'A', m, n, d_A, m, d_S, d_U, m, d_VT, n, d_Work, workSize, MemorySegment.NULL, d_Info));
-            double[] sArr = new double[Math.min(m, n)];
-            MemorySegment hostS = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) Math.min(m, n));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostS, d_S, (long) Math.min(m, n) * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
-            MemorySegment.copy(hostS, ValueLayout.JAVA_DOUBLE, 0, sArr, 0, Math.min(m, n));
-            Ring<E> ring = (Ring<E>) a.getScalarRing();
-            E[] sVals = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), sArr.length);
-            for (int i = 0; i < sArr.length; i++) sVals[i] = (E) Complex.of(sArr[i], 0.0);
-            Vector<E> S = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(sVals), this, ring);
-            E[] flatU = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * m);
-            for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatU[i * m + j] = (i == j) ? (E) Complex.ONE : ring.zero();
-            E[] flatVT = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
-            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) flatVT[i * n + j] = (i == j) ? (E) Complex.ONE : ring.zero();
-            return new SVDResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(flatU, m, m, this, ring), S, new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(flatVT, n, n, this, ring));
-        } catch (Throwable t) { throw new RuntimeException("CUDA complex double SVD failed", t); }
-    }
 
     private boolean isComplex(Matrix<E> a) { return a.getScalarRing().zero() instanceof Complex; }
     private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
