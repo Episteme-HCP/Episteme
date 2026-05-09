@@ -14,10 +14,10 @@ public class DebugSVD {
             NativeMPFRDenseLinearAlgebraBackend backend = new NativeMPFRDenseLinearAlgebraBackend();
             
             int n = 4;
-            Double[][] data = new Double[n][n];
+            Real[][] data = new Real[n][n];
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    data[i][j] = (i == j) ? 1.0 : 0.1;
+                    data[i][j] = Real.of((i == j) ? 1.0 : 0.1);
                 }
             }
             
