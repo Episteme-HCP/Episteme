@@ -418,8 +418,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             }
             // Fill L diagonal with 1
             for (int i = 0; i < Math.min(m,n); i++) if (flatL[i * Math.min(m,n) + i] == null || flatL[i * Math.min(m,n) + i].equals(ring.zero())) flatL[i * Math.min(m,n) + i] = (E) RealFloat.ONE;
-            Matrix<E> L = new DenseMatrix<>(flatL, m, Math.min(m,n), ring);
-            Matrix<E> U = new DenseMatrix<>(flatU, Math.min(m,n), n, ring);
+            Matrix<E> L = new DenseMatrix<>(flatL, m, Math.min(m,n), this, ring);
+            Matrix<E> U = new DenseMatrix<>(flatU, Math.min(m,n), n, this, ring);
             return new LUResult<>(L, U, null);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float LU decomposition failed", t);
@@ -476,7 +476,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             // Build Q as identity placeholder
             E[] flatQ = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * m);
             for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatQ[i * m + j] = (i == j) ? (E) RealFloat.ONE : ring.zero();
-            Matrix<E> Q = new DenseMatrix<>(flatQ, m, m, ring);
+            Matrix<E> Q = new DenseMatrix<>(flatQ, m, m, this, ring);
             E[] flatR = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * n);
             java.util.Arrays.fill(flatR, ring.zero());
             for (int i = 0; i < m; i++) {
@@ -484,7 +484,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                     if (i <= j) flatR[i * n + j] = (E) RealFloat.create(result[i * n + j]);
                 }
             }
-            Matrix<E> R = new DenseMatrix<>(flatR, m, n, ring);
+            Matrix<E> R = new DenseMatrix<>(flatR, m, n, this, ring);
             return new QRResult<>(Q, R);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float QR decomposition failed", t);
@@ -528,15 +528,15 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             // Build S as a vector of singular values
             E[] sVals = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), sArr.length);
             for (int i = 0; i < sArr.length; i++) sVals[i] = (E) RealFloat.create(sArr[i]);
-            Vector<E> S = new DenseVector<>(java.util.Arrays.asList(sVals), ring);
+            Vector<E> S = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(sVals), this, ring);
             
-            // Build U and V as identity placeholders (full extraction requires ormqr)
+            // Build U and V as identity placeholders
             E[] flatU = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * m);
             for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatU[i * m + j] = (i == j) ? (E) RealFloat.ONE : ring.zero();
-            Matrix<E> U_mat = new DenseMatrix<>(flatU, m, m, ring);
+            Matrix<E> U_mat = new DenseMatrix<>(flatU, m, m, this, ring);
             E[] flatV = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
             for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) flatV[i * n + j] = (i == j) ? (E) RealFloat.ONE : ring.zero();
-            Matrix<E> V_mat = new DenseMatrix<>(flatV, n, n, ring);
+            Matrix<E> V_mat = new DenseMatrix<>(flatV, n, n, this, ring);
             return new SVDResult<>(U_mat, S, V_mat);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float SVD failed", t);
@@ -967,7 +967,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             E[] flatR = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * n);
             java.util.Arrays.fill(flatR, ring.zero());
             for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) if (i <= j) flatR[i * n + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(result[(i * n + j) * 2]), RealFloat.create(result[(i * n + j) * 2 + 1]));
-            return new QRResult<>(new DenseMatrix<>(flatQ, m, m, ring), new DenseMatrix<>(flatR, m, n, ring));
+            return new QRResult<>(new DenseMatrix<>(flatQ, m, m, this, ring), new DenseMatrix<>(flatR, m, n, this, ring));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float QR failed", t); }
     }
 
@@ -993,7 +993,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             E[] flatL = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
             java.util.Arrays.fill(flatL, ring.zero());
             for (int i = 0; i < n; i++) for (int j = 0; j <= i; j++) flatL[i * n + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(result[(i * n + j) * 2]), RealFloat.create(result[(i * n + j) * 2 + 1]));
-            return new DenseMatrix<>(flatL, n, n, ring);
+            return new DenseMatrix<>(flatL, n, n, this, ring);
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float cholesky failed", t); }
     }
 
@@ -1027,7 +1027,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 flatW[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(wData[i]), RealFloat.ZERO);
                 for (int j = 0; j < n; j++) flatV[i * n + j] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(vData[(i * n + j) * 2]), RealFloat.create(vData[(i * n + j) * 2 + 1]));
             }
-            return new GenericEigen<>(new DenseMatrix<>(flatV, n, n, ring), new DenseVector<>(java.util.Arrays.asList(flatW), ring));
+            return new GenericEigen<>(new DenseMatrix<>(flatV, n, n, this, ring), new DenseVector<>(java.util.Arrays.asList(flatW), ring).withProvider(this));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float eigen failed", t); }
     }
 
@@ -1059,7 +1059,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             for (int i = 0; i < m; i++) for (int j = 0; j < m; j++) flatU[i * m + j] = (i == j) ? (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ONE : ring.zero();
             E[] flatV = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n * n);
             for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) flatV[i * n + j] = (i == j) ? (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ONE : ring.zero();
-            return new SVDResult<>(new DenseMatrix<>(flatU, m, m, ring), new DenseVector<>(java.util.Arrays.asList(sVals), ring), new DenseMatrix<>(flatV, n, n, ring));
+            Vector<E> S = new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(sVals), this, ring);
+            return new SVDResult<>(new DenseMatrix<>(flatU, m, m, this, ring), S, new DenseMatrix<>(flatV, n, n, this, ring));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float SVD failed", t); }
     }
 }
