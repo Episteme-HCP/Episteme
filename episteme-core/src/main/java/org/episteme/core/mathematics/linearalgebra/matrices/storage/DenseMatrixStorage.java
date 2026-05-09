@@ -62,8 +62,11 @@ public class DenseMatrixStorage<E> implements MatrixStorage<E> {
         Class<?> componentType = Object.class;
         if (initialValue != null) {
             componentType = initialValue.getClass();
-            if (initialValue instanceof Real) componentType = Real.class;
-            else if (initialValue instanceof Complex) componentType = Complex.class;
+            if (initialValue instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                componentType = org.episteme.core.mathematics.numbers.real.Real.class;
+            } else if (initialValue instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+                componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+            }
         }
         this.data = (E[]) java.lang.reflect.Array.newInstance(componentType, rows * cols);
         if (initialValue != null) {

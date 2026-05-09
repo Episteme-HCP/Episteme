@@ -106,10 +106,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     private long getPrecision() {
-        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
-        int digits = ctx.getJavaMathContext().getPrecision();
-        if (digits <= 0) digits = 256; 
-        return (long) (digits * 3.322) + 1;
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().getPrecisionBits();
     }
 
     @Override

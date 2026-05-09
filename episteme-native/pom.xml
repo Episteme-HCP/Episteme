@@ -18,6 +18,8 @@
         <cuda.exclude.1>**/_NONE_/**</cuda.exclude.1>
         <cuda.exclude.2>**/_NONE_/**</cuda.exclude.2>
         <cuda.exclude.3>**/_NONE_/**</cuda.exclude.3>
+        <la.native.exclude.1>**/NativeCUDA*LinearAlgebra*Backend.java</la.native.exclude.1>
+        <la.native.exclude.2>**/NativeOpenCL*LinearAlgebra*Backend.java</la.native.exclude.2>
     </properties>
 
     <dependencies>
@@ -197,18 +199,17 @@
                         <exclude>${cuda.exclude.1}</exclude>
                         <exclude>${cuda.exclude.2}</exclude>
                         <exclude>${cuda.exclude.3}</exclude>
+                        <exclude>${la.native.exclude.1}</exclude>
+                        <exclude>${la.native.exclude.2}</exclude>
                         <exclude>module-info.java</exclude>
                         <exclude>**/NativeOpenCLFFTBackend.java</exclude>
-                        <exclude>**/NativeCUDA*LinearAlgebra*Backend.java</exclude>
-                        <exclude>**/NativeOpenCL*LinearAlgebra*Backend.java</exclude>
                     </excludes>
                     <testExcludes>
                         <exclude>${cuda.exclude.1}</exclude>
                         <exclude>${cuda.exclude.2}</exclude>
                         <exclude>${cuda.exclude.3}</exclude>
-                        <exclude>**/NativeOpenCLFFTBackend.java</exclude>
-                        <exclude>**/NativeCUDA*LinearAlgebra*Backend.java</exclude>
-                        <exclude>**/NativeOpenCL*LinearAlgebra*Backend.java</exclude>
+                        <exclude>${la.native.exclude.1}</exclude>
+                        <exclude>${la.native.exclude.2}</exclude>
                         <exclude>**/NativeOpenCLTest.java</exclude>
                         <exclude>**/NativeOpenCLFFTTest.java</exclude>
                         <exclude>**/NativeHardeningStressTest.java</exclude>
@@ -279,6 +280,8 @@
             <properties>
                 <cuda.exclude.1>none</cuda.exclude.1>
                 <cuda.exclude.2>none</cuda.exclude.2>
+                <la.native.exclude.1>none</la.native.exclude.1>
+                <la.native.exclude.2>none</la.native.exclude.2>
             </properties>
             <dependencies>
                 <dependency>
@@ -315,6 +318,8 @@
             <properties>
                 <cuda.exclude.1>none</cuda.exclude.1>
                 <cuda.exclude.2>none</cuda.exclude.2>
+                <la.native.exclude.1>none</la.native.exclude.1>
+                <la.native.exclude.2>none</la.native.exclude.2>
             </properties>
             <dependencies>
                 <dependency>
@@ -341,6 +346,12 @@
             </dependencies>
         </profile>
         <!-- Profile for systems with OpenBLAS installed -->
+        <profile>
+            <id>opencl</id>
+            <properties>
+                <la.native.exclude.2>none</la.native.exclude.2>
+            </properties>
+        </profile>
         <profile>
             <id>openblas</id>
             <properties>

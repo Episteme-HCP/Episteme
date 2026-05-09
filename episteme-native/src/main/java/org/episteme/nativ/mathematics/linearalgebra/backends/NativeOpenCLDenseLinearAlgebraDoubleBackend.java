@@ -132,7 +132,10 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public boolean isCompatible(Ring<?> ring) {
         Object zero = ring.zero();
-        return zero instanceof RealDouble || zero instanceof Complex || (zero instanceof Real r && !r.isFast());
+        if (zero instanceof Complex c) {
+            return c.getReal() instanceof org.episteme.core.mathematics.numbers.real.RealDouble;
+        }
+        return zero instanceof RealDouble;
     }
 
     @Override
@@ -283,7 +286,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         if (isComplex(a)) return scaleComplex(scalar, a);
         int n = a.rows() * a.cols();
         double[] da = toDoubleArray(a);
-        double s = getRealValue(scalar);
+        double s = (scalar instanceof Number num) ? num.doubleValue() : 0.0;
         double[] dc = new double[n];
         
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -330,8 +333,14 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     private Matrix<E> scaleComplex(E scalar, Matrix<E> a) {
         int n = a.rows() * a.cols();
         double[] da = toComplexDoubleArray(a);
-        double sr = getRealValue(scalar);
-        double si = (scalar instanceof Complex c) ? c.imaginary() : 0.0;
+        double sr = 0.0;
+        double si = 0.0;
+        if (scalar instanceof Complex c) {
+            sr = c.real();
+            si = c.imaginary();
+        } else if (scalar instanceof Number num) {
+            sr = num.doubleValue();
+        }
         double[] dc = new double[n * 2];
         try (ResourceTracker tracker = new ResourceTracker()) {
             cl_context context = OpenCLManager.getContext();
@@ -714,17 +723,18 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     }
 
     private Vector<E> fromDoubleVec(double[] data, Ring<E> ring) {
-        E[] elements = (E[]) new FieldElement[data.length];
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) elements[i] = (E) RealDouble.of(data[i]);
-        return new DenseVector<>(java.util.Arrays.asList(elements), ring);
+        return new DenseVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), (LinearAlgebraProvider<E>) this, ring);
     }
 
     private Vector<E> fromComplexDoubleVec(double[] data, Ring<E> ring) {
-        E[] elements = (E[]) new FieldElement[data.length / 2];
-        for (int i = 0; i < elements.length; i++) {
+        int len = data.length / 2;
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), len);
+        for (int i = 0; i < len; i++) {
             elements[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
         }
-        return new DenseVector<>(java.util.Arrays.asList(elements), ring);
+        return new DenseVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), (LinearAlgebraProvider<E>) this, ring);
     }
 
     @Override
@@ -791,11 +801,20 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
 
     private Matrix<E> fromDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
         Ring<E> ring = reference.getScalarRing();
-        E[] elements = (E[]) new FieldElement[data.length];
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) {
             elements[i] = (E) RealDouble.of(data[i]);
         }
-        return new DenseMatrix<>(elements, rows, cols, ring);
+        return new DenseMatrix<>(elements, rows, cols, this, ring);
+    }
+ 
+    private Matrix<E> fromComplexDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
+        Ring<E> ring = reference.getScalarRing();
+        E[] elements = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
+        for (int i = 0; i < rows * cols; i++) {
+            elements[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
+        }
+        return new DenseMatrix<>(elements, rows, cols, this, ring);
     }
 
     private double[] toComplexDoubleArray(Matrix<E> m) {
@@ -817,14 +836,6 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         return data;
     }
 
-    private Matrix<E> fromComplexDoubleArray(double[] data, int rows, int cols, Matrix<E> reference) {
-        Ring<E> ring = reference.getScalarRing();
-        E[] elements = (E[]) new FieldElement[rows * cols];
-        for (int i = 0; i < rows * cols; i++) {
-            elements[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
-        }
-        return new DenseMatrix<>(elements, rows, cols, ring);
-    }
 
     private double getRealValue(E val) {
         if (val instanceof Number n) return n.doubleValue();

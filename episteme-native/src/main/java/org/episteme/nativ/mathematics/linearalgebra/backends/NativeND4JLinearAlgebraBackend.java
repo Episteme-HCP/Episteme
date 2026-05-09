@@ -206,7 +206,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
                 data[i * cols + j] = array.getDouble(i, j);
             }
         }
-        return RealDoubleMatrix.of(data, rows, cols);
+        return RealDoubleMatrix.of(data, rows, cols, this);
     }
 
     private INDArray toINDArray(Vector<Real> v) {
@@ -220,7 +220,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     private Vector<Real> fromINDArrayVector(INDArray arr) {
         INDArray contiguous = arr.isView() || arr.ordering() != 'c' ? arr.dup('c') : arr;
         double[] data = contiguous.data().asDouble();
-        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
+        return org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(new org.episteme.core.mathematics.linearalgebra.vectors.storage.HeapRealDoubleVectorStorage(data), this);
     }
 
     @Override

@@ -612,7 +612,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
     private SparseMatrix<E> ensureSparse(Matrix<E> a) {
         if (a instanceof SparseMatrix) return (SparseMatrix<E>) a;
         Ring<E> r = a.getScalarRing();
-        SparseMatrix<E> s = SparseMatrix.zeros(a.rows(), a.cols(), r);
+        SparseMatrix<E> s = new SparseMatrix<>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<>(a.rows(), a.cols(), r.zero()), (LinearAlgebraProvider<E>) this, r);
         for (int i = 0; i < a.rows(); i++) {
             for (int j = 0; j < a.cols(); j++) {
                 E val = a.get(i, j);
@@ -634,7 +634,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
         for (int i = 0; i < data.length; i++) {
             if (data[i] != 0.0) storage.set(i, (E) RealDouble.of(data[i]));
         }
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, this, ring);
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(storage, (LinearAlgebraProvider<E>) this, ring);
     }
 
     private Vector<E> fromDoubleArray(double[] data, Ring<E> ring) { return fromDoubleVec(data, ring); }
@@ -686,7 +686,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             elements[i] = (E) Complex.of(data[i * 2], data[i * 2 + 1]);
         }
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
-            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), null, ring);
+            new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), (LinearAlgebraProvider<E>) this, ring);
     }
 
     private boolean isComplex(Matrix<E> m) {

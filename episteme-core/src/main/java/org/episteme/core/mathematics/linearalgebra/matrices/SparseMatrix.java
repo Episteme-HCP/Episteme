@@ -78,13 +78,16 @@ public class SparseMatrix<E> extends GenericMatrix<E> {
     }
 
     // Internal constructor using storage - Made public for Providers
-    public SparseMatrix(MatrixStorage<E> storage, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
-        super(storage, AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
-        // Explicit validation
+    public SparseMatrix(MatrixStorage<E> storage, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        super(storage, provider, ring);
         if (storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage
                 || storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage) { // RealDouble is Dense
             throw new IllegalArgumentException("Cannot create SparseMatrix with Dense storage");
         }
+    }
+
+    public SparseMatrix(MatrixStorage<E> storage, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        this(storage, AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
     }
 
     public static <E> SparseMatrix<E> fromDense(List<List<E>> rows, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {

@@ -57,9 +57,14 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
      * the provider selected by higher-level algorithms like Benchmarks.
      */
     protected RealDoubleMatrix(RealDoubleMatrixStorage storage) {
-        super(storage,
-                lookupInternalProvider(),
-                org.episteme.core.mathematics.sets.Reals.getInstance());
+        this(storage, lookupInternalProvider());
+    }
+
+    /**
+     * Public constructor for Providers and internal use.
+     */
+    public RealDoubleMatrix(RealDoubleMatrixStorage storage, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider) {
+        super(storage, provider, org.episteme.core.mathematics.sets.Reals.getInstance());
         this.doubleStorage = storage;
     }
 
@@ -95,6 +100,10 @@ public class RealDoubleMatrix extends GenericMatrix<Real> implements AutoCloseab
      */
     public static RealDoubleMatrix of(double[] data, int rows, int cols) {
         return new RealDoubleMatrix(new HeapRealDoubleMatrixStorage(data, rows, cols));
+    }
+
+    public static RealDoubleMatrix of(double[] data, int rows, int cols, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Real> provider) {
+        return new RealDoubleMatrix(new HeapRealDoubleMatrixStorage(data, rows, cols), provider);
     }
 
     /**

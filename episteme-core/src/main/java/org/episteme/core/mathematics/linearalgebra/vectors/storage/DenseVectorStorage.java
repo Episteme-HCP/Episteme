@@ -44,9 +44,13 @@ public class DenseVectorStorage<E> implements VectorStorage<E> {
         this.dimension = dimension;
         Class<?> componentType = Object.class;
         if (initialValue != null) {
-            if (initialValue instanceof Real) componentType = Real.class;
-            else if (initialValue instanceof Complex) componentType = Complex.class;
-            else componentType = initialValue.getClass();
+            if (initialValue instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                componentType = org.episteme.core.mathematics.numbers.real.Real.class;
+            } else if (initialValue instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+                componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+            } else {
+                componentType = initialValue.getClass();
+            }
         }
         this.data = (E[]) java.lang.reflect.Array.newInstance(componentType, dimension);
         if (initialValue != null) {
@@ -77,8 +81,11 @@ public class DenseVectorStorage<E> implements VectorStorage<E> {
         } else {
             E first = data.get(0);
             Class<?> componentType = first.getClass();
-            if (first instanceof Real) componentType = Real.class;
-            else if (first instanceof Complex) componentType = Complex.class;
+            if (first instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                componentType = org.episteme.core.mathematics.numbers.real.Real.class;
+            } else if (first instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+                componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+            }
             this.data = (E[]) java.lang.reflect.Array.newInstance(componentType, dimension);
             for (int i = 0; i < dimension; i++) this.data[i] = data.get(i);
         }

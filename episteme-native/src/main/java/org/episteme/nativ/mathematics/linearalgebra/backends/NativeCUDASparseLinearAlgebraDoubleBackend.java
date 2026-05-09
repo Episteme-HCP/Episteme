@@ -196,7 +196,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
     private Vector<E> toVector(double[] data, Ring<E> ring) {
         E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), data.length);
         for (int i = 0; i < data.length; i++) values[i] = (E) RealDouble.of(data[i]);
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), null, ring);
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), (LinearAlgebraProvider<E>) this, ring);
     }
 
     private org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> ensureSparse(Matrix<E> A) {
@@ -207,7 +207,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
             E val = A.get(i, j);
             if (val != null && !ring.zero().equals(val)) storage.set(i, j, val);
         }
-        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, ring);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, (LinearAlgebraProvider<E>) this, ring);
     }
 
     private boolean isComplex(Matrix<E> a) {
@@ -242,7 +242,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         for (int i = 0; i < dim; i++) {
             values[i] = (E) Complex.of(RealDouble.of(data[i * 2]), RealDouble.of(data[i * 2 + 1]));
         }
-        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), null, ring);
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), (LinearAlgebraProvider<E>) this, ring);
     }
 
     @Override
