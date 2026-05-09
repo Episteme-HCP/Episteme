@@ -23,6 +23,7 @@
 
 package org.episteme.core.mathematics.linearalgebra.matrices;
 
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
