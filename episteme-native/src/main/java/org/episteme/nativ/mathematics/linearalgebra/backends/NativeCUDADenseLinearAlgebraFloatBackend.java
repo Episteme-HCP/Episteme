@@ -189,7 +189,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment d_Y = malloc((long) m * 8, tracker);
             
             float[] hA = toComplexFloatArray(a);
-            float[] hX = toComplexFloatArray(b);
+            float[] hX = toComplexFloatVec(b);
             
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hA), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_X.address(), arena.allocateFrom(ValueLayout.JAVA_FLOAT, hX), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
@@ -204,7 +204,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY.address(), d_Y.address(), (long) m * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segY, ValueLayout.JAVA_FLOAT, 0, result, 0, m * 2);
             
-            return fromComplexFloatArray(result, (Ring<E>) a.getScalarRing());
+            return fromComplexFloatVec(result, (Ring<E>) a.getScalarRing());
         } catch (Throwable t) {
             throw new RuntimeException("CUDA complex float mat-vec multiply failed", t);
         }
@@ -306,18 +306,22 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) result[i * n + j] = packed[j * m + i];
             
             Ring<E> ring = (Ring<E>) a.getScalarRing();
-            Matrix<E> L = new DenseMatrix<>(new FieldElement[m * Math.min(m,n)], m, Math.min(m,n), ring);
-            Matrix<E> U = new DenseMatrix<>(new FieldElement[Math.min(m,n) * n], Math.min(m,n), n, ring);
+            E[] flatL = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * Math.min(m,n));
+            E[] flatU = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), Math.min(m,n) * n);
+            java.util.Arrays.fill(flatL, ring.zero());
+            java.util.Arrays.fill(flatU, ring.zero());
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
                     E val = (E) RealFloat.create(result[i * n + j]);
-                    if (i > j && i < m && j < Math.min(m, n)) L.set(i, j, val);
-                    else if (i == j && i < Math.min(m,n)) { L.set(i, j, (E) RealFloat.ONE); U.set(i, j, val); }
-                    else if (i < j && i < Math.min(m,n) && j < n) U.set(i, j, val);
+                    if (i > j && i < m && j < Math.min(m, n)) flatL[i * Math.min(m,n) + j] = val;
+                    else if (i == j && i < Math.min(m,n)) { flatL[i * Math.min(m,n) + j] = (E) RealFloat.ONE; flatU[i * n + j] = val; }
+                    else if (i < j && i < Math.min(m,n) && j < n) flatU[i * n + j] = val;
                 }
             }
             // Fill L diagonal with 1
-            for (int i = 0; i < Math.min(m,n); i++) if (L.get(i,i) == null) L.set(i,i,(E) RealFloat.ONE);
+            for (int i = 0; i < Math.min(m,n); i++) if (flatL[i * Math.min(m,n) + i] == null || flatL[i * Math.min(m,n) + i].equals(ring.zero())) flatL[i * Math.min(m,n) + i] = (E) RealFloat.ONE;
+            Matrix<E> L = new DenseMatrix<>(flatL, m, Math.min(m,n), ring);
+            Matrix<E> U = new DenseMatrix<>(flatU, Math.min(m,n), n, ring);
             return new LUResult<>(L, U, null);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float LU decomposition failed", t);
@@ -366,12 +370,12 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             Matrix<E> Q = new DenseMatrix<>(flatQ, m, m, ring);
             E[] flatR = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), m * n);
             java.util.Arrays.fill(flatR, ring.zero());
-            Matrix<E> R = new DenseMatrix<>(flatR, m, n, ring);
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
-                    if (i <= j) R.set(i, j, (E) RealFloat.create(result[i * n + j]));
+                    if (i <= j) flatR[i * n + j] = (E) RealFloat.create(result[i * n + j]);
                 }
             }
+            Matrix<E> R = new DenseMatrix<>(flatR, m, n, ring);
             return new QRResult<>(Q, R);
         } catch (Throwable t) {
             throw new RuntimeException("CUDA float QR decomposition failed", t);
