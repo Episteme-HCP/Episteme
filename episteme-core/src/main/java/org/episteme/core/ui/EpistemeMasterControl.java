@@ -14,7 +14,7 @@ import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
 import org.episteme.core.io.UserPreferences;
 import org.episteme.core.ui.i18n.I18N;
-import org.episteme.core.ui.viewers.Viewer;
+import org.episteme.core.ui.Viewer;
 
 import java.util.*;
 
