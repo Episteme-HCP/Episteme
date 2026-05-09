@@ -626,6 +626,17 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         return data;
     }
 
+    private float[] toComplexFloatVec(Vector<E> v) {
+        int n = v.dimension();
+        float[] data = new float[n * 2];
+        for (int i = 0; i < n; i++) {
+            org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
+            data[i * 2] = c.getReal().floatValue();
+            data[i * 2 + 1] = c.getImaginary().floatValue();
+        }
+        return data;
+    }
+
     @Override public void close() {}
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.GPU; }
     @Override public String getType() { return "math"; }
