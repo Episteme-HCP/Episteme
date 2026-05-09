@@ -12,6 +12,7 @@ import org.episteme.core.Episteme;
 import org.episteme.core.io.ResourceIO;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
+import org.episteme.core.io.UserPreferences;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.ui.viewers.Viewer;
 
@@ -23,7 +24,7 @@ import java.util.*;
  */
 public class EpistemeMasterControl extends Application {
 
-    private static final EpistemePreferences PREFS = EpistemePreferences.getInstance();
+    private static final UserPreferences PREFS = UserPreferences.getInstance();
     private static final String PREF_SELECTED_TAB = "mastercontrol.selected_tab";
     private static final String PREF_SELECTED_DEVICE = "mastercontrol.selected_device";
 

@@ -128,22 +128,36 @@ public final class CUDAManager {
     public static MethodHandle CUSOLVER_DGEQRF;
     
     // SVD
-    public static MethodHandle CUSOLVER_SGESVD_BUFFER_SIZE;
-    public static MethodHandle CUSOLVER_SGESVD;
     public static MethodHandle CUSOLVER_DGESVD_BUFFER_SIZE;
     public static MethodHandle CUSOLVER_DGESVD;
+    public static MethodHandle CUSOLVER_ZGEQRF_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_ZGEQRF;
+    public static MethodHandle CUSOLVER_CGEQRF_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_CGEQRF;
+    public static MethodHandle CUSOLVER_ZGESVD_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_ZGESVD;
+    public static MethodHandle CUSOLVER_CGESVD_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_CGESVD;
     
     // Cholesky
     public static MethodHandle CUSOLVER_SPOTRF_BUFFER_SIZE;
     public static MethodHandle CUSOLVER_SPOTRF;
     public static MethodHandle CUSOLVER_DPOTRF_BUFFER_SIZE;
     public static MethodHandle CUSOLVER_DPOTRF;
+    public static MethodHandle CUSOLVER_ZPOTRF_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_ZPOTRF;
+    public static MethodHandle CUSOLVER_CPOTRF_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_CPOTRF;
     
     // Eigen
     public static MethodHandle CUSOLVER_SSYEVD_BUFFER_SIZE;
     public static MethodHandle CUSOLVER_SSYEVD;
     public static MethodHandle CUSOLVER_DSYEVD_BUFFER_SIZE;
     public static MethodHandle CUSOLVER_DSYEVD;
+    public static MethodHandle CUSOLVER_ZHEEVD_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_ZHEEVD;
+    public static MethodHandle CUSOLVER_CHEEVD_BUFFER_SIZE;
+    public static MethodHandle CUSOLVER_CHEEVD;
 
     public static MethodHandle CUSOLVER_STATUS_GET_STRING;
 
@@ -398,21 +412,39 @@ public final class CUDAManager {
         
         // SVD
         CUSOLVER_SGESVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnSgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-        CUSOLVER_SGESVD = lookup(cusolverLookup, "cusolverDnSgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_SGESVD = lookup(cusolverLookup, "cusolverDnSgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUSOLVER_DGESVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnDgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-        CUSOLVER_DGESVD = lookup(cusolverLookup, "cusolverDnDgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_DGESVD = lookup(cusolverLookup, "cusolverDnDgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        
+        CUSOLVER_ZGEQRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnZgeqrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_ZGEQRF = lookup(cusolverLookup, "cusolverDnZgeqrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CGEQRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnCgeqrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CGEQRF = lookup(cusolverLookup, "cusolverDnCgeqrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        
+        CUSOLVER_ZGESVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnZgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_ZGESVD = lookup(cusolverLookup, "cusolverDnZgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CGESVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnCgesvd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CGESVD = lookup(cusolverLookup, "cusolverDnCgesvd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
         // Cholesky
         CUSOLVER_SPOTRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnSpotrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-        CUSOLVER_SPOTRF = lookup(cusolverLookup, "cusolverDnSpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_SPOTRF = lookup(cusolverLookup, "cusolverDnSpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUSOLVER_DPOTRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnDpotrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
-        CUSOLVER_DPOTRF = lookup(cusolverLookup, "cusolverDnDpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_DPOTRF = lookup(cusolverLookup, "cusolverDnDpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_ZPOTRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnZpotrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_ZPOTRF = lookup(cusolverLookup, "cusolverDnZpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CPOTRF_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnCpotrf_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CPOTRF = lookup(cusolverLookup, "cusolverDnCpotrf", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
         // Eigen
         CUSOLVER_SSYEVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnSsyevd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-        CUSOLVER_SSYEVD = lookup(cusolverLookup, "cusolverDnSsyevd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_SSYEVD = lookup(cusolverLookup, "cusolverDnSsyevd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUSOLVER_DSYEVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnDsyevd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-        CUSOLVER_DSYEVD = lookup(cusolverLookup, "cusolverDnDsyevd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_DSYEVD = lookup(cusolverLookup, "cusolverDnDsyevd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_ZHEEVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnZheevd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_ZHEEVD = lookup(cusolverLookup, "cusolverDnZheevd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSOLVER_CHEEVD_BUFFER_SIZE = lookup(cusolverLookup, "cusolverDnCheevd_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSOLVER_CHEEVD = lookup(cusolverLookup, "cusolverDnCheevd", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
         CUSOLVER_STATUS_GET_STRING = lookup(cusolverLookup, "cusolverGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
     }
