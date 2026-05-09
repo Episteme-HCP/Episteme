@@ -58,7 +58,11 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public boolean isCompatible(Ring<?> ring) {
         Object zero = ring.zero();
-        return zero instanceof RealFloat || (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex c && c.getReal() instanceof RealFloat);
+        boolean res = zero instanceof RealFloat || (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex c && c.getReal() instanceof RealFloat);
+        if (logger.isDebugEnabled()) {
+            logger.debug("isCompatible check: zero={}, type={}, result={}", zero, zero.getClass().getName(), res);
+        }
+        return res;
     }
 
     @Override public String getId() { return "cuda-dense-float"; }
