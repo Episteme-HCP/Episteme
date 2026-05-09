@@ -1209,10 +1209,19 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 }
                 
                 uData[k * n + k] = data[k * n + k];
-                for (int i = k + 1; i < n; i++) {
-                    if (Math.abs(uData[k * n + k]) > 1e-18) {
-                        lData[i * n + k] = data[i * n + k] / uData[k * n + k];
-                        for (int j = k + 1; j < m; j++) data[i * m + j] -= lData[i * n + k] * data[k * m + j];
+                double pivot = uData[k * n + k];
+                if (Math.abs(pivot) > 1e-18) {
+                    var species = getDoubleSpecies();
+                    for (int i = k + 1; i < n; i++) {
+                        double factor = data[i * n + k] / pivot;
+                        lData[i * n + k] = factor;
+                        int j = k + 1;
+                        for (; j + species.length() <= m; j += species.length()) {
+                            var vK = DoubleVector.fromArray(species, data, k * m + j);
+                            var vI = DoubleVector.fromArray(species, data, i * m + j);
+                            vI.sub(vK.mul(factor)).intoArray(data, i * m + j);
+                        }
+                        for (; j < m; j++) data[i * m + j] -= factor * data[k * m + j];
                     }
                 }
                 for (int j = k + 1; j < m; j++) uData[k * n + j] = data[k * n + j];
@@ -1364,12 +1373,37 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         
         if (isRealRing(ring)) {
             double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
-            org.ejml.data.DMatrixRMaj ejmlA = new org.ejml.data.DMatrixRMaj(n, n, true, data);
-            var cholEjml = org.ejml.dense.row.factory.DecompositionFactory_DDRM.chol(n, true);
-            if (!cholEjml.decompose(ejmlA)) throw new RuntimeException("Cholesky decomposition failed");
+            double[] l = new double[n * n];
+            var species = getDoubleSpecies();
             
-            Matrix<Real> L = fromDoubleArray(cholEjml.getT(null).data, n, n);
-            return (CholeskyResult<E>) (Object) new CholeskyResult<>(L);
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j <= i; j++) {
+                    double sum = 0;
+                    int k = 0;
+                    // SIMD Dot product for the sum
+                    int loopBound = species.loopBound(j);
+                    if (loopBound > 0) {
+                        var vSum = DoubleVector.zero(species);
+                        for (; k < loopBound; k += species.length()) {
+                            var vLi = DoubleVector.fromArray(species, l, i * n + k);
+                            var vLj = DoubleVector.fromArray(species, l, j * n + k);
+                            vSum = vSum.add(vLi.mul(vLj));
+                        }
+                        sum = vSum.reduceLanes(VectorOperators.ADD);
+                    }
+                    for (; k < j; k++) sum += l[i * n + k] * l[j * n + k];
+
+                    if (i == j) {
+                        double val = data[i * n + i] - sum;
+                        if (val < 0) throw new ArithmeticException("Matrix is not positive definite");
+                        l[i * n + i] = Math.sqrt(val);
+                    } else {
+                        if (Math.abs(l[j * n + j]) < 1e-18) throw new ArithmeticException("Zero pivot in Cholesky");
+                        l[i * n + j] = (data[i * n + j] - sum) / l[j * n + j];
+                    }
+                }
+            }
+            return (CholeskyResult<E>) (Object) new CholeskyResult<>(fromDoubleArray(l, n, n));
         } else if (isComplexRing(ring)) {
             org.ejml.data.ZMatrixRMaj ejmlA = toEJMLComplex(a);
             var cholEjml = org.ejml.dense.row.factory.DecompositionFactory_ZDRM.chol(n, true);

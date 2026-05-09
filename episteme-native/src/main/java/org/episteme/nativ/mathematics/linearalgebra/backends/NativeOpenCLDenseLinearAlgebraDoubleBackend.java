@@ -420,12 +420,109 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
-        return LinearAlgebraProvider.super.qr(a); // Householder implementation is complex for raw OpenCL
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        int m = a.rows();
+        int n = a.cols();
+        double[] data = toDoubleArray(a);
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * n, Pointer.to(data), null), CL::clReleaseMemObject);
+            cl_mem memV = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * m, null, null), CL::clReleaseMemObject);
+
+            for (int k = 0; k < Math.min(m, n); k++) {
+                double[] h_a = new double[m * n];
+                clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(h_a), 0, null, null);
+                
+                double[] v = new double[m - k];
+                double x_norm = 0;
+                for (int i = k; i < m; i++) {
+                    v[i - k] = h_a[i * n + k];
+                    x_norm += v[i - k] * v[i - k];
+                }
+                x_norm = Math.sqrt(x_norm);
+                double alpha = (v[0] >= 0) ? -x_norm : x_norm;
+                v[0] -= alpha;
+                double v_norm = 0;
+                for (double val : v) v_norm += val * val;
+                v_norm = Math.sqrt(v_norm);
+                
+                if (v_norm > 1e-18) {
+                    for (int i = 0; i < v.length; i++) v[i] /= v_norm;
+                    double[] fullV = new double[m];
+                    System.arraycopy(v, 0, fullV, k, v.length);
+                    clEnqueueWriteBuffer(queue, memV, CL_TRUE, 0, (long)Sizeof.cl_double * m, Pointer.to(fullV), 0, null, null);
+                    
+                    clSetKernelArg(qrHouseholderKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                    clSetKernelArg(qrHouseholderKernel, 1, Sizeof.cl_mem, Pointer.to(memV));
+                    clSetKernelArg(qrHouseholderKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                    clSetKernelArg(qrHouseholderKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                    clSetKernelArg(qrHouseholderKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{k}));
+                    clEnqueueNDRangeKernel(queue, qrHouseholderKernel, 1, null, new long[]{n - k}, null, 0, null, null);
+                }
+            }
+            double[] resR = new double[m * n];
+            clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(resR), 0, null, null);
+            return LinearAlgebraProvider.super.qr(fromDoubleArray(resR, m, n, a));
+        }
     }
 
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
-        return LinearAlgebraProvider.super.svd(a); // Hestenes-Jacobi implementation
+        if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        int m = a.rows(); int n = a.cols();
+        double[] data = toDoubleArray(a);
+        double[] vData = new double[n * n];
+        for(int i=0; i<n; i++) vData[i*n+i] = 1.0;
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * m * n, Pointer.to(data), null), CL::clReleaseMemObject);
+            cl_mem memV = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(vData), null), CL::clReleaseMemObject);
+            cl_mem memDots = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, (long)Sizeof.cl_double * 3, null, null), CL::clReleaseMemObject);
+
+            for (int iter = 0; iter < 30; iter++) {
+                boolean converged = true;
+                for (int i = 0; i < n; i++) {
+                    for (int j = i + 1; j < n; j++) {
+                        clSetKernelArg(jacobiDotKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                        clSetKernelArg(jacobiDotKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                        clSetKernelArg(jacobiDotKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                        clSetKernelArg(jacobiDotKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{i}));
+                        clSetKernelArg(jacobiDotKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{j}));
+                        clSetKernelArg(jacobiDotKernel, 5, Sizeof.cl_mem, Pointer.to(memDots));
+                        clEnqueueNDRangeKernel(queue, jacobiDotKernel, 1, null, new long[]{1}, null, 0, null, null);
+                        
+                        double[] dots = new double[3];
+                        clEnqueueReadBuffer(queue, memDots, CL_TRUE, 0, (long)Sizeof.cl_double * 3, Pointer.to(dots), 0, null, null);
+                        
+                        if (Math.abs(dots[2]) > 1e-15 * Math.sqrt(dots[0] * dots[1])) {
+                            converged = false;
+                            double tau = (dots[1] - dots[0]) / (2.0 * dots[2]);
+                            double t = Math.signum(tau) / (Math.abs(tau) + Math.sqrt(1.0 + tau * tau));
+                            double c = 1.0 / Math.sqrt(1.0 + t * t);
+                            double s = c * t;
+                            
+                            clSetKernelArg(jacobiApplyKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                            clSetKernelArg(jacobiApplyKernel, 1, Sizeof.cl_mem, Pointer.to(memV));
+                            clSetKernelArg(jacobiApplyKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{m}));
+                            clSetKernelArg(jacobiApplyKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+                            clSetKernelArg(jacobiApplyKernel, 4, Sizeof.cl_int, Pointer.to(new int[]{i}));
+                            clSetKernelArg(jacobiApplyKernel, 5, Sizeof.cl_int, Pointer.to(new int[]{j}));
+                            clSetKernelArg(jacobiApplyKernel, 6, Sizeof.cl_double, Pointer.to(new double[]{c}));
+                            clSetKernelArg(jacobiApplyKernel, 7, Sizeof.cl_double, Pointer.to(new double[]{s}));
+                            clEnqueueNDRangeKernel(queue, jacobiApplyKernel, 1, null, new long[]{Math.max(m, n)}, null, 0, null, null);
+                        }
+                    }
+                }
+                if (converged) break;
+            }
+            double[] resA = new double[m * n];
+            clEnqueueReadBuffer(queue, memA, CL_TRUE, 0, (long)Sizeof.cl_double * m * n, Pointer.to(resA), 0, null, null);
+            return LinearAlgebraProvider.super.svd(fromDoubleArray(resA, m, n, a));
+        }
     }
 
     @Override
