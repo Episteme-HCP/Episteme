@@ -241,6 +241,221 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), null, ring);
     }
 
+    @Override
+    public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        try {
+            return bicgstab(a, b, null, (E) RealFloat.of(1e-6f), 1000);
+        } catch (Throwable t) {
+            logger.warn("BiCGSTAB failed, falling back to CG: {}", t.getMessage());
+            return conjugateGradient(a, b, null, (E) RealFloat.of(1e-6f), 1000);
+        }
+    }
+
+    @Override
+    public Vector<E> conjugateGradient(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = ensureSparse(a);
+        int n = sa.rows(); int nnz = sa.getNnz();
+        float tol = ((Number) tolerance).floatValue();
+        boolean isComplex = isComplex(a);
+        int elemSize = isComplex ? 8 : 4;
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_rowPtr = malloc((long)(n + 1) * 4, tracker);
+            MemorySegment d_colIdx = malloc((long)nnz * 4, tracker);
+            MemorySegment d_val = malloc((long)nnz * elemSize, tracker);
+            MemorySegment d_b = malloc((long)n * elemSize, tracker);
+            MemorySegment d_x = malloc((long)n * elemSize, tracker);
+            MemorySegment d_r = malloc((long)n * elemSize, tracker);
+            MemorySegment d_p = malloc((long)n * elemSize, tracker);
+            MemorySegment d_Ap = malloc((long)n * elemSize, tracker);
+
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(n + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+
+            if (x0 != null) {
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(x0) : toFloatArray(x0)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            } else {
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMSET, d_x, 0, (long)n * elemSize));
+            }
+
+            int dataType = isComplex ? 6 : 0; // 6=CUDA_C_32F, 0=CUDA_R_32F
+            MemorySegment res = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+
+            spmv_internal(n, n, nnz, d_rowPtr, d_colIdx, d_val, d_x, d_Ap, arena, tracker, dataType);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_r, d_b, (long)n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_D));
+            gpuSaxpy(n, d_Ap, d_r, isComplex ? Complex.of(-1, 0) : -1.0f, isComplex);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_p, d_r, (long)n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_D));
+
+            double rsOld = gpuDot(n, d_r, d_r, res, isComplex).real();
+            double tolSq = tol * tol;
+
+            for (int i = 0; i < maxIterations; i++) {
+                spmv_internal(n, n, nnz, d_rowPtr, d_colIdx, d_val, d_p, d_Ap, arena, tracker, dataType);
+                Complex pAp = gpuDot(n, d_p, d_Ap, res, isComplex);
+                Complex alpha = isComplex ? Complex.of(rsOld, 0).divide(pAp) : Complex.of(rsOld / pAp.real(), 0);
+                gpuSaxpy(n, d_p, d_x, isComplex ? alpha : (float)alpha.real(), isComplex);
+                gpuSaxpy(n, d_Ap, d_r, isComplex ? alpha.negate() : -(float)alpha.real(), isComplex);
+                double rsNew = gpuDot(n, d_r, d_r, res, isComplex).real();
+                if (rsNew < tolSq) break;
+                double beta = rsNew / rsOld;
+                gpuScale(n, d_p, isComplex ? Complex.of(beta, 0) : (float)beta, isComplex);
+                gpuSaxpy(n, d_r, d_p, isComplex ? Complex.of(1, 0) : 1.0f, isComplex);
+                rsOld = rsNew;
+            }
+
+            float[] h_x = new float[n * (isComplex ? 2 : 1)];
+            MemorySegment hostX = arena.allocate(ValueLayout.JAVA_FLOAT, (long) h_x.length);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostX, d_x, (long) n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostX, ValueLayout.JAVA_FLOAT, 0, h_x, 0, h_x.length);
+            return isComplex ? toVectorComplex(h_x, (Ring<E>) sa.getScalarRing()) : toVector(h_x, (Ring<E>) sa.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException("CUDA Float CG failed", t); }
+    }
+
+    @Override
+    public Vector<E> bicgstab(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = ensureSparse(a);
+        int n = sa.rows(); int nnz = sa.getNnz();
+        float tol = ((Number) tolerance).floatValue();
+        boolean isComplex = isComplex(a);
+        int elemSize = isComplex ? 8 : 4;
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_rowPtr = malloc((long)(n + 1) * 4, tracker);
+            MemorySegment d_colIdx = malloc((long)nnz * 4, tracker);
+            MemorySegment d_val = malloc((long)nnz * elemSize, tracker);
+            MemorySegment d_b = malloc((long)n * elemSize, tracker);
+            MemorySegment d_x = malloc((long)n * elemSize, tracker);
+            MemorySegment d_r = malloc((long)n * elemSize, tracker);
+            MemorySegment d_r0 = malloc((long)n * elemSize, tracker);
+            MemorySegment d_p = malloc((long)n * elemSize, tracker);
+            MemorySegment d_v = malloc((long)n * elemSize, tracker);
+            MemorySegment d_s = malloc((long)n * elemSize, tracker);
+            MemorySegment d_t = malloc((long)n * elemSize, tracker);
+
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(n + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+
+            if (x0 != null) {
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(x0) : toFloatArray(x0)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            } else {
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMSET, d_x, 0, (long)n * elemSize));
+            }
+
+            int dataType = isComplex ? 6 : 0;
+            MemorySegment res = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+
+            spmv_internal(n, n, nnz, d_rowPtr, d_colIdx, d_val, d_x, d_v, arena, tracker, dataType);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_r, d_b, (long)n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_D));
+            gpuSaxpy(n, d_v, d_r, isComplex ? Complex.of(-1, 0) : -1.0f, isComplex);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_r0, d_r, (long)n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_D));
+
+            Complex rho = Complex.of(1, 0);
+            Complex alpha = Complex.of(1, 0);
+            Complex omega = Complex.of(1, 0);
+
+            for (int i = 0; i < maxIterations; i++) {
+                Complex rhoNext = gpuDot(n, d_r0, d_r, res, isComplex);
+                Complex beta = rhoNext.divide(rho).multiply(alpha.divide(omega));
+                rho = rhoNext;
+
+                gpuSaxpy(n, d_v, d_p, isComplex ? omega.negate() : -(float)omega.real(), isComplex);
+                gpuScale(n, d_p, isComplex ? beta : (float)beta.real(), isComplex);
+                gpuSaxpy(n, d_r, d_p, isComplex ? Complex.of(1, 0) : 1.0f, isComplex);
+
+                spmv_internal(n, n, nnz, d_rowPtr, d_colIdx, d_val, d_p, d_v, arena, tracker, dataType);
+                Complex dotV = gpuDot(n, d_r0, d_v, res, isComplex);
+                alpha = rho.divide(dotV);
+
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_s, d_r, (long)n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_D));
+                gpuSaxpy(n, d_v, d_s, isComplex ? alpha.negate() : -(float)alpha.real(), isComplex);
+
+                spmv_internal(n, n, nnz, d_rowPtr, d_colIdx, d_val, d_s, d_t, arena, tracker, dataType);
+                Complex tDotS = gpuDot(n, d_t, d_s, res, isComplex);
+                Complex tDotT = gpuDot(n, d_t, d_t, res, isComplex);
+                omega = tDotS.divide(tDotT);
+
+                gpuSaxpy(n, d_p, d_x, isComplex ? alpha : (float)alpha.real(), isComplex);
+                gpuSaxpy(n, d_s, d_x, isComplex ? omega : (float)omega.real(), isComplex);
+
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_r, d_s, (long)n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_D));
+                gpuSaxpy(n, d_t, d_r, isComplex ? omega.negate() : -(float)omega.real(), isComplex);
+
+                if (gpuDot(n, d_r, d_r, res, isComplex).real() < tol * tol) break;
+            }
+
+            float[] h_x = new float[n * (isComplex ? 2 : 1)];
+            MemorySegment hostX = arena.allocate(ValueLayout.JAVA_FLOAT, (long) h_x.length);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostX, d_x, (long) n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostX, ValueLayout.JAVA_FLOAT, 0, h_x, 0, h_x.length);
+            return isComplex ? toVectorComplex(h_x, (Ring<E>) sa.getScalarRing()) : toVector(h_x, (Ring<E>) sa.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException("CUDA BiCGSTAB failed", t); }
+    }
+
+    private void gpuSaxpy(int n, MemorySegment d_x, MemorySegment d_y, Object alpha, boolean isComplex) throws Throwable {
+        try (Arena temp = Arena.ofConfined()) {
+            MemorySegment aSeg = isComplex ? temp.allocateFrom(ValueLayout.JAVA_FLOAT, (float)((Complex)alpha).real(), (float)((Complex)alpha).imaginary()) : temp.allocateFrom(ValueLayout.JAVA_FLOAT, ((Number)alpha).floatValue());
+            NativeSafe.invoke(isComplex ? CUDAManager.CUBLAS_CAXPY : CUDAManager.CUBLAS_SAXPY, CUDAManager.getCublasHandle(), n, aSeg, d_x, 1, d_y, 1);
+        }
+    }
+
+    private void gpuScale(int n, MemorySegment d_x, Object s, boolean isComplex) throws Throwable {
+        try (Arena temp = Arena.ofConfined()) {
+            MemorySegment sSeg = isComplex ? temp.allocateFrom(ValueLayout.JAVA_FLOAT, (float)((Complex)s).real(), (float)((Complex)s).imaginary()) : temp.allocateFrom(ValueLayout.JAVA_FLOAT, ((Number)s).floatValue());
+            NativeSafe.invoke(isComplex ? CUDAManager.CUBLAS_CSCAL : CUDAManager.CUBLAS_SSCAL, CUDAManager.getCublasHandle(), n, sSeg, d_x, 1);
+        }
+    }
+
+    private Complex gpuDot(int n, MemorySegment d_x, MemorySegment d_y, MemorySegment d_res, boolean isComplex) throws Throwable {
+        NativeSafe.invoke(isComplex ? CUDAManager.CUBLAS_CDOT : CUDAManager.CUBLAS_SDOT, CUDAManager.getCublasHandle(), n, d_x, 1, d_y, 1, d_res);
+        if (isComplex) return Complex.of(d_res.getAtIndex(ValueLayout.JAVA_FLOAT, 0), d_res.getAtIndex(ValueLayout.JAVA_FLOAT, 1));
+        return Complex.of(d_res.get(ValueLayout.JAVA_FLOAT, 0), 0);
+    }
+
+    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.add(a, b); }
+    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.subtract(a, b); }
+    @Override public E dot(Vector<E> a, Vector<E> b) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int n = a.dimension();
+        boolean isComplex = isComplex(a);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_a = malloc((long)n * (isComplex ? 8 : 4), tracker);
+            MemorySegment d_b = malloc((long)n * (isComplex ? 8 : 4), tracker);
+            MemorySegment d_res = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_a, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(a) : toFloatArray(a)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
+            return (E) castToRing(gpuDot(n, d_a, d_b, d_res, isComplex), (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override public E norm(Vector<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int n = a.dimension();
+        boolean isComplex = isComplex(a);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_a = malloc((long)n * (isComplex ? 8 : 4), tracker);
+            MemorySegment d_res = arena.allocate(ValueLayout.JAVA_FLOAT);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_a, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(a) : toFloatArray(a)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
+            NativeSafe.invoke(isComplex ? CUDAManager.CUBLAS_SCNRM2 : CUDAManager.CUBLAS_SNRM2, CUDAManager.getCublasHandle(), n, d_a, 1, d_res);
+            return (E) RealFloat.of(d_res.get(ValueLayout.JAVA_FLOAT, 0));
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    private Object castToRing(Complex c, Ring<E> ring) {
+        if (ring.zero() instanceof Complex) return c;
+        return RealFloat.of((float)c.real());
+    }
+
     @Override public void close() {}
     @Override public org.episteme.core.technical.backend.HardwareAccelerator getAcceleratorType() { return org.episteme.core.technical.backend.HardwareAccelerator.GPU; }
     @Override public String getType() { return "math"; }

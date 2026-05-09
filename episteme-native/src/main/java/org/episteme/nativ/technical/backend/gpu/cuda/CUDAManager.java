@@ -73,14 +73,19 @@ public final class CUDAManager {
     public static MethodHandle CUBLAS_DDOT;
     public static MethodHandle CUBLAS_SDOT;
     public static MethodHandle CUBLAS_CDOT;
+    public static MethodHandle CUBLAS_ZDOTU;
     public static MethodHandle CUBLAS_DAXPY;
     public static MethodHandle CUBLAS_SAXPY;
     public static MethodHandle CUBLAS_CAXPY;
+    public static MethodHandle CUBLAS_ZAXPY;
     public static MethodHandle CUBLAS_DSCAL;
     public static MethodHandle CUBLAS_SSCAL;
     public static MethodHandle CUBLAS_CSCAL;
+    public static MethodHandle CUBLAS_ZSCAL;
     public static MethodHandle CUBLAS_SNRM2;
+    public static MethodHandle CUBLAS_SCNRM2;
     public static MethodHandle CUBLAS_DNRM2;
+    public static MethodHandle CUBLAS_DZNRM2;
     public static MethodHandle CUBLAS_STRSM;
     public static MethodHandle CUBLAS_DTRSM;
     public static MethodHandle CUBLAS_STATUS_GET_STRING;
@@ -308,16 +313,26 @@ public final class CUDAManager {
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_CAXPY = lookup(cublasLookup, "cublasCaxpy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_ZAXPY = lookup(cublasLookup, "cublasZaxpy_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_DSCAL = lookup(cublasLookup, "cublasDscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_SSCAL = lookup(cublasLookup, "cublasSscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_CSCAL = lookup(cublasLookup, "cublasCscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_ZSCAL = lookup(cublasLookup, "cublasZscal_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_SNRM2 = lookup(cublasLookup, "cublasSnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUBLAS_SCNRM2 = lookup(cublasLookup, "cublasScnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUBLAS_DNRM2 = lookup(cublasLookup, "cublasDnrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUBLAS_DZNRM2 = lookup(cublasLookup, "cublasDznrm2_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUBLAS_ZDOTU = lookup(cublasLookup, "cublasZdotu_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUBLAS_STRSM = lookup(cublasLookup, "cublasStrsm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
