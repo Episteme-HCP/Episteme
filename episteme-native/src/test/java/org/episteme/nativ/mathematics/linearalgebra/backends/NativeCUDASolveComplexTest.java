@@ -24,7 +24,7 @@ public class NativeCUDASolveComplexTest {
     @EnabledIf("isCudaAvailable")
     public void testSolveComplex() {
         NativeCUDADenseLinearAlgebraDoubleBackend backend = new NativeCUDADenseLinearAlgebraDoubleBackend();
-        Ring<Complex> ring = Complex.RING;
+        Ring<Complex> ring = org.episteme.core.mathematics.sets.Complexes.getInstance();
 
         // A = [[1+i, 0], [0, 1-i]]
         Complex[][] aData = {
