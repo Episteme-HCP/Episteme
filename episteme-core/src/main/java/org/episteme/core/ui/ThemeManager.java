@@ -31,8 +31,8 @@ import java.util.prefs.Preferences;
  * Standardizes the use of CSS files and provides high-performance theme switching.
  */
 public class ThemeManager {
-    private static final ThemeManager INSTANCE = new ThemeManager();
     private static final Preferences PREFS = Preferences.userNodeForPackage(ThemeManager.class);
+    private static final ThemeManager INSTANCE = new ThemeManager();
     private static final String PREF_THEME = "ui_theme";
 
     private String currentTheme;

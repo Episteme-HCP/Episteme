@@ -41,6 +41,8 @@ public class MasterControlDiscovery {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterControlDiscovery.class);
     private static final MasterControlDiscovery INSTANCE = new MasterControlDiscovery();
+    private final Map<String, List<ClassInfo>> classCache = new HashMap<>();
+    private List<ClassInfo> allDiscoveredClasses = null;
 
     public static MasterControlDiscovery getInstance() {
         return INSTANCE;
@@ -105,6 +107,70 @@ public class MasterControlDiscovery {
     // --- Legacy Scanning Methods (Required for Loaders, Devices, and I18N) ---
 
     public List<ClassInfo> findClasses(String suffix) {
+        if (classCache.containsKey(suffix)) {
+            return new ArrayList<>(classCache.get(suffix));
+        }
+
+        if (allDiscoveredClasses == null) {
+            allDiscoveredClasses = scanAllEpistemeClasses();
+        }
+
+        List<ClassInfo> results = new ArrayList<>();
+        for (ClassInfo info : allDiscoveredClasses) {
+            boolean matchesSuffix = info.simpleName.endsWith(suffix) && !info.simpleName.equals(suffix);
+            
+            // Flexible matching for loaders and readers
+            if ("Loader".equals(suffix) && info.simpleName.endsWith("Reader")) {
+                matchesSuffix = true;
+            }
+            
+            // Special case: if suffix is "Demo", also include "App" (for Killer Apps)
+            if ("Demo".equals(suffix) && info.simpleName.endsWith("App")) {
+                matchesSuffix = true;
+            }
+            
+            boolean isDeviceRequested = "Device".equals(suffix);
+
+            if (matchesSuffix || isDeviceRequested) {
+                try {
+                    Class<?> cls = Class.forName(info.fullName, false, MasterControlDiscovery.class.getClassLoader());
+                    if (!Modifier.isAbstract(cls.getModifiers()) && !Modifier.isInterface(cls.getModifiers())
+                            && Modifier.isPublic(cls.getModifiers())) {
+
+                        if (isDeviceRequested) {
+                            if (!org.episteme.core.device.Device.class.isAssignableFrom(cls)) {
+                                if (!matchesSuffix)
+                                    continue;
+                            }
+                        }
+
+                        if ("Loader".equals(suffix)) {
+                            if (!org.episteme.core.io.ResourceIO.class.isAssignableFrom(cls)) {
+                                if (!info.simpleName.endsWith("Loader") && !info.simpleName.endsWith("Reader")) {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        results.add(info);
+                    }
+                } catch (Throwable t) {
+                    // Ignore
+                }
+            }
+        }
+
+        results.sort(Comparator.comparing((ClassInfo c) -> c.simpleName)
+                .thenComparing(c -> c.fullName));
+        
+        classCache.put(suffix, results);
+        return results;
+    }
+
+    private List<ClassInfo> scanAllEpistemeClasses() {
+        logger.info("Performing one-time full Episteme class discovery...");
+        long start = System.currentTimeMillis();
+        
         Set<String> processed = new HashSet<>();
         List<ClassInfo> results = new ArrayList<>();
         
@@ -114,7 +180,6 @@ public class MasterControlDiscovery {
             allPaths.addAll(Arrays.asList(classpath.split(java.io.File.pathSeparator)));
         }
 
-        // Include all relevant classloaders
         addClassLoaderPaths(allPaths, Thread.currentThread().getContextClassLoader());
         addClassLoaderPaths(allPaths, ClassLoader.getSystemClassLoader());
         addClassLoaderPaths(allPaths, MasterControlDiscovery.class.getClassLoader());
@@ -127,40 +192,75 @@ public class MasterControlDiscovery {
             if (!file.exists()) continue;
 
             if (file.isDirectory()) {
-                scanDirectory(file, "", suffix, results, processed, tccl);
+                scanDirectoryRecursive(file, "", results, processed, tccl);
             } else if (file.getName().endsWith(".jar")) {
                 if (!isSystemJar(file.getName())) {
-                    scanJar(file, suffix, results, processed, tccl);
+                    scanJarRecursive(file, results, processed, tccl);
                 }
             }
         }
 
-        // --- DEVELOPMENT HEURISTIC: Scan sibling module target/classes ---
+        // Development heuristic
         try {
             java.io.File current = new java.io.File(System.getProperty("user.dir"));
             java.io.File parent = current.getParentFile();
             if (parent != null && (new java.io.File(parent, "pom.xml")).exists()) {
-                logger.info("Dev mode: Scanning siblings in {}", parent.getAbsolutePath());
                 java.io.File[] modules = parent.listFiles(java.io.File::isDirectory);
                 if (modules != null) {
                     for (java.io.File module : modules) {
                         java.io.File targetClasses = new java.io.File(module, "target/classes");
                         if (targetClasses.exists() && targetClasses.isDirectory()) {
                             if (!allPaths.contains(targetClasses.getAbsolutePath())) {
-                                logger.info("Found sibling dev module: {}", module.getName());
-                                scanDirectory(targetClasses, "", suffix, results, processed, tccl);
+                                scanDirectoryRecursive(targetClasses, "", results, processed, tccl);
                             }
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            logger.warn("Development heuristic scan failed: {}", e.getMessage());
-        }
+        } catch (Exception e) {}
 
-        results.sort(Comparator.comparing((ClassInfo c) -> c.simpleName)
-                .thenComparing(c -> c.fullName));
+        long end = System.currentTimeMillis();
+        logger.info("Discovered {} Episteme classes in {} ms", results.size(), (end - start));
         return results;
+    }
+
+    private void scanDirectoryRecursive(java.io.File directory, String packageName, List<ClassInfo> results,
+            Set<String> processed, ClassLoader classLoader) {
+        java.io.File[] files = directory.listFiles();
+        if (files == null) return;
+
+        for (java.io.File file : files) {
+            if (file.isDirectory()) {
+                String newPackage = packageName.isEmpty() ? file.getName() : packageName + "." + file.getName();
+                scanDirectoryRecursive(file, newPackage, results, processed, classLoader);
+            } else if (file.getName().endsWith(".class")) {
+                String className = file.getName().substring(0, file.getName().length() - 6);
+                String fullClassName = packageName.isEmpty() ? className : packageName + "." + className;
+
+                if (!fullClassName.startsWith("org.episteme.")) continue;
+                if (processed.add(fullClassName)) {
+                    results.add(new ClassInfo(className, fullClassName, "Discovered class"));
+                }
+            }
+        }
+    }
+
+    private void scanJarRecursive(java.io.File jarFile, List<ClassInfo> results, Set<String> processed, ClassLoader classLoader) {
+        try (java.util.jar.JarFile jar = new java.util.jar.JarFile(jarFile)) {
+            Enumeration<java.util.jar.JarEntry> entries = jar.entries();
+            while (entries.hasMoreElements()) {
+                java.util.jar.JarEntry entry = entries.nextElement();
+                if (entry.getName().endsWith(".class")) {
+                    String entryName = entry.getName();
+                    String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
+                    if (!className.startsWith("org.episteme.")) continue;
+                    if (processed.add(className)) {
+                        String simpleName = className.substring(className.lastIndexOf('.') + 1);
+                        results.add(new ClassInfo(simpleName, className, "From " + jarFile.getName()));
+                    }
+                }
+            }
+        } catch (java.io.IOException e) {}
     }
 
     private boolean isSystemJar(String name) {

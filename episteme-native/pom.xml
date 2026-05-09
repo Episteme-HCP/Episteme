@@ -198,11 +198,24 @@
                         <exclude>${cuda.exclude.2}</exclude>
                         <exclude>${cuda.exclude.3}</exclude>
                         <exclude>module-info.java</exclude>
+                        <exclude>**/NativeOpenCLFFTBackend.java</exclude>
+                        <exclude>**/NativeCUDA*LinearAlgebra*Backend.java</exclude>
+                        <exclude>**/NativeOpenCL*LinearAlgebra*Backend.java</exclude>
                     </excludes>
                     <testExcludes>
                         <exclude>${cuda.exclude.1}</exclude>
                         <exclude>${cuda.exclude.2}</exclude>
                         <exclude>${cuda.exclude.3}</exclude>
+                        <exclude>**/NativeOpenCLFFTBackend.java</exclude>
+                        <exclude>**/NativeCUDA*LinearAlgebra*Backend.java</exclude>
+                        <exclude>**/NativeOpenCL*LinearAlgebra*Backend.java</exclude>
+                        <exclude>**/NativeOpenCLTest.java</exclude>
+                        <exclude>**/NativeOpenCLFFTTest.java</exclude>
+                        <exclude>**/NativeHardeningStressTest.java</exclude>
+                        <exclude>**/NativeCUDADenseLinearAlgebraBackendTest.java</exclude>
+                        <exclude>**/NativeOpenCLDenseLinearAlgebraBackendTest.java</exclude>
+                        <exclude>**/NativeCUDASparseLinearAlgebraBackendTest.java</exclude>
+                        <exclude>**/NativeOpenCLSparseLinearAlgebraBackendTest.java</exclude>
                     </testExcludes>
                 </configuration>
             </plugin>

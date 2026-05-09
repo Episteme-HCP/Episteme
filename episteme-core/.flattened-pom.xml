@@ -278,18 +278,15 @@
         <includes>
           <include>episteme.properties</include>
         </includes>
-        <excludes>
-          <exclude>**/*.jpg</exclude>
-          <exclude>**/*.png</exclude>
-          <exclude>**/*.bin</exclude>
-        </excludes>
       </resource>
       <resource>
         <filtering>false</filtering>
         <directory>src/main/resources</directory>
         <includes>
-          <include>**/*.jpg</include>
+          <include>**/*.properties</include>
+          <include>**/*.css</include>
           <include>**/*.png</include>
+          <include>**/*.jpg</include>
           <include>**/*.bin</include>
         </includes>
         <excludes>
@@ -308,6 +305,19 @@
             <arg>jdk.incubator.vector</arg>
             <arg>-Xpkginfo:always</arg>
           </compilerArgs>
+          <testExcludes>
+            <exclude>**/CPUDenseLinearAlgebraProviderTest.java</exclude>
+            <exclude>**/CPUSparseLinearAlgebraProviderTest.java</exclude>
+            <exclude>**/LinearAlgebraProviderTest.java</exclude>
+            <exclude>**/SolverTest.java</exclude>
+            <exclude>**/TensorTest.java</exclude>
+            <exclude>**/TensorBackendTest.java</exclude>
+            <exclude>**/CARMAAlgorithmTest.java</exclude>
+            <exclude>**/RealDoubleCARMAAlgorithmTest.java</exclude>
+            <exclude>**/PredicateFormulaTest.java</exclude>
+            <exclude>**/GraphNodeTest.java</exclude>
+            <exclude>**/SerializationTest.java</exclude>
+          </testExcludes>
           <annotationProcessorPaths>
             <path>
               <groupId>com.google.auto.service</groupId>

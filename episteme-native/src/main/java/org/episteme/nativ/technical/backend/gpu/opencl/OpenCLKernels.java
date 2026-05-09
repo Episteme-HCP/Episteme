@@ -226,8 +226,30 @@ public final class OpenCLKernels {
         "    }\n" +
         "    if (row < n) {\n" +
         "        double vi = v[row * n + i_col]; double vj = v[row * n + j_col];\n" +
-        "        v[row * n + i_col] = cos_v * vi + sin_v * vj;\n" +
+        "        "        v[row * n + i_col] = cos_v * vi + sin_v * vj;\n" +
         "        v[row * n + j_col] = -sin_v * vi + cos_v * vj;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void solve_triangular_lower(__global const double *a, __global double *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = 0; i < n; i++) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            double sum = 0.0;\n" +
+        "            for (int j = 0; j < i; j++) sum += a[i * n + j] * b[j];\n" +
+        "            double diag = unit_diag ? 1.0 : a[i * n + i];\n" +
+        "            b[i] = (b[i] - sum) / diag;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void solve_triangular_upper(__global const double *a, __global double *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = n - 1; i >= 0; i--) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            double sum = 0.0;\n" +
+        "            for (int j = i + 1; j < n; j++) sum += a[i * n + j] * b[j];\n" +
+        "            double diag = unit_diag ? 1.0 : a[i * n + i];\n" +
+        "            b[i] = (b[i] - sum) / diag;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
         "    }\n" +
         "}\n";
 
@@ -317,6 +339,53 @@ public final class OpenCLKernels {
         "    if (i < n && i != k) {\n" +
         "        float factor = a[i * n + k];\n" +
         "        for (int j = 0; j < n; j++) inv[i * n + j] -= factor * inv[k * n + j];\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void lu_decompose_step_float(__global float *a, const int n, const int k) {\n" +
+        "    int i = get_global_id(1) + k + 1;\n" +
+        "    int j = get_global_id(0) + k + 1;\n" +
+        "    if (i < n && j < n) {\n" +
+        "        if (j == k + 1) a[i * n + k] /= a[k * n + k];\n" +
+        "        a[i * n + j] -= a[i * n + k] * a[k * n + j];\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void cholesky_decompose_step_float(__global float *a, const int n, const int k) {\n" +
+        "    int i = get_global_id(0) + k + 1;\n" +
+        "    if (i < n) {\n" +
+        "        float sum = 0.0f;\n" +
+        "        for (int j = 0; j < k; j++) sum += a[i * n + j] * a[k * n + j];\n" +
+        "        a[i * n + k] = (a[i * n + k] - sum) / a[k * n + k];\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void qr_householder_apply_float(__global float *a, const int rows, const int cols, const int k, __global const float *v) {\n" +
+        "    int j = get_global_id(0) + k;\n" +
+        "    int i = get_global_id(1) + k;\n" +
+        "    if (i < rows && j < cols) {\n" +
+        "        float dot = 0.0f;\n" +
+        "        for (int m = k; m < rows; m++) dot += v[m] * a[m * cols + j];\n" +
+        "        a[i * cols + j] -= 2.0f * v[i] * dot;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void solve_triangular_lower_float(__global const float *a, __global float *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = 0; i < n; i++) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            float sum = 0.0f;\n" +
+        "            for (int j = 0; j < i; j++) sum += a[i * n + j] * b[j];\n" +
+        "            float diag = unit_diag ? 1.0f : a[i * n + i];\n" +
+        "            b[i] = (b[i] - sum) / diag;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void solve_triangular_upper_float(__global const float *a, __global float *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = n - 1; i >= 0; i--) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            float sum = 0.0f;\n" +
+        "            for (int j = i + 1; j < n; j++) sum += a[i * n + j] * b[j];\n" +
+        "            float diag = unit_diag ? 1.0f : a[i * n + i];\n" +
+        "            b[i] = (b[i] - sum) / diag;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
         "    }\n" +
         "}\n";
     

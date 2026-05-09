@@ -1040,13 +1040,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         int n = a.rows();
         Ring<E> ring = a.getScalarRing();
         
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals || ring.getClass().getName().contains("Reals")) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real || ring.getClass().getName().contains("Reals")) {
             E sum = ring.zero();
             for (int i = 0; i < n; i++) {
                 sum = ring.add(sum, a.get(i, i));
             }
             return sum;
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes || ring.getClass().getName().contains("Complexes")) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex || ring.getClass().getName().contains("Complexes")) {
             Complex sum = Complex.ZERO;
             for (int i = 0; i < n; i++) {
                 Object val = a.get(i, i);

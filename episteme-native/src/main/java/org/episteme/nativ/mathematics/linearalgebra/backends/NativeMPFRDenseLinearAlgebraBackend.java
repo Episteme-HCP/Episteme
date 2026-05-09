@@ -8,6 +8,8 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 import com.google.auto.service.AutoService;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
+import java.util.List;
+import java.util.ArrayList;
 import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.*;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -1367,8 +1369,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             NativeSafe.invoke(MPFR_INIT2, normA, prec);
             NativeSafe.invoke(MPFR_INIT2, normB, prec);
             
-            Real nA = (Real) norm(a);
-            Real nB = (Real) norm(b);
+            Real nA = getReal(norm(a));
+            Real nB = getReal(norm(b));
             NativeSafe.invoke(MPFR_SET_STR, normA, arena.allocateFrom(nA.bigDecimalValue().toPlainString()), 10, 0);
             NativeSafe.invoke(MPFR_SET_STR, normB, arena.allocateFrom(nB.bigDecimalValue().toPlainString()), 10, 0);
             
@@ -1738,19 +1740,19 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             Matrix<E> v = eigen.getEigenvectors();
             
             // s_i = sqrt(lambda_i)
-            E[] sigma = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), n);
+            List<E> sigmaList = new java.util.ArrayList<>(n);
             for (int i = 0; i < n; i++) {
                 E val = sValues.get(i);
-                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO));
+                sigmaList.add((E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO)));
             }
-            Vector<E> s = Vector.of(java.util.Arrays.asList(sigma), a.getScalarRing());
+            Vector<E> s = Vector.of(sigmaList, a.getScalarRing());
             
             // U = A * V * Sigma^-1
             Matrix<E> u = createMatrix(m, n, a.getScalarRing());
             for (int i = 0; i < n; i++) {
                 Vector<E> vi = v.getColumn(i);
                 Vector<E> avi = multiply(a, vi);
-                E si = sigma[i];
+                E si = sigmaList.get(i);
                 double sVal = getRealValue(si);
                 if (sVal > 1e-30) {
                     setColumn(u, i, multiply(avi, createScalar(1.0 / sVal, a)));
@@ -1767,19 +1769,19 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             Vector<E> sValues = eigen.getEigenvalues();
             Matrix<E> u = eigen.getEigenvectors();
             
-            E[] sigma = (E[]) java.lang.reflect.Array.newInstance(a.getScalarRing().zero().getClass(), m);
+            List<E> sigmaList = new java.util.ArrayList<>(m);
             for (int i = 0; i < m; i++) {
                 E val = sValues.get(i);
-                sigma[i] = (E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO));
+                sigmaList.add((E) (Object) (val instanceof Real r ? r.sqrt() : (E)(Object)Complex.of(Real.of(Math.sqrt(((Complex)val).real())), Real.ZERO)));
             }
-            Vector<E> s = Vector.of(java.util.Arrays.asList(sigma), a.getScalarRing());
+            Vector<E> s = Vector.of(sigmaList, a.getScalarRing());
             
             // V = A^T * U * Sigma^-1
             Matrix<E> v = createMatrix(n, m, a.getScalarRing());
             for (int i = 0; i < m; i++) {
                 Vector<E> ui = u.getColumn(i);
                 Vector<E> atui = multiply(at, ui);
-                E si = sigma[i];
+                E si = sigmaList.get(i);
                 double sVal = getRealValue(si);
                 if (sVal > 1e-30) {
                     setColumn(v, i, multiply(atui, createScalar(1.0 / sVal, a)));
@@ -1911,6 +1913,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
             Matrix<E> qMat = backToMatrix_internal(h_Q, m, m, arena, a.getScalarRing(), isComplex);
             Matrix<E> rMat = backToMatrix_internal(h_A, m, n, arena, a.getScalarRing(), isComplex);
+            
+            // Explicitly zero out the lower triangular part of R for strict compliance
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < Math.min(i, n); j++) {
+                    rMat.getStorage().set(i, j, a.getScalarRing().zero());
+                }
+            }
+            
             return new QRResult<>(qMat, rMat);
         } catch (Throwable t) {
             logger.error("MPFR QR failed: {}", t.getMessage());

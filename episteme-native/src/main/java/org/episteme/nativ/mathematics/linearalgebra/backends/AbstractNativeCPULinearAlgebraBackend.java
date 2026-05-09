@@ -715,7 +715,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (!AVAILABLE) throw new UnsupportedOperationException("Native library not available");
         
         Ring<E> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real || ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 @SuppressWarnings("unchecked")
@@ -725,7 +725,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             @SuppressWarnings("unchecked")
             Vector<E> res = (Vector<E>) (Object) multiplyReal((Matrix<Real>)(Object)a, (Vector<Real>)(Object)b);
             return res;
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 @SuppressWarnings("unchecked")
@@ -962,7 +962,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
         Ring<E> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 float[] ad = toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a);
@@ -981,7 +981,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             @SuppressWarnings("unchecked")
             Matrix<E> result = (Matrix<E>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
             return result;
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 float[] ad = toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a);
@@ -1011,7 +1011,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         Ring<E> ring = a.getScalarRing();
         int rows = a.rows();
         int cols = a.cols();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             double[] ad = toDoubleArray((Matrix<Real>)(Object)a);
             double[] bd = toDoubleArray((Matrix<Real>)(Object)b);
             double[] rd = new double[ad.length];
@@ -1019,7 +1019,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             @SuppressWarnings("unchecked")
             Matrix<E> result = (Matrix<E>)(Object) RealDoubleMatrix.of(rd, rows, cols);
             return result;
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             double[] ad = toComplexDoubleArray((Matrix<Complex>)(Object)a);
             double[] bd = toComplexDoubleArray((Matrix<Complex>)(Object)b);
             double[] rd = new double[ad.length];
@@ -1035,7 +1035,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     @SuppressWarnings("unchecked")
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 float s = ((org.episteme.core.mathematics.numbers.real.Real)scalar).floatValue();
@@ -1055,7 +1055,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             @SuppressWarnings("unchecked")
             Matrix<E> result = (Matrix<E>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
             return result;
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             org.episteme.core.mathematics.numbers.complex.Complex s;
             if (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
                 s = (org.episteme.core.mathematics.numbers.complex.Complex)scalar;
@@ -1079,7 +1079,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (a.cols() != b.rows()) throw new IllegalArgumentException("Incompatible dimensions: " + a.cols() + " != " + b.rows());
         
         Ring<E> ring = a.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (!AVAILABLE || SGEMM_HANDLE == null) throw new UnsupportedOperationException("SGEMM not available");
@@ -1112,7 +1112,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] cData = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 return (Matrix<E>)(Object) RealDoubleMatrix.of(cData, m, n);
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (!AVAILABLE || CGEMM_HANDLE == null) throw new UnsupportedOperationException("CGEMM not available");
@@ -1160,7 +1160,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         Ring<E> ring = a.getScalarRing();
         int n = a.rows();
         int m = a.cols();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             if (!AVAILABLE) throw new UnsupportedOperationException(getName() + ": inverse() not available");
             if (n != m) return pseudoInverse(a);
             try (Arena arena = Arena.ofConfined()) {
@@ -1176,7 +1176,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] invData = aSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 return (Matrix<E>)(Object) RealDoubleMatrix.of(invData, n, n);
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZGETRF_HANDLE == null || ZGETRI_HANDLE == null) throw new UnsupportedOperationException("ZGETRF/ZGETRI not available");
             if (n != m) return pseudoInverse(a);
             try (Arena arena = Arena.ofConfined()) {
@@ -1206,7 +1206,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
         Ring<E> ring = a.getScalarRing();
         int n = a.rows();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             if (DGESV_HANDLE == null) throw new UnsupportedOperationException("DGESV not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
@@ -1220,7 +1220,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] res = bSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 return (Vector<E>)(Object) RealDoubleVector.of(res);
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZGESV_HANDLE == null) throw new UnsupportedOperationException("ZGESV not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
@@ -1271,7 +1271,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         Ring<E> ring = a.getScalarRing();
         int m = a.rows();
         int n = a.cols();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             double[] data = toDoubleArray((Matrix<Real>)(Object)a);
             double[] res = new double[n * m];
             
@@ -1286,7 +1286,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
             }
             return (Matrix<E>)(Object) RealDoubleMatrix.of(res, n, m);
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             double[] data = toComplexDoubleArray((Matrix<Complex>)(Object)a);
             double[] resData = new double[2 * n * m];
             for (int i=0; i<m; i++) {
@@ -1310,7 +1310,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
@@ -1326,7 +1326,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
                 return (E) Real.of(det);
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZGETRF_HANDLE == null) throw new UnsupportedOperationException("ZGETRF not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
@@ -1354,7 +1354,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         Ring<E> ring = a.getScalarRing();
         int n = a.rows();
         int m = a.cols();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(n, m));
@@ -1398,7 +1398,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     (Vector<E>)(Object) RealDoubleVector.of(pData)
                 );
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZGETRF_HANDLE == null) throw new UnsupportedOperationException("ZGETRF not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
@@ -1454,7 +1454,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
 
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
@@ -1471,7 +1471,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     (Vector<E>)(Object) RealDoubleVector.of(wData)
                 );
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZHEEV_HANDLE == null) throw new UnsupportedOperationException("ZHEEV not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
@@ -1510,7 +1510,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         int n = a.rows();
         if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 int info = (int) NativeSafe.invoke(DPOTRF_HANDLE, LAPACK_ROW_MAJOR, (byte) 'L', n, aSeg, n);
@@ -1526,7 +1526,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>((Matrix<E>)(Object)L);
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZPOTRF_HANDLE == null) throw new UnsupportedOperationException("ZPOTRF not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
@@ -1558,7 +1558,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         
         Ring<E> ring = a.getScalarRing();
         int n = a.dimension();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (SDOT_HANDLE == null) throw new UnsupportedOperationException("SDOT not available");
@@ -1574,7 +1574,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 MemorySegment bSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
                 return (E) org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DDOT_HANDLE, n, aSeg, 1, bSeg, 1));
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (CDOTC_HANDLE == null) throw new UnsupportedOperationException("CDOTC not available");
@@ -1606,7 +1606,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (!AVAILABLE) throw new UnsupportedOperationException("Native library not available");
         Ring<E> ring = a.getScalarRing();
         int n = a.dimension();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (SNRM2_HANDLE != null) {
@@ -1622,7 +1622,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     return (E) org.episteme.core.mathematics.numbers.real.Real.of((double) NativeSafe.invoke(DNRM2_HANDLE, n, aSeg, 1));
                 }
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
                 if (CNRM2_HANDLE != null) {
@@ -1799,10 +1799,10 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         }
         
         // Fallback to MathContext for generic 'Reals' ring which doesn't specify precision in its zero()
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals || ring.getClass().getName().contains("Reals")) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real || ring.getClass().getName().contains("Reals")) {
             return org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.FAST;
         }
-        if (ring instanceof org.episteme.core.mathematics.sets.Complexes || ring.getClass().getName().contains("Complexes")) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex || ring.getClass().getName().contains("Complexes")) {
             return org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.FAST;
         }
         
@@ -1885,7 +1885,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         int dim = vector.dimension();
         Ring<E> ring = vector.getScalarRing();
         
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             org.episteme.core.mathematics.numbers.real.Real sVal = (org.episteme.core.mathematics.numbers.real.Real)scalar;
             float sFloat = sVal.floatValue();
@@ -1912,7 +1912,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     }
                 }
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
              E zero = ring.zero();
              org.episteme.core.mathematics.numbers.complex.Complex s = (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) ? c : org.episteme.core.mathematics.numbers.complex.Complex.of(((Real)scalar).doubleValue());
              if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
@@ -1952,7 +1952,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         int n = a.cols();
         int k = Math.min(m, n);
 
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             if (!AVAILABLE || DGEQRF_HANDLE == null) throw new UnsupportedOperationException(getName() + ": QR not available");
 
             RealDoubleMatrix qMat = RealDoubleMatrix.direct(m, n); 
@@ -1987,7 +1987,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
             }
             throw new ArithmeticException("Native QR failed with info: " + info);
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZGEQRF_HANDLE == null || ZUNGQR_HANDLE == null) throw new UnsupportedOperationException("ZGEQRF/ZUNGQR not available");
             
             double[] aData = toComplexDoubleArray((Matrix<Complex>)(Object)a);
@@ -2000,7 +2000,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             if (info == 0) {
                 double[] rDataArr = new double[2 * k * n];
                 aBuf.get(rDataArr);
-                aBuf.flip();
+                aBuf.position(0);
                 
                 Complex[] complexR = new Complex[k * n];
                 for (int i = 0; i < k; i++) {
@@ -2017,6 +2017,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 info = zungqr(m, k, k, aBuf, n, tau);
                 if (info == 0) {
                     double[] qDataArr = new double[2 * m * n];
+                    aBuf.position(0);
+                    aBuf.limit(aBuf.capacity());
                     aBuf.get(qDataArr);
                     
                     Complex[] complexQ = new Complex[m * k];
@@ -2040,7 +2042,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         Ring<E> ring = a.getScalarRing();
         int m = a.rows();
         int n = a.cols();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             if (AVAILABLE) {
                 if (DGESVD_HANDLE == null) throw new UnsupportedOperationException("LAPACKE dgesvd not available");
                 
@@ -2090,7 +2092,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 }
                 return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(U, S, V);
             }
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             if (ZGESVD_HANDLE == null) throw new UnsupportedOperationException("ZGESVD not available");
             
             boolean transposed = false;
@@ -2154,11 +2156,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         Ring<E> ring = a.getScalarRing();
         int n = a.rows();
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             double sum = 0;
             for (int i = 0; i < n; i++) sum += ((Real) a.get(i, i)).doubleValue();
             return createScalar(sum, a);
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             org.episteme.core.mathematics.numbers.complex.Complex sum = org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
             for (int i = 0; i < n; i++) sum = sum.add((org.episteme.core.mathematics.numbers.complex.Complex) a.get(i, i));
             return createScalar(sum.real(), sum.imaginary(), (Object) a);
@@ -2192,7 +2194,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         int rows = m.rows();
         int cols = m.cols();
         Ring<E> ring = m.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             org.episteme.core.mathematics.numbers.complex.Complex exp = (org.episteme.core.mathematics.numbers.complex.Complex) exponent;
             org.episteme.core.mathematics.numbers.complex.Complex[][] res = new org.episteme.core.mathematics.numbers.complex.Complex[rows][cols];
             for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) res[i][j] = ((org.episteme.core.mathematics.numbers.complex.Complex) m.get(i, j)).pow(exp);
@@ -2210,7 +2212,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         int rows = m.rows();
         int cols = m.cols();
         Ring<E> ring = m.getScalarRing();
-        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             org.episteme.core.mathematics.numbers.complex.Complex[][] res = new org.episteme.core.mathematics.numbers.complex.Complex[rows][cols];
             for (int i = 0; i < rows; i++) for (int j = 0; j < cols; j++) res[i][j] = complexOp.apply((org.episteme.core.mathematics.numbers.complex.Complex) m.get(i, j));
             return (Matrix<E>) Matrix.of(res, (org.episteme.core.mathematics.structures.rings.Ring<org.episteme.core.mathematics.numbers.complex.Complex>) ring);
