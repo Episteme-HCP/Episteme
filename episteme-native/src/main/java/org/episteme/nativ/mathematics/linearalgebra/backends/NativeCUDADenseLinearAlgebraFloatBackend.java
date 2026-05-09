@@ -97,7 +97,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             // Since we want Transpose and cuBLAS is col-major, it's tricky.
             // Row-major Transpose(A) is equivalent to Col-major A.
             // Simplified: use SGEAM with alpha=1, beta=0 and transA=1.
-            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SGEAM, handle, 1, 1, m, n, 
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SGEAM, handle, 1, 0, m, n, 
                 arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_A, n, 
                 arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f), d_A, n, d_C, m));
             

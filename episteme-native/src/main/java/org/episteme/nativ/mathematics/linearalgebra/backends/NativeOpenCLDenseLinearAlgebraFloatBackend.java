@@ -404,7 +404,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
                 clSetKernelArg(gaussJordanInvKernel, 1, Sizeof.cl_mem, Pointer.to(memInv));
                 clSetKernelArg(gaussJordanInvKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
                 clSetKernelArg(gaussJordanInvKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{k}));
-                clEnqueueNDRangeKernel(queue, gaussJordanInvKernel, 1, null, new long[]{n}, null, 0, null, null);
+                clEnqueueNDRangeKernel(queue, gaussJordanInvKernel, 2, null, new long[]{n, n}, null, 0, null, null);
                 
                 clSetKernelArg(gaussJordanKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
                 clSetKernelArg(gaussJordanKernel, 1, Sizeof.cl_int, Pointer.to(new int[]{n}));
