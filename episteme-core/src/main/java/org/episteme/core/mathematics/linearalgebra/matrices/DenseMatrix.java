@@ -75,6 +75,10 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
         this(new DenseMatrixStorage<>(rows, cols, flatData), provider, ring);
     }
 
+    public DenseMatrix(E[] flatData, int rows, int cols, Ring<E> ring) {
+        this(new DenseMatrixStorage<>(rows, cols, flatData), ring);
+    }
+
     // Internal constructor
     public DenseMatrix(MatrixStorage<E> storage, LinearAlgebraProvider<E> provider, Ring<E> ring) {
         super(storage, provider, ring);
