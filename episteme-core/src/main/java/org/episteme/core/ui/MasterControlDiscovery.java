@@ -200,24 +200,43 @@ public class MasterControlDiscovery {
             }
         }
 
-        // Development heuristic
+        // Development heuristic: find target/classes in peer modules
         try {
-            java.io.File current = new java.io.File(System.getProperty("user.dir"));
-            java.io.File parent = current.getParentFile();
-            if (parent != null && (new java.io.File(parent, "pom.xml")).exists()) {
-                java.io.File[] modules = parent.listFiles(java.io.File::isDirectory);
+            java.io.File current = new java.io.File(System.getProperty("user.dir")).getAbsoluteFile();
+            java.io.File root = current;
+            
+            // Traverse up until we find a directory that looks like the project root (contains episteme-core)
+            while (root != null && !new java.io.File(root, "episteme-core").exists()) {
+                root = root.getParentFile();
+            }
+            
+            if (root != null) {
+                logger.info("Dev Mode: Scanning Episteme project root at {}", root.getAbsolutePath());
+                java.io.File[] modules = root.listFiles(java.io.File::isDirectory);
                 if (modules != null) {
                     for (java.io.File module : modules) {
                         java.io.File targetClasses = new java.io.File(module, "target/classes");
                         if (targetClasses.exists() && targetClasses.isDirectory()) {
-                            if (!allPaths.contains(targetClasses.getAbsolutePath())) {
-                                scanDirectoryRecursive(targetClasses, "", results, processed, tccl);
-                            }
+                            logger.info("Dev Mode: Scanning module classes at {}", targetClasses.getAbsolutePath());
+                            scanDirectoryRecursive(targetClasses, "", results, processed, tccl);
+                        }
+                        // Also check for JARs in target if classes directory is missing
+                        java.io.File targetDir = new java.io.File(module, "target");
+                        if (targetDir.exists() && targetDir.isDirectory()) {
+                             java.io.File[] jars = targetDir.listFiles(f -> f.getName().endsWith(".jar") && f.getName().startsWith("episteme-") && !f.getName().contains("sources"));
+                             if (jars != null) {
+                                 for (java.io.File jar : jars) {
+                                     logger.info("Dev Mode: Scanning module JAR at {}", jar.getAbsolutePath());
+                                     scanJarRecursive(jar, results, processed, tccl);
+                                 }
+                             }
                         }
                     }
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            logger.warn("Dev discovery failed: {}", e.getMessage());
+        }
 
         long end = System.currentTimeMillis();
         logger.info("Discovered {} Episteme classes in {} ms", results.size(), (end - start));

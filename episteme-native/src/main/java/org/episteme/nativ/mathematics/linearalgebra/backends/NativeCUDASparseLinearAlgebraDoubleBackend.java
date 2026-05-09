@@ -435,8 +435,8 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         return Complex.of(d_res.get(ValueLayout.JAVA_DOUBLE, 0), 0);
     }
 
-    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.add(a, b); }
-    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { return LinearAlgebraProvider.super.subtract(a, b); }
+    @Override public Vector<E> add(Vector<E> a, Vector<E> b) { return SparseLinearAlgebraProvider.super.add(a, b); }
+    @Override public Vector<E> subtract(Vector<E> a, Vector<E> b) { return SparseLinearAlgebraProvider.super.subtract(a, b); }
     @Override public E dot(Vector<E> a, Vector<E> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.dimension();
@@ -525,4 +525,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
     public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
         throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not implemented in sparse backend");
     }
+
+    private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof Complex; }
+    private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
 }

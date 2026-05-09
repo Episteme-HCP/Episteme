@@ -551,9 +551,10 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { return LinearAlgebraProvider.super.eigen(a); }
 
     @Override
-    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean lower, boolean unitDiagonal) {
+    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
         int n = a.rows();
+        if (transpose) throw new UnsupportedOperationException("Transpose solve not yet implemented for OpenCL");
         double[] da = toDoubleArray(a);
         double[] db = toDoubleVec(b);
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -562,11 +563,11 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n * n, Pointer.to(da), null), CL::clReleaseMemObject);
             cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * n, Pointer.to(db), null), CL::clReleaseMemObject);
             
-            cl_kernel kernel = lower ? solveTriangularLowerKernel : solveTriangularUpperKernel;
+            cl_kernel kernel = upper ? solveTriangularUpperKernel : solveTriangularLowerKernel;
             clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memA));
             clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memB));
             clSetKernelArg(kernel, 2, Sizeof.cl_int, Pointer.to(new int[]{n}));
-            clSetKernelArg(kernel, 3, Sizeof.cl_int, Pointer.to(new int[]{unitDiagonal ? 1 : 0}));
+            clSetKernelArg(kernel, 3, Sizeof.cl_int, Pointer.to(new int[]{unit ? 1 : 0}));
             
             clEnqueueNDRangeKernel(queue, kernel, 1, null, new long[]{1}, null, 0, null, null);
             double[] result = new double[n];
@@ -780,9 +781,8 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         return 0.0;
     }
 
-    private boolean isComplex(Matrix<E> m) {
-        return m.getScalarRing().zero() instanceof Complex;
-    }
+    private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof Complex; }
+    private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
 
     private static cl_kernel tryCreateKernel(cl_program program, String name) {
         try {

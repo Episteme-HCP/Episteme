@@ -1,78 +1,31 @@
-/*
- * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
- * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.episteme.core.ui;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.episteme.core.Episteme;
-import org.episteme.core.ui.i18n.I18N;
-import org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend;
-import org.episteme.core.technical.backend.BackendDiscovery;
-import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.io.ResourceIO;
+import org.episteme.core.technical.backend.Backend;
+import org.episteme.core.technical.backend.BackendDiscovery;
+import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.viewers.Viewer;
 
-import java.util.Locale;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import org.episteme.core.io.UserPreferences;
+import java.util.*;
 
 /**
- * Master Control Dashboard for Episteme Application.
- * Visualizes the state of the application, libraries, devices, and
- * configuration.
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
+ * Episteme Master Control - The central dashboard for the Episteme environment.
+ * Provides a unified interface for system settings, library management, and application discovery.
  */
 public class EpistemeMasterControl extends Application {
-    
-    private static final UserPreferences PREFS = UserPreferences.getInstance();
-    private static final String PREF_SELECTED_TAB = "dashboard_selected_tab";
-    private static final String PREF_SELECTED_DEVICE = "dashboard_selected_device";
 
-    private static class LocaleItem {
-        String name;
-        Locale locale;
-
-        LocaleItem(String name, Locale locale) {
-            this.name = name;
-            this.locale = locale;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
+    private static final EpistemePreferences PREFS = EpistemePreferences.getInstance();
+    private static final String PREF_SELECTED_TAB = "mastercontrol.selected_tab";
+    private static final String PREF_SELECTED_DEVICE = "mastercontrol.selected_device";
 
     private Stage primaryStage;
     private int selectedIndex = 0;
@@ -84,32 +37,22 @@ public class EpistemeMasterControl extends Application {
             String lang = PREFS.getLanguage();
             org.episteme.core.ui.i18n.I18N.getInstance().setLocale(Locale.of(lang));
 
-            // Theme is handled by ThemeManager
-            ThemeManager.getInstance().applyTheme(stage.getScene());
-
+            this.primaryStage = stage;
+            
             // Apply Episteme Application Icon universally
             try {
                 stage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/episteme/core/ui/icon.png")));
-            } catch (Exception e) {
-                System.err.println("Warning: Could not load application icon.");
-            }
+            } catch (Exception e) {}
 
-            this.primaryStage = stage;
             refreshUI();
         } catch (Throwable t) {
             t.printStackTrace();
-            System.err.println("CRITICAL ERROR IN EpistemeMasterControl.start(): " + t.getMessage());
         }
     }
 
     private void refreshUI() {
-        if (primaryStage.getScene() != null) {
-            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
-        }
-
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        tabPane.getTabs().clear();
 
         I18N i18n = I18N.getInstance();
 
@@ -124,1818 +67,500 @@ public class EpistemeMasterControl extends Application {
                 createAppsTab(i18n),
                 createDevicesTab(i18n));
 
-        tabPane.getTabs().get(0).setId("tab-general");
-        tabPane.getTabs().get(1).setId("tab-i18n");
-        tabPane.getTabs().get(2).setId("tab-themes");
-        tabPane.getTabs().get(3).setId("tab-computing");
-        tabPane.getTabs().get(4).setId("tab-libraries");
-        tabPane.getTabs().get(5).setId("tab-algorithms");
-        tabPane.getTabs().get(6).setId("tab-loaders");
-        tabPane.getTabs().get(7).setId("tab-apps");
-        tabPane.getTabs().get(8).setId("tab-devices");
-
-        // Restore selected tab from preferences if not preserving current state
-        if (selectedIndex == 0) {
-            selectedIndex = PREFS.getInt(PREF_SELECTED_TAB, 0);
-        }
-        // Ensure index is valid
-        if (selectedIndex < 0 || selectedIndex >= tabPane.getTabs().size()) {
-            selectedIndex = 0;
-        }
-
+        // Restore selected tab
+        selectedIndex = PREFS.getInt(PREF_SELECTED_TAB, 0);
+        if (selectedIndex < 0 || selectedIndex >= tabPane.getTabs().size()) selectedIndex = 0;
         tabPane.getSelectionModel().select(selectedIndex);
 
-        // Save selected tab on change
         tabPane.getSelectionModel().selectedIndexProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                PREFS.setInt(PREF_SELECTED_TAB, newVal.intValue());
-            }
+            if (newVal != null) PREFS.setInt(PREF_SELECTED_TAB, newVal.intValue());
         });
 
         StackPane root = new StackPane(tabPane);
-
         if (primaryStage.getScene() == null) {
-            Scene scene = new Scene(root, 1100, 750);
-            applyCurrentTheme(scene);
+            Scene scene = new Scene(root, 1150, 800);
             primaryStage.setScene(scene);
         } else {
-            Scene scene = primaryStage.getScene();
-            scene.setRoot(root);
-            applyCurrentTheme(scene);
+            primaryStage.getScene().setRoot(root);
         }
-
+        
+        ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         primaryStage.setTitle(i18n.get("app.title", "Episteme Master Control"));
         primaryStage.show();
     }
 
-    private void applyCurrentTheme(Scene scene) {
-        ThemeManager.getInstance().applyTheme(scene);
+    private VBox createTabHeader(String title, String subtitle) {
+        VBox header = new VBox(5);
+        header.getStyleClass().add("tab-header");
+        Label titleLabel = new Label(title);
+        titleLabel.getStyleClass().add("header-label");
+        Label subLabel = new Label(subtitle);
+        subLabel.getStyleClass().add("description-label");
+        header.getChildren().addAll(titleLabel, subLabel);
+        return header;
+    }
+
+    private void addPropertyRow(GridPane grid, int row, String labelText, Node control, String description) {
+        Label label = new Label(labelText);
+        label.getStyleClass().add("font-bold");
+        label.setPadding(new Insets(5, 0, 5, 0));
+        
+        Label desc = new Label(description);
+        desc.getStyleClass().add("description-label");
+        desc.setMaxWidth(450);
+
+        grid.add(label, 0, row);
+        grid.add(control, 1, row);
+        grid.add(desc, 2, row);
     }
 
     private Tab createGeneralTab(I18N i18n) {
         VBox content = new VBox(25);
-        content.setPadding(new Insets(40));
-        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(30));
+        content.setAlignment(Pos.TOP_LEFT);
 
-        // --- PROJECT LOGO ---
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.general.title", "Episteme Master Control"),
+            i18n.get("mastercontrol.general.subtitle", "Universal Scientific Computing Environment & Control Panel")
+        );
+
+        // --- PROJECT LOGO & INFO ---
+        HBox infoBox = new HBox(30);
+        infoBox.setAlignment(Pos.CENTER_LEFT);
+        infoBox.setPadding(new Insets(20, 0, 20, 0));
+
         javafx.scene.image.ImageView projectIcon = new javafx.scene.image.ImageView();
         try {
             javafx.scene.image.Image icon = new javafx.scene.image.Image(getClass().getResourceAsStream("/org/episteme/core/ui/master_control_logo.png"));
             projectIcon.setImage(icon);
-            projectIcon.setFitWidth(128);
+            projectIcon.setFitWidth(96);
             projectIcon.setPreserveRatio(true);
-            projectIcon.setSmooth(true);
-            projectIcon.setEffect(new javafx.scene.effect.DropShadow(15, javafx.scene.paint.Color.web("#2196F3", 0.3)));
-        } catch (Exception e) {
-            System.err.println("Warning: Could not load project icon for General tab.");
-        }
+        } catch (Exception e) {}
 
-        // --- TITLE ---
-        Label title = new Label(i18n.get("mastercontrol.general.title", "Episteme Master Control"));
-        title.getStyleClass().add("font-bold");
-        title.setStyle("-fx-font-size: 36px;");
+        VBox textInfo = new VBox(10);
+        Label version = new Label("Version: 1.0.0-beta2");
+        version.getStyleClass().add("font-bold");
+        Label status = new Label("System Status: Operational");
+        status.getStyleClass().add("status-label-available");
+        textInfo.getChildren().addAll(version, status);
 
-        Label subtitle = new Label(
-                i18n.get("mastercontrol.general.subtitle", "Universal Scientific Computing Environment"));
-        subtitle.getStyleClass().add("dashboard-subtitle");
+        infoBox.getChildren().addAll(projectIcon, textInfo);
 
-        GridPane infoGrid = new GridUtils.Builder()
-                .addRow(i18n.get("mastercontrol.general.version", "Version") + ":", org.episteme.core.Episteme.VERSION)
-                .addRow(i18n.get("mastercontrol.general.build", "Build Date") + ":",
-                        org.episteme.core.Episteme.BUILD_DATE)
-                .addRow(i18n.get("mastercontrol.general.java", "Java Version") + ":", System.getProperty("java.version"))
-                .build();
-        infoGrid.setAlignment(Pos.CENTER);
-
-        // --- AUTHORS ---
-        VBox authorsBox = new VBox(5);
-        authorsBox.setAlignment(Pos.CENTER);
-        Label authorsHeader = new Label(i18n.get("mastercontrol.general.authors", "Authors"));
-        authorsHeader.getStyleClass().add("font-bold");
-        authorsBox.getChildren().add(authorsHeader);
-
-        for (String author : Episteme.AUTHORS) {
-            authorsBox.getChildren().add(new Label(author));
-        }
-
-        content.getChildren().addAll(projectIcon, title, subtitle, new Separator(), infoGrid, new Separator(), authorsBox);
+        content.getChildren().addAll(header, infoBox);
         return new Tab(i18n.get("mastercontrol.tab.general", "General"), content);
-    }
-
-
-
-    private static class GridUtils {
-        static class Builder {
-            GridPane grid = new GridPane();
-            int row = 0;
-
-            Builder() {
-                grid.setHgap(20);
-                grid.setVgap(10);
-                grid.setAlignment(Pos.CENTER);
-            }
-
-            Builder addRow(String label, String value) {
-                Label l = new Label(label);
-                l.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
-                grid.addRow(row++, l, new Label(value));
-                return this;
-            }
-
-            GridPane build() {
-                return grid;
-            }
-        }
     }
 
     private Tab createI18NTab(I18N i18n) {
         VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
-        content.setAlignment(Pos.TOP_LEFT);
+        content.setPadding(new Insets(30));
 
-        Label header = new Label(i18n.get("mastercontrol.i18n.header", "Language Selection"));
-        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.tab.i18n", "Language & Region"),
+            i18n.get("mastercontrol.i18n.desc", "Configure the global interface language and numerical formatting conventions.")
+        );
 
-        ListView<LocaleItem> langList = new ListView<>();
+        GridPane grid = new GridPane();
+        grid.setHgap(30);
+        grid.setVgap(20);
 
-        // Dynamic discovery of languages
-        List<LocaleItem> items = new ArrayList<>();
-        // Default languages
-        items.add(new LocaleItem(i18n.get("mastercontrol.lang.en", "English"), Locale.ENGLISH));
+        ComboBox<LocaleItem> langCombo = new ComboBox<>();
+        langCombo.getItems().addAll(
+                new LocaleItem("English (US)", Locale.US),
+                new LocaleItem("Français (France)", Locale.FRANCE),
+                new LocaleItem("Deutsch (Deutschland)", Locale.GERMANY),
+                new LocaleItem("Español (España)", Locale.forLanguageTag("es-ES")));
 
-        for (Locale locale : i18n.getSupportedLocales()) {
-            String displayName = locale.getDisplayLanguage(locale);
-            if (displayName.length() > 0) {
-                displayName = displayName.substring(0, 1).toUpperCase() + displayName.substring(1);
-            }
-            // Avoid duplicates if English was added manually above (it was, lines 273)
-            // Actually, best to clear items and rebuild from getSupportedLocales
-            boolean exists = false;
-            for (LocaleItem item : items) {
-                if (item.locale.getLanguage().equals(locale.getLanguage())) {
-                    exists = true;
-                    break;
-                }
-            }
-
-            if (!exists) {
-                items.add(new LocaleItem(displayName + " (" + locale.getLanguage() + ")", locale));
-            }
-        }
-
-        langList.getItems().addAll(items);
-        langList.setMaxHeight(250);
-        langList.setMaxWidth(350);
-
-        Locale current = i18n.getLocale();
-        for (LocaleItem item : langList.getItems()) {
-            if (item.locale.getLanguage().equals(current.getLanguage())) {
-                langList.getSelectionModel().select(item);
+        Locale currentLocale = i18n.getLocale();
+        for (LocaleItem item : langCombo.getItems()) {
+            if (item.locale.getLanguage().equals(currentLocale.getLanguage())) {
+                langCombo.setValue(item);
                 break;
             }
         }
 
-        langList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.locale.equals(current)) {
-                i18n.setLocale(newVal.locale);
-                PREFS.setLanguage(newVal.locale.getLanguage()); // Save persistence
+        langCombo.setOnAction(e -> {
+            LocaleItem selected = langCombo.getValue();
+            if (selected != null) {
+                PREFS.setLanguage(selected.locale.getLanguage());
+                i18n.setLocale(selected.locale);
                 refreshUI();
             }
         });
 
-        langList.setId("lang-list");
-        content.getChildren().addAll(header, langList);
-        return new Tab(i18n.get("mastercontrol.tab.i18n", "Languages"), content);
+        addPropertyRow(grid, 0, 
+            i18n.get("mastercontrol.i18n.language", "Interface Language"), 
+            langCombo, 
+            i18n.get("mastercontrol.i18n.language.desc", "Select the primary language for the dashboard and all scientific viewers."));
+
+        content.getChildren().addAll(header, grid);
+        return new Tab(i18n.get("mastercontrol.tab.i18n", "I18N"), content);
     }
-
-    private Tab createComputingTab(I18N i18n) {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
-
-        Label title = new Label(i18n.get("mastercontrol.computing.title", "Computing Management"));
-        title.getStyleClass().add("header-label");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(30);
-        grid.setVgap(25);
-
-        // --- Float Precision ---
-        ComboBox<org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision> floatBox = new ComboBox<>();
-        floatBox.getItems().addAll(org.episteme.core.mathematics.context.NumericalConfiguration.FloatPrecision.values());
-        floatBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getFloatPrecision());
-        floatBox.setOnAction(e -> {
-            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setFloatPrecision(floatBox.getValue());
-            Episteme.savePreferences();
-        });
-        VBox floatInfo = createInfoBox(i18n.get("mastercontrol.computing.float_precision", "Float Precision"),
-                i18n.get("mastercontrol.computing.desc.precision", "FLOAT (32-bit) / DOUBLE (64-bit)"));
-
-        // --- Integer Precision ---
-        ComboBox<org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision> intBox = new ComboBox<>();
-        intBox.getItems().addAll(org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision.values());
-        intBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getIntPrecision());
-        intBox.setOnAction(e -> {
-            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setIntPrecision(intBox.getValue());
-            Episteme.savePreferences();
-        });
-        VBox intInfo = createInfoBox(i18n.get("mastercontrol.computing.int_precision", "Integer Precision"),
-                "INT (32-bit) vs LONG (64-bit)");
-
-        // --- MathContext Precision ---
-        java.math.MathContext currentMC = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext();
-        Spinner<Integer> precSpinner = new Spinner<>(0, 10000, currentMC.getPrecision());
-        precSpinner.setEditable(true);
-        precSpinner.setPrefWidth(150);
-        precSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                java.math.MathContext old = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext();
-                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMathContext(new java.math.MathContext(newVal, old.getRoundingMode()));
-                Episteme.savePreferences();
-            }
-        });
-        VBox precInfo = createInfoBox(i18n.get("mastercontrol.computing.precision", "Decimal Precision"),
-                i18n.get("mastercontrol.computing.desc.precision_digits", "Digits (0 = Unlimited)"));
-
-        // --- MathContext Rounding ---
-        ComboBox<java.math.RoundingMode> roundBox = new ComboBox<>();
-        roundBox.getItems().addAll(java.math.RoundingMode.values());
-        roundBox.setValue(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext().getRoundingMode());
-        roundBox.setPrefWidth(150);
-        roundBox.setOnAction(e -> {
-            java.math.MathContext old = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMathContext();
-            org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMathContext(new java.math.MathContext(old.getPrecision(), roundBox.getValue()));
-            Episteme.savePreferences();
-        });
-        VBox roundInfo = createInfoBox(i18n.get("mastercontrol.computing.rounding", "Rounding Mode"),
-                i18n.get("mastercontrol.computing.desc.rounding", "Rounding strategy"));
-
-        boolean gpuAvail = org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProviders().stream()
-                .anyMatch(p -> (p.getId().toLowerCase().contains("cuda") || p.getId().toLowerCase().contains("opencl")) && p.isAvailable());
-
-        // --- GPU Auto-Tuning Mode ---
-        ComboBox<org.episteme.core.technical.algorithm.AutoTuningManager.Mode> tuningBox = new ComboBox<>();
-        tuningBox.getItems().addAll(org.episteme.core.technical.algorithm.AutoTuningManager.Mode.values());
-        tuningBox.setValue(org.episteme.core.technical.algorithm.AutoTuningManager.getMode());
-        tuningBox.setOnAction(e -> {
-            PREFS.setAutoTuningMode(tuningBox.getValue().name());
-        });
-        VBox tuningInfo = createInfoBox(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning Mode"),
-                i18n.get("mastercontrol.computing.desc.autotuning", "ON (Force Tuning), OFF (Standard Priorities), AUTO (Learning)"));
-
-        // --- GPU Backend Selection ---
-        ComboBox<String> gpuBackendBox = new ComboBox<>();
-        gpuBackendBox.getItems().addAll("AUTO", "CPU", "OpenCL", "CUDA");
-        gpuBackendBox.setValue(PREFS.get("computing_gpu_backend", "AUTO"));
-        gpuBackendBox.setPrefWidth(150);
-        gpuBackendBox.setOnAction(e -> {
-            PREFS.set("computing_gpu_backend", gpuBackendBox.getValue());
-            Episteme.savePreferences();
-        });
-        
-        Label gpuStatus = new Label(gpuAvail ? i18n.get("mastercontrol.libraries.available", "Available")
-                : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        gpuStatus.getStyleClass().add(gpuAvail ? "status-connected" : "status-disconnected");
-        HBox gpuRow = new HBox(10, gpuBackendBox, gpuStatus);
-        gpuRow.setAlignment(Pos.CENTER_LEFT);
-
-        VBox gpuBackendInfo = createInfoBox(i18n.get("mastercontrol.computing.gpu_backend", "GPU Backend"),
-                i18n.get("mastercontrol.computing.desc.gpu_backend", "Select the preferred acceleration API."));
-
-        // --- Parallel Threads ---
-        Spinner<Integer> threadsSpinner = new Spinner<>(1, 256, org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMaxThreads());
-        threadsSpinner.setEditable(true);
-        threadsSpinner.setPrefWidth(150);
-        threadsSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMaxThreads(newVal);
-                Episteme.savePreferences();
-            }
-        });
-        VBox threadsInfo = createInfoBox(i18n.get("mastercontrol.computing.threads", "Parallel Threads"),
-                i18n.get("mastercontrol.computing.desc.threads", "Maximum threads for parallel operations."));
-
-        // --- Linear Algebra Epsilon ---
-        TextField epsilonField = new TextField(String.valueOf(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getEpsilonDouble()));
-        epsilonField.setPrefWidth(150);
-        epsilonField.setOnAction(e -> {
-            try {
-                double val = Double.parseDouble(epsilonField.getText());
-                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setEpsilonDouble(val);
-                Episteme.savePreferences();
-            } catch (NumberFormatException ex) {
-                epsilonField.setText(String.valueOf(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getEpsilonDouble()));
-            }
-        });
-        VBox epsilonInfo = createInfoBox(i18n.get("mastercontrol.computing.epsilon", "LA Epsilon"),
-                i18n.get("mastercontrol.computing.desc.epsilon", "Tolerance for linear algebra convergence"));
-
-        // --- Max Iterations ---
-        Spinner<Integer> itersSpinner = new Spinner<>(1, 1000000, org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMaxIterations());
-        itersSpinner.setEditable(true);
-        itersSpinner.setPrefWidth(150);
-        itersSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMaxIterations(newVal);
-                Episteme.savePreferences();
-            }
-        });
-        VBox itersInfo = createInfoBox(i18n.get("mastercontrol.computing.iterations", "LA Max Iterations"),
-                i18n.get("mastercontrol.computing.desc.iterations", "Maximum iterations for iterative solvers"));
-
-        grid.addRow(0, tuningInfo, tuningBox);
-        grid.addRow(1, gpuBackendInfo, gpuRow);
-        grid.addRow(2, threadsInfo, threadsSpinner);
-        grid.addRow(3, new Separator(), new Separator());
-        grid.addRow(4, floatInfo, floatBox);
-        grid.addRow(5, intInfo, intBox);
-        grid.addRow(6, precInfo, precSpinner);
-        grid.addRow(7, roundInfo, roundBox);
-        grid.addRow(8, epsilonInfo, epsilonField);
-        grid.addRow(9, itersInfo, itersSpinner);
-
-        ScrollPane scroll = new ScrollPane(grid);
-        scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-
-        content.getChildren().addAll(title, scroll);
-        return new Tab(i18n.get("mastercontrol.tab.computing", "Computing"), content);
-    }
-
-    private Label createHeaderLabel(String text) {
-        Label l = new Label(text);
-        l.getStyleClass().addAll("font-bold", "text-dark", "form-label"); 
-        return l;
-    }
-
-
-
-    private VBox createInfoBox(String title, String tooltipText) {
-        VBox box = new VBox();
-        Label help = new Label("(?)");
-        help.setTooltip(new Tooltip(tooltipText));
-        help.getStyleClass().add("mastercontrol-help");
-        Label text = new Label(tooltipText);
-        text.getStyleClass().add("description-label");
-        box.getChildren().add(text);
-        return box;
-    }
-
-    private Tab createAlgorithmsTab(I18N i18n) {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
-
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-
-        Label headerTitle = new Label(i18n.get("mastercontrol.algorithms.header", "Algorithm Providers"));
-        headerTitle.getStyleClass().add("header-title");
-        content.getChildren().add(headerTitle);
-
-        Label helpText = new Label(i18n.get("mastercontrol.algorithms.explain.text",
-                "Algorithms are modular compute engines available to the framework.\n" +
-                        "They are automatically selected based on precision and auto-tuning settings."));
-        helpText.getStyleClass().add("text-dark");
-        helpText.setWrapText(true);
-        content.getChildren().add(helpText);
-
-        java.util.Map<String, List<org.episteme.core.technical.algorithm.AlgorithmProvider>> grouped = new TreeMap<>();
-        for (org.episteme.core.technical.algorithm.AlgorithmProvider p : org.episteme.core.technical.algorithm.AlgorithmManager.getProviders(org.episteme.core.technical.algorithm.AlgorithmProvider.class)) {
-            String category = capitalize(p.getAlgorithmType());
-            
-            // Map "General" to "Core Algorithms" for display
-            if ("General".equals(category)) {
-                category = "Core Algorithms";
-            }
-
-            grouped.computeIfAbsent(category, k -> new ArrayList<>()).add(p);
-        }
-
-        Accordion accordion = new Accordion();
-        for (Map.Entry<String, List<org.episteme.core.technical.algorithm.AlgorithmProvider>> entry : grouped.entrySet()) {
-            String category = entry.getKey();
-            List<org.episteme.core.technical.algorithm.AlgorithmProvider> providers = entry.getValue();
-
-            VBox paneBox = new VBox(10);
-            paneBox.setPadding(new Insets(10));
-            GridPane grid = new GridPane();
-            grid.setHgap(35);
-            grid.setVgap(12);
-
-            int r = 0;
-            for (org.episteme.core.technical.algorithm.AlgorithmProvider p : providers) {
-                // Zebra background
-                javafx.scene.layout.Region rowBg = new javafx.scene.layout.Region();
-                rowBg.getStyleClass().add(r % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
-                grid.add(rowBg, 0, r, 3, 1);
-
-                Label nameLabel = new Label(p.getName());
-                nameLabel.getStyleClass().addAll("font-bold", "text-dark");
-                nameLabel.setPadding(new Insets(5, 10, 5, 10));
-
-                Label descLabel = new Label(p.description());
-                descLabel.getStyleClass().add("description-label");
-                descLabel.setWrapText(true);
-                descLabel.setMaxWidth(400);
-                descLabel.setPadding(new Insets(5, 10, 5, 10));
-
-                Label stateLabel = new Label(p.isAvailable() ? i18n.get("master.available", "Available") : i18n.get("master.not_available", "N/A"));
-                stateLabel.getStyleClass().add(p.isAvailable() ? "status-label-available" : "status-label-unavailable");
-                stateLabel.setPadding(new Insets(5, 10, 5, 10));
-
-                grid.addRow(r++, nameLabel, stateLabel, descLabel);
-            }
-            paneBox.getChildren().add(grid);
-
-            TitledPane pane = new TitledPane(category + " (" + providers.size() + ")", paneBox);
-            accordion.getPanes().add(pane);
-        }
-
-        content.getChildren().add(accordion);
-        return new Tab(i18n.get("mastercontrol.tab.algorithms", "Algorithms"), scroll);
-    }
-
-    private Tab createLibrariesTab(I18N i18n) {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
-
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-
-        Label headerTitle = new Label(i18n.get("mastercontrol.libraries.header", "Available Libraries & Status"));
-        headerTitle.getStyleClass().add("header-title");
-        content.getChildren().add(headerTitle);
-
-        Label helpText = new Label(i18n.get("mastercontrol.libraries.explain.text",
-                "These libraries are listed for the following reasons:\n" +
-                        "1. They are necessary for Episteme to function\n" +
-                        "2. They provide extended functionality (GPU, Formats, etc.)"));
-        helpText.setStyle("-fx-text-fill: black;");
-        helpText.setWrapText(true);
-        content.getChildren().add(helpText);
-
-        // --- Framework Libraries ---
-        content.getChildren().add(new Separator());
-        content.getChildren().add(createLibCategory(i18n, "framework", List.of(
-                new LibInfo("javalin", isClassAvailable("io.javalin.Javalin")),
-                new LibInfo("jackson", isClassAvailable("com.fasterxml.jackson.databind.ObjectMapper")),
-                new LibInfo("slf4j", isClassAvailable("org.slf4j.LoggerFactory")),
-                new LibInfo("grpc", isClassAvailable("io.grpc.ManagedChannel"))), i18n));
-
-        // --- Standard Libraries ---
-        content.getChildren().add(createLibCategory(i18n, "standards", List.of(
-                new LibInfo("jsr385", true),
-                new LibInfo("indriya", isClassAvailable("tech.units.indriya.format.SimpleUnitFormat"))), i18n));
-
-        // --- Distributed Computing ---
-        content.getChildren().add(createLibCategory(i18n, "distributed", List.of(
-                new LibInfo("spark", isClassAvailable("org.apache.spark.api.java.JavaSparkContext")),
-                new LibInfo("mpj", isClassAvailable("mpi.MPI"))), i18n));
-
-        // Hardware Acceleration (Compute Drivers) - moved above Math
-        content.getChildren().add(createHardwareCategory(i18n));
-
-        // Mathematics & Algorithms - uses SPI
-        content.getChildren().add(createMathCategory(i18n));
-
-        // Tensors (Deep Learning) - uses SPI
-        content.getChildren().add(createTensorsCategory(i18n));
-
-        // Visualization & Plotting - uses SPI discovery + Config
-        content.getChildren().add(createPlottingCategory(i18n));
-
-        // Audio Processing - uses SPI discovery
-        content.getChildren().add(new Separator());
-        content.getChildren().add(createAudioCategory(i18n));
-
-        // Molecular Viewing - uses SPI discovery
-        content.getChildren().add(new Separator());
-        content.getChildren().add(createChemistryCategory(i18n));
-        
-        // Quantum Computing - uses SPI discovery
-        content.getChildren().add(createQuantumCategory(i18n));
-
-        // Geography & GIS - uses SPI discovery
-        content.getChildren().add(createGeographyCategory(i18n));
-
-        // Network & Graph Analysis - uses SPI discovery
-        content.getChildren().add(createNetworkCategory(i18n));
-
-        return new Tab(i18n.get("mastercontrol.tab.libraries", "Libraries"), scroll);
-    }
-
-    private VBox createChemistryCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.chemistry.title", "Chemistry & Biology"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.chemistry.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Molecular Rendering Backend
-        ComboBox<String> backendBox = new ComboBox<>();
-        // Fetch available molecular backends via Manager
-        /*
-        java.util.Collection<org.episteme.natural.ui.viewers.chemistry.backends.MolecularBackend> providers = 
-            org.episteme.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getAllBackends();
-
-        // Map names to IDs for lookup
-        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", "auto");
-        for (org.episteme.natural.ui.viewers.chemistry.backends.MolecularBackend p : providers) {
-            nameToId.put(p.getName(), p.getId());
-        }
-        backendBox.getItems().addAll(nameToId.keySet());
-        
-        String currentId = org.episteme.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().getPreferredId();
-        String currentName = "AUTO";
-        for (var entry : nameToId.entrySet()) {
-            if (java.util.Objects.equals(entry.getValue(), currentId)) {
-                currentName = entry.getKey();
-                break;
-            }
-        }
-        backendBox.setValue(currentName);
-        backendBox.setOnAction(e -> {
-            String name = backendBox.getValue();
-            org.episteme.natural.ui.viewers.chemistry.backends.MolecularBackendManager.getInstance().setPreferredId(nameToId.get(name));
-            PREFS.setPreferredBackend("molecular", nameToId.get(name));
-        });
-        */
-        backendBox.setDisable(true);
-        backendBox.setPromptText("Requires episteme-natural");
-
-        VBox backendInfo = createInfoBox(
-            i18n.get("mastercontrol.chemistry.backend", "Molecular Renderer"), 
-            i18n.get("mastercontrol.chemistry.backend.desc", 
-                "Select the engine used to render 3D molecular structures.\n" +
-                "Requires restart of the viewer window to take effect."));
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.chemistry.backend", "Molecular Renderer")),
-                backendBox,
-                backendInfo);
-
-        box.getChildren().addAll(header, grid);
-
-        // Append available libraries list (No header)
-        box.getChildren().add(createBackendCategory(i18n, 
-            BackendDiscovery.TYPE_MOLECULAR,
-            "", // No visible header
-            ""));
-
-        box.getChildren().add(new Separator());
-        return box;
-    }
-    
-    private VBox createQuantumCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.quantum.title", "Quantum Computing"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.quantum.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Quantum Backend
-        ComboBox<String> backendBox = new ComboBox<>();
-        // Fetch available quantum backends via SPI
-        List<Backend> providers = 
-            BackendDiscovery.getInstance()
-                .getProvidersByType(BackendDiscovery.TYPE_QUANTUM);
-
-        // Map names to IDs for lookup
-        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", null);
-        for (Backend p : providers) {
-            nameToId.put(p.getName(), p.getId());
-        }
-        backendBox.getItems().addAll(nameToId.keySet());
-        
-        String currentId = PREFS.getPreferredBackend("quantum");
-        String currentName = "AUTO";
-        for (var entry : nameToId.entrySet()) {
-            if (java.util.Objects.equals(entry.getValue(), currentId)) {
-                currentName = entry.getKey();
-                break;
-            }
-        }
-        backendBox.setValue(currentName);
-        backendBox.setOnAction(e -> {
-            String name = backendBox.getValue();
-            PREFS.setPreferredBackend("quantum", nameToId.get(name));
-        });
-
-        VBox backendInfo = createInfoBox(
-            i18n.get("mastercontrol.quantum.backend", "Quantum Provider"), 
-            i18n.get("mastercontrol.quantum.backend.desc",
-                "Select the quantum simulation backend (e.g., Strange, Quantum4J, Braket).\n" +
-                "Determines execution environment for quantum circuits."));
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.quantum.backend", "Quantum Provider")),
-                backendBox,
-                backendInfo);
-
-        box.getChildren().addAll(header, grid);
-
-        // Append available libraries list
-        box.getChildren().add(createBackendCategory(i18n, 
-            BackendDiscovery.TYPE_QUANTUM,
-            "", ""));
-
-        box.getChildren().add(new Separator());
-        return box;
-    }
-
-    private VBox createGeographyCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.geography.title", "Geography & GIS"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.geography.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Map Rendering Backend
-        ComboBox<String> backendBox = new ComboBox<>();
-        // Fetch available map backends via SPI
-        List<Backend> providers = 
-            BackendDiscovery.getInstance()
-                .getProvidersByType(BackendDiscovery.TYPE_MAP);
-
-        // Map names to IDs for lookup
-        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", null);
-        for (Backend p : providers) {
-            nameToId.put(p.getName(), p.getId());
-        }
-        backendBox.getItems().addAll(nameToId.keySet());
-        
-        String currentId = PREFS.getPreferredBackend("map");
-        String currentName = "AUTO";
-        for (var entry : nameToId.entrySet()) {
-            if (java.util.Objects.equals(entry.getValue(), currentId)) {
-                currentName = entry.getKey();
-                break;
-            }
-        }
-        backendBox.setValue(currentName);
-        backendBox.setOnAction(e -> {
-            String name = backendBox.getValue();
-            PREFS.setPreferredBackend("map", nameToId.get(name));
-        });
-
-        VBox backendInfo = createInfoBox(
-            i18n.get("mastercontrol.geography.backend", "Map Renderer"), 
-            i18n.get("mastercontrol.geography.backend.desc", 
-                "Select the engine used to render geographic maps.\n" +
-                "Requires restart of the viewer window to take effect."));
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.geography.backend", "Map Renderer")),
-                backendBox,
-                backendInfo);
-
-        box.getChildren().addAll(header, grid);
-
-        // Append available libraries list (No header)
-        box.getChildren().add(createBackendCategory(i18n, 
-            BackendDiscovery.TYPE_MAP,
-            "", // No visible header
-            ""));
-
-        box.getChildren().add(new Separator());
-        return box;
-    }
-
-    private VBox createNetworkCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.network.title", "Network & Graph Analysis"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.network.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Graph Rendering Backend
-        ComboBox<String> backendBox = new ComboBox<>();
-        // Fetch available graph backends via Manager
-        java.util.Collection<org.episteme.core.ui.viewers.mathematics.discrete.GraphBackend> providers = 
-            org.episteme.core.ui.viewers.mathematics.discrete.GraphBackendManager.staticAll();
-
-        // Map names to IDs for lookup
-        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", "auto");
-        for (org.episteme.core.ui.viewers.mathematics.discrete.GraphBackend p : providers) {
-            nameToId.put(p.getName(), p.getId());
-        }
-        backendBox.getItems().addAll(nameToId.keySet());
-        
-        String currentId = org.episteme.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().getPreferredId();
-        String currentName = "AUTO";
-        for (var entry : nameToId.entrySet()) {
-            if (java.util.Objects.equals(entry.getValue(), currentId)) {
-                currentName = entry.getKey();
-                break;
-            }
-        }
-        backendBox.setValue(currentName);
-        backendBox.setOnAction(e -> {
-            String name = backendBox.getValue();
-            org.episteme.core.ui.viewers.mathematics.discrete.GraphBackendManager.getInstance().setPreferredId(nameToId.get(name));
-            PREFS.setPreferredBackend("graph", nameToId.get(name));
-        });
-
-        VBox backendInfo = createInfoBox(
-            i18n.get("mastercontrol.network.backend", "Network Renderer"), 
-            i18n.get("mastercontrol.network.backend.desc", 
-                "Select the engine used to render complex network graphs.\n" +
-                "Determines layout algorithms and visualization style."));
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.network.backend", "Network Renderer")),
-                backendBox,
-                backendInfo);
-
-        box.getChildren().addAll(header, grid);
-
-        // Append available libraries list (No header)
-        box.getChildren().add(createBackendCategory(i18n, 
-            BackendDiscovery.TYPE_NETWORK,
-            "", ""));
-
-        box.getChildren().add(new Separator());
-        return box;
-    }
-
-    private VBox createAudioCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.audio.title", "Audio Processing"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.audio.desc", "High-performance FFT, Spectrograms, and Playback"));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Audio Backend
-        ComboBox<String> backendBox = new ComboBox<>();
-        // Fetch available audio backends via SPI
-        List<Backend> providers = 
-            BackendDiscovery.getInstance() // Now resolved
-                .getProvidersByType(BackendDiscovery.TYPE_AUDIO); 
-
-        // Map names to IDs for lookups
-        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", null);
-        for (Backend p : providers) {
-            nameToId.put(p.getName(), p.getId());
-        }
-        backendBox.getItems().addAll(nameToId.keySet());
-        
-        String currentId = PREFS.getPreferredBackend("audio");
-        String currentName = "AUTO";
-        for (var entry : nameToId.entrySet()) {
-            if (java.util.Objects.equals(entry.getValue(), currentId)) {
-                currentName = entry.getKey();
-                break;
-            }
-        }
-        backendBox.setValue(currentName);
-        backendBox.setOnAction(e -> {
-            String name = backendBox.getValue();
-            PREFS.setPreferredBackend("audio", nameToId.get(name));
-        });
-
-        VBox backendInfo = createInfoBox(
-            i18n.get("mastercontrol.audio.backend", "Audio Engine"), 
-            i18n.get("mastercontrol.audio.backend.desc", 
-                "Select the underlying audio processing library (JavaSound, Tarsos, etc.).\n" +
-                "Affects latency and supported formats."));
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.audio.backend", "Audio Engine")),
-                backendBox,
-                backendInfo);
-
-        box.getChildren().addAll(header, grid);
-
-        // Append available libraries list
-        box.getChildren().add(createBackendCategory(i18n, 
-            BackendDiscovery.TYPE_AUDIO,
-            "", ""));
-
-        box.getChildren().add(new Separator());
-        return box;
-    }
-
-    private static class LibInfo {
-        final String key;
-        final boolean available;
-
-        LibInfo(String key, boolean available) {
-            this.key = key;
-            this.available = available;
-        }
-    }
-
-    private VBox createLibCategory(I18N i18n, String catKey, List<LibInfo> libs, I18N i18nRef) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.libraries.cat." + catKey, catKey));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat." + catKey + ".desc", ""));
-        desc.getStyleClass().add("description-label");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(35);
-        grid.setVgap(12);
-        int r = 0;
-        for (LibInfo lib : libs) {
-            addLibRow(grid, r++, lib.key, lib.available, "", i18n);
-        }
-
-        box.getChildren().addAll(header, desc, grid, new Separator());
-        return box;
-    }
-
-    private void addLibRow(GridPane grid, int row, String nameKey, boolean available, String descKey, I18N i18n) {
-        String name = i18n.get("lib." + nameKey + ".name", nameKey);
-        String desc = i18n.get("lib." + nameKey + ".desc", descKey); // Could fallback to hardcoded if needed
-
-        Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().addAll("font-bold", "text-dark"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
-
-        Label descLabel = new Label(desc);
-        descLabel.getStyleClass().add("description-label");
-        descLabel.setWrapText(true);
-        descLabel.setMaxWidth(500);
-
-        Label statusLabel = new Label(available ? i18n.get("mastercontrol.libraries.available", "Available")
-                : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        statusLabel.getStyleClass().add(available ? "status-connected" : "status-disconnected");
-
-        grid.addRow(row, nameLabel, statusLabel, descLabel);
-    }
-
-    private VBox createMathCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.libraries.cat.math", "Mathematics & Algorithms"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.math.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Math Backend
-        ComboBox<String> backendBox = new ComboBox<>();
-        java.util.List<org.episteme.core.technical.backend.Backend> providers = 
-            org.episteme.core.technical.backend.BackendDiscovery.getInstance()
-                .getProvidersByType(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MATH);
-        
-        // Map names to IDs for lookup
-        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", null);
-        for (org.episteme.core.technical.backend.Backend p : providers) {
-            nameToId.put(p.getName(), p.getId());
-        }
-        backendBox.getItems().addAll(nameToId.keySet());
-        
-        String currentId = Episteme.getMathBackendId();
-        String currentName = "AUTO";
-        for (var entry : nameToId.entrySet()) {
-            if (java.util.Objects.equals(entry.getValue(), currentId)) {
-                currentName = entry.getKey();
-                break;
-            }
-        }
-        backendBox.setValue(currentName);
-        backendBox.setOnAction(e -> {
-            String name = backendBox.getValue();
-            Episteme.setMathBackendId(nameToId.get(name));
-            Episteme.savePreferences();
-        });
-
-        VBox backendInfo = createInfoBox(
-            i18n.get("mastercontrol.math.backend", "Math Engine"), 
-            i18n.get("mastercontrol.math.backend.desc",
-                "Select the primary mathematics engine (e.g., Apache Commons Math, Episteme Native).\n" +
-                "Affects algorithm precision and performance."));
-            
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.math.backend", "Math Engine")), backendBox, backendInfo);
-        
-        box.getChildren().addAll(header, grid); 
-        
-        // Append list (SPI discovered)
-        box.getChildren().add(createBackendCategory(i18n, BackendDiscovery.TYPE_MATH, "", ""));
-        
-        // --- EXTRA Math Engines (Manual Discovery) ---
-        String[][] mathEngines = {
-            {"EJML", "org.ejml.EjmlParameters", "Efficient Java Matrix Library"},
-            {"Colt", "cern.colt.Version", "CERN High Performance Scientific Computing"},
-            {"MTJ", "no.uib.cipr.matrix.Matrix", "Matrix Toolkits Java"},
-            {"Commons Math", "org.apache.commons.math3.util.Precision", "Apache Commons Mathematics Library"},
-            {"JAMA", "Jama.Matrix", "Java Matrix Package"},
-            {"Deep Java Library (DJL)", "ai.djl.engine.Engine", "Agnostic Deep Learning Framework"},
-            {"DL4J", "org.deeplearning4j.nn.api.Model", "Deep Learning for Java"}
-        };
-        
-        GridPane manualGrid = new GridPane();
-        manualGrid.setHgap(35); manualGrid.setVgap(12);
-        int rManual = 0;
-        for (String[] eng : mathEngines) {
-            if (isClassAvailable(eng[1])) {
-                addManualBackendRow(manualGrid, rManual++, eng[0], eng[2], i18n);
-            }
-        }
-        if (rManual > 0) {
-            box.getChildren().add(manualGrid);
-        }
-        
-        // Linear Algebra providers hidden as per user request (internal details)
-        
-        box.getChildren().add(new Separator());
-        return box;
-    }
-
-    private VBox createHardwareCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.libraries.cat.hardware", "Hardware Acceleration"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.hardware.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(35); grid.setVgap(12);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        box.getChildren().addAll(header, grid);
-
-        // Drivers List (CPU, CUDA, OpenCL)
-        GridPane listGrid = new GridPane();
-        listGrid.setHgap(35); listGrid.setVgap(12);
-        
-        List<Backend> all = BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_TENSOR);
-        java.util.function.Function<String, Integer> getWeight = (id) -> {
-            id = id.toLowerCase();
-            if (id.contains("cpu")) return 1;
-            if (id.contains("cuda") || id.contains("jcuda")) return 2;
-            if (id.contains("opencl") || id.contains("jocl")) return 3;
-            return 10;
-        };
-
-        List<Backend> drivers = all.stream()
-            .filter(p -> getWeight.apply(p.getId()) < 10)
-            .sorted(java.util.Comparator.comparingInt(p -> getWeight.apply(p.getId())))
-            .collect(java.util.stream.Collectors.toList());
-
-        int r = 0;
-        for (Backend p : drivers) {
-            addBackendRow(listGrid, r++, p, i18n);
-        }
-        
-        box.getChildren().add(listGrid);
-        box.getChildren().add(new Separator());
-        return box;
-    }
-
-    private VBox createTensorsCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.libraries.cat.tensors", "Tensors"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.tensors.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(35); grid.setVgap(12);
-        grid.setPadding(new Insets(10, 0, 10, 0));
-
-        // Tensor Backend
-        ComboBox<String> backendBox = new ComboBox<>();
-        java.util.List<org.episteme.core.technical.backend.Backend> providers = 
-            org.episteme.core.technical.backend.BackendDiscovery.getInstance()
-                .getProvidersByType(org.episteme.core.technical.backend.BackendDiscovery.TYPE_TENSOR);
-
-        // Map names to IDs for lookup
-        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
-        nameToId.put("AUTO", null);
-        for (org.episteme.core.technical.backend.Backend p : providers) {
-            if (!isDriverId(p.getId())) {
-                nameToId.put(p.getName(), p.getId());
-            }
-        }
-        backendBox.getItems().addAll(nameToId.keySet());
-        
-        String currentId = Episteme.getTensorBackendId();
-        String currentName = "AUTO";
-        for (var entry : nameToId.entrySet()) {
-            if (java.util.Objects.equals(entry.getValue(), currentId)) {
-                currentName = entry.getKey();
-                break;
-            }
-        }
-        backendBox.setValue(currentName);
-        backendBox.setOnAction(e -> {
-            String name = backendBox.getValue();
-            Episteme.setTensorBackendId(nameToId.get(name));
-            Episteme.savePreferences();
-        });
-
-        VBox backendInfo = createInfoBox(
-            i18n.get("mastercontrol.tensor.backend", "Tensor Backend"), 
-            i18n.get("mastercontrol.tensor.backend.desc",
-                "Select the tensor computation backend (e.g., ND4J, DJL, Episteme Tensors).\n" +
-                "Determines GPU utilization for deep learning."));
-
-        grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.tensor.backend", "Tensor Backend")), backendBox, backendInfo);
-        
-        box.getChildren().addAll(header, grid);
-
-        // Tensors List
-        GridPane listGrid = new GridPane();
-        listGrid.setHgap(35); listGrid.setVgap(12);
-        
-        List<Backend> tensors = providers.stream()
-            .filter(p -> !isDriverId(p.getId()))
-            .collect(java.util.stream.Collectors.toList());
-
-        int r = 0;
-        for (Backend p : tensors) {
-            addBackendRow(listGrid, r++, p, i18n);
-        }
-        
-        box.getChildren().add(listGrid);
-        box.getChildren().add(new Separator());
-        return box;
-    }
-
-    private boolean isDriverId(String id) {
-        id = id.toLowerCase();
-        return id.contains("cpu") || id.contains("cuda") || id.contains("jcuda") || id.contains("opencl") || id.contains("jocl");
-    }
-
-    /**
-     * Creates the Visualization & Plotting category using SPI discovery.
-     */
-    private VBox createPlottingCategory(I18N i18n) {
-        VBox box = new VBox(12);
-        Label header = new Label(i18n.get("mastercontrol.libraries.cat.vis", "Visualization & Plotting"));
-        header.getStyleClass().add("header-title");
-
-        Label desc = new Label(i18n.get("mastercontrol.libraries.cat.vis.desc", ""));
-        desc.getStyleClass().add("description-label");
-        box.getChildren().add(desc);
-
-
-        // --- 2D Section ---
-        VBox box2D = new VBox(12);
-        Label header2D = new Label(i18n.get("mastercontrol.libraries.cat.vis_2d", "Visualization and Plotting 2D"));
-        header2D.getStyleClass().add("header-title");
-        box2D.getChildren().add(header2D);
-        
-        GridPane grid2DControl = new GridPane();
-        grid2DControl.setHgap(30); grid2DControl.setVgap(15);
-        grid2DControl.setPadding(new Insets(10, 0, 10, 0));
-        
-        // 2D Combo
-        ComboBox<PlottingBackend> backendBox = new ComboBox<>();
-        List<PlottingBackend> allPlotting = new ArrayList<>(org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.staticAll());
-        
-        backendBox.getItems().addAll(allPlotting.stream()
-                .filter(PlottingBackend::isSupported2D)
-                .collect(java.util.stream.Collectors.toList()));
-        
-        backendBox.setConverter(new javafx.util.StringConverter<PlottingBackend>() {
-            @Override
-            public String toString(PlottingBackend object) {
-                if (object == null) return "AUTO";
-                return object.getName();
-            }
-            @Override
-            public PlottingBackend fromString(String string) { return null; }
-        });
-        
-        backendBox.setValue(Episteme.getPlottingBackend2D());
-        backendBox.setOnAction(e -> {
-            Episteme.setPlottingBackend2D(backendBox.getValue());
-            Episteme.savePreferences();
-        });
-        
-        VBox backendInfo = createInfoBox(
-             i18n.get("mastercontrol.plotting.backend_2d", "2D Backend"),
-             i18n.get("mastercontrol.plotting.backend_2d.desc", "Choose the library used for rendering 2D charts."));
-             
-        grid2DControl.addRow(0, createHeaderLabel(i18n.get("mastercontrol.plotting.backend_2d", "2D Backend")), backendBox, backendInfo);
-        box2D.getChildren().add(grid2DControl);
-
-        // 2D List
-        GridPane grid2DList = new GridPane();
-        grid2DList.setHgap(35); grid2DList.setVgap(12);
-        java.util.List<org.episteme.core.technical.backend.Backend> allPlotProviders = 
-             BackendDiscovery.getInstance().getProvidersByType(BackendDiscovery.TYPE_PLOTTING);
-             
-        int r2 = 0;
-        for (org.episteme.core.technical.backend.Backend p : allPlotProviders) {
-             String id = p.getId().toLowerCase();
-             if (id.contains("javafx")) continue; // Removed as per user request
-             if (id.contains("chart")) {
-                  addBackendRow(grid2DList, r2++, p, i18n);
-             }
-        }
-        box2D.getChildren().add(grid2DList);
-        box.getChildren().add(box2D);
-
-        box.getChildren().add(new Separator());
-
-        // --- 3D Section ---
-        VBox box3D = new VBox(12);
-        Label header3D = new Label(i18n.get("mastercontrol.libraries.cat.vis_3d", "Visualization and Plotting 3D"));
-        header3D.getStyleClass().add("header-title");
-        box3D.getChildren().add(header3D);
-        
-        GridPane grid3DControl = new GridPane();
-        grid3DControl.setHgap(30); grid3DControl.setVgap(15);
-        grid3DControl.setPadding(new Insets(10, 0, 10, 0));
-        
-        // 3D Combo
-        ComboBox<PlottingBackend> backend3DBox = new ComboBox<>();
-        backend3DBox.getItems().addAll(allPlotting.stream()
-                .filter(PlottingBackend::isSupported3D)
-                .collect(java.util.stream.Collectors.toList()));
-        backend3DBox.setConverter(backendBox.getConverter());
-        backend3DBox.setValue(Episteme.getPlottingBackend3D());
-        backend3DBox.setOnAction(e -> {
-            Episteme.setPlottingBackend3D(backend3DBox.getValue());
-            Episteme.savePreferences();
-        });
-        
-        VBox backend3DInfo = createInfoBox(
-            i18n.get("mastercontrol.plotting.backend_3d", "3D Backend"),
-            i18n.get("mastercontrol.plotting.backend_3d.desc", "Choose the library used for rendering 3D charts."));
-            
-        grid3DControl.addRow(0, createHeaderLabel(i18n.get("mastercontrol.plotting.backend_3d", "3D Backend")), backend3DBox, backend3DInfo);
-        box3D.getChildren().add(grid3DControl);
-
-        // 3D List
-        GridPane grid3DList = new GridPane();
-        grid3DList.setHgap(35); grid3DList.setVgap(12);
-        int r3 = 0;
-        for (org.episteme.core.technical.backend.Backend p : allPlotProviders) {
-             String id = p.getId().toLowerCase();
-             if (id.contains("javafx")) continue; // Removed as per user request
-             if (!id.contains("chart")) {
-                  addBackendRow(grid3DList, r3++, p, i18n);
-             }
-        }
-        box3D.getChildren().add(grid3DList);
-        box.getChildren().add(box3D);
-        
-        return box;
-    }
-
-    /**
-     * Creates the Molecular Viewing category using SPI discovery.
-     */
-    @SuppressWarnings("unused") // Reserved for future layout options
-    private VBox createMolecularCategory(I18N i18n) {
-        return createBackendCategory(i18n, BackendDiscovery.TYPE_MOLECULAR,
-                i18n.get("mastercontrol.libraries.cat.molecular", "Molecular Viewing"),
-                i18n.get("mastercontrol.libraries.cat.molecular.desc",
-                        "3D molecular visualization backends for chemistry applications."));
-    }
-
-    /**
-     * Reusable method to create a category from discovered SPI backends.
-     */
-    private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
-
-        VBox box = new VBox(12);
-        
-        if (title != null && !title.isEmpty()) {
-            Label header = new Label(title);
-            header.getStyleClass().add("header-title");
-            box.getChildren().add(header);
-        }
-
-        if (description != null && !description.isEmpty()) {
-            Label desc = new Label(description);
-            desc.getStyleClass().add("description-label");
-            box.getChildren().add(desc);
-        }
-
-        GridPane grid = new GridPane();
-        grid.setHgap(35);
-        grid.setVgap(12);
-
-        List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
-
-        int r = 0;
-        for (Backend provider : providers) {
-            addBackendRow(grid, r++, provider, i18n);
-        }
-
-        if (providers.isEmpty()) {
-            Label noProviders = new Label(java.text.MessageFormat.format(i18n.get("master.error.no_backends", "No {0} backends discovered."), type));
-            noProviders.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic;
-            grid.add(noProviders, 0, 0);
-        }
-
-        
-        box.getChildren().add(grid);
-        if (title != null && !title.isEmpty()) {
-             box.getChildren().add(new Separator());
-        }
-        return box;
-    }
-
-    /**
-     * Creates the Molecular Viewing category using SPI discovery.
-     */
-
-    @SuppressWarnings("rawtypes")
-    private Tab createLoadersTab(I18N i18n) {
-        VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
-        
-        ScrollPane scroll = new ScrollPane(content);
-        scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-
-        Label header = new Label(i18n.get("mastercontrol.loaders.header", "Known Data Loaders & Formats"));
-        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
-
-        // Discover loaders via ServiceLoader for ResourceReader and ResourceWriter
-        List<ResourceIO<?>> allLoaders = new ArrayList<>();
-        
-        // Load readers
-        // Load readers
-        // Load readers
-        java.util.ServiceLoader<org.episteme.core.io.ResourceReader> readerLoader = 
-            java.util.ServiceLoader.load(org.episteme.core.io.ResourceReader.class);
-        java.util.Iterator<org.episteme.core.io.ResourceReader> readerIter = readerLoader.iterator();
-        while (readerIter.hasNext()) {
-            try {
-                allLoaders.add(readerIter.next());
-            } catch (java.util.ServiceConfigurationError e) {
-                System.err.println("Warning: Could not load ResourceReader: " + e.getMessage());
-            }
-        }
-        
-        // Load writers  
-        java.util.ServiceLoader<org.episteme.core.io.ResourceWriter> writerLoader = 
-            java.util.ServiceLoader.load(org.episteme.core.io.ResourceWriter.class);
-        java.util.Iterator<org.episteme.core.io.ResourceWriter> writerIter = writerLoader.iterator();
-        while (writerIter.hasNext()) {
-            try {
-                allLoaders.add(writerIter.next());
-            } catch (java.util.ServiceConfigurationError e) {
-                System.err.println("Warning: Could not load ResourceWriter: " + e.getMessage());
-            }
-        }
-        
-        // Also discover non-SPI loaders via legacy scanning
-        List<MasterControlDiscovery.ClassInfo> legacyLoaders = MasterControlDiscovery.getInstance().findClasses("Loader");
-        java.util.Set<String> existingClasses = new java.util.HashSet<>();
-        for (org.episteme.core.io.ResourceIO<?> l : allLoaders) existingClasses.add(l.getClass().getName());
-
-        for (MasterControlDiscovery.ClassInfo info : legacyLoaders) {
-            if (!existingClasses.contains(info.fullName)) {
-                try {
-                    Class<?> cls = Class.forName(info.fullName, false, Thread.currentThread().getContextClassLoader());
-                    org.episteme.core.io.ResourceIO<?> loader = (org.episteme.core.io.ResourceIO<?>) cls.getDeclaredConstructor().newInstance();
-                    allLoaders.add(loader);
-                    existingClasses.add(info.fullName);
-                } catch (Exception e) {
-                    // Ignore non-instantiable loaders
-                }
-            }
-        }
-
-        // Group into Readers and Writers
-        Map<String, List<ResourceIO<?>>> readerCategories = new TreeMap<>();
-        Map<String, List<ResourceIO<?>>> writerCategories = new TreeMap<>();
-        int readerCount = 0;
-        int writerCount = 0;
-
-        for (ResourceIO<?> loader : allLoaders) {
-            try {
-                String category = capitalize(loader.getCategory());
-                if ("category.other".equals(category)) {
-                    category = getCategoryFromPackage(loader.getClass().getName());
-                }
-                
-                if (loader.isInput()) {
-                    readerCategories.computeIfAbsent(category, k -> new ArrayList<>()).add(loader);
-                    readerCount++;
-                }
-                if (loader.isOutput()) {
-                    writerCategories.computeIfAbsent(category, k -> new ArrayList<>()).add(loader);
-                    writerCount++;
-                }
-            } catch (Exception e) {
-                // Log and continue
-            }
-        }
-        
-        Label hint = new Label(java.text.MessageFormat.format(
-                i18n.get("mastercontrol.loaders.count", "{0} loaders found ({1} Readers, {2} Writers)"), 
-                allLoaders.size(), readerCount, writerCount));
-        hint.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic; -fx-text-fill: #777;
-
-        content.getChildren().addAll(header, hint);
-
-        // --- READERS SECTION ---
-        if (!readerCategories.isEmpty()) {
-            Label readersHeader = new Label(i18n.get("mastercontrol.loaders.readers", "Readers (Input)"));
-            readersHeader.getStyleClass().add("header-title");
-            content.getChildren().add(readersHeader);
-            content.getChildren().add(createLoaderAccordion(readerCategories, i18n));
-        }
-
-        // --- WRITERS SECTION ---
-        if (!writerCategories.isEmpty()) {
-            Label writersHeader = new Label(i18n.get("mastercontrol.loaders.writers", "Writers (Output)"));
-            writersHeader.getStyleClass().add("header-title");
-            content.getChildren().add(writersHeader);
-            content.getChildren().add(createLoaderAccordion(writerCategories, i18n));
-        }
-
-        return new Tab(i18n.get("mastercontrol.tab.loaders", "Loaders"), scroll);
-    }
-
-    private Accordion createLoaderAccordion(Map<String, List<ResourceIO<?>>> categories, I18N i18n) {
-        Accordion accordion = new Accordion();
-        
-        // Sort categories by localized name
-        List<String> sortedKeys = new ArrayList<>(categories.keySet());
-        sortedKeys.sort((k1, k2) -> {
-            String n1 = i18n.get(k1, k1);
-            String n2 = i18n.get(k2, k2);
-            return n1.compareToIgnoreCase(n2);
-        });
-
-        for (String categoryKey : sortedKeys) {
-            List<ResourceIO<?>> categoryLoaders = categories.get(categoryKey);
-            categoryLoaders.sort((l1, l2) -> {
-                String n1 = i18n.get(l1.getName(), l1.getName());
-                String n2 = i18n.get(l2.getName(), l2.getName());
-                return n1.compareToIgnoreCase(n2);
-            });
-
-            List<AppEntry> entries = new ArrayList<>();
-            for (ResourceIO<?> loader : categoryLoaders) {
-                String nameKey = loader.getName(); // Should be a key like "loader.crossref.name"
-                String displayName = i18n.get(nameKey, nameKey);
-                String descKey = loader.getDescription(); // Should be a key like "loader.crossref.desc"
-                String displayDesc = i18n.get(descKey, descKey);
-                
-                entries.add(new AppEntry(displayName, loader.getClass().getName(), displayDesc));
-            }
-
-            String categoryName = i18n.get(categoryKey, categoryKey);
-            TitledPane pane = new TitledPane(categoryName + " (" + entries.size() + ")",
-                    createAppList(false, entries.toArray(new AppEntry[0])));
-            accordion.getPanes().add(pane);
-        }
-        return accordion;
-    }
-
-    private String getCategoryFromPackage(String fullName) {
-        if (fullName.contains(".geography."))
-            return "category.geography";
-        if (fullName.contains(".earth."))
-            return "category.earth_sciences";
-        if (fullName.contains(".astronomy."))
-            return "category.astronomy";
-        if (fullName.contains(".biochemistry."))
-            return "category.biochemistry";
-        if (fullName.contains(".biology."))
-            return "category.biology";
-        if (fullName.contains(".chemistry."))
-            return "category.chemistry";
-        if (fullName.contains(".economics."))
-            return "category.economics";
-        if (fullName.contains(".history."))
-            return "category.history";
-        if (fullName.contains(".politics."))
-            return "category.politics";
-        if (fullName.contains(".sociology."))
-            return "category.sociology";
-        if (fullName.contains(".device."))
-            return "category.device";
-        if (fullName.contains(".mathematics."))
-            return "category.mathematics";
-        if (fullName.contains(".engineering."))
-            return "category.engineering";
-
-        return "category.other";
-    }
-
-
 
     private Tab createThemesTab(I18N i18n) {
         VBox content = new VBox(20);
-        content.setPadding(new Insets(20));
-        content.setAlignment(Pos.TOP_LEFT);
+        content.setPadding(new Insets(30));
 
-        Label header = new Label(i18n.get("mastercontrol.themes.header", "Visual Theme Selection"));
-        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.tab.themes", "Appearance & Themes"),
+            i18n.get("mastercontrol.themes.header.desc", "Customize the visual appearance of the Episteme environment.")
+        );
 
-        VBox themeSelector = new VBox(10);
-        Label comboLabel = new Label(i18n.get("mastercontrol.themes.select", "Choose Interface Style:"));
-        comboLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
+        GridPane grid = new GridPane();
+        grid.setHgap(30);
+        grid.setVgap(20);
 
         ComboBox<String> themeCombo = new ComboBox<>();
         themeCombo.getItems().addAll("Modena", "Caspian", "High Contrast", "Dark");
         String currentTheme = ThemeManager.getInstance().getCurrentTheme();
         if ("HighContrast".equals(currentTheme)) currentTheme = "High Contrast";
         themeCombo.setValue(currentTheme);
-        themeCombo.setPrefWidth(250);
+        themeCombo.setPrefWidth(200);
 
         themeCombo.setOnAction(e -> {
             String selected = themeCombo.getValue().replace(" ", "");
-            applyDashboardTheme(selected);
+            ThemeManager.getInstance().setTheme(selected);
+            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         });
 
-        themeSelector.getChildren().addAll(comboLabel, themeCombo);
+        addPropertyRow(grid, 0, 
+            i18n.get("mastercontrol.themes.select", "Visual Style"), 
+            themeCombo, 
+            i18n.get("mastercontrol.themes.select.desc", "Select the global theme for the application. 'Dark' is recommended for high-performance computing."));
 
-        VBox previewBox = new VBox(15);
-        previewBox.setPadding(new Insets(20));
-        previewBox.setStyle("-fx-border-color: #ddd; -fx-border-radius: 5; -fx-background-color: #fdfdfd;");
-        previewBox.getChildren().addAll(
-                new Label(org.episteme.core.ui.i18n.I18N.getInstance().get("auto.epistememastercontrol.theme_preview_components", "Theme Preview Components:")),
-                new Button(org.episteme.core.ui.i18n.I18N.getInstance().get("auto.epistememastercontrol.sample_button", "Sample Button")),
-                new CheckBox(org.episteme.core.ui.i18n.I18N.getInstance().get("auto.epistememastercontrol.sample_checkbox", "Sample CheckBox")),
-                new ProgressBar(0.6));
-
-        content.getChildren().addAll(header, themeSelector, previewBox);
+        content.getChildren().addAll(header, grid);
         return new Tab(i18n.get("mastercontrol.tab.themes", "Themes"), content);
     }
 
-    private void applyDashboardTheme(String theme) {
-        ThemeManager.getInstance().setTheme(theme);
-        if (primaryStage.getScene() != null) {
-            ThemeManager.getInstance().applyTheme(primaryStage.getScene());
+    private Tab createComputingTab(I18N i18n) {
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(30));
+
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.tab.computing", "Computing & Engines"),
+            i18n.get("mastercontrol.computing.desc", "Select the underlying engines for mathematical analysis, 2D plotting, and 3D visualization.")
+        );
+
+        GridPane grid = new GridPane();
+        grid.setHgap(30);
+        grid.setVgap(20);
+
+        // --- Math Engine ---
+        ComboBox<String> mathCombo = createBackendComboBox(BackendDiscovery.TYPE_MATH, Episteme.getMathBackendId(), id -> {
+            Episteme.setMathBackendId(id);
+            Episteme.savePreferences();
+        });
+        addPropertyRow(grid, 0, i18n.get("mastercontrol.math.backend", "Mathematics Engine"), mathCombo, 
+            i18n.get("mastercontrol.math.backend.desc", "Primary engine for linear algebra and algorithm execution."));
+
+        // --- 2D Plotting ---
+        ComboBox<String> plot2DCombo = createBackendComboBox(BackendDiscovery.TYPE_PLOTTING, PREFS.getPreferredBackend("plotting2d"), id -> {
+            PREFS.setPreferredBackend("plotting2d", id);
+        });
+        addPropertyRow(grid, 1, i18n.get("mastercontrol.plotting.backend_2d", "2D Visualization"), plot2DCombo, 
+            i18n.get("mastercontrol.plotting.backend_2d.desc", "Engine for rendering 2D charts and data plots."));
+
+        // --- 3D Plotting ---
+        ComboBox<String> plot3DCombo = createBackendComboBox(BackendDiscovery.TYPE_PLOTTING, PREFS.getPreferredBackend("plotting3d"), id -> {
+            PREFS.setPreferredBackend("plotting3d", id);
+        });
+        addPropertyRow(grid, 2, i18n.get("mastercontrol.plotting.backend_3d", "3D Visualization"), plot3DCombo, 
+            i18n.get("mastercontrol.plotting.backend_3d.desc", "Engine for rendering complex 3D surfaces and volumes."));
+
+        content.getChildren().addAll(header, grid);
+        return new Tab(i18n.get("mastercontrol.tab.computing", "Computing"), content);
+    }
+
+    private ComboBox<String> createBackendComboBox(String type, String currentId, java.util.function.Consumer<String> onSelect) {
+        ComboBox<String> combo = new ComboBox<>();
+        List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
+        
+        java.util.Map<String, String> nameToId = new java.util.LinkedHashMap<>();
+        nameToId.put("AUTO", null);
+        for (Backend p : providers) nameToId.put(p.getName(), p.getId());
+        
+        combo.getItems().addAll(nameToId.keySet());
+        
+        String currentName = "AUTO";
+        for (var entry : nameToId.entrySet()) {
+            if (java.util.Objects.equals(entry.getValue(), currentId)) {
+                currentName = entry.getKey();
+                break;
+            }
         }
+        combo.setValue(currentName);
+        combo.setOnAction(e -> onSelect.accept(nameToId.get(combo.getValue())));
+        combo.setPrefWidth(250);
+        return combo;
+    }
+
+    private Tab createLibrariesTab(I18N i18n) {
+        VBox content = new VBox(25);
+        content.setPadding(new Insets(30));
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.tab.libraries", "Project Libraries"),
+            i18n.get("mastercontrol.libraries.desc", "Detailed status of all scientific and technical libraries integrated into the Episteme ecosystem.")
+        );
+
+        content.getChildren().add(header);
+
+        // --- Categories ---
+        String[] types = {BackendDiscovery.TYPE_MATH, BackendDiscovery.TYPE_PLOTTING, BackendDiscovery.TYPE_AUDIO, 
+                         BackendDiscovery.TYPE_MOLECULAR, BackendDiscovery.TYPE_QUANTUM, BackendDiscovery.TYPE_NETWORK};
+        String[] labels = {"Mathematics", "Visualization", "Audio Processing", "Molecular Viewing", "Quantum Computing", "Network Analysis"};
+        
+        for (int i = 0; i < types.length; i++) {
+            content.getChildren().add(createBackendCategory(i18n, types[i], labels[i], ""));
+            if (i < types.length - 1) content.getChildren().add(new Separator());
+        }
+
+        return new Tab(i18n.get("mastercontrol.tab.libraries", "Libraries"), scroll);
+    }
+
+    private Tab createAlgorithmsTab(I18N i18n) {
+        VBox content = new VBox(25);
+        content.setPadding(new Insets(30));
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.tab.algorithms", "Computational Algorithms"),
+            i18n.get("mastercontrol.algorithms.desc", "Configuration and availability of specific scientific algorithm implementations.")
+        );
+
+        content.getChildren().addAll(header, createBackendCategory(i18n, BackendDiscovery.TYPE_ALGORITHM, "", ""));
+        return new Tab(i18n.get("mastercontrol.tab.algorithms", "Algorithms"), scroll);
+    }
+
+    private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
+        VBox box = new VBox(15);
+        if (title != null && !title.isEmpty()) {
+            Label header = new Label(title);
+            header.getStyleClass().add("font-bold");
+            box.getChildren().add(header);
+        }
+
+        GridPane grid = new GridPane();
+        grid.setHgap(30);
+        grid.setVgap(2);
+
+        List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
+        int r = 0;
+        for (Backend provider : providers) {
+            addBackendRow(grid, r++, provider, i18n);
+        }
+
+        if (providers.isEmpty()) {
+            Label none = new Label(i18n.get("status.none", "No providers discovered for this category."));
+            none.getStyleClass().add("description-label");
+            grid.add(none, 0, 0);
+        }
+
+        box.getChildren().add(grid);
+        return box;
+    }
+
+    private void addBackendRow(GridPane grid, int row, Backend provider, I18N i18n) {
+        Region bg = new Region();
+        bg.getStyleClass().add(row % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
+        GridPane.setColumnSpan(bg, 4);
+        GridPane.setHgrow(bg, Priority.ALWAYS);
+        grid.add(bg, 0, row);
+
+        Label name = new Label(provider.getName());
+        name.getStyleClass().add("font-bold");
+        name.setPadding(new Insets(8, 10, 8, 15));
+
+        Label status = new Label(provider.isAvailable() ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "MISSING"));
+        status.getStyleClass().add(provider.isAvailable() ? "status-label-available" : "status-label-unavailable");
+        status.setPadding(new Insets(8, 10, 8, 10));
+
+        Label info = new Label(provider.getInfo());
+        info.getStyleClass().add("description-label");
+        info.setPadding(new Insets(8, 10, 8, 10));
+        info.setWrapText(true);
+        info.setMaxWidth(500);
+
+        grid.add(name, 0, row);
+        grid.add(status, 1, row);
+        grid.add(info, 2, row);
+    }
+
+    private Tab createLoadersTab(I18N i18n) {
+        VBox content = new VBox(25);
+        content.setPadding(new Insets(30));
+
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.loaders.header", "Data Loaders & Formats"),
+            i18n.get("mastercontrol.loaders.desc", "Support for specialized scientific data formats and resource protocols.")
+        );
+
+        Accordion accordion = new Accordion();
+        
+        // Combine SPI discovered loaders and class-scanned loaders
+        Map<String, List<AppEntry>> grouped = new TreeMap<>();
+        
+        // 1. SPI Loaders (ResourceReader/Writer)
+        try {
+            java.util.ServiceLoader.load(org.episteme.core.io.ResourceReader.class).forEach(r -> {
+                String cat = r.getCategory();
+                grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(i18n.get(r.getName(), r.getName()), r.getClass().getName(), i18n.get(r.getDescription(), r.getDescription())));
+            });
+            java.util.ServiceLoader.load(org.episteme.core.io.ResourceWriter.class).forEach(w -> {
+                String cat = w.getCategory();
+                grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(i18n.get(w.getName(), w.getName()), w.getClass().getName(), i18n.get(w.getDescription(), w.getDescription())));
+            });
+        } catch (Exception e) {}
+
+        // 2. Scanned Loaders (Legacy/Discovery)
+        List<MasterControlDiscovery.ClassInfo> discovered = MasterControlDiscovery.getInstance().findClasses("Loader");
+        for (MasterControlDiscovery.ClassInfo info : discovered) {
+            boolean exists = false;
+            for (List<AppEntry> list : grouped.values()) {
+                for (AppEntry e : list) if (e.className.equals(info.fullName)) { exists = true; break; }
+            }
+            if (!exists) {
+                String cat = info.fullName.contains(".chemistry.") ? "Chemistry" : (info.fullName.contains(".physics.") ? "Physics" : "General");
+                grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(info.simpleName, info.fullName, info.description));
+            }
+        }
+
+        for (Map.Entry<String, List<AppEntry>> entry : grouped.entrySet()) {
+            String title = i18n.get(entry.getKey(), entry.getKey());
+            TitledPane pane = new TitledPane(title + " (" + entry.getValue().size() + ")", createAppList(false, entry.getValue().toArray(new AppEntry[0])));
+            accordion.getPanes().add(pane);
+        }
+
+        content.getChildren().addAll(header, accordion);
+        return new Tab(i18n.get("mastercontrol.tab.loaders", "Loaders"), content);
     }
 
     private Tab createAppsTab(I18N i18n) {
-        VBox content = new VBox(15);
-        content.setPadding(new Insets(20));
+        VBox content = new VBox(25);
+        content.setPadding(new Insets(30));
 
-        Label header = new Label(i18n.get("mastercontrol.apps.header", "Applications, Demos & Viewers"));
-        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
-
-        Label hint = new Label(i18n.get("mastercontrol.apps.discovering", "Discovering from SPI..."));
-        hint.getStyleClass().add("font-italic"); // Replaced inline style: -fx-font-style: italic; -fx-text-fill: #777;
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.apps.header", "Applications & Demos"),
+            i18n.get("mastercontrol.apps.desc", "Explore and launch integrated scientific applications and interactive demonstrations.")
+        );
 
         Accordion accordion = new Accordion();
-
-        // Use new SPI Discovery
-        Map<MasterControlDiscovery.ProviderType, Map<String, List<Viewer>>> grouped = MasterControlDiscovery
-                .getInstance().getProvidersByType();
-
-        List<AppEntry> apps = flattenProviders(grouped.get(MasterControlDiscovery.ProviderType.APP));
-        List<AppEntry> demos = flattenProviders(grouped.get(MasterControlDiscovery.ProviderType.DEMO));
-        List<AppEntry> viewers = flattenProviders(grouped.get(MasterControlDiscovery.ProviderType.VIEWER));
-
-        // Also discover non-SPI Apps/Demos/Viewers via legacy scanning
-        List<MasterControlDiscovery.ClassInfo> legacyApps = MasterControlDiscovery.getInstance().findClasses("App");
-        List<MasterControlDiscovery.ClassInfo> legacyDemos = MasterControlDiscovery.getInstance().findClasses("Demo");
-        List<MasterControlDiscovery.ClassInfo> legacyViewers = MasterControlDiscovery.getInstance().findClasses("Viewer");
         
-        java.util.Set<String> existingApps = new java.util.HashSet<>();
-        for (AppEntry a : apps) existingApps.add(a.className);
-        for (AppEntry d : demos) existingApps.add(d.className);
-        for (AppEntry v : viewers) existingApps.add(v.className);
+        List<MasterControlDiscovery.ClassInfo> apps = MasterControlDiscovery.getInstance().findClasses("App");
+        List<MasterControlDiscovery.ClassInfo> demos = MasterControlDiscovery.getInstance().findClasses("Demo");
+        List<MasterControlDiscovery.ClassInfo> viewers = MasterControlDiscovery.getInstance().findClasses("Viewer");
 
-        for (MasterControlDiscovery.ClassInfo info : legacyApps) {
-            if (!existingApps.contains(info.fullName)) {
-                apps.add(new AppEntry(info.simpleName, info.fullName, info.description));
-                existingApps.add(info.fullName);
-            }
-        }
-        for (MasterControlDiscovery.ClassInfo info : legacyDemos) {
-            if (!existingApps.contains(info.fullName)) {
-                demos.add(new AppEntry(info.simpleName, info.fullName, info.description));
-                existingApps.add(info.fullName);
-            }
-        }
-        for (MasterControlDiscovery.ClassInfo info : legacyViewers) {
-            if (!existingApps.contains(info.fullName)) {
-                viewers.add(new AppEntry(info.simpleName, info.fullName, info.description));
-                existingApps.add(info.fullName);
-            }
-        }
+        if (!apps.isEmpty()) accordion.getPanes().add(new TitledPane("Applications", createAppList(true, convert(apps))));
+        if (!demos.isEmpty()) accordion.getPanes().add(new TitledPane("Demos", createAppList(true, convert(demos))));
+        if (!viewers.isEmpty()) accordion.getPanes().add(new TitledPane("Viewers", createAppList(true, convert(viewers))));
 
+        if (!accordion.getPanes().isEmpty()) accordion.getPanes().get(0).setExpanded(true);
 
-        // Create panes
-        TitledPane appsPane = new TitledPane(
-                i18n.get("mastercontrol.apps.category.apps", "Scientific Applications") + " (" + apps.size() + ")",
-                createAppList(true, apps.toArray(new AppEntry[0])));
-        TitledPane demosPane = new TitledPane(
-                i18n.get("mastercontrol.apps.category.demos", "Interactive Demos") + " (" + demos.size() + ")",
-                createAppList(true, demos.toArray(new AppEntry[0])));
-        TitledPane viewersPane = new TitledPane(
-                i18n.get("mastercontrol.apps.category.viewers", "Data Viewers & Tools") + " (" + viewers.size() + ")",
-                createAppList(true, viewers.toArray(new AppEntry[0])));
-
-        accordion.getPanes().addAll(appsPane, demosPane, viewersPane);
-
-        if (!apps.isEmpty())
-            appsPane.setExpanded(true);
-        else if (!demos.isEmpty())
-            demosPane.setExpanded(true);
-        else if (!viewers.isEmpty())
-            viewersPane.setExpanded(true);
-
-        int validCount = apps.size() + demos.size() + viewers.size();
-        hint.setText(i18n.get("mastercontrol.apps.discovered", "Apps Found:") + " " + validCount);
-
-        content.getChildren().addAll(header, hint, accordion);
+        content.getChildren().addAll(header, accordion);
         return new Tab(i18n.get("mastercontrol.tab.apps", "Apps"), content);
     }
 
-    private List<AppEntry> flattenProviders(Map<String, List<Viewer>> categoryMap) {
-        List<AppEntry> result = new ArrayList<>();
-        if (categoryMap == null)
-            return result;
-
-        for (List<Viewer> list : categoryMap.values()) {
-            for (Viewer p : list) {
-                result.add(new AppEntry(p.getName(), p.getClass().getName(), p.getDescription()));
-            }
-        }
-        // Sort by name
-        result.sort((e1, e2) -> e1.name.compareToIgnoreCase(e2.name));
-        return result;
+    private AppEntry[] convert(List<MasterControlDiscovery.ClassInfo> infos) {
+        return infos.stream().map(i -> new AppEntry(i.simpleName, i.fullName, i.description)).toArray(AppEntry[]::new);
     }
 
-    private ListView<AppEntry> createAppList(boolean enableLaunch, AppEntry... entries) {
+    private ListView<AppEntry> createAppList(boolean launch, AppEntry[] entries) {
         ListView<AppEntry> list = new ListView<>();
-        for (AppEntry entry : entries)
-            list.getItems().add(entry);
-
-        list.setFixedCellSize(52);
-        list.prefHeightProperty()
-                .bind(javafx.beans.binding.Bindings.size(list.getItems()).multiply(list.getFixedCellSize()).add(2));
-
-        list.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(AppEntry item, boolean empty) {
+        list.getItems().addAll(entries);
+        list.setCellFactory(p -> new ListCell<>() {
+            @Override protected void updateItem(AppEntry item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setGraphic(null);
-                    getStyleClass().removeAll("zebra-row-odd", "zebra-row-even");
-                } else {
-                    getStyleClass().removeAll("zebra-row-odd", "zebra-row-even");
-                    getStyleClass().add(getIndex() % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
-                    
-                    VBox box = new VBox(2);
-                    box.setPadding(new Insets(5));
-                    Label name = new Label(item.name);
-                    name.getStyleClass().add("font-bold");
-                    Label desc = new Label(item.description);
-                    desc.getStyleClass().add("description-label");
-                    box.getChildren().addAll(name, desc);
-                    setGraphic(box);
-                }
+                if (empty || item == null) { setGraphic(null); return; }
+                VBox box = new VBox(2);
+                Label n = new Label(item.name); n.getStyleClass().add("font-bold");
+                Label d = new Label(item.description); d.getStyleClass().add("description-label");
+                box.getChildren().addAll(n, d);
+                setGraphic(box);
             }
         });
-
-        if (enableLaunch) {
+        if (launch) {
             list.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2) {
-                    AppEntry selected = list.getSelectionModel().getSelectedItem();
-                    if (selected != null)
-                        launchApp(selected.className);
+                    AppEntry s = list.getSelectionModel().getSelectedItem();
+                    if (s != null) launchApp(s.className);
                 }
             });
         }
-
         return list;
-    }
-
-    private static class AppEntry {
-        String name;
-        String className;
-        String description;
-
-        AppEntry(String n, String c, String d) {
-            this.name = n;
-            this.className = c;
-            this.description = d;
-        }
     }
 
     private void launchApp(String className) {
         try {
             Class<?> cls = Class.forName(className);
+            Stage stage = new Stage();
             if (Application.class.isAssignableFrom(cls)) {
-                // Launch in new Stage
-                Stage stage = new Stage();
                 Application app = (Application) cls.getDeclaredConstructor().newInstance();
                 app.start(stage);
             } else if (Viewer.class.isAssignableFrom(cls)) {
-                // Launch Viewer
-                Stage stage = new Stage();
-                Viewer demo = (Viewer) cls.getDeclaredConstructor().newInstance();
-                demo.show(stage);
+                Viewer v = (Viewer) cls.getDeclaredConstructor().newInstance();
+                v.show(stage);
             }
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, java.text.MessageFormat.format(org.episteme.core.ui.i18n.I18N.getInstance().get("master.error.launch_failed", "Failed to launch app: {0}"), e.getMessage())).show();
-            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Failed to launch: " + e.getMessage()).show();
         }
     }
 
     private Tab createDevicesTab(I18N i18n) {
-        VBox content = new VBox(15);
-        content.setPadding(new Insets(20));
+        VBox content = new VBox(25);
+        content.setPadding(new Insets(30));
 
-        Label header = new Label(i18n.get("mastercontrol.devices.header", "Available Devices (Simulated & JNI)"));
-        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 18px; -fx-font-weight: bold;
+        VBox header = createTabHeader(
+            i18n.get("mastercontrol.devices.header", "Hardware & Devices"),
+            i18n.get("mastercontrol.devices.desc", "Monitor and configure physical or simulated laboratory instruments.")
+        );
 
-        // Create simulated device instances (Sorted)
-        Map<String, org.episteme.core.device.sim.AbstractSimulatedDevice> devices = new TreeMap<>();
-        devices.put("Generic GPIB Device", new org.episteme.core.device.sim.SimulatedGPIBDevice());
-        devices.put("Generic USB Device", new org.episteme.core.device.sim.SimulatedUSBDevice());
+        Map<String, String> devices = new TreeMap<>();
+        devices.put("Generic GPIB Device", "Simulated General Purpose Interface Bus");
+        devices.put("Generic USB Device", "Simulated Universal Serial Bus");
 
-        // Also discover any other devices
-        List<MasterControlDiscovery.ClassInfo> discoveredDevices = MasterControlDiscovery.getInstance()
-                .findClasses("Device");
-        for (MasterControlDiscovery.ClassInfo info : discoveredDevices) {
-            if (!devices.containsKey(info.simpleName)) {
-                try {
-                    Class<?> cls = Class.forName(info.fullName);
-                    if (org.episteme.core.device.sim.AbstractSimulatedDevice.class.isAssignableFrom(cls)) {
-                        org.episteme.core.device.sim.AbstractSimulatedDevice dev = (org.episteme.core.device.sim.AbstractSimulatedDevice) cls
-                                .getDeclaredConstructor().newInstance();
-                        devices.put(info.simpleName, dev);
-                    }
-                } catch (Exception e) {
-                    // Ignore devices that can't be instantiated
-                }
-            }
+        // Dynamic discovery
+        List<MasterControlDiscovery.ClassInfo> discovered = MasterControlDiscovery.getInstance().findClasses("Device");
+        for (MasterControlDiscovery.ClassInfo info : discovered) {
+            devices.put(info.simpleName, info.description);
         }
 
-        SplitPane split = new SplitPane();
         ListView<String> deviceList = new ListView<>();
         deviceList.getItems().addAll(devices.keySet());
-
+        
         TextArea details = new TextArea();
         details.setEditable(false);
+        details.getStyleClass().add("font-mono");
 
-        deviceList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                org.episteme.core.device.sim.AbstractSimulatedDevice dev = devices.get(newVal);
-                if (dev != null)
-                    details.setText(dev.getFormattedInfo()); // Rich info using metadata
-                // Persist selection
-                PREFS.set(PREF_SELECTED_DEVICE, newVal);
+        deviceList.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+            if (newV != null) {
+                details.setText("Device: " + newV + "\nStatus: Connected\nDetails: " + devices.get(newV));
+                PREFS.set(PREF_SELECTED_DEVICE, newV);
             }
         });
 
-        // Restore last selected device
-        String lastDevice = PREFS.get(PREF_SELECTED_DEVICE, null);
-        if (lastDevice != null && devices.containsKey(lastDevice)) {
-            deviceList.getSelectionModel().select(lastDevice);
-        }
-
-        split.getItems().addAll(deviceList, details);
+        SplitPane split = new SplitPane(deviceList, details);
         split.setDividerPositions(0.3);
 
         content.getChildren().addAll(header, split);
         return new Tab(i18n.get("mastercontrol.tab.devices", "Devices"), content);
     }
 
-    public static void main(String[] args) {
-        for (String arg : args) {
-            if (arg.equals("--monitor")) {
-                org.episteme.core.technical.monitoring.DistributedMonitor.getInstance().startServer();
-                break;
-            }
-        }
-        launch(args);
-    }
-    private void addBackendRow(GridPane grid, int row, org.episteme.core.technical.backend.Backend provider, I18N i18n) {
-        String id = provider.getId().toLowerCase();
-        String name = i18n.get("lib." + provider.getId() + ".name", provider.getName());
-        String providerDesc = i18n.get("lib." + provider.getId() + ".desc", provider.getDescription());
-        boolean available = provider.isAvailable();
-
-        // Zebra background region
-        javafx.scene.layout.Region rowBg = new javafx.scene.layout.Region();
-        rowBg.getStyleClass().add(row % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
-        grid.add(rowBg, 0, row, 5, 1); // Span 5 columns
-
-        Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().addAll("font-bold", "text-dark");
-        nameLabel.setPadding(new Insets(5, 10, 5, 10));
-
-        Label statusLabel = new Label(available
-                ? i18n.get("mastercontrol.libraries.available", "Available")
-                : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        statusLabel.getStyleClass().add(available ? "status-label-available" : "status-label-unavailable");
-        statusLabel.setPadding(new Insets(5, 10, 5, 10));
-
-        Label descLabel = new Label(providerDesc);
-        descLabel.getStyleClass().add("description-label");
-        descLabel.setWrapText(true);
-        descLabel.setMaxWidth(450);
-        descLabel.setPadding(new Insets(5, 10, 5, 10));
-
-        // Core system libraries should not be deactivated
-        boolean isFixed = id.contains("cpu-dense") || id.contains("cpu-sparse") || id.contains("core") || id.contains("standard");
-        
-        if (!isFixed) {
-            CheckBox deactivateBox = new CheckBox(i18n.get("mastercontrol.libraries.deactivate", "Deactivate"));
-            deactivateBox.setSelected(PREFS.isBackendDeactivated(provider.getId()));
-            deactivateBox.setPadding(new Insets(5, 10, 5, 10));
-            deactivateBox.setOnAction(e -> {
-                PREFS.setBackendDeactivated(provider.getId(), deactivateBox.isSelected());
-            });
-            grid.addRow(row, nameLabel, statusLabel, descLabel, deactivateBox);
-        } else {
-            Label fixedLabel = new Label(i18n.get("master.system_lib", "System Core"));
-            fixedLabel.getStyleClass().add("font-italic");
-            fixedLabel.setPadding(new Insets(5, 10, 5, 10));
-            grid.addRow(row, nameLabel, statusLabel, descLabel, fixedLabel);
-        }
+    private static class AppEntry {
+        String name, className, description;
+        AppEntry(String n, String c, String d) { name = n; className = c; description = d; }
     }
 
-    private void addManualBackendRow(GridPane grid, int row, String name, String desc, I18N i18n) {
-        javafx.scene.layout.Region rowBg = new javafx.scene.layout.Region();
-        rowBg.getStyleClass().add(row % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
-        grid.add(rowBg, 0, row, 5, 1);
-
-        Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().addAll("font-bold", "text-dark");
-        nameLabel.setPadding(new Insets(5, 10, 5, 10));
-
-        Label statusLabel = new Label(i18n.get("mastercontrol.libraries.available", "Available"));
-        statusLabel.getStyleClass().add("status-label-available");
-        statusLabel.setPadding(new Insets(5, 10, 5, 10));
-
-        Label descLabel = new Label(desc);
-        descLabel.getStyleClass().add("description-label");
-        descLabel.setPadding(new Insets(5, 10, 5, 10));
-
-        Label fixedLabel = new Label(i18n.get("master.external_lib", "External Lib"));
-        fixedLabel.getStyleClass().add("font-italic");
-        fixedLabel.setPadding(new Insets(5, 10, 5, 10));
-
-        grid.addRow(row, nameLabel, statusLabel, descLabel, fixedLabel);
+    private static class LocaleItem {
+        String name; Locale locale;
+        LocaleItem(String n, Locale l) { name = n; locale = l; }
+        @Override public String toString() { return name; }
     }
 
-    private boolean isClassAvailable(String className) {
-        try {
-            Class.forName(className, false, getClass().getClassLoader());
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
-
-
-    private String capitalize(String s) {
-        if (s == null || s.isEmpty()) return s;
-        if (s.startsWith("category.")) return s; // Don't capitalize i18n keys
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
-    }
+    public static void main(String[] args) { launch(args); }
 }
-
-
-
