@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>io.github.episteme-hcp</groupId>
         <artifactId>episteme-parent</artifactId>
         <version>${revision}</version>
     </parent>
@@ -83,21 +83,21 @@
 
         <!-- Core Episteme -->
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <!-- Episteme Natural (for loaders: FASTALoader, VizieRLoader) -->
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <!-- Episteme Social (for WorldBank and Economic Tools) -->
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-social</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -348,7 +348,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <includeScope>runtime</includeScope>
-                            <excludeGroupIds>io.github.silveremartin-dev</excludeGroupIds>
+                            <excludeGroupIds>io.github.episteme-hcp</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>

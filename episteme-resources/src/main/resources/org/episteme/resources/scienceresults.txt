@@ -1,4 +1,4 @@
-﻿We could offer a file summarizing the main achievements in science. I wasn't able to find a good text on this on the Internet although many probably exist.
+We could offer a file summarizing the main achievements in science. I wasn't able to find a good text on this on the Internet although many probably exist.
 
 A list of these achievements would include:
 Planets are spheres,
@@ -113,9 +113,9 @@ wine
 1915 - Albert Einstein: general theory of relativity - also David Hilbert 
 1918 - Emmy Noether: Noether's theorem - conditions under which the conservation laws are valid 
 1924 - Wolfgang Pauli: quantum Pauli exclusion principle 
-1925 - Erwin Schr�dinger: Schr�dinger equation (Quantum mechanics) 
+1925 - Erwin Schr?dinger: Schr?dinger equation (Quantum mechanics) 
 1927 - Werner Heisenberg: Uncertainty principle (Quantum mechanics) 
-1927 - Georges Lema�tre: Theory of the Big Bang 
+1927 - Georges Lema?tre: Theory of the Big Bang 
 1928 - Paul Dirac: Dirac equation (Quantum mechanics) 
 1929 - Edwin Hubble: Hubble's law of the expanding universe 
 1929 - Lars Onsager's reciprocal relations: also called Fourth law of thermodynamics 

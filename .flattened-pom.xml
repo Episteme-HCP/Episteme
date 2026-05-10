@@ -2,13 +2,13 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.github.silveremartin-dev</groupId>
+  <groupId>io.github.episteme-hcp</groupId>
   <artifactId>episteme-parent</artifactId>
   <version>1.0.0-beta2</version>
   <packaging>pom</packaging>
   <name>Episteme Unifying Parent</name>
   <description>Episteme - Unified Scientific Computing Framework (Parent POM)</description>
-  <url>https://github.com/silveremartin-dev/Episteme</url>
+  <url>https://github.com/Episteme-HCP/Episteme</url>
   <inceptionYear>2025</inceptionYear>
   <licenses>
     <license>
@@ -51,20 +51,20 @@
     <module>episteme-jni</module>
   </modules>
   <scm>
-    <connection>scm:git:git://github.com/silveremartin-dev/Episteme.git</connection>
-    <developerConnection>scm:git:ssh://github.com:silveremartin-dev/Episteme.git</developerConnection>
-    <url>https://github.com/silveremartin-dev/Episteme/tree/main</url>
+    <connection>scm:git:git://github.com/Episteme-HCP/Episteme.git</connection>
+    <developerConnection>scm:git:ssh://github.com:Episteme-HCP/Episteme.git</developerConnection>
+    <url>https://github.com/Episteme-HCP/Episteme/tree/main</url>
   </scm>
   <distributionManagement>
     <repository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/silveremartin-dev/Episteme</url>
+      <url>https://maven.pkg.github.com/Episteme-HCP/Episteme</url>
     </repository>
     <snapshotRepository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/silveremartin-dev/Episteme</url>
+      <url>https://maven.pkg.github.com/Episteme-HCP/Episteme</url>
     </snapshotRepository>
   </distributionManagement>
   <properties>
@@ -110,17 +110,17 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>io.github.episteme-hcp</groupId>
         <artifactId>episteme-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>io.github.episteme-hcp</groupId>
         <artifactId>episteme-natural</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>io.github.episteme-hcp</groupId>
         <artifactId>episteme-database</artifactId>
         <version>${project.version}</version>
       </dependency>
