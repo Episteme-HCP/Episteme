@@ -53,6 +53,15 @@ public class NativeSafe {
         }
 
         try {
+            // Pre-call validation: Ensure no NULL segments are passed to native code
+            for (int i = 0; i < args.length; i++) {
+                if (args[i] instanceof MemorySegment seg && seg.equals(MemorySegment.NULL)) {
+                    logger.warn("Native Safe: Arg[{}] is NULL MemorySegment for handle {}. This may cause a crash.", i, handle);
+                    // We don't throw here to allow some functions that support NULL (like some JoCL ones) 
+                    // but for MPFR we should be careful.
+                }
+            }
+
             // 1. Primary Attempt: Direct invocation using Panama MethodHandle
             return handle.invokeWithArguments(args);
         } catch (Throwable t1) {

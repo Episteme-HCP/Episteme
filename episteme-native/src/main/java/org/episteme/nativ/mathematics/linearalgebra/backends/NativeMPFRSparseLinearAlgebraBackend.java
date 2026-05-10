@@ -1984,6 +1984,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             NativeSafe.invoke(MPFR_INIT2, hLocalR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
             if (isComplex && hLocalI != null) NativeSafe.invoke(MPFR_INIT2, hLocalI.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
         }
+        trackArray(tracker, hLocalR, rows * cols);
+        if (isComplex) trackArray(tracker, hLocalI, rows * cols);
         
         for (int i=0; i < rows; i++) {
             for (int j=0; j < cols; j++) {
@@ -2002,28 +2004,31 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             NativeSafe.invoke(MPFR_SET_ZERO, gR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), 0);
             if (isComplex && gI != null) NativeSafe.invoke(MPFR_SET_ZERO, gI.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), 0);
         }
+        trackArray(tracker, gR, rows);
+        if (isComplex) trackArray(tracker, gI, rows);
+        
         setMPFR_internal(gR.asSlice(0, MPFR_LAYOUT), (isComplex && gI != null) ? gI.asSlice(0, MPFR_LAYOUT) : null, beta, arena);
         
         // Use a dedicated local arena for temporaries to avoid overwhelming the main arena
         try (Arena localArena = Arena.ofConfined()) {
             // Pre-allocate common temporaries
-            MemorySegment r_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, r_tmp, prec);
-            MemorySegment cR_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, cR_tmp, prec);
+            MemorySegment r_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, r_tmp, prec); track(tracker, r_tmp);
+            MemorySegment cR_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, cR_tmp, prec); track(tracker, cR_tmp);
             MemorySegment cI_tmp = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, cI_tmp, prec);
-            MemorySegment sR_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR_tmp, prec);
+            if (isComplex) { NativeSafe.invoke(MPFR_INIT2, cI_tmp, prec); track(tracker, cI_tmp); }
+            MemorySegment sR_tmp = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sR_tmp, prec); track(tracker, sR_tmp);
             MemorySegment sI_tmp = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sI_tmp, prec);
+            if (isComplex) { NativeSafe.invoke(MPFR_INIT2, sI_tmp, prec); track(tracker, sI_tmp); }
             
-            MemorySegment t1R = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec);
+            MemorySegment t1R = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1R, prec); track(tracker, t1R);
             MemorySegment t1I = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, t1I, prec);
-            MemorySegment t2R = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2R, prec);
+            if (isComplex) { NativeSafe.invoke(MPFR_INIT2, t1I, prec); track(tracker, t1I); }
+            MemorySegment t2R = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2R, prec); track(tracker, t2R);
             MemorySegment t2I = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, t2I, prec);
+            if (isComplex) { NativeSafe.invoke(MPFR_INIT2, t2I, prec); track(tracker, t2I); }
             
-            MemorySegment tmp1 = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
-            MemorySegment tmp2 = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
+            MemorySegment tmp1 = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec); track(tracker, tmp1);
+            MemorySegment tmp2 = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec); track(tracker, tmp2);
 
             // Apply Givens rotations to transform H to upper triangular R
         for (int i = 0; i < cols; i++) {
@@ -2248,10 +2253,14 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         for (int i = cols - 1; i >= 0; i--) {
             NativeSafe.invoke(MPFR_INIT2, yR.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
             if (isComplex) NativeSafe.invoke(MPFR_INIT2, yI.asSlice(i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT), prec);
-            
-            MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, prec);
+        }
+        trackArray(tracker, yR, cols);
+        if (isComplex) trackArray(tracker, yI, cols);
+
+        for (int i = cols - 1; i >= 0; i--) {
+            MemorySegment sumR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, sumR, prec); track(tracker, sumR);
             MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null; 
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, prec);
+            if (isComplex) { NativeSafe.invoke(MPFR_INIT2, sumI, prec); track(tracker, sumI); }
             
             NativeSafe.invoke(MPFR_SET_ZERO, sumR, 0);
             if (isComplex) NativeSafe.invoke(MPFR_SET_ZERO, sumI, 0);
@@ -2344,18 +2353,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             }
         }
         
-        // Cleanup local MPFR resources
-        NativeSafe.invoke(MPFR_CLEAR, r_tmp);
-        NativeSafe.invoke(MPFR_CLEAR, cR_tmp);
-        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, cI_tmp);
-        NativeSafe.invoke(MPFR_CLEAR, sR_tmp);
-        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, sI_tmp);
-        NativeSafe.invoke(MPFR_CLEAR, t1R);
-        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, t1I);
-        NativeSafe.invoke(MPFR_CLEAR, t2R);
-        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, t2I);
-        NativeSafe.invoke(MPFR_CLEAR, tmp1);
-        if (isComplex) NativeSafe.invoke(MPFR_CLEAR, tmp2);
+        }
     }
 }
 
