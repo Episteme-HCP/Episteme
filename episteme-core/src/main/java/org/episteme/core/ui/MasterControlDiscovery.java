@@ -259,6 +259,7 @@ public class MasterControlDiscovery {
                 scanDirectoryRecursive(file, newPackage, results, processed, classLoader);
             } else if (file.getName().endsWith(".class")) {
                 String className = file.getName().substring(0, file.getName().length() - 6);
+                if (className.contains("$")) continue; // Filter out inner/anonymous classes
                 String fullClassName = packageName.isEmpty() ? className : packageName + "." + className;
 
                 if (!fullClassName.startsWith("org.episteme.")) continue;
@@ -277,6 +278,7 @@ public class MasterControlDiscovery {
                 if (entry.getName().endsWith(".class")) {
                     String entryName = entry.getName();
                     String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
+                    if (className.contains("$")) continue; // Filter out inner/anonymous classes
                     if (!className.startsWith("org.episteme.")) continue;
                     if (processed.add(className)) {
                         String simpleName = className.substring(className.lastIndexOf('.') + 1);
@@ -327,7 +329,8 @@ public class MasterControlDiscovery {
         
         // 4. Resource-based discovery (very robust for discovering JARs containing specific packages)
         try {
-            String[] markers = {"org/episteme", "META-INF/services/org.episteme.core.ui.Viewer", "org/episteme/core", "org/episteme/natural", "org/episteme/native"};
+            String[] markers = {"org/episteme", "META-INF/services/org.episteme.core.ui.Viewer", "org/episteme/core", 
+                                "org/episteme/natural", "org/episteme/nativ", "org/episteme/social", "org/episteme/apps"};
             for (String marker : markers) {
                 java.util.Enumeration<java.net.URL> resources = cl.getResources(marker);
                 while (resources.hasMoreElements()) {

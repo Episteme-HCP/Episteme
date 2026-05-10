@@ -2355,7 +2355,6 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         
         }
     }
-}
 
     private int compare(E a, E b) {
         if (a instanceof Real rA && b instanceof Real rB) {
