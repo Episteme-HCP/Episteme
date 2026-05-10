@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>io.github.episteme-hcp</groupId>
         <artifactId>episteme-parent</artifactId>
         <version>${revision}</version>
     </parent>
@@ -21,7 +21,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -36,7 +36,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -51,7 +51,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-social</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -66,7 +66,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-native</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -81,7 +81,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-client</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -96,7 +96,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-server</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -348,7 +348,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <excludeGroupIds>io.github.silveremartin-dev</excludeGroupIds>
+                            <excludeGroupIds>io.github.episteme-hcp</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>

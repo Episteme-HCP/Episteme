@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>io.github.silveremartin-dev</groupId>
+    <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
     <version>1.0.0-beta2</version>
   </parent>
@@ -20,7 +20,7 @@
   </licenses>
   <dependencies>
     <dependency>
-      <groupId>io.github.silveremartin-dev</groupId>
+      <groupId>io.github.episteme-hcp</groupId>
       <artifactId>episteme-core</artifactId>
     </dependency>
     <dependency>

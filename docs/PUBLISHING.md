@@ -72,8 +72,8 @@ To use Episteme in another project, add the following to its `pom.xml`:
 <repositories>
     <repository>
         <id>github</id>
-        <name>GitHub silveremartin-dev Apache Maven Packages</name>
-        <url>https://maven.pkg.github.com/silveremartin-dev/Episteme</url>
+        <name>GitHub Episteme-HCP Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/Episteme-HCP/Episteme</url>
     </repository>
 </repositories>
 ```
@@ -81,7 +81,7 @@ To use Episteme in another project, add the following to its `pom.xml`:
 ### 2. Add Dependency
 ```xml
 <dependency>
-    <groupId>io.github.silveremartin-dev</groupId>
+    <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-core</artifactId>
     <version>1.0.0-beta2</version>
 </dependency>

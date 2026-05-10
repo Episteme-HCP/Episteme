@@ -64,7 +64,7 @@ echo "--- [4/4] Project Sync ---"
 cd "$HOME"
 if [ ! -d "Episteme" ]; then
     echo "Cloning repository..."
-    git clone https://github.com/silveremartin-dev/Episteme.git
+    git clone https://github.com/Episteme-HCP/Episteme.git
     cd Episteme
 else
     echo "Updating repository..."

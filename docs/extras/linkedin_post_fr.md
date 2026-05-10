@@ -20,7 +20,7 @@ Voici ce qui différencie Episteme :
 
 Je suis extrêmement fier de ce que ce projet démontre sur l'avenir de l'ingénierie logicielle assistée par l'IA et du calcul haute performance sur la JVM.
 
-**Découvrez le projet et nos benchmarks ici :** [https://github.com/silveremartin-dev/Episteme](https://github.com/silveremartin-dev/Episteme)
+**Découvrez le projet et nos benchmarks ici :** [https://github.com/Episteme-HCP/Episteme](https://github.com/Episteme-HCP/Episteme)
 *(N'hésitez pas à laisser une étoile (star) au projet s'il vous intéresse ! ⭐)*
 
 💼 **À la recherche de mon prochain défi !**

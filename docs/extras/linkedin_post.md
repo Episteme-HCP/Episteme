@@ -20,7 +20,7 @@ Here is what makes Episteme different:
 
 I’m incredibly proud of what this project demonstrates about the future of AI-assisted software engineering and high-performance computing on the JVM.
 
-**Explore the project and benchmarks here:** [https://github.com/silveremartin-dev/Episteme](https://github.com/silveremartin-dev/Episteme)
+**Explore the project and benchmarks here:** [https://github.com/Episteme-HCP/Episteme](https://github.com/Episteme-HCP/Episteme)
 *(Feel free to star it if you find it interesting! ⭐)*
 
 💼 **Looking for my next challenge!**

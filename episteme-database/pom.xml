@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>io.github.episteme-hcp</groupId>
         <artifactId>episteme-parent</artifactId>
         <version>${revision}</version>
     </parent>
@@ -16,7 +16,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-core</artifactId>
         </dependency>
         

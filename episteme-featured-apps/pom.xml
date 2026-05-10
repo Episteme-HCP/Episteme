@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.silveremartin-dev</groupId>
+        <groupId>io.github.episteme-hcp</groupId>
         <artifactId>episteme-parent</artifactId>
         <version>${revision}</version>
     </parent>
@@ -22,22 +22,22 @@
     <dependencies>
         <!-- Episteme Modules -->
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-social</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-native</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -48,7 +48,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.github.silveremartin-dev</groupId>
+            <groupId>io.github.episteme-hcp</groupId>
             <artifactId>episteme-jni</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -182,7 +182,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <excludeGroupIds>io.github.silveremartin-dev</excludeGroupIds>
+                            <excludeGroupIds>io.github.episteme-hcp</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
