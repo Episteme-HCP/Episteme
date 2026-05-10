@@ -13,6 +13,7 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;
 import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
@@ -187,6 +188,57 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             
             return fromComplexFloatArray(yData, sa.getScalarRing());
         }
+    }
+
+    @Override
+    public E trace(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        SparseMatrix<E> sa = ensureSparse(a);
+        int n = Math.min(sa.rows(), sa.cols());
+        int[] rowPtr = sa.getRowPointers();
+        int[] colIdx = sa.getColIndices();
+        Object[] values = sa.getValues();
+        
+        if (isComplex(sa)) {
+            Complex sum = Complex.ZERO;
+            for (int i = 0; i < n; i++) {
+                for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
+                    if (colIdx[j] == i) {
+                        sum = sum.add((Complex) values[j]);
+                        break;
+                    }
+                }
+            }
+            return (E) (Object) sum;
+        } else {
+            float sum = 0.0f;
+            for (int i = 0; i < n; i++) {
+                for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
+                    if (colIdx[j] == i) {
+                        sum += ((Number) values[j]).floatValue();
+                        break;
+                    }
+                }
+            }
+            return (E) (Object) RealFloat.of(sum);
+        }
+    }
+
+    @Override
+    public Matrix<E> conjugateTranspose(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        SparseMatrix<E> sa = ensureSparse(a);
+        Ring<E> ring = (Ring<E>) sa.getScalarRing();
+        SparseMatrixStorage<E> transposedStorage = sa.getSparseStorage().transpose();
+        
+        if (isComplex(sa)) {
+             for (java.util.Map.Entry<Long, E> entry : transposedStorage.getData().entrySet()) {
+                 Complex c = (Complex) entry.getValue();
+                 transposedStorage.set((int)(entry.getKey() >>> 32), (int)(entry.getKey() & 0xFFFFFFFFL), (E) (Object) c.conjugate());
+             }
+        }
+        
+        return new SparseMatrix<>(transposedStorage, (LinearAlgebraProvider<E>) this, ring);
     }
 
     @Override

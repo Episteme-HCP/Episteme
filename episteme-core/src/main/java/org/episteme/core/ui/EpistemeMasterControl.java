@@ -463,21 +463,51 @@ public class EpistemeMasterControl extends Application {
         content.getChildren().add(new Separator());
 
         // --- SPI Categories ---
-        String[] types = {BackendDiscovery.TYPE_MATH, BackendDiscovery.TYPE_PLOTTING, BackendDiscovery.TYPE_AUDIO, 
-                         BackendDiscovery.TYPE_MOLECULAR, BackendDiscovery.TYPE_QUANTUM, BackendDiscovery.TYPE_NETWORK};
+        String[] types = {
+            BackendDiscovery.TYPE_MATH, BackendDiscovery.TYPE_LINEAR_ALGEBRA, BackendDiscovery.TYPE_TENSOR,
+            BackendDiscovery.TYPE_PLOTTING, BackendDiscovery.TYPE_AUDIO, 
+            BackendDiscovery.TYPE_MOLECULAR, BackendDiscovery.TYPE_QUANTUM, BackendDiscovery.TYPE_NETWORK,
+            BackendDiscovery.TYPE_ML, BackendDiscovery.TYPE_VISION, BackendDiscovery.TYPE_VIDEO,
+            BackendDiscovery.TYPE_DISTRIBUTED, BackendDiscovery.TYPE_GRAPH, BackendDiscovery.TYPE_MAP
+        };
         String[] labels = {
             i18n.get("category.math", "Mathematics"),
+            i18n.get("category.la", "Linear Algebra"),
+            i18n.get("category.tensor", "Tensor Computing"),
             i18n.get("category.plotting", "Visualization"),
             i18n.get("category.audio", "Audio Processing"),
             i18n.get("category.molecular", "Molecular Viewing"),
             i18n.get("category.quantum", "Quantum Computing"),
-            i18n.get("category.network", "Network Analysis")
+            i18n.get("category.network", "Network Analysis"),
+            i18n.get("category.ml", "Machine Learning"),
+            i18n.get("category.vision", "Computer Vision"),
+            i18n.get("category.video", "Video Processing"),
+            i18n.get("category.distributed", "Distributed Computing"),
+            i18n.get("category.graph", "Graph Analysis"),
+            i18n.get("category.map", "Geospatial Maps")
         };
         
         boolean first = true;
         for (int i = 0; i < types.length; i++) {
-            List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(types[i]);
-            if (!providers.isEmpty()) {
+            // Check visibility using both SPI and Scanned results
+            boolean hasProviders = !BackendDiscovery.getInstance().getProvidersByType(types[i]).isEmpty();
+            if (!hasProviders) {
+                List<MasterControlDiscovery.ClassInfo> scanned = MasterControlDiscovery.getInstance().findClasses("Backend");
+                for (MasterControlDiscovery.ClassInfo info : scanned) {
+                    try {
+                        Class<?> cls = Class.forName(info.fullName, false, MasterControlDiscovery.class.getClassLoader());
+                        if (Backend.class.isAssignableFrom(cls)) {
+                            Backend instance = (Backend) cls.getDeclaredConstructor().newInstance();
+                            if (instance.getType().equalsIgnoreCase(types[i])) {
+                                hasProviders = true;
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {}
+                }
+            }
+
+            if (hasProviders) {
                 if (!first) content.getChildren().add(new Separator());
                 content.getChildren().add(createBackendCategory(i18n, types[i], labels[i], ""));
                 first = false;
@@ -543,7 +573,6 @@ public class EpistemeMasterControl extends Application {
         grid.setVgap(0); // Tighter gap for zebra rows
         grid.setMaxWidth(Double.MAX_VALUE);
 
-        // Ensure the second column (info) grows to fill space, and background spans all
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setMinWidth(200);
         ColumnConstraints col2 = new ColumnConstraints();
@@ -552,7 +581,30 @@ public class EpistemeMasterControl extends Application {
         col3.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().addAll(col1, col2, col3);
 
-        List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
+        // 1. SPI Providers
+        List<Backend> providers = new ArrayList<>(BackendDiscovery.getInstance().getProvidersByType(type));
+        
+        // 2. Scanned Providers (Aggressive discovery)
+        List<MasterControlDiscovery.ClassInfo> discovered = MasterControlDiscovery.getInstance().findClasses("Backend");
+        for (MasterControlDiscovery.ClassInfo info : discovered) {
+            boolean alreadyPresent = false;
+            for (Backend p : providers) if (p.getClass().getName().equals(info.fullName)) { alreadyPresent = true; break; }
+            
+            if (!alreadyPresent) {
+                try {
+                    Class<?> cls = Class.forName(info.fullName, false, MasterControlDiscovery.class.getClassLoader());
+                    if (Backend.class.isAssignableFrom(cls)) {
+                        Backend instance = (Backend) cls.getDeclaredConstructor().newInstance();
+                        if (instance.getType().equalsIgnoreCase(type)) {
+                            providers.add(instance);
+                        }
+                    }
+                } catch (Exception e) {
+                    // Might fail if dependencies are missing, skip
+                }
+            }
+        }
+
         int r = 0;
         for (Backend provider : providers) {
             addBackendRow(grid, r++, provider, i18n);

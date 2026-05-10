@@ -10,6 +10,7 @@ import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
@@ -40,6 +41,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
     private static final int CUSPARSE_INDEX_32BIT = 1;
     private static final int CUSPARSE_INDEX_BASE_ZERO = 0;
     private static final int CUSPARSE_SPMM_ALG_DEFAULT = 0;
+    private static final int CUSPARSE_ORDER_ROW = 2;
 
     @Override
     public boolean isAvailable() {
@@ -182,6 +184,30 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         return data;
     }
 
+    private float[] toFloatArrayGeneric(Matrix<E> m) {
+        int rows = m.rows(); int cols = m.cols();
+        float[] data = new float[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i * cols + j] = ((Number) m.get(i, j)).floatValue();
+            }
+        }
+        return data;
+    }
+
+    private float[] toComplexFloatArrayGeneric(Matrix<E> m) {
+        int rows = m.rows(); int cols = m.cols();
+        float[] data = new float[rows * cols * 2];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Complex c = (Complex) m.get(i, j);
+                data[(i * cols + j) * 2] = (float) c.real();
+                data[(i * cols + j) * 2 + 1] = (float) c.imaginary();
+            }
+        }
+        return data;
+    }
+
     private float[] toFloatArray(Vector<E> v) {
         int dim = v.dimension();
         float[] data = new float[dim];
@@ -215,8 +241,8 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         float[] data = new float[vals.length * 2];
         for (int i = 0; i < vals.length; i++) {
             org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) vals[i];
-            data[i * 2] = c.getReal().floatValue();
-            data[i * 2 + 1] = c.getImaginary().floatValue();
+            data[i * 2] = (float) c.real();
+            data[i * 2 + 1] = (float) c.imaginary();
         }
         return data;
     }
@@ -226,8 +252,8 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         float[] data = new float[dim * 2];
         for (int i = 0; i < dim; i++) {
             org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
-            data[i * 2] = c.getReal().floatValue();
-            data[i * 2 + 1] = c.getImaginary().floatValue();
+            data[i * 2] = (float) c.real();
+            data[i * 2 + 1] = (float) c.imaginary();
         }
         return data;
     }
@@ -239,6 +265,143 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             values[i] = (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[i * 2]), RealFloat.create(data[i * 2 + 1]));
         }
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(values), null, ring);
+    }
+
+    @Override
+    public Matrix<E> toDense(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = ensureSparse(a);
+        int m = sa.rows(); int n = sa.cols(); int nnz = sa.getNnz();
+        boolean isComplex = isComplex(sa);
+        int elemSize = isComplex ? 8 : 4;
+        int dataType = isComplex ? 4 : 0; // CUDA_C_32F : CUDA_R_32F
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_rowPtr = malloc((long)(m + 1) * 4, tracker);
+            MemorySegment d_colIdx = malloc((long)nnz * 4, tracker);
+            MemorySegment d_val = malloc((long)nnz * elemSize, tracker);
+            MemorySegment d_dense = malloc((long)m * n * elemSize, tracker);
+
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+
+            MemorySegment handle = CUDAManager.getCusparseHandle();
+            MemorySegment spMatDescr = arena.allocate(ValueLayout.ADDRESS);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_CREATE_CSR, spMatDescr, (long)m, (long)n, (long)nnz, d_rowPtr, d_colIdx, d_val, CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_BASE_ZERO, dataType));
+            
+            MemorySegment dnMatDescr = arena.allocate(ValueLayout.ADDRESS);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_CREATE_DN_MAT, dnMatDescr, (long)m, (long)n, (long)n, d_dense, dataType, CUSPARSE_ORDER_ROW));
+
+            MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_SPARSE_TO_DENSE_BUFFER_SIZE, handle, spMatDescr.get(ValueLayout.ADDRESS, 0), dnMatDescr.get(ValueLayout.ADDRESS, 0), 0, bufferSizePtr));
+            long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
+            MemorySegment d_buffer = malloc(bufferSize, tracker);
+
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_SPARSE_TO_DENSE, handle, spMatDescr.get(ValueLayout.ADDRESS, 0), dnMatDescr.get(ValueLayout.ADDRESS, 0), 0, d_buffer));
+
+            MemorySegment h_seg = arena.allocate((long)m * n * elemSize);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, h_seg, d_dense, (long)m * n * elemSize, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            float[] resultArr = h_seg.toArray(ValueLayout.JAVA_FLOAT);
+
+            if (isComplex) {
+                return (Matrix<E>) createComplexDenseMatrix(resultArr, m, n, (Ring<E>) sa.getScalarRing());
+            } else {
+                // Return a generic dense matrix for float (or specialized if exists)
+                return (Matrix<E>) createRealDenseMatrix(resultArr, m, n, (Ring<E>) sa.getScalarRing());
+            }
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public Matrix<E> fromDense(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int m = a.rows(); int n = a.cols();
+        boolean isComplex = isComplex(a);
+        int elemSize = isComplex ? 8 : 4;
+        int dataType = isComplex ? 4 : 0;
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_dense = malloc((long)m * n * elemSize, tracker);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_dense, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArrayGeneric(a) : toFloatArrayGeneric(a)), (long)m * n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+
+            MemorySegment handle = CUDAManager.getCusparseHandle();
+            MemorySegment dnMatDescr = arena.allocate(ValueLayout.ADDRESS);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_CREATE_DN_MAT, dnMatDescr, (long)m, (long)n, (long)n, d_dense, dataType, CUSPARSE_ORDER_ROW));
+
+            MemorySegment spMatDescr = arena.allocate(ValueLayout.ADDRESS);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_CREATE_CSR, spMatDescr, (long)m, (long)n, 0L, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL, CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_32BIT, CUSPARSE_INDEX_BASE_ZERO, dataType));
+
+            MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_DENSE_TO_SPARSE_BUFFER_SIZE, handle, dnMatDescr.get(ValueLayout.ADDRESS, 0), spMatDescr.get(ValueLayout.ADDRESS, 0), 0, bufferSizePtr));
+            long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
+            MemorySegment d_buffer = malloc(bufferSize, tracker);
+
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_DENSE_TO_SPARSE, handle, dnMatDescr.get(ValueLayout.ADDRESS, 0), spMatDescr.get(ValueLayout.ADDRESS, 0), 0, d_buffer));
+            
+            MemorySegment rowsPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            MemorySegment colsPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            MemorySegment nnzPtr = arena.allocate(ValueLayout.JAVA_LONG);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_GET_SIZE, spMatDescr.get(ValueLayout.ADDRESS, 0), rowsPtr, colsPtr, nnzPtr));
+            long nnz = nnzPtr.get(ValueLayout.JAVA_LONG, 0);
+
+            MemorySegment d_rowPtr = malloc((long)(m + 1) * 4, tracker);
+            MemorySegment d_colIdx = malloc((long)nnz * 4, tracker);
+            MemorySegment d_val = malloc((long)nnz * elemSize, tracker);
+
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_SET_POINTERS, spMatDescr.get(ValueLayout.ADDRESS, 0), d_rowPtr, d_colIdx, d_val));
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_DENSE_TO_SPARSE, handle, dnMatDescr.get(ValueLayout.ADDRESS, 0), spMatDescr.get(ValueLayout.ADDRESS, 0), 1, d_buffer));
+
+            int[] h_rowPtr = d_rowPtr.toArray(ValueLayout.JAVA_INT);
+            int[] h_colIdx = d_colIdx.toArray(ValueLayout.JAVA_INT);
+            float[] h_val = d_val.toArray(ValueLayout.JAVA_FLOAT);
+
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            if (isComplex) {
+                 Complex[] complexValues = new Complex[(int)nnz];
+                 for (int i = 0; i < nnz; i++) complexValues[i] = Complex.of(h_val[i*2], h_val[i*2+1]);
+                 return (Matrix<E>) new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(
+                     new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E>(m, n, (E) Complex.ZERO, h_rowPtr, h_colIdx, (E[]) complexValues),
+                     this, ring);
+            } else {
+                 org.episteme.core.mathematics.numbers.real.RealFloat[] realValues = new org.episteme.core.mathematics.numbers.real.RealFloat[(int)nnz];
+                 for (int i = 0; i < nnz; i++) realValues[i] = org.episteme.core.mathematics.numbers.real.RealFloat.create(h_val[i]);
+                 return (Matrix<E>) new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(
+                     new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E>(m, n, (E) org.episteme.core.mathematics.numbers.real.RealFloat.ZERO, h_rowPtr, h_colIdx, (E[]) realValues),
+                     this, ring);
+            }
+        } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    private Matrix<Complex> createComplexDenseMatrix(float[] data, int m, int n, Ring<E> ring) {
+        Complex[][] complexData = new Complex[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                int idx = (i * n + j) * 2;
+                complexData[i][j] = Complex.of(data[idx], data[idx + 1]);
+            }
+        }
+        Complex[] flatData = new Complex[m * n];
+        for (int i = 0; i < m; i++) System.arraycopy(complexData[i], 0, flatData, i * n, n);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<Complex>(m, n, flatData),
+            (LinearAlgebraProvider<Complex>) (Object) new NativeCUDADenseLinearAlgebraFloatBackend(), (Ring<Complex>) (Object) ring);
+    }
+
+    private Matrix<E> createRealDenseMatrix(float[] data, int m, int n, Ring<E> ring) {
+        org.episteme.core.mathematics.numbers.real.RealFloat[][] realData = new org.episteme.core.mathematics.numbers.real.RealFloat[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                realData[i][j] = org.episteme.core.mathematics.numbers.real.RealFloat.create(data[i * n + j]);
+            }
+        }
+        org.episteme.core.mathematics.numbers.real.RealFloat[] flatData = new org.episteme.core.mathematics.numbers.real.RealFloat[m * n];
+        for (int i = 0; i < m; i++) System.arraycopy(realData[i], 0, flatData, i * n, n);
+        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(m, n, (E[]) flatData),
+            (LinearAlgebraProvider<E>) (Object) new NativeCUDADenseLinearAlgebraFloatBackend(), ring);
     }
 
     @Override
@@ -437,7 +600,8 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         } catch (Throwable t) { throw new RuntimeException(t); }
     }
 
-    @Override public E norm(Vector<E> a) {
+    @Override
+    public E norm(Vector<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.dimension();
         boolean isComplex = isComplex(a);
@@ -447,8 +611,105 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_res = arena.allocate(ValueLayout.JAVA_FLOAT);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_a, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(a) : toFloatArray(a)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
             NativeSafe.invoke(isComplex ? CUDAManager.CUBLAS_SCNRM2 : CUDAManager.CUBLAS_SNRM2, CUDAManager.getCublasHandle(), n, d_a, 1, d_res);
-            return (E) RealFloat.of(d_res.get(ValueLayout.JAVA_FLOAT, 0));
+            return (E) (Object) RealFloat.of(d_res.get(ValueLayout.JAVA_FLOAT, 0));
         } catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    @Override
+    public E trace(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = ensureSparse(a);
+        int n = Math.min(sa.rows(), sa.cols());
+        int[] rowPtr = sa.getRowPointers();
+        int[] colIdx = sa.getColIndices();
+        Object[] values = sa.getValues();
+        
+        if (isComplex(sa)) {
+            Complex sum = Complex.ZERO;
+            for (int i = 0; i < n; i++) {
+                for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
+                    if (colIdx[j] == i) {
+                        sum = sum.add((Complex) values[j]);
+                        break;
+                    }
+                }
+            }
+            return (E) (Object) sum;
+        } else {
+            float sum = 0.0f;
+            for (int i = 0; i < n; i++) {
+                for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
+                    if (colIdx[j] == i) {
+                        sum += ((Number) values[j]).floatValue();
+                        break;
+                    }
+                }
+            }
+            return (E) (Object) RealFloat.of(sum);
+        }
+    }
+
+    @Override
+    public Matrix<E> conjugateTranspose(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa = ensureSparse(a);
+        int m = sa.rows(); int n = sa.cols(); int nnz = sa.getNnz();
+        boolean isComplex = isComplex(sa);
+        int elemSize = isComplex ? 8 : 4;
+        int dataType = isComplex ? 6 : 0;
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_rowPtr = malloc((long)(m + 1) * 4, tracker);
+            MemorySegment d_colIdx = malloc((long)nnz * 4, tracker);
+            MemorySegment d_val = malloc((long)nnz * elemSize, tracker);
+            
+            MemorySegment d_cscRowPtr = malloc((long)(n + 1) * 4, tracker);
+            MemorySegment d_cscColIdx = malloc((long)nnz * 4, tracker);
+            MemorySegment d_cscVal = malloc((long)nnz * elemSize, tracker);
+
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+
+            MemorySegment handle = CUDAManager.getCusparseHandle();
+            MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_CSR2CSC_BUFFER_SIZE, handle, m, n, nnz, d_rowPtr, d_colIdx, d_val, d_cscRowPtr, d_cscColIdx, d_cscVal, dataType, 1, bufferSizePtr));
+            long bufferSize = bufferSizePtr.get(ValueLayout.JAVA_LONG, 0);
+            MemorySegment d_buffer = malloc(bufferSize, tracker);
+
+            checkCusparse((int) NativeSafe.invoke(CUDAManager.CUSPARSE_CSR2CSC, handle, m, n, nnz, d_val, d_rowPtr, d_colIdx, d_cscVal, d_cscColIdx, d_cscRowPtr, dataType, 1, 0, d_buffer));
+
+            int[] h_cscRowPtr = new int[n + 1];
+            int[] h_cscColIdx = new int[nnz];
+            float[] h_cscVal = new float[nnz * (isComplex ? 2 : 1)];
+
+            clEnqueueReadBuffer_dummy_float(d_cscRowPtr, h_cscRowPtr, (long)(n + 1) * 4, arena);
+            clEnqueueReadBuffer_dummy_float(d_cscColIdx, h_cscColIdx, (long)nnz * 4, arena);
+            clEnqueueReadBuffer_dummy_float(d_cscVal, h_cscVal, (long)nnz * elemSize, arena);
+
+            Ring<E> ring = (Ring<E>) sa.getScalarRing();
+            E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), nnz);
+            for (int i = 0; i < nnz; i++) {
+                if (isComplex) {
+                    Complex c = Complex.of(RealFloat.create(h_cscVal[i * 2]), RealFloat.create(h_cscVal[i * 2 + 1]));
+                    values[i] = (E) (Object) c.conjugate();
+                } else {
+                    values[i] = (E) (Object) RealFloat.create(h_cscVal[i]);
+                }
+            }
+            
+            org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
+                new org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E>(n, m, ring.zero(), h_cscRowPtr, h_cscColIdx, values);
+            return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, ring);
+        } catch (Throwable t) { throw new RuntimeException("CUDA sparse conjugate transpose failed", t); }
+    }
+
+    private void clEnqueueReadBuffer_dummy_float(MemorySegment d_ptr, Object host_ptr, long size, Arena arena) throws Throwable {
+        MemorySegment hostSeg = arena.allocate(size);
+        checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostSeg, d_ptr, size, CUDAManager.CUDA_MEMCPY_D_TO_H));
+        if (host_ptr instanceof int[] ia) MemorySegment.copy(hostSeg, ValueLayout.JAVA_INT, 0, ia, 0, ia.length);
+        else if (host_ptr instanceof float[] fa) MemorySegment.copy(hostSeg, ValueLayout.JAVA_FLOAT, 0, fa, 0, fa.length);
     }
 
     private Object castToRing(Complex c, Ring<E> ring) {

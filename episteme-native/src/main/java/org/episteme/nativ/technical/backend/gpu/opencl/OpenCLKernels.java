@@ -251,6 +251,23 @@ public final class OpenCLKernels {
         "        }\n" +
         "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void trace_kernel(__global const double *a, __global double *result, const int n) {\n" +
+        "    if (get_global_id(0) == 0) {\n" +
+        "        double sum = 0.0;\n" +
+        "        for (int i = 0; i < n; i++) sum += a[i * n + i];\n" +
+        "        result[0] = sum;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void conjugate_transpose_kernel(__global const double2_custom *a, __global double2_custom *b, const int rows, const int cols) {\n" +
+        "    int r = get_global_id(1); int c = get_global_id(0);\n" +
+        "    if (r < rows && c < cols) {\n" +
+        "        b[c * rows + r].r = a[r * cols + c].r;\n" +
+        "        b[c * rows + r].i = -a[r * cols + c].i;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void normalize_vec_kernel(__global double *a, const double norm_inv, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) a[i] *= norm_inv;\n" +
         "}\n";
 
     public static final String DENSE_FLOAT_KERNELS = 
@@ -387,6 +404,23 @@ public final class OpenCLKernels {
         "        }\n" +
         "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
         "    }\n" +
+        "}\n" +
+        "__kernel void trace_kernel_float(__global const float *a, __global float *result, const int n) {\n" +
+        "    if (get_global_id(0) == 0) {\n" +
+        "        float sum = 0.0f;\n" +
+        "        for (int i = 0; i < n; i++) sum += a[i * n + i];\n" +
+        "        result[0] = sum;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void conjugate_transpose_kernel_float(__global const float2 *a, __global float2 *b, const int rows, const int cols) {\n" +
+        "    int r = get_global_id(1); int c = get_global_id(0);\n" +
+        "    if (r < rows && c < cols) {\n" +
+        "        b[c * rows + r].x = a[r * cols + c].x;\n" +
+        "        b[c * rows + r].y = -a[r * cols + c].y;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void normalize_vec_kernel_float(__global float *a, const float norm_inv, const int n) {\n" +
+        "    int i = get_global_id(0); if (i < n) a[i] *= norm_inv;\n" +
         "}\n";
     
     // TODO: Add more float kernels as needed (Sparse, etc.)

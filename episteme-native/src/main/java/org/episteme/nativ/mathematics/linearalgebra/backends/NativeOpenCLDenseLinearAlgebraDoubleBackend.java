@@ -67,6 +67,9 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     private cl_kernel complexVecScaleKernel;
     private cl_kernel jacobiDotKernel;
     private cl_kernel jacobiApplyKernel;
+    private cl_kernel traceKernel;
+    private cl_kernel conjugateTransposeKernel;
+    private cl_kernel normalizeVecKernel;
     
     private volatile boolean initialized = false;
 
@@ -104,6 +107,9 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
             complexVecScaleKernel = tryCreateKernel(program, "complex_vec_scale");
             jacobiDotKernel = tryCreateKernel(program, "hestenes_jacobi_dot");
             jacobiApplyKernel = tryCreateKernel(program, "hestenes_jacobi_apply");
+            traceKernel = tryCreateKernel(program, "trace_kernel");
+            conjugateTransposeKernel = tryCreateKernel(program, "conjugate_transpose_kernel");
+            normalizeVecKernel = tryCreateKernel(program, "normalize_vec_kernel");
             
             initialized = (matMulKernel != null);
             if (initialized) {
@@ -242,9 +248,146 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     }
 
     @Override
-    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
-        if (isComplex(a)) return elementWiseComplex(a, b, complexVecAddKernel);
-        return elementWise(a, b, vecAddKernel);
+    public E trace(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int n = Math.min(a.rows(), a.cols());
+        double[] src = isComplex(a) ? toComplexDoubleArray(a) : toDoubleArray(a);
+        double[] res = new double[1];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * (isComplex(a) ? 2 : 1) * a.rows() * a.cols(), Pointer.to(src), null), CL::clReleaseMemObject);
+            cl_mem memRes = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * (isComplex(a) ? 2 : 1), null, null), CL::clReleaseMemObject);
+            
+            if (isComplex(a)) {
+                // For complex, we'll just do it on CPU for now as we didn't add a complex trace kernel yet
+                // Actually let's just do it on CPU if it's easier, or add the kernel.
+                // Re-using the same logic as CUDA for now for complex
+                Complex sum = Complex.ZERO;
+                for (int i = 0; i < n; i++) {
+                    sum = sum.add(Complex.of(src[(i * a.cols() + i) * 2], src[(i * a.cols() + i) * 2 + 1]));
+                }
+                return (E) sum;
+            } else {
+                clSetKernelArg(traceKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+                clSetKernelArg(traceKernel, 1, Sizeof.cl_mem, Pointer.to(memRes));
+                clSetKernelArg(traceKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{a.cols()}));
+                
+                clEnqueueNDRangeKernel(queue, traceKernel, 1, null, new long[]{1}, null, 0, null, null);
+                clEnqueueReadBuffer(queue, memRes, CL_TRUE, 0, (long)Sizeof.cl_double, Pointer.to(res), 0, null, null);
+                return (E) RealDouble.of(res[0]);
+            }
+        }
+    }
+
+    @Override
+    public Matrix<E> conjugateTranspose(Matrix<E> a) {
+        if (!isComplex(a)) return transpose(a);
+        int rows = a.rows(); int cols = a.cols();
+        double[] src = toComplexDoubleArray(a);
+        double[] dst = new double[rows * cols * 2];
+        
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            
+            cl_mem memA = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * rows * cols * 2, Pointer.to(src), null), CL::clReleaseMemObject);
+            cl_mem memB = tracker.track(clCreateBuffer(context, CL_MEM_WRITE_ONLY, (long)Sizeof.cl_double * rows * cols * 2, null, null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(conjugateTransposeKernel, 0, Sizeof.cl_mem, Pointer.to(memA));
+            clSetKernelArg(conjugateTransposeKernel, 1, Sizeof.cl_mem, Pointer.to(memB));
+            clSetKernelArg(conjugateTransposeKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{rows}));
+            clSetKernelArg(conjugateTransposeKernel, 3, Sizeof.cl_int, Pointer.to(new int[]{cols}));
+            
+            clEnqueueNDRangeKernel(queue, conjugateTransposeKernel, 2, null, new long[]{cols, rows}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memB, CL_TRUE, 0, (long)Sizeof.cl_double * rows * cols * 2, Pointer.to(dst), 0, null, null);
+            
+            return fromComplexDoubleArray(dst, cols, rows, a);
+        }
+    }
+
+    @Override
+    public Vector<E> normalize(Vector<E> v) {
+        E n = norm(v);
+        if (n == null) return v;
+        double nv = getRealValue(n);
+        if (nv == 0) return v;
+        
+        int dim = v.dimension();
+        if (isComplex(v)) {
+             // Complex normalization
+             return multiply(v, (E) Complex.of(1.0 / nv, 0.0));
+        }
+        
+        double[] data = toDoubleArrayVec(v);
+        double[] res = new double[dim];
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            cl_context context = OpenCLManager.getContext();
+            cl_command_queue queue = OpenCLManager.getCommandQueue();
+            cl_mem memV = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, (long)Sizeof.cl_double * dim, Pointer.to(data), null), CL::clReleaseMemObject);
+            
+            clSetKernelArg(normalizeVecKernel, 0, Sizeof.cl_mem, Pointer.to(memV));
+            clSetKernelArg(normalizeVecKernel, 1, Sizeof.cl_double, Pointer.to(new double[]{1.0 / nv}));
+            clSetKernelArg(normalizeVecKernel, 2, Sizeof.cl_int, Pointer.to(new int[]{dim}));
+            
+            clEnqueueNDRangeKernel(queue, normalizeVecKernel, 1, null, new long[]{dim}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memV, CL_TRUE, 0, (long)Sizeof.cl_double * dim, Pointer.to(res), 0, null, null);
+            return fromDoubleVec(res, (Ring<E>) v.getScalarRing());
+        }
+    }
+
+    private double getRealValue(E val) {
+        if (val instanceof Complex c) return c.real();
+        if (val instanceof Real r) return r.doubleValue();
+        if (val instanceof Number n) return n.doubleValue();
+        return 0.0;
+    }
+
+    @Override
+    public Vector<E> cross(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
+        Ring<E> ring = (Ring<E>) a.getScalarRing();
+        if (isComplex(a)) {
+            Complex a1 = getComplex(a.get(0)), a2 = getComplex(a.get(1)), a3 = getComplex(a.get(2));
+            Complex b1 = getComplex(b.get(0)), b2 = getComplex(b.get(1)), b3 = getComplex(b.get(2));
+            return (Vector<E>) (Vector) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
+                a2.multiply(b3).subtract(a3.multiply(b2)),
+                a3.multiply(b1).subtract(a1.multiply(b3)),
+                a1.multiply(b2).subtract(a2.multiply(b1))
+            ), (Ring) ring);
+        }
+        double a1 = getReal(a.get(0)), a2 = getReal(a.get(1)), a3 = getReal(a.get(2));
+        double b1 = getReal(b.get(0)), b2 = getReal(b.get(1)), b3 = getReal(b.get(2));
+        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
+            (E) RealDouble.of(a2 * b3 - a3 * b2),
+            (E) RealDouble.of(a3 * b1 - a1 * b3),
+            (E) RealDouble.of(a1 * b2 - a2 * b1)
+        ), ring);
+    }
+
+    private Complex getComplex(Object o) {
+        if (o instanceof Complex c) return c;
+        if (o instanceof Real r) return Complex.of(r.doubleValue(), 0.0);
+        if (o instanceof Number n) return Complex.of(n.doubleValue(), 0.0);
+        return Complex.ZERO;
+    }
+
+    private double getReal(Object o) {
+        if (o instanceof Real r) return r.doubleValue();
+        if (o instanceof Number n) return n.doubleValue();
+        if (o instanceof Complex c) return c.real();
+        return 0.0;
+    }
+
+    @Override
+    public E angle(Vector<E> a, Vector<E> b) {
+        E d = dot(a, b);
+        E nA = norm(a);
+        E nB = norm(b);
+        double cosTheta = getRealValue(d) / (getRealValue(nA) * getRealValue(nB));
+        return (E) RealDouble.of(Math.acos(Math.max(-1.0, Math.min(1.0, cosTheta))));
     }
 
     @Override
@@ -463,16 +606,6 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         return det;
     }
 
-    @Override
-    public E trace(Matrix<E> a) {
-        int n = Math.min(a.rows(), a.cols());
-        Ring<E> ring = (Ring<E>) a.getScalarRing();
-        E sum = ring.zero();
-        for (int i = 0; i < n; i++) {
-            sum = ring.add(sum, a.get(i, i));
-        }
-        return sum;
-    }
     
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
@@ -958,11 +1091,11 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     }
 
 
-    private double getRealValue(E val) {
-        if (val instanceof Number n) return n.doubleValue();
-        if (val instanceof Real r) return r.doubleValue();
-        if (val instanceof Complex c) return c.real();
-        return 0.0;
+    private double[] toDoubleArrayVec(Vector<E> v) {
+        int dim = v.dimension();
+        double[] data = new double[dim];
+        for (int i = 0; i < dim; i++) data[i] = getRealValue(v.get(i));
+        return data;
     }
 
     private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof Complex; }

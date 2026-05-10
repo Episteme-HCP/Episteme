@@ -15,6 +15,7 @@ import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
@@ -168,7 +169,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SNRM2, CUDAManager.getCublasHandle(), n, d_A, 1, d_Res));
-            return (E) RealFloat.create(d_Res.get(ValueLayout.JAVA_FLOAT, 0));
+            return (E) (Object) RealFloat.create(d_Res.get(ValueLayout.JAVA_FLOAT, 0));
         } catch (Throwable t) { throw new RuntimeException("CUDA float norm failed", t); }
     }
 
@@ -182,8 +183,118 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatVec(a)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_SCNRM2, CUDAManager.getCublasHandle(), n, d_A, 1, d_Res));
-            return (E) org.episteme.core.mathematics.numbers.real.RealFloat.create(d_Res.get(ValueLayout.JAVA_FLOAT, 0));
+            return (E) (Object) RealFloat.create(d_Res.get(ValueLayout.JAVA_FLOAT, 0));
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float norm failed", t); }
+    }
+
+    @Override
+    public E trace(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int n = Math.min(a.rows(), a.cols());
+        if (isComplex(a)) {
+            float[] data = toComplexFloatArray(a);
+            org.episteme.core.mathematics.numbers.complex.Complex sum = org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
+            for (int i = 0; i < n; i++) {
+                sum = sum.add(org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(data[(i * a.cols() + i) * 2]), RealFloat.create(data[(i * a.cols() + i) * 2 + 1])));
+            }
+            return (E) (Object) sum;
+        }
+        float[] data = toFloatArray(a);
+        float sum = 0;
+        for (int i = 0; i < n; i++) sum += data[i * a.cols() + i];
+        return (E) (Object) RealFloat.create(sum);
+    }
+
+    @Override
+    public Matrix<E> conjugateTranspose(Matrix<E> a) {
+        if (!isComplex(a)) return transpose(a);
+        int rows = a.rows(); int cols = a.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) rows * cols * 8, tracker);
+            MemorySegment d_C = malloc((long) rows * cols * 8, tracker);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray(a)), (long) rows * cols * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_CGEAM, handle, 2, 0, rows, cols, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, new float[]{1.0f, 0.0f}), d_A, cols, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, new float[]{0.0f, 0.0f}), d_A, cols, 
+                d_C, rows));
+            
+            float[] result = new float[rows * cols * 2];
+            MemorySegment host = arena.allocate(ValueLayout.JAVA_FLOAT, (long) rows * cols * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, host, d_C, (long) rows * cols * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(host, ValueLayout.JAVA_FLOAT, 0, result, 0, rows * cols * 2);
+            return fromComplexFloatArray(result, cols, rows, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException("CUDA complex float conjugate transpose failed", t); }
+    }
+
+    @Override
+    public Vector<E> normalize(Vector<E> v) {
+        E n = norm(v);
+        if (n == null) return v;
+        float nv = getFloatValue(n);
+        if (nv == 0) return v;
+        return multiply(v, createScalar(1.0f / nv, v));
+    }
+
+    private float getFloatValue(E val) {
+        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return (float) c.real();
+        if (val instanceof Real r) return (float) r.doubleValue();
+        if (val instanceof Number n) return n.floatValue();
+        return 0.0f;
+    }
+
+    private E createScalar(float val, Vector<E> v) {
+        Ring<E> ring = (Ring<E>) v.getScalarRing();
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(val), RealFloat.create(0.0f));
+        return (E) (Object) RealFloat.create(val);
+    }
+
+    @Override
+    public Vector<E> cross(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
+        Ring<E> ring = (Ring<E>) a.getScalarRing();
+        if (isComplex(a)) {
+            org.episteme.core.mathematics.numbers.complex.Complex a1 = getComplex(a.get(0)), a2 = getComplex(a.get(1)), a3 = getComplex(a.get(2));
+            org.episteme.core.mathematics.numbers.complex.Complex b1 = getComplex(b.get(0)), b2 = getComplex(b.get(1)), b3 = getComplex(b.get(2));
+            return (Vector<E>) (Vector) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
+                a2.multiply(b3).subtract(a3.multiply(b2)),
+                a3.multiply(b1).subtract(a1.multiply(b3)),
+                a1.multiply(b2).subtract(a2.multiply(b1))
+            ), (Ring) ring);
+        }
+        float a1 = getFloat(a.get(0)), a2 = getFloat(a.get(1)), a3 = getFloat(a.get(2));
+        float b1 = getFloat(b.get(0)), b2 = getFloat(b.get(1)), b3 = getFloat(b.get(2));
+        return (Vector<E>) (Vector) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
+            (E) (Object) RealFloat.create(a2 * b3 - a3 * b2),
+            (E) (Object) RealFloat.create(a3 * b1 - a1 * b3),
+            (E) (Object) RealFloat.create(a1 * b2 - a2 * b1)
+        ), (Ring) ring);
+    }
+
+    private org.episteme.core.mathematics.numbers.complex.Complex getComplex(Object o) {
+        if (o instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return c;
+        if (o instanceof Real r) return org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create((float) r.doubleValue()), RealFloat.create(0.0f));
+        if (o instanceof Number n) return org.episteme.core.mathematics.numbers.complex.Complex.of(RealFloat.create(n.floatValue()), RealFloat.create(0.0f));
+        return org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
+    }
+
+    private float getFloat(Object o) {
+        if (o instanceof Real r) return (float) r.doubleValue();
+        if (o instanceof Number n) return n.floatValue();
+        if (o instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return (float) c.real();
+        return 0.0f;
+    }
+
+    @Override
+    public E angle(Vector<E> a, Vector<E> b) {
+        E d = dot(a, b);
+        E nA = norm(a);
+        E nB = norm(b);
+        float cosTheta = getFloatValue(d) / (getFloatValue(nA) * getFloatValue(nB));
+        return (E) (Object) RealFloat.create((float) Math.acos(Math.max(-1.0, Math.min(1.0, cosTheta))));
     }
 
     private Matrix<E> combine(Matrix<E> a, Matrix<E> b, float alpha, float beta) {

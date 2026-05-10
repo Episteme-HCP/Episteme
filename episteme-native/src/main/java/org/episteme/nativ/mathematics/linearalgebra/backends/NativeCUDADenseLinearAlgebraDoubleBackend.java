@@ -68,6 +68,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     @Override public String getId() { return "cuda-dense-double"; }
     @Override public String getName() { return "Native CUDA Dense Linear Algebra Double Backend"; }
     @Override public int getPriority() { return 105; }
+    @Override public void shutdown() {}
     
     @Override
     public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
@@ -295,7 +296,6 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
             MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_DOUBLE);
             
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(a)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            
             checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DNRM2, CUDAManager.getCublasHandle(), n, d_A, 1, d_Res));
             return (E) RealDouble.of(d_Res.get(ValueLayout.JAVA_DOUBLE, 0));
         } catch (Throwable t) { throw new RuntimeException("CUDA double norm failed", t); }
@@ -315,9 +315,116 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
         } catch (Throwable t) { throw new RuntimeException("CUDA complex double norm failed", t); }
     }
 
-    @Override public void shutdown() {}
+    @Override
+    public E trace(Matrix<E> a) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int n = Math.min(a.rows(), a.cols());
+        if (isComplex(a)) {
+            double[] data = toComplexDoubleArray(a);
+            Complex sum = Complex.ZERO;
+            for (int i = 0; i < n; i++) {
+                sum = sum.add(Complex.of(data[(i * a.cols() + i) * 2], data[(i * a.cols() + i) * 2 + 1]));
+            }
+            return (E) sum;
+        }
+        double[] data = toDoubleArray(a);
+        double sum = 0;
+        for (int i = 0; i < n; i++) sum += data[i * a.cols() + i];
+        return (E) RealDouble.of(sum);
+    }
 
     @Override
+    public Matrix<E> conjugateTranspose(Matrix<E> a) {
+        if (!isComplex(a)) return transpose(a);
+        int rows = a.rows(); int cols = a.cols();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) rows * cols * 16, tracker);
+            MemorySegment d_C = malloc((long) rows * cols * 16, tracker);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a)), (long) rows * cols * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_ZGEAM, handle, 2, 0, rows, cols, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_A, cols, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0), d_A, cols, 
+                d_C, rows));
+            
+            double[] result = new double[rows * cols * 2];
+            MemorySegment host = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) rows * cols * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, host, d_C, (long) rows * cols * 16, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(host, ValueLayout.JAVA_DOUBLE, 0, result, 0, rows * cols * 2);
+            return toMatrixComplex(result, cols, rows, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { throw new RuntimeException("CUDA conjugate transpose failed", t); }
+    }
+
+    @Override
+    public Vector<E> normalize(Vector<E> v) {
+        E n = norm(v);
+        if (n == null) return v;
+        double nv = getRealValue(n);
+        if (nv == 0) return v;
+        return multiply(v, createScalar(1.0 / nv, v));
+    }
+
+    private double getRealValue(E val) {
+        if (val instanceof Complex c) return c.real();
+        if (val instanceof Real r) return r.doubleValue();
+        if (val instanceof Number n) return n.doubleValue();
+        return 0.0;
+    }
+
+    private E createScalar(double val, Vector<E> v) {
+        Ring<E> ring = (Ring<E>) v.getScalarRing();
+        if (ring.zero() instanceof Complex) return (E) Complex.of(val, 0.0);
+        return (E) RealDouble.of(val);
+    }
+
+    @Override
+    public Vector<E> cross(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
+        Ring<E> ring = (Ring<E>) a.getScalarRing();
+        if (isComplex(a)) {
+            Complex a1 = getComplex(a.get(0)), a2 = getComplex(a.get(1)), a3 = getComplex(a.get(2));
+            Complex b1 = getComplex(b.get(0)), b2 = getComplex(b.get(1)), b3 = getComplex(b.get(2));
+            return (Vector<E>) (Vector) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
+                a2.multiply(b3).subtract(a3.multiply(b2)),
+                a3.multiply(b1).subtract(a1.multiply(b3)),
+                a1.multiply(b2).subtract(a2.multiply(b1))
+            ), (Ring) ring);
+        }
+        double a1 = getReal(a.get(0)), a2 = getReal(a.get(1)), a3 = getReal(a.get(2));
+        double b1 = getReal(b.get(0)), b2 = getReal(b.get(1)), b3 = getReal(b.get(2));
+        return (Vector<E>) (Vector) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
+            (E) RealDouble.of(a2 * b3 - a3 * b2),
+            (E) RealDouble.of(a3 * b1 - a1 * b3),
+            (E) RealDouble.of(a1 * b2 - a2 * b1)
+        ), (Ring) ring);
+    }
+
+    private Complex getComplex(Object o) {
+        if (o instanceof Complex c) return c;
+        if (o instanceof Real r) return Complex.of(r.doubleValue(), 0.0);
+        if (o instanceof Number n) return Complex.of(n.doubleValue(), 0.0);
+        return Complex.ZERO;
+    }
+
+    private double getReal(Object o) {
+        if (o instanceof Real r) return r.doubleValue();
+        if (o instanceof Number n) return n.doubleValue();
+        if (o instanceof Complex c) return c.real();
+        return 0.0;
+    }
+
+    @Override
+    public E angle(Vector<E> a, Vector<E> b) {
+        E d = dot(a, b);
+        E nA = norm(a);
+        E nB = norm(b);
+        double cosTheta = getRealValue(d) / (getRealValue(nA) * getRealValue(nB));
+        return (E) RealDouble.of(Math.acos(Math.max(-1.0, Math.min(1.0, cosTheta))));
+    }
+
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
         if (isComplex(a)) return multiplyComplex(a, b);
         int m = a.rows(); int k = a.cols(); int n = b.cols();

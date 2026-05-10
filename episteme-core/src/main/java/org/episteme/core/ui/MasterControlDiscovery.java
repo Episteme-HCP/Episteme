@@ -132,9 +132,15 @@ public class MasterControlDiscovery {
                 matchesSuffix = true;
             }
             
+            // Heuristic for Algorithm Providers
+            if ("Provider".equals(suffix) && (info.simpleName.endsWith("Backend") || info.simpleName.endsWith("Engine"))) {
+                matchesSuffix = true;
+            }
+            
             boolean isDeviceRequested = "Device".equals(suffix);
             boolean isViewerRequested = "Viewer".equals(suffix);
             boolean isAppRequested = "App".equals(suffix);
+            boolean isBackendRequested = "Backend".equals(suffix) || "Provider".equals(suffix);
 
             // 2. Reflection-based interface matching (Robust)
             boolean implementsInterface = false;
@@ -148,6 +154,7 @@ public class MasterControlDiscovery {
                 if (isAppRequested && org.episteme.core.ui.App.class.isAssignableFrom(cls)) implementsInterface = true;
                 if (isDeviceRequested && org.episteme.core.device.Device.class.isAssignableFrom(cls)) implementsInterface = true;
                 if ("Loader".equals(suffix) && org.episteme.core.io.ResourceIO.class.isAssignableFrom(cls)) implementsInterface = true;
+                if (isBackendRequested && org.episteme.core.technical.backend.Backend.class.isAssignableFrom(cls)) implementsInterface = true;
 
             } catch (Throwable t) {
                 // Ignore if class cannot be loaded (dependencies might be missing)

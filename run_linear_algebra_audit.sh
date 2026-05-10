@@ -10,10 +10,10 @@ echo "=========================================="
 export MAVEN_OPTS="--add-modules jdk.incubator.vector \
   --enable-preview \
   --enable-native-access=ALL-UNNAMED \
-  -Depisteme.backend.disable.cuda-dense=true \
-  -Depisteme.backend.disable.cuda-sparse=true \
-  -Depisteme.backend.disable.opencl-dense=true \
-  -Depisteme.backend.disable.opencl-sparse=true \
+  -Depisteme.backend.disable.cuda-dense=false \
+  -Depisteme.backend.disable.cuda-sparse=false \
+  -Depisteme.backend.disable.opencl-dense=false \
+  -Depisteme.backend.disable.opencl-sparse=false \
   -Depisteme.backend.disable.grpc-math=true"
 
 echo "[1/3] Auditing FAST Mode (Float 32-bit)..."

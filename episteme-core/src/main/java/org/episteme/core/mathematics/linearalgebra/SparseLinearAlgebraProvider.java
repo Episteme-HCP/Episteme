@@ -4,7 +4,8 @@
  */
 
 package org.episteme.core.mathematics.linearalgebra;
-
+import org.episteme.core.mathematics.numbers.complex.Complex;
+import org.episteme.core.mathematics.numbers.real.Real;
 
 /**
  * Marker interface for Linear Algebra Providers specialized for Sparse Matrices.
@@ -42,5 +43,40 @@ public interface SparseLinearAlgebraProvider<E> extends LinearAlgebraProvider<E>
      */
     default Vector<E> gmres(Matrix<E> a, Vector<E> b, Vector<E> x0, E tolerance, int maxIterations, int restarts) {
         throw new UnsupportedOperationException(getName() + " does not support GMRES");
+    }
+
+    /**
+     * Converts a sparse matrix to its dense representation.
+     */
+    default Matrix<E> toDense(Matrix<E> a) {
+        if (a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> sa) {
+            org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = sa.getSparseStorage();
+            return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(storage.toDense(), this, (org.episteme.core.mathematics.structures.rings.Ring<E>)a.getScalarRing());
+        }
+        return a; // Already dense or unknown type
+    }
+
+    /**
+     * Converts a dense matrix to its sparse representation.
+     */
+    default Matrix<E> fromDense(Matrix<E> a) {
+        if (!(a instanceof org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix)) {
+            org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage<E> storage = 
+                org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage.fromDense(
+                    (org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E>)a.getStorage(), 
+                    (E)a.getScalarRing().zero());
+            return new org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<>(storage, this, (org.episteme.core.mathematics.structures.rings.Ring<E>)a.getScalarRing());
+        }
+        return a; // Already sparse
+    }
+
+    @Override
+    default int rank(Matrix<E> a) {
+        return LinearAlgebraProvider.super.rank(toDense(a));
+    }
+
+    @Override
+    default E conditionNumber(Matrix<E> a) {
+        return LinearAlgebraProvider.super.conditionNumber(toDense(a));
     }
 }

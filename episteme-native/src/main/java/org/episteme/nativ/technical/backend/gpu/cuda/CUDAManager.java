@@ -103,6 +103,14 @@ public final class CUDAManager {
     public static MethodHandle CUSPARSE_SPMV_BUFFER_SIZE;
     public static MethodHandle CUSPARSE_SPMM;
     public static MethodHandle CUSPARSE_SPMM_BUFFER_SIZE;
+    public static MethodHandle CUSPARSE_CSR2CSC_BUFFER_SIZE;
+    public static MethodHandle CUSPARSE_CSR2CSC;
+    public static MethodHandle CUSPARSE_SPARSE_TO_DENSE_BUFFER_SIZE;
+    public static MethodHandle CUSPARSE_SPARSE_TO_DENSE;
+    public static MethodHandle CUSPARSE_DENSE_TO_SPARSE_BUFFER_SIZE;
+    public static MethodHandle CUSPARSE_DENSE_TO_SPARSE;
+    public static MethodHandle CUSPARSE_GET_SIZE;
+    public static MethodHandle CUSPARSE_SET_POINTERS;
     public static MethodHandle CUSPARSE_STATUS_GET_STRING;
 
     // --- cuSolver ---
@@ -378,6 +386,16 @@ public final class CUDAManager {
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
         CUSPARSE_SPMM = lookup(cusparseLookup, "cusparseSpMM", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, 
             ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSPARSE_CSR2CSC_BUFFER_SIZE = lookup(cusparseLookup, "cusparseCsr2cscEx2_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSPARSE_CSR2CSC = lookup(cusparseLookup, "cusparseCsr2cscEx2", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSPARSE_SPARSE_TO_DENSE_BUFFER_SIZE = lookup(cusparseLookup, "cusparseSparseToDense_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSPARSE_SPARSE_TO_DENSE = lookup(cusparseLookup, "cusparseSparseToDense", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSPARSE_DENSE_TO_SPARSE_BUFFER_SIZE = lookup(cusparseLookup, "cusparseDenseToSparse_bufferSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSPARSE_DENSE_TO_SPARSE = lookup(cusparseLookup, "cusparseDenseToSparse", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+        CUSPARSE_GET_SIZE = lookup(cusparseLookup, "cusparseSpMatGetSize", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+        CUSPARSE_SET_POINTERS = lookup(cusparseLookup, "cusparseCsrSetPointers", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
         CUSPARSE_STATUS_GET_STRING = lookup(cusparseLookup, "cusparseGetStatusString", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
         // cuSolver
