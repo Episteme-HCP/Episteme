@@ -2023,8 +2023,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             if (isComplex) NativeSafe.invoke(MPFR_INIT2, t2I, prec);
             
             MemorySegment tmp1 = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp1, prec);
-            MemorySegment tmp2 = isComplex ? localArena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
+            MemorySegment tmp2 = localArena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tmp2, prec);
 
             // Apply Givens rotations to transform H to upper triangular R
         for (int i = 0; i < cols; i++) {
@@ -2186,12 +2185,12 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 MemorySegment a = h_ii_R;
                 MemorySegment b = h_ip1i_R;
                 
-                MemorySegment r = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, r, prec);
-                MemorySegment c = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, c, prec);
-                MemorySegment s = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, s, prec);
+                MemorySegment r = r_tmp;
+                MemorySegment c = cR_tmp;
+                MemorySegment s = sR_tmp;
                 
-                MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
-                MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+                MemorySegment t1 = t1R;
+                MemorySegment t2 = t2R;
                 
                 NativeSafe.invoke(MPFR_MUL, t1, a, a, 0);
                 NativeSafe.invoke(MPFR_MUL, t2, b, b, 0);
