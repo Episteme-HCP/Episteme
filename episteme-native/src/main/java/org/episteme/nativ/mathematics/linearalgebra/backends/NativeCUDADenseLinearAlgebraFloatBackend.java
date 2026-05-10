@@ -766,27 +766,68 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        if (isComplex(a)) return solveTriangularComplex(a, b, upper, transpose, conjugate, unit);
+        
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) n * n * 4, tracker);
             MemorySegment d_B = malloc((long) n * 4, tracker);
+            
+            // In memory, A (Row-Major) is A^T (Column-Major).
+            // Ax = b  =>  x^T A^T = b^T.
+            // Side: RIGHT (1), op(A) = Non-Transpose (0) => x^T A^T = b^T (matches Ax=b)
+            // Side: RIGHT (1), op(A) = Transpose (1) => x^T A = b^T (matches A^T x=b)
+            
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) n * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b)), (long) n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCublasHandle();
-            int uplo = upper ? 1 : 0;
-            int trans = transpose ? 1 : 0;
+            int uplo = upper ? 0 : 1; // Row Upper is Column Lower
+            int trans = transpose ? 1 : 0; 
             int diag = unit ? 1 : 0;
-            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_STRSM, handle, 0, uplo, trans, diag, n, 1, 
-                arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_A, n, d_B, n));
+            
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_STRSM, handle, 1, uplo, trans, diag, 1, n, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f), d_A, n, d_B, 1));
             
             float[] result = new float[n];
             MemorySegment hostB = arena.allocate(ValueLayout.JAVA_FLOAT, n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostB, d_B, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostB, ValueLayout.JAVA_FLOAT, 0, result, 0, n);
             return fromFloatVec(result, (Ring<E>) a.getScalarRing());
-        } catch (Throwable t) { throw new RuntimeException("CUDA float solveTriangular failed", t); }
+        } catch (Throwable t) { 
+            logger.error("CUDA float solveTriangular failed: {}", t.getMessage());
+            throw new RuntimeException("CUDA float solveTriangular failed", t); 
+        }
+    }
+
+    private Vector<E> solveTriangularComplex(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        int n = a.rows();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) n * n * 8, tracker);
+            MemorySegment d_B = malloc((long) n * 8, tracker);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray(a)), (long) n * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatVec(b)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            int uplo = upper ? 0 : 1; 
+            int trans = transpose ? (conjugate ? 2 : 1) : 0; // CUBLAS_OP_N=0, T=1, C=2
+            int diag = unit ? 1 : 0;
+            
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_CTRSM, handle, 1, uplo, trans, diag, 1, n, 
+                arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f), d_A, n, d_B, 1));
+            
+            float[] result = new float[n * 2];
+            MemorySegment hostB = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostB, d_B, (long) n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostB, ValueLayout.JAVA_FLOAT, 0, result, 0, n * 2);
+            return fromComplexFloatVec(result, (Ring<E>) a.getScalarRing());
+        } catch (Throwable t) { 
+            logger.error("CUDA complex float solveTriangular failed: {}", t.getMessage());
+            throw new RuntimeException("CUDA complex float solveTriangular failed", t); 
+        }
     }
 
     @Override

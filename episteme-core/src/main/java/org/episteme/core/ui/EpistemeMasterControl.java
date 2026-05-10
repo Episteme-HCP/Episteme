@@ -90,6 +90,16 @@ public class EpistemeMasterControl extends Application {
         
         ThemeManager.getInstance().applyTheme(primaryStage.getScene());
         primaryStage.setTitle(i18n.get("app.title", "Episteme Master Control"));
+        
+        // Add toast label to root
+        this.statusLabel = new Label();
+        this.statusLabel.getStyleClass().add("status-toast");
+        this.statusLabel.setVisible(false);
+        this.statusLabel.setMouseTransparent(true);
+        StackPane.setAlignment(this.statusLabel, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(this.statusLabel, new Insets(0, 0, 50, 0));
+        root.getChildren().add(this.statusLabel);
+
         primaryStage.show();
     }
 
@@ -382,18 +392,14 @@ public class EpistemeMasterControl extends Application {
             i18n.get("mastercontrol.computing.iterations.desc", "Maximum number of iterations allowed for iterative solvers (e.g., GMRES, BiCGSTAB)."));
 
         Spinner<Integer> bitsSpinner = new Spinner<>(64, 4096, config.getPrecisionBits());
-        bitsSpinner.valueProperty().addListener((obs, old, val) -> config.setPrecisionBits(val));
+        bitsSpinner.valueProperty().addListener((obs, old, val) -> {
+            config.setPrecisionBits(val);
+            notifySaved(i18n);
+        });
         addPropertyRow(grid, 17, i18n.get("mastercontrol.computing.bits", "Internal Precision (Bits)"), bitsSpinner, 
             i18n.get("mastercontrol.computing.bits.desc", "Bit-width for internal calculations in native high-precision backends."));
 
-        Button saveBtn = new Button(i18n.get("mastercontrol.computing.save", "Apply and Save Globally"));
-        saveBtn.getStyleClass().add("button-primary");
-        saveBtn.setOnAction(e -> {
-            Episteme.savePreferences();
-            showStatus(i18n.get("mastercontrol.status.saved", "Computing preferences saved successfully."), false);
-        });
-
-        content.getChildren().addAll(header, grid, saveBtn);
+        content.getChildren().addAll(header, grid);
         scroll.setContent(content);
         return new Tab(i18n.get("mastercontrol.tab.computing", "Computing"), scroll);
     }
@@ -553,10 +559,45 @@ public class EpistemeMasterControl extends Application {
 
         VBox header = createTabHeader(
             i18n.get("mastercontrol.tab.algorithms", "Computational Algorithms"),
-            i18n.get("mastercontrol.algorithms.desc", "Configuration and availability of specific scientific algorithm implementations.")
+            i18n.get("mastercontrol.algorithms.desc", "Explore and configure modular compute engines available in the Episteme environment.")
         );
 
-        content.getChildren().addAll(header, createBackendCategory(i18n, BackendDiscovery.TYPE_MATH, "", ""));
+        Accordion accordion = new Accordion();
+        String[] types = {
+            BackendDiscovery.TYPE_MATH, BackendDiscovery.TYPE_LINEAR_ALGEBRA, BackendDiscovery.TYPE_TENSOR,
+            BackendDiscovery.TYPE_AUDIO, BackendDiscovery.TYPE_ML, BackendDiscovery.TYPE_VISION,
+            BackendDiscovery.TYPE_DISTRIBUTED, BackendDiscovery.TYPE_GRAPH, BackendDiscovery.TYPE_MAP
+        };
+        String[] labels = {
+            i18n.get("category.math", "Mathematics"),
+            i18n.get("category.la", "Linear Algebra"),
+            i18n.get("category.tensor", "Tensor Computing"),
+            i18n.get("category.audio", "Audio Processing"),
+            i18n.get("category.ml", "Machine Learning"),
+            i18n.get("category.vision", "Computer Vision"),
+            i18n.get("category.distributed", "Distributed Systems"),
+            i18n.get("category.graph", "Graph Analysis"),
+            i18n.get("category.map", "Geospatial Analysis")
+        };
+
+        for (int i = 0; i < types.length; i++) {
+            VBox catBox = createBackendCategory(i18n, types[i], "", "");
+            if (!catBox.getChildren().isEmpty()) {
+                Node potentialGrid = catBox.getChildren().get(0);
+                int count = 0;
+                if (potentialGrid instanceof GridPane gp) {
+                    count = gp.getRowCount();
+                }
+                if (count > 0) {
+                    TitledPane pane = new TitledPane("(" + count + ") " + labels[i], catBox);
+                    accordion.getPanes().add(pane);
+                }
+            }
+        }
+
+        if (!accordion.getPanes().isEmpty()) accordion.getPanes().get(0).setExpanded(true);
+
+        content.getChildren().addAll(header, accordion);
         return new Tab(i18n.get("mastercontrol.tab.algorithms", "Algorithms"), scroll);
     }
 
@@ -573,13 +614,15 @@ public class EpistemeMasterControl extends Application {
         grid.setVgap(0); // Tighter gap for zebra rows
         grid.setMaxWidth(Double.MAX_VALUE);
 
+        ColumnConstraints col0 = new ColumnConstraints();
+        col0.setMinWidth(40);
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setMinWidth(200);
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setMinWidth(100);
         ColumnConstraints col3 = new ColumnConstraints();
         col3.setHgrow(Priority.ALWAYS);
-        grid.getColumnConstraints().addAll(col1, col2, col3);
+        grid.getColumnConstraints().addAll(col0, col1, col2, col3);
 
         // 1. SPI Providers
         List<Backend> providers = new ArrayList<>(BackendDiscovery.getInstance().getProvidersByType(type));
@@ -605,6 +648,20 @@ public class EpistemeMasterControl extends Application {
             }
         }
 
+        // 3. Preferred Backend Selector
+        HBox prefBox = new HBox(15);
+        prefBox.setAlignment(Pos.CENTER_LEFT);
+        prefBox.setPadding(new Insets(10, 15, 10, 15));
+        Label prefLabel = new Label(i18n.get("mastercontrol.preferred.backend", "Preferred Backend:"));
+        prefLabel.getStyleClass().add("font-bold");
+        
+        ComboBox<String> prefCombo = createBackendComboBox(type, UserPreferences.getInstance().getPreferredBackend(type), id -> {
+            UserPreferences.getInstance().setPreferredBackend(type, id);
+            notifySaved(i18n);
+        });
+        prefBox.getChildren().addAll(prefLabel, prefCombo);
+        box.getChildren().add(0, prefBox);
+
         int r = 0;
         for (Backend provider : providers) {
             addBackendRow(grid, r++, provider, i18n);
@@ -617,9 +674,17 @@ public class EpistemeMasterControl extends Application {
     private void addBackendRow(GridPane grid, int row, Backend provider, I18N i18n) {
         Region bg = new Region();
         bg.getStyleClass().add(row % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
-        GridPane.setColumnSpan(bg, 3);
+        GridPane.setColumnSpan(bg, 4); // Extra column for checkbox
         GridPane.setHgrow(bg, Priority.ALWAYS);
         grid.add(bg, 0, row);
+
+        CheckBox activeCb = new CheckBox();
+        activeCb.setSelected(!UserPreferences.getInstance().isBackendDeactivated(provider.getId()));
+        activeCb.setOnAction(e -> {
+            UserPreferences.getInstance().setBackendDeactivated(provider.getId(), !activeCb.isSelected());
+            notifySaved(i18n);
+        });
+        activeCb.setPadding(new Insets(10));
 
         Label name = new Label(provider.getName());
         name.getStyleClass().add("font-bold");
@@ -634,9 +699,10 @@ public class EpistemeMasterControl extends Application {
         info.setPadding(new Insets(10, 10, 10, 10));
         info.setWrapText(true);
 
-        grid.add(name, 0, row);
-        grid.add(status, 1, row);
-        grid.add(info, 2, row);
+        grid.add(activeCb, 0, row);
+        grid.add(name, 1, row);
+        grid.add(status, 2, row);
+        grid.add(info, 3, row);
     }
 
     private Tab createLoadersTab(I18N i18n) {
@@ -673,16 +739,14 @@ public class EpistemeMasterControl extends Application {
                 for (AppEntry e : list) if (e.className.equals(info.fullName)) { exists = true; break; }
             }
             if (!exists) {
-                String catName = info.fullName.contains(".chemistry.") ? "Chemistry" : (info.fullName.contains(".physics.") ? "Physics" : "General");
-                String cat = i18n.get("category." + catName.toLowerCase(), catName);
+                String catName = info.fullName.contains(".chemistry.") ? "Chemistry" : (info.fullName.contains(".physics.") ? "Physics" : "Scientific Systems");
+                String cat = i18n.get("category." + catName.toLowerCase().replace(" ", ""), catName);
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(info.simpleName, info.fullName, info.description));
             }
         }
 
         for (Map.Entry<String, List<AppEntry>> entry : grouped.entrySet()) {
-            String title = entry.getKey();
-            TitledPane pane = new TitledPane(title + " (" + entry.getValue().size() + ")", createAppList(false, entry.getValue().toArray(new AppEntry[0])));
-            accordion.getPanes().add(pane);
+            accordion.getPanes().add(new TitledPane("(" + entry.getValue().size() + ") " + entry.getKey(), createAppList(false, entry.getValue().toArray(new AppEntry[0]))));
         }
 
         content.getChildren().addAll(header, accordion);
@@ -704,9 +768,9 @@ public class EpistemeMasterControl extends Application {
         List<MasterControlDiscovery.ClassInfo> demos = MasterControlDiscovery.getInstance().findClasses("Demo");
         List<MasterControlDiscovery.ClassInfo> viewers = MasterControlDiscovery.getInstance().findClasses("Viewer");
 
-        if (!apps.isEmpty()) accordion.getPanes().add(new TitledPane(i18n.get("mastercontrol.apps.category.apps", "Applications"), createAppList(true, convert(apps))));
-        if (!demos.isEmpty()) accordion.getPanes().add(new TitledPane(i18n.get("mastercontrol.apps.category.demos", "Demos"), createAppList(true, convert(demos))));
-        if (!viewers.isEmpty()) accordion.getPanes().add(new TitledPane(i18n.get("mastercontrol.apps.category.viewers", "Viewers"), createAppList(true, convert(viewers))));
+        if (!apps.isEmpty()) accordion.getPanes().add(new TitledPane("(" + apps.size() + ") " + i18n.get("mastercontrol.apps.category.apps", "Applications"), createAppList(true, convert(apps))));
+        if (!demos.isEmpty()) accordion.getPanes().add(new TitledPane("(" + demos.size() + ") " + i18n.get("mastercontrol.apps.category.demos", "Demos"), createAppList(true, convert(demos))));
+        if (!viewers.isEmpty()) accordion.getPanes().add(new TitledPane("(" + viewers.size() + ") " + i18n.get("mastercontrol.apps.category.viewers", "Viewers"), createAppList(true, convert(viewers))));
 
         if (!accordion.getPanes().isEmpty()) accordion.getPanes().get(0).setExpanded(true);
 
@@ -795,7 +859,8 @@ public class EpistemeMasterControl extends Application {
         SplitPane split = new SplitPane(deviceList, details);
         split.setDividerPositions(0.3);
 
-        content.getChildren().addAll(header, split);
+        int totalDevices = devices.size();
+        content.getChildren().addAll(header, new Label("(" + totalDevices + ") " + i18n.get("mastercontrol.devices.list", "Detected Devices")), split);
         return new Tab(i18n.get("mastercontrol.tab.devices", "Devices"), content);
     }
 
@@ -816,6 +881,25 @@ public class EpistemeMasterControl extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.show();
+    }
+
+    private Label statusLabel;
+
+    private void notifySaved(I18N i18n) {
+        Episteme.savePreferences();
+        org.episteme.core.technical.algorithm.AlgorithmManager.refresh();
+        if (statusLabel != null) {
+            statusLabel.setText(i18n.get("mastercontrol.status.saved", "Settings saved."));
+            statusLabel.setVisible(true);
+            statusLabel.setOpacity(1.0);
+            
+            javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(2), statusLabel);
+            fade.setFromValue(1.0);
+            fade.setToValue(0.0);
+            fade.setDelay(javafx.util.Duration.seconds(1));
+            fade.setOnFinished(e -> statusLabel.setVisible(false));
+            fade.play();
+        }
     }
 
     public static void main(String[] args) { launch(args); }

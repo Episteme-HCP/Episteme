@@ -899,30 +899,82 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     @Override
     public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        if (isComplex(a)) return solveTriangularComplex(a, b, upper, transpose, conjugate, unit);
+        
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) n * n * 8, tracker);
             MemorySegment d_B = malloc((long) n * 8, tracker);
+            
+            // In memory, A (Row-Major) is A^T (Column-Major).
+            // Ax = b  =>  x^T A^T = b^T.
+            // We solve X * op(M) = alpha * B with M = A^T (Column-Major memory).
+            // op(M) = Non-Transpose (0) => X * A^T = B  => matches Ax = b.
+            // op(M) = Transpose (1) => X * A = B  => matches A^T x = b.
+            
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a)), (long) n * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleVec(b)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCublasHandle();
-            int uplo = upper ? 1 : 0;
-            int trans = transpose ? 1 : 0;
-            int diag = unit ? 1 : 0;
-            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DTRSM, handle, 0, uplo, trans, diag, n, 1, 
-                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_A, n, d_B, n));
+            
+            // Side: RIGHT (1) because we solve x^T A^T = b^T
+            // Uplo: Row-Major Upper is Column-Major Lower.
+            int uplo = upper ? 0 : 1; // CUBLAS_FILL_MODE_LOWER=0, UPPER=1
+            int trans = transpose ? 1 : 0; // CUBLAS_OP_N=0, OP_T=1
+            int diag = unit ? 1 : 0; // CUBLAS_DIAG_NON_UNIT=0, UNIT=1
+            
+            // TRSM(handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb)
+            // Here B is x^T (1 x n), so m = 1, n = n.
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_DTRSM, handle, 1, uplo, trans, diag, 1, n, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0), d_A, n, d_B, 1));
             
             double[] result = new double[n];
             MemorySegment hostB = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostB, d_B, (long) n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostB, ValueLayout.JAVA_DOUBLE, 0, result, 0, n);
+            
             Ring<E> ring = (Ring<E>) a.getScalarRing();
             E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n);
             for (int i = 0; i < n; i++) values[i] = (E) RealDouble.of(result[i]);
             return new DenseVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(java.util.Arrays.asList(values)), this, ring);
-        } catch (Throwable t) { throw new RuntimeException("CUDA double solveTriangular failed", t); }
+        } catch (Throwable t) { 
+            logger.error("CUDA double solveTriangular failed: {}", t.getMessage());
+            throw new RuntimeException("CUDA double solveTriangular failed", t); 
+        }
+    }
+
+    private Vector<E> solveTriangularComplex(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        int n = a.rows();
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment d_A = malloc((long) n * n * 16, tracker);
+            MemorySegment d_B = malloc((long) n * 16, tracker);
+            
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray(a)), (long) n * n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleVec(b)), (long) n * 16, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            
+            MemorySegment handle = CUDAManager.getCublasHandle();
+            int uplo = upper ? 0 : 1; 
+            int trans = transpose ? (conjugate ? 2 : 1) : 0; // CUBLAS_OP_N=0, T=1, C=2
+            int diag = unit ? 1 : 0;
+            
+            checkCublas((int) NativeSafe.invoke(CUDAManager.CUBLAS_ZTRSM, handle, 1, uplo, trans, diag, 1, n, 
+                arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0), d_A, n, d_B, 1));
+            
+            double[] result = new double[n * 2];
+            MemorySegment hostB = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * 2);
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostB, d_B, (long) n * 16, CUDAManager.CUDA_MEMCPY_D_TO_H));
+            MemorySegment.copy(hostB, ValueLayout.JAVA_DOUBLE, 0, result, 0, n * 2);
+            
+            Ring<E> ring = (Ring<E>) a.getScalarRing();
+            E[] values = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), n);
+            for (int i = 0; i < n; i++) values[i] = (E) Complex.of(result[i * 2], result[i * 2 + 1]);
+            return new DenseVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(java.util.Arrays.asList(values)), this, ring);
+        } catch (Throwable t) { 
+            logger.error("CUDA complex double solveTriangular failed: {}", t.getMessage());
+            throw new RuntimeException("CUDA complex double solveTriangular failed", t); 
+        }
     }
 
     @Override

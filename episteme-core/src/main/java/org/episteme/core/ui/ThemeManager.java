@@ -64,41 +64,33 @@ public class ThemeManager {
         // Clear existing stylesheets to avoid stacking and performance degradation
         scene.getStylesheets().clear();
 
-        // Base styling (Always loaded)
+        // 1. Base styling (Always loaded)
         java.net.URL mainCss = ThemeManager.class.getResource("/org/episteme/core/ui/main.css");
-        if (mainCss != null) {
-            scene.getStylesheets().add(mainCss.toExternalForm());
-        }
+        if (mainCss != null) scene.getStylesheets().add(mainCss.toExternalForm());
 
-        // Load theme.css (Custom styles including the Orange Banner)
+        // 2. Global Component Layout (Shared across all themes)
         java.net.URL themeCss = ThemeManager.class.getResource("/org/episteme/core/ui/theme.css");
-        if (themeCss != null) {
-            scene.getStylesheets().add(themeCss.toExternalForm());
-        }
+        if (themeCss != null) scene.getStylesheets().add(themeCss.toExternalForm());
 
+        // 3. Theme-specific Colors
+        String themeFile = null;
         if ("High Contrast".equalsIgnoreCase(currentTheme) || "HighContrast".equalsIgnoreCase(currentTheme)) {
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
-            java.net.URL hcCss = ThemeManager.class.getResource("/org/episteme/core/ui/high-contrast.css");
-            if (hcCss != null) {
-                scene.getStylesheets().add(hcCss.toExternalForm());
-            }
+            themeFile = "high-contrast.css";
         } else if ("Dark".equalsIgnoreCase(currentTheme)) {
-             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
-             java.net.URL darkCss = ThemeManager.class.getResource("/org/episteme/core/ui/dark.css");
-             if (darkCss != null) {
-                 scene.getStylesheets().add(darkCss.toExternalForm());
-             }
+            javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
+            themeFile = "dark.css";
         } else if ("Caspian".equalsIgnoreCase(currentTheme)) {
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_CASPIAN);
         } else {
+            // Default: Light
             javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
+            themeFile = "light.css";
         }
-        
-        // Ensure theme.css is always loaded last for shared overrides
-        if (themeCss != null) {
-            String themeUrl = themeCss.toExternalForm();
-            scene.getStylesheets().remove(themeUrl); // Avoid duplicates
-            scene.getStylesheets().add(themeUrl);
+
+        if (themeFile != null) {
+            java.net.URL specificCss = ThemeManager.class.getResource("/org/episteme/core/ui/" + themeFile);
+            if (specificCss != null) scene.getStylesheets().add(specificCss.toExternalForm());
         }
     }
 

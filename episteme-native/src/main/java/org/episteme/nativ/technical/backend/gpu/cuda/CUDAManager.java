@@ -88,6 +88,8 @@ public final class CUDAManager {
     public static MethodHandle CUBLAS_DZNRM2;
     public static MethodHandle CUBLAS_STRSM;
     public static MethodHandle CUBLAS_DTRSM;
+    public static MethodHandle CUBLAS_CTRSM;
+    public static MethodHandle CUBLAS_ZTRSM;
     public static MethodHandle CUBLAS_STATUS_GET_STRING;
 
     // --- cuSPARSE ---
@@ -362,6 +364,14 @@ public final class CUDAManager {
             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
         CUBLAS_DTRSM = lookup(cublasLookup, "cublasDtrsm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_CTRSM = lookup(cublasLookup, "cublasCtrsm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+            ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+        CUBLAS_ZTRSM = lookup(cublasLookup, "cublasZtrsm_v2", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
             ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
             ValueLayout.ADDRESS, ValueLayout.JAVA_INT));

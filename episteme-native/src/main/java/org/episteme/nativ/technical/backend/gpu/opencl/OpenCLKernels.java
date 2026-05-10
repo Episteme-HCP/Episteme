@@ -252,6 +252,52 @@ public final class OpenCLKernels {
         "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
         "    }\n" +
         "}\n" +
+        "__kernel void complex_solve_triangular_lower(__global const double2_custom *a, __global double2_custom *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = 0; i < n; i++) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            double2_custom sum = {0.0, 0.0};\n" +
+        "            for (int j = 0; j < i; j++) {\n" +
+        "                double2_custom av = a[i * n + j]; double2_custom bv = b[j];\n" +
+        "                sum.r += av.r * bv.r - av.i * bv.i;\n" +
+        "                sum.i += av.r * bv.i + av.i * bv.r;\n" +
+        "            }\n" +
+        "            double2_custom bi = b[i]; double2_custom res;\n" +
+        "            res.r = bi.r - sum.r; res.i = bi.i - sum.i;\n" +
+        "            if (!unit_diag) {\n" +
+        "                double2_custom diag = a[i * n + i];\n" +
+        "                double d = diag.r * diag.r + diag.i * diag.i;\n" +
+        "                double rr = (res.r * diag.r + res.i * diag.i) / d;\n" +
+        "                double ri = (res.i * diag.r - res.r * diag.i) / d;\n" +
+        "                res.r = rr; res.i = ri;\n" +
+        "            }\n" +
+        "            b[i] = res;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void complex_solve_triangular_upper(__global const double2_custom *a, __global double2_custom *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = n - 1; i >= 0; i--) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            double2_custom sum = {0.0, 0.0};\n" +
+        "            for (int j = i + 1; j < n; j++) {\n" +
+        "                double2_custom av = a[i * n + j]; double2_custom bv = b[j];\n" +
+        "                sum.r += av.r * bv.r - av.i * bv.i;\n" +
+        "                sum.i += av.r * bv.i + av.i * bv.r;\n" +
+        "            }\n" +
+        "            double2_custom bi = b[i]; double2_custom res;\n" +
+        "            res.r = bi.r - sum.r; res.i = bi.i - sum.i;\n" +
+        "            if (!unit_diag) {\n" +
+        "                double2_custom diag = a[i * n + i];\n" +
+        "                double d = diag.r * diag.r + diag.i * diag.i;\n" +
+        "                double rr = (res.r * diag.r + res.i * diag.i) / d;\n" +
+        "                double ri = (res.i * diag.r - res.r * diag.i) / d;\n" +
+        "                res.r = rr; res.i = ri;\n" +
+        "            }\n" +
+        "            b[i] = res;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "}\n" +
         "__kernel void trace_kernel(__global const double *a, __global double *result, const int n) {\n" +
         "    if (get_global_id(0) == 0) {\n" +
         "        double sum = 0.0;\n" +
@@ -405,11 +451,80 @@ public final class OpenCLKernels {
         "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
         "    }\n" +
         "}\n" +
+        "__kernel void complex_solve_triangular_lower_float(__global const float2 *a, __global float2 *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = 0; i < n; i++) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            float2 sum = (float2)(0.0f, 0.0f);\n" +
+        "            for (int j = 0; j < i; j++) {\n" +
+        "                float2 av = a[i * n + j]; float2 bv = b[j];\n" +
+        "                sum.x += av.x * bv.x - av.y * bv.y;\n" +
+        "                sum.y += av.x * bv.y + av.y * bv.x;\n" +
+        "            }\n" +
+        "            float2 bi = b[i]; float2 res;\n" +
+        "            res.x = bi.x - sum.x; res.y = bi.y - sum.y;\n" +
+        "            if (!unit_diag) {\n" +
+        "                float2 diag = a[i * n + i];\n" +
+        "                float d = diag.x * diag.x + diag.y * diag.y;\n" +
+        "                float rr = (res.x * diag.x + res.y * diag.y) / d;\n" +
+        "                float ri = (res.y * diag.x - res.x * diag.y) / d;\n" +
+        "                res.x = rr; res.y = ri;\n" +
+        "            }\n" +
+        "            b[i] = res;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void complex_solve_triangular_upper_float(__global const float2 *a, __global float2 *b, const int n, const int unit_diag) {\n" +
+        "    for (int i = n - 1; i >= 0; i--) {\n" +
+        "        if (get_global_id(0) == 0) {\n" +
+        "            float2 sum = (float2)(0.0f, 0.0f);\n" +
+        "            for (int j = i + 1; j < n; j++) {\n" +
+        "                float2 av = a[i * n + j]; float2 bv = b[j];\n" +
+        "                sum.x += av.x * bv.x - av.y * bv.y;\n" +
+        "                sum.y += av.x * bv.y + av.y * bv.x;\n" +
+        "            }\n" +
+        "            float2 bi = b[i]; float2 res;\n" +
+        "            res.x = bi.x - sum.x; res.y = bi.y - sum.y;\n" +
+        "            if (!unit_diag) {\n" +
+        "                float2 diag = a[i * n + i];\n" +
+        "                float d = diag.x * diag.x + diag.y * diag.y;\n" +
+        "                float rr = (res.x * diag.x + res.y * diag.y) / d;\n" +
+        "                float ri = (res.y * diag.x - res.x * diag.y) / d;\n" +
+        "                res.x = rr; res.y = ri;\n" +
+        "            }\n" +
+        "            b[i] = res;\n" +
+        "        }\n" +
+        "        barrier(CLK_GLOBAL_MEM_FENCE);\n" +
+        "    }\n" +
+        "}\n" +
         "__kernel void trace_kernel_float(__global const float *a, __global float *result, const int n) {\n" +
         "    if (get_global_id(0) == 0) {\n" +
         "        float sum = 0.0f;\n" +
         "        for (int i = 0; i < n; i++) sum += a[i * n + i];\n" +
         "        result[0] = sum;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void hestenes_jacobi_dot_float(__global const float *a, int m, int n, int i_col, int j_col, __global float *out_dot) {\n" +
+        "    if (get_global_id(0) == 0) {\n" +
+        "        float s_ii = 0; float s_jj = 0; float s_ij = 0;\n" +
+        "        for (int k = 0; k < m; k++) {\n" +
+        "            float val_i = a[k * n + i_col]; float val_j = a[k * n + j_col];\n" +
+        "            s_ii += val_i * val_i; s_jj += val_j * val_j; s_ij += val_i * val_j;\n" +
+        "        }\n" +
+        "        out_dot[0] = s_ii; out_dot[1] = s_jj; out_dot[2] = s_ij;\n" +
+        "    }\n" +
+        "}\n" +
+        "__kernel void hestenes_jacobi_apply_float(__global float *a, __global float *v, int m, int n, int i_col, int j_col, float cos_v, float sin_v) {\n" +
+        "    int row = get_global_id(0);\n" +
+        "    if (row < m) {\n" +
+        "        float ai = a[row * n + i_col]; float aj = a[row * n + j_col];\n" +
+        "        a[row * n + i_col] = cos_v * ai + sin_v * aj;\n" +
+        "        a[row * n + j_col] = -sin_v * ai + cos_v * aj;\n" +
+        "    }\n" +
+        "    if (row < n) {\n" +
+        "        float vi = v[row * n + i_col]; float vj = v[row * n + j_col];\n" +
+        "        v[row * n + i_col] = cos_v * vi + sin_v * vj;\n" +
+        "        v[row * n + j_col] = -sin_v * vi + cos_v * vj;\n" +
         "    }\n" +
         "}\n" +
         "__kernel void conjugate_transpose_kernel_float(__global const float2 *a, __global float2 *b, const int rows, const int cols) {\n" +
