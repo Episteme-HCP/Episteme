@@ -219,7 +219,7 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Vector<E> normalize(Vector<E> v) { checkJBlas(); return jblasImpl.normalize(v); }
     @Override public Vector<E> cross(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.cross(a, b); }
     @Override public Vector<E> projection(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.projection(a, b); }
-    @Override public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) { checkJBlas(); return jblasImpl.solveTriangular(A, b, upper, transpose, unit); }
+    @Override public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) { checkJBlas(); return jblasImpl.solveTriangular(A, b, upper, transpose, conjugate, unit); }
     @Override public E angle(Vector<E> a, Vector<E> b) { checkJBlas(); return jblasImpl.angle(a, b); }
 
     private void checkJBlas() {
@@ -561,7 +561,7 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         @Override
-        public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+        public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
             org.jblas.DoubleMatrix ma = toJBlasMatrix(A);
             org.jblas.DoubleMatrix mb = toJBlasVector(b);
             int n = A.rows();

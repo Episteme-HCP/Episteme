@@ -222,7 +222,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
     @Override public Vector<E> normalize(Vector<E> v) { checkEjml(); return ejmlImpl.normalize(v); }
     @Override public Vector<E> cross(Vector<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.cross(a, b); }
     @Override public Vector<E> projection(Vector<E> a, Vector<E> b) { checkEjml(); return ejmlImpl.projection(a, b); }
-    @Override public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) { checkEjml(); return ejmlImpl.solveTriangular(A, b, upper, transpose, unit); }
+    @Override public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) { checkEjml(); return ejmlImpl.solveTriangular(A, b, upper, transpose, conjugate, unit); }
 
     private void checkEjml() {
         if (ejmlImpl == null) {
@@ -615,7 +615,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         @Override
-        public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+        public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
             org.ejml.simple.SimpleMatrix ma = toEjmlMatrix(A);
             org.ejml.simple.SimpleMatrix mb = toEjmlVector(b);
             

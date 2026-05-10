@@ -228,7 +228,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
 
     @Override
     @SuppressWarnings("unchecked")
-    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (A.rows() != A.cols()) throw new IllegalArgumentException("Matrix must be square");
         if (A.rows() != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
         
@@ -256,11 +256,15 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                             diag = v;
                         } else if (j > i) {
                             E v = (E) values[k];
-                            sum = f.add(sum, f.multiply(v, x[j]));
+                            E matVal = (conjugate && !transpose) ? conjugate(v) : v;
+                            sum = f.add(sum, f.multiply(matVal, x[j]));
                         }
                     }
                     if (!unit && (diag == null || diag.equals(f.zero()))) throw new ArithmeticException("Singular triangular matrix at row " + i);
-                    x[i] = unit ? f.subtract(b.get(i), sum) : f.divide(f.subtract(b.get(i), sum), diag);
+                    E val;
+                    if (unit) val = f.subtract(b.get(i), sum);
+                    else val = f.divide(f.subtract(b.get(i), sum), diag);
+                    x[i] = (conjugate && !transpose) ? conjugate(val) : val;
                 }
             } else {
                 // Forward substitution
@@ -278,7 +282,10 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                         }
                     }
                     if (!unit && (diag == null || diag.equals(f.zero()))) throw new ArithmeticException("Singular triangular matrix at row " + i);
-                    x[i] = unit ? f.subtract(b.get(i), sum) : f.divide(f.subtract(b.get(i), sum), diag);
+                    E val;
+                    if (unit) val = f.subtract(b.get(i), sum);
+                    else val = f.divide(f.subtract(b.get(i), sum), diag);
+                    x[i] = (conjugate && !transpose) ? conjugate(val) : val;
                 }
             }
         } else {
@@ -311,9 +318,9 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 }
                 // Let's use a simpler (though slightly less efficient for CSR) transposed solve
                 // by just using the transpose matrix.
-                return solveTriangular(transpose(A), b, !upper, false, unit);
+                return solveTriangular(transpose(A), b, !upper, false, conjugate, unit);
             } else {
-                return solveTriangular(transpose(A), b, !upper, false, unit);
+                return solveTriangular(transpose(A), b, !upper, false, conjugate, unit);
             }
         }
         
@@ -631,8 +638,8 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
                 if (!isLower && !isUpper) break;
             }
             
-            if (isLower) return solveTriangular(a, b, false, false, false);
-            if (isUpper) return solveTriangular(a, b, true, false, false);
+            if (isLower) return solveTriangular(a, b, false, false, false, false);
+            if (isUpper) return solveTriangular(a, b, true, false, false, false);
 
             E tol;
             org.episteme.core.mathematics.context.NumericalConfiguration config = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration();

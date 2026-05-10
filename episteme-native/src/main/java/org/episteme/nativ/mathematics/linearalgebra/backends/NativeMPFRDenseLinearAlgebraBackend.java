@@ -1285,9 +1285,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         Vector<E> pb = Vector.of(pbData, b.getScalarRing());
         
         // Solve L*y = pb (unit lower)
-        Vector<E> y = solveTriangular(l, pb, false, false, true);
+        Vector<E> y = solveTriangular(l, pb, false, false, false, true);
         // Solve U*x = y (upper)
-        return solveTriangular(u, y, true, false, false);
+        return solveTriangular(u, y, true, false, false, false);
     }
 
     @Override
@@ -1303,7 +1303,26 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         Vector<E> qtB = multiply(isComplex ? conjugateTranspose(q) : transpose(q), b); 
         
         // Solve R*x = qtB (upper)
-        return solveTriangular(r, qtB, true, false, false);
+        // If R is rectangular (m > n), we take the top-left n x n square part of R and first n elements of qtB
+        int n = r.cols();
+        if (r.rows() != n) {
+            Matrix<E> rSquare = r.getSubMatrix(0, n - 1, 0, n - 1);
+            // Since we don't have subVector, we just pass the original qtB. solveTriangular will use the first n elements if we modify it, 
+            // but currently it requires dimension parity.
+            // Let's assume for now it's square or we extract it.
+            // We'll use a hack to get subvector if possible, or just slice it.
+            // For now, let's just use the square part of R and hope qtB dimension matches n.
+            // Actually, QR in Episteme usually produces m x m Q and m x n R.
+            // So qtB is m x 1. We need d1 = qtB(0..n-1).
+            // Let's create a subvector.
+            java.util.List<E> d1List = new java.util.ArrayList<>(n);
+            for (int i = 0; i < n; i++) d1List.add(qtB.get(i));
+            Vector<E> d1 = Vector.of(d1List, b.getScalarRing());
+            
+            return solveTriangular(rSquare, d1, true, false, false, false);
+        }
+        
+        return solveTriangular(r, qtB, true, false, false, false);
     }
 
     @Override
@@ -1312,9 +1331,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         // Cholesky solve: L*L^T*x = b -> L*y = b, L^T*x = y
         Matrix<E> l = cholesky.getL();
         // Solve L*y = b (lower)
-        Vector<E> y = solveTriangular(l, b, false, false, false);
-        // Solve L^T*x = y (transposed lower)
-        return solveTriangular(l, y, false, true, false);
+        Vector<E> y = solveTriangular(l, b, false, false, false, false);
+        // Solve L^T*x = y (transposed lower). For complex, it's L^H
+        boolean isComplex = ((Object)l.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        return solveTriangular(l, y, false, true, isComplex, false);
     }
 
 
@@ -1493,7 +1513,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
     @Override
     @SuppressWarnings("unchecked")
-    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
         int n = A.rows();
         if (n != A.cols() || n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
@@ -1528,7 +1548,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         
                         for (int j = 0; j < i; j++) {
                             if (isComplex) {
-                                complexSubtractMulVector(h_X, j, getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true), sumR, sumI, (int) prec, arena, tracker);
+                                if (transpose && conjugate) {
+                                    // A^H substitution: sum -= conj(A[i,j]) * X[j]
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true), sumR, sumI, (int) prec, arena, tracker, true);
+                                } else {
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true), sumR, sumI, (int) prec, arena, tracker, false);
+                                }
                             } else {
                                 NativeSafe.invoke(MPFR_MUL, termR, getMPFR(h_A, i, j, n, 0, false), getMPFRVector(h_X, j, 0, false), rnd);
                                 NativeSafe.invoke(MPFR_SUB, sumR, sumR, termR, rnd);
@@ -1557,16 +1582,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         
                         for (int j = i + 1; j < n; j++) {
                             if (isComplex) {
-                                // sum -= A[i,j] * X[j]
-                                // We need a way to subtract from sum
-                                MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, (int) prec);
-                                MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, (int) prec);
-                                try {
-                                    complexMultiply(prodR, prodI, getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true), getMPFRVector(h_X, j, 0, true), getMPFRVector(h_X, j, 1, true), (int) prec, arena, tracker);
-                                    NativeSafe.invoke(MPFR_SUB, sumR, sumR, prodR, rnd);
-                                    NativeSafe.invoke(MPFR_SUB, sumI, sumI, prodI, rnd);
-                                } finally {
-                                    NativeSafe.invoke(MPFR_CLEAR, prodR); NativeSafe.invoke(MPFR_CLEAR, prodI);
+                                if (transpose && conjugate) {
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true), sumR, sumI, (int) prec, arena, tracker, true);
+                                } else {
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, i, j, n, 0, true), getMPFR(h_A, i, j, n, 1, true), sumR, sumI, (int) prec, arena, tracker, false);
                                 }
                             } else {
                                 NativeSafe.invoke(MPFR_MUL, termR, getMPFR(h_A, i, j, n, 0, false), getMPFRVector(h_X, j, 0, false), rnd);
@@ -1600,10 +1619,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         for (int j = 0; j < i; j++) {
                             // sum -= A[j,i] * X[j]
                             if (isComplex) {
-                                // conjugate if transpose means Hermitian? usually transpose means just transpose for solveTriangular
-                                // but if we want parity with BLAS/LAPACK, it depends on 'trans' param ('T' or 'C')
-                                // Let's assume standard transpose for now.
-                                complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker);
+                                if (conjugate) {
+                                    // A^H x = b -> A_ji becomes conj(A_ji)
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker, true);
+                                } else {
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker, false);
+                                }
                             } else {
                                 NativeSafe.invoke(MPFR_MUL, termR, getMPFR(h_A, j, i, n, 0, false), getMPFRVector(h_X, j, 0, false), rnd);
                                 NativeSafe.invoke(MPFR_SUB, sumR, sumR, termR, rnd);
@@ -1632,7 +1653,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         
                         for (int j = i + 1; j < n; j++) {
                             if (isComplex) {
-                                complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker);
+                                if (conjugate) {
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker, true);
+                                } else {
+                                    complexSubtractMulVector(h_X, j, getMPFR(h_A, j, i, n, 0, true), getMPFR(h_A, j, i, n, 1, true), sumR, sumI, (int) prec, arena, tracker, false);
+                                }
                             } else {
                                 NativeSafe.invoke(MPFR_MUL, termR, getMPFR(h_A, j, i, n, 0, false), getMPFRVector(h_X, j, 0, false), rnd);
                                 NativeSafe.invoke(MPFR_SUB, sumR, sumR, termR, rnd);
@@ -2213,8 +2238,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             }
         }
         // Square matrix: check if triangular
-        if (isLowerTriangular(a)) return solveTriangular(a, b, false, false, false);
-        if (isUpperTriangular(a)) return solveTriangular(a, b, true, false, false);
+        if (isLowerTriangular(a)) return solveTriangular(a, b, false, false, false, false);
+        if (isUpperTriangular(a)) return solveTriangular(a, b, true, false, false, false);
 
         return solveSquare(a, b);
     }
@@ -2245,13 +2270,30 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         return true;
     }
 
-    private void complexSubtractMulVector(MemorySegment h_X, int j, MemorySegment aR, MemorySegment aI, MemorySegment sumR, MemorySegment sumI, int prec, Arena arena, ResourceTracker tracker) throws Throwable {
+    private void complexSubtractMulVector(MemorySegment h_X, int j, MemorySegment aR, MemorySegment aI, MemorySegment sumR, MemorySegment sumI, int prec, Arena arena, ResourceTracker tracker, boolean conjugate) throws Throwable {
         MemorySegment xjR = getMPFRVector(h_X, j, 0, true);
         MemorySegment xjI = getMPFRVector(h_X, j, 1, true);
         MemorySegment prodR = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodR, prec);
         MemorySegment prodI = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, prodI, prec);
         try {
-            complexMultiply(prodR, prodI, aR, aI, xjR, xjI, prec, arena, tracker);
+            if (conjugate) {
+                // (aR - i*aI) * (xjR + i*xjI) = (aR*xjR + aI*xjI) + i(aR*xjI - aI*xjR)
+                MemorySegment t1 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, prec);
+                MemorySegment t2 = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t2, prec);
+                try {
+                    NativeSafe.invoke(MPFR_MUL, t1, aR, xjR, 0);
+                    NativeSafe.invoke(MPFR_MUL, t2, aI, xjI, 0);
+                    NativeSafe.invoke(MPFR_ADD, prodR, t1, t2, 0);
+
+                    NativeSafe.invoke(MPFR_MUL, t1, aR, xjI, 0);
+                    NativeSafe.invoke(MPFR_MUL, t2, aI, xjR, 0);
+                    NativeSafe.invoke(MPFR_SUB, prodI, t1, t2, 0);
+                } finally {
+                    NativeSafe.invoke(MPFR_CLEAR, t1); NativeSafe.invoke(MPFR_CLEAR, t2);
+                }
+            } else {
+                complexMultiply(prodR, prodI, aR, aI, xjR, xjI, prec, arena, tracker);
+            }
             NativeSafe.invoke(MPFR_SUB, sumR, sumR, prodR, 0);
             NativeSafe.invoke(MPFR_SUB, sumI, sumI, prodI, 0);
         } finally {

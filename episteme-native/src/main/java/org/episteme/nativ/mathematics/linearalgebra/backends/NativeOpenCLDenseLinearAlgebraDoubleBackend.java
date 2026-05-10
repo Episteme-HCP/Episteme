@@ -860,7 +860,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     }
 
     @Override
-    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
         int n = a.rows();
         Matrix<E> workingA = transpose ? a.transpose() : a;

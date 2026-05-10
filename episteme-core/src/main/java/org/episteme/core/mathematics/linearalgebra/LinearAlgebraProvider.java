@@ -142,9 +142,10 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
      * @param b the right-hand side vector
      * @param upper true if A is upper triangular, false if lower
      * @param transpose true if solving A^T x = b
+     * @param conjugate true if solving A^H x = b (only if transpose is true and complex)
      * @param unit true if A is unit triangular (diagonal is all ones)
      */
-    default Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    default Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         throw new UnsupportedOperationException(getName() + " does not support solveTriangular()");
     }
     default Matrix<E> scale(E scalar, Matrix<E> a) {

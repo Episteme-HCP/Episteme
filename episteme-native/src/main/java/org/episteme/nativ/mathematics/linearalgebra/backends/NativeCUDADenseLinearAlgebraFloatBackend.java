@@ -764,7 +764,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     }
 
     @Override
-    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         int n = a.rows();
         try (ResourceTracker tracker = new ResourceTracker()) {

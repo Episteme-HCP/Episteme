@@ -528,7 +528,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     }
 
     @Override
-    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         int n = A.rows();
         if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
         if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
@@ -541,7 +541,9 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 for (int i = 0; i < n; i++) {
                     E sum = ring.zero();
                     for (int j = 0; j < i; j++) {
-                        sum = ring.add(sum, ring.multiply(A.get(j, i), x[j]));
+                        E aVal = A.get(j, i);
+                        if (conjugate) aVal = conjugateScalar(aVal);
+                        sum = ring.add(sum, ring.multiply(aVal, x[j]));
                     }
                     E val = ring.subtract(b.get(i), sum);
                     if (!unit) {
@@ -557,7 +559,9 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 for (int i = n - 1; i >= 0; i--) {
                     E sum = ring.zero();
                     for (int j = i + 1; j < n; j++) {
-                        sum = ring.add(sum, ring.multiply(A.get(i, j), x[j]));
+                        E aVal = A.get(i, j);
+                        if (conjugate) aVal = conjugateScalar(aVal);
+                        sum = ring.add(sum, ring.multiply(aVal, x[j]));
                     }
                     E val = ring.subtract(b.get(i), sum);
                     if (!unit) {
@@ -575,7 +579,9 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 for (int i = n - 1; i >= 0; i--) {
                     E sum = ring.zero();
                     for (int j = i + 1; j < n; j++) {
-                        sum = ring.add(sum, ring.multiply(A.get(j, i), x[j]));
+                        E aVal = A.get(j, i);
+                        if (conjugate) aVal = conjugateScalar(aVal);
+                        sum = ring.add(sum, ring.multiply(aVal, x[j]));
                     }
                     E val = ring.subtract(b.get(i), sum);
                     if (!unit) {
@@ -591,7 +597,9 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 for (int i = 0; i < n; i++) {
                     E sum = ring.zero();
                     for (int j = 0; j < i; j++) {
-                        sum = ring.add(sum, ring.multiply(A.get(i, j), x[j]));
+                        E aVal = A.get(i, j);
+                        if (conjugate) aVal = conjugateScalar(aVal);
+                        sum = ring.add(sum, ring.multiply(aVal, x[j]));
                     }
                     E val = ring.subtract(b.get(i), sum);
                     if (!unit) {
@@ -608,6 +616,11 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
             new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(x), this, ring);
+    }
+
+    private E conjugateScalar(E val) {
+        if (val instanceof Complex c) return (E) c.conjugate();
+        return val;
     }
 
     @Override
@@ -1032,7 +1045,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             Vector<E> QtB = Q.transpose().multiply(b);
             
             // Solve R x = QtB (R is upper triangular n x n)
-            return solveTriangular(R, QtB, true, false, false);
+            return solveTriangular(R, QtB, true, false, false, false);
         }
 
         // Square Case: LU
@@ -1055,10 +1068,9 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         Vector<E> pb = Vector.of(java.util.Arrays.asList(bDataArr), ring);
         
         // 2. Solve L y = Pb (Lower unit triangular)
-        Vector<E> y = solveTriangular(lu.getL(), pb, false, false, true);
-        
-        // 3. Solve U x = y (Upper triangular)
-        return solveTriangular(lu.getU(), y, true, false, false);
+        Vector<E> y = solveTriangular(lu.getL(), pb, false, false, false, true);
+        // Solve U*x = y (upper)
+        return solveTriangular(lu.getU(), y, true, false, false, false);
     }
 
     @Override
