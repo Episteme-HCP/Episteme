@@ -67,6 +67,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     private static MethodHandle DORGQR_HANDLE;
     private static MethodHandle DGESVD_HANDLE;
     private static MethodHandle DGELS_HANDLE;
+    private static MethodHandle DTRSM_HANDLE;
 
     // Single Precision (S)
     private static MethodHandle SGEMM_HANDLE;
@@ -76,6 +77,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     private static MethodHandle SSCAL_HANDLE;
     private static MethodHandle SGESV_HANDLE;
     private static MethodHandle SGETRF_HANDLE;
+    private static MethodHandle STRSM_HANDLE;
 
     // Complex Double (Z)
     private static MethodHandle ZGEMM_HANDLE;
@@ -91,6 +93,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     private static MethodHandle ZGEQRF_HANDLE;
     private static MethodHandle ZUNGQR_HANDLE;
     private static MethodHandle ZGESVD_HANDLE;
+    private static MethodHandle ZTRSM_HANDLE;
 
     // Complex Float (C)
     private static MethodHandle CGEMM_HANDLE;
@@ -106,6 +109,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     private static MethodHandle CGEQRF_HANDLE;
     private static MethodHandle CUNGQR_HANDLE;
     private static MethodHandle CGESVD_HANDLE;
+    private static MethodHandle CTRSM_HANDLE;
     
     private static boolean AVAILABLE = false;
     private static boolean initAttempted = false;
@@ -115,6 +119,15 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     public static final int CblasNoTrans = 111;
     public static final int CblasTrans = 112;
     public static final int CblasConjTrans = 113;
+
+    public static final int CblasUpper = 121;
+    public static final int CblasLower = 122;
+
+    public static final int CblasUnit = 131;
+    public static final int CblasNonUnit = 132;
+
+    public static final int CblasLeft = 141;
+    public static final int CblasRight = 142;
 
     public static final int LAPACK_ROW_MAJOR = 101;
     public static final int LAPACK_COL_MAJOR = 102;
@@ -179,6 +192,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
                 DSCAL_HANDLE = lookup.find("cblas_dscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
+                DTRSM_HANDLE = lookup.find("cblas_dtrsm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
                 // --- Single Precision (S) ---
                 SGEMM_HANDLE = lookup.find("cblas_sgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -188,6 +206,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 SDOT_HANDLE = lookup.find("cblas_sdot").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 SNRM2_HANDLE = lookup.find("cblas_snrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 SSCAL_HANDLE = lookup.find("cblas_sscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
+                STRSM_HANDLE = lookup.find("cblas_strsm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // --- Complex Double (Z) ---
                 ZGEMM_HANDLE = lookup.find("cblas_zgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
@@ -199,6 +222,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 ZNRM2_HANDLE = lookup.find("cblas_dznrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 ZSCAL_HANDLE = lookup.find("cblas_zscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
+                ZTRSM_HANDLE = lookup.find("cblas_ztrsm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
                 // --- Complex Float (C) ---
                 CGEMM_HANDLE = lookup.find("cblas_cgemm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
                     ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -208,6 +236,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 CDOTC_HANDLE = lookup.find("cblas_cdotc_sub").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS))).orElse(null);
                 CNRM2_HANDLE = lookup.find("cblas_scnrm2").map(s -> linker.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_FLOAT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
                 CSCAL_HANDLE = lookup.find("cblas_cscal").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
+
+                CTRSM_HANDLE = lookup.find("cblas_ctrsm").map(s -> linker.downcallHandle(s, FunctionDescriptor.ofVoid(
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))).orElse(null);
 
                 // LAPACKE (Standard C interface names and variants)
                 DGESV_HANDLE = NativeFFMLoader.findSymbol(lookup, "LAPACKE_dgesv", "dgesv", "lapack_dgesv")
@@ -416,6 +449,80 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 // No-op
             }
         };
+    }
+
+    @Override
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + ": solveTriangular() not available");
+        int n = A.rows();
+        if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
+        if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+
+        boolean single = isFloat(A);
+        boolean complex = isComplex(A);
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment segA;
+            MemorySegment segB;
+            
+            // Side = Left (141)
+            int side = CblasLeft;
+            // Uplo = Upper (121) / Lower (122)
+            int uplo = upper ? CblasUpper : CblasLower;
+            // Trans = NoTrans (111) / Trans (112) / ConjTrans (113)
+            int trans;
+            if (transpose) {
+                trans = conjugate ? CblasConjTrans : CblasTrans;
+            } else {
+                trans = CblasNoTrans;
+            }
+            // Diag = Unit (131) / NonUnit (132)
+            int diag = unit ? CblasUnit : CblasNonUnit;
+
+            if (complex) {
+                if (single) {
+                    if (CTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS ctrsm not available");
+                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<Complex>) A));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<Complex>) b));
+                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    NativeSafe.invoke(CTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
+                    float[] result = segB.toArray(ValueLayout.JAVA_FLOAT);
+                    Complex[] complexRes = new Complex[n];
+                    for (int i = 0; i < n; i++) complexRes[i] = Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2 * i]), org.episteme.core.mathematics.numbers.real.RealFloat.of(result[2 * i + 1]));
+                    return (Vector<E>) Vector.of(java.util.Arrays.asList(complexRes), Complexes.getInstance());
+                } else {
+                    if (ZTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS ztrsm not available");
+                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>) A));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<Complex>) b));
+                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                    NativeSafe.invoke(ZTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
+                    double[] result = segB.toArray(ValueLayout.JAVA_DOUBLE);
+                    Complex[] complexRes = new Complex[n];
+                    for (int i = 0; i < n; i++) complexRes[i] = Complex.of(result[2 * i], result[2 * i + 1]);
+                    return (Vector<E>) Vector.of(java.util.Arrays.asList(complexRes), Complexes.getInstance());
+                }
+            } else {
+                if (single) {
+                    if (STRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS strsm not available");
+                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<Real>) A));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<Real>) b));
+                    NativeSafe.invoke(STRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0f, segA, n, segB, 1);
+                    float[] result = segB.toArray(ValueLayout.JAVA_FLOAT);
+                    Real[] realRes = new Real[n];
+                    for (int i = 0; i < n; i++) realRes[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(result[i]);
+                    return (Vector<E>) Vector.of(java.util.Arrays.asList(realRes), Reals.getInstance());
+                } else {
+                    if (DTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS dtrsm not available");
+                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>) A));
+                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<Real>) b));
+                    NativeSafe.invoke(DTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0, segA, n, segB, 1);
+                    double[] result = segB.toArray(ValueLayout.JAVA_DOUBLE);
+                    return (Vector<E>) (Object) RealDoubleVector.of(result);
+                }
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("Native solveTriangular failed", t);
+        }
     }
 
     // --- Low-level BLAS/LAPACK methods ---

@@ -1316,8 +1316,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
         if (a.rows() == a.cols()) {
             // Check if triangular first for better precision
-            if (isLowerTriangular(a)) return solveTriangular(a, b, false, false, false);
-            if (isUpperTriangular(a)) return solveTriangular(a, b, true, false, false);
+            if (isLowerTriangular(a)) return solveTriangular(a, b, false, false, false, false);
+            if (isUpperTriangular(a)) return solveTriangular(a, b, true, false, false, false);
 
             // Square system
             org.episteme.core.mathematics.context.NumericalConfiguration config = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration();
@@ -1378,7 +1378,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @Override
     @SuppressWarnings("unchecked")
-    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (!AVAILABLE) throw new UnsupportedOperationException(getName() + " is not available.");
         ensureAlive();
         int n = A.rows();
@@ -1441,15 +1441,28 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                                     MemorySegment xjI = h_x.asSlice((j * 2 + 1) * layoutSize, MPFR_LAYOUT);
                                     
                                     // (valR + i*valI)*(xjR + i*xjI) = (valR*xjR - valI*xjI) + i(valR*xjI + valI*xjR)
-                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
-                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
-                                    NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
-                                    NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
-                                    
-                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
-                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
-                                    NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
-                                    NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                    // if conjugate: (valR - i*valI)*(xjR + i*xjI) = (valR*xjR + valI*xjI) + i(valR*xjI - valI*xjR)
+                                    if (conjugate) {
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
+                                        NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
+                                        NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                    } else {
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
+                                        NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
+                                        NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                    }
                                 } else {
                                     NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
                                     NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
@@ -1491,15 +1504,28 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                                     MemorySegment valI = h_vals.asSlice((k * 2 + 1) * layoutSize, MPFR_LAYOUT);
                                     MemorySegment xjI = h_x.asSlice((j * 2 + 1) * layoutSize, MPFR_LAYOUT);
                                     
-                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
-                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
-                                    NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
-                                    NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
-                                    
-                                    NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
-                                    NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
-                                    NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
-                                    NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                    // conjugate if Hermitian: (valR - i*valI)*(xjR + i*xjI) = (valR*xjR + valI*xjI) + i(valR*xjI - valI*xjR)
+                                    if (conjugate) {
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
+                                        NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
+                                        NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                    } else {
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjI, 0);
+                                        NativeSafe.invoke(MPFR_SUB, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
+
+                                        NativeSafe.invoke(MPFR_MUL, t1, valR, xjI, 0);
+                                        NativeSafe.invoke(MPFR_MUL, t2, valI, xjR, 0);
+                                        NativeSafe.invoke(MPFR_ADD, t1, t1, t2, 0);
+                                        NativeSafe.invoke(MPFR_SUB, sumI, sumI, t1, 0);
+                                    }
                                 } else {
                                     NativeSafe.invoke(MPFR_MUL, t1, valR, xjR, 0);
                                     NativeSafe.invoke(MPFR_SUB, sumR, sumR, t1, 0);
@@ -1523,11 +1549,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     }
                 }
             } else {
-                // Transposed solve A^T x = b
-                // For sparse CSR, A^T solve is less efficient unless we have CSC.
-                // We'll use the provided Matrix transpose fallback if needed, 
-                // but here we can implement it by treating rows as columns.
-                throw new UnsupportedOperationException("Transposed triangular solve not yet optimized for Sparse MPFR");
+                // Transposed solve A^T x = b or A^H x = b
+                return solveTriangular(transpose(A), b, !upper, false, conjugate, unit);
             }
 
             java.util.List<E> resList = new java.util.ArrayList<>(n);

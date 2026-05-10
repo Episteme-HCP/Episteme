@@ -285,6 +285,17 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 ZGETRS = findLapackSymbol("LAPACKE_zgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
 
                 // QR Decomposition
+                FunctionDescriptor trtrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE,
+                        ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                        AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+                );
+                STRTRS = findLapackSymbol("LAPACKE_strtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+                DTRTRS = findLapackSymbol("LAPACKE_dtrtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+                CTRTRS = findLapackSymbol("LAPACKE_ctrtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+                ZTRTRS = findLapackSymbol("LAPACKE_ztrtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+
+                // QR Decomposition
                 FunctionDescriptor geqrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                         ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                         AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
@@ -448,6 +459,11 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     private static MethodHandle CTRSM;
     private static MethodHandle ZTRSM;
     
+    private static MethodHandle STRTRS;
+    private static MethodHandle DTRTRS;
+    private static MethodHandle CTRTRS;
+    private static MethodHandle ZTRTRS;
+    
     // LAPACK Method Handles
     private static MethodHandle SGESV;
     private static MethodHandle DGESV;
@@ -545,8 +561,9 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         return "openblas";
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": solveTriangular() not available");
         int n = A.rows();
         if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
@@ -571,7 +588,12 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             // CBLAS Constants
             int side = 141; // CblasLeft
             int uplo = upper ? 121 : 122; // CblasUpper : CblasLower
-            int trans = transpose ? 112 : 111; // CblasTrans : CblasNoTrans
+            int trans;
+            if (transpose) {
+                trans = conjugate ? 113 : 112; // CblasConjTrans : CblasTrans
+            } else {
+                trans = 111; // CblasNoTrans
+            }
             int diag = unit ? 131 : 132; // CblasUnit : CblasNonUnit
 
             if (complex) {
@@ -986,46 +1008,92 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
          int n = A.rows();
          if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
          boolean complex = isComplex(A);
+         boolean single = isFloat(A);
          
          if (complex) {
-             if (ZGETRF != null) {
-                 try (ResourceTracker tracker = new ResourceTracker()) {
-                     Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
-                     MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-                     int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
-                     if (info < 0) throw new IllegalArgumentException("ZGETRF failed: illegal argument " + (-info));
-                     if (info > 0) return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
-                     org.episteme.core.mathematics.numbers.complex.Complex det = org.episteme.core.mathematics.numbers.complex.Complex.of(1.0);
-                     int swaps = 0;
-                     for(int i=0; i<n; i++) {
-                         double r = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long)(i*n + i)*2);
-                         double im = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long)(i*n + i)*2 + 1);
-                         det = det.multiply(org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
-                         int p = segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long)i);
-                         if (p != (i + 1)) swaps++;
+             if (single) {
+                 if (CGETRF != null) {
+                     try (ResourceTracker tracker = new ResourceTracker()) {
+                         Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
+                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+                         int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                         if (info < 0) throw new IllegalArgumentException("CGETRF failed: illegal argument " + (-info));
+                         if (info > 0) return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
+                         org.episteme.core.mathematics.numbers.complex.Complex det = org.episteme.core.mathematics.numbers.complex.Complex.of(1.0);
+                         int swaps = 0;
+                         for(int i=0; i<n; i++) {
+                             float r = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long)(i*n + i)*2);
+                             float im = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long)(i*n + i)*2 + 1);
+                             det = det.multiply(org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
+                             int p = segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long)i);
+                             if (p != (i + 1)) swaps++;
+                         }
+                         if (swaps % 2 != 0) det = det.negate();
+                         return (E) (Object) det;
+                     } catch (Throwable e) { 
+                         throw new RuntimeException("Native complex float determinant failed", e);
                      }
-                     if (swaps % 2 != 0) det = det.negate();
-                     return (E) (Object) det;
-                 } catch (Throwable e) { 
-                     throw new RuntimeException("Native complex determinant failed", e);
+                 }
+             } else {
+                 if (ZGETRF != null) {
+                     try (ResourceTracker tracker = new ResourceTracker()) {
+                         Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
+                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+                         int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                         if (info < 0) throw new IllegalArgumentException("ZGETRF failed: illegal argument " + (-info));
+                         if (info > 0) return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
+                         org.episteme.core.mathematics.numbers.complex.Complex det = org.episteme.core.mathematics.numbers.complex.Complex.of(1.0);
+                         int swaps = 0;
+                         for(int i=0; i<n; i++) {
+                             double r = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long)(i*n + i)*2);
+                             double im = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long)(i*n + i)*2 + 1);
+                             det = det.multiply(org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
+                             int p = segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long)i);
+                             if (p != (i + 1)) swaps++;
+                         }
+                         if (swaps % 2 != 0) det = det.negate();
+                         return (E) (Object) det;
+                     } catch (Throwable e) { 
+                         throw new RuntimeException("Native complex double determinant failed", e);
+                     }
                  }
              }
          } else {
-             if (DGETRF != null) {
-                 try (Arena arena = Arena.ofConfined()) {
-                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
-                     MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
-                     int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
-                     if (info > 0) return (E) (Object) Real.ZERO;
-                     double det = 1.0;
-                     for(int i=0; i<n; i++) {
-                         det *= segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + i);
-                         if (segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != i + 1) det = -det;
+             if (single) {
+                 if (SGETRF != null) {
+                     try (Arena arena = Arena.ofConfined()) {
+                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
+                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+                         int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                         if (info > 0) return createScalar(0.0, A);
+                         float det = 1.0f;
+                         for(int i=0; i<n; i++) {
+                             det *= segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) i * n + i);
+                             if (segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != i + 1) det = -det;
+                         }
+                         return createScalar(det, A);
+                     } catch (Throwable e) { 
+                         throw new RuntimeException("Native real float determinant failed", e);
                      }
-                      return createScalar(det, A);
-                 } catch (Throwable e) { 
-                     throw new RuntimeException("Native real determinant failed", e);
+                 }
+             } else {
+                 if (DGETRF != null) {
+                     try (Arena arena = Arena.ofConfined()) {
+                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
+                         MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
+                         int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                         if (info > 0) return createScalar(0.0, A);
+                         double det = 1.0;
+                         for(int i=0; i<n; i++) {
+                             det *= segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + i);
+                             if (segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != i + 1) det = -det;
+                         }
+                         return createScalar(det, A);
+                     } catch (Throwable e) { 
+                         throw new RuntimeException("Native real double determinant failed", e);
+                     }
                  }
              }
          }
@@ -1458,6 +1526,71 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
 
     }
 
+
+    @Override
+    public CholeskyResult<E> cholesky(Matrix<E> a) {
+        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": cholesky() not available");
+        int n = a.rows();
+        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        boolean complex = isComplex(a);
+        boolean single = isFloat(a);
+
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
+            MemorySegment segA;
+            int info;
+            if (complex) {
+                if (single) {
+                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    info = (int) NativeSafe.invoke(CPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+                    if (info != 0) throw new RuntimeException("CPOTRF failed: " + info);
+                    float[] data = segA.toArray(ValueLayout.JAVA_FLOAT);
+                    // Zero out upper part
+                    for (int i = 0; i < n; i++) {
+                        for (int j = i + 1; j < n; j++) {
+                            data[(i * n + j) * 2] = 0;
+                            data[(i * n + j) * 2 + 1] = 0;
+                        }
+                    }
+                    return new CholeskyResult<>(createDenseMatrix(data, n, n, a));
+                } else {
+                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    info = (int) NativeSafe.invoke(ZPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+                    if (info != 0) throw new RuntimeException("ZPOTRF failed: " + info);
+                    double[] data = segA.toArray(ValueLayout.JAVA_DOUBLE);
+                    for (int i = 0; i < n; i++) {
+                        for (int j = i + 1; j < n; j++) {
+                            data[(i * n + j) * 2] = 0;
+                            data[(i * n + j) * 2 + 1] = 0;
+                        }
+                    }
+                    return new CholeskyResult<>(createDenseMatrix(data, n, n, a));
+                }
+            } else {
+                if (single) {
+                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                    info = (int) NativeSafe.invoke(SPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+                    if (info != 0) throw new RuntimeException("SPOTRF failed: " + info);
+                    float[] data = segA.toArray(ValueLayout.JAVA_FLOAT);
+                    for (int i = 0; i < n; i++) {
+                        for (int j = i + 1; j < n; j++) data[i * n + j] = 0;
+                    }
+                    return new CholeskyResult<>(createDenseMatrix(data, n, n, a));
+                } else {
+                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                    info = (int) NativeSafe.invoke(DPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
+                    if (info != 0) throw new RuntimeException("DPOTRF failed: " + info);
+                    double[] data = segA.toArray(ValueLayout.JAVA_DOUBLE);
+                    for (int i = 0; i < n; i++) {
+                        for (int j = i + 1; j < n; j++) data[i * n + j] = 0;
+                    }
+                    return new CholeskyResult<>(createDenseMatrix(data, n, n, a));
+                }
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("POTRF failed", t);
+        }
+    }
 
     @Override
     public int rank(Matrix<E> a) {
@@ -2296,53 +2429,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     }
 
 
-    @Override
-    public CholeskyResult<E> cholesky(Matrix<E> a) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": cholesky() not available");
-        int n = a.rows();
-        if (n != a.cols()) throw new IllegalArgumentException("Matrix must be square");
-        boolean complex = isComplex(a);
-        boolean single = isFloat(a);
 
-        try (ResourceTracker tracker = new ResourceTracker()) {
-            Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-            if (complex) {
-                if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    int info = (int) NativeSafe.invoke(CPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
-                    if (info != 0) throw new ArithmeticException("CPOTRF failed: " + info);
-                    float[] resData = segA.toArray(ValueLayout.JAVA_FLOAT);
-                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[(i * n + j) * 2] = 0; resData[(i * n + j) * 2 + 1] = 0; }
-                    return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    int info = (int) NativeSafe.invoke(ZPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
-                    if (info != 0) throw new ArithmeticException("ZPOTRF failed: " + info);
-                    double[] resData = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[(i * n + j) * 2] = 0; resData[(i * n + j) * 2 + 1] = 0; }
-                    return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                }
-            } else {
-                if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
-                    int info = (int) NativeSafe.invoke(SPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
-                    if (info != 0) throw new ArithmeticException("SPOTRF failed: " + info);
-                    float[] resData = segA.toArray(ValueLayout.JAVA_FLOAT);
-                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[i * n + j] = 0; }
-                    return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-                    int info = (int) NativeSafe.invoke(DPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
-                    if (info != 0) throw new ArithmeticException("DPOTRF failed: " + info);
-                    double[] resData = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                    for (int i = 0; i < n; i++) for (int j = i + 1; j < n; j++) { resData[i * n + j] = 0; }
-                    return new CholeskyResult<>(createDenseMatrix(resData, n, n, a));
-                }
-            }
-        } catch (Throwable t) {
-            throw new RuntimeException("FFM BLAS Cholesky failed: " + t.getMessage(), t);
-        }
-    }
 
     @Override
     public LUResult<E> lu(Matrix<E> a) {
@@ -2706,8 +2793,21 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     @Override
     public Vector<E> solve(org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr, Vector<E> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": solve(QRResult) not available");
-        Vector<E> qtb = multiply(transpose(qr.Q()), b);
-        return solve(qr.R(), qtb); // Evaluates LU(R) quickly and natively solves using our optimized solve(LU) via GETRS.
+        boolean complex = isComplex(qr.Q());
+        Vector<E> qtb = multiply(complex ? conjugateTranspose(qr.Q()) : transpose(qr.Q()), b);
+        
+        Matrix<E> r = qr.getR();
+        int n = r.cols();
+        if (r.rows() != n) {
+            // Rectangular R: solve square part
+            Matrix<E> rSquare = r.getSubMatrix(0, n - 1, 0, n - 1);
+            java.util.List<E> d1List = new java.util.ArrayList<>(n);
+            for (int i = 0; i < n; i++) d1List.add(qtb.get(i));
+            Vector<E> d1 = Vector.of(d1List, (Ring<E>)b.getScalarRing());
+            return solveTriangular(rSquare, d1, true, false, false, false);
+        }
+        
+        return solveTriangular(r, qtb, true, false, false, false);
     }
 
     @Override

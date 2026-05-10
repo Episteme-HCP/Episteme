@@ -275,6 +275,66 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     }
 
     @Override
+    public Vector<Real> solveTriangular(Matrix<Real> A, Vector<Real> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        int n = A.rows();
+        if (n != A.cols()) throw new IllegalArgumentException("Matrix must be square");
+        if (n != b.dimension()) throw new IllegalArgumentException("Dimension mismatch");
+
+        INDArray arrA = toINDArray(A);
+        INDArray arrB = toINDArray(b).dup(); // We modify B in-place
+
+        // Manual forward/backward substitution using ND4J accessors
+        if (upper) {
+            if (transpose) {
+                // Forward substitution (L^T y = b) where L^T is Lower
+                for (int i = 0; i < n; i++) {
+                    double sum = arrB.getDouble(i);
+                    for (int j = 0; j < i; j++) {
+                        sum -= arrA.getDouble(j, i) * arrB.getDouble(j);
+                    }
+                    if (!unit) sum /= arrA.getDouble(i, i);
+                    arrB.putScalar(i, sum);
+                }
+            } else {
+                // Backward substitution (U x = b)
+                for (int i = n - 1; i >= 0; i--) {
+                    double sum = arrB.getDouble(i);
+                    for (int j = i + 1; j < n; j++) {
+                        sum -= arrA.getDouble(i, j) * arrB.getDouble(j);
+                    }
+                    if (!unit) sum /= arrA.getDouble(i, i);
+                    arrB.putScalar(i, sum);
+                }
+            }
+        } else {
+            if (transpose) {
+                // Backward substitution (U^T x = b) where U^T is Upper
+                for (int i = n - 1; i >= 0; i--) {
+                    double sum = arrB.getDouble(i);
+                    for (int j = i + 1; j < n; j++) {
+                        sum -= arrA.getDouble(j, i) * arrB.getDouble(j);
+                    }
+                    if (!unit) sum /= arrA.getDouble(i, i);
+                    arrB.putScalar(i, sum);
+                }
+            } else {
+                // Forward substitution (L y = b)
+                for (int i = 0; i < n; i++) {
+                    double sum = arrB.getDouble(i);
+                    for (int j = 0; j < i; j++) {
+                        sum -= arrA.getDouble(i, j) * arrB.getDouble(j);
+                    }
+                    if (!unit) sum /= arrA.getDouble(i, i);
+                    arrB.putScalar(i, sum);
+                }
+            }
+        }
+
+        return fromINDArrayVector(arrB);
+    }
+
+    @Override
     public Vector<Real> multiply(Matrix<Real> a, Vector<Real> b) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
         return fromINDArrayVector(toINDArray(a).mmul(toINDArray(b)));
