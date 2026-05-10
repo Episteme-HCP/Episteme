@@ -7,6 +7,8 @@ package org.episteme.core.mathematics.linearalgebra;
 
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
@@ -148,7 +150,84 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
     default Matrix<E> scale(E scalar, Matrix<E> a) {
         throw new UnsupportedOperationException(getName() + " does not support scale()");
     }
-    default Matrix<E> exp(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support exp()"); }
+    
+    /**
+     * Computes the matrix exponential e^A.
+     */
+    default Matrix<E> exp(Matrix<E> a) {
+        try {
+            EigenResult<E> eigen = eigen(a);
+            // exp(A) = V * exp(D) * V^-1
+            // This only works if A is diagonalizable.
+            // For general case, should use Pade approximation or Taylor series.
+            // But for now, eigenvalue based is better than nothing.
+            Matrix<E> V = eigen.V();
+            Vector<E> D = eigen.D();
+            
+            // exp(D)
+            E[] expD = (E[]) new Object[D.dimension()];
+            for (int i = 0; i < D.dimension(); i++) {
+                // This is tricky because we need a way to compute scalar exp
+                // For now, let's just use the provider's scalar methods if available
+                // Actually, let's just throw for now until we have a better way to handle scalar math on E
+                throw new UnsupportedOperationException("Matrix exp not fully implemented in default provider");
+            }
+            return null; // Placeholder
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(getName() + " does not support exp()", e);
+        }
+    }
+
+    /**
+     * Returns the rank of the matrix.
+     */
+    default int rank(Matrix<E> a) {
+        SVDResult<E> svd = svd(a);
+        Vector<E> s = svd.S();
+        int rank = 0;
+        double tol = 1e-12; // Should be dynamic based on precision
+        for (int i = 0; i < s.dimension(); i++) {
+            E val = s.get(i);
+            double dVal = 0;
+            if (val instanceof Number n) dVal = n.doubleValue();
+            else if (val instanceof Real r) dVal = r.doubleValue();
+            else if (val instanceof Complex c) dVal = c.abs().doubleValue();
+            
+            if (dVal > tol) rank++;
+        }
+        return rank;
+    }
+
+    /**
+     * Returns the condition number of the matrix (L2 norm).
+     */
+    default E conditionNumber(Matrix<E> a) {
+        SVDResult<E> svd = svd(a);
+        Vector<E> s = svd.S();
+        if (s.dimension() == 0) return null;
+        
+        double maxS = 0;
+        double minS = Double.MAX_VALUE;
+        
+        for (int i = 0; i < s.dimension(); i++) {
+            E val = s.get(i);
+            double dVal = 0;
+            if (val instanceof Number n) dVal = n.doubleValue();
+            else if (val instanceof Real r) dVal = r.doubleValue();
+            else if (val instanceof Complex c) dVal = c.abs().doubleValue();
+            
+            if (dVal > maxS) maxS = dVal;
+            if (dVal < minS && dVal > 1e-18) minS = dVal;
+        }
+        
+        double cond = maxS / minS;
+        // Need to cast back to E. This is a bit hacky but consistent with current provider pattern
+        Ring<E> ring = a.getScalarRing();
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealDouble) return (E) org.episteme.core.mathematics.numbers.real.RealDouble.of(cond);
+        if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float)cond);
+        return null;
+    }
+
     default Matrix<E> log(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support log()"); }
     default Matrix<E> log10(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support log10()"); }
     default Matrix<E> sin(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support sin()"); }

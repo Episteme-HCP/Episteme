@@ -193,6 +193,41 @@ public class SparseMatrixStorage<E> implements MatrixStorage<E> {
         cachedCSR = null; // Invalidate cache
     }
 
+    public SparseMatrixStorage<E> transpose() {
+        SparseMatrixStorage<E> result = new SparseMatrixStorage<>(colsCount, rowsCount, zeroValue);
+        for (Map.Entry<Long, E> entry : data.entrySet()) {
+            long key = entry.getKey();
+            int row = (int) (key >>> 32);
+            int col = (int) (key & 0xFFFFFFFFL);
+            result.set(col, row, entry.getValue());
+        }
+        return result;
+    }
+
+    public DenseMatrixStorage<E> toDense() {
+        DenseMatrixStorage<E> result = new DenseMatrixStorage<>(rowsCount, colsCount, zeroValue);
+        for (Map.Entry<Long, E> entry : data.entrySet()) {
+            long key = entry.getKey();
+            int row = (int) (key >>> 32);
+            int col = (int) (key & 0xFFFFFFFFL);
+            result.set(row, col, entry.getValue());
+        }
+        return result;
+    }
+
+    public static <E> SparseMatrixStorage<E> fromDense(org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<E> source, E zeroValue) {
+        SparseMatrixStorage<E> result = new SparseMatrixStorage<>(source.rows(), source.cols(), zeroValue);
+        for (int i = 0; i < source.rows(); i++) {
+            for (int j = 0; j < source.cols(); j++) {
+                E val = source.get(i, j);
+                if (!val.equals(zeroValue)) {
+                    result.set(i, j, val);
+                }
+            }
+        }
+        return result;
+    }
+
     private long key(int row, int col) {
         return ((long) row << 32) | (col & 0xFFFFFFFFL);
     }

@@ -1460,6 +1460,72 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
 
 
     @Override
+    public int rank(Matrix<E> a) {
+        SVDResult<E> svdResult = svd(a);
+        Vector<E> s = svdResult.S();
+        int rank = 0;
+        double tol = isFloat(a) ? 1e-6 : 1e-12;
+        for (int i = 0; i < s.dimension(); i++) {
+            if (getRealValue(s.get(i)) > tol) rank++;
+        }
+        return rank;
+    }
+
+    @Override
+    public E conditionNumber(Matrix<E> a) {
+        SVDResult<E> svdResult = svd(a);
+        Vector<E> s = svdResult.S();
+        if (s.dimension() == 0) return null;
+        double max = getRealValue(s.get(0));
+        double min = getRealValue(s.get(s.dimension() - 1));
+        if (min < 1e-18) min = 1e-18;
+        return castScalar(max / min, (Ring<E>) a.getScalarRing());
+    }
+
+    @Override
+    public Matrix<E> exp(Matrix<E> a) {
+        if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
+        EigenResult<E> eigen = eigen(a);
+        Matrix<E> V = eigen.V();
+        Vector<E> D = eigen.D();
+        int n = D.dimension();
+        
+        // Compute exp(D)
+        E[][] expDArr = (E[][]) new Object[n][n];
+        Ring<E> ring = (Ring<E>) a.getScalarRing();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    E val = D.get(i);
+                    if (val instanceof Complex c) {
+                        expDArr[i][j] = (E) c.exp();
+                    } else {
+                        expDArr[i][j] = castScalar(Math.exp(getRealValue(val)), ring);
+                    }
+                } else {
+                    expDArr[i][j] = ring.zero();
+                }
+            }
+        }
+        
+        Matrix<E> expD = createDenseMatrixGeneric(expDArr, ring);
+        Matrix<E> VInv = inverse(V);
+        return V.multiply(expD).multiply(VInv);
+    }
+
+    private Matrix<E> createDenseMatrixGeneric(E[][] data, Ring<E> ring) {
+        int rows = data.length;
+        int cols = data[0].length;
+        E[] flatData = (E[]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows * cols);
+        for (int i = 0; i < rows; i++) {
+            System.arraycopy(data[i], 0, flatData, i * cols, cols);
+        }
+        return new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<>(
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(rows, cols, flatData),
+            this, ring);
+    }
+
+    @Override
     public void shutdown() {
         // No-op for FFM BLAS.
     }
@@ -2716,13 +2782,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         }
     }
 
@@ -2733,13 +2799,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         }
     }
 
@@ -2750,13 +2816,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         }
     }
 
@@ -2767,13 +2833,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList((E[]) arr), ring);
+            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
         }
     }
 
@@ -2782,7 +2848,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     // --- Func Category (Matrix Transcendentals) ---
     // For 1x1 matrices used in compliance audit
 
-    @Override public Matrix<E> exp(Matrix<E> m) { return applyFunc(m, Math::exp, Complex::exp); }
+
     @Override public Matrix<E> log(Matrix<E> m) { return applyFunc(m, Math::log, Complex::log); }
     @Override public Matrix<E> log10(Matrix<E> m) { return applyFunc(m, Math::log10, org.episteme.core.mathematics.numbers.complex.Complex::log10); }
     @Override public Matrix<E> sin(Matrix<E> m) { return applyFunc(m, Math::sin, Complex::sin); }
