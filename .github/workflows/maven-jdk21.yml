@@ -1,4 +1,4 @@
-name: Episteme CI
+name: Episteme CI (JDK 21)
 
 on:
   push:
@@ -8,14 +8,13 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }} (JDK ${{ matrix.java-version }})
+    name: Build on ${{ matrix.os }} (JDK 21)
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 1
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        java-version: ['21', '25']
-      fail-fast: false # Don't cancel other OS jobs if one fails
+      fail-fast: false
 
     env:
       MAVEN_OPTS: "--add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=3 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
@@ -23,10 +22,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up JDK ${{ matrix.java-version }}
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: ${{ matrix.java-version }}
+        java-version: '21'
         distribution: 'oracle'
         cache: maven
 
@@ -37,19 +36,10 @@ jobs:
         mvn -B install:install-file -Dfile="libs/mpi.jar" -DgroupId=org.mpjexpress -DartifactId=mpi -Dversion=0.44 -Dpackaging=jar
 
     - name: Build with Maven
-      # SKIPPING TESTS IN CI:
-      # 1. 'episteme-ui' requires a graphical environment (JavaFX/Glass) which is not available on headless GitHub runners.
-      # 2. 'episteme-native' and 'episteme-jni' tests require pre-installed native shared libraries (MPFR, OpenBLAS, OpenCL, CUDA) 
-      #    and specific hardware (GPUs) not present on standard runners.
-      # 3. 'episteme-server' requires a running gRPC/Database environment for full integration.
-      # Full verification is performed on local production-grade environments before tagging.
       shell: bash
-      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=${{ matrix.java-version }} --file pom.xml
+      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=21 --file pom.xml
 
     - name: Run Benchmarks (CLI)
-      # Run benchmarks and export JSON. 
-      # Note: Native libs for HDF5/OpenCL might be missing on GitHub runners, 
-      # but checks should skip them gracefully.
       shell: bash
       continue-on-error: true
       run: |
@@ -60,14 +50,14 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: benchmark-results-${{ matrix.os }}
+        name: benchmark-results-${{ matrix.os }}-jdk21
         path: benchmark-results.json
 
     - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-${{ matrix.os }}
+        name: test-results-${{ matrix.os }}-jdk21
         path: |
           **/target/surefire-reports/*.xml
           **/target/failsafe-reports/*.xml
