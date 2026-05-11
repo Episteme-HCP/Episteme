@@ -76,11 +76,12 @@ public class LinearAlgebraComplianceTest {
         }));
  
         List<LinearAlgebraProvider<?>> providers = discoverAllProviders();
+        String refFilter = System.getProperty("org.episteme.test.reference", "Standard");
         LinearAlgebraProvider<?> referenceProvider = providers.stream()
-            .filter(p -> p.getName().contains("Standard"))
+            .filter(p -> p.getName().contains(refFilter))
             .findFirst()
             .orElse(providers.get(0));
- 
+
         System.out.println("[AuditEngine] Starting Linear Algebra Audit (Mode: " + mode + ")");
         System.out.println("[AuditEngine] Ground Truth Reference: " + referenceProvider.getName());
         
@@ -340,6 +341,8 @@ public class LinearAlgebraComplianceTest {
     private List<LinearAlgebraProvider<?>> discoverAllProviders() {
         Map<String, LinearAlgebraProvider<?>> providers = new TreeMap<>();
         String excludeFilter = System.getProperty("org.episteme.audit.exclude", "");
+        String[] excludes = excludeFilter.isEmpty() ? new String[0] : excludeFilter.split(",");
+        boolean skipBackendDiscovery = Boolean.getBoolean("org.episteme.audit.skipDiscovery");
         
         // 1. ServiceLoader discovery (Standard SPI)
         try {
@@ -351,7 +354,16 @@ public class LinearAlgebraComplianceTest {
                     System.out.println("[AuditEngine] ServiceLoader: Attempting next...");
                     LinearAlgebraProvider<?> p = iterator.next();
                     System.out.println("[AuditEngine] ServiceLoader: Found " + p.getName());
-                    if (!excludeFilter.isEmpty() && p.getName().contains(excludeFilter)) {
+                    
+                    boolean excluded = false;
+                    for (String ex : excludes) {
+                        if (p.getName().toLowerCase().contains(ex.trim().toLowerCase())) {
+                            excluded = true;
+                            break;
+                        }
+                    }
+                    
+                    if (excluded) {
                         System.out.println("[AuditEngine] ServiceLoader: Skipping excluded provider: " + p.getName());
                         continue;
                     }
@@ -365,23 +377,36 @@ public class LinearAlgebraComplianceTest {
         }
         
         // 2. Backend discovery (Including native/GPU backends even if hardware is missing)
-        try {
-            System.out.println("[AuditEngine] BackendDiscovery: Starting...");
-            for (Backend b : BackendDiscovery.getInstance().getProviders()) {
-                System.out.println("[AuditEngine] BackendDiscovery: Checking backend " + b.getName() + " (" + b.getClass().getSimpleName() + ")");
-                try {
-                    for (var ap : b.getAlgorithmProviders()) {
-                        if (ap instanceof LinearAlgebraProvider<?> p) {
-                            System.out.println("[AuditEngine] BackendDiscovery: Found provider " + p.getName() + " from backend " + b.getName());
-                            if (!excludeFilter.isEmpty() && p.getName().contains(excludeFilter)) continue;
-                            providers.put(p.getName(), p);
+        if (!skipBackendDiscovery) {
+            try {
+                System.out.println("[AuditEngine] BackendDiscovery: Starting...");
+                for (Backend b : BackendDiscovery.getInstance().getProviders()) {
+                    System.out.println("[AuditEngine] BackendDiscovery: Checking backend " + b.getName() + " (" + b.getClass().getSimpleName() + ")");
+                    try {
+                        for (var ap : b.getAlgorithmProviders()) {
+                            if (ap instanceof LinearAlgebraProvider<?> p) {
+                                System.out.println("[AuditEngine] BackendDiscovery: Found provider " + p.getName() + " from backend " + b.getName());
+                                
+                                boolean excluded = false;
+                                for (String ex : excludes) {
+                                    if (p.getName().toLowerCase().contains(ex.trim().toLowerCase())) {
+                                        excluded = true;
+                                        break;
+                                    }
+                                }
+                                if (excluded) continue;
+                                
+                                providers.put(p.getName(), p);
+                            }
                         }
+                    } catch (Throwable t) {
+                        System.err.println("[AuditEngine] Could not retrieve providers from backend: " + b.getName());
                     }
-                } catch (Throwable t) {
-                    System.err.println("[AuditEngine] Could not retrieve providers from backend: " + b.getName());
                 }
-            }
-        } catch (Throwable t) {}
+            } catch (Throwable t) {}
+        } else {
+            System.out.println("[AuditEngine] BackendDiscovery: Skipped by configuration.");
+        }
         
         return new ArrayList<>(providers.values());
     }

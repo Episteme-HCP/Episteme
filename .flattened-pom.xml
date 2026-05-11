@@ -88,7 +88,7 @@
     <junit.version>5.10.1</junit.version>
     <javalin.version>6.1.3</javalin.version>
     <resilience4j.version>2.2.0</resilience4j.version>
-    <target.java.version>25</target.java.version>
+    <target.java.version>21</target.java.version>
     <logback.version>1.5.16</logback.version>
     <micrometer.version>1.12.2</micrometer.version>
     <javacv.version>1.5.10</javacv.version>
@@ -1094,6 +1094,22 @@
       <id>fat-jar</id>
       <build>
         <plugins>
+          <plugin>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>shade-parent-skip</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <skip>true</skip>
+                </configuration>
+              </execution>
+            </executions>
+            <inherited>false</inherited>
+          </plugin>
           <plugin>
             <artifactId>maven-shade-plugin</artifactId>
             <executions>

@@ -19,10 +19,7 @@
     </license>
   </licenses>
   <properties>
-    <maven.compiler.release>25</maven.compiler.release>
-    <maven.compiler.target>25</maven.compiler.target>
     <jzy3d.exclude>**/Jzy3d*.java</jzy3d.exclude>
-    <maven.compiler.source>25</maven.compiler.source>
   </properties>
   <dependencies>
     <dependency>
