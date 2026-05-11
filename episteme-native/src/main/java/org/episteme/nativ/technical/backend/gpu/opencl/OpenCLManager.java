@@ -60,8 +60,8 @@ public final class OpenCLManager {
             logger.info("OpenCL Manager initialized successfully. Device: {}, Double Support: {}", 
                 getDeviceString(device, CL_DEVICE_NAME), supportsDouble);
         } catch (Throwable t) {
-            logger.error("Failed to initialize OpenCL Manager: {}", t.getMessage());
-            throw new RuntimeException("OpenCL initialization failed", t);
+            logger.error("Failed to initialize OpenCL Manager: {}. OpenCL backends will be unavailable.", t.getMessage());
+            initialized = false;
         }
     }
 
