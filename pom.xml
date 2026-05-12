@@ -1134,18 +1134,6 @@
       </build>
     </profile>
 
-    <profile>
-      <id>enable-shade-for-jars</id>
-      <activation>
-        <file>
-          <exists>src</exists>
-        </file>
-      </activation>
-      <properties>
-        <shade.skip>false</shade.skip>
-      </properties>
-    </profile>
-
     <!-- Fat Jar Profile using Maven Shade -->
     <profile>
       <id>fat-jar</id>

@@ -73,6 +73,7 @@
     <maven.compiler.release>${target.java.version}</maven.compiler.release>
     <jcuda.version>11.8.0</jcuda.version>
     <auto-service.version>1.1.1</auto-service.version>
+    <shade.skip>true</shade.skip>
     <mainClass></mainClass>
     <jackson.version>2.16.1</jackson.version>
     <ode4j.version>0.5.4</ode4j.version>
@@ -1091,6 +1092,17 @@
       </properties>
     </profile>
     <profile>
+      <id>enable-shade-for-jars</id>
+      <activation>
+        <file>
+          <exists>src</exists>
+        </file>
+      </activation>
+      <properties>
+        <shade.skip>false</shade.skip>
+      </properties>
+    </profile>
+    <profile>
       <id>fat-jar</id>
       <build>
         <plugins>
@@ -1098,23 +1110,13 @@
             <artifactId>maven-shade-plugin</artifactId>
             <executions>
               <execution>
-                <id>shade-parent-skip</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-                <configuration>
-                  <skip>true</skip>
-                </configuration>
-              </execution>
-              <execution>
                 <id>fat-jar-shade</id>
                 <phase>package</phase>
                 <goals>
                   <goal>shade</goal>
                 </goals>
                 <configuration>
-                  <skip>false</skip>
+                  <skip>${shade.skip}</skip>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <shadedClassifierName>fat</shadedClassifierName>
                   <createDependencyReducedPom>false</createDependencyReducedPom>

@@ -67,8 +67,7 @@ public final class RealBig extends Real {
         if (other.isInfinite()) {
             return other;
         }
-        return RealBig.create(value.add(other.bigDecimalValue(), 
-            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
+        return RealBig.create(value.add(other.bigDecimalValue()));
     }
 
     @Override
@@ -77,8 +76,7 @@ public final class RealBig extends Real {
         if (other.isInfinite()) {
             return other.negate();
         }
-        return RealBig.create(value.subtract(other.bigDecimalValue(), 
-            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
+        return RealBig.create(value.subtract(other.bigDecimalValue()));
     }
 
     @Override
@@ -91,8 +89,7 @@ public final class RealBig extends Real {
             // sign(this) * infinity
             return (this.value.signum() > 0) ? other : other.negate();
         }
-        return RealBig.create(value.multiply(other.bigDecimalValue(), 
-            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
+        return RealBig.create(value.multiply(other.bigDecimalValue()));
     }
 
     @Override

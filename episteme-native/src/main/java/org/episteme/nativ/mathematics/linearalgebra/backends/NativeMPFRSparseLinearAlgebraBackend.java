@@ -224,7 +224,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         if (value instanceof Real r) {
             s = r.bigDecimalValue().toPlainString();
         } else {
-            s = String.valueOf(getRealValue(value));
+            s = getReal(value).bigDecimalValue().toPlainString();
         }
         NativeSafe.invoke(MPFR_SET_STR, destR, arena.allocateFrom(s), 10, 0);
     }

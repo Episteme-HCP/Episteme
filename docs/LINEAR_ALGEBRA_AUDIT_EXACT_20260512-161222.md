@@ -8,8 +8,8 @@ This report summarizes the compliance and feature support for all discovered Lin
 | :--- | :--- | :--- | :---: | :---: |
 | Episteme CPU (Dense) | CPU (Standard JVM) | ✅ Ready | 40/40 | 40/40 |
 | Episteme CPU (Sparse) | Generic JVM | ⚠️ Partial | 40/43 | 40/43 |
-| Native MPFR Dense Linear Algebra Backend | CPU (Panama/MPFR) | ⚠️ Partial | 7/40 | 26/40 |
-| Native MPFR Sparse Linear Algebra Backend | Generic JVM | ⚠️ Partial | 4/43 | 21/43 |
+| Native MPFR Dense Linear Algebra Backend | CPU (Panama/MPFR) | ⚠️ Partial | 25/40 | 26/40 |
+| Native MPFR Sparse Linear Algebra Backend | Generic JVM | ⚠️ Partial | 19/43 | 21/43 |
 
 ### Category: Fallback
 
@@ -26,8 +26,8 @@ This report summarizes the compliance and feature support for all discovered Lin
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Episteme CPU (Dense) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Episteme CPU (Sparse) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native MPFR Dense Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native MPFR Sparse Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Native MPFR Dense Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Native MPFR Sparse Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 
 ### Category: Solvers
 
@@ -35,8 +35,8 @@ This report summarizes the compliance and feature support for all discovered Lin
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Episteme CPU (Dense) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Episteme CPU (Sparse) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native MPFR Dense Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ✅ PASS |
-| Native MPFR Sparse Linear Algebra Backend | ➕ N/A | ➕ N/A | ❌ AssertionError | ❌ AssertionError | ➕ N/A | ➕ N/A | ❌ AssertionError | ✅ PASS |
+| Native MPFR Dense Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ✅ PASS |
+| Native MPFR Sparse Linear Algebra Backend | ➕ N/A | ➕ N/A | ❌ AssertionError | ✅ PASS | ➕ N/A | ➕ N/A | ❌ AssertionError | ✅ PASS |
 
 ### Category: Decompositions
 
@@ -53,7 +53,7 @@ This report summarizes the compliance and feature support for all discovered Lin
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Episteme CPU (Dense) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Episteme CPU (Sparse) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native MPFR Dense Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS |
+| Native MPFR Dense Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS |
 | Native MPFR Sparse Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ➕ N/A | ➕ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ➕ N/A | ➕ N/A | ✅ PASS |
 
 ### Category: Tri
@@ -71,8 +71,8 @@ This report summarizes the compliance and feature support for all discovered Lin
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Episteme CPU (Dense) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Episteme CPU (Sparse) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native MPFR Dense Linear Algebra Backend | ✅ PASS | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native MPFR Sparse Linear Algebra Backend | ✅ PASS | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Native MPFR Dense Linear Algebra Backend | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+| Native MPFR Sparse Linear Algebra Backend | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 
 ### Category: Func
 
@@ -80,8 +80,8 @@ This report summarizes the compliance and feature support for all discovered Lin
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | Episteme CPU (Dense) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
 | Episteme CPU (Sparse) | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
-| Native MPFR Dense Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError |
-| Native MPFR Sparse Linear Algebra Backend | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ➕ N/A | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ❌ AssertionError | ➕ N/A | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError |
+| Native MPFR Dense Linear Algebra Backend | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ❌ AssertionError | ✅ PASS | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError |
+| Native MPFR Sparse Linear Algebra Backend | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ➕ N/A | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS | ❌ AssertionError | ✅ PASS | ❌ AssertionError | ➕ N/A | ✅ PASS | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError | ❌ AssertionError |
 
 ### Category: Sparse
 
@@ -102,4 +102,4 @@ This report summarizes the compliance and feature support for all discovered Lin
 | Native MPFR Sparse Linear Algebra Backend | ➕ N/A | ❌ AssertionError | ➕ N/A | ✅ PASS |
 
 ---
-*Generated by Universal Audit Engine on Tue May 12 16:39:56 CEST 2026*
+*Generated by Universal Audit Engine on Tue May 12 16:12:59 CEST 2026*

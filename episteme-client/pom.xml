@@ -13,6 +13,7 @@
 
     <properties>
         <mainClass>org.episteme.client.GridMonitorApp</mainClass>
+        <shade.skip>false</shade.skip>
     </properties>
 
     <dependencies>

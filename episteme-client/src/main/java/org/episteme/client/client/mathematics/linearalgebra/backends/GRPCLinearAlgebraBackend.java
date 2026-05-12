@@ -743,10 +743,17 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
 
     private ScalarResponse toProtoScalar(E scalar) {
         ScalarResponse.Builder builder = ScalarResponse.newBuilder();
+        boolean hp = org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT;
+
         if (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) {
-            builder.setValue(c.getReal().doubleValue())
-                   .setImaginary(c.getImaginary().doubleValue())
-                   .setIsComplex(true);
+            if (hp) {
+                builder.setHpValue(c.getReal().toString() + ";" + c.getImaginary().toString())
+                       .setIsComplex(true);
+            } else {
+                builder.setValue(c.getReal().doubleValue())
+                       .setImaginary(c.getImaginary().doubleValue())
+                       .setIsComplex(true);
+            }
         } else if (scalar instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
             builder.setHpValue(rb.toString())
                    .setIsComplex(false);
