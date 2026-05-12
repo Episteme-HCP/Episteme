@@ -118,19 +118,14 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <excludes>
-                    <exclude>**/*.jpg</exclude>
-                    <exclude>**/*.png</exclude>
-                    <exclude>**/*.tif</exclude>
-                    <exclude>**/*.tiff</exclude>
-                    <exclude>**/*.obj</exclude>
-                    <exclude>**/*.gltf</exclude>
-                    <exclude>**/*.glb</exclude>
-                    <exclude>**/*.bin</exclude>
-                    <exclude>**/*.fbx</exclude>
-                    <exclude>**/*.stl</exclude>
-                </excludes>
+                <includes>
+                    <include>episteme.properties</include>
+                </includes>
             </resource>
         </resources>
         <plugins>

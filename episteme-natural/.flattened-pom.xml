@@ -97,20 +97,15 @@
   <build>
     <resources>
       <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>**/*.jpg</exclude>
-          <exclude>**/*.png</exclude>
-          <exclude>**/*.tif</exclude>
-          <exclude>**/*.tiff</exclude>
-          <exclude>**/*.obj</exclude>
-          <exclude>**/*.gltf</exclude>
-          <exclude>**/*.glb</exclude>
-          <exclude>**/*.bin</exclude>
-          <exclude>**/*.fbx</exclude>
-          <exclude>**/*.stl</exclude>
-        </excludes>
+        <includes>
+          <include>episteme.properties</include>
+        </includes>
       </resource>
     </resources>
     <plugins>

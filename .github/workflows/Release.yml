@@ -62,8 +62,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B deploy -DskipTests -Djacoco.skip=true -Prelease-jdk25,fat-jar
 
+      - name: Set up JDK 21 for verification
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+          cache: maven
+
       - name: Build & Verify on JDK 21
-        # verifies build integrity on JDK 21 without re-deploying (prevents 409 Conflict)
+        # verifies build integrity on JDK 21 using the correct JDK version
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

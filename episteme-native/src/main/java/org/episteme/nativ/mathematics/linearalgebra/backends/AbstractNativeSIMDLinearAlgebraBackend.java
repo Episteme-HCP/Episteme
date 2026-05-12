@@ -70,11 +70,16 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
     private boolean isComplexRing(Ring<?> ring) {
         if (ring == null) return false;
-        return ring instanceof org.episteme.core.mathematics.sets.Complexes || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        if (ring instanceof org.episteme.core.mathematics.sets.Complexes) return true;
+        Object zero = ring.zero();
+        return zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
     }
 
     private boolean isRealRing(Ring<?> ring) {
-        return ring instanceof org.episteme.core.mathematics.sets.Reals;
+        if (ring == null) return false;
+        if (ring instanceof org.episteme.core.mathematics.sets.Reals) return true;
+        Object zero = ring.zero();
+        return zero instanceof org.episteme.core.mathematics.numbers.real.Real;
     }
 
     private boolean isFloat(Object obj) {
@@ -126,7 +131,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         }
         
         // Fallback to MathContext for generic 'Reals' ring which doesn't specify precision in its zero()
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals || ring.getClass().getName().contains("Reals")) {
+        if (isRealRing(ring)) {
             return org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.FAST;
         }
         if (ring instanceof org.episteme.core.mathematics.sets.Complexes || ring.getClass().getName().contains("Complexes")) {
@@ -140,7 +145,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     private E castScalar(Object val, Ring<E> ring) {
         if (val == null) return ring.zero();
         boolean isComplexRing = ring instanceof org.episteme.core.mathematics.sets.Complexes;
-        boolean isRealRing = ring instanceof org.episteme.core.mathematics.sets.Reals;
+        boolean isRealRing = isRealRing(ring);
         
         if (isComplexRing) {
             if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) return (E) val;
@@ -230,7 +235,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     public String getId() {
         if (ring == null) return "simd-unknown";
-        return "simd-" + (ring instanceof Reals ? "real" : "complex");
+        return "simd-" + (isRealRing(ring) ? "real" : "complex");
     }
 
     @Override
@@ -299,7 +304,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         
         boolean res = false;
         // Strict domain matching
-        if (this.ring instanceof Reals) {
+        if (isRealRing(this.ring)) {
             res = ring instanceof Reals || ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real;
         } else if (this.ring instanceof Complexes) {
             res = ring instanceof Complexes || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
@@ -1090,7 +1095,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         int swaps = 0;
         for (int i = 0; i < n; i++) if (Math.abs(getRealValue(P.get(i)) - i) > 0.1) swaps++;
         if ((swaps / 2) % 2 != 0) {
-            if (ring instanceof org.episteme.core.mathematics.sets.Reals) det = (E) Real.of(-getRealValue(det));
+            if (isRealRing(ring)) det = (E) Real.of(-getRealValue(det));
             else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) det = (E) ((Complex)det).negate();
         }
         
@@ -1119,7 +1124,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
             for (int i = 0; i < k; i++) sInvData[i] = sData[i] > 1e-12 ? 1.0 / sData[i] : 0.0;
             
             Matrix<E> Sinv;
-            if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+            if (isRealRing(ring)) {
                 Sinv = (Matrix<E>)(Object) RealDoubleMatrix.diagonal(sInvData);
             } else {
                 Complex[] complexSInv = new Complex[k*k];
@@ -1134,7 +1139,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         }
 
         // Square case: Gaussian Elimination for Reals (SIMD)
-        if (ring instanceof org.episteme.core.mathematics.sets.Reals) {
+        if (isRealRing(ring)) {
             double[] data = toMatrixDoubleArray((Matrix<Real>) (Object) a);
             double[] inv = new double[n * n];
             for (int i = 0; i < n; i++) inv[i * n + i] = 1.0;
@@ -1181,7 +1186,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
                 }
             }
             return (Matrix<E>) (Object) fromDoubleArray(inv, n, n);
-        } else if (ring instanceof org.episteme.core.mathematics.sets.Complexes) {
+        } else if (isComplexRing(ring)) {
             // Square case for Complexes: LU based
             LUResult<E> lu = lu(a);
             int dim = n;

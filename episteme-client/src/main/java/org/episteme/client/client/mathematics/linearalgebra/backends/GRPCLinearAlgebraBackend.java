@@ -133,7 +133,10 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
 
     @Override
     public boolean isAvailable() {
-        return channel != null && !channel.isShutdown() && !isExplicitlyDisabled();
+        if (channel == null || channel.isShutdown() || isExplicitlyDisabled()) return false;
+        // Non-blocking connectivity check
+        io.grpc.ConnectivityState state = channel.getState(false);
+        return state != io.grpc.ConnectivityState.SHUTDOWN && state != io.grpc.ConnectivityState.TRANSIENT_FAILURE;
     }
 
     @Override
