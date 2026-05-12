@@ -442,7 +442,8 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
      * @return log10(this)
      */
     public Complex log10() {
-        return log().divide(Complex.of(Real.of(Math.log(10.0))));
+        Real ln10 = Real.of(10.0).log();
+        return log().divide(Complex.of(ln10));
     }
 
     /**
@@ -452,7 +453,8 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
      * @return cube root of this
      */
     public Complex cbrt() {
-        return pow(1.0 / 3.0);
+        Real oneThird = Real.of(1.0).divide(Real.of(3.0));
+        return log().multiply(Complex.of(oneThird)).exp();
     }
 
     @Override

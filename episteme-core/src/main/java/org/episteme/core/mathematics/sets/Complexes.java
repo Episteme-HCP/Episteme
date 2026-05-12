@@ -74,7 +74,7 @@ public final class Complexes implements Field<Complex>, InfiniteSet<Complex> {
 
     @Override
     public Complex zero() {
-        return Complex.ZERO;
+        return Complex.of(0.0).zero();
     }
 
     @Override
@@ -89,7 +89,7 @@ public final class Complexes implements Field<Complex>, InfiniteSet<Complex> {
 
     @Override
     public Complex one() {
-        return Complex.ONE;
+        return Complex.of(1.0).one();
     }
 
     @Override
