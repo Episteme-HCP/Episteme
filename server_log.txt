@@ -1,0 +1,159 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@43ee72e6]
+SLF4J: Found provider [org.slf4j.nop.NOPServiceProvider@23529fee]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+14:11:58,336 |-INFO in ch.qos.logback.classic.LoggerContext[default] - This is logback-classic version 1.5.16
+14:11:58,336 |-INFO in ch.qos.logback.classic.LoggerContext[default] - This is logback-core version 1.5.18
+14:11:58,337 |-WARN in ch.qos.logback.classic.LoggerContext[default] - Versions of logback-core and logback-classic are different!
+14:11:58,348 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - Here is a list of configurators discovered as a service, by rank: 
+14:11:58,348 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 -   org.springframework.boot.logging.logback.RootLogLevelConfigurator
+14:11:58,348 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - They will be invoked in order until ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY is returned.
+14:11:58,349 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - Constructed configurator of type class org.springframework.boot.logging.logback.RootLogLevelConfigurator
+14:11:58,404 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - org.springframework.boot.logging.logback.RootLogLevelConfigurator.configure() call lasted 31 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+14:11:58,404 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - Trying to configure with ch.qos.logback.classic.joran.SerializedModelConfigurator
+14:11:58,407 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - Constructed configurator of type class ch.qos.logback.classic.joran.SerializedModelConfigurator
+14:11:58,411 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.scmo]
+14:11:58,415 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.scmo]
+14:11:58,415 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - ch.qos.logback.classic.joran.SerializedModelConfigurator.configure() call lasted 8 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+14:11:58,415 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
+14:11:58,417 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
+14:11:58,420 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
+14:11:58,421 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback.xml] at [jar:nested:/C:/Silvere/Encours/Developpement/Episteme/episteme-server/target/episteme-server-1.0.0-beta2-exec.jar/!BOOT-INF/classes/!/logback.xml]
+14:11:58,471 |-INFO in ConfigurationWatchList(mainURL=jar:nested:/C:/Silvere/Encours/Developpement/Episteme/episteme-server/target/episteme-server-1.0.0-beta2-exec.jar/!BOOT-INF/classes/!/logback.xml, fileWatchList={}, urlWatchList=[}) - URL [jar:nested:/C:/Silvere/Encours/Developpement/Episteme/episteme-server/target/episteme-server-1.0.0-beta2-exec.jar/!BOOT-INF/classes/!/logback.xml] is not of type file
+14:11:59,573 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [CONSOLE]
+14:11:59,573 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+14:11:59,612 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+14:11:59,899 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - BEWARE: Writing to the console can be very slow. Avoid logging to the 
+14:11:59,899 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - console in production environments, especially in high volume systems.
+14:11:59,899 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - See also https://logback.qos.ch/codes.html#slowConsole
+14:11:59,899 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [DIAGNOSTICS]
+14:11:59,899 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.FileAppender]
+14:11:59,937 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+14:11:59,938 |-INFO in ch.qos.logback.core.FileAppender[DIAGNOSTICS] - File property is set to [episteme_diagnostics.log]
+14:11:59,945 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [BENCHMARK]
+14:11:59,945 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.FileAppender]
+14:11:59,945 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+14:11:59,946 |-INFO in ch.qos.logback.core.FileAppender[BENCHMARK] - File property is set to [episteme_benchmark.log]
+14:11:59,947 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to INFO
+14:11:59,947 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [CONSOLE] to Logger[ROOT]
+14:11:59,966 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [DIAGNOSTICS] to Logger[ROOT]
+14:11:59,966 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [BENCHMARK] to Logger[ROOT]
+14:11:59,966 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@7b50df34 - End of configuration.
+14:11:59,968 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@1b410b60 - Registering current configuration as safe fallback point
+14:11:59,968 |-INFO in ch.qos.logback.classic.util.ContextInitializer@13d9cbf5 - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 1551 milliseconds. ExecutionStatus=DO_NOT_INVOKE_NEXT_IF_ANY
+
+SLF4J: Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@43ee72e6]
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.0)
+
+14:12:01.908 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+14:12:02.090 [main] INFO  o.e.s.server.EpistemeApplication - Starting EpistemeApplication using Java 25 with PID 25592 (C:\Silvere\Encours\Developpement\Episteme\episteme-server\target\episteme-server-1.0.0-beta2-exec.jar started by silve in C:\Silvere\Encours\Developpement\Episteme)
+14:12:02.091 [main] DEBUG o.e.s.server.EpistemeApplication - Running with Spring Boot v3.5.0, Spring v6.2.7
+14:12:02.093 [main] INFO  o.e.s.server.EpistemeApplication - No active profile set, falling back to 1 default profile: "default"
+14:12:07.980 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+14:12:08.345 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 324 ms. Found 4 JPA repository interfaces.
+14:12:09.040 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=2b7f4d10-2a6b-3dde-a42b-1d6487a43201
+14:12:11.127 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+14:12:11.184 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+14:12:11.188 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+14:12:11.188 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+14:12:11.258 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+14:12:11.259 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 9010 ms
+14:12:12.362 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+14:12:12.587 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.15.Final
+14:12:12.671 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+14:12:13.587 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+14:12:13.674 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+14:12:14.759 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:./data/episteme user=SA
+14:12:14.786 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+14:12:14.931 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+14:12:17.731 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+14:12:17.852 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+14:12:18.985 [main] INFO  o.e.s.s.config.ApplicationConfig - ✓ Loaded configuration from /application.properties
+14:12:18.988 [main] INFO  o.e.s.s.config.ApplicationConfig - Configuration loaded successfully
+14:12:19.225 [main] INFO  o.e.s.s.discovery.DiscoveryService - mDNS: Broadcasting Episteme-Grid-Server on port 50051
+14:12:19.659 [main] INFO  n.d.b.g.c.a.GrpcClientAutoConfiguration - Detected grpc-netty-shaded: Creating ShadedNettyChannelFactory + InProcessChannelFactory
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by io.grpc.netty.shaded.io.netty.util.internal.PlatformDependent0$4 (jar:nested:/C:/Silvere/Encours/Developpement/Episteme/episteme-server/target/episteme-server-1.0.0-beta2-exec.jar/!BOOT-INF/lib/grpc-netty-shaded-1.60.0.jar!/)
+WARNING: Please consider reporting this to the maintainers of class io.grpc.netty.shaded.io.netty.util.internal.PlatformDependent0$4
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+14:12:20.743 [main] INFO  o.e.s.s.integrations.DeviceRegistry - Discovering Episteme devices...
+14:12:20.745 [main] INFO  o.e.core.ui.MasterControlDiscovery - Performing one-time full Episteme class discovery...
+14:12:20.790 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning Episteme project root at C:\Silvere\Encours\Developpement\Episteme
+14:12:20.802 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-benchmarks\target\classes
+14:12:20.829 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-benchmarks\target\episteme-benchmarks-1.0.0-beta2.jar
+14:12:20.830 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-client\target\classes
+14:12:20.842 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-client\target\episteme-client-1.0.0-beta2.jar
+14:12:20.842 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes
+14:12:20.997 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\episteme-core-1.0.0-beta2.jar
+14:12:21.002 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-database\target\classes
+14:12:21.003 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-database\target\episteme-database-1.0.0-beta2.jar
+14:12:21.006 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-featured-apps\target\classes
+14:12:21.017 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-featured-apps\target\episteme-featured-apps-1.0.0-beta2.jar
+14:12:21.019 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-jni\target\classes
+14:12:21.021 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-jni\target\episteme-jni-1.0.0-beta2.jar
+14:12:21.025 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-native\target\classes
+14:12:21.045 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-native\target\episteme-native-1.0.0-beta2.jar
+14:12:21.046 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-natural\target\classes
+14:12:21.355 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-natural\target\episteme-natural-1.0.0-beta2.jar
+14:12:21.365 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-resources\target\classes
+14:12:21.505 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-server\target\classes
+14:12:21.534 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-server\target\episteme-server-1.0.0-beta2-exec.jar
+14:12:21.536 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-server\target\episteme-server-1.0.0-beta2.jar
+14:12:21.538 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-social\target\classes
+14:12:21.605 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-social\target\episteme-social-1.0.0-beta2.jar
+14:12:21.608 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module classes at C:\Silvere\Encours\Developpement\Episteme\episteme-worker\target\classes
+14:12:21.608 [main] INFO  o.e.core.ui.MasterControlDiscovery - Dev Mode: Scanning module JAR at C:\Silvere\Encours\Developpement\Episteme\episteme-worker\target\episteme-worker-1.0.0-beta2.jar
+14:12:21.610 [main] INFO  o.e.core.ui.MasterControlDiscovery - Discovered 3410 Episteme classes in 864 ms
+14:12:26.168 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.social.device.sim.SimulatedBallotCaster: org.episteme.social.device.sim.SimulatedBallotCaster.<init>()
+14:12:26.170 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedCentrifuge: org.episteme.natural.device.sim.SimulatedCentrifuge.<init>()
+14:12:26.176 [main] INFO  o.e.s.s.integrations.DeviceRegistry - Registered device: Generic GPIB Device (GPIB0::1::INSTR)
+14:12:26.177 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedHumidityProbe: org.episteme.natural.device.sim.SimulatedHumidityProbe.<init>()
+14:12:26.180 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedMicroscope: org.episteme.natural.device.sim.SimulatedMicroscope.<init>()
+14:12:26.180 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedMultimeter: org.episteme.natural.device.sim.SimulatedMultimeter.<init>()
+14:12:26.180 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedOscilloscope: org.episteme.natural.device.sim.SimulatedOscilloscope.<init>()
+14:12:26.180 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedPHMeter: org.episteme.natural.device.sim.SimulatedPHMeter.<init>()
+14:12:26.183 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedPressureGauge: org.episteme.natural.device.sim.SimulatedPressureGauge.<init>()
+14:12:26.183 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedSeismograph: org.episteme.natural.device.sim.SimulatedSeismograph.<init>()
+14:12:26.185 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedSpectrometer: org.episteme.natural.device.sim.SimulatedSpectrometer.<init>()
+14:12:26.186 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedTelescope: org.episteme.natural.device.sim.SimulatedTelescope.<init>()
+14:12:26.190 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedTemperatureProbe: org.episteme.natural.device.sim.SimulatedTemperatureProbe.<init>()
+14:12:26.191 [main] INFO  o.e.s.s.integrations.DeviceRegistry - Registered device: Generic USB Device (USB:1234:5678)
+14:12:26.192 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedVitalSignsMonitor: org.episteme.natural.device.sim.SimulatedVitalSignsMonitor.<init>()
+14:12:26.193 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.social.device.sim.SimulatedVoterScanner: org.episteme.social.device.sim.SimulatedVoterScanner.<init>()
+14:12:26.193 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.social.device.sim.SimulatedVotingMachine: org.episteme.social.device.sim.SimulatedVotingMachine.<init>()
+14:12:26.193 [main] DEBUG o.e.s.s.integrations.DeviceRegistry - Could not instantiate device class org.episteme.natural.device.sim.SimulatedWeatherStation: org.episteme.natural.device.sim.SimulatedWeatherStation.<init>()
+14:12:26.194 [main] INFO  o.e.s.s.integrations.DeviceRegistry - Device discovery complete. Found 2 devices.
+14:12:26.198 [main] INFO  o.e.s.server.mcp.MCPToolRegistry - Registered 8 dynamic MCP tools from grid algorithms
+14:12:28.804 [main] DEBUG o.e.s.s.storage.S3StorageService - Bucket verification: Unable to execute HTTP request: Connect to localhost:9000 [localhost/127.0.0.1, localhost/0:0:0:0:0:0:0:1] failed: Connection refused: getsockopt
+14:12:28.804 [main] INFO  o.e.s.s.storage.S3StorageService - S3 Storage Service ENABLED (Endpoint: http://localhost:9000, Bucket: episteme-data)
+14:12:30.521 [main] INFO  n.d.b.g.s.a.GrpcServerFactoryAutoConfiguration - Detected grpc-netty-shaded: Creating ShadedNettyGrpcServerFactory
+14:12:31.330 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 2 endpoints beneath base path '/actuator'
+14:12:31.498 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+14:12:31.537 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+14:12:31.618 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: org.episteme.server.server.proto.AuthService, bean: authServiceImpl, class: org.episteme.server.server.service.AuthServiceImpl
+14:12:31.621 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: org.episteme.server.server.proto.CollaborationService, bean: collaborationServiceImpl, class: org.episteme.server.server.service.CollaborationServiceImpl
+14:12:31.622 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: org.episteme.server.server.proto.ComputeService, bean: computeServiceImpl, class: org.episteme.server.server.service.ComputeServiceImpl
+14:12:31.622 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: org.episteme.server.server.proto.DataService, bean: dataServiceImpl, class: org.episteme.server.server.service.DataServiceImpl
+14:12:31.622 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: org.episteme.server.server.proto.DeviceService, bean: deviceServiceImpl, class: org.episteme.server.server.service.DeviceServiceImpl
+14:12:31.622 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: org.episteme.computing.remote.MatrixService, bean: matrixServiceImpl, class: org.episteme.server.server.service.MatrixServiceImpl
+14:12:31.622 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: grpc.health.v1.Health, bean: grpcHealthService, class: io.grpc.protobuf.services.HealthServiceImpl
+14:12:31.622 [main] INFO  n.d.b.g.s.s.AbstractGrpcServerFactory - Registered gRPC service: grpc.reflection.v1alpha.ServerReflection, bean: protoReflectionService, class: io.grpc.protobuf.services.ProtoReflectionService
+14:12:31.826 [main] INFO  n.d.b.g.s.s.GrpcServerLifecycle - gRPC Server started, listening on address: *, port: 50051
+14:12:31.877 [main] INFO  o.e.s.server.EpistemeApplication - Started EpistemeApplication in 31.347 seconds (process running for 35.423)
+14:12:32.593 [main] INFO  o.e.s.s.config.AdminUserInitializer - ✓ Created admin user: admin 

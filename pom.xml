@@ -109,6 +109,7 @@
     <mainClass></mainClass>
     <artifact.classifier></artifact.classifier>
     <artifact.suffix></artifact.suffix>
+    <shade.skip>true</shade.skip>
     <maven.jar.finalName>${project.artifactId}-${project.version}</maven.jar.finalName>
   </properties>
 
@@ -1133,6 +1134,18 @@
       </build>
     </profile>
 
+    <profile>
+      <id>enable-shade-for-jars</id>
+      <activation>
+        <file>
+          <exists>src</exists>
+        </file>
+      </activation>
+      <properties>
+        <shade.skip>false</shade.skip>
+      </properties>
+    </profile>
+
     <!-- Fat Jar Profile using Maven Shade -->
     <profile>
       <id>fat-jar</id>
@@ -1144,21 +1157,13 @@
             <artifactId>maven-shade-plugin</artifactId>
             <executions>
               <execution>
-                <id>shade-parent-skip</id>
-                <phase>package</phase>
-                <goals><goal>shade</goal></goals>
-                <configuration>
-                  <skip>true</skip>
-                </configuration>
-              </execution>
-              <execution>
                 <id>fat-jar-shade</id>
                 <phase>package</phase>
                 <goals>
                   <goal>shade</goal>
                 </goals>
                 <configuration>
-                  <skip>false</skip>
+                  <skip>${shade.skip}</skip>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <shadedClassifierName>fat</shadedClassifierName>
                   <createDependencyReducedPom>false</createDependencyReducedPom>
