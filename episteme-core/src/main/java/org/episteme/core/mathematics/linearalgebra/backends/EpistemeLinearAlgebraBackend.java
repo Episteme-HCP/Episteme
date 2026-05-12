@@ -196,6 +196,11 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     }
 
     @Override
+    public E trace(Matrix<E> a) {
+        return getBestProvider(a).trace(a);
+    }
+
+    @Override
     public E determinant(Matrix<E> a) {
         return getBestProvider(a).determinant(a);
     }
@@ -248,6 +253,11 @@ public class EpistemeLinearAlgebraBackend<E> implements SparseLinearAlgebraProvi
     @Override
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
         return executeComplexOperation(p -> p.solve(cholesky, b));
+    }
+
+    @Override
+    public Vector<E> solveTriangular(Matrix<E> a, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        return denseProvider.solveTriangular(a, b, upper, transpose, conjugate, unit);
     }
 
     @Override

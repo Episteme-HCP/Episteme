@@ -3408,7 +3408,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         complexMultiply(prodR, prodI, s1R, s1I, s2R, s2I, (int) prec, arena, tracker);
         
         NativeSafe.invoke(MPFR_ADD, prodR, aR, prodR, 0);
-        NativeSafe.invoke(MPFR_ADD, aI, aI, prodI, 0); // Corrected sum: aI + prodI
+        NativeSafe.invoke(MPFR_ADD, prodI, aI, prodI, 0);
         complexLog(resR, resI, prodR, prodI, (int) prec, arena, tracker);
     }
 

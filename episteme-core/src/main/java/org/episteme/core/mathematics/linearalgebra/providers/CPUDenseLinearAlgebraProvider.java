@@ -150,6 +150,73 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         return sum;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        int n = b.dimension();
+        Ring<E> ring = b.getScalarRing();
+        
+        Class<?> componentType = ring.zero().getClass();
+        if (ring.zero() instanceof Real) componentType = Real.class;
+        else if (ring.zero() instanceof Complex) componentType = Complex.class;
+        
+        E[] x = (E[]) java.lang.reflect.Array.newInstance(componentType, n);
+        
+        if (upper) {
+            if (transpose) {
+                // U^T * x = b (Forward substitution)
+                for (int i = 0; i < n; i++) {
+                    E sum = ring.zero();
+                    for (int j = 0; j < i; j++) {
+                        E val = A.get(j, i);
+                        if (conjugate) val = conjugate(val);
+                        sum = ring.add(sum, ring.multiply(val, x[j]));
+                    }
+                    E diag = unit ? ring.one() : A.get(i, i);
+                    if (conjugate) diag = conjugate(diag);
+                    x[i] = ((org.episteme.core.mathematics.structures.rings.Field<E>)ring).divide(ring.subtract(b.get(i), sum), diag);
+                }
+            } else {
+                // U * x = b (Back substitution)
+                for (int i = n - 1; i >= 0; i--) {
+                    E sum = ring.zero();
+                    for (int j = i + 1; j < n; j++) {
+                        sum = ring.add(sum, ring.multiply(A.get(i, j), x[j]));
+                    }
+                    E diag = unit ? ring.one() : A.get(i, i);
+                    x[i] = ((org.episteme.core.mathematics.structures.rings.Field<E>)ring).divide(ring.subtract(b.get(i), sum), diag);
+                }
+            }
+        } else {
+            if (transpose) {
+                // L^T * x = b (Back substitution)
+                for (int i = n - 1; i >= 0; i--) {
+                    E sum = ring.zero();
+                    for (int j = i + 1; j < n; j++) {
+                        E val = A.get(j, i);
+                        if (conjugate) val = conjugate(val);
+                        sum = ring.add(sum, ring.multiply(val, x[j]));
+                    }
+                    E diag = unit ? ring.one() : A.get(i, i);
+                    if (conjugate) diag = conjugate(diag);
+                    x[i] = ((org.episteme.core.mathematics.structures.rings.Field<E>)ring).divide(ring.subtract(b.get(i), sum), diag);
+                }
+            } else {
+                // L * x = b (Forward substitution)
+                for (int i = 0; i < n; i++) {
+                    E sum = ring.zero();
+                    for (int j = 0; j < i; j++) {
+                        sum = ring.add(sum, ring.multiply(A.get(i, j), x[j]));
+                    }
+                    E diag = unit ? ring.one() : A.get(i, i);
+                    x[i] = ((org.episteme.core.mathematics.structures.rings.Field<E>)ring).divide(ring.subtract(b.get(i), sum), diag);
+                }
+            }
+        }
+        return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
+                new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(x), this, ring);
+    }
+
     @SuppressWarnings("unchecked")
     private Matrix<E> elementWiseTranscendental(Matrix<E> a, String op) {
         int m = a.rows();
@@ -1141,8 +1208,8 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         public static Vector<Real> solve(LUResult<Real> lu, Vector<Real> b) {
+            CPUDenseLinearAlgebraProvider<Real> provider = new CPUDenseLinearAlgebraProvider<>();
             int n = lu.L().rows();
-            Real[] x = new Real[n];
             Real[] pb = new Real[n];
 
             for (int i = 0; i < n; i++) {
@@ -1153,25 +1220,13 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 else pIdx = i;
                 pb[i] = b.get(pIdx);
             }
-
-            Real[] y = new Real[n];
-            for (int i = 0; i < n; i++) {
-                Real sum = Real.ZERO;
-                for (int j = 0; j < i; j++) {
-                    sum = sum.add(lu.L().get(i, j).multiply(y[j]));
-                }
-                y[i] = pb[i].subtract(sum);
-            }
-
-            for (int i = n - 1; i >= 0; i--) {
-                Real sum = Real.ZERO;
-                for (int j = i + 1; j < n; j++) {
-                    sum = sum.add(lu.U().get(i, j).multiply(x[j]));
-                }
-                x[i] = y[i].subtract(sum).divide(lu.U().get(i, i));
-            }
-
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), Reals.getInstance());
+            
+            Vector<Real> pbv = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(pb), Reals.getInstance());
+            
+            // Forward substitution L*y = Pb
+            Vector<Real> y = provider.solveTriangular(lu.L(), pbv, false, false, false, true);
+            // Backward substitution U*x = y
+            return provider.solveTriangular(lu.U(), y, true, false, false, false);
         }
 
         public static Real determinant(Matrix<Real> a) {
