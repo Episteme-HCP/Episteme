@@ -36,12 +36,18 @@ public class LinearAlgebraAuditSuite {
             Random rand = new Random(42);
         
         // --- 1. SQUARE MATRIX OPERATIONS (N x N) ---
+        System.out.println("[LinearAlgebraAudit] Generating random matrix A...");
         Matrix<E> A = randomMatrix(n, n, ref, ring, rand);
+        System.out.println("[LinearAlgebraAudit] Generating random matrix B...");
         Matrix<E> B = randomMatrix(n, n, ref, ring, rand);
+        System.out.println("[LinearAlgebraAudit] Generating random vector v...");
         Vector<E> v = randomVector(n, ref, ring, rand);
+        System.out.println("[LinearAlgebraAudit] Generating random invertible matrix invA...");
         Matrix<E> invA = randomInvertibleMatrix(n, ring, rand); 
+        System.out.println("[LinearAlgebraAudit] Generating random SPD matrix spdA...");
         Matrix<E> spdA = randomSPDMatrix(n, ref, ring, rand);
         E scalar = ring.add(ring.one(), ring.one()); // 2.0
+        System.out.println("[LinearAlgebraAudit] Starting operations...");
 
         action.run(prefix + "Add", () -> verify(p.add(A, B), ref.add(A, B), tolerance));
         action.run(prefix + "Sub", () -> verify(p.subtract(A, B), ref.subtract(A, B), tolerance));

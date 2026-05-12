@@ -593,8 +593,8 @@
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
+              <arg>--enable-preview</arg>
               <arg>-Xpkginfo:always</arg>
-              <arg>${extra.compiler.args}</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -906,8 +906,8 @@
           <compilerArgs>
             <arg>--add-modules</arg>
             <arg>jdk.incubator.vector</arg>
+            <arg>--enable-preview</arg>
             <arg>-Xpkginfo:always</arg>
-            <arg>${extra.compiler.args}</arg>
           </compilerArgs>
         </configuration>
       </plugin>
@@ -1107,18 +1107,14 @@
                   <skip>true</skip>
                 </configuration>
               </execution>
-            </executions>
-            <inherited>false</inherited>
-          </plugin>
-          <plugin>
-            <artifactId>maven-shade-plugin</artifactId>
-            <executions>
               <execution>
+                <id>fat-jar-shade</id>
                 <phase>package</phase>
                 <goals>
                   <goal>shade</goal>
                 </goals>
                 <configuration>
+                  <skip>false</skip>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <shadedClassifierName>fat</shadedClassifierName>
                   <createDependencyReducedPom>false</createDependencyReducedPom>

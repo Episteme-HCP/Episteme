@@ -348,30 +348,44 @@ public class LinearAlgebraComplianceTest {
         try {
             @SuppressWarnings("rawtypes")
             ServiceLoader<LinearAlgebraProvider> loader = ServiceLoader.load(LinearAlgebraProvider.class);
-            var iterator = loader.iterator();
-            while (iterator.hasNext()) {
+            loader.stream().forEach(provider -> {
+                String className = provider.type().getName();
+                boolean excluded = false;
+                for (String ex : excludes) {
+                    if (className.toLowerCase().contains(ex.trim().toLowerCase())) {
+                        excluded = true;
+                        break;
+                    }
+                }
+                
+                if (excluded) {
+                    System.out.println("[AuditEngine] ServiceLoader: Skipping excluded class: " + className);
+                    return;
+                }
+
                 try {
-                    System.out.println("[AuditEngine] ServiceLoader: Attempting next...");
-                    LinearAlgebraProvider<?> p = iterator.next();
+                    System.out.println("[AuditEngine] ServiceLoader: Attempting to instantiate " + className + "...");
+                    LinearAlgebraProvider<?> p = provider.get();
                     System.out.println("[AuditEngine] ServiceLoader: Found " + p.getName());
                     
-                    boolean excluded = false;
+                    // Also check name for exclusion
+                    boolean nameExcluded = false;
                     for (String ex : excludes) {
                         if (p.getName().toLowerCase().contains(ex.trim().toLowerCase())) {
-                            excluded = true;
+                            nameExcluded = true;
                             break;
                         }
                     }
-                    
-                    if (excluded) {
-                        System.out.println("[AuditEngine] ServiceLoader: Skipping excluded provider: " + p.getName());
-                        continue;
+
+                    if (nameExcluded) {
+                        System.out.println("[AuditEngine] ServiceLoader: Skipping excluded provider (by name): " + p.getName());
+                    } else {
+                        providers.put(p.getName(), p);
                     }
-                    providers.put(p.getName(), p);
                 } catch (Throwable t) {
-                    System.err.println("[AuditEngine] ServiceLoader: Skipping broken provider: " + t.getMessage());
+                    System.err.println("[AuditEngine] ServiceLoader: Skipping broken provider [" + className + "]: " + t.getMessage());
                 }
-            }
+            });
         } catch (Throwable t) {
             System.err.println("[AuditEngine] ServiceLoader failed: " + t.getMessage());
         }
