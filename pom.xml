@@ -99,7 +99,7 @@
     <!-- Platform targeting to avoid downloading all binaries (e.g. Windows DLLs in Docker) -->
     <javacpp.platform>${os.detected.classifier}</javacpp.platform>
     
-    <target.java.version>21</target.java.version>
+    <target.java.version>25</target.java.version>
     <maven.compiler.release>${target.java.version}</maven.compiler.release>
     <maven.compiler.source>${target.java.version}</maven.compiler.source>
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
