@@ -71,18 +71,46 @@ public class BackendDiscovery {
         if (cachedProviders == null) {
             cachedProviders = new ArrayList<>();
             ServiceLoader<Backend> loader = ServiceLoader.load(Backend.class);
-            Iterator<Backend> iterator = loader.iterator();
-            while (iterator.hasNext()) {
-                try {
-                    Backend backend = iterator.next();
-                    cachedProviders.add(backend);
-                    logger.debug("Discovered Backend: {} (Priority: {})", backend.getName(), backend.getPriority());
-                } catch (ServiceConfigurationError | Exception e) {
-                    logger.warn("Skipping bad Backend provider: {}", e.getMessage());
-                } catch (Throwable t) {
-                    logger.warn("Critical failure loading Backend provider: {}", t.getMessage());
+            String excludeFilter = System.getProperty("org.episteme.audit.exclude", "");
+            String[] excludes = excludeFilter.isEmpty() ? new String[0] : excludeFilter.split(",");
+
+            loader.stream().forEach(provider -> {
+                String className = provider.type().getName();
+                boolean excluded = false;
+                for (String ex : excludes) {
+                    if (className.toLowerCase().contains(ex.trim().toLowerCase())) {
+                        excluded = true;
+                        break;
+                    }
                 }
-            }
+                
+                if (excluded) {
+                    logger.debug("BackendDiscovery: Skipping excluded class: {}", className);
+                    return;
+                }
+
+                try {
+                    Backend backend = provider.get();
+                    
+                    // Also check name for exclusion
+                    boolean nameExcluded = false;
+                    for (String ex : excludes) {
+                        if (backend.getName().toLowerCase().contains(ex.trim().toLowerCase())) {
+                            nameExcluded = true;
+                            break;
+                        }
+                    }
+
+                    if (nameExcluded) {
+                        logger.debug("BackendDiscovery: Skipping excluded backend (by name): {}", backend.getName());
+                    } else {
+                        cachedProviders.add(backend);
+                        logger.debug("Discovered Backend: {} (Priority: {})", backend.getName(), backend.getPriority());
+                    }
+                } catch (Throwable t) {
+                    logger.warn("Skipping bad Backend provider [{}]: {}", className, t.getMessage());
+                }
+            });
             logger.info("Backend Discovery complete. {} backends loaded.", cachedProviders.size());
         }
         return cachedProviders;
