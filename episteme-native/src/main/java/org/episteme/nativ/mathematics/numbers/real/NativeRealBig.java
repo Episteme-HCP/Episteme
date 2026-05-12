@@ -223,7 +223,9 @@ public final class NativeRealBig extends Real {
             MemorySegment expPtr = local.allocate(C_LONG);
             long bufSize = 10000;
             MemorySegment buf = local.allocate(bufSize);
-            MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, buf, expPtr, 10, 0L, ptr, 0); // 0L lets MPFR determine exact string len
+            // Use n=0 to get the minimal number of digits required to reconstruct the value exactly.
+            // This prevents "binary noise" from showing up as extra digits in decimal representation.
+            MemorySegment strPtr = (MemorySegment) NativeSafe.invoke(MPFR_GET_STR, buf, expPtr, 10, 0L, ptr, 0); 
             
             if (strPtr.equals(MemorySegment.NULL)) return BigDecimal.ZERO;
 

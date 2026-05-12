@@ -857,7 +857,9 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     private Real getRealPart(Object val) {
         if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return c.getReal();
         if (val instanceof Real r) return r;
-        if (val instanceof Number n) return Real.of(n.doubleValue());
+        if (val instanceof java.math.BigDecimal bd) return org.episteme.core.mathematics.numbers.real.RealBig.of(bd);
+        if (val instanceof Number n) return Real.of(n.toString());
+        if (val == null) return Real.ZERO;
         return Real.of(val.toString());
     }
 
@@ -1037,10 +1039,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     private static void setMPFR(MemorySegment mpfr, Real val, Arena arena, int rnd) throws Throwable {
         if (val instanceof NativeRealBig nrb) {
             NativeSafe.invoke(MPFR_SET, mpfr, nrb.getPtr(), rnd);
-        } else if (val instanceof org.episteme.core.mathematics.numbers.real.RealDouble rd) {
-            NativeSafe.invoke(MPFR_SET_D, mpfr, rd.doubleValue(), rnd);
         } else {
-            NativeSafe.invoke(MPFR_SET_STR, mpfr, arena.allocateFrom(val.bigDecimalValue().toPlainString()), 10, rnd);
+            // Always use string for high precision stability to avoid double-precision floor
+            String s = val.bigDecimalValue().toPlainString();
+            NativeSafe.invoke(MPFR_SET_STR, mpfr, arena.allocateFrom(s), 10, rnd);
         }
     }
 
@@ -1393,12 +1395,16 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 tracker.track(h_ExponentI, s -> NativeSafe.invoke(MPFR_CLEAR, s));
             }
 
-            if (isComplex) {
-                org.episteme.core.mathematics.numbers.complex.Complex ce = (org.episteme.core.mathematics.numbers.complex.Complex) exponent;
+            if (exponent instanceof org.episteme.core.mathematics.numbers.complex.Complex ce) {
                 NativeSafe.invoke(MPFR_SET_STR, h_ExponentR, arena.allocateFrom(ce.getReal().bigDecimalValue().toPlainString()), 10, rnd);
-                NativeSafe.invoke(MPFR_SET_STR, h_ExponentI, arena.allocateFrom(ce.getImaginary().bigDecimalValue().toPlainString()), 10, rnd);
+                if (h_ExponentI != null) {
+                    NativeSafe.invoke(MPFR_SET_STR, h_ExponentI, arena.allocateFrom(ce.getImaginary().bigDecimalValue().toPlainString()), 10, rnd);
+                }
             } else {
                 NativeSafe.invoke(MPFR_SET_STR, h_ExponentR, arena.allocateFrom(((org.episteme.core.mathematics.numbers.real.Real)exponent).bigDecimalValue().toPlainString()), 10, rnd);
+                if (h_ExponentI != null) {
+                    NativeSafe.invoke(MPFR_SET_STR, h_ExponentI, arena.allocateFrom("0.0"), 10, rnd);
+                }
             }
 
             for (int i = 0; i < rows; i++) {
@@ -1713,7 +1719,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             int maxIter = n * n * 30;
             int iter = 0;
             MemorySegment eps = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, eps, (int) prec);
-            NativeSafe.invoke(MPFR_SET_D, eps, 1e-35, rnd);
+            NativeSafe.invoke(MPFR_SET_STR, eps, arena.allocateFrom("1e-50"), 10, rnd);
 
             MemorySegment t = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t, (int) prec);
             MemorySegment c = arena.allocate(MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, c, (int) prec);

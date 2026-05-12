@@ -227,10 +227,17 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
                 Object scalar;
-                if (request.getIsComplex()) {
+                if (!request.getHpScalar().isEmpty()) {
+                    String val = request.getHpScalar();
+                    if (request.getIsComplex() && val.contains(";")) {
+                        String[] parts = val.split(";");
+                        scalar = Complex.of(org.episteme.core.mathematics.numbers.real.RealBig.of(parts[0]),
+                                         org.episteme.core.mathematics.numbers.real.RealBig.of(parts[1]));
+                    } else {
+                        scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(val);
+                    }
+                } else if (request.getIsComplex()) {
                     scalar = Complex.of(request.getScalar(), request.getImaginary());
-                } else if (!request.getHpScalar().isEmpty()) {
-                    scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(request.getHpScalar());
                 } else {
                     scalar = Real.of(request.getScalar());
                 }
@@ -301,10 +308,17 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
             executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
                 Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
                 Object scalar;
-                if (request.getIsComplex()) {
+                if (!request.getHpScalar().isEmpty()) {
+                    String val = request.getHpScalar();
+                    if (request.getIsComplex() && val.contains(";")) {
+                        String[] parts = val.split(";");
+                        scalar = Complex.of(org.episteme.core.mathematics.numbers.real.RealBig.of(parts[0]),
+                                         org.episteme.core.mathematics.numbers.real.RealBig.of(parts[1]));
+                    } else {
+                        scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(val);
+                    }
+                } else if (request.getIsComplex()) {
                     scalar = Complex.of(request.getScalar(), request.getImaginary());
-                } else if (!request.getHpScalar().isEmpty()) {
-                    scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(request.getHpScalar());
                 } else {
                     scalar = Real.of(request.getScalar());
                 }
@@ -550,7 +564,13 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
 
     private Object fromProtoScalar(ScalarResponse response) {
         if (!response.getHpValue().isEmpty()) {
-            return org.episteme.core.mathematics.numbers.real.RealBig.of(response.getHpValue());
+            String val = response.getHpValue();
+            if (response.getIsComplex() && val.contains(";")) {
+                String[] parts = val.split(";");
+                return Complex.of(org.episteme.core.mathematics.numbers.real.RealBig.of(parts[0]),
+                                 org.episteme.core.mathematics.numbers.real.RealBig.of(parts[1]));
+            }
+            return org.episteme.core.mathematics.numbers.real.RealBig.of(val);
         }
         if (response.getIsComplex()) {
             return Complex.of(response.getValue(), response.getImaginary());
@@ -576,24 +596,28 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         
         if (!proto.getHpDataList().isEmpty()) {
             List<String> hpData = proto.getHpDataList();
-            org.episteme.core.mathematics.numbers.real.Real[][] raw = new org.episteme.core.mathematics.numbers.real.Real[rows][cols];
             java.util.concurrent.atomic.AtomicInteger idx = new java.util.concurrent.atomic.AtomicInteger(0);
-            org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
-                for (int i = 0; i < rows; i++) {
-                    for (int j = 0; j < cols; j++) {
-                        int currentIdx = idx.getAndIncrement();
-                        String s = hpData.get(currentIdx);
-                        try {
-                            raw[i][j] = org.episteme.core.mathematics.numbers.real.RealBig.of(s);
-                        } catch (Exception e) {
-                            LOG.error("Failed to parse high-precision string at [{},{}]: '{}'", i, j, s);
-                            throw e;
+            return org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                if (isComplex) {
+                    Complex[][] raw = new Complex[rows][cols];
+                    for (int i = 0; i < rows; i++) {
+                        for (int j = 0; j < cols; j++) {
+                            org.episteme.core.mathematics.numbers.real.Real re = org.episteme.core.mathematics.numbers.real.RealBig.of(hpData.get(idx.getAndIncrement()));
+                            org.episteme.core.mathematics.numbers.real.Real im = org.episteme.core.mathematics.numbers.real.RealBig.of(hpData.get(idx.getAndIncrement()));
+                            raw[i][j] = Complex.of(re, im);
                         }
                     }
+                    return DenseMatrix.of(raw, Complex.ZERO);
+                } else {
+                    org.episteme.core.mathematics.numbers.real.Real[][] raw = new org.episteme.core.mathematics.numbers.real.Real[rows][cols];
+                    for (int i = 0; i < rows; i++) {
+                        for (int j = 0; j < cols; j++) {
+                            raw[i][j] = org.episteme.core.mathematics.numbers.real.RealBig.of(hpData.get(idx.getAndIncrement()));
+                        }
+                    }
+                    return org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix.of(raw, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
                 }
-                return null;
             });
-            return org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix.of(raw, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
         }
 
         ByteString byteData = proto.getData();
@@ -623,11 +647,24 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
 
         if (!proto.getHpDataList().isEmpty()) {
             List<String> hpData = proto.getHpDataList();
-            List<org.episteme.core.mathematics.numbers.real.Real> data = new ArrayList<>(size);
-            for (String s : hpData) {
-                data.add(org.episteme.core.mathematics.numbers.real.RealBig.of(s));
-            }
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(data, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
+            java.util.concurrent.atomic.AtomicInteger idx = new java.util.concurrent.atomic.AtomicInteger(0);
+            return org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                if (isComplex) {
+                    List<Complex> data = new ArrayList<>(size);
+                    for (int i = 0; i < size; i++) {
+                        org.episteme.core.mathematics.numbers.real.Real re = org.episteme.core.mathematics.numbers.real.RealBig.of(hpData.get(idx.getAndIncrement()));
+                        org.episteme.core.mathematics.numbers.real.Real im = org.episteme.core.mathematics.numbers.real.RealBig.of(hpData.get(idx.getAndIncrement()));
+                        data.add(Complex.of(re, im));
+                    }
+                    return DenseVector.of(data, Complex.ZERO);
+                } else {
+                    List<org.episteme.core.mathematics.numbers.real.Real> data = new ArrayList<>(size);
+                    for (int i = 0; i < size; i++) {
+                        data.add(org.episteme.core.mathematics.numbers.real.RealBig.of(hpData.get(idx.getAndIncrement())));
+                    }
+                    return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(data, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
+                }
+            });
         }
 
         ByteString byteData = proto.getData();

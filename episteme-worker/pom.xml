@@ -15,6 +15,7 @@
 
   <properties>
     <mainClass>org.episteme.worker.WorkerNode</mainClass>
+    <shade.skip>false</shade.skip>
   </properties>
 
   <dependencies>

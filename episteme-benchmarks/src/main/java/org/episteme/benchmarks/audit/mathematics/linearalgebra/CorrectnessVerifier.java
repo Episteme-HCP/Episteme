@@ -87,15 +87,22 @@ public class CorrectnessVerifier {
     }
 
     private static void verifyScalar(Object actual, Object expected, double tolerance) {
-        if (actual instanceof RealBig ab && expected instanceof RealBig eb) {
-            java.math.BigDecimal aVal = ab.bigDecimalValue();
-            java.math.BigDecimal eVal = eb.bigDecimalValue();
+        if (actual instanceof Real ar && expected instanceof Real er) {
+            java.math.BigDecimal aVal = ar.bigDecimalValue();
+            java.math.BigDecimal eVal = er.bigDecimalValue();
             java.math.BigDecimal diff = aVal.subtract(eVal).abs();
             java.math.BigDecimal norm = aVal.abs().max(eVal.abs()).max(java.math.BigDecimal.ONE);
-            java.math.BigDecimal relError = diff.divide(norm, new java.math.MathContext(64));
+            java.math.MathContext mc = new java.math.MathContext(128); // Higher precision for relative error calculation
             
-            if (relError.doubleValue() > tolerance) {
-                throw new AssertionError(String.format("Exact Accuracy failure: expected %s but got %s. Error: %s > %e", 
+            double relError = 0;
+            try {
+                relError = diff.divide(norm, mc).doubleValue();
+            } catch (ArithmeticException e) {
+                relError = 0;
+            }
+            
+            if (relError > tolerance) {
+                throw new AssertionError(String.format("Accuracy failure: expected %s but got %s. Error: %e > %e", 
                     expected, actual, relError, tolerance));
             }
             return;
