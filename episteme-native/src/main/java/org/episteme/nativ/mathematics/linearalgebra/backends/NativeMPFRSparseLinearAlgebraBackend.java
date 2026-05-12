@@ -1321,7 +1321,11 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
             // Square system
             org.episteme.core.mathematics.context.NumericalConfiguration config = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration();
-            E tol = createScalar(config.getEpsilonDouble(), b);
+            double eps = config.getEpsilonDouble();
+            if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+                eps = 1e-100; // Use extremely tight tolerance for EXACT mode
+            }
+            E tol = createScalar(eps, b);
             return bicgstab(a, b, Vector.zeros(b.dimension(), (org.episteme.core.mathematics.structures.rings.Ring<E>) b.getScalarRing()), tol, config.getMaxIterations());
         }
         // Rectangular solve

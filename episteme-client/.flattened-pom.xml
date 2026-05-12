@@ -19,6 +19,7 @@
     </license>
   </licenses>
   <properties>
+    <shade.skip>false</shade.skip>
     <mainClass>org.episteme.client.GridMonitorApp</mainClass>
   </properties>
   <dependencies>

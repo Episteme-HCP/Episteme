@@ -909,6 +909,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         int n = a.cols();
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
+        diag("Executing ADD with precision: " + prec + " bits");
 
         try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
             MemorySegment h_A = initMatrix(a, arena, tracker, prec, isComplex);
@@ -1017,6 +1018,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         int rows = a.rows();
         int cols = a.cols();
         MemorySegment mat = allocateMatrix(rows, cols, arena, tracker, prec, isComplex);
+        diag("Initializing Matrix [" + rows + "x" + cols + "] with precision: " + prec + " bits");
         MatrixStorage<?> storage = a.getStorage(); 
         
         for (int i = 0; i < rows; i++) {

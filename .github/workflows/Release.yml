@@ -62,12 +62,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B deploy -DskipTests -Djacoco.skip=true -Prelease-jdk25,fat-jar
 
-      - name: Build & Deploy to GitHub Packages (JDK 21)
-        # builds, attaches fat jars, and deploys to GitHub Packages
+      - name: Build & Verify on JDK 21
+        # verifies build integrity on JDK 21 without re-deploying (prevents 409 Conflict)
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn -B deploy -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar
+        run: mvn -B verify -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

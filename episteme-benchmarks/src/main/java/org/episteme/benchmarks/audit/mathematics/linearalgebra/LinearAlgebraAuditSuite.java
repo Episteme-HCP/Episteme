@@ -136,38 +136,34 @@ public class LinearAlgebraAuditSuite {
 
     private static <E> Matrix<E> randomMatrix(int rows, int cols, LinearAlgebraProvider<E> p, Ring<E> ring, Random rand) {
         MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(rows, cols, ring, 1.0);
-        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                storage.set(i, j, randomElement(ring, rand, isComplex));
+                storage.set(i, j, randomElement(ring.zero(), rand));
             }
         }
         return new GenericMatrix<>(storage, p, ring);
     }
 
     @SuppressWarnings("unchecked")
-    private static <E> E randomElement(Ring<E> ring, Random rand, boolean isComplex) {
-        E zero = ring.zero();
-        boolean isFloat = (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) ||
-                         (isComplex && ((org.episteme.core.mathematics.numbers.complex.Complex)(Object)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat);
-        
-        if (isComplex) {
+    private static <E> E randomElement(E zero, java.util.Random rand) {
+        if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             Real rVal, iVal;
-            if (isFloat) {
-                rVal = org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble());
-                iVal = org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble());
-            } else if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex c && c.getReal() instanceof RealBig) {
-                rVal = RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
-                iVal = RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
+            if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+                java.math.BigInteger rUnscaled = new java.math.BigInteger(128, rand);
+                java.math.BigInteger iUnscaled = new java.math.BigInteger(128, rand);
+                rVal = RealBig.create(new java.math.BigDecimal(rUnscaled, 40));
+                iVal = RealBig.create(new java.math.BigDecimal(iUnscaled, 40));
             } else {
                 rVal = Real.of(rand.nextDouble());
                 iVal = Real.of(rand.nextDouble());
             }
-            return (E) Complex.of(rVal, iVal);
+            return (E) org.episteme.core.mathematics.numbers.complex.Complex.of(rVal, iVal);
         }
         
-        if (zero instanceof RealBig) return (E) RealBig.create(java.math.BigDecimal.valueOf(rand.nextDouble()));
-        if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of((float)rand.nextDouble());
+        if (zero instanceof RealBig) {
+            java.math.BigInteger unscaled = new java.math.BigInteger(128, rand);
+            return (E) RealBig.create(new java.math.BigDecimal(unscaled, 40));
+        }
         if (zero instanceof Real) return (E) Real.of(rand.nextDouble());
         return zero;
     }
@@ -214,7 +210,7 @@ public class LinearAlgebraAuditSuite {
         
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                storage.set(i, j, i == j ? large : randomElement(ring, rand, isComplex));
+                storage.set(i, j, i == j ? large : randomElement(ring.zero(), rand));
             }
         }
         LinearAlgebraProvider<E> p = AlgorithmManager.getRegistry().selectLinearAlgebraProvider(OperationContext.DEFAULT, ring);
@@ -240,9 +236,8 @@ public class LinearAlgebraAuditSuite {
 
     private static <E> Vector<E> randomVector(int n, LinearAlgebraProvider<E> p, Ring<E> ring, Random rand) {
         VectorStorage<E> storage = AlgorithmManager.getRegistry().createVectorStorage(n, ring, 1.0);
-        boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         for (int i = 0; i < n; i++) {
-            storage.set(i, randomElement(ring, rand, isComplex));
+            storage.set(i, randomElement(ring.zero(), rand));
         }
         return new GenericVector<>(storage, p, ring);
     }

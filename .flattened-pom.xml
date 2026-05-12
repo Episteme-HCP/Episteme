@@ -1092,17 +1092,6 @@
       </properties>
     </profile>
     <profile>
-      <id>enable-shade-for-jars</id>
-      <activation>
-        <file>
-          <exists>src</exists>
-        </file>
-      </activation>
-      <properties>
-        <shade.skip>false</shade.skip>
-      </properties>
-    </profile>
-    <profile>
       <id>fat-jar</id>
       <build>
         <plugins>

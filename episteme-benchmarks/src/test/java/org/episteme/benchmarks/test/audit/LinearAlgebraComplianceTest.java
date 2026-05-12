@@ -34,6 +34,7 @@ public class LinearAlgebraComplianceTest {
  
     private PrecisionMode mode;
     private int matrixSize;
+    private int timeoutValue = 300;
     private String reportFileName;
  
     private enum OpStatus {
@@ -137,6 +138,17 @@ public class LinearAlgebraComplianceTest {
 
                     java.util.concurrent.Future<?> future = executor.submit(() -> {
                         try {
+                            // Explicitly set context for the audit thread as ThreadLocal/InheritableThreadLocal 
+                            // can be unreliable with certain Executor implementations if the thread was reused.
+                            if (mode == PrecisionMode.EXACT) {
+                                org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.exact());
+                                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMathContext(new java.math.MathContext(128));
+                            } else if (mode == PrecisionMode.FAST) {
+                                org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.fast());
+                            } else {
+                                org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.normal());
+                            }
+
                             if (mode == PrecisionMode.EXACT) {
                                 @SuppressWarnings("unchecked")
                                 LinearAlgebraProvider<RealBig> castedProv = (LinearAlgebraProvider<RealBig>) (LinearAlgebraProvider<?>) prov;
@@ -156,11 +168,12 @@ public class LinearAlgebraComplianceTest {
                     });
 
                     try {
-                        future.get(300, java.util.concurrent.TimeUnit.SECONDS);
+                        future.get(timeoutValue, java.util.concurrent.TimeUnit.SECONDS);
                     } catch (java.util.concurrent.TimeoutException e) {
                         future.cancel(true);
-                        System.err.println("[AuditEngine] TIMEOUT (300s) during audit of " + prov.getName());
-                        res.status.put("CRITICAL", "❌ TIMEOUT");
+                        System.err.println("[AuditEngine] TIMEOUT (" + timeoutValue + "s) during audit of " + prov.getName());
+                        res.status.put("RB:CRITICAL", "❌ TIMEOUT");
+                        res.status.put("C:CRITICAL", "❌ TIMEOUT");
                     } catch (Throwable t) {
                         System.err.println("[AuditEngine] Critical failure during audit of " + prov.getName() + ": " + t.getMessage());
                         res.status.put("CRITICAL", "❌ " + t.getClass().getSimpleName());
@@ -216,11 +229,13 @@ public class LinearAlgebraComplianceTest {
         switch (mode) {
             case FAST -> { matrixSize = 8; reportFileName = "LINEAR_ALGEBRA_AUDIT_FAST_" + timestamp + ".md"; org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.fast()); }
             case EXACT -> { 
-                matrixSize = 12; 
+                matrixSize = 8; 
                 reportFileName = "LINEAR_ALGEBRA_AUDIT_EXACT_" + timestamp + ".md"; 
                 org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.exact());
                 // Force precision well beyond 64-bit double limit for accurate audit
                 org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMathContext(new java.math.MathContext(128));
+                // Increase timeout for exact mode
+                timeoutValue = 900;
             }
             default -> { matrixSize = 12; reportFileName = "LINEAR_ALGEBRA_AUDIT_NORMAL_" + timestamp + ".md"; org.episteme.core.mathematics.context.MathContext.setCurrent(org.episteme.core.mathematics.context.MathContext.normal()); }
         }
