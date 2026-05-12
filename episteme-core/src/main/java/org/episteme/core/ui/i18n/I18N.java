@@ -48,7 +48,6 @@ public class I18N {
     private final List<Consumer<Locale>> listeners = new ArrayList<>();
 
     private I18N() {
-        System.out.println("[DEBUG] I18N: Initializing I18N, current locale is: " + currentLocale);
         // Auto-register all known bundles
         addBundle(CORE_BUNDLE_BASE);
         // Try to load additional bundles (they may not be on classpath depending on module)
@@ -64,9 +63,8 @@ public class I18N {
         try {
             ResourceBundle.getBundle(bundleBase, currentLocale, new Utf8Control());
             addBundle(bundleBase);
-            System.out.println("[DEBUG] I18N: Successfully auto-registered bundle: " + bundleBase);
         } catch (MissingResourceException e) {
-            System.out.println("[DEBUG] I18N: Bundle not found on classpath: " + bundleBase);
+            // Bundle not found on classpath
         }
     }
 
@@ -171,7 +169,6 @@ public class I18N {
                 }
             }
         }
-        System.out.println("[DEBUG] I18N: Missing key '" + key + "' in any of: " + bundleBases);
         // Return key as fallback
         return markIfTest(key);
     }
