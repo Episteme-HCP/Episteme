@@ -25,6 +25,45 @@ public record LUResult<E>(Matrix<E> L, Matrix<E> U, Vector<E> P) {
     public Vector<E> getP() { return P; }
 
     /**
+     * Reconstructs the matrix A (as permuted by P).
+     * <p>
+     * Returns P * A = L * U.
+     * </p>
+     *
+     * @return the reconstructed matrix L * U
+     */
+    @SuppressWarnings("unchecked")
+    public Matrix<E> reconstruct() {
+        return (Matrix<E>) ((Matrix<Object>) L).multiply((Matrix<Object>) U);
+    }
+
+    /**
+     * Reconstructs the original matrix A (un-permuted).
+     *
+     * @return the original matrix A
+     */
+    @SuppressWarnings("unchecked")
+    public Matrix<E> getOriginalA() {
+        int n = L.rows();
+        Matrix<E> LU = reconstruct();
+        E[][] data = (E[][]) new Object[n][LU.cols()];
+        for (int i = 0; i < n; i++) {
+            Object pVal = P.get(i);
+            int pIdx;
+            if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
+            else if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+            else if (pVal instanceof org.episteme.core.mathematics.numbers.complex.Complex) pIdx = (int) ((org.episteme.core.mathematics.numbers.complex.Complex) pVal).real();
+            else pIdx = i;
+            
+            // Row i of LU is original row pIdx of A
+            for (int j = 0; j < LU.cols(); j++) {
+                data[pIdx][j] = LU.get(i, j);
+            }
+        }
+        return Matrix.of(data, L.getScalarRing());
+    }
+
+    /**
      * Solves the system A * x = b using the LU decomposition results.
      *
      * @param b the right-hand side vector

@@ -175,7 +175,8 @@ public class LinearAlgebraComplianceTest {
                         res.status.put("RB:CRITICAL", "❌ TIMEOUT");
                         res.status.put("C:CRITICAL", "❌ TIMEOUT");
                     } catch (Throwable t) {
-                        if (t.getCause() instanceof io.grpc.StatusRuntimeException || t instanceof io.grpc.StatusRuntimeException) {
+                        if (t.getCause() instanceof io.grpc.StatusRuntimeException || t instanceof io.grpc.StatusRuntimeException || 
+                            (t.getMessage() != null && t.getMessage().contains("Remote server is unavailable"))) {
                             System.out.println("[AuditEngine] gRPC Backend Unreachable: " + prov.getName() + ". Marking as DISABLED.");
                             res.status.put("gRPC:READY", OpStatus.DISABLED.toString());
                             res.available = false;
@@ -316,7 +317,8 @@ public class LinearAlgebraComplianceTest {
             res.status.put(opName, OpStatus.UNSUPPORTED.toString());
             res.latencies.put(opName, 0.0);
         } catch (Throwable e) {
-            if (e.getCause() instanceof io.grpc.StatusRuntimeException || e instanceof io.grpc.StatusRuntimeException) {
+            if (e.getCause() instanceof io.grpc.StatusRuntimeException || e instanceof io.grpc.StatusRuntimeException ||
+                (e.getMessage() != null && e.getMessage().contains("Remote server is unavailable"))) {
                 res.status.put(opName, OpStatus.DISABLED.toString());
                 res.latencies.put(opName, 0.0);
             } else {

@@ -268,6 +268,16 @@ public class DistributedLinearAlgebraProvider<E> implements SparseLinearAlgebraP
     }
 
     @Override
+    public E trace(Matrix<E> a) {
+        return executeOnLocal(a.getScalarRing(), p -> p.trace(a));
+    }
+
+    @Override
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        return wrap((Vector<E>) executeOnLocal(b.getScalarRing(), p -> p.solveTriangular(A, b, upper, transpose, conjugate, unit)));
+    }
+
+    @Override
     public Matrix<E> inverse(Matrix<E> a) {
         return wrap((Matrix<E>) executeOnLocal(a.getScalarRing(), p -> p.inverse(a)));
     }
