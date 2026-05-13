@@ -1171,6 +1171,17 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         return data;
     }
 
+    private double getDouble(E val) {
+        if (val instanceof Number n) return n.doubleValue();
+        if (val instanceof Real r) return r.doubleValue();
+        if (val instanceof Complex c) return c.real();
+        return 0.0;
+    }
+
+    private double getRealValue(E val) {
+        return getDouble(val);
+    }
+
     private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof Complex; }
     private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
 
