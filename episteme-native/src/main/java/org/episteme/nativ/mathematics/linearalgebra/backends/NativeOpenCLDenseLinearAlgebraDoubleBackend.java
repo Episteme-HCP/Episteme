@@ -316,7 +316,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     public Vector<E> normalize(Vector<E> v) {
         E n = norm(v);
         if (n == null) return v;
-        double nv = getRealValue(n);
+        double nv = extractDouble(n);
         if (nv == 0) return v;
         
         int dim = v.dimension();
@@ -342,15 +342,11 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         }
     }
 
-    private double getDouble(E val) {
+    private double extractDouble(Object val) {
         if (val instanceof Complex c) return c.real();
         if (val instanceof Real r) return r.doubleValue();
         if (val instanceof Number n) return n.doubleValue();
         return 0.0;
-    }
-
-    private double getRealValue(E val) {
-        return getDouble(val);
     }
 
     @Override
@@ -366,8 +362,8 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
                 a1.multiply(b2).subtract(a2.multiply(b1))
             ), (Ring) ring);
         }
-        double a1 = getReal(a.get(0)), a2 = getReal(a.get(1)), a3 = getReal(a.get(2));
-        double b1 = getReal(b.get(0)), b2 = getReal(b.get(1)), b3 = getReal(b.get(2));
+        double a1 = extractDouble(a.get(0)), a2 = extractDouble(a.get(1)), a3 = extractDouble(a.get(2));
+        double b1 = extractDouble(b.get(0)), b2 = extractDouble(b.get(1)), b3 = extractDouble(b.get(2));
         return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
             (E) RealDouble.of(a2 * b3 - a3 * b2),
             (E) RealDouble.of(a3 * b1 - a1 * b3),
@@ -382,19 +378,14 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         return Complex.ZERO;
     }
 
-    private double getReal(Object o) {
-        if (o instanceof Real r) return r.doubleValue();
-        if (o instanceof Number n) return n.doubleValue();
-        if (o instanceof Complex c) return c.real();
-        return 0.0;
-    }
+
 
     @Override
     public E angle(Vector<E> a, Vector<E> b) {
         E d = dot(a, b);
         E nA = norm(a);
         E nB = norm(b);
-        double cosTheta = getRealValue(d) / (getRealValue(nA) * getRealValue(nB));
+        double cosTheta = extractDouble(d) / (extractDouble(nA) * extractDouble(nA));
         return (E) RealDouble.of(Math.acos(Math.max(-1.0, Math.min(1.0, cosTheta))));
     }
 
@@ -1027,7 +1018,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     private double[] toDoubleVec(Vector<E> v) {
         int n = v.dimension();
         double[] data = new double[n];
-        for (int i = 0; i < n; i++) data[i] = getDouble(v.get(i));
+        for (int i = 0; i < n; i++) data[i] = extractDouble(v.get(i));
         return data;
     }
 
@@ -1040,7 +1031,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
                 data[i * 2] = cv.real();
                 data[i * 2 + 1] = cv.imaginary();
             } else {
-                data[i * 2] = getDouble(val);
+                data[i * 2] = extractDouble(val);
                 data[i * 2 + 1] = 0.0;
             }
         }
@@ -1118,7 +1109,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         double[] data = new double[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = getDouble(m.get(i, j));
+                data[i * cols + j] = extractDouble(m.get(i, j));
             }
         }
         return data;
@@ -1159,7 +1150,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
                     data[(i * cols + j) * 2] = cv.real();
                     data[(i * cols + j) * 2 + 1] = cv.imaginary();
                 } else {
-                    data[(i * cols + j) * 2] = getRealValue(val);
+                    data[(i * cols + j) * 2] = extractDouble(val);
                     data[(i * cols + j) * 2 + 1] = 0.0;
                 }
             }
@@ -1171,7 +1162,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     private double[] toDoubleArrayVec(Vector<E> v) {
         int dim = v.dimension();
         double[] data = new double[dim];
-        for (int i = 0; i < dim; i++) data[i] = getRealValue(v.get(i));
+        for (int i = 0; i < dim; i++) data[i] = extractDouble(v.get(i));
         return data;
     }
 
