@@ -144,10 +144,10 @@ public class I18N {
      * Toggles between English and French.
      */
     public void toggleLanguage() {
-        if (currentLocale.getLanguage().equals(Locale.FRENCH.getLanguage())) {
-            setLocale(Locale.ENGLISH);
-        } else {
+        if (currentLocale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
             setLocale(Locale.FRENCH);
+        } else {
+            setLocale(Locale.ENGLISH);
         }
     }
 
