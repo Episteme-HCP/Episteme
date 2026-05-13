@@ -251,4 +251,14 @@ public class LinearAlgebraAuditSuite {
         }
         return new GenericMatrix<>(storage, p, ring);
     }
+
+    private static <E> E getSmallTolerance(Ring<E> ring) {
+        if (ring.zero() instanceof RealBig) {
+            return (E) RealBig.create(new java.math.BigDecimal("1e-40"));
+        }
+        if (ring.zero() instanceof Complex c && c.getReal() instanceof RealBig) {
+            return (E) Complex.of(RealBig.create(new java.math.BigDecimal("1e-40")), RealBig.ZERO);
+        }
+        return (E) (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat ? org.episteme.core.mathematics.numbers.real.RealFloat.of(1e-12f) : Real.of(1e-12));
+    }
 }

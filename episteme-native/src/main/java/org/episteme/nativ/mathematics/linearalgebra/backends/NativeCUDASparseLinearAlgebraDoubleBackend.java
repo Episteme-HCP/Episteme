@@ -198,12 +198,19 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         return data;
     }
 
+    private Complex getComplex(Object val) {
+        if (val instanceof Complex c) return c;
+        if (val instanceof Number n) return Complex.of(RealDouble.of(n.doubleValue()));
+        if (val instanceof Real r) return Complex.of(RealDouble.of(r.doubleValue()));
+        throw new IllegalArgumentException("Cannot convert to complex: " + val.getClass());
+    }
+
     private double[] toComplexDoubleArrayGeneric(Matrix<E> m) {
         int rows = m.rows(); int cols = m.cols();
         double[] data = new double[rows * cols * 2];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                Complex c = (Complex) m.get(i, j);
+                Complex c = getComplex(m.get(i, j));
                 data[(i * cols + j) * 2] = c.real();
                 data[(i * cols + j) * 2 + 1] = c.imaginary();
             }
@@ -243,7 +250,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         Object[] vals = m.getValues();
         double[] data = new double[vals.length * 2];
         for (int i = 0; i < vals.length; i++) {
-            Complex c = (Complex) vals[i];
+            Complex c = getComplex(vals[i]);
             data[i * 2] = ((Number) c.real()).doubleValue();
             data[i * 2 + 1] = ((Number) c.imaginary()).doubleValue();
         }
@@ -254,7 +261,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         int dim = v.dimension();
         double[] data = new double[dim * 2];
         for (int i = 0; i < dim; i++) {
-            Complex c = (Complex) v.get(i);
+            Complex c = getComplex(v.get(i));
             data[i * 2] = ((Number) c.real()).doubleValue();
             data[i * 2 + 1] = ((Number) c.imaginary()).doubleValue();
         }
@@ -643,7 +650,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
             for (int i = 0; i < n; i++) {
                 for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
                     if (colIdx[j] == i) {
-                        sum = sum.add((Complex) values[j]);
+                        sum = sum.add(getComplex(values[j]));
                         break;
                     }
                 }

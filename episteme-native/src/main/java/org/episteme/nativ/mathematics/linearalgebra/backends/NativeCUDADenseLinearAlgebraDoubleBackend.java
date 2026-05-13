@@ -671,7 +671,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
         int n = a.rows();
         if (isComplex(a)) {
             Complex det = Complex.ONE;
-            for (int i = 0; i < n; i++) det = det.multiply((Complex) U.get(i, i));
+            for (int i = 0; i < n; i++) det = det.multiply(getComplex(U.get(i, i)));
             return (E) det;
         }
         double det = 1.0;
