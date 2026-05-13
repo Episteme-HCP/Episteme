@@ -585,6 +585,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.lu(a);
         int n = a.rows();
         float[] data = toFloatArray(a);
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -630,6 +631,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.qr(a);
         int m = a.rows();
         int n = a.cols();
         float[] data = toFloatArray(a);
@@ -707,6 +709,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.svd(a);
         int m = a.rows(); int n = a.cols();
         float[] data = toFloatArray(a);
         float[] vData = new float[n * n];
@@ -784,6 +787,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Float Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.cholesky(a);
         int n = a.rows();
         float[] data = toFloatArray(a);
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -1036,7 +1040,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         float[] data = new float[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = ((Number) m.get(i, j)).floatValue();
+                data[i * cols + j] = getFloat(m.get(i, j));
             }
         }
         return data;
@@ -1045,7 +1049,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     private float[] toFloatVec(Vector<E> v) {
         int n = v.dimension();
         float[] data = new float[n];
-        for (int i = 0; i < n; i++) data[i] = ((Number) v.get(i)).floatValue();
+        for (int i = 0; i < n; i++) data[i] = getFloat(v.get(i));
         return data;
     }
 

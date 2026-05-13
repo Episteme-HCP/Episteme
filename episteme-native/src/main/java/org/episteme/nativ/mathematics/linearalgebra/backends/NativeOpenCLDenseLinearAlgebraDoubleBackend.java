@@ -614,6 +614,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.lu(a);
         int n = a.rows();
         double[] data = toDoubleArray(a);
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -661,6 +662,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.qr(a);
         int m = a.rows();
         int n = a.cols();
         double[] data = toDoubleArray(a);
@@ -747,6 +749,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.svd(a);
         int m = a.rows(); int n = a.cols();
         double[] data = toDoubleArray(a);
         double[] vData = new double[n * n];
@@ -825,6 +828,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException("OpenCL Double Backend not available");
+        if (isComplex(a)) return LinearAlgebraProvider.super.cholesky(a);
         int n = a.rows();
         double[] data = toDoubleArray(a);
         try (ResourceTracker tracker = new ResourceTracker()) {
@@ -1019,7 +1023,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
     private double[] toDoubleVec(Vector<E> v) {
         int n = v.dimension();
         double[] data = new double[n];
-        for (int i = 0; i < n; i++) data[i] = getRealValue(v.get(i));
+        for (int i = 0; i < n; i++) data[i] = getDouble(v.get(i));
         return data;
     }
 
@@ -1032,7 +1036,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
                 data[i * 2] = cv.real();
                 data[i * 2 + 1] = cv.imaginary();
             } else {
-                data[i * 2] = getRealValue(val);
+                data[i * 2] = getDouble(val);
                 data[i * 2 + 1] = 0.0;
             }
         }
@@ -1110,7 +1114,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         double[] data = new double[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = getRealValue(m.get(i, j));
+                data[i * cols + j] = getDouble(m.get(i, j));
             }
         }
         return data;

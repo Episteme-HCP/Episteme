@@ -83,7 +83,11 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
         }
 
         if (proto.getMathContextPrecision() > 0) {
-            context = MathContext.withPrecision(proto.getMathContextPrecision());
+            java.math.RoundingMode rm = java.math.RoundingMode.HALF_UP;
+            if (proto.getMathContextRoundingMode() >= 0 && proto.getMathContextRoundingMode() < java.math.RoundingMode.values().length) {
+                rm = java.math.RoundingMode.values()[proto.getMathContextRoundingMode()];
+            }
+            context = MathContext.withPrecision(proto.getMathContextPrecision(), rm);
         }
 
         return context;
@@ -293,7 +297,7 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                 Vector<?> result = prov.solveTriangular(
                     matrix, 
                     vector, 
-                    request.getLower(), 
+                    !request.getLower(), 
                     request.getTranspose(), 
                     request.getConjugate(), 
                     request.getUnit()

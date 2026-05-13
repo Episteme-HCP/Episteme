@@ -27,6 +27,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import org.episteme.server.server.proto.*;
+import org.episteme.server.server.proto.common.NumericalContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -139,6 +140,26 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         return state != io.grpc.ConnectivityState.SHUTDOWN && state != io.grpc.ConnectivityState.TRANSIENT_FAILURE;
     }
 
+    private NumericalContext getNumericalContext() {
+        org.episteme.core.mathematics.context.MathContext mc = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        NumericalContext.Builder builder = NumericalContext.newBuilder();
+        
+        switch (mc.getRealPrecision()) {
+            case FAST -> builder.setRealPrecision(NumericalContext.RealPrecision.FAST);
+            case EXACT -> builder.setRealPrecision(NumericalContext.RealPrecision.EXACT);
+            default -> builder.setRealPrecision(NumericalContext.RealPrecision.NORMAL);
+        }
+        
+        builder.setMathContextPrecision(mc.getNumericalConfiguration().getMathContext().getPrecision());
+        builder.setMathContextRoundingMode(mc.getNumericalConfiguration().getMathContext().getRoundingMode().ordinal());
+        
+        // Propagate preferred backend if set in context metadata
+        String pref = mc.getMetadata("org.episteme.backend.preference");
+        if (pref != null) builder.setBackendId(pref);
+        
+        return builder.build();
+    }
+
     @Override
     public Object createBackend() {
         return this;
@@ -219,6 +240,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         MatrixRequest request = MatrixRequest.newBuilder()
                 .setMatrixA(protoA)
                 .setMatrixB(protoB)
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -237,6 +259,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         MatrixRequest request = MatrixRequest.newBuilder()
                 .setMatrixA(protoA)
                 .setMatrixB(protoB)
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -255,6 +278,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         MatrixRequest request = MatrixRequest.newBuilder()
                 .setMatrixA(protoA)
                 .setMatrixB(protoB)
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -269,6 +293,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     public Matrix<E> transpose(Matrix<E> a) {
         SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -283,6 +308,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     public Matrix<E> inverse(Matrix<E> a) {
         SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -311,6 +337,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         }
 
         try {
+            builder.setContext(getNumericalContext());
             MatrixResponse response = blockingStub.matrixScale(builder.build());
             return fromProtoMatrix(response.getResult());
         } catch (StatusRuntimeException e) {
@@ -322,6 +349,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     public E determinant(Matrix<E> a) {
         SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -337,6 +365,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     public E trace(Matrix<E> a) {
         SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -357,6 +386,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
                 .setUnit(unit)
                 .setTranspose(transpose)
                 .setConjugate(conjugate)
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -374,6 +404,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         VectorRequest request = VectorRequest.newBuilder()
                 .setVectorA(toProtoVector(a))
                 .setVectorB(toProtoVector(b))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -389,6 +420,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         VectorRequest request = VectorRequest.newBuilder()
                 .setVectorA(toProtoVector(a))
                 .setVectorB(toProtoVector(b))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -417,6 +449,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         }
 
         try {
+            builder.setContext(getNumericalContext());
             VectorResponse response = blockingStub.vectorScale(builder.build());
             return fromProtoVector(response.getResult());
         } catch (StatusRuntimeException e) {
@@ -429,6 +462,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         VectorRequest request = VectorRequest.newBuilder()
                 .setVectorA(toProtoVector(a))
                 .setVectorB(toProtoVector(b))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -443,6 +477,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     public E norm(Vector<E> a) {
         SingleVectorRequest request = SingleVectorRequest.newBuilder()
                 .setVector(toProtoVector(a))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -460,6 +495,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         MatrixVectorRequest request = MatrixVectorRequest.newBuilder()
                 .setMatrix(toProtoMatrix(m))
                 .setVector(toProtoVector(v))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -475,6 +511,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         MatrixVectorRequest request = MatrixVectorRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
                 .setVector(toProtoVector(b))
+                .setContext(getNumericalContext())
                 .build();
 
         try {
@@ -488,7 +525,11 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<E> lu(Matrix<E> a) {
         try {
-            LUResponse response = blockingStub.matrixLU(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
+                .build();
+            LUResponse response = blockingStub.matrixLU(request);
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<>(
                 fromProtoMatrix(response.getL()),
                 fromProtoMatrix(response.getU()),
@@ -502,7 +543,11 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<E> qr(Matrix<E> a) {
         try {
-            QRResponse response = blockingStub.matrixQR(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
+                .build();
+            QRResponse response = blockingStub.matrixQR(request);
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<>(
                 fromProtoMatrix(response.getQ()),
                 fromProtoMatrix(response.getR())
@@ -515,7 +560,11 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) {
         try {
-            SVDResponse response = blockingStub.matrixSVD(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
+                .build();
+            SVDResponse response = blockingStub.matrixSVD(request);
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<>(
                 fromProtoMatrix(response.getU()),
                 fromProtoVector(response.getS()),
@@ -529,7 +578,11 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) {
         try {
-            CholeskyResponse response = blockingStub.matrixCholesky(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
+                .build();
+            CholeskyResponse response = blockingStub.matrixCholesky(request);
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<>(
                 fromProtoMatrix(response.getL())
             );
@@ -541,7 +594,11 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @Override
     public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) {
         try {
-            EigenResponse response = blockingStub.matrixEigen(SingleMatrixRequest.newBuilder().setMatrix(toProtoMatrix(a)).build());
+            SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .setContext(getNumericalContext())
+                .build();
+            EigenResponse response = blockingStub.matrixEigen(request);
             return new org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<>(
                 fromProtoMatrix(response.getV()),
                 fromProtoVector(response.getD())
@@ -614,8 +671,8 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         if (!data.getHpDataList().isEmpty()) {
             List<String> hpData = data.getHpDataList();
             List<List<E>> matrixRows = new ArrayList<>();
-            // Use RealBig.ZERO or Complex for ring
-            Object ring = isComplex ? org.episteme.core.mathematics.numbers.complex.Complex.of(RealBig.ZERO, RealBig.ZERO) : RealBig.ZERO;
+            // Select correct field based on complex flag
+            Field<?> targetField = isComplex ? org.episteme.core.mathematics.sets.Complexes.getInstance() : org.episteme.core.mathematics.sets.Reals.getInstance();
             
             org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
                 int idx = 0;
@@ -636,7 +693,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
                 }
                 return null;
             });
-            return DenseMatrix.of(matrixRows, (Field<E>) ring);
+            return DenseMatrix.of(matrixRows, (Field<E>) targetField);
         }
 
         ByteString byteData = data.getData();
@@ -661,7 +718,8 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
             matrixRows.add(row);
         }
 
-        return DenseMatrix.of(matrixRows, field);
+        Field<?> targetField = isComplex ? org.episteme.core.mathematics.sets.Complexes.getInstance() : org.episteme.core.mathematics.sets.Reals.getInstance();
+        return DenseMatrix.of(matrixRows, (Field<E>) targetField);
     }
 
     private VectorData toProtoVector(Vector<E> vector) {
@@ -719,8 +777,8 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         if (!data.getHpDataList().isEmpty()) {
             List<String> hpData = data.getHpDataList();
             List<E> elements = new ArrayList<>();
-            // Use RealBig.ZERO or Complex for ring
-            Object ring = isComplex ? org.episteme.core.mathematics.numbers.complex.Complex.of(RealBig.ZERO, RealBig.ZERO) : RealBig.ZERO;
+            // Select correct field based on complex flag
+            Field<?> targetField = isComplex ? org.episteme.core.mathematics.sets.Complexes.getInstance() : org.episteme.core.mathematics.sets.Reals.getInstance();
             
             org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
                 int idx = 0;
@@ -735,7 +793,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
                 }
                 return null;
             });
-            return DenseVector.of(elements, (Field<E>) ring);
+            return DenseVector.of(elements, (Field<E>) targetField);
         }
 
         ByteString byteData = data.getData();
@@ -755,7 +813,8 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
             }
         }
 
-        return DenseVector.of(elements, field);
+        Field<?> targetField = isComplex ? org.episteme.core.mathematics.sets.Complexes.getInstance() : org.episteme.core.mathematics.sets.Reals.getInstance();
+        return DenseVector.of(elements, (Field<E>) targetField);
     }
 
     @SuppressWarnings("unchecked")
@@ -821,6 +880,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
                 .setX0(toProtoVector(x0))
                 .setTolerance(toProtoScalar(tolerance))
                 .setMaxIterations(maxIterations)
+                .setContext(getNumericalContext())
                 .build();
         try {
             VectorResponse response = blockingStub.biCGSTAB(request);
@@ -838,6 +898,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
                 .setX0(toProtoVector(x0))
                 .setTolerance(toProtoScalar(tolerance))
                 .setMaxIterations(maxIterations)
+                .setContext(getNumericalContext())
                 .build();
         try {
             VectorResponse response = blockingStub.conjugateGradient(request);
@@ -856,6 +917,7 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
                 .setTolerance(toProtoScalar(tolerance))
                 .setMaxIterations(maxIterations)
                 .setRestart(restart)
+                .setContext(getNumericalContext())
                 .build();
         try {
             VectorResponse response = blockingStub.gMRES(request);

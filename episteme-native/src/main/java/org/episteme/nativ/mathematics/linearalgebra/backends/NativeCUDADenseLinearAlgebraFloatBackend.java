@@ -484,7 +484,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     @Override
     public LUResult<E> lu(Matrix<E> a) {
         if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
-        if (isComplex(a)) throw new UnsupportedOperationException("Complex LU not yet implemented");
+        if (isComplex(a)) return luComplex(a);
         
         int m = a.rows();
         int n = a.cols();
@@ -926,11 +926,12 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
     }
 
     private float[] toFloatArray(Matrix<E> m) {
-        int rows = m.rows(); int cols = m.cols();
+        int rows = m.rows();
+        int cols = m.cols();
         float[] data = new float[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = ((Number) m.get(i, j)).floatValue();
+                data[i * cols + j] = getFloat(m.get(i, j));
             }
         }
         return data;

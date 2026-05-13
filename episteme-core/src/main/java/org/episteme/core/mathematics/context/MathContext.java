@@ -333,7 +333,18 @@ public final class MathContext {
      * @return the new context
      */
     public static MathContext withPrecision(int precision) {
-        return MathContext.exact().withJavaMathContext(new java.math.MathContext(precision, java.math.RoundingMode.HALF_UP));
+        return withPrecision(precision, java.math.RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Returns a new context with the specified precision and rounding mode (EXACT mode).
+     * 
+     * @param precision the number of digits
+     * @param rm the rounding mode
+     * @return the new context
+     */
+    public static MathContext withPrecision(int precision, java.math.RoundingMode rm) {
+        return MathContext.exact().withJavaMathContext(new java.math.MathContext(precision, rm));
     }
 
     @Override
