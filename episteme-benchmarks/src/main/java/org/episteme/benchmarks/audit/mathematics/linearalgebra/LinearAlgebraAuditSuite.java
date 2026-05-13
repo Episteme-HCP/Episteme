@@ -169,16 +169,6 @@ public class LinearAlgebraAuditSuite {
     }
 
     @SuppressWarnings("unchecked")
-    private static <E> E getSmallTolerance(Ring<E> ring) {
-        E zero = ring.zero();
-        if (zero instanceof RealBig) return (E) RealBig.create(new java.math.BigDecimal("1e-12"));
-        if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) return (E) org.episteme.core.mathematics.numbers.real.RealFloat.of(1e-6f);
-        if (zero instanceof Complex c) {
-            if (c.getReal() instanceof RealBig) return (E) Complex.of(RealBig.create(new java.math.BigDecimal("1e-12")));
-            return (E) Complex.of(1e-10);
-        }
-        return (E) Real.of(1e-10);
-    }
 
     private static <E> Matrix<E> randomInvertibleMatrix(int n, Ring<E> ring, Random rand) {
         MatrixStorage<E> storage = AlgorithmManager.getRegistry().createStorage(n, n, ring, 1.0);

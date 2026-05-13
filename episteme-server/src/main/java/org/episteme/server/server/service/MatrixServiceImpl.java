@@ -269,6 +269,46 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
 
     @Override
     @SuppressWarnings("unchecked")
+    public void matrixTrace(SingleMatrixRequest request, StreamObserver<ScalarResponse> responseObserver) {
+        try {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Object trace = prov.trace(matrix);
+                responseObserver.onNext(toProtoScalar(trace));
+                responseObserver.onCompleted();
+                return null;
+            });
+        } catch (Exception e) {
+            handleError("matrixTrace", e, responseObserver);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void solveTriangular(TriangularSolveRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
+                Vector<?> result = prov.solveTriangular(
+                    matrix, 
+                    vector, 
+                    request.getLower(), 
+                    request.getTranspose(), 
+                    request.getConjugate(), 
+                    request.getUnit()
+                );
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
+        } catch (Exception e) {
+            handleError("solveTriangular", e, responseObserver);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void vectorAdd(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
             executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {

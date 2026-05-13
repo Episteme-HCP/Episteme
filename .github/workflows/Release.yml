@@ -70,11 +70,12 @@ jobs:
           cache: maven
 
       - name: Build & Verify on JDK 21
-        # verifies build integrity on JDK 21 using the correct JDK version
+        # verifies build integrity on JDK 21 using the correct JDK version.
+        # 'clean' is essential here to remove JDK 25 binaries from previous step.
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn -B verify -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar
+        run: mvn -B clean verify -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

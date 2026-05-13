@@ -175,9 +175,17 @@ public class LinearAlgebraComplianceTest {
                         res.status.put("RB:CRITICAL", "❌ TIMEOUT");
                         res.status.put("C:CRITICAL", "❌ TIMEOUT");
                     } catch (Throwable t) {
-                        System.err.println("[AuditEngine] Critical failure during audit of " + prov.getName() + ": " + t.getMessage());
-                        res.status.put("CRITICAL", "❌ " + t.getClass().getSimpleName());
+                        if (t.getCause() instanceof io.grpc.StatusRuntimeException || t instanceof io.grpc.StatusRuntimeException) {
+                            System.out.println("[AuditEngine] gRPC Backend Unreachable: " + prov.getName() + ". Marking as DISABLED.");
+                            res.status.put("gRPC:READY", OpStatus.DISABLED.toString());
+                            res.available = false;
+                        } else {
+                            System.err.println("[AuditEngine] Critical failure during audit of " + prov.getName() + ": " + t.getMessage());
+                            res.status.put("CRITICAL", "❌ " + t.getClass().getSimpleName());
+                        }
                     }
+                } else {
+                    res.status.put("AVAILABILITY", OpStatus.DISABLED.toString());
                 }
                 results.add(res);
                 globalResults.add(res);
@@ -308,8 +316,13 @@ public class LinearAlgebraComplianceTest {
             res.status.put(opName, OpStatus.UNSUPPORTED.toString());
             res.latencies.put(opName, 0.0);
         } catch (Throwable e) {
-            res.status.put(opName, "❌ " + e.getClass().getSimpleName());
-            res.latencies.put(opName, -1.0);
+            if (e.getCause() instanceof io.grpc.StatusRuntimeException || e instanceof io.grpc.StatusRuntimeException) {
+                res.status.put(opName, OpStatus.DISABLED.toString());
+                res.latencies.put(opName, 0.0);
+            } else {
+                res.status.put(opName, "❌ " + e.getClass().getSimpleName());
+                res.latencies.put(opName, -1.0);
+            }
             
             // Capture detailed failure info
             Map<String, Object> failureInfo = new HashMap<>();
