@@ -9,17 +9,22 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.episteme.core.Episteme;
-import org.episteme.core.io.ResourceIO;
+import org.episteme.core.io.UserPreferences;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.tensors.TensorProvider;
+import org.episteme.core.mathematics.context.ComputeMode;
+import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.mathematics.context.NumericalConfiguration;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
-import org.episteme.core.io.UserPreferences;
-import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.ui.Viewer;
-import org.episteme.core.mathematics.context.NumericalConfiguration;
-import org.episteme.core.mathematics.context.MathContext;
-import org.episteme.core.mathematics.context.ComputeMode;
+import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.ThemeManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Episteme Master Control - The central dashboard for the Episteme environment.
@@ -563,35 +568,42 @@ public class EpistemeMasterControl extends Application {
         );
 
         Accordion accordion = new Accordion();
-        String[] types = {
-            BackendDiscovery.TYPE_MATH, BackendDiscovery.TYPE_LINEAR_ALGEBRA, BackendDiscovery.TYPE_TENSOR,
-            BackendDiscovery.TYPE_AUDIO, BackendDiscovery.TYPE_ML, BackendDiscovery.TYPE_VISION,
+        
+        // 1. High-level Algorithm Providers
+        Map<String, Class<? extends AlgorithmProvider>> algoTypes = new LinkedHashMap<>();
+        algoTypes.put(i18n.get("category.la", "Linear Algebra"), LinearAlgebraProvider.class);
+        algoTypes.put(i18n.get("category.tensor", "Tensor Computing"), TensorProvider.class);
+        
+        // Add more types if they exist on classpath
+        try { algoTypes.put(i18n.get("category.ml", "Machine Learning"), (Class<? extends AlgorithmProvider>) Class.forName("org.episteme.core.mathematics.ml.MLProvider")); } catch (Exception e) {}
+        try { algoTypes.put(i18n.get("category.vision", "Computer Vision"), (Class<? extends AlgorithmProvider>) Class.forName("org.episteme.core.media.vision.VisionAlgorithmProvider")); } catch (Exception e) {}
+
+        for (Map.Entry<String, Class<? extends AlgorithmProvider>> entry : algoTypes.entrySet()) {
+            VBox catBox = createAlgorithmCategory(i18n, entry.getKey(), entry.getValue());
+            if (!catBox.getChildren().isEmpty()) {
+                TitledPane pane = new TitledPane(entry.getKey(), catBox);
+                accordion.getPanes().add(pane);
+            }
+        }
+
+        // 2. Low-level Backends (Legacy/Engines)
+        String[] backendTypes = {
+            BackendDiscovery.TYPE_MATH, BackendDiscovery.TYPE_AUDIO,
             BackendDiscovery.TYPE_DISTRIBUTED, BackendDiscovery.TYPE_GRAPH, BackendDiscovery.TYPE_MAP
         };
-        String[] labels = {
+        String[] backendLabels = {
             i18n.get("category.math", "Mathematics"),
-            i18n.get("category.la", "Linear Algebra"),
-            i18n.get("category.tensor", "Tensor Computing"),
             i18n.get("category.audio", "Audio Processing"),
-            i18n.get("category.ml", "Machine Learning"),
-            i18n.get("category.vision", "Computer Vision"),
             i18n.get("category.distributed", "Distributed Systems"),
             i18n.get("category.graph", "Graph Analysis"),
             i18n.get("category.map", "Geospatial Analysis")
         };
 
-        for (int i = 0; i < types.length; i++) {
-            VBox catBox = createBackendCategory(i18n, types[i], "", "");
+        for (int i = 0; i < backendTypes.length; i++) {
+            VBox catBox = createBackendCategory(i18n, backendTypes[i], "", "");
             if (!catBox.getChildren().isEmpty()) {
-                Node potentialGrid = catBox.getChildren().get(0);
-                int count = 0;
-                if (potentialGrid instanceof GridPane gp) {
-                    count = gp.getRowCount();
-                }
-                if (count > 0) {
-                    TitledPane pane = new TitledPane("(" + count + ") " + labels[i], catBox);
-                    accordion.getPanes().add(pane);
-                }
+                TitledPane pane = new TitledPane(backendLabels[i], catBox);
+                accordion.getPanes().add(pane);
             }
         }
 
@@ -599,6 +611,35 @@ public class EpistemeMasterControl extends Application {
 
         content.getChildren().addAll(header, accordion);
         return new Tab(i18n.get("mastercontrol.tab.algorithms", "Algorithms"), scroll);
+    }
+
+    private VBox createAlgorithmCategory(I18N i18n, String title, Class<? extends AlgorithmProvider> type) {
+        VBox box = new VBox(15);
+        List<? extends AlgorithmProvider> providers = AlgorithmManager.getProviders(type);
+        if (providers.isEmpty()) return box;
+
+        GridPane grid = new GridPane();
+        grid.setHgap(30);
+        grid.setVgap(10);
+        
+        int r = 0;
+        for (AlgorithmProvider p : providers) {
+            Label name = new Label(p.getName());
+            name.getStyleClass().add("font-bold");
+            
+            Label prio = new Label("Prio: " + p.getPriority());
+            prio.setOpacity(0.6);
+            
+            Label desc = new Label(p.description());
+            desc.setWrapText(true);
+            
+            grid.add(name, 0, r);
+            grid.add(prio, 1, r);
+            grid.add(desc, 2, r);
+            r++;
+        }
+        box.getChildren().add(grid);
+        return box;
     }
 
     private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
@@ -739,7 +780,13 @@ public class EpistemeMasterControl extends Application {
                 for (AppEntry e : list) if (e.className.equals(info.fullName)) { exists = true; break; }
             }
             if (!exists) {
-                String catName = info.fullName.contains(".chemistry.") ? "Chemistry" : (info.fullName.contains(".physics.") ? "Physics" : "Scientific Systems");
+                String catName = "Scientific Systems";
+                if (info.fullName.contains(".chemistry.")) catName = "Chemistry";
+                else if (info.fullName.contains(".physics.")) catName = "Physics";
+                else if (info.fullName.contains(".biology.")) catName = "Biology";
+                else if (info.fullName.contains(".mathematics.")) catName = "Mathematics";
+                else if (info.fullName.contains(".geography.")) catName = "Geography";
+                
                 String cat = i18n.get("category." + catName.toLowerCase().replace(" ", ""), catName);
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(info.simpleName, info.fullName, info.description));
             }
@@ -764,18 +811,45 @@ public class EpistemeMasterControl extends Application {
 
         Accordion accordion = new Accordion();
         
-        List<MasterControlDiscovery.ClassInfo> apps = MasterControlDiscovery.getInstance().findClasses("App");
-        List<MasterControlDiscovery.ClassInfo> demos = MasterControlDiscovery.getInstance().findClasses("Demo");
-        List<MasterControlDiscovery.ClassInfo> viewers = MasterControlDiscovery.getInstance().findClasses("Viewer");
-
-        if (!apps.isEmpty()) accordion.getPanes().add(new TitledPane("(" + apps.size() + ") " + i18n.get("mastercontrol.apps.category.apps", "Applications"), createAppList(true, convert(apps))));
-        if (!demos.isEmpty()) accordion.getPanes().add(new TitledPane("(" + demos.size() + ") " + i18n.get("mastercontrol.apps.category.demos", "Demos"), createAppList(true, convert(demos))));
-        if (!viewers.isEmpty()) accordion.getPanes().add(new TitledPane("(" + viewers.size() + ") " + i18n.get("mastercontrol.apps.category.viewers", "Viewers"), createAppList(true, convert(viewers))));
+        Map<MasterControlDiscovery.ProviderType, Map<String, List<Viewer>>> grouped = MasterControlDiscovery.getInstance().getProvidersByType();
+        
+        addAppPane(accordion, i18n, grouped, MasterControlDiscovery.ProviderType.APP, "mastercontrol.apps.category.apps", "Applications");
+        addAppPane(accordion, i18n, grouped, MasterControlDiscovery.ProviderType.DISTRIBUTED_APP, "mastercontrol.apps.category.distributed", "Distributed Applications");
+        addAppPane(accordion, i18n, grouped, MasterControlDiscovery.ProviderType.DEMO, "mastercontrol.apps.category.demos", "Demos");
+        addAppPane(accordion, i18n, grouped, MasterControlDiscovery.ProviderType.VIEWER, "mastercontrol.apps.category.viewers", "Viewers");
 
         if (!accordion.getPanes().isEmpty()) accordion.getPanes().get(0).setExpanded(true);
 
         content.getChildren().addAll(header, accordion);
         return new Tab(i18n.get("mastercontrol.tab.apps", "Apps"), content);
+    }
+
+    private void addAppPane(Accordion accordion, I18N i18n, Map<MasterControlDiscovery.ProviderType, Map<String, List<Viewer>>> grouped, 
+                             MasterControlDiscovery.ProviderType type, String key, String defaultTitle) {
+        Map<String, List<Viewer>> typeMap = grouped.get(type);
+        if (typeMap == null || typeMap.isEmpty()) return;
+
+        int totalCount = typeMap.values().stream().mapToInt(List::size).sum();
+        VBox container = new VBox(15);
+        
+        for (Map.Entry<String, List<Viewer>> entry : typeMap.entrySet()) {
+            String catName = entry.getKey();
+            List<Viewer> viewers = entry.getValue();
+            
+            VBox catBox = new VBox(5);
+            Label catLabel = new Label(catName);
+            catLabel.getStyleClass().add("font-bold");
+            catLabel.setStyle("-fx-font-size: 14px; -fx-padding: 5 0 5 0;");
+            
+            AppEntry[] entries = viewers.stream()
+                .map(v -> new AppEntry(v.getName(), v.getClass().getName(), v.getDescription()))
+                .toArray(AppEntry[]::new);
+                
+            catBox.getChildren().addAll(catLabel, createAppList(true, entries));
+            container.getChildren().add(catBox);
+        }
+
+        accordion.getPanes().add(new TitledPane("(" + totalCount + ") " + i18n.get(key, defaultTitle), container));
     }
 
     private AppEntry[] convert(List<MasterControlDiscovery.ClassInfo> infos) {
@@ -838,9 +912,11 @@ public class EpistemeMasterControl extends Application {
 
         // Dynamic discovery
         List<MasterControlDiscovery.ClassInfo> discovered = MasterControlDiscovery.getInstance().findClasses("Device");
-        for (MasterControlDiscovery.ClassInfo info : discovered) {
-            devices.put(info.simpleName, info.description);
-        }
+        // Also look for SimulatedDevice specifically to be sure
+        List<MasterControlDiscovery.ClassInfo> simulated = MasterControlDiscovery.getInstance().findClasses("SimulatedDevice");
+        
+        for (MasterControlDiscovery.ClassInfo info : discovered) devices.put(info.simpleName, info.description);
+        for (MasterControlDiscovery.ClassInfo info : simulated) devices.put(info.simpleName, info.description);
 
         ListView<String> deviceList = new ListView<>();
         deviceList.getItems().addAll(devices.keySet());

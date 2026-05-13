@@ -9,6 +9,7 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,25 +198,25 @@ public class NativeSafe {
                 int pos = db.position();
                 db.get(array);
                 db.position(pos);
-                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, array);
+                return allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, array);
             } else if (buffer instanceof java.nio.IntBuffer ib) {
                 int[] array = new int[ib.remaining()];
                 int pos = ib.position();
                 ib.get(array);
                 ib.position(pos);
-                return arena.allocateFrom(ValueLayout.JAVA_INT, array);
+                return allocateFromArray(arena, ValueLayout.JAVA_INT, array);
             } else if (buffer instanceof java.nio.FloatBuffer fb) {
                 float[] array = new float[fb.remaining()];
                 int pos = fb.position();
                 fb.get(array);
                 fb.position(pos);
-                return arena.allocateFrom(ValueLayout.JAVA_FLOAT, array);
+                return allocateFromArray(arena, ValueLayout.JAVA_FLOAT, array);
             } else if (buffer instanceof java.nio.LongBuffer lb) {
                 long[] array = new long[lb.remaining()];
                 int pos = lb.position();
                 lb.get(array);
                 lb.position(pos);
-                return arena.allocateFrom(ValueLayout.JAVA_LONG, array);
+                return allocateFromArray(arena, ValueLayout.JAVA_LONG, array);
             }
             throw new UnsupportedOperationException("Unsupported buffer type for native conversion: " + buffer.getClass());
         }
@@ -244,6 +245,43 @@ public class NativeSafe {
             lb.put(array);
             lb.position(pos);
         }
+    }
+
+    /**
+     * JDK 21-compatible allocation from array.
+     * Arena.allocateFrom(array) was added in JDK 22.
+     */
+    public static MemorySegment allocateFromArray(Arena arena, ValueLayout.OfDouble layout, double[] array) {
+        MemorySegment seg = arena.allocate(layout, array.length);
+        MemorySegment.copy(MemorySegment.ofArray(array), 0, seg, 0, (long)array.length * layout.byteSize());
+        return seg;
+    }
+
+    public static MemorySegment allocateFromArray(Arena arena, ValueLayout.OfFloat layout, float[] array) {
+        MemorySegment seg = arena.allocate(layout, array.length);
+        MemorySegment.copy(MemorySegment.ofArray(array), 0, seg, 0, (long)array.length * layout.byteSize());
+        return seg;
+    }
+
+    public static MemorySegment allocateFromArray(Arena arena, ValueLayout.OfInt layout, int[] array) {
+        MemorySegment seg = arena.allocate(layout, array.length);
+        MemorySegment.copy(MemorySegment.ofArray(array), 0, seg, 0, (long)array.length * layout.byteSize());
+        return seg;
+    }
+
+    public static MemorySegment allocateFromArray(Arena arena, ValueLayout.OfLong layout, long[] array) {
+        MemorySegment seg = arena.allocate(layout, array.length);
+        MemorySegment.copy(MemorySegment.ofArray(array), 0, seg, 0, (long)array.length * layout.byteSize());
+        return seg;
+    }
+
+    /**
+     * Reinterprets a MemorySegment with a new size and a cleaner.
+     * Useful for segments returned by native code that don't have a known size or scope.
+     */
+    public static MemorySegment reinterpret(MemorySegment seg, long newSize, Arena arena, Consumer<MemorySegment> cleaner) {
+        if (seg == null || seg.equals(MemorySegment.NULL)) return MemorySegment.NULL;
+        return seg.reinterpret(newSize, arena, cleaner);
     }
 }
 

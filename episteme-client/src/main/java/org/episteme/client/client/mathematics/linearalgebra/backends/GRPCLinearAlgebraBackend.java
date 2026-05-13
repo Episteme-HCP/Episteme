@@ -150,12 +150,14 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
             default -> builder.setRealPrecision(NumericalContext.RealPrecision.NORMAL);
         }
         
-        builder.setMathContextPrecision(mc.getNumericalConfiguration().getMathContext().getPrecision());
-        builder.setMathContextRoundingMode(mc.getNumericalConfiguration().getMathContext().getRoundingMode().ordinal());
+        builder.setMathContextPrecision(mc.getJavaMathContext().getPrecision());
+        builder.setMathContextRoundingMode(mc.getJavaMathContext().getRoundingMode().ordinal());
         
-        // Propagate preferred backend if set in context metadata
-        String pref = mc.getMetadata("org.episteme.backend.preference");
-        if (pref != null) builder.setBackendId(pref);
+        // Propagate preferred backend if set in current configuration
+        String pref = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getBackendId();
+        if (pref != null && !pref.equals("java-cpu")) {
+             builder.setBackendId(pref);
+        }
         
         return builder.build();
     }

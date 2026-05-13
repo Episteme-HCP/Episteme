@@ -18,6 +18,7 @@ import com.google.auto.service.AutoService;
 /**
  * Concrete Native CPU-BLAS provider for Real numbers.
  */
+@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, AlgorithmProvider.class})
 public class NativeCPULinearAlgebraRealBackend extends AbstractNativeCPULinearAlgebraBackend<Real> {
 

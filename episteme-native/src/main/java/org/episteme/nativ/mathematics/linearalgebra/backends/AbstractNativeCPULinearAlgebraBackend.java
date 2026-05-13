@@ -482,9 +482,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             if (complex) {
                 if (single) {
                     if (CTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS ctrsm not available");
-                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<Complex>) A));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<Complex>) b));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    segA = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<Complex>) A));
+                    segB = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<Complex>) b));
+                    MemorySegment alpha = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+                    alpha.set(ValueLayout.JAVA_FLOAT, 0, 1.0f);
+                    alpha.set(ValueLayout.JAVA_FLOAT, 4, 0.0f);
                     NativeSafe.invoke(CTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
                     float[] result = segB.toArray(ValueLayout.JAVA_FLOAT);
                     Complex[] complexRes = new Complex[n];
@@ -492,9 +494,11 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     return (Vector<E>) Vector.of(java.util.Arrays.asList(complexRes), Complexes.getInstance());
                 } else {
                     if (ZTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS ztrsm not available");
-                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>) A));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<Complex>) b));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                    segA = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>) A));
+                    segB = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<Complex>) b));
+                    MemorySegment alpha = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                    alpha.set(ValueLayout.JAVA_DOUBLE, 0, 1.0);
+                    alpha.set(ValueLayout.JAVA_DOUBLE, 8, 0.0);
                     NativeSafe.invoke(ZTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
                     double[] result = segB.toArray(ValueLayout.JAVA_DOUBLE);
                     Complex[] complexRes = new Complex[n];
@@ -504,8 +508,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             } else {
                 if (single) {
                     if (STRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS strsm not available");
-                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<Real>) A));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<Real>) b));
+                    segA = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<Real>) A));
+                    segB = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_FLOAT, toFloatArray((Vector<Real>) b));
                     NativeSafe.invoke(STRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0f, segA, n, segB, 1);
                     float[] result = segB.toArray(ValueLayout.JAVA_FLOAT);
                     Real[] realRes = new Real[n];
@@ -513,8 +517,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     return (Vector<E>) Vector.of(java.util.Arrays.asList(realRes), Reals.getInstance());
                 } else {
                     if (DTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS dtrsm not available");
-                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>) A));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<Real>) b));
+                    segA = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>) A));
+                    segB = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<Real>) b));
                     NativeSafe.invoke(DTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0, segA, n, segB, 1);
                     double[] result = segB.toArray(ValueLayout.JAVA_DOUBLE);
                     return (Vector<E>) (Object) RealDoubleVector.of(result);

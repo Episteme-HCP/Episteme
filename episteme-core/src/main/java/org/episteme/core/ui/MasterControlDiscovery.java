@@ -80,7 +80,7 @@ public class MasterControlDiscovery {
     }
 
     public enum ProviderType {
-        APP, DEMO, VIEWER
+        APP, DISTRIBUTED_APP, DEMO, VIEWER
     }
 
     /**
@@ -93,7 +93,14 @@ public class MasterControlDiscovery {
         for (Viewer provider : getProviders()) {
             ProviderType type = ProviderType.VIEWER;
             if (provider instanceof App) {
-                type = ((App) provider).isDemo() ? ProviderType.DEMO : ProviderType.APP;
+                App app = (App) provider;
+                if (app.isDemo()) {
+                    type = ProviderType.DEMO;
+                } else if (app.getClass().getName().contains(".distributed.")) {
+                    type = ProviderType.DISTRIBUTED_APP;
+                } else {
+                    type = ProviderType.APP;
+                }
             }
 
             groupedProviders
