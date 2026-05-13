@@ -349,6 +349,7 @@ public class EpistemeMasterControl extends Application {
         roundingCombo.setValue(config.getMathContext().getRoundingMode());
         roundingCombo.setOnAction(e -> {
             config.setMathContext(new java.math.MathContext(config.getMathContext().getPrecision(), roundingCombo.getValue()));
+            notifySaved(i18n);
         });
         addPropertyRow(grid, 7, i18n.get("mastercontrol.computing.rounding", "Rounding Mode"), roundingCombo, 
             i18n.get("mastercontrol.computing.rounding.desc", "Strategy for rounding numbers when precision is lost."));
@@ -368,12 +369,14 @@ public class EpistemeMasterControl extends Application {
 
         ComboBox<String> plot2DCombo = createBackendComboBox(BackendDiscovery.TYPE_PLOTTING, PREFS.getPreferredBackend("plotting2d"), id -> {
             PREFS.setPreferredBackend("plotting2d", id);
+            notifySaved(i18n);
         });
         addPropertyRow(grid, 11, i18n.get("mastercontrol.plotting.backend_2d", "2D Visualization"), plot2DCombo, 
             i18n.get("mastercontrol.plotting.backend_2d.desc", "Engine for rendering 2D charts and data plots."));
 
         ComboBox<String> plot3DCombo = createBackendComboBox(BackendDiscovery.TYPE_PLOTTING, PREFS.getPreferredBackend("plotting3d"), id -> {
             PREFS.setPreferredBackend("plotting3d", id);
+            notifySaved(i18n);
         });
         addPropertyRow(grid, 12, i18n.get("mastercontrol.plotting.backend_3d", "3D Visualization"), plot3DCombo, 
             i18n.get("mastercontrol.plotting.backend_3d.desc", "Engine for rendering complex 3D surfaces and volumes."));
@@ -386,13 +389,19 @@ public class EpistemeMasterControl extends Application {
 
         TextField epsilonField = new TextField(String.valueOf(config.getEpsilonDouble()));
         epsilonField.setOnAction(e -> {
-            try { config.setEpsilonDouble(Double.parseDouble(epsilonField.getText())); } catch (Exception ex) {}
+            try { 
+                config.setEpsilonDouble(Double.parseDouble(epsilonField.getText())); 
+                notifySaved(i18n);
+            } catch (Exception ex) {}
         });
         addPropertyRow(grid, 15, i18n.get("mastercontrol.computing.epsilon", "LA Epsilon"), epsilonField, 
             i18n.get("mastercontrol.computing.epsilon.desc", "The threshold below which a number is considered zero in linear algebra operations."));
 
         Spinner<Integer> iterSpinner = new Spinner<>(1, 100000, config.getMaxIterations());
-        iterSpinner.valueProperty().addListener((obs, old, val) -> config.setMaxIterations(val));
+        iterSpinner.valueProperty().addListener((obs, old, val) -> {
+            config.setMaxIterations(val);
+            notifySaved(i18n);
+        });
         addPropertyRow(grid, 16, i18n.get("mastercontrol.computing.iterations", "Max Iterations"), iterSpinner, 
             i18n.get("mastercontrol.computing.iterations.desc", "Maximum number of iterations allowed for iterative solvers (e.g., GMRES, BiCGSTAB)."));
 
@@ -600,7 +609,7 @@ public class EpistemeMasterControl extends Application {
         };
 
         for (int i = 0; i < backendTypes.length; i++) {
-            VBox catBox = createBackendCategory(i18n, backendTypes[i], "", "");
+            VBox catBox = createBackendListCategory(i18n, backendTypes[i]);
             if (!catBox.getChildren().isEmpty()) {
                 TitledPane pane = new TitledPane(backendLabels[i], catBox);
                 accordion.getPanes().add(pane);
@@ -614,102 +623,110 @@ public class EpistemeMasterControl extends Application {
     }
 
     private VBox createAlgorithmCategory(I18N i18n, String title, Class<? extends AlgorithmProvider> type) {
-        VBox box = new VBox(15);
+        VBox box = new VBox(0);
         List<? extends AlgorithmProvider> providers = AlgorithmManager.getProviders(type);
         if (providers.isEmpty()) return box;
 
-        GridPane grid = new GridPane();
-        grid.setHgap(30);
-        grid.setVgap(10);
-        
         int r = 0;
         for (AlgorithmProvider p : providers) {
+            HBox row = new HBox(20);
+            row.setPadding(new Insets(10, 15, 10, 15));
+            row.setAlignment(Pos.CENTER_LEFT);
+            if (r % 2 != 0) row.setStyle("-fx-background-color: rgba(255,255,255,0.05);");
+            
             Label name = new Label(p.getName());
             name.getStyleClass().add("font-bold");
+            name.setPrefWidth(200);
             
             Label prio = new Label("Prio: " + p.getPriority());
             prio.setOpacity(0.6);
+            prio.setPrefWidth(80);
             
             Label desc = new Label(p.description());
             desc.setWrapText(true);
+            HBox.setHgrow(desc, Priority.ALWAYS);
             
-            grid.add(name, 0, r);
-            grid.add(prio, 1, r);
-            grid.add(desc, 2, r);
+            row.getChildren().addAll(name, prio, desc);
+            box.getChildren().add(row);
             r++;
         }
-        box.getChildren().add(grid);
         return box;
     }
 
-    private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
-        VBox box = new VBox(15);
-        if (title != null && !title.isEmpty()) {
-            Label header = new Label(title);
-            header.getStyleClass().add("font-bold");
-            box.getChildren().add(header);
-        }
-
-        GridPane grid = new GridPane();
-        grid.setHgap(30);
-        grid.setVgap(0); // Tighter gap for zebra rows
-        grid.setMaxWidth(Double.MAX_VALUE);
-
-        ColumnConstraints col0 = new ColumnConstraints();
-        col0.setMinWidth(40);
-        ColumnConstraints col1 = new ColumnConstraints();
-        col1.setMinWidth(200);
-        ColumnConstraints col2 = new ColumnConstraints();
-        col2.setMinWidth(100);
-        ColumnConstraints col3 = new ColumnConstraints();
-        col3.setHgrow(Priority.ALWAYS);
-        grid.getColumnConstraints().addAll(col0, col1, col2, col3);
-
-        // 1. SPI Providers
+    private VBox createBackendListCategory(I18N i18n, String type) {
+        VBox box = new VBox(0);
         List<Backend> providers = new ArrayList<>(BackendDiscovery.getInstance().getProvidersByType(type));
         
-        // 2. Scanned Providers (Aggressive discovery)
+        // Add discovered via scanning
         List<MasterControlDiscovery.ClassInfo> discovered = MasterControlDiscovery.getInstance().findClasses("Backend");
         for (MasterControlDiscovery.ClassInfo info : discovered) {
-            boolean alreadyPresent = false;
-            for (Backend p : providers) if (p.getClass().getName().equals(info.fullName)) { alreadyPresent = true; break; }
-            
-            if (!alreadyPresent) {
+            if (providers.stream().noneMatch(p -> p.getClass().getName().equals(info.fullName))) {
                 try {
                     Class<?> cls = Class.forName(info.fullName, false, MasterControlDiscovery.class.getClassLoader());
                     if (Backend.class.isAssignableFrom(cls)) {
                         Backend instance = (Backend) cls.getDeclaredConstructor().newInstance();
-                        if (instance.getType().equalsIgnoreCase(type)) {
-                            providers.add(instance);
-                        }
+                        if (instance.getType().equalsIgnoreCase(type)) providers.add(instance);
                     }
-                } catch (Exception e) {
-                    // Might fail if dependencies are missing, skip
-                }
+                } catch (Exception e) {}
             }
         }
 
-        // 3. Preferred Backend Selector
-        HBox prefBox = new HBox(15);
-        prefBox.setAlignment(Pos.CENTER_LEFT);
-        prefBox.setPadding(new Insets(10, 15, 10, 15));
-        Label prefLabel = new Label(i18n.get("mastercontrol.preferred.backend", "Preferred Backend:"));
-        prefLabel.getStyleClass().add("font-bold");
-        
-        ComboBox<String> prefCombo = createBackendComboBox(type, UserPreferences.getInstance().getPreferredBackend(type), id -> {
-            UserPreferences.getInstance().setPreferredBackend(type, id);
-            notifySaved(i18n);
-        });
-        prefBox.getChildren().addAll(prefLabel, prefCombo);
-        box.getChildren().add(0, prefBox);
-
         int r = 0;
-        for (Backend provider : providers) {
-            addBackendRow(grid, r++, provider, i18n);
+        for (Backend b : providers) {
+            HBox row = new HBox(20);
+            row.setPadding(new Insets(10, 15, 10, 15));
+            row.setAlignment(Pos.CENTER_LEFT);
+            if (r % 2 != 0) row.setStyle("-fx-background-color: rgba(255,255,255,0.05);");
+            
+            Label name = new Label(b.getName());
+            name.getStyleClass().add("font-bold");
+            name.setPrefWidth(200);
+            
+            Label status = new Label(i18n.get("status.available", "AVAILABLE"));
+            status.getStyleClass().add("status-label-available");
+            status.setPrefWidth(120);
+            
+            Label desc = new Label(b.getDescription());
+            desc.setWrapText(true);
+            HBox.setHgrow(desc, Priority.ALWAYS);
+            
+            row.getChildren().addAll(name, status, desc);
+            box.getChildren().add(row);
+            r++;
+        }
+        return box;
+    }
+
+    private VBox createManualLibraryCategory(I18N i18n, String title, String[][] libraries) {
+        VBox cat = new VBox(0);
+        if (title != null && !title.isEmpty()) {
+            Label header = new Label(title);
+            header.getStyleClass().add("font-bold");
+            header.setStyle("-fx-font-size: 14px; -fx-padding: 10 15 10 15;");
+            cat.getChildren().add(header);
         }
 
-        box.getChildren().add(grid);
-        return box;
+        for (int i = 0; i < libraries.length; i++) {
+            String[] lib = libraries[i];
+            HBox row = new HBox(20);
+            row.setPadding(new Insets(10, 15, 10, 15));
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.getStyleClass().add("library-row");
+            if (i % 2 != 0) row.setStyle("-fx-background-color: rgba(255,255,255,0.05);");
+            
+            boolean avail = false;
+            try { Class.forName(lib[1]); avail = true; } catch (Exception e) {}
+            
+            Label name = new Label(i18n.get(lib[0], lib[0].replace("lib.", "").replace(".name", "")));
+            name.setPrefWidth(200);
+            
+            Label status = new Label(avail ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "NOT FOUND"));
+            status.getStyleClass().add(avail ? "status-label-available" : "status-label-unavailable");
+            
+            row.getChildren().addAll(name, status);
+            cat.getChildren().add(row);
+        }
+        return cat;
     }
 
     private void addBackendRow(GridPane grid, int row, Backend provider, I18N i18n) {
@@ -786,6 +803,8 @@ public class EpistemeMasterControl extends Application {
                 else if (info.fullName.contains(".biology.")) catName = "Biology";
                 else if (info.fullName.contains(".mathematics.")) catName = "Mathematics";
                 else if (info.fullName.contains(".geography.")) catName = "Geography";
+                else if (info.fullName.contains(".social.")) catName = "Social Sciences";
+                else if (info.fullName.contains(".native.")) catName = "Native Systems";
                 
                 String cat = i18n.get("category." + catName.toLowerCase().replace(" ", ""), catName);
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(info.simpleName, info.fullName, info.description));
