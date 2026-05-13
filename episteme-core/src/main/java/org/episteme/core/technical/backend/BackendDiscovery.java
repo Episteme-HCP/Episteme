@@ -90,7 +90,9 @@ public class BackendDiscovery {
                 }
 
                 try {
+                    logger.info("BackendDiscovery: Initializing provider: {}", className);
                     Backend backend = provider.get();
+                    logger.info("BackendDiscovery: Successfully initialized: {}", className);
                     
                     // Also check name for exclusion
                     boolean nameExcluded = false;

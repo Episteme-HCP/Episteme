@@ -253,7 +253,7 @@ public class LinearAlgebraComplianceTest {
     private void runExactAudit(ComplianceResult res, LinearAlgebraProvider<RealBig> prov, LinearAlgebraProvider<RealBig> ref) {
         @SuppressWarnings("unchecked")
         Ring<RealBig> rbRing = (Ring<RealBig>) (Object) RealBig.ZERO.getScalarRing();
-        double tolerance = 1e-28; 
+        double tolerance = 1e-100; 
         
         if (prov.isCompatible(rbRing)) {
             LinearAlgebraAuditSuite.runFullAudit(prov, ref, matrixSize, (op, test) -> auditOp(res, op, test), rbRing, "RB:", tolerance);

@@ -119,6 +119,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
+                <excludes>
+                    <exclude>episteme.properties</exclude>
+                </excludes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>

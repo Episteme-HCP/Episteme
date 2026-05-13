@@ -327,11 +327,15 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         }
     }
 
-    private float getFloatValue(E val) {
+    private float getFloat(E val) {
         if (val instanceof Complex c) return c.getReal().floatValue();
         if (val instanceof Real r) return r.floatValue();
         if (val instanceof Number n) return n.floatValue();
         return 0.0f;
+    }
+
+    private float getFloatValue(E val) {
+        return getFloat(val);
     }
 
     @Override
@@ -1023,22 +1027,6 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         }
     }
 
-    private float getFloat(E val) {
-        if (val instanceof Number n) return n.floatValue();
-        if (val instanceof Real r) return r.floatValue();
-        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return c.getReal().floatValue();
-        return 0.0f;
-    }
-
-    private float getFloatValue(E val) {
-        return getFloat(val);
-    }
-
-    private org.episteme.core.mathematics.numbers.complex.Complex getComplex(E val) {
-        if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex c) return c;
-        if (val instanceof Real r) return org.episteme.core.mathematics.numbers.complex.Complex.of(r);
-        return org.episteme.core.mathematics.numbers.complex.Complex.of(Real.of(((Number)val).doubleValue()));
-    }
 
     // Helpers
     private boolean isComplex(Matrix<E> m) { return m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex; }
