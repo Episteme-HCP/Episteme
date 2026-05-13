@@ -332,6 +332,41 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         }
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public E trace(Matrix<E> a) {
+        SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
+                .setMatrix(toProtoMatrix(a))
+                .build();
+
+        try {
+            ScalarResponse response = blockingStub.matrixTrace(request);
+            return fromProtoScalar(response);
+        } catch (StatusRuntimeException e) {
+            throw mapException("matrixTrace", e);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
+        TriangularSolveRequest request = TriangularSolveRequest.newBuilder()
+                .setMatrix(toProtoMatrix(A))
+                .setVector(toProtoVector(b))
+                .setLower(!upper)
+                .setUnit(unit)
+                .setTranspose(transpose)
+                .setConjugate(conjugate)
+                .build();
+
+        try {
+            VectorResponse response = blockingStub.solveTriangular(request);
+            return fromProtoVector(response.getResult());
+        } catch (StatusRuntimeException e) {
+            throw mapException("solveTriangular", e);
+        }
+    }
+
     // ==================== Vector Operations ====================
 
     @Override

@@ -39,6 +39,20 @@ service MatrixService {
   rpc BiCGSTAB (IterativeSolverRequest) returns (VectorResponse);
   rpc ConjugateGradient (IterativeSolverRequest) returns (VectorResponse);
   rpc GMRES (GMRESRequest) returns (VectorResponse);
+
+  // New methods for compliance
+  rpc MatrixTrace (SingleMatrixRequest) returns (ScalarResponse);
+  rpc SolveTriangular (TriangularSolveRequest) returns (VectorResponse);
+}
+
+message TriangularSolveRequest {
+  MatrixData matrix = 1;
+  VectorData vector = 2;
+  bool lower = 3;
+  bool unit = 4;
+  bool transpose = 5;
+  bool conjugate = 6;
+  org.episteme.computing.common.NumericalContext context = 10;
 }
 
 message LUResponse {

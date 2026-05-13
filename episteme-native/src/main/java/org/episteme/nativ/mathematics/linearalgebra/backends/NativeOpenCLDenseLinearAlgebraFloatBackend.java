@@ -1053,7 +1053,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         int n = v.dimension();
         float[] data = new float[n * 2];
         for (int i = 0; i < n; i++) {
-            org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
+            Complex c = getComplex(v.get(i));
             data[i * 2] = c.getReal().floatValue();
             data[i * 2 + 1] = c.getImaginary().floatValue();
         }
@@ -1065,7 +1065,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         float[] data = new float[rows * cols * 2];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) m.get(i, j);
+                Complex c = getComplex(m.get(i, j));
                 data[(i * cols + j) * 2] = c.getReal().floatValue();
                 data[(i * cols + j) * 2 + 1] = c.getImaginary().floatValue();
             }
