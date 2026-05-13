@@ -302,7 +302,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     public Vector<E> normalize(Vector<E> v) {
         E n = norm(v);
         if (n == null) return v;
-        float nv = getFloatValue(n);
+        float nv = extractFloat(n);
         if (nv == 0) return v;
         
         int dim = v.dimension();
@@ -327,15 +327,11 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         }
     }
 
-    private float getFloat(E val) {
+    private float extractFloat(Object val) {
         if (val instanceof Complex c) return c.getReal().floatValue();
         if (val instanceof Real r) return r.floatValue();
         if (val instanceof Number n) return n.floatValue();
         return 0.0f;
-    }
-
-    private float getFloatValue(E val) {
-        return getFloat(val);
     }
 
     @Override
@@ -351,8 +347,8 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
                 a1.multiply(b2).subtract(a2.multiply(b1))
             ), (Ring) ring);
         }
-        float a1 = getFloat(a.get(0)), a2 = getFloat(a.get(1)), a3 = getFloat(a.get(2));
-        float b1 = getFloat(b.get(0)), b2 = getFloat(b.get(1)), b3 = getFloat(b.get(2));
+        float a1 = extractFloat(a.get(0)), a2 = extractFloat(a.get(1)), a3 = extractFloat(a.get(2));
+        float b1 = extractFloat(b.get(0)), b2 = extractFloat(b.get(1)), b3 = extractFloat(b.get(2));
         return (Vector<E>) (Vector) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(
             (E) (Object) RealFloat.create(a2 * b3 - a3 * b2),
             (E) (Object) RealFloat.create(a3 * b1 - a1 * b3),
@@ -367,19 +363,14 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         return Complex.ZERO;
     }
 
-    private float getFloat(Object o) {
-        if (o instanceof Real r) return r.floatValue();
-        if (o instanceof Number n) return n.floatValue();
-        if (o instanceof Complex c) return c.getReal().floatValue();
-        return 0.0f;
-    }
+
 
     @Override
     public E angle(Vector<E> a, Vector<E> b) {
         E d = dot(a, b);
         E nA = norm(a);
         E nB = norm(b);
-        float cosTheta = getFloatValue(d) / (getFloatValue(nA) * getFloatValue(nB));
+        float cosTheta = extractFloat(d) / (extractFloat(nA) * extractFloat(nB));
         return (E) (Object) RealFloat.create((float) Math.acos(Math.max(-1.0, Math.min(1.0, cosTheta))));
     }
 
@@ -1035,7 +1026,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     private float[] toFloatArrayVec(Vector<E> v) {
         int dim = v.dimension();
         float[] data = new float[dim];
-        for (int i = 0; i < dim; i++) data[i] = getFloatValue(v.get(i));
+        for (int i = 0; i < dim; i++) data[i] = extractFloat(v.get(i));
         return data;
     }
 
@@ -1045,7 +1036,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
         float[] data = new float[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = getFloat(m.get(i, j));
+                data[i * cols + j] = extractFloat(m.get(i, j));
             }
         }
         return data;
@@ -1054,7 +1045,7 @@ public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E
     private float[] toFloatVec(Vector<E> v) {
         int n = v.dimension();
         float[] data = new float[n];
-        for (int i = 0; i < n; i++) data[i] = getFloat(v.get(i));
+        for (int i = 0; i < n; i++) data[i] = extractFloat(v.get(i));
         return data;
     }
 

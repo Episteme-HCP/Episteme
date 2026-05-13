@@ -697,35 +697,24 @@ public class EpistemeMasterControl extends Application {
         return box;
     }
 
-    private VBox createManualLibraryCategory(I18N i18n, String title, String[][] libraries) {
-        VBox cat = new VBox(0);
-        if (title != null && !title.isEmpty()) {
-            Label header = new Label(title);
-            header.getStyleClass().add("font-bold");
-            header.setStyle("-fx-font-size: 14px; -fx-padding: 10 15 10 15;");
-            cat.getChildren().add(header);
-        }
 
-        for (int i = 0; i < libraries.length; i++) {
-            String[] lib = libraries[i];
-            HBox row = new HBox(20);
-            row.setPadding(new Insets(10, 15, 10, 15));
-            row.setAlignment(Pos.CENTER_LEFT);
-            row.getStyleClass().add("library-row");
-            if (i % 2 != 0) row.setStyle("-fx-background-color: rgba(255,255,255,0.05);");
-            
-            boolean avail = false;
-            try { Class.forName(lib[1]); avail = true; } catch (Exception e) {}
-            
-            Label name = new Label(i18n.get(lib[0], lib[0].replace("lib.", "").replace(".name", "")));
-            name.setPrefWidth(200);
-            
-            Label status = new Label(avail ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "NOT FOUND"));
-            status.getStyleClass().add(avail ? "status-label-available" : "status-label-unavailable");
-            
-            row.getChildren().addAll(name, status);
-            cat.getChildren().add(row);
+
+    private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
+        VBox cat = new VBox(15);
+        Label titleLbl = new Label(title);
+        titleLbl.getStyleClass().add("font-bold");
+        cat.getChildren().add(titleLbl);
+        
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(5);
+        
+        List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
+        int row = 0;
+        for (Backend b : providers) {
+            addBackendRow(grid, row++, b, i18n);
         }
+        cat.getChildren().add(grid);
         return cat;
     }
 
