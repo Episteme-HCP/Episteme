@@ -206,7 +206,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             for (int i = 0; i < n; i++) {
                 for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
                     if (colIdx[j] == i) {
-                        sum = sum.add((Complex) values[j]);
+                        sum = sum.add(getComplex(values[j]));
                         break;
                     }
                 }
@@ -236,7 +236,7 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
         if (isComplex(sa)) {
              // Conjugate values
              for (java.util.Map.Entry<Long, E> entry : transposedStorage.getData().entrySet()) {
-                 Complex c = (Complex) entry.getValue();
+                 Complex c = getComplex(entry.getValue());
                  transposedStorage.set((int)(entry.getKey() >>> 32), (int)(entry.getKey() & 0xFFFFFFFFL), (E) c.conjugate());
              }
         }
@@ -697,6 +697,13 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
         if (val instanceof Real r) return r.doubleValue();
         if (val instanceof Complex c) return c.real();
         return 0.0;
+    }
+
+    private Complex getComplex(Object val) {
+        if (val instanceof Complex c) return c;
+        if (val instanceof Number n) return Complex.of(RealDouble.of(n.doubleValue()));
+        if (val instanceof Real r) return Complex.of(RealDouble.of(r.doubleValue()));
+        throw new IllegalArgumentException("Cannot convert to complex: " + val.getClass());
     }
 
     private double[] toComplexDoubleArray(SparseMatrix<E> m) {

@@ -180,7 +180,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
     private float[] toFloatArray(org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix<E> m) {
         Object[] vals = m.getValues();
         float[] data = new float[vals.length];
-        for (int i = 0; i < vals.length; i++) data[i] = ((Number) vals[i]).floatValue();
+        for (int i = 0; i < vals.length; i++) data[i] = getRealValue(vals[i]);
         return data;
     }
 
@@ -189,7 +189,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         float[] data = new float[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                data[i * cols + j] = ((Number) m.get(i, j)).floatValue();
+                data[i * cols + j] = getRealValue(m.get(i, j));
             }
         }
         return data;
@@ -200,7 +200,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         float[] data = new float[rows * cols * 2];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                Complex c = (Complex) m.get(i, j);
+                Complex c = getComplex(m.get(i, j));
                 data[(i * cols + j) * 2] = (float) c.real();
                 data[(i * cols + j) * 2 + 1] = (float) c.imaginary();
             }
@@ -211,7 +211,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
     private float[] toFloatArray(Vector<E> v) {
         int dim = v.dimension();
         float[] data = new float[dim];
-        for (int i = 0; i < dim; i++) data[i] = ((Number) v.get(i)).floatValue();
+        for (int i = 0; i < dim; i++) data[i] = getRealValue(v.get(i));
         return data;
     }
 
@@ -240,7 +240,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         Object[] vals = m.getValues();
         float[] data = new float[vals.length * 2];
         for (int i = 0; i < vals.length; i++) {
-            org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) vals[i];
+            org.episteme.core.mathematics.numbers.complex.Complex c = getComplex(vals[i]);
             data[i * 2] = (float) c.real();
             data[i * 2 + 1] = (float) c.imaginary();
         }
@@ -251,7 +251,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         int dim = v.dimension();
         float[] data = new float[dim * 2];
         for (int i = 0; i < dim; i++) {
-            org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) v.get(i);
+            org.episteme.core.mathematics.numbers.complex.Complex c = getComplex(v.get(i));
             data[i * 2] = (float) c.real();
             data[i * 2 + 1] = (float) c.imaginary();
         }
@@ -629,7 +629,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             for (int i = 0; i < n; i++) {
                 for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
                     if (colIdx[j] == i) {
-                        sum = sum.add((Complex) values[j]);
+                        sum = sum.add(getComplex(values[j]));
                         break;
                     }
                 }
@@ -770,6 +770,20 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
     @Override
     public void matrixMultiply(java.nio.DoubleBuffer A, java.nio.DoubleBuffer B, java.nio.DoubleBuffer C, int m, int n, int k) {
         throw new UnsupportedOperationException("Matrix multiply for DoubleBuffer not supported in float backend");
+    }
+
+    private float getRealValue(Object val) {
+        if (val instanceof Number n) return n.floatValue();
+        if (val instanceof Real r) return r.floatValue();
+        if (val instanceof Complex c) return (float) c.real();
+        return 0.0f;
+    }
+
+    private Complex getComplex(Object val) {
+        if (val instanceof Complex c) return c;
+        if (val instanceof Number n) return Complex.of(RealFloat.of(n.floatValue()));
+        if (val instanceof Real r) return Complex.of(RealFloat.of(r.floatValue()));
+        throw new IllegalArgumentException("Cannot convert to complex: " + val.getClass());
     }
 
     private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }

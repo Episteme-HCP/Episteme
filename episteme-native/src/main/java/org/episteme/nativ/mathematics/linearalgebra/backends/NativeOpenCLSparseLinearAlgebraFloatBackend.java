@@ -137,10 +137,10 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         int[] colIndices = sa.getColIndices();
         float[] values = new float[nnz];
         Object[] valsObj = sa.getValues();
-        for (int i = 0; i < nnz; i++) values[i] = ((Number) valsObj[i]).floatValue();
+        for (int i = 0; i < nnz; i++) values[i] = getRealValue(valsObj[i]);
         
         float[] xData = new float[cols];
-        for (int i = 0; i < cols; i++) xData[i] = ((Number) x.get(i)).floatValue();
+        for (int i = 0; i < cols; i++) xData[i] = getRealValue(x.get(i));
         
         float[] yData = new float[rows];
         
@@ -204,7 +204,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             for (int i = 0; i < n; i++) {
                 for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
                     if (colIdx[j] == i) {
-                        sum = sum.add((Complex) values[j]);
+                        sum = sum.add(getComplex(values[j]));
                         break;
                     }
                 }
@@ -215,7 +215,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
             for (int i = 0; i < n; i++) {
                 for (int j = rowPtr[i]; j < rowPtr[i + 1]; j++) {
                     if (colIdx[j] == i) {
-                        sum += ((Number) values[j]).floatValue();
+                        sum += getRealValue(values[j]);
                         break;
                     }
                 }
@@ -233,7 +233,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         
         if (isComplex(sa)) {
              for (java.util.Map.Entry<Long, E> entry : transposedStorage.getData().entrySet()) {
-                 Complex c = (Complex) entry.getValue();
+                 Complex c = getComplex(entry.getValue());
                  transposedStorage.set((int)(entry.getKey() >>> 32), (int)(entry.getKey() & 0xFFFFFFFFL), (E) (Object) c.conjugate());
              }
         }
@@ -545,13 +545,13 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
     private float[] toFloatArray(SparseMatrix<E> m) {
         Object[] vals = m.getValues();
         float[] data = new float[vals.length];
-        for (int i = 0; i < vals.length; i++) data[i] = ((Number) vals[i]).floatValue();
+        for (int i = 0; i < vals.length; i++) data[i] = getRealValue(vals[i]);
         return data;
     }
 
     private float[] toFloatVec(Vector<E> v) {
         float[] data = new float[v.dimension()];
-        for (int i = 0; i < v.dimension(); i++) data[i] = ((Number) v.get(i)).floatValue();
+        for (int i = 0; i < v.dimension(); i++) data[i] = getRealValue(v.get(i));
         return data;
     }
 
@@ -569,7 +569,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         float[] data = new float[nnz * 2];
         Object[] vals = m.getValues();
         for (int i = 0; i < nnz; i++) {
-            Complex c = (Complex) vals[i];
+            Complex c = getComplex(vals[i]);
             data[i * 2] = c.getReal().floatValue();
             data[i * 2 + 1] = c.getImaginary().floatValue();
         }
@@ -580,7 +580,7 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         int n = v.dimension();
         float[] data = new float[n * 2];
         for (int i = 0; i < n; i++) {
-            Complex c = (Complex) v.get(i);
+            Complex c = getComplex(v.get(i));
             data[i * 2] = c.getReal().floatValue();
             data[i * 2 + 1] = c.getImaginary().floatValue();
         }
@@ -595,6 +595,20 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
         }
         return new org.episteme.core.mathematics.linearalgebra.vectors.GenericVector<>(
             new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(elements), null, ring);
+    }
+
+    private float getRealValue(Object val) {
+        if (val instanceof Number n) return n.floatValue();
+        if (val instanceof Real r) return r.floatValue();
+        if (val instanceof Complex c) return (float) c.real();
+        return 0.0f;
+    }
+
+    private Complex getComplex(Object val) {
+        if (val instanceof Complex c) return c;
+        if (val instanceof Number n) return Complex.of(RealFloat.of(n.floatValue()));
+        if (val instanceof Real r) return Complex.of(RealFloat.of(r.floatValue()));
+        throw new IllegalArgumentException("Cannot convert to complex: " + val.getClass());
     }
 
     private boolean isComplex(Matrix<E> m) {
