@@ -1102,7 +1102,12 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         }
     }
 
-    // Helpers
+    private double extractDouble(E element) {
+        if (element instanceof Real r) return r.doubleValue();
+        if (element instanceof Complex c) return c.real();
+        return 0.0;
+    }
+
     private double[] toDoubleArray(Matrix<E> m) {
         int rows = m.rows();
         int cols = m.cols();

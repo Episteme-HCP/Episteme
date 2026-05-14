@@ -28,6 +28,15 @@ public final class OpenCLManager {
     public static synchronized void ensureInitialized() {
         if (initialized) return;
 
+        if (Boolean.getBoolean("episteme.native.disable") || 
+            Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+            Boolean.getBoolean("episteme.native.skip.opencl") || 
+            Boolean.getBoolean("episteme.backend.opencl.disabled")) {
+            logger.info("OpenCL: Initialization skipped as requested by system property.");
+            initialized = false;
+            return;
+        }
+
         try {
             // Check if JOCL can even load its own native library first
             try {

@@ -119,7 +119,323 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         }
     }
 
+    private static void bindSymbols() {
+        // --- SINGLE PRECISION (FLOAT) ---
+        FunctionDescriptor sgemmDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SGEMM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_sgemm")
+            .map(s -> LINKER.downcallHandle(s, sgemmDesc)).orElse(null);
+
+        FunctionDescriptor sgemvDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SGEMV = NativeFFMLoader.findSymbol(LOOKUP, "cblas_sgemv")
+            .map(s -> LINKER.downcallHandle(s, sgemvDesc)).orElse(null);
+
+        FunctionDescriptor sdotDesc = FunctionDescriptor.of(ValueLayout.JAVA_FLOAT,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SDOT = NativeFFMLoader.findSymbol(LOOKUP, "cblas_sdot")
+            .map(s -> LINKER.downcallHandle(s, sdotDesc)).orElse(null);
+
+        FunctionDescriptor snrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_FLOAT,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SNRM2 = NativeFFMLoader.findSymbol(LOOKUP, "cblas_snrm2")
+            .map(s -> LINKER.downcallHandle(s, snrm2Desc)).orElse(null);
+
+        FunctionDescriptor saxpyDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SAXPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_saxpy")
+            .map(s -> LINKER.downcallHandle(s, saxpyDesc)).orElse(null);
+
+        FunctionDescriptor sscalDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SSCAL = NativeFFMLoader.findSymbol(LOOKUP, "cblas_sscal")
+            .map(s -> LINKER.downcallHandle(s, sscalDesc)).orElse(null);
+
+
+        // --- DOUBLE PRECISION (Standard) ---
+        FunctionDescriptor dgemmDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DGEMM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dgemm")
+                .map(s -> LINKER.downcallHandle(s, dgemmDesc)).orElse(null);
+
+        FunctionDescriptor ddotDesc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DDOT = NativeFFMLoader.findSymbol(LOOKUP, "cblas_ddot")
+            .map(s -> LINKER.downcallHandle(s, ddotDesc)).orElse(null);
+
+        FunctionDescriptor dnrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DNRM2 = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dnrm2")
+            .map(s -> LINKER.downcallHandle(s, dnrm2Desc)).orElse(null);
+
+        FunctionDescriptor daxpyDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DAXPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_daxpy")
+            .map(s -> LINKER.downcallHandle(s, daxpyDesc)).orElse(null);
+        
+        FunctionDescriptor dscalDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DSCAL = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dscal")
+            .map(s -> LINKER.downcallHandle(s, dscalDesc)).orElse(null);
+
+
+        FunctionDescriptor dgemvDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DGEMV = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dgemv")
+            .map(s -> LINKER.downcallHandle(s, dgemvDesc)).orElse(null);
+
+        // --- COMPLEX BLAS (FLOAT & DOUBLE) ---
+        FunctionDescriptor cgemmDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        CGEMM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_cgemm")
+            .map(s -> LINKER.downcallHandle(s, cgemmDesc)).orElse(null);
+        ZGEMM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zgemm")
+                .map(s -> LINKER.downcallHandle(s, cgemmDesc)).orElse(null);
+
+        FunctionDescriptor cgemvDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        CGEMV = NativeFFMLoader.findSymbol(LOOKUP, "cblas_cgemv")
+            .map(s -> LINKER.downcallHandle(s, cgemvDesc)).orElse(null);
+        ZGEMV = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zgemv")
+            .map(s -> LINKER.downcallHandle(s, cgemvDesc)).orElse(null);
+
+        FunctionDescriptor cdotcDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+        );
+        CDOTC = NativeFFMLoader.findSymbol(LOOKUP, "cblas_cdotc_sub", "cblas_cdots")
+            .map(s -> LINKER.downcallHandle(s, cdotcDesc)).orElse(null);
+        ZDOTC = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zdotc_sub", "cblas_zdotc")
+            .map(s -> LINKER.downcallHandle(s, cdotcDesc)).orElse(null);
+
+        FunctionDescriptor scnrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_FLOAT,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SCNRM2 = NativeFFMLoader.findSymbol(LOOKUP, "cblas_scnrm2")
+            .map(s -> LINKER.downcallHandle(s, scnrm2Desc)).orElse(null);
+        
+        FunctionDescriptor dznrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DZNRM2 = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dznrm2")
+            .map(s -> LINKER.downcallHandle(s, dznrm2Desc)).orElse(null);
+
+        FunctionDescriptor caxpyDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        CAXPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_caxpy")
+            .map(s -> LINKER.downcallHandle(s, caxpyDesc)).orElse(null);
+        ZAXPY = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zaxpy")
+            .map(s -> LINKER.downcallHandle(s, caxpyDesc)).orElse(null);
+
+        FunctionDescriptor cscalDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        CSCAL = NativeFFMLoader.findSymbol(LOOKUP, "cblas_cscal")
+            .map(s -> LINKER.downcallHandle(s, cscalDesc)).orElse(null);
+        ZSCAL = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zscal")
+            .map(s -> LINKER.downcallHandle(s, cscalDesc)).orElse(null);
+
+
+        // LAPACK
+        FunctionDescriptor gesvDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SGESV = findLapackSymbol("LAPACKE_sgesv").map(s -> LINKER.downcallHandle(s, gesvDesc)).orElse(null);
+        DGESV = findLapackSymbol("LAPACKE_dgesv").map(s -> LINKER.downcallHandle(s, gesvDesc)).orElse(null);
+        CGESV = findLapackSymbol("LAPACKE_cgesv").map(s -> LINKER.downcallHandle(s, gesvDesc)).orElse(null);
+        ZGESV = findLapackSymbol("LAPACKE_zgesv").map(s -> LINKER.downcallHandle(s, gesvDesc)).orElse(null);
+        
+        FunctionDescriptor getrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+        );
+        SGETRF = findLapackSymbol("LAPACKE_sgetrf").map(s -> LINKER.downcallHandle(s, getrfDesc)).orElse(null);
+        DGETRF = findLapackSymbol("LAPACKE_dgetrf").map(s -> LINKER.downcallHandle(s, getrfDesc)).orElse(null);
+        CGETRF = findLapackSymbol("LAPACKE_cgetrf").map(s -> LINKER.downcallHandle(s, getrfDesc)).orElse(null);
+        ZGETRF = findLapackSymbol("LAPACKE_zgetrf").map(s -> LINKER.downcallHandle(s, getrfDesc)).orElse(null);
+
+        FunctionDescriptor getriDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+        );
+        SGETRI = findLapackSymbol("LAPACKE_sgetri", "lapacke_sgetri", "sgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+        DGETRI = findLapackSymbol("LAPACKE_dgetri", "lapacke_dgetri", "dgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+        CGETRI = findLapackSymbol("LAPACKE_cgetri", "lapacke_cgetri", "cgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+        ZGETRI = findLapackSymbol("LAPACKE_zgetri", "lapacke_zgetri", "zgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+
+        FunctionDescriptor getrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SGETRS = findLapackSymbol("LAPACKE_sgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
+        DGETRS = findLapackSymbol("LAPACKE_dgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
+        CGETRS = findLapackSymbol("LAPACKE_cgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
+        ZGETRS = findLapackSymbol("LAPACKE_zgetrs").map(s -> LINKER.downcallHandle(s, getrsDesc)).orElse(null);
+
+        // QR Decomposition
+        FunctionDescriptor trtrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        STRTRS = findLapackSymbol("LAPACKE_strtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+        DTRTRS = findLapackSymbol("LAPACKE_dtrtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+        CTRTRS = findLapackSymbol("LAPACKE_ctrtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+        ZTRTRS = findLapackSymbol("LAPACKE_ztrtrs").map(s -> LINKER.downcallHandle(s, trtrsDesc)).orElse(null);
+
+        // QR Decomposition
+        FunctionDescriptor geqrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+        );
+        SGEQRF = findLapackSymbol("LAPACKE_sgeqrf", "lapacke_sgeqrf", "sgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+        DGEQRF = findLapackSymbol("LAPACKE_dgeqrf", "lapacke_dgeqrf", "dgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+        CGEQRF = findLapackSymbol("LAPACKE_cgeqrf", "lapacke_cgeqrf", "cgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+        ZGEQRF = findLapackSymbol("LAPACKE_zgeqrf", "lapacke_zgeqrf", "zgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+
+        FunctionDescriptor orgqrDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+        );
+        SORGQR = findLapackSymbol("LAPACKE_sorgqr").map(s -> LINKER.downcallHandle(s, orgqrDesc)).orElse(null);
+        DORGQR = findLapackSymbol("LAPACKE_dorgqr").map(s -> LINKER.downcallHandle(s, orgqrDesc)).orElse(null);
+        CUNGQR = findLapackSymbol("LAPACKE_cungqr").map(s -> LINKER.downcallHandle(s, orgqrDesc)).orElse(null);
+        ZUNGQR = findLapackSymbol("LAPACKE_zungqr").map(s -> LINKER.downcallHandle(s, orgqrDesc)).orElse(null);
+
+        // Singular Value Decomposition
+        FunctionDescriptor gesvdDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, 
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, 
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, AddressLayout.ADDRESS, 
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS
+        );
+        SGESVD = findLapackSymbol("LAPACKE_sgesvd").map(s -> LINKER.downcallHandle(s, gesvdDesc)).orElse(null);
+        DGESVD = findLapackSymbol("LAPACKE_dgesvd").map(s -> LINKER.downcallHandle(s, gesvdDesc)).orElse(null);
+        CGESVD = findLapackSymbol("LAPACKE_cgesvd").map(s -> LINKER.downcallHandle(s, gesvdDesc)).orElse(null);
+        ZGESVD = findLapackSymbol("LAPACKE_zgesvd").map(s -> LINKER.downcallHandle(s, gesvdDesc)).orElse(null);
+
+        // Cholesky
+        FunctionDescriptor potrfDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SPOTRF = findLapackSymbol("LAPACKE_spotrf", "lapacke_spotrf", "spotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+        DPOTRF = findLapackSymbol("LAPACKE_dpotrf", "lapacke_dpotrf", "dpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+        CPOTRF = findLapackSymbol("LAPACKE_cpotrf", "lapacke_cpotrf", "cpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+        ZPOTRF = findLapackSymbol("LAPACKE_zpotrf", "lapacke_zpotrf", "zpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+
+        FunctionDescriptor potrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SPOTRS = findLapackSymbol("LAPACKE_spotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
+        DPOTRS = findLapackSymbol("LAPACKE_dpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
+        CPOTRS = findLapackSymbol("LAPACKE_cpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
+        ZPOTRS = findLapackSymbol("LAPACKE_zpotrs").map(s -> LINKER.downcallHandle(s, potrsDesc)).orElse(null);
+
+        // Eigen
+        FunctionDescriptor syevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS
+        );
+        SSYEV = findLapackSymbol("LAPACKE_ssyev").map(s -> LINKER.downcallHandle(s, syevDesc)).orElse(null);
+        DSYEV = findLapackSymbol("LAPACKE_dsyev").map(s -> LINKER.downcallHandle(s, syevDesc)).orElse(null);
+
+        FunctionDescriptor heevDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
+        );
+        CHEEV = findLapackSymbol("LAPACKE_cheev").map(s -> LINKER.downcallHandle(s, heevDesc)).orElse(null);
+        ZHEEV = findLapackSymbol("LAPACKE_zheev").map(s -> LINKER.downcallHandle(s, heevDesc)).orElse(null);
+
+        FunctionDescriptor gelsDescriptor = FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, AddressLayout.ADDRESS,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        SGELS = findLapackSymbol("LAPACKE_sgels").map(s -> LINKER.downcallHandle(s, gelsDescriptor)).orElse(null);
+        DGELS = findLapackSymbol("LAPACKE_dgels").map(s -> LINKER.downcallHandle(s, gelsDescriptor)).orElse(null);
+        CGELS = findLapackSymbol("LAPACKE_cgels").map(s -> LINKER.downcallHandle(s, gelsDescriptor)).orElse(null);
+        ZGELS = findLapackSymbol("LAPACKE_zgels").map(s -> LINKER.downcallHandle(s, gelsDescriptor)).orElse(null);
+
+        // --- TRSM (Triangular Solve) ---
+        FunctionDescriptor ctrsmDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        CTRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_ctrsm")
+                .map(s -> LINKER.downcallHandle(s, ctrsmDesc)).orElse(null);
+        ZTRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_ztrsm")
+                .map(s -> LINKER.downcallHandle(s, ctrsmDesc)).orElse(null);
+
+        FunctionDescriptor dtrsmDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_DOUBLE, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        DTRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_dtrsm")
+                .map(s -> LINKER.downcallHandle(s, dtrsmDesc)).orElse(null);
+
+        FunctionDescriptor strsmDesc = FunctionDescriptor.ofVoid(
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
+                ValueLayout.JAVA_FLOAT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT,
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT
+        );
+        STRSM = NativeFFMLoader.findSymbol(LOOKUP, "cblas_strsm")
+                .map(s -> LINKER.downcallHandle(s, strsmDesc)).orElse(null);
+    }
+
     private static final Linker LINKER = NativeFFMLoader.getLinker();
+
 
     // CBLAS Layout Constants
     private static final int CblasRowMajor = 101;

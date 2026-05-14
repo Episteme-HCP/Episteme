@@ -48,7 +48,15 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
     private static MethodHandle QUEST_MEASURE;
 
     private static synchronized void ensureInitialized() {
-        if (IS_INITIALIZED) return; // Check IS_INITIALIZED instead of LOOKUP
+        if (IS_INITIALIZED) return;
+        
+        if (Boolean.getBoolean("episteme.native.disable") || 
+            Boolean.getBoolean("episteme.backend.native.disabled") ||
+            Boolean.getBoolean("episteme.backend.native-quantum.disabled")) {
+            IS_INITIALIZED = true;
+            return;
+        }
+
         Optional<SymbolLookup> lib = NativeFFMLoader.loadLibrary("QuEST", Arena.global());
         if (lib.isPresent()) {
             LOOKUP = lib.get();

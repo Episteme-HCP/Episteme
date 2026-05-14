@@ -213,17 +213,30 @@ public class NumericalConfiguration {
         this.computeMode = mode;
         String targetBackendId = "java-cpu";
 
+        // Reset global GPU/Native disable flags based on mode
         switch (mode) {
+            case CPU:
+                System.setProperty("episteme.backend.gpu.disabled", "true");
+                System.setProperty("episteme.backend.cuda.disabled", "true");
+                System.setProperty("episteme.backend.opencl.disabled", "true");
+                targetBackendId = "java-cpu";
+                break;
             case OPENCL:
+                System.setProperty("episteme.backend.gpu.disabled", "false");
+                System.setProperty("episteme.backend.cuda.disabled", "true");
+                System.setProperty("episteme.backend.opencl.disabled", "false");
                 targetBackendId = findBackendIdPart("linear-algebra", "opencl");
                 break;
             case CUDA:
+                System.setProperty("episteme.backend.gpu.disabled", "false");
+                System.setProperty("episteme.backend.cuda.disabled", "false");
+                System.setProperty("episteme.backend.opencl.disabled", "true");
                 targetBackendId = findBackendIdPart("linear-algebra", "cuda");
                 break;
-            case CPU:
-                targetBackendId = "java-cpu";
-                break;
             case AUTO:
+                System.setProperty("episteme.backend.gpu.disabled", "false");
+                System.setProperty("episteme.backend.cuda.disabled", "false");
+                System.setProperty("episteme.backend.opencl.disabled", "false");
                 if (isGpuAvailable()) {
                     targetBackendId = org.episteme.core.technical.backend.BackendDiscovery.getInstance()
                             .getBestProvider("linear-algebra").map(p -> p.getId()).orElse("java-cpu");
