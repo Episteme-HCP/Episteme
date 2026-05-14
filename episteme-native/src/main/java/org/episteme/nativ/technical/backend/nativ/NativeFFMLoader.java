@@ -83,6 +83,11 @@ public class NativeFFMLoader {
      * @return an Optional containing the SymbolLookup if found, or empty.
      */
     public static Optional<SymbolLookup> loadLibrary(String libName, Arena arena) {
+        if (Boolean.getBoolean("episteme.native.disable")) {
+             logger.warn("[NativeFFMLoader] Native library loading is GLOBALLY disabled via 'episteme.native.disable' property.");
+             return Optional.empty();
+        }
+
         if (LOADED_LIBS.containsKey(libName)) {
             return Optional.of(LOADED_LIBS.get(libName));
         }
@@ -91,7 +96,7 @@ public class NativeFFMLoader {
         }
         
         if (Boolean.getBoolean("episteme.native.skip." + libName)) {
-             logger.warn("[NativeFFMLoader] Skipping library {} as requested by system property (base name)", libName);
+             logger.info("[NativeFFMLoader] Skipping library {} as requested by 'episteme.native.skip.{}' property.", libName, libName);
              return Optional.empty();
         }
 

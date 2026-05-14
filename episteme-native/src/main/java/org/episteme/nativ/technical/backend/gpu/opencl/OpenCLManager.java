@@ -29,11 +29,29 @@ public final class OpenCLManager {
         if (initialized) return;
 
         try {
-            CL.setExceptionsEnabled(true);
+            // Check if JOCL can even load its own native library first
+            try {
+                CL.setExceptionsEnabled(true);
+            } catch (Throwable t) {
+                logger.warn("JOCL native library not found or could not be loaded. OpenCL disabled.");
+                initialized = false;
+                return;
+            }
             
             int[] numPlatforms = new int[1];
-            clGetPlatformIDs(0, null, numPlatforms);
-            if (numPlatforms[0] == 0) throw new RuntimeException("No OpenCL platforms found");
+            try {
+                clGetPlatformIDs(0, null, numPlatforms);
+            } catch (Throwable t) {
+                logger.warn("clGetPlatformIDs failed (possibly no drivers). OpenCL disabled. Error: {}", t.getMessage());
+                initialized = false;
+                return;
+            }
+
+            if (numPlatforms[0] == 0) {
+                logger.info("No OpenCL platforms found. GPU acceleration disabled.");
+                initialized = false;
+                return;
+            }
             
             cl_platform_id[] platforms = new cl_platform_id[numPlatforms[0]];
             clGetPlatformIDs(platforms.length, platforms, null);
@@ -41,6 +59,12 @@ public final class OpenCLManager {
 
             int[] numDevices = new int[1];
             clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, null, numDevices);
+            if (numDevices[0] == 0) {
+                logger.info("No OpenCL devices found on platform {}. GPU acceleration disabled.", platform);
+                initialized = false;
+                return;
+            }
+
             cl_device_id[] devices = new cl_device_id[numDevices[0]];
             clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, devices.length, devices, null);
             device = devices[0];
