@@ -182,32 +182,65 @@ public final class CUDAManager {
         try {
             cudaLookup = NativeFFMLoader.loadLibrary("cuda", managerArena).orElse(null);
             cudartLookup = NativeFFMLoader.loadLibrary("cudart", managerArena).orElse(null);
-            cublasLookup = NativeFFMLoader.loadLibrary("cublas", managerArena).orElse(null);
-            cusparseLookup = NativeFFMLoader.loadLibrary("cusparse", managerArena).orElse(null);
-            cusolverLookup = NativeFFMLoader.loadLibrary("cusolver", managerArena).orElse(null);
-
+            
             if (cudaLookup == null && cudartLookup == null) {
-                logger.warn("CUDA libraries not found. CUDA backends will be unavailable.");
+                logger.info("CUDA libraries (cuda/cudart) not found. GPU acceleration via CUDA disabled.");
                 return;
             }
 
             bindSymbols();
 
             try (Arena temp = Arena.ofConfined()) {
+                // Check if any CUDA devices are present
+                if (CUDA_GET_DEVICE_COUNT != null) {
+                    MemorySegment countPtr = temp.allocate(ValueLayout.JAVA_INT);
+                    try {
+                        int res = (int) NativeSafe.invoke(CUDA_GET_DEVICE_COUNT, countPtr);
+                        if (res != 0 || countPtr.get(ValueLayout.JAVA_INT, 0) == 0) {
+                            logger.info("No CUDA devices found (count: {}). CUDA backends disabled.", countPtr.get(ValueLayout.JAVA_INT, 0));
+                            return;
+                        }
+                    } catch (Throwable t) {
+                        logger.warn("Failed to query CUDA device count: {}. Assuming no GPU.", t.getMessage());
+                        return;
+                    }
+                }
+
+                cublasLookup = NativeFFMLoader.loadLibrary("cublas", managerArena).orElse(null);
+                cusparseLookup = NativeFFMLoader.loadLibrary("cusparse", managerArena).orElse(null);
+                cusolverLookup = NativeFFMLoader.loadLibrary("cusolver", managerArena).orElse(null);
+
                 MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
                 
-                if (CUBLAS_CREATE != null && (int) NativeSafe.invoke(CUBLAS_CREATE, p) == 0) {
-                    cublasHandle = p.get(ValueLayout.ADDRESS, 0);
+                if (CUBLAS_CREATE != null) {
+                    try {
+                        if ((int) NativeSafe.invoke(CUBLAS_CREATE, p) == 0) {
+                            cublasHandle = p.get(ValueLayout.ADDRESS, 0);
+                        }
+                    } catch (Throwable t) {
+                        logger.error("Failed to create cuBLAS handle: {}", t.getMessage());
+                    }
                 }
                 
-                if (CUSPARSE_CREATE != null && (int) NativeSafe.invoke(CUSPARSE_CREATE, p) == 0) {
-                    cusparseHandle = p.get(ValueLayout.ADDRESS, 0);
+                if (CUSPARSE_CREATE != null) {
+                    try {
+                        if ((int) NativeSafe.invoke(CUSPARSE_CREATE, p) == 0) {
+                            cusparseHandle = p.get(ValueLayout.ADDRESS, 0);
+                        }
+                    } catch (Throwable t) {
+                        logger.error("Failed to create cuSPARSE handle: {}", t.getMessage());
+                    }
                 }
                 
                 if (useCusolver && CUSOLVER_CREATE != null) {
-                    if ((int) NativeSafe.invoke(CUSOLVER_CREATE, p) == 0) {
-                        cusolverHandle = p.get(ValueLayout.ADDRESS, 0);
-                    } else {
+                    try {
+                        if ((int) NativeSafe.invoke(CUSOLVER_CREATE, p) == 0) {
+                            cusolverHandle = p.get(ValueLayout.ADDRESS, 0);
+                        } else {
+                            useCusolver = false;
+                        }
+                    } catch (Throwable t) {
+                        logger.error("Failed to create cuSolver handle: {}", t.getMessage());
                         useCusolver = false;
                     }
                 }
