@@ -177,6 +177,16 @@ public final class CUDAManager {
 
     public static synchronized void ensureInitialized() {
         if (initialized) return;
+
+        if (Boolean.getBoolean("episteme.native.disable") || 
+            Boolean.getBoolean("episteme.backend.gpu.disabled") ||
+            Boolean.getBoolean("episteme.native.skip.cuda") || 
+            Boolean.getBoolean("episteme.backend.cuda.disabled")) {
+            logger.info("CUDA: Initialization skipped as requested by system property.");
+            initialized = false;
+            return;
+        }
+
         initialized = true;
 
         try {

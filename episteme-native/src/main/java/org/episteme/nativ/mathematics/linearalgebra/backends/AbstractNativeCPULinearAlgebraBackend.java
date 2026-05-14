@@ -136,7 +136,8 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (initAttempted) return;
         initAttempted = true;
 
-        if (Boolean.getBoolean("episteme.backend.cpu.disabled") || 
+        if (Boolean.getBoolean("episteme.native.disable") || 
+            Boolean.getBoolean("episteme.backend.cpu.disabled") || 
             Boolean.getBoolean("episteme.backend.cpu-real.disabled") ||
             Boolean.getBoolean("episteme.backend.cpu-complex.disabled")) {
             logger.log(System.Logger.Level.INFO, "Native CPU-BLAS initialization skipped as requested by system property.");
@@ -362,6 +363,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     public boolean isExplicitlyDisabled() {
         String id = getId();
         return (id != null && Boolean.getBoolean("episteme.backend." + id + ".disabled")) || 
+               Boolean.getBoolean("episteme.native.disable") ||
                Boolean.getBoolean("episteme.backend.cpu.disabled") ||
                Boolean.getBoolean("episteme.backend.disable." + id) || 
                Boolean.getBoolean("episteme.linearalgebra.disable." + id);

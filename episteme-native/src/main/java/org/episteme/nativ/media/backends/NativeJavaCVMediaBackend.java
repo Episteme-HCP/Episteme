@@ -40,8 +40,10 @@ public class NativeJavaCVMediaBackend implements AudioBackend, VideoBackend, Vis
 
     static {
         boolean available = false;
-        boolean globalDisabled = Boolean.getBoolean("episteme.backend.native.disabled");
-        boolean backendDisabled = Boolean.getBoolean("episteme.backend.native-javacv-media.disabled");
+        boolean globalDisabled = Boolean.getBoolean("episteme.native.disable") || 
+                                 Boolean.getBoolean("episteme.backend.native.disabled");
+        boolean backendDisabled = Boolean.getBoolean("episteme.backend.native-javacv-media.disabled") ||
+                                  Boolean.getBoolean("episteme.native.skip.javacv");
 
         if (!globalDisabled && !backendDisabled) {
             try {

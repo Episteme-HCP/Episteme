@@ -135,6 +135,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     public boolean isExplicitlyDisabled() {
         String id = getId();
         return (id != null && Boolean.getBoolean("episteme.backend." + id + ".disabled")) || 
+               Boolean.getBoolean("episteme.native.disable") ||
                Boolean.getBoolean("episteme.backend.disable." + id);
     }
 
