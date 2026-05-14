@@ -113,6 +113,28 @@ public class BackendDiscovery {
                     logger.warn("Skipping bad Backend provider [{}]: {}", className, t.getMessage());
                 }
             });
+
+            // 2. Reflection Fallback (using MasterControlDiscovery if available)
+            try {
+                org.episteme.core.ui.MasterControlDiscovery.getInstance().findClasses("Backend").forEach(info -> {
+                    boolean exists = cachedProviders.stream().anyMatch(p -> p.getClass().getName().equals(info.fullName));
+                    if (!exists) {
+                        try {
+                            Class<?> cls = Class.forName(info.fullName, false, Backend.class.getClassLoader());
+                            if (Backend.class.isAssignableFrom(cls)) {
+                                logger.info("BackendDiscovery: Found backend via reflection: {}", info.fullName);
+                                Backend instance = (Backend) cls.getDeclaredConstructor().newInstance();
+                                cachedProviders.add(instance);
+                            }
+                        } catch (Exception e) {
+                            // Skip if cannot instantiate
+                        }
+                    }
+                });
+            } catch (NoClassDefFoundError e) {
+                // Might happen in CLI environments without UI modules
+            }
+
             logger.info("Backend Discovery complete. {} backends loaded.", cachedProviders.size());
         }
         return cachedProviders;

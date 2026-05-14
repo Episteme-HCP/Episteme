@@ -43,9 +43,15 @@ public class MasterControlDiscovery {
     private static final MasterControlDiscovery INSTANCE = new MasterControlDiscovery();
     private final Map<String, List<ClassInfo>> classCache = new HashMap<>();
     private List<ClassInfo> allDiscoveredClasses = null;
+    private final java.util.concurrent.CompletableFuture<List<ClassInfo>> discoveryFuture;
 
     public static MasterControlDiscovery getInstance() {
         return INSTANCE;
+    }
+
+    private MasterControlDiscovery() {
+        // Start scanning in background immediately
+        discoveryFuture = java.util.concurrent.CompletableFuture.supplyAsync(this::scanAllEpistemeClasses);
     }
 
     /**
@@ -146,7 +152,13 @@ public class MasterControlDiscovery {
         }
 
         if (allDiscoveredClasses == null) {
-            allDiscoveredClasses = scanAllEpistemeClasses();
+            try {
+                // Wait for background scan if not finished
+                allDiscoveredClasses = discoveryFuture.get(5, java.util.concurrent.TimeUnit.SECONDS);
+            } catch (Exception e) {
+                logger.error("Background discovery failed or timed out", e);
+                allDiscoveredClasses = new ArrayList<>();
+            }
         }
 
         List<ClassInfo> results = new ArrayList<>();
@@ -185,10 +197,11 @@ public class MasterControlDiscovery {
                 }
 
                 if (isViewerRequested && org.episteme.core.ui.Viewer.class.isAssignableFrom(cls)) implementsInterface = true;
-                if (isAppRequested && org.episteme.core.ui.App.class.isAssignableFrom(cls)) implementsInterface = true;
-                if (isDeviceRequested && org.episteme.core.device.Device.class.isAssignableFrom(cls)) implementsInterface = true;
-                if ("Loader".equals(suffix) && org.episteme.core.io.ResourceIO.class.isAssignableFrom(cls)) implementsInterface = true;
-                if (isBackendRequested && org.episteme.core.technical.backend.Backend.class.isAssignableFrom(cls)) implementsInterface = true;
+                if (isAppRequested && (org.episteme.core.ui.App.class.isAssignableFrom(cls) || org.episteme.core.ui.Viewer.class.isAssignableFrom(cls))) implementsInterface = true;
+                if (isDeviceRequested && (org.episteme.core.device.Device.class.isAssignableFrom(cls) || cls.getSimpleName().contains("Device"))) implementsInterface = true;
+                if ("Loader".equals(suffix) && (org.episteme.core.io.ResourceIO.class.isAssignableFrom(cls) || cls.getName().contains(".io."))) implementsInterface = true;
+                if (isBackendRequested && (org.episteme.core.technical.backend.Backend.class.isAssignableFrom(cls) || 
+                                           org.episteme.core.technical.algorithm.AlgorithmProvider.class.isAssignableFrom(cls))) implementsInterface = true;
 
             } catch (Throwable t) {
                 // Ignore if class cannot be loaded (dependencies might be missing)
@@ -224,9 +237,18 @@ public class MasterControlDiscovery {
         addClassLoaderPaths(allPaths, MasterControlDiscovery.class.getClassLoader());
 
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        String[] paths = allPaths.toArray(new String[0]);
+        
+        // Filter paths to keep only Episteme-related or potential directories
+        List<String> filteredPaths = allPaths.stream()
+            .filter(p -> {
+                String lp = p.toLowerCase();
+                if (lp.contains("episteme")) return true;
+                if (new java.io.File(p).isDirectory()) return true;
+                return false;
+            })
+            .collect(java.util.stream.Collectors.toList());
 
-        for (String path : paths) {
+        for (String path : filteredPaths) {
             java.io.File file = new java.io.File(path);
             if (!file.exists()) continue;
 

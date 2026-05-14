@@ -104,6 +104,32 @@ public class StandardAlgorithmService implements AlgorithmService {
                 }
             }
         } catch (Exception e) {}
+        
+        // Path 3: Direct Reflection (for AlgorithmProviders not linked to a Backend)
+        try {
+            org.episteme.core.ui.MasterControlDiscovery.getInstance().findClasses("Provider").forEach(info -> {
+                try {
+                    Class<?> cls = Class.forName(info.fullName, false, providerClass.getClassLoader());
+                    if (providerClass.isAssignableFrom(cls)) {
+                        String key = cls.getName(); // Simple key for pre-instantiation check
+                        boolean exists = seenKeys.stream().anyMatch(k -> k.startsWith(key + ":"));
+                        if (!exists) {
+                            P provider = (P) cls.getDeclaredConstructor().newInstance();
+                            if (isFiltered(provider.getName())) return;
+                            String fullKey = provider.getClass().getName() + ":" + provider.getName();
+                            if (provider.isAvailable() && seenKeys.add(fullKey)) {
+                                logger.info("StandardAlgorithmService: Found provider via reflection: {}", info.fullName);
+                                available.add(provider);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // Skip
+                }
+            });
+        } catch (NoClassDefFoundError e) {
+            // UI discovery not available
+        }
 
         available.sort(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed());
         return available;
