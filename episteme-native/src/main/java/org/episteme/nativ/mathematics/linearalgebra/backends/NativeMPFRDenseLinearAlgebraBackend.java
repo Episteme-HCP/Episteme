@@ -7,6 +7,7 @@ package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import com.google.auto.service.AutoService;
 import java.lang.foreign.*;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import java.lang.invoke.MethodHandle;
 import java.util.List;
 import java.util.ArrayList;
@@ -1535,17 +1536,23 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             MemorySegment h_B = initVector(b, arena, tracker, prec, isComplex);
             MemorySegment h_X = allocateVector(n, arena, tracker, prec, isComplex);
             
-            MemorySegment sumR = arena.allocate(MPFR_LAYOUT); track(tracker, sumR);
+            MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
             MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) track(tracker, sumI);
-            MemorySegment termR = arena.allocate(MPFR_LAYOUT); track(tracker, termR);
+            MemorySegment termR = arena.allocate(MPFR_LAYOUT);
             MemorySegment termI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) track(tracker, termI);
             
             NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
+            track(tracker, sumR);
+            if (isComplex) {
+                NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
+                track(tracker, sumI);
+            }
             NativeSafe.invoke(MPFR_INIT2, termR, (int) prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, termI, (int) prec);
+            track(tracker, termR);
+            if (isComplex) {
+                NativeSafe.invoke(MPFR_INIT2, termI, (int) prec);
+                track(tracker, termI);
+            }
 
             if (!transpose) {
                 if (!upper) {
