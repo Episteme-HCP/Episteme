@@ -129,6 +129,27 @@ public class LinearAlgebraAuditSuite {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private static <E> E getSmallTolerance(Ring<E> ring) {
+        E zero = ring.zero();
+        if (zero instanceof Complex) {
+            Real rVal;
+            if (((Complex) zero).getReal() instanceof RealBig) {
+                rVal = RealBig.create(new java.math.BigDecimal("1e-20"));
+            } else {
+                rVal = Real.of(1e-10);
+            }
+            return (E) Complex.of(rVal);
+        }
+        if (zero instanceof RealBig) {
+            return (E) RealBig.create(new java.math.BigDecimal("1e-20"));
+        }
+        if (zero instanceof Real) {
+            return (E) Real.of(1e-10);
+        }
+        return zero;
+    }
+
     private static Object verify(Object actual, Object expected, double tolerance) {
         CorrectnessVerifier.verify(actual, expected, tolerance);
         return actual;
