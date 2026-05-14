@@ -465,10 +465,10 @@ public class EpistemeMasterControl extends Application {
         content.getChildren().add(createManualLibraryCategory(i18n, 
             i18n.get("mastercontrol.libraries.cat.framework", "Framework Libraries"),
             new String[][] {
-                {"lib.javalin.name", "io.javalin.Javalin"},
-                {"lib.jackson.name", "com.fasterxml.jackson.databind.ObjectMapper"},
-                {"lib.slf4j.name", "org.slf4j.Logger"},
-                {"lib.grpc.name", "io.grpc.ManagedChannel"}
+                {"lib.javalin.name", "io.javalin.Javalin", "lib.javalin.desc"},
+                {"lib.jackson.name", "com.fasterxml.jackson.databind.ObjectMapper", "lib.jackson.desc"},
+                {"lib.slf4j.name", "org.slf4j.Logger", "lib.slf4j.desc"},
+                {"lib.grpc.name", "io.grpc.ManagedChannel", "lib.grpc.desc"}
             }
         ));
         content.getChildren().add(new Separator());
@@ -476,8 +476,8 @@ public class EpistemeMasterControl extends Application {
         content.getChildren().add(createManualLibraryCategory(i18n, 
             i18n.get("mastercontrol.libraries.cat.standards", "Standards"),
             new String[][] {
-                {"lib.jsr385.name", "javax.measure.Unit"},
-                {"lib.indriya.name", "tech.units.indriya.format.SimpleUnitFormat"}
+                {"lib.jsr385.name", "javax.measure.Unit", "lib.jsr385.desc"},
+                {"lib.indriya.name", "tech.units.indriya.format.SimpleUnitFormat", "lib.indriya.desc"}
             }
         ));
         content.getChildren().add(new Separator());
@@ -538,29 +538,50 @@ public class EpistemeMasterControl extends Application {
     }
 
     private VBox createManualLibraryCategory(I18N i18n, String title, String[][] libs) {
-        VBox cat = new VBox(15);
+        VBox cat = new VBox(0); // Use 0 spacing for stripes
         Label titleLbl = new Label(title);
         titleLbl.getStyleClass().add("font-bold");
+        titleLbl.setStyle("-fx-padding: 0 0 10 0;");
         cat.getChildren().add(titleLbl);
 
-        for (String[] lib : libs) {
-            HBox row = new HBox(15);
-            row.setAlignment(Pos.CENTER_LEFT);
-            row.getStyleClass().add("library-row");
-            
+        for (int i = 0; i < libs.length; i++) {
+            String[] lib = libs[i];
             boolean avail = false;
             try { Class.forName(lib[1]); avail = true; } catch (Exception e) {}
             
-            Label name = new Label(i18n.get(lib[0], lib[0].replace("lib.", "").replace(".name", "")));
-            name.setPrefWidth(200);
+            String name = i18n.get(lib[0], lib[0].replace("lib.", "").replace(".name", ""));
+            String desc = lib.length > 2 ? i18n.get(lib[2], "") : "";
             
-            Label status = new Label(avail ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "NOT FOUND"));
-            status.getStyleClass().add(avail ? "status-label-available" : "status-label-unavailable");
-            
-            row.getChildren().addAll(name, status);
+            HBox row = createManualLibraryRow(i18n, name, avail, desc, i % 2 == 1);
             cat.getChildren().add(row);
         }
         return cat;
+    }
+
+    private HBox createManualLibraryRow(I18N i18n, String nameStr, boolean available, String descStr, boolean striped) {
+        HBox row = new HBox(15);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(10, 15, 10, 15));
+        if (striped) {
+            row.setStyle("-fx-background-color: rgba(0,0,0,0.03); -fx-background-radius: 5;");
+        }
+
+        Label name = new Label(nameStr);
+        name.setPrefWidth(250);
+        name.getStyleClass().add("font-medium");
+
+        Label status = new Label(available ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "NOT FOUND"));
+        status.setPrefWidth(120);
+        status.getStyleClass().add(available ? "status-label-available" : "status-label-unavailable");
+        status.setAlignment(Pos.CENTER);
+
+        Label desc = new Label(descStr);
+        desc.setOpacity(0.7);
+        desc.setWrapText(true);
+        HBox.setHgrow(desc, Priority.ALWAYS);
+
+        row.getChildren().addAll(name, status, desc);
+        return row;
     }
 
     private Tab createAlgorithmsTab(I18N i18n) {
@@ -627,30 +648,36 @@ public class EpistemeMasterControl extends Application {
         List<? extends AlgorithmProvider> providers = AlgorithmManager.getProviders(type);
         if (providers.isEmpty()) return box;
 
-        int r = 0;
-        for (AlgorithmProvider p : providers) {
-            HBox row = new HBox(20);
-            row.setPadding(new Insets(10, 15, 10, 15));
-            row.setAlignment(Pos.CENTER_LEFT);
-            if (r % 2 != 0) row.setStyle("-fx-background-color: rgba(255,255,255,0.05);");
-            
-            Label name = new Label(p.getName());
-            name.getStyleClass().add("font-bold");
-            name.setPrefWidth(200);
-            
-            Label prio = new Label("Prio: " + p.getPriority());
-            prio.setOpacity(0.6);
-            prio.setPrefWidth(80);
-            
-            Label desc = new Label(p.description());
-            desc.setWrapText(true);
-            HBox.setHgrow(desc, Priority.ALWAYS);
-            
-            row.getChildren().addAll(name, prio, desc);
-            box.getChildren().add(row);
-            r++;
+        for (int i = 0; i < providers.size(); i++) {
+            box.getChildren().add(createAlgorithmRow(i18n, providers.get(i), i % 2 == 1));
         }
         return box;
+    }
+
+    private HBox createAlgorithmRow(I18N i18n, AlgorithmProvider p, boolean striped) {
+        HBox row = new HBox(15);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(10, 15, 10, 15));
+        if (striped) {
+            row.setStyle("-fx-background-color: rgba(0,0,0,0.03); -fx-background-radius: 5;");
+        }
+
+        Label name = new Label(p.getName());
+        name.setPrefWidth(250);
+        name.getStyleClass().add("font-medium");
+
+        Label status = new Label(i18n.get("status.ready", "READY"));
+        status.setPrefWidth(120);
+        status.getStyleClass().add("status-label-available");
+        status.setAlignment(Pos.CENTER);
+
+        Label desc = new Label(p.description());
+        desc.setOpacity(0.7);
+        desc.setWrapText(true);
+        HBox.setHgrow(desc, Priority.ALWAYS);
+
+        row.getChildren().addAll(name, status, desc);
+        return row;
     }
 
     private VBox createBackendListCategory(I18N i18n, String type) {
@@ -671,86 +698,65 @@ public class EpistemeMasterControl extends Application {
             }
         }
 
-        int r = 0;
-        for (Backend b : providers) {
-            HBox row = new HBox(20);
-            row.setPadding(new Insets(10, 15, 10, 15));
-            row.setAlignment(Pos.CENTER_LEFT);
-            if (r % 2 != 0) row.setStyle("-fx-background-color: rgba(255,255,255,0.05);");
-            
-            Label name = new Label(b.getName());
-            name.getStyleClass().add("font-bold");
-            name.setPrefWidth(200);
-            
-            Label status = new Label(i18n.get("status.available", "AVAILABLE"));
-            status.getStyleClass().add("status-label-available");
-            status.setPrefWidth(120);
-            
-            Label desc = new Label(b.getDescription());
-            desc.setWrapText(true);
-            HBox.setHgrow(desc, Priority.ALWAYS);
-            
-            row.getChildren().addAll(name, status, desc);
-            box.getChildren().add(row);
-            r++;
+        for (int i = 0; i < providers.size(); i++) {
+            box.getChildren().add(createBackendRow(i18n, providers.get(i), i % 2 == 1, false));
         }
         return box;
+    }
+
+    private HBox createBackendRow(I18N i18n, Backend b, boolean striped, boolean showCheckbox) {
+        HBox row = new HBox(15);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(10, 15, 10, 15));
+        if (striped) {
+            row.setStyle("-fx-background-color: rgba(0,0,0,0.03); -fx-background-radius: 5;");
+        }
+
+        if (showCheckbox) {
+            CheckBox activeCb = new CheckBox();
+            activeCb.setSelected(!UserPreferences.getInstance().isBackendDeactivated(b.getId()));
+            activeCb.setOnAction(e -> {
+                UserPreferences.getInstance().setBackendDeactivated(b.getId(), !activeCb.isSelected());
+                notifySaved(i18n);
+            });
+            activeCb.setPadding(new Insets(0, 10, 0, 0));
+            row.getChildren().add(activeCb);
+        }
+
+        Label name = new Label(b.getName());
+        name.setPrefWidth(250);
+        name.getStyleClass().add("font-medium");
+
+        Label status = new Label(b.isAvailable() ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "MISSING"));
+        status.setPrefWidth(120);
+        status.getStyleClass().add(b.isAvailable() ? "status-label-available" : "status-label-unavailable");
+        status.setAlignment(Pos.CENTER);
+
+        Label desc = new Label(b.getDescription());
+        desc.setOpacity(0.7);
+        desc.setWrapText(true);
+        HBox.setHgrow(desc, Priority.ALWAYS);
+
+        row.getChildren().addAll(name, status, desc);
+        return row;
     }
 
 
 
     private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
-        VBox cat = new VBox(15);
+        VBox cat = new VBox(0);
         Label titleLbl = new Label(title);
         titleLbl.getStyleClass().add("font-bold");
+        titleLbl.setStyle("-fx-padding: 0 0 10 0;");
         cat.getChildren().add(titleLbl);
         
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(5);
-        
         List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
-        int row = 0;
-        for (Backend b : providers) {
-            addBackendRow(grid, row++, b, i18n);
+        for (int i = 0; i < providers.size(); i++) {
+            cat.getChildren().add(createBackendRow(i18n, providers.get(i), i % 2 == 1, true));
         }
-        cat.getChildren().add(grid);
         return cat;
     }
 
-    private void addBackendRow(GridPane grid, int row, Backend provider, I18N i18n) {
-        Region bg = new Region();
-        bg.getStyleClass().add(row % 2 == 0 ? "zebra-row-even" : "zebra-row-odd");
-        GridPane.setColumnSpan(bg, 4); // Extra column for checkbox
-        GridPane.setHgrow(bg, Priority.ALWAYS);
-        grid.add(bg, 0, row);
-
-        CheckBox activeCb = new CheckBox();
-        activeCb.setSelected(!UserPreferences.getInstance().isBackendDeactivated(provider.getId()));
-        activeCb.setOnAction(e -> {
-            UserPreferences.getInstance().setBackendDeactivated(provider.getId(), !activeCb.isSelected());
-            notifySaved(i18n);
-        });
-        activeCb.setPadding(new Insets(10));
-
-        Label name = new Label(provider.getName());
-        name.getStyleClass().add("font-bold");
-        name.setPadding(new Insets(10, 10, 10, 15));
-
-        Label status = new Label(provider.isAvailable() ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "MISSING"));
-        status.getStyleClass().add(provider.isAvailable() ? "status-label-available" : "status-label-unavailable");
-        status.setPadding(new Insets(10, 10, 10, 10));
-
-        Label info = new Label(provider.getDescription());
-        info.getStyleClass().add("description-label");
-        info.setPadding(new Insets(10, 10, 10, 10));
-        info.setWrapText(true);
-
-        grid.add(activeCb, 0, row);
-        grid.add(name, 1, row);
-        grid.add(status, 2, row);
-        grid.add(info, 3, row);
-    }
 
     private Tab createLoadersTab(I18N i18n) {
         VBox content = new VBox(25);
@@ -864,29 +870,49 @@ public class EpistemeMasterControl extends Application {
         return infos.stream().map(i -> new AppEntry(i.simpleName, i.fullName, i.description)).toArray(AppEntry[]::new);
     }
 
-    private ListView<AppEntry> createAppList(boolean launch, AppEntry[] entries) {
-        ListView<AppEntry> list = new ListView<>();
-        list.getItems().addAll(entries);
-        list.setCellFactory(p -> new ListCell<>() {
-            @Override protected void updateItem(AppEntry item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setGraphic(null); return; }
-                VBox box = new VBox(2);
-                Label n = new Label(item.name); n.getStyleClass().add("font-bold");
-                Label d = new Label(item.description); d.getStyleClass().add("description-label");
-                box.getChildren().addAll(n, d);
-                setGraphic(box);
-            }
-        });
-        if (launch) {
-            list.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2) {
-                    AppEntry s = list.getSelectionModel().getSelectedItem();
-                    if (s != null) launchApp(s.className);
-                }
-            });
+    private VBox createAppList(boolean launch, AppEntry[] entries) {
+        VBox box = new VBox(0);
+        for (int i = 0; i < entries.length; i++) {
+            box.getChildren().add(createAppRow(entries[i], i % 2 == 1, launch));
         }
-        return list;
+        return box;
+    }
+
+    private HBox createAppRow(AppEntry app, boolean striped, boolean showLaunch) {
+        HBox row = new HBox(15);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(10, 15, 10, 15));
+        if (striped) {
+            row.setStyle("-fx-background-color: rgba(0,0,0,0.03); -fx-background-radius: 5;");
+        }
+
+        Label name = new Label(app.name);
+        name.setPrefWidth(250);
+        name.getStyleClass().add("font-medium");
+
+        boolean available = false;
+        try { Class.forName(app.className); available = true; } catch (Exception e) {}
+
+        Label status = new Label(available ? I18N.getInstance().get("status.available", "AVAILABLE") : I18N.getInstance().get("status.missing", "MISSING"));
+        status.setPrefWidth(120);
+        status.getStyleClass().add(available ? "status-label-available" : "status-label-unavailable");
+        status.setAlignment(Pos.CENTER);
+
+        Label desc = new Label(app.description);
+        desc.setOpacity(0.7);
+        desc.setWrapText(true);
+        HBox.setHgrow(desc, Priority.ALWAYS);
+
+        row.getChildren().addAll(name, status, desc);
+
+        if (showLaunch && available) {
+            Button launchBtn = new Button(I18N.getInstance().get("action.launch", "Launch"));
+            launchBtn.getStyleClass().add("button-small");
+            launchBtn.setOnAction(e -> launchApp(app.className));
+            row.getChildren().add(launchBtn);
+        }
+
+        return row;
     }
 
     private void launchApp(String className) {
