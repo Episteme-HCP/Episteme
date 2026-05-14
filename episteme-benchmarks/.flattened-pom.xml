@@ -5,10 +5,10 @@
   <parent>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta2</version>
+    <version>1.0.0-beta3</version>
   </parent>
   <artifactId>episteme-benchmarks</artifactId>
-  <version>1.0.0-beta2</version>
+  <version>1.0.0-beta3</version>
   <name>Episteme Benchmarking Suite</name>
   <description>Benchmarking and performance analysis suite for Episteme. Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
   <licenses>
