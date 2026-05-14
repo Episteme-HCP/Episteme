@@ -89,3 +89,20 @@
     -fx-text-fill: #e74c3c;
     -fx-font-weight: bold;
 }
+.app-row {
+    -fx-padding: 10 15;
+    -fx-background-radius: 5;
+    -fx-alignment: center-left;
+}
+
+.app-row:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+}
+
+.app-row-striped {
+    -fx-background-color: rgba(0, 0, 0, 0.02);
+}
+
+.app-row-striped:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.07);
+}

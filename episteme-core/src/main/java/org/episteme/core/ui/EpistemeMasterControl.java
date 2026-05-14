@@ -197,11 +197,12 @@ public class EpistemeMasterControl extends Application {
 
         ComboBox<LocaleItem> langCombo = new ComboBox<>();
         langCombo.getItems().addAll(
-                new LocaleItem(i18n.get("lang.en", "English (US)"), Locale.US),
-                new LocaleItem(i18n.get("lang.fr", "Français (France)"), Locale.FRANCE),
-                new LocaleItem(i18n.get("lang.de", "Deutsch (Deutschland)"), Locale.GERMANY),
-                new LocaleItem(i18n.get("lang.es", "Español (España)"), Locale.forLanguageTag("es-ES")),
-                new LocaleItem(i18n.get("lang.zh", "中文 (中国)"), Locale.CHINA));
+                new LocaleItem(i18n.get("mastercontrol.lang.en", "English"), Locale.US),
+                new LocaleItem(i18n.get("mastercontrol.lang.fr", "Français"), Locale.FRANCE),
+                new LocaleItem(i18n.get("mastercontrol.lang.de", "Deutsch"), Locale.GERMANY),
+                new LocaleItem(i18n.get("mastercontrol.lang.es", "Español"), Locale.forLanguageTag("es-ES")),
+                new LocaleItem(i18n.get("mastercontrol.lang.it", "Italiano"), Locale.ITALY),
+                new LocaleItem(i18n.get("mastercontrol.lang.zh", "中文"), Locale.CHINA));
 
         Locale currentLocale = i18n.getLocale();
         for (LocaleItem item : langCombo.getItems()) {
@@ -880,11 +881,8 @@ public class EpistemeMasterControl extends Application {
 
     private HBox createAppRow(AppEntry app, boolean striped, boolean showLaunch) {
         HBox row = new HBox(15);
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(10, 15, 10, 15));
-        if (striped) {
-            row.setStyle("-fx-background-color: rgba(0,0,0,0.03); -fx-background-radius: 5;");
-        }
+        row.getStyleClass().add("app-row");
+        if (striped) row.getStyleClass().add("app-row-striped");
 
         Label name = new Label(app.name);
         name.setPrefWidth(250);
@@ -904,6 +902,15 @@ public class EpistemeMasterControl extends Application {
         HBox.setHgrow(desc, Priority.ALWAYS);
 
         row.getChildren().addAll(name, status, desc);
+
+        if (available) {
+            row.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2) {
+                    launchApp(app.className);
+                }
+            });
+            row.setCursor(javafx.scene.Cursor.HAND);
+        }
 
         if (showLaunch && available) {
             Button launchBtn = new Button(I18N.getInstance().get("action.launch", "Launch"));

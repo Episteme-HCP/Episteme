@@ -6,6 +6,7 @@
 package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import java.lang.invoke.MethodHandle;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.structures.rings.Field;
@@ -460,17 +461,21 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
     }
 
     private void axpy_internal(MemorySegment y, E alpha, MemorySegment x, int n, int prec, Arena arena, ResourceTracker tracker, boolean isComplex) throws Throwable {
-        MemorySegment aR = arena.allocate(MPFR_LAYOUT); track(tracker, aR);
+        MemorySegment aR = arena.allocate(MPFR_LAYOUT);
         MemorySegment aI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-        if (isComplex) track(tracker, aI);
-        
-        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
-        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
 
         NativeSafe.invoke(MPFR_INIT2, aR, (int) prec);
-        if (isComplex) NativeSafe.invoke(MPFR_INIT2, aI, (int) prec);
+        track(tracker, aR);
+        if (isComplex) {
+            NativeSafe.invoke(MPFR_INIT2, aI, (int) prec);
+            track(tracker, aI);
+        }
         NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
+        track(tracker, t1);
         NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
+        track(tracker, t2);
 
         if (isComplex) {
             Complex c = (alpha instanceof Complex cv) ? cv : Complex.of(getReal(alpha));
@@ -509,15 +514,25 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @SuppressWarnings("unchecked")
     private E dot_internal(MemorySegment x, MemorySegment y, int n, int prec, Arena arena, ResourceTracker tracker, boolean isComplex, Ring<E> ring) throws Throwable {
-        MemorySegment sumR = arena.allocate(MPFR_LAYOUT); track(tracker, sumR);
-        NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec); NativeSafe.invoke(MPFR_SET_UI, sumR, 0, 0);
-        MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-        if (isComplex) { track(tracker, sumI); NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec); NativeSafe.invoke(MPFR_SET_UI, sumI, 0, 0); }
+        MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
+        NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec); 
+        track(tracker, sumR);
+        NativeSafe.invoke(MPFR_SET_UI, sumR, 0, 0);
         
-        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
-        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
+        MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+        if (isComplex) { 
+            NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec); 
+            track(tracker, sumI);
+            NativeSafe.invoke(MPFR_SET_UI, sumI, 0, 0); 
+        }
+        
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
+        track(tracker, t1);
+        
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
+        track(tracker, t2);
 
         long layoutSize = MPFR_LAYOUT.byteSize();
         int stride = isComplex ? 2 : 1;
@@ -557,10 +572,14 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
     @SuppressWarnings("unchecked")
     private E norm_internal(MemorySegment x, int n, int prec, Arena arena, ResourceTracker tracker, boolean isComplex, Ring<E> ring) throws Throwable {
-        MemorySegment sumSq = arena.allocate(MPFR_LAYOUT); track(tracker, sumSq);
-        NativeSafe.invoke(MPFR_INIT2, sumSq, (int) prec); NativeSafe.invoke(MPFR_SET_UI, sumSq, 0, 0);
-        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
+        MemorySegment sumSq = arena.allocate(MPFR_LAYOUT);
+        NativeSafe.invoke(MPFR_INIT2, sumSq, (int) prec);
+        track(tracker, sumSq);
+        NativeSafe.invoke(MPFR_SET_UI, sumSq, 0, 0);
+        
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
+        track(tracker, t1);
 
         int stride = isComplex ? 2 : 1;
         long layoutSize = MPFR_LAYOUT.byteSize();
@@ -632,16 +651,23 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         long layoutSize = MPFR_LAYOUT.byteSize();
         int stride = isComplex ? 2 : 1;
 
-        MemorySegment sumR = arena.allocate(MPFR_LAYOUT); track(tracker, sumR);
-        MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-        if (isComplex) track(tracker, sumI);
-        MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
-        MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
-        
+        MemorySegment sumR = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, sumR, (int) prec);
-        if (isComplex) NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
+        track(tracker, sumR);
+        
+        MemorySegment sumI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+        if (isComplex) {
+            NativeSafe.invoke(MPFR_INIT2, sumI, (int) prec);
+            track(tracker, sumI);
+        }
+        
+        MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
+        track(tracker, t1);
+        
+        MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
+        track(tracker, t2);
 
         for (int i = 0; i < sa.rows(); i++) {
             NativeSafe.invoke(MPFR_SET_UI, sumR, 0L, 0);
@@ -728,31 +754,45 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         Object[] vals = sa.getValues();
         
         try (Arena arena = Arena.ofConfined(); ResourceTracker tracker = new ResourceTracker()) {
-            MemorySegment sR = arena.allocate(MPFR_LAYOUT); track(tracker, sR);
-            MemorySegment sI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) track(tracker, sI);
-            
+            MemorySegment sR = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, sR, (int) prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
+            track(tracker, sR);
+            
+            MemorySegment sI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) {
+                NativeSafe.invoke(MPFR_INIT2, sI, (int) prec);
+                track(tracker, sI);
+            }
 
             setMPFR_internal(sR, sI, scalar, arena);
             
-            MemorySegment t1 = arena.allocate(MPFR_LAYOUT); track(tracker, t1);
-            MemorySegment t2 = arena.allocate(MPFR_LAYOUT); track(tracker, t2);
-            MemorySegment valR = arena.allocate(MPFR_LAYOUT); track(tracker, valR);
-            MemorySegment valI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) track(tracker, valI);
-            
-            MemorySegment resR = arena.allocate(MPFR_LAYOUT); track(tracker, resR);
-            MemorySegment resI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
-            if (isComplex) track(tracker, resI);
-
+            MemorySegment t1 = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, t1, (int) prec);
+            track(tracker, t1);
+            
+            MemorySegment t2 = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, t2, (int) prec);
+            track(tracker, t2);
+            
+            MemorySegment valR = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, valR, (int) prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, valI, (int) prec);
+            track(tracker, valR);
+            
+            MemorySegment valI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) {
+                NativeSafe.invoke(MPFR_INIT2, valI, (int) prec);
+                track(tracker, valI);
+            }
+            
+            MemorySegment resR = arena.allocate(MPFR_LAYOUT);
             NativeSafe.invoke(MPFR_INIT2, resR, (int) prec);
-            if (isComplex) NativeSafe.invoke(MPFR_INIT2, resI, (int) prec);
+            track(tracker, resR);
+            
+            MemorySegment resI = isComplex ? arena.allocate(MPFR_LAYOUT) : null;
+            if (isComplex) {
+                NativeSafe.invoke(MPFR_INIT2, resI, (int) prec);
+                track(tracker, resI);
+            }
 
             for (int i = 0; i < sa.rows(); i++) {
                 for (int k = rowPtr[i]; k < rowPtr[i+1]; k++) {
