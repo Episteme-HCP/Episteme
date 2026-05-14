@@ -3,7 +3,9 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.nativ.media.vision.backends;
+
+
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.media.VisionBackend;
@@ -153,7 +155,7 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
         
         try (Arena arena = Arena.ofConfined()) {
             // High-speed copy to native memory
-            MemorySegment pixelSegment = arena.allocateFrom(ValueLayout.JAVA_INT, data);
+            MemorySegment pixelSegment = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, data);
             
             // Call native function
             MH_PROCESS_IMAGE.invokeExact(pixelSegment, width, height, opCode);
@@ -187,3 +189,5 @@ public class NativeCPUCBindingVisionBackend implements VisionBackend, CPUBackend
         return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }
 }
+
+

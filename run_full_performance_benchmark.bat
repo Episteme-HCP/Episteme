@@ -10,7 +10,7 @@ echo ==========================================
 set MAVEN_OPTS=--add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED
 
 echo Running Universal Multimodal Audit...
-call mvn clean test -pl episteme-benchmarks -am "-Drevision=1.0.0-beta2" -Dtest=UniversalMultimodalAudit -Dsurefire.failIfNoSpecifiedTests=false
+call mvn clean test -pl episteme-benchmarks -am "-Drevision=1.0.0-beta3" -Dtest=UniversalMultimodalAudit -Dsurefire.failIfNoSpecifiedTests=false
 
 echo ==========================================
 echo Benchmark Completed.

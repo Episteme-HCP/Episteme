@@ -85,10 +85,10 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_x = malloc((long)k * 4, tracker);
             MemorySegment d_y = malloc((long)m * 4, tracker);
 
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(sa)), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(x)), (long)k * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(sa)), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(x)), (long)k * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
 
             spmv_internal(m, k, nnz, d_rowPtr, d_colIdx, d_val, d_x, d_y, arena, tracker, CUDA_R_32F);
 
@@ -113,10 +113,10 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_val = malloc((long)nnz * 8, tracker);
             MemorySegment d_x = malloc((long)k * 8, tracker);
             MemorySegment d_y = malloc((long)m * 8, tracker);
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatArray(sa)), (long)nnz * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, toComplexFloatVec(x)), (long)k * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray(sa)), (long)nnz * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatVec(x)), (long)k * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             spmv_internal(m, k, nnz, d_rowPtr, d_colIdx, d_val, d_x, d_y, arena, tracker, 6); // 6 = CUDA_C_32F
             float[] h_y = new float[m * 2];
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * 2);
@@ -142,11 +142,11 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         MemorySegment vecY = vecYPtr.get(ValueLayout.ADDRESS, 0);
         tracker.track(vecY, s -> { try { NativeSafe.invoke(CUDAManager.CUSPARSE_DESTROY_DN_VEC, s); } catch (Throwable t) {} });
 
-        MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f);
-        MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f);
+        MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f);
+        MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f);
         if (dataType == 6) { // CUDA_C_32F
-            alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
-            beta = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
+            alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+            beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
         }
         MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
 
@@ -283,9 +283,9 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_val = malloc((long)nnz * elemSize, tracker);
             MemorySegment d_dense = malloc((long)m * n * elemSize, tracker);
 
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
 
             MemorySegment handle = CUDAManager.getCusparseHandle();
             MemorySegment spMatDescr = arena.allocate(ValueLayout.ADDRESS);
@@ -325,7 +325,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_dense = malloc((long)m * n * elemSize, tracker);
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_dense, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArrayGeneric(a) : toFloatArrayGeneric(a)), (long)m * n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_dense, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArrayGeneric(a) : toFloatArrayGeneric(a)), (long)m * n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
 
             MemorySegment handle = CUDAManager.getCusparseHandle();
             MemorySegment dnMatDescr = arena.allocate(ValueLayout.ADDRESS);
@@ -435,13 +435,13 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_p = malloc((long)n * elemSize, tracker);
             MemorySegment d_Ap = malloc((long)n * elemSize, tracker);
 
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(n + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(n + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
 
             if (x0 != null) {
-                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(x0) : toFloatArray(x0)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(x0) : toFloatArray(x0)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
             } else {
                 checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMSET, d_x, 0, (long)n * elemSize));
             }
@@ -502,13 +502,13 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_s = malloc((long)n * elemSize, tracker);
             MemorySegment d_t = malloc((long)n * elemSize, tracker);
 
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(n + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(n + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
 
             if (x0 != null) {
-                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(x0) : toFloatArray(x0)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+                checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_x, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(x0) : toFloatArray(x0)), (long)n * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
             } else {
                 checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMSET, d_x, 0, (long)n * elemSize));
             }
@@ -594,8 +594,8 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_a = malloc((long)n * (isComplex ? 8 : 4), tracker);
             MemorySegment d_b = malloc((long)n * (isComplex ? 8 : 4), tracker);
             MemorySegment d_res = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_a, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(a) : toFloatArray(a)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_a, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(a) : toFloatArray(a)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_b, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(b) : toFloatArray(b)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
             return (E) castToRing(gpuDot(n, d_a, d_b, d_res, isComplex), (Ring<E>) a.getScalarRing());
         } catch (Throwable t) { throw new RuntimeException(t); }
     }
@@ -609,7 +609,7 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_a = malloc((long)n * (isComplex ? 8 : 4), tracker);
             MemorySegment d_res = arena.allocate(ValueLayout.JAVA_FLOAT);
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_a, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(a) : toFloatArray(a)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_a, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatVec(a) : toFloatArray(a)), (long)n * (isComplex ? 8 : 4), CUDAManager.CUDA_MEMCPY_H_TO_D));
             NativeSafe.invoke(isComplex ? CUDAManager.CUBLAS_SCNRM2 : CUDAManager.CUBLAS_SNRM2, CUDAManager.getCublasHandle(), n, d_a, 1, d_res);
             return (E) (Object) RealFloat.of(d_res.get(ValueLayout.JAVA_FLOAT, 0));
         } catch (Throwable t) { throw new RuntimeException(t); }
@@ -668,9 +668,9 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
             MemorySegment d_cscColIdx = malloc((long)nnz * 4, tracker);
             MemorySegment d_cscVal = malloc((long)nnz * elemSize, tracker);
 
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, arena.allocateFrom(ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
-            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, arena.allocateFrom(ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_rowPtr, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getRowPointers()), (long)(m + 1) * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_colIdx, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, sa.getColIndices()), (long)nnz * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
+            checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_val, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, isComplex ? toComplexFloatArray(sa) : toFloatArray(sa)), (long)nnz * elemSize, CUDAManager.CUDA_MEMCPY_H_TO_D));
 
             MemorySegment handle = CUDAManager.getCusparseHandle();
             MemorySegment bufferSizePtr = arena.allocate(ValueLayout.JAVA_LONG);
@@ -788,3 +788,4 @@ public class NativeCUDASparseLinearAlgebraFloatBackend<E extends FieldElement<E>
 
     private boolean isComplex(Vector<E> v) { return v.getScalarRing().zero() instanceof Complex; }
 }
+

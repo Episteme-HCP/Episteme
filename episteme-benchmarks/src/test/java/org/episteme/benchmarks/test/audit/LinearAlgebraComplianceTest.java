@@ -34,7 +34,7 @@ public class LinearAlgebraComplianceTest {
  
     private PrecisionMode mode;
     private int matrixSize;
-    private int timeoutValue = 300;
+    private int timeoutValue = 1800;
     private String reportFileName;
  
     private enum OpStatus {

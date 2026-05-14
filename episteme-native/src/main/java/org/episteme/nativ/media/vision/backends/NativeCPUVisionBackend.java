@@ -3,7 +3,9 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.nativ.media.vision.backends;
+
+
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 import org.episteme.core.media.vision.ImageOp;
 import org.episteme.core.media.VisionBackend;
@@ -91,7 +93,7 @@ public class NativeCPUVisionBackend implements VisionBackend, CPUBackend, Native
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment pixelSegment = arena.allocateFrom(ValueLayout.JAVA_INT, pixels);
+            MemorySegment pixelSegment = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, pixels);
             
             // Pure Java Panama off-heap processing
             long byteSize = pixelSegment.byteSize();
@@ -136,3 +138,5 @@ public class NativeCPUVisionBackend implements VisionBackend, CPUBackend, Native
         return org.episteme.core.technical.backend.HardwareAccelerator.CPU;
     }
 }
+
+
