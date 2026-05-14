@@ -89,26 +89,53 @@ public class MasterControlDiscovery {
      */
     public Map<ProviderType, Map<String, List<Viewer>>> getProvidersByType() {
         Map<ProviderType, Map<String, List<Viewer>>> groupedProviders = new EnumMap<>(ProviderType.class);
+        Set<String> seenClasses = new HashSet<>();
 
+        // 1. SPI Discovery
         for (Viewer provider : getProviders()) {
-            ProviderType type = ProviderType.VIEWER;
-            if (provider instanceof App) {
-                App app = (App) provider;
-                if (app.isDemo()) {
-                    type = ProviderType.DEMO;
-                } else if (app.getClass().getName().contains(".distributed.")) {
-                    type = ProviderType.DISTRIBUTED_APP;
-                } else {
-                    type = ProviderType.APP;
-                }
-            }
-
-            groupedProviders
-                    .computeIfAbsent(type, k -> new TreeMap<>(java.text.Collator.getInstance()))
-                    .computeIfAbsent(provider.getCategory() == null ? "General" : provider.getCategory(), c -> new ArrayList<>())
-                    .add(provider);
+            seenClasses.add(provider.getClass().getName());
+            addProviderToMap(groupedProviders, provider);
         }
+
+        // 2. Reflection Fallback (for classes not registered via SPI)
+        List<ClassInfo> discovered = findClasses("App");
+        discovered.addAll(findClasses("Viewer"));
+        
+        ClassLoader loader = MasterControlDiscovery.class.getClassLoader();
+        for (ClassInfo info : discovered) {
+            if (seenClasses.contains(info.fullName)) continue;
+            try {
+                Class<?> cls = Class.forName(info.fullName, false, loader);
+                if (org.episteme.core.ui.Viewer.class.isAssignableFrom(cls) && !cls.isInterface() && !Modifier.isAbstract(cls.getModifiers())) {
+                    Viewer instance = (Viewer) cls.getDeclaredConstructor().newInstance();
+                    addProviderToMap(groupedProviders, instance);
+                    seenClasses.add(info.fullName);
+                }
+            } catch (Exception e) {
+                // Skip if instantiation fails
+            }
+        }
+
         return groupedProviders;
+    }
+
+    private void addProviderToMap(Map<ProviderType, Map<String, List<Viewer>>> groupedProviders, Viewer provider) {
+        ProviderType type = ProviderType.VIEWER;
+        if (provider instanceof App) {
+            App app = (App) provider;
+            if (app.isDemo()) {
+                type = ProviderType.DEMO;
+            } else if (app.getClass().getName().contains(".distributed.")) {
+                type = ProviderType.DISTRIBUTED_APP;
+            } else {
+                type = ProviderType.APP;
+            }
+        }
+
+        String category = provider.getCategory();
+        groupedProviders.computeIfAbsent(type, k -> new TreeMap<>())
+                        .computeIfAbsent(category == null ? "General" : category, k -> new ArrayList<>())
+                        .add(provider);
     }
 
     // --- Legacy Scanning Methods (Required for Loaders, Devices, and I18N) ---
