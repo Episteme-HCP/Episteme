@@ -3,7 +3,9 @@
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  */
 
-package org.episteme.nativ.physics.classical.mechanics.collision.backends;
+
+
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 import com.google.auto.service.AutoService;
 import org.episteme.core.technical.backend.Backend;
@@ -121,8 +123,8 @@ public class ODEBackend implements NativeCollisionProvider, MechanicsBackend, CP
     public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
         if (isLoaded()) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
-                MemorySegment radSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, radii);
+                MemorySegment posSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment radSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, radii);
                 MemorySegment colSeg = arena.allocate(ValueLayout.JAVA_INT, (long) n * n * 2);
                 int count = detectSphereCollisions(posSeg, radSeg, n, colSeg, ValueLayout.JAVA_DOUBLE);
                 MemorySegment.copy(colSeg, ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
@@ -136,10 +138,10 @@ public class ODEBackend implements NativeCollisionProvider, MechanicsBackend, CP
     public void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
         if (isLoaded()) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
-                MemorySegment velSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, velocities);
-                MemorySegment massSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, masses);
-                MemorySegment colSeg = arena.allocateFrom(ValueLayout.JAVA_INT, collisions);
+                MemorySegment posSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, positions);
+                MemorySegment velSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, velocities);
+                MemorySegment massSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, masses);
+                MemorySegment colSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, collisions);
                 resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions, ValueLayout.JAVA_DOUBLE);
                 // Copy back updated positions and velocities
                 MemorySegment.copy(posSeg, ValueLayout.JAVA_DOUBLE, 0, positions, 0, n * 3);
@@ -221,3 +223,5 @@ public class ODEBackend implements NativeCollisionProvider, MechanicsBackend, CP
         return this;
     }
 }
+
+

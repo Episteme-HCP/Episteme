@@ -4,6 +4,8 @@
  */
 package org.episteme.nativ.mathematics.linearalgebra.backends;
 
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
+
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -617,13 +619,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             if (complex) {
                 MemorySegment alpha;
                 if (single) {
-                    alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
                     NativeSafe.invoke(CTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
                     @SuppressWarnings("unchecked")
                     Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
                     return result;
                 } else {
-                    alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                    alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
                     NativeSafe.invoke(ZTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
                     @SuppressWarnings("unchecked")
                     Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
@@ -926,7 +928,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
          if (complex) {
              if (single) {
                  try (Arena arena = Arena.ofConfined()) {
-                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
+                     MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
                      MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
                      int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                      if (info != 0) throw new ArithmeticException("CGETRF failed: " + info);
@@ -937,7 +939,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                  }
              } else {
                  try (Arena arena = Arena.ofConfined()) {
-                     MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
+                     MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
                      MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
                      int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                      if (info != 0) throw new ArithmeticException("ZGETRF failed: " + info);
@@ -952,7 +954,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
          if (single) {
              try (ResourceTracker tracker = new ResourceTracker()) {
                  Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-                 MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
+                 MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(A));
                  MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
                  int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                  if (info != 0) throw new ArithmeticException("SGETRF failed: " + info);
@@ -965,7 +967,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
  
          try (ResourceTracker tracker = new ResourceTracker()) {
              Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-             MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
+             MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
              MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
              int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, m, segA, n, segIpiv);
              if (info != 0) throw new ArithmeticException("DGETRF failed: " + info);
@@ -1033,7 +1035,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                  if (CGETRF != null) {
                      try (ResourceTracker tracker = new ResourceTracker()) {
                          Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
+                         MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
                          MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
                          int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info < 0) throw new IllegalArgumentException("CGETRF failed: illegal argument " + (-info));
@@ -1057,7 +1059,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                  if (ZGETRF != null) {
                      try (ResourceTracker tracker = new ResourceTracker()) {
                          Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
+                         MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
                          MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
                          int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info < 0) throw new IllegalArgumentException("ZGETRF failed: illegal argument " + (-info));
@@ -1082,7 +1084,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
              if (single) {
                  if (SGETRF != null) {
                      try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(A));
+                         MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(A));
                          MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
                          int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info > 0) return createScalar(0.0, A);
@@ -1099,7 +1101,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
              } else {
                  if (DGETRF != null) {
                      try (Arena arena = Arena.ofConfined()) {
-                         MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
+                         MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
                          MemorySegment segIpiv = arena.allocate(ValueLayout.JAVA_INT, n);
                          int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info > 0) return createScalar(0.0, A);
@@ -1215,7 +1217,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             if (complex) {
                 if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     MemorySegment tau = arena.allocate(ValueLayout.JAVA_FLOAT, (long) k * 2);
                     if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] CGEQRF: m={}, n={}, lda={}", m, n, n);
                     int info = (int) NativeSafe.invoke(CGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
@@ -1236,7 +1238,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     }
                     return new QRResult<E>(createDenseMatrix(qData, m, k, a), R);
                 } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     MemorySegment tau = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k * 2);
                     if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] ZGEQRF: m={}, n={}, lda={}", m, n, n);
                     int info = (int) NativeSafe.invoke(ZGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
@@ -1259,7 +1261,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 }
             } else {
                 if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                     MemorySegment tau = arena.allocate(ValueLayout.JAVA_FLOAT, (long) k);
                     if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] SGEQRF: m={}, n={}, lda={}", m, n, n);
                     int info = (int) NativeSafe.invoke(SGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
@@ -1274,7 +1276,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     for (int i = 0; i < m; i++) for (int j = 0; j < k; j++) qData[i * k + j] = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) i * n + j);
                     return new QRResult<E>(createDenseMatrix(qData, m, k, a), R);
                 } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     MemorySegment tau = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
                     if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] DGEQRF: m={}, n={}, lda={}", m, n, n);
                     int info = (int) NativeSafe.invoke(DGEQRF, LAPACK_ROW_MAJOR, m, n, segA, n, tau);
@@ -1313,7 +1315,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
 
             if (complex) {
                 if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     MemorySegment s = arena.allocate(ValueLayout.JAVA_FLOAT, (long) k);
                     u = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * m * 2);
                     vt = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n * 2);
@@ -1335,7 +1337,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     Matrix<E> V = createDenseMatrix(vArr, n, n, a);
                     return new SVDResult<>(U, S, V);
                 } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     MemorySegment s = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
                     u = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * m * 2);
                     vt = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n * 2);
@@ -1377,7 +1379,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 }
             } else {
                 if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                     MemorySegment s = arena.allocate(ValueLayout.JAVA_FLOAT, (long) k);
                     u = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * m);
                     vt = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n);
@@ -1396,7 +1398,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     Matrix<E> V = createDenseMatrix(vArr, n, n, a);
                     return new SVDResult<>(U, S, V);
                 } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     MemorySegment s = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) k);
                     u = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * m);
                     vt = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n * n);
@@ -1438,7 +1440,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             if (complex) {
                 if (single) {
                     w = arena.allocate(ValueLayout.JAVA_FLOAT, n);
-                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     info = (int) NativeSafe.invoke(CHEEV, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
                     if (info != 0) throw new RuntimeException("CHEEV failed: " + info);
                     float[] eigenvalues = w.toArray(ValueLayout.JAVA_FLOAT);
@@ -1464,7 +1466,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     return new EigenResult<E>(createDenseMatrix(sortedV, n, n, a), vW);
                 } else {
                     w = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     info = (int) NativeSafe.invoke(ZHEEV, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
                     if (info != 0) throw new RuntimeException("ZHEEV failed: " + info);
                     double[] eigenvalues = w.toArray(ValueLayout.JAVA_DOUBLE);
@@ -1492,7 +1494,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             } else {
                 if (single) {
                     w = arena.allocate(ValueLayout.JAVA_FLOAT, n);
-                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                     info = (int) NativeSafe.invoke(SSYEV, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
                     if (info != 0) throw new RuntimeException("SSYEV failed: " + info);
                     float[] eigenvalues = w.toArray(ValueLayout.JAVA_FLOAT);
@@ -1515,7 +1517,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     return new EigenResult<E>(createDenseMatrix(sortedV, n, n, a), vW);
                 } else {
                     w = arena.allocate(ValueLayout.JAVA_DOUBLE, n);
-                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     info = (int) NativeSafe.invoke(DSYEV, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, segA, n, w);
                     if (info != 0) throw new RuntimeException("DSYEV failed: " + info);
                     double[] eigenvalues = w.toArray(ValueLayout.JAVA_DOUBLE);
@@ -1559,7 +1561,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             int info;
             if (complex) {
                 if (single) {
-                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     info = (int) NativeSafe.invoke(CPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new RuntimeException("CPOTRF failed: " + info);
                     float[] data = segA.toArray(ValueLayout.JAVA_FLOAT);
@@ -1572,7 +1574,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     }
                     return new CholeskyResult<>(createDenseMatrix(data, n, n, a));
                 } else {
-                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     info = (int) NativeSafe.invoke(ZPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new RuntimeException("ZPOTRF failed: " + info);
                     double[] data = segA.toArray(ValueLayout.JAVA_DOUBLE);
@@ -1586,7 +1588,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 }
             } else {
                 if (single) {
-                    segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                     info = (int) NativeSafe.invoke(SPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new RuntimeException("SPOTRF failed: " + info);
                     float[] data = segA.toArray(ValueLayout.JAVA_FLOAT);
@@ -1595,7 +1597,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     }
                     return new CholeskyResult<>(createDenseMatrix(data, n, n, a));
                 } else {
-                    segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                    segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     info = (int) NativeSafe.invoke(DPOTRF, LAPACK_ROW_MAJOR, (byte) 'L', n, segA, n);
                     if (info != 0) throw new RuntimeException("DPOTRF failed: " + info);
                     double[] data = segA.toArray(ValueLayout.JAVA_DOUBLE);
@@ -1986,14 +1988,14 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             if (complex) {
                 if (single) {
                     MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
-                    MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
                     NativeSafe.invoke(CGEMM, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, segA, k, segB, n, beta, segC, n);
                     return createDenseMatrix(segC.toArray(ValueLayout.JAVA_FLOAT), m, n, a);
                 } else {
                     MemorySegment segC = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
-                    MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                    MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
                     NativeSafe.invoke(ZGEMM, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, segA, k, segB, n, beta, segC, n);
                     return createDenseMatrix(segC.toArray(ValueLayout.JAVA_DOUBLE), m, n, a);
                 }
@@ -2065,11 +2067,11 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
 
         if (isFloat(a)) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
                 MemorySegment segY = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * 2);
-                MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
-                MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
+                MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
                 NativeSafe.invoke(CGEMV, CblasRowMajor, CblasNoTrans, m, n, alpha, segA, n, segX, 1, beta, segY, 1);
                 float[] resData = segY.toArray(ValueLayout.JAVA_FLOAT);
                 return createDenseVector(resData, m, a);
@@ -2077,12 +2079,12 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         }
 
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-            MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+            MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+            MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
             MemorySegment segY = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * 2);
 
-            MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
-            MemorySegment beta = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
+            MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+            MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
 
             if (ZGEMV != null) {
                 NativeSafe.invoke(ZGEMV, CblasRowMajor, CblasNoTrans, m, n, alpha, segA, n, segX, 1, beta, segY, 1);
@@ -2107,8 +2109,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         if (complex) {
             if (single) {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
                     MemorySegment res = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
                     // Single precision complex dot product (conjugated)
                     NativeSafe.invoke(CDOTC, n, segB, 1, segA, 1, res);
@@ -2116,8 +2118,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 } catch (Throwable t) { throw new RuntimeException("CDOTC failed", t); }
             } else {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    MemorySegment segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                     MemorySegment res = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
                     NativeSafe.invoke(ZDOTC, n, segB, 1, segA, 1, res);
                     return createScalar(res.get(ValueLayout.JAVA_DOUBLE, 0), res.get(ValueLayout.JAVA_DOUBLE, 8), a);
@@ -2127,15 +2129,15 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
-                MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
                 return createScalar((double)(float) NativeSafe.invoke(SDOT, n, segX, 1, segY, 1), a);
             } catch (Throwable t) { throw new RuntimeException("SDOT failed", t); }
         }
 
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
             return createScalar((double) NativeSafe.invoke(DDOT, n, segX, 1, segY, 1), a);
         } catch (Throwable t) { throw new RuntimeException("DDOT failed", t); }
     }
@@ -2151,12 +2153,12 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         if (complex) {
             if (single) {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     return createScalar((double)(float) NativeSafe.invoke(SCNRM2, n, segX, 1), a);
                 } catch (Throwable t) { throw new RuntimeException("SCNRM2 failed", t); }
             } else {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     return createScalar((double) NativeSafe.invoke(DZNRM2, n, segX, 1), a);
                 } catch (Throwable t) { throw new RuntimeException("DZNRM2 failed", t); }
             }
@@ -2164,13 +2166,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                 return createScalar((double)(float) NativeSafe.invoke(SNRM2, n, segX, 1), a);
             } catch (Throwable t) { throw new RuntimeException("SNRM2 failed", t); }
         }
 
         try (Arena arena = Arena.ofConfined()) {
-            MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             return createScalar((double) NativeSafe.invoke(DNRM2, n, segX, 1), a);
         } catch (Throwable t) { throw new RuntimeException("DNRM2 failed", t); }
     }
@@ -2185,18 +2187,18 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         if (complex) {
             if (single) {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
                     NativeSafe.invoke(CAXPY, n, alpha, segX, 1, segY, 1);
                     float[] resData = segY.toArray(ValueLayout.JAVA_FLOAT);
                     return createDenseVector(resData, n, a);
                 } catch (Throwable t) { throw new RuntimeException("CAXPY failed", t); }
             } else {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
                      NativeSafe.invoke(ZAXPY, n, alpha, segX, 1, segY, 1);
                     double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
                     return createDenseVector(resData, n, a);
@@ -2206,8 +2208,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
-                MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
                 NativeSafe.invoke(SAXPY, n, 1.0f, segX, 1, segY, 1);
                 float[] result = segY.toArray(ValueLayout.JAVA_FLOAT);
                 return createDenseVector(result, n, a);
@@ -2217,8 +2219,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         MemorySegment segY;
         Arena resultArena = Arena.ofAuto();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment segX = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            segY = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            MemorySegment segX = tempNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            segY = resultNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
             NativeSafe.invoke(DAXPY, n, 1.0, segX, 1, segY, 1);
         } catch (Throwable t) { throw new RuntimeException("DAXPY failed", t); }
         return createZeroCopyDoubleVector(segY, n, resultArena, a);
@@ -2234,18 +2236,18 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         if (complex) {
             if (single) {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, -1.0f, 0.0f);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, -1.0f, 0.0f);
                     NativeSafe.invoke(CAXPY, n, alpha, segX, 1, segY, 1);
                     float[] resData = segY.toArray(ValueLayout.JAVA_FLOAT);
                     return createDenseVector(resData, n, a);
                 } catch (Throwable t) { throw new RuntimeException("CAXPY failed", t); }
             } else {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
                     NativeSafe.invoke(ZAXPY, n, alpha, segX, 1, segY, 1);
                     double[] resData = segY.toArray(ValueLayout.JAVA_DOUBLE);
                     return createDenseVector(resData, n, a);
@@ -2255,8 +2257,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
-                MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                 NativeSafe.invoke(SAXPY, n, -1.0f, segX, 1, segY, 1);
                 float[] result = segY.toArray(ValueLayout.JAVA_FLOAT);
                 return createDenseVector(result, n, a);
@@ -2266,8 +2268,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         MemorySegment segY;
         Arena resultArena = Arena.ofAuto();
         try (Arena tempArena = Arena.ofConfined()) {
-            MemorySegment segX = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-            segY = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment segX = tempNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            segY = resultNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             NativeSafe.invoke(DAXPY, n, -1.0, segX, 1, segY, 1);
         } catch (Throwable t) { throw new RuntimeException("DAXPY failed", t); }
         return createZeroCopyDoubleVector(segY, n, resultArena, a);
@@ -2284,16 +2286,16 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             org.episteme.core.mathematics.numbers.complex.Complex cScalar = (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) ? c : org.episteme.core.mathematics.numbers.complex.Complex.of(getRealValue(scalar));
             if (single) {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(vector));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, (float) cScalar.real(), (float) cScalar.imaginary());
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(vector));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, (float) cScalar.real(), (float) cScalar.imaginary());
                     NativeSafe.invoke(CSCAL, n, alpha, segX, 1);
                     float[] resData = segX.toArray(ValueLayout.JAVA_FLOAT);
                     return createDenseVector(resData, n, vector);
                 } catch (Throwable t) { throw new RuntimeException("CSCAL failed", t); }
             } else {
                 try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(vector));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, cScalar.real(), cScalar.imaginary());
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(vector));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, cScalar.real(), cScalar.imaginary());
                     NativeSafe.invoke(ZSCAL, n, alpha, segX, 1);
                     double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
                     return createDenseVector(resData, n, vector);
@@ -2305,7 +2307,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         double s = getRealValue(scalar);
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(vector));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(vector));
                 NativeSafe.invoke(SSCAL, n, (float) s, segX, 1);
                 float[] resData = segX.toArray(ValueLayout.JAVA_FLOAT);
                 return createDenseVector(resData, n, vector);
@@ -2315,7 +2317,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         MemorySegment segX;
         Arena resultArena = Arena.ofAuto();
         try {
-            segX = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(vector));
+            segX = resultNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(vector));
             NativeSafe.invoke(DSCAL, n, s, segX, 1);
         } catch (Throwable t) { throw new RuntimeException("DSCAL failed", t); }
         return createZeroCopyDoubleVector(segX, n, resultArena, vector);
@@ -2351,9 +2353,9 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             if (single) {
                 try (Arena arena = Arena.ofConfined()) {
                     int len = m * n;
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
                     NativeSafe.invoke(CAXPY, len, alpha, segX, 1, segY, 1);
                     float[] result = segY.toArray(ValueLayout.JAVA_FLOAT);
                     return createDenseMatrix(result, m, n, a);
@@ -2361,9 +2363,9 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             } else {
                 try (Arena arena = Arena.ofConfined()) {
                     int len = m * n;
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
                     NativeSafe.invoke(ZAXPY, len, alpha, segX, 1, segY, 1);
                     double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
                     return createDenseMatrix(result, m, n, a);
@@ -2374,8 +2376,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
                 int len = m * n;
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
-                MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
                 NativeSafe.invoke(SAXPY, len, 1.0f, segX, 1, segY, 1);
                 float[] result = segY.toArray(ValueLayout.JAVA_FLOAT);
                 return createDenseMatrix(result, m, n, a);
@@ -2386,8 +2388,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         Arena resultArena = Arena.ofAuto();
         try (Arena tempArena = Arena.ofConfined()) {
             int len = m * n;
-            MemorySegment segX = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
-            segY = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            MemorySegment segX = tempNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            segY = resultNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
             NativeSafe.invoke(DAXPY, len, 1.0, segX, 1, segY, 1);
         } catch (Throwable t) { throw new RuntimeException("DAXPY matrix add failed", t); }
         return createZeroCopyDoubleMatrix(segY, m, n, resultArena, a);
@@ -2404,9 +2406,9 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             if (single) {
                 try (Arena arena = Arena.ofConfined()) {
                     int len = m * n;
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, -1.0f, 0.0f);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, -1.0f, 0.0f);
                     NativeSafe.invoke(CAXPY, len, alpha, segX, 1, segY, 1);
                     float[] result = segY.toArray(ValueLayout.JAVA_FLOAT);
                     return createDenseMatrix(result, m, n, a);
@@ -2414,9 +2416,9 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             } else {
                 try (Arena arena = Arena.ofConfined()) {
                     int len = m * n;
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
-                    MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                    MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, -1.0, 0.0);
                     NativeSafe.invoke(ZAXPY, len, alpha, segX, 1, segY, 1);
                     double[] result = segY.toArray(ValueLayout.JAVA_DOUBLE);
                     return createDenseMatrix(result, m, n, a);
@@ -2427,8 +2429,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
                 int len = m * n;
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
-                MemorySegment segY = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                MemorySegment segY = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                 NativeSafe.invoke(SAXPY, len, -1.0f, segX, 1, segY, 1);
                 float[] result = segY.toArray(ValueLayout.JAVA_FLOAT);
                 return createDenseMatrix(result, m, n, a);
@@ -2439,8 +2441,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         Arena resultArena = Arena.ofAuto();
         try (Arena tempArena = Arena.ofConfined()) {
             int len = m * n;
-            MemorySegment segX = tempArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
-            segY = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            MemorySegment segX = tempNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+            segY = resultNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             NativeSafe.invoke(DAXPY, len, -1.0, segX, 1, segY, 1);
         } catch (Throwable t) { throw new RuntimeException("DAXPY matrix subtract failed", t); }
         return createZeroCopyDoubleMatrix(segY, m, n, resultArena, a);
@@ -2462,14 +2464,14 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             
             if (complex) {
                 if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("CGETRF failed: " + info);
                     float[] resA = segA.toArray(ValueLayout.JAVA_FLOAT);
                     int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
                     return reconstructLU(resA, ipiv, m, n, a, true);
                 } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("ZGETRF failed: " + info);
                     double[] resA = segA.toArray(ValueLayout.JAVA_DOUBLE);
@@ -2478,14 +2480,14 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 }
             } else {
                 if (single) {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                     int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("SGETRF failed: " + info);
                     float[] resA = segA.toArray(ValueLayout.JAVA_FLOAT);
                     int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
                     return reconstructLU(resA, ipiv, m, n, a, false);
                 } else {
-                    MemorySegment segA = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+                    MemorySegment segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("DGETRF failed: " + info);
                     double[] resA = segA.toArray(ValueLayout.JAVA_DOUBLE);
@@ -2611,16 +2613,16 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             org.episteme.core.mathematics.numbers.complex.Complex sc = (org.episteme.core.mathematics.numbers.complex.Complex) (Object) scalar;
             if (single) {
                  try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_FLOAT, (float) sc.real(), (float) sc.imaginary());
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, (float) sc.real(), (float) sc.imaginary());
                     NativeSafe.invoke(CSCAL, m * n, alpha, segX, 1);
                     float[] resData = segX.toArray(ValueLayout.JAVA_FLOAT);
                     return createDenseMatrix(resData, m, n, a);
                 } catch (Throwable t) { throw new RuntimeException("CSCAL failed", t); }
             } else {
                  try (Arena arena = Arena.ofConfined()) {
-                    MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
-                    MemorySegment alpha = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, sc.real(), sc.imaginary());
+                    MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
+                    MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, sc.real(), sc.imaginary());
                     NativeSafe.invoke(ZSCAL, m * n, alpha, segX, 1);
                     double[] resData = segX.toArray(ValueLayout.JAVA_DOUBLE);
                     return createDenseMatrix(resData, m, n, a);
@@ -2631,7 +2633,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         double s = ((Real)(Object)scalar).doubleValue();
         if (single) {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment segX = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(a));
+                MemorySegment segX = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                 NativeSafe.invoke(SSCAL, m * n, (float) s, segX, 1);
                 float[] resData = segX.toArray(ValueLayout.JAVA_FLOAT);
                 return createDenseMatrix(resData, m, n, a);
@@ -2641,7 +2643,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         MemorySegment segX;
         Arena resultArena = Arena.ofAuto();
         try {
-            segX = resultArena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
+            segX = resultNativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
             NativeSafe.invoke(DSCAL, m * n, s, segX, 1);
         } catch (Throwable t) { throw new RuntimeException("DSCAL failed", t); }
         return createZeroCopyDoubleMatrix(segX, m, n, resultArena, a);
@@ -2718,14 +2720,14 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     }
                 }
             }
-            MemorySegment segIpiv = arena.allocateFrom(ValueLayout.JAVA_INT, ipiv);
+            MemorySegment segIpiv = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_INT, ipiv);
             MemorySegment segB;
             if (complex) {
-                if (single) segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
-                else segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                if (single) segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                else segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
             } else {
-                if (single) segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
-                else segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+                if (single) segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                else segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
             }
             
             int info;
@@ -2767,19 +2769,19 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             
             if (complex) {
                 if (single) {
-                    segL = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(cholesky.L()));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
+                    segL = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(cholesky.L()));
+                    segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
                 } else {
-                    segL = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(cholesky.L()));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
+                    segL = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(cholesky.L()));
+                    segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
                 }
             } else {
                 if (single) {
-                    segL = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(cholesky.L()));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray(b));
+                    segL = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(cholesky.L()));
+                    segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
                 } else {
-                    segL = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(cholesky.L()));
-                    segB = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
+                    segL = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(cholesky.L()));
+                    segB = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
                 }
             }
             
@@ -3061,24 +3063,25 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             boolean single = isFloat(m);
             boolean complex = isComplex(m);
             if (complex) {
-                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray((Matrix<E>)m));
-                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray((Matrix<E>)m));
+                if (single) return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray((Matrix<E>)m));
+                return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray((Matrix<E>)m));
             } else {
-                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<E>)m));
-                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<E>)m));
+                if (single) return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<E>)m));
+                return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<E>)m));
             }
         } else if (obj instanceof Vector<?> v) {
             boolean single = isFloat(v);
             boolean complex = isComplex(v);
              if (complex) {
-                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toInterlacedFloatArray((Vector<E>)v));
-                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray((Vector<E>)v));
+                if (single) return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray((Vector<E>)v));
+                return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray((Vector<E>)v));
             } else {
-                if (single) return arena.allocateFrom(ValueLayout.JAVA_FLOAT, toFloatArray((Vector<E>)v));
-                return arena.allocateFrom(ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<E>)v));
+                if (single) return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray((Vector<E>)v));
+                return NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<E>)v));
             }
         }
         throw new IllegalArgumentException("Unsupported object for FFM conversion: " + (obj != null ? obj.getClass() : "null"));
     }
 
 }
+

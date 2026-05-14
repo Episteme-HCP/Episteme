@@ -275,6 +275,28 @@ public class NativeSafe {
         return seg;
     }
 
+    public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfFloat layout, float... elements) {
+        return allocateFromArray(arena, layout, elements);
+    }
+
+    public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfDouble layout, double... elements) {
+        return allocateFromArray(arena, layout, elements);
+    }
+
+    public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfInt layout, int... elements) {
+        return allocateFromArray(arena, layout, elements);
+    }
+
+    public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfLong layout, long... elements) {
+        return allocateFromArray(arena, layout, elements);
+    }
+
+    public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfByte layout, byte... elements) {
+        MemorySegment seg = arena.allocate(layout, elements.length);
+        MemorySegment.copy(MemorySegment.ofArray(elements), 0, seg, 0, (long)elements.length * layout.byteSize());
+        return seg;
+    }
+
     /**
      * Reinterprets a MemorySegment with a new size and a cleaner.
      * Useful for segments returned by native code that don't have a known size or scope.
