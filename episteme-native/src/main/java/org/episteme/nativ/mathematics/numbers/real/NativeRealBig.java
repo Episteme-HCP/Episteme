@@ -41,7 +41,7 @@ public final class NativeRealBig extends Real {
     public NativeRealBig(String value, long precision) {
         this.arena = Arena.ofAuto();
         this.precision = precision;
-        this.ptr = arena.allocate(MPFR_LAYOUT);
+        this.ptr = NativeSafe.allocate(arena, MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, ptr, c_long(precision));
         
         // Ensure manual cleanup via MPFR_CLEAR if the arena is not automatically cleaning up correctly
@@ -60,7 +60,7 @@ public final class NativeRealBig extends Real {
         else if (value.equalsIgnoreCase("infinity") || value.equalsIgnoreCase("inf")) mpfrValue = "@Inf@";
         else if (value.equalsIgnoreCase("-infinity") || value.equalsIgnoreCase("-inf")) mpfrValue = "-@Inf@";
 
-        MemorySegment str = arena.allocateFrom(mpfrValue);
+        MemorySegment str = NativeSafe.allocateFrom(arena, mpfrValue);
         NativeSafe.invoke(MPFR_SET_STR, ptr, str, 10, 0); // 0 = RNDN
     }
 
@@ -70,7 +70,7 @@ public final class NativeRealBig extends Real {
     private NativeRealBig(long precision) {
         this.arena = Arena.ofAuto();
         this.precision = precision;
-        this.ptr = arena.allocate(MPFR_LAYOUT);
+        this.ptr = NativeSafe.allocate(arena, MPFR_LAYOUT);
         NativeSafe.invoke(MPFR_INIT2, ptr, c_long(precision));
     }
 
@@ -231,7 +231,7 @@ public final class NativeRealBig extends Real {
             
             if (strPtr.equals(MemorySegment.NULL)) return BigDecimal.ZERO;
 
-            String digits = strPtr.reinterpret(bufSize).getString(0);
+            String digits = NativeSafe.getString(strPtr.reinterpret(bufSize), 0L);
             long exp = (C_LONG.byteSize() == 4) ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
             
             if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
@@ -442,3 +442,5 @@ public final class NativeRealBig extends Real {
         return bigDecimalValue().toPlainString();
     }
 }
+
+

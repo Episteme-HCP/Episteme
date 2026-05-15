@@ -32,7 +32,7 @@ import org.episteme.core.mathematics.structures.rings.FieldElement;
 /**
  * OpenCL implementation of Sparse Linear Algebra Provider for Float precision.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("unchecked")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<E>> implements SparseLinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     @Override public boolean isLoaded() { return isAvailable(); }
@@ -378,7 +378,6 @@ public class NativeOpenCLSparseLinearAlgebraFloatBackend<E extends FieldElement<
 
             cl_kernel currentSpmv = isComplex ? complexSpmvKernel : spmvKernel;
             cl_kernel currentDot = isComplex ? complexDotPartialKernel : dotPartialKernel;
-            cl_kernel currentAdd = isComplex ? complexVecAddKernel : vecAddKernel;
             cl_kernel currentSub = isComplex ? complexVecSubKernel : vecSubKernel;
             cl_kernel currentScale = isComplex ? complexVecScaleKernel : vecScaleKernel;
             cl_kernel currentSaxpy = isComplex ? complexSaxpyKernel : saxpyKernel;

@@ -57,8 +57,8 @@ public class NativeOpenCLDenseLinearAlgebraBackendTest {
 
             RealFloat[][] dataA = {{RealFloat.create(1.0f), RealFloat.create(2.0f)}, {RealFloat.create(3.0f), RealFloat.create(4.0f)}};
             RealFloat[][] dataB = {{RealFloat.create(5.0f), RealFloat.create(6.0f)}, {RealFloat.create(7.0f), RealFloat.create(8.0f)}};
-            Matrix<RealFloat> a = Matrix.of(dataA, (org.episteme.core.mathematics.structures.rings.Ring) org.episteme.core.mathematics.sets.Reals.getInstance());
-            Matrix<RealFloat> b = Matrix.of(dataB, (org.episteme.core.mathematics.structures.rings.Ring) org.episteme.core.mathematics.sets.Reals.getInstance());
+            Matrix<RealFloat> a = Matrix.of(dataA, org.episteme.core.mathematics.sets.Reals.getInstance());
+            Matrix<RealFloat> b = Matrix.of(dataB, org.episteme.core.mathematics.sets.Reals.getInstance());
 
             Matrix<RealFloat> result = backend.multiply(a, b);
             
@@ -80,8 +80,8 @@ public class NativeOpenCLDenseLinearAlgebraBackendTest {
 
             RealDouble[][] dataA = {{RealDouble.of(1.0), RealDouble.of(2.0)}, {RealDouble.of(3.0), RealDouble.of(4.0)}};
             RealDouble[][] dataB = {{RealDouble.of(5.0), RealDouble.of(6.0)}, {RealDouble.of(7.0), RealDouble.of(8.0)}};
-            Matrix<RealDouble> a = Matrix.of(dataA, (org.episteme.core.mathematics.structures.rings.Ring) org.episteme.core.mathematics.sets.Reals.getInstance());
-            Matrix<RealDouble> b = Matrix.of(dataB, (org.episteme.core.mathematics.structures.rings.Ring) org.episteme.core.mathematics.sets.Reals.getInstance());
+            Matrix<RealDouble> a = Matrix.of(dataA, org.episteme.core.mathematics.sets.Reals.getInstance());
+            Matrix<RealDouble> b = Matrix.of(dataB, org.episteme.core.mathematics.sets.Reals.getInstance());
 
             Matrix<RealDouble> result = backend.multiply(a, b);
             

@@ -7,7 +7,6 @@ package org.episteme.nativ.mathematics.linearalgebra.vectors.storage;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;

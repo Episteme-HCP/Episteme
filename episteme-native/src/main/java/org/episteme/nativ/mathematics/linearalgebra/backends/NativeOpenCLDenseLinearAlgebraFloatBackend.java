@@ -35,7 +35,7 @@ import java.util.Arrays;
 /**
  * OpenCL implementation of Dense Linear Algebra Provider for Float precision.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("unchecked")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLDenseLinearAlgebraFloatBackend<E extends FieldElement<E>> implements LinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     @Override public boolean isLoaded() { return isAvailable(); }

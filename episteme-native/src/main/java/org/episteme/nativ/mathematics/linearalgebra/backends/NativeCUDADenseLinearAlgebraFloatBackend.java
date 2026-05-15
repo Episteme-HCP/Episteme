@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Native CUDA Dense Linear Algebra Backend for Float precision.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("unchecked")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
 public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>> implements LinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeCUDADenseLinearAlgebraFloatBackend.class);

@@ -605,7 +605,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public String getId() {
         return "ffm-blas";
     }
@@ -655,27 +654,19 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 if (single) {
                     alpha = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
                     NativeSafe.invoke(CTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
-                    @SuppressWarnings("unchecked")
-                    Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
-                    return result;
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
                 } else {
                     alpha = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
                     NativeSafe.invoke(ZTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
-                    @SuppressWarnings("unchecked")
-                    Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
-                    return result;
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
                 }
             } else {
                 if (single) {
                     NativeSafe.invoke(STRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0f, segA, n, segB, 1);
-                    @SuppressWarnings("unchecked")
-                    Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
-                    return result;
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
                 } else {
                     NativeSafe.invoke(DTRSM, CblasRowMajor, side, uplo, trans, diag, n, 1, 1.0, segA, n, segB, 1);
-                    @SuppressWarnings("unchecked")
-                    Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
-                    return result;
+                    return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
                 }
             }
         } catch (Throwable t) { 
@@ -683,8 +674,22 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         }
     }
 
+    private Vector<E> createDenseVector(float[] data, int dimension, Object ref) {
+        org.episteme.core.mathematics.context.MathContext.checkCancelled();
+        java.util.List<E> list = new java.util.ArrayList<>(data.length);
+        for (float f : data) list.add((E) org.episteme.core.mathematics.numbers.real.RealFloat.create(f));
+        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(
+            list,
+            ((Matrix<E>)ref).getScalarRing()
+        );
+    }
+
+    private Vector<E> createDenseVector(double[] data, int dimension, Object ref) {
+        org.episteme.core.mathematics.context.MathContext.checkCancelled();
+        return (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
+    }
+
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> A, Vector<E> b) {
         if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": solve() not available");
         org.episteme.core.mathematics.context.MathContext.checkCancelled();
@@ -723,32 +728,24 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                         if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] CGESV: n={}, lda={}", n, n);
                         int info = (int) NativeSafe.invoke(CGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                         if (info != 0) throw new ArithmeticException("CGESV failed: " + info);
-                        @SuppressWarnings("unchecked")
-                        Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
-                        return result;
+                        return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
                     } else {
                         if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] ZGESV: n={}, lda={}", n, n);
                         int info = (int) NativeSafe.invoke(ZGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                         if (info != 0) throw new ArithmeticException("ZGESV failed: " + info);
-                        @SuppressWarnings("unchecked")
-                        Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
-                        return result;
+                        return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
                     }
                 } else {
                     if (single) {
                         if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] SGESV: n={}, lda={}", n, n);
                         int info = (int) NativeSafe.invoke(SGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                         if (info != 0) throw new ArithmeticException("SGESV failed: " + info);
-                        @SuppressWarnings("unchecked")
-                        Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
-                        return result;
+                        return createDenseVector(segB.toArray(ValueLayout.JAVA_FLOAT), n, A);
                     } else {
                         if (logger.isDebugEnabled()) logger.debug("[FFM-BLAS] DGESV: n={}, lda={}", n, n);
                         int info = (int) NativeSafe.invoke(DGESV, LAPACK_ROW_MAJOR, n, 1, segA, n, segIpiv, segB, 1);
                         if (info != 0) throw new ArithmeticException("DGESV failed: " + info);
-                        @SuppressWarnings("unchecked")
-                        Vector<E> result = (Vector<E>) createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
-                        return result;
+                        return createDenseVector(segB.toArray(ValueLayout.JAVA_DOUBLE), n, A);
                     }
                 }
             }
@@ -770,9 +767,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                          float[] resFull = segB.toArray(ValueLayout.JAVA_FLOAT);
                          float[] resData = new float[n * 2];
                          System.arraycopy(resFull, 0, resData, 0, n * 2);
-                         @SuppressWarnings("unchecked")
-                         Vector<E> result = (Vector<E>) createDenseVector(resData, n, A);
-                         return result;
+                         return createDenseVector(resData, n, A);
                      } else {
                          MemorySegment segA_D = getSegment(A, arena, tracker);
                         double[] bPad = new double[maxDim * 2];
@@ -784,9 +779,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                          double[] resFull = segB.toArray(ValueLayout.JAVA_DOUBLE);
                          double[] resData = new double[n * 2];
                          System.arraycopy(resFull, 0, resData, 0, n * 2);
-                         @SuppressWarnings("unchecked")
-                         Vector<E> result = (Vector<E>) createDenseVector(resData, n, A);
-                         return result;
+                         return createDenseVector(resData, n, A);
                      }
                  } else {
                      MemorySegment segA = getSegment(A, arena, tracker);
@@ -799,9 +792,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                          if (info != 0) throw new RuntimeException("SGELS failed: " + info);
                          float[] result = new float[n];
                          MemorySegment.copy(segB, ValueLayout.JAVA_FLOAT, 0L, result, 0, n);
-                         @SuppressWarnings("unchecked")
-                         Vector<E> resVec = (Vector<E>) createDenseVector(result, n, A);
-                         return resVec;
+                         return createDenseVector(result, n, A);
                      } else {
                         double[] bPad = new double[maxDim];
                         double[] bOrig = toDoubleArray(b);
@@ -811,9 +802,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                          if (info != 0) throw new RuntimeException("DGELS failed: " + info);
                          double[] result = new double[n];
                          MemorySegment.copy(segB, ValueLayout.JAVA_DOUBLE, 0L, result, 0, n);
-                         @SuppressWarnings("unchecked")
-                         Vector<E> resVec = (Vector<E>) createDenseVector(result, n, A);
-                         return resVec;
+                         return createDenseVector(result, n, A);
                      }
                  }
              }
@@ -822,7 +811,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
 
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> normalize(Vector<E> v) {
         E n = norm(v);
         if (n == null) return v;
@@ -843,7 +831,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> cross(Vector<E> a, Vector<E> b) {
         if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
         
@@ -868,7 +855,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E angle(Vector<E> a, Vector<E> b) {
         E d = dot(a, b);
         E nA = norm(a);
@@ -899,7 +885,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> projection(Vector<E> a, Vector<E> b) {
         E dAB = dot(a, b);
         E dBB = dot(b, b);
@@ -935,7 +920,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     res[(j * m + i) * 2 + 1] = data[(i * n + j) * 2 + 1];
                 }
             }
-            return (Matrix<E>) createDenseMatrix(res, n, m, a);
+            return createDenseMatrix(res, n, m, a);
         }
         double[] data = toDoubleArray(a);
         double[] res = new double[m * n];
@@ -944,12 +929,11 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 res[j * m + i] = data[i * n + j];
             }
         }
-        return (Matrix<E>) createDenseMatrix(res, n, m, a);
+        return createDenseMatrix(res, n, m, a);
     }
 
     
     @Override
-    @SuppressWarnings("unchecked")
     public Matrix<E> inverse(Matrix<E> A) {
          if (!IS_AVAILABLE) throw new UnsupportedOperationException(getName() + ": inverse() not available");
          int m = A.rows();
@@ -958,57 +942,44 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
          
          boolean complex = isComplex(A);
          boolean single = isFloat(A);
-
-         if (complex) {
-             if (single) {
-                 try (Arena arena = Arena.ofConfined()) {
-                     MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
-                     MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
+ 
+         try (Arena arena = Arena.ofConfined()) {
+             MemorySegment segA;
+             MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
+             
+             if (complex) {
+                 if (single) {
+                     segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
                      int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                      if (info != 0) throw new ArithmeticException("CGETRF failed: " + info);
                      info = (int) NativeSafe.invoke(CGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
                      if (info != 0) throw new ArithmeticException("CGETRI failed: " + info);
-                     float[] result = segA.toArray(ValueLayout.JAVA_FLOAT);
-                     return (Matrix<E>) createDenseMatrix(result, n, n, A);
-                 }
-             } else {
-                 try (Arena arena = Arena.ofConfined()) {
-                     MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
-                     MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
+                     return createDenseMatrix(segA.toArray(ValueLayout.JAVA_FLOAT), n, n, A);
+                 } else {
+                     segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
                      int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                      if (info != 0) throw new ArithmeticException("ZGETRF failed: " + info);
                      info = (int) NativeSafe.invoke(ZGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
                      if (info != 0) throw new ArithmeticException("ZGETRI failed: " + info);
-                     double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                     return (Matrix<E>) createDenseMatrix(result, n, n, A);
+                     return createDenseMatrix(segA.toArray(ValueLayout.JAVA_DOUBLE), n, n, A);
+                 }
+             } else {
+                 if (single) {
+                     segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(A));
+                     int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                     if (info != 0) throw new ArithmeticException("SGETRF failed: " + info);
+                     info = (int) NativeSafe.invoke(SGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
+                     if (info != 0) throw new ArithmeticException("SGETRI failed: " + info);
+                     return createDenseMatrix(segA.toArray(ValueLayout.JAVA_FLOAT), n, n, A);
+                 } else {
+                     segA = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
+                     int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
+                     if (info != 0) throw new ArithmeticException("DGETRF failed: " + info);
+                     info = (int) NativeSafe.invoke(DGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
+                     if (info != 0) throw new ArithmeticException("DGETRI failed: " + info);
+                     return createDenseMatrix(segA.toArray(ValueLayout.JAVA_DOUBLE), n, n, A);
                  }
              }
-         }
-         
-         if (single) {
-             try (ResourceTracker tracker = new ResourceTracker()) {
-                 Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-                 MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, toFloatArray(A));
-                 MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
-                 int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
-                 if (info != 0) throw new ArithmeticException("SGETRF failed: " + info);
-                 info = (int) NativeSafe.invoke(SGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
-                 if (info != 0) throw new ArithmeticException("SGETRI failed: " + info);
-                 float[] result = segA.toArray(ValueLayout.JAVA_FLOAT);
-                 return (Matrix<E>) createDenseMatrix(result, n, n, A);
-             }
-         }
- 
-         try (ResourceTracker tracker = new ResourceTracker()) {
-             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-             MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
-             MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
-             int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, m, segA, n, segIpiv);
-             if (info != 0) throw new ArithmeticException("DGETRF failed: " + info);
-             info = (int) NativeSafe.invoke(DGETRI, LAPACK_ROW_MAJOR, n, segA, n, segIpiv);
-             if (info != 0) throw new ArithmeticException("DGETRI failed: " + info);
-             double[] result = segA.toArray(ValueLayout.JAVA_DOUBLE);
-             return (Matrix<E>) createDenseMatrix(result, n, n, A);
          }
     }
 
@@ -1784,7 +1755,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     private E castScalar(Object val, Ring<E> ring) {
         if (val == null) return ring.zero();
         
@@ -2924,70 +2894,70 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     }
 
     private Vector<E> createDenseVector(double[] data, int dimension, Matrix<E> ref) {
-        Ring<E> ring = (Ring<E>) ref.getScalarRing();
+        Ring<E> ring = ref.getScalarRing();
         if (isComplex(ref)) {
             org.episteme.core.mathematics.numbers.complex.Complex[] arr = new org.episteme.core.mathematics.numbers.complex.Complex[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         }
     }
 
     private Vector<E> createDenseVector(float[] data, int dimension, Matrix<E> ref) {
-        Ring<E> ring = (Ring<E>) ref.getScalarRing();
+        Ring<E> ring = ref.getScalarRing();
         if (isComplex(ref)) {
             org.episteme.core.mathematics.numbers.complex.Complex[] arr = new org.episteme.core.mathematics.numbers.complex.Complex[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         }
     }
 
     private Vector<E> createDenseVector(double[] data, int dimension, Vector<E> ref) {
-        Ring<E> ring = (Ring<E>) ref.getScalarRing();
+        Ring<E> ring = ref.getScalarRing();
         if (isComplex(ref)) {
             org.episteme.core.mathematics.numbers.complex.Complex[] arr = new org.episteme.core.mathematics.numbers.complex.Complex[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         }
     }
 
     private Vector<E> createDenseVector(float[] data, int dimension, Vector<E> ref) {
-        Ring<E> ring = (Ring<E>) ref.getScalarRing();
+        Ring<E> ring = ref.getScalarRing();
         if (isComplex(ref)) {
             org.episteme.core.mathematics.numbers.complex.Complex[] arr = new org.episteme.core.mathematics.numbers.complex.Complex[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.complex.Complex.of(data[i * 2], data[i * 2 + 1]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         } else {
             org.episteme.core.mathematics.numbers.real.Real[] arr = new org.episteme.core.mathematics.numbers.real.Real[dimension];
             for (int i = 0; i < dimension; i++) {
                 arr[i] = org.episteme.core.mathematics.numbers.real.Real.of(data[i]);
             }
-            return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(arr), (Ring) ring);
+            return org.episteme.core.mathematics.linearalgebra.Vector.of((java.util.List<E>) (java.util.List<?>) java.util.Arrays.asList(arr), (Ring<E>) (Ring<?>) ring);
         }
     }
 
@@ -3113,4 +3083,6 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     }
 
 }
+
+
 

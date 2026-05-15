@@ -876,34 +876,32 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
             @SuppressWarnings("unchecked")
             E[] resultArr = (E[]) new Object[n];
-            try {
-                for (int i = 0; i < n; i++) {
-                    E val = a.get(i);
-                    if (isComplex) {
-                        Complex cv = (val instanceof Complex c) ? c : Complex.of((Real) val);
-                        NativeSafe.invoke(MPFR_SET_STR, valR, NativeSafe.allocateFrom(arena, cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                        NativeSafe.invoke(MPFR_SET_STR, valI, NativeSafe.allocateFrom(arena, cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
-                        
-                        // (valR + i*valI)*(sR + i*sI) = (valR*sR - valI*sI) + i(valR*sI + valI*sR)
-                        NativeSafe.invoke(MPFR_MUL, t1, valR, sR, 0);
-                        NativeSafe.invoke(MPFR_MUL, t2, valI, sI, 0);
-                        NativeSafe.invoke(MPFR_SUB, resR, t1, t2, 0);
-                        
-                        NativeSafe.invoke(MPFR_MUL, t1, valR, sI, 0);
-                        NativeSafe.invoke(MPFR_MUL, t2, valI, sR, 0);
-                        NativeSafe.invoke(MPFR_ADD, resI, t1, t2, 0);
-                        
-                        resultArr[i] = (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena));
-                    } else {
-                        NativeSafe.invoke(MPFR_SET_STR, valR, NativeSafe.allocateFrom(arena, ((Real)val).bigDecimalValue().toPlainString()), 10, 0);
-                        NativeSafe.invoke(MPFR_MUL, resR, valR, sR, 0);
-                        resultArr[i] = (E) (Object) readMPFR(resR, arena);
-                    }
+            for (int i = 0; i < n; i++) {
+                E val = a.get(i);
+                if (isComplex) {
+                    Complex cv = (val instanceof Complex c) ? c : Complex.of((Real) val);
+                    NativeSafe.invoke(MPFR_SET_STR, valR, NativeSafe.allocateFrom(arena, cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, valI, NativeSafe.allocateFrom(arena, cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    
+                    // (valR + i*valI)*(sR + i*sI) = (valR*sR - valI*sI) + i(valR*sI + valI*sR)
+                    NativeSafe.invoke(MPFR_MUL, t1, valR, sR, 0);
+                    NativeSafe.invoke(MPFR_MUL, t2, valI, sI, 0);
+                    NativeSafe.invoke(MPFR_SUB, resR, t1, t2, 0);
+                    
+                    NativeSafe.invoke(MPFR_MUL, t1, valR, sI, 0);
+                    NativeSafe.invoke(MPFR_MUL, t2, valI, sR, 0);
+                    NativeSafe.invoke(MPFR_ADD, resI, t1, t2, 0);
+                    
+                    resultArr[i] = (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena));
+                } else {
+                    NativeSafe.invoke(MPFR_SET_STR, valR, NativeSafe.allocateFrom(arena, ((Real)val).bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_MUL, resR, valR, sR, 0);
+                    resultArr[i] = (E) (Object) readMPFR(resR, arena);
                 }
-                @SuppressWarnings("unchecked")
-                Vector<E> res = Vector.of((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(resultArr), (Ring<E>) field);
-                return res;
             }
+            @SuppressWarnings("unchecked")
+            Vector<E> res = Vector.of((java.util.List<E>)(java.util.List<?>)java.util.Arrays.asList(resultArr), (Ring<E>) field);
+            return res;
         } catch (Throwable t) {
             throw new RuntimeException("Sparse MPFR Vector scale failed", t);
         }

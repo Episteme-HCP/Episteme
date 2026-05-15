@@ -10,6 +10,7 @@ import java.lang.foreign.*;
 import java.util.Arrays;
 import java.util.function.Function;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 /**
  * Tensor implementation backed by native memory (off-heap).

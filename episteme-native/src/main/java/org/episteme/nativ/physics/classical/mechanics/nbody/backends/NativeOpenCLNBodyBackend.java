@@ -133,7 +133,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
             flat[base+2] = (float) nd.comZ;
             flat[base+3] = (float) nd.totalMass;
             flat[base+4] = (float) nd.size;
-            flat[base+5] = nd.children[0] != null ? (float)(int) idx.get(nd.children[0]) : -1f;
+            flat[base+5] = nd.children[0] != null ? (float) idx.get(nd.children[0]) : -1f;
             flat[base+6] = nd.bodyIdx;
         }
         return flat;

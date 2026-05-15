@@ -30,7 +30,7 @@ public class NativeCUDADeterminantComplexTest {
         };
         DenseMatrix<Complex> A = new DenseMatrix<>(aData, ring);
         
-        Complex det = (Complex) backend.determinant(A);
+        Complex det = backend.determinant(A);
 
         assertThat(det.real()).isCloseTo(-1.0, offset(1e-10));
         assertThat(det.imaginary()).isCloseTo(3.0, offset(1e-10));

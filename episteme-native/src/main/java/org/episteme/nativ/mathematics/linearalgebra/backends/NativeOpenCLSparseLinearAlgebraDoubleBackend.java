@@ -29,13 +29,12 @@ import org.slf4j.LoggerFactory;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 import org.episteme.core.mathematics.structures.rings.FieldElement;
 
-import java.util.function.Function;
 
 /**
  * OpenCL implementation of Sparse Linear Algebra Provider for Double precision.
  * Requires fp64 support.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings("unchecked")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, SparseLinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement<E>> implements SparseLinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     @Override public boolean isLoaded() { return isAvailable(); }
@@ -394,7 +393,6 @@ public class NativeOpenCLSparseLinearAlgebraDoubleBackend<E extends FieldElement
             cl_kernel currentDot = isComplex ? complexDotPartialKernel : dotPartialKernel;
             cl_kernel currentSaxpy = isComplex ? complexSaxpyKernel : saxpyKernel;
             cl_kernel currentAdd = isComplex ? complexVecAddKernel : vecAddKernel;
-            cl_kernel currentSub = isComplex ? complexVecSubKernel : vecSubKernel;
             cl_kernel currentScale = isComplex ? complexVecScaleKernel : vecScaleKernel;
 
             // r = b - Ax

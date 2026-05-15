@@ -329,5 +329,14 @@ public class NativeSafe {
         if (seg == null || seg.equals(MemorySegment.NULL)) return MemorySegment.NULL;
         return seg.reinterpret(newSize, arena, cleaner);
     }
+
+    /**
+     * Reads a null-terminated UTF-8 string from a MemorySegment at the specified offset.
+     * Uses the standard JDK getString method (JDK 22+).
+     */
+    public static String getString(MemorySegment seg, long offset) {
+        if (seg == null || seg.equals(MemorySegment.NULL)) return null;
+        return seg.getString(offset);
+    }
 }
 

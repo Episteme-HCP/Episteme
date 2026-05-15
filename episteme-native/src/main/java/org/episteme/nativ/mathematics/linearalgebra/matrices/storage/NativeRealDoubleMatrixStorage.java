@@ -25,7 +25,6 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
     private final int rows;
     private final int cols;
     private final Arena arena;
-    private final boolean ownsArena;
 
     public NativeRealDoubleMatrixStorage(int rows, int cols, Arena arena) {
         if (rows <= 0 || cols <= 0) {
@@ -34,7 +33,6 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
         this.rows = rows;
         this.cols = cols;
         this.arena = arena;
-        this.ownsArena = false;
         
         long size = (long) rows * cols * Double.BYTES;
         this.data = arena.allocate(size, ValueLayout.JAVA_DOUBLE.byteAlignment());
@@ -48,7 +46,6 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
         this.rows = rows;
         this.cols = cols;
         this.arena = Arena.ofAuto();
-        this.ownsArena = false;
         
         long size = (long) rows * cols * Double.BYTES;
         this.data = arena.allocate(size, ValueLayout.JAVA_DOUBLE.byteAlignment());
@@ -60,7 +57,6 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
         this.rows = rows;
         this.cols = cols;
         this.arena = arena;
-        this.ownsArena = false;
     }
 
     @Override public MemorySegment segment() { return data; }
