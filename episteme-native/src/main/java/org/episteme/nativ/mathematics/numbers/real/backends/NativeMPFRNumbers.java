@@ -28,8 +28,8 @@ public final class NativeMPFRNumbers {
     
     // Platform-dependent C 'long' size - Windows 'long' is always 32-bit (LLP64), Linux/macOS 'long' is 64-bit (LP64)
     public static final ValueLayout JAVA_LONG = ValueLayout.JAVA_LONG;
-    public static final ValueLayout C_LONG = (Linker.nativeLinker().canonicalLayouts().get("long") != null && 
-                                              Linker.nativeLinker().canonicalLayouts().get("long").byteSize() == 4)
+    public static final ValueLayout C_LONG = (System.getProperty("os.name").toLowerCase().contains("win") && 
+                                              System.getProperty("os.arch").contains("64"))
                                               ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG;
     
     public static Object c_long(long value) {

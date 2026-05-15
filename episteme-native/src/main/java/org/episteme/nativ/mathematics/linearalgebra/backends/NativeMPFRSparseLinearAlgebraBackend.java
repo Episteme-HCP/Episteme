@@ -227,7 +227,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
         } else {
             s = getReal(value).bigDecimalValue().toPlainString();
         }
-        NativeSafe.invoke(MPFR_SET_STR, destR, arena.allocateFrom(s), 10, 0);
+        NativeSafe.invoke(MPFR_SET_STR, destR, NativeSafe.allocateFrom(arena, s), 10, 0);
     }
 
     private boolean isComplex(Object obj) {
@@ -479,10 +479,10 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
         if (isComplex) {
             Complex c = (alpha instanceof Complex cv) ? cv : Complex.of(getReal(alpha));
-            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(c.getReal().bigDecimalValue().toPlainString()), 10, 0);
-            NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aR, NativeSafe.allocateFrom(arena, c.getReal().bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aI, NativeSafe.allocateFrom(arena, c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
         } else {
-            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(getReal(alpha).bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aR, NativeSafe.allocateFrom(arena, getReal(alpha).bigDecimalValue().toPlainString()), 10, 0);
         }
 
         long layoutSize = MPFR_LAYOUT.byteSize();
@@ -617,8 +617,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
 
         if (isComplex) {
             Complex c = (alpha instanceof Complex cv) ? cv : Complex.of((Real) alpha);
-            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(c.getReal().bigDecimalValue().toPlainString()), 10, 0);
-            NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aR, NativeSafe.allocateFrom(arena, c.getReal().bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aI, NativeSafe.allocateFrom(arena, c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
             
             long layoutSize = MPFR_LAYOUT.byteSize();
             for (int i = 0; i < n; i++) {
@@ -636,7 +636,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 NativeSafe.invoke(MPFR_SET, xiR, t1, 0);
             }
         } else {
-            NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(((Real)alpha).bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, aR, NativeSafe.allocateFrom(arena, ((Real)alpha).bigDecimalValue().toPlainString()), 10, 0);
             long layoutSize = MPFR_LAYOUT.byteSize();
             for (int i = 0; i < n; i++) {
                 MemorySegment xiR = x.asSlice(i * layoutSize, MPFR_LAYOUT);
@@ -852,10 +852,10 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             
             if (isComplex) {
                 Complex cs = (scalar instanceof Complex cv) ? cv : Complex.of((Real) scalar);
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, NativeSafe.allocateFrom(arena, cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sI, NativeSafe.allocateFrom(arena, cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
             } else {
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(((Real)scalar).bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, NativeSafe.allocateFrom(arena, ((Real)scalar).bigDecimalValue().toPlainString()), 10, 0);
             }
 
             MemorySegment t1 = NativeSafe.allocate(arena, MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t1, (int) prec); track(tracker, t1);
@@ -881,8 +881,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                     E val = a.get(i);
                     if (isComplex) {
                         Complex cv = (val instanceof Complex c) ? c : Complex.of((Real) val);
-                        NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                        NativeSafe.invoke(MPFR_SET_STR, valI, arena.allocateFrom(cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                        NativeSafe.invoke(MPFR_SET_STR, valR, NativeSafe.allocateFrom(arena, cv.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                        NativeSafe.invoke(MPFR_SET_STR, valI, NativeSafe.allocateFrom(arena, cv.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                         
                         // (valR + i*valI)*(sR + i*sI) = (valR*sR - valI*sI) + i(valR*sI + valI*sR)
                         NativeSafe.invoke(MPFR_MUL, t1, valR, sR, 0);
@@ -895,7 +895,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                         
                         resultArr[i] = (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena));
                     } else {
-                        NativeSafe.invoke(MPFR_SET_STR, valR, arena.allocateFrom(((Real)val).bigDecimalValue().toPlainString()), 10, 0);
+                        NativeSafe.invoke(MPFR_SET_STR, valR, NativeSafe.allocateFrom(arena, ((Real)val).bigDecimalValue().toPlainString()), 10, 0);
                         NativeSafe.invoke(MPFR_MUL, resR, valR, sR, 0);
                         resultArr[i] = (E) (Object) readMPFR(resR, arena);
                     }
@@ -1018,16 +1018,16 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 if (isComplex) {
                     Complex ca = (valA instanceof Complex c) ? c : Complex.of((Real) valA);
                     Complex cb = (valB instanceof Complex c) ? c : Complex.of((Real) valB);
-                    NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(ca.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t1I, arena.allocateFrom(ca.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t2R, arena.allocateFrom(cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t2I, arena.allocateFrom(cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, ca.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t1I, NativeSafe.allocateFrom(arena, ca.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t2R, NativeSafe.allocateFrom(arena, cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t2I, NativeSafe.allocateFrom(arena, cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                     NativeSafe.invoke(MPFR_ADD, resR, t1R, t2R, 0);
                     NativeSafe.invoke(MPFR_ADD, resI, t1I, t2I, 0);
                     resultArr[i] = (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena));
                 } else {
-                    NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(((Real)valA).bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t2R, arena.allocateFrom(((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, ((Real)valA).bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t2R, NativeSafe.allocateFrom(arena, ((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
                     NativeSafe.invoke(MPFR_ADD, resR, t1R, t2R, 0);
                     resultArr[i] = (E) (Object) readMPFR(resR, arena);
                 }
@@ -1073,16 +1073,16 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                 if (isComplex) {
                     Complex ca = (valA instanceof Complex c) ? c : Complex.of((Real) valA);
                     Complex cb = (valB instanceof Complex c) ? c : Complex.of((Real) valB);
-                    NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(ca.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t1I, arena.allocateFrom(ca.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t2R, arena.allocateFrom(cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t2I, arena.allocateFrom(cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, ca.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t1I, NativeSafe.allocateFrom(arena, ca.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t2R, NativeSafe.allocateFrom(arena, cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t2I, NativeSafe.allocateFrom(arena, cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                     NativeSafe.invoke(MPFR_SUB, resR, t1R, t2R, 0);
                     NativeSafe.invoke(MPFR_SUB, resI, t1I, t2I, 0);
                     resultArr[i] = (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena));
                 } else {
-                    NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(((Real)valA).bigDecimalValue().toPlainString()), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, t2R, arena.allocateFrom(((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, ((Real)valA).bigDecimalValue().toPlainString()), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, t2R, NativeSafe.allocateFrom(arena, ((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
                     NativeSafe.invoke(MPFR_SUB, resR, t1R, t2R, 0);
                     resultArr[i] = (E) (Object) readMPFR(resR, arena);
                 }
@@ -1143,16 +1143,16 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                         if (isComplex) {
                             Complex ca = (valA instanceof Complex c) ? c : Complex.of((Real) valA);
                             Complex cb = (valB instanceof Complex c) ? c : Complex.of((Real) valB);
-                            NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(ca.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                            NativeSafe.invoke(MPFR_SET_STR, t1I, arena.allocateFrom(ca.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
-                            NativeSafe.invoke(MPFR_SET_STR, t2R, arena.allocateFrom(cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                            NativeSafe.invoke(MPFR_SET_STR, t2I, arena.allocateFrom(cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, ca.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t1I, NativeSafe.allocateFrom(arena, ca.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t2R, NativeSafe.allocateFrom(arena, cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t2I, NativeSafe.allocateFrom(arena, cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                             NativeSafe.invoke(MPFR_SUB, resR, t1R, t2R, 0);
                             NativeSafe.invoke(MPFR_SUB, resI, t1I, t2I, 0);
                             rowValues.put(col, (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena)));
                         } else {
-                            NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(((Real)valA).bigDecimalValue().toPlainString()), 10, 0);
-                            NativeSafe.invoke(MPFR_SET_STR, t2R, arena.allocateFrom(((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, ((Real)valA).bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t2R, NativeSafe.allocateFrom(arena, ((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
                             NativeSafe.invoke(MPFR_SUB, resR, t1R, t2R, 0);
                             rowValues.put(col, (E) (Object) readMPFR(resR, arena));
                         }
@@ -1160,13 +1160,13 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                         // Subtracting valB from zero: 0 - valB
                         if (isComplex) {
                             Complex cb = (valB instanceof Complex c) ? c : Complex.of((Real) valB);
-                            NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                            NativeSafe.invoke(MPFR_SET_STR, t1I, arena.allocateFrom(cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, cb.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t1I, NativeSafe.allocateFrom(arena, cb.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                             NativeSafe.invoke(MPFR_NEG, resR, t1R, 0);
                             NativeSafe.invoke(MPFR_NEG, resI, t1I, 0);
                             rowValues.put(col, (E) (Object) Complex.of(readMPFR(resR, arena), readMPFR(resI, arena)));
                         } else {
-                            NativeSafe.invoke(MPFR_SET_STR, t1R, arena.allocateFrom(((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
+                            NativeSafe.invoke(MPFR_SET_STR, t1R, NativeSafe.allocateFrom(arena, ((Real)valB).bigDecimalValue().toPlainString()), 10, 0);
                             NativeSafe.invoke(MPFR_NEG, resR, t1R, 0);
                             rowValues.put(col, (E) (Object) readMPFR(resR, arena));
                         }
@@ -2490,8 +2490,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
              NativeSafe.invoke(MPFR_INIT2, aR, prec);
              NativeSafe.invoke(MPFR_INIT2, aI, prec);
              
-             NativeSafe.invoke(MPFR_SET_STR, aR, arena.allocateFrom(z.getReal().bigDecimalValue().toPlainString()), 10, 0);
-             NativeSafe.invoke(MPFR_SET_STR, aI, arena.allocateFrom(z.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+             NativeSafe.invoke(MPFR_SET_STR, aR, NativeSafe.allocateFrom(arena, z.getReal().bigDecimalValue().toPlainString()), 10, 0);
+             NativeSafe.invoke(MPFR_SET_STR, aI, NativeSafe.allocateFrom(arena, z.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
              
              switch (op.toLowerCase()) {
                  case "exp" -> NativeMPFRDenseLinearAlgebraBackend.complexExp(resR, resI, aR, aI, prec, arena, tracker);
@@ -2514,8 +2514,8 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
                          MemorySegment eI = NativeSafe.allocate(arena, MPFR_LAYOUT); track(tracker, eI);
                          NativeSafe.invoke(MPFR_INIT2, eR, prec);
                          NativeSafe.invoke(MPFR_INIT2, eI, prec);
-                         NativeSafe.invoke(MPFR_SET_STR, eR, arena.allocateFrom(exp.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                         NativeSafe.invoke(MPFR_SET_STR, eI, arena.allocateFrom(exp.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                         NativeSafe.invoke(MPFR_SET_STR, eR, NativeSafe.allocateFrom(arena, exp.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                         NativeSafe.invoke(MPFR_SET_STR, eI, NativeSafe.allocateFrom(arena, exp.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                          NativeMPFRDenseLinearAlgebraBackend.complexPow(resR, resI, aR, aI, eR, eI, prec, arena, tracker);
                      }
                  }
@@ -2536,7 +2536,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             MemorySegment val = NativeSafe.allocate(arena, MPFR_LAYOUT); track(tracker, val);
             NativeSafe.invoke(MPFR_INIT2, res, (int) prec);
             NativeSafe.invoke(MPFR_INIT2, val, (int) prec);
-            NativeSafe.invoke(MPFR_SET_STR, val, arena.allocateFrom(v.bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, val, NativeSafe.allocateFrom(arena, v.bigDecimalValue().toPlainString()), 10, 0);
             
             MethodHandle handle = switch (op.toLowerCase()) {
                 case "exp" -> MPFR_EXP;
@@ -2561,7 +2561,7 @@ public class NativeMPFRSparseLinearAlgebraBackend<E> implements SparseLinearAlge
             } else if (op.equalsIgnoreCase("pow") && args.length > 0 && args[0] instanceof Real exp) {
                 MemorySegment e = NativeSafe.allocate(arena, MPFR_LAYOUT); track(tracker, e);
                 NativeSafe.invoke(MPFR_INIT2, e, (int) prec);
-                NativeSafe.invoke(MPFR_SET_STR, e, arena.allocateFrom(exp.bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, e, NativeSafe.allocateFrom(arena, exp.bigDecimalValue().toPlainString()), 10, 0);
                 NativeSafe.invoke(MPFR_POW, res, val, e, 0);
             } else {
                  throw new UnsupportedOperationException("Op " + op + " not implemented for real sparse");

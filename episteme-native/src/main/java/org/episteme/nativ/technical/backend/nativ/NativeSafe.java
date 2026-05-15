@@ -271,7 +271,7 @@ public class NativeSafe {
     }
 
     public static MemorySegment allocateFromArray(Arena arena, ValueLayout.OfLong layout, long[] array) {
-        MemorySegment seg = arena.allocate(layout, array.length);
+        MemorySegment seg = allocate(arena, layout, array.length);
         MemorySegment.copy(MemorySegment.ofArray(array), 0, seg, 0, (long)array.length * layout.byteSize());
         return seg;
     }
@@ -302,6 +302,10 @@ public class NativeSafe {
 
     public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfLong layout, long... elements) {
         return allocateFromArray(arena, layout, elements);
+    }
+
+    public static MemorySegment allocateFrom(Arena arena, String s) {
+        return arena.allocateFrom(s);
     }
 
     public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfByte layout, byte... elements) {

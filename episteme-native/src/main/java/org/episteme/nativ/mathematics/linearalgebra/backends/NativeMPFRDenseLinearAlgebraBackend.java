@@ -436,8 +436,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             
             if (isComplex) {
                 org.episteme.core.mathematics.numbers.complex.Complex cs = (org.episteme.core.mathematics.numbers.complex.Complex) scalar;
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, NativeSafe.allocateFrom(arena, cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sI, NativeSafe.allocateFrom(arena, cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
                 
                 // Pre-allocate temporary segments for complexMultiply to avoid allocations inside the loop
                 MemorySegment tR = NativeSafe.allocate(arena, MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, tR, (int) prec);
@@ -465,7 +465,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 }
             } else {
                 String valStr = (scalar instanceof Real rs) ? rs.bigDecimalValue().toPlainString() : scalar.toString();
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(valStr), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, NativeSafe.allocateFrom(arena, valStr), 10, 0);
                 
                 for (int i = 0; i < n; i++) {
                     MemorySegment rv = h_V.asSlice((long) i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
@@ -656,8 +656,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 if (isComplex) {
                     MemorySegment sumR = getMPFRVector(h_Y, i, 0, true);
                     MemorySegment sumI = getMPFRVector(h_Y, i, 1, true);
-                    NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, rnd);
-                    NativeSafe.invoke(MPFR_SET_STR, sumI, arena.allocateFrom("0"), 10, rnd);
+                    NativeSafe.invoke(MPFR_SET_STR, sumR, NativeSafe.allocateFrom(arena, "0"), 10, rnd);
+                    NativeSafe.invoke(MPFR_SET_STR, sumI, NativeSafe.allocateFrom(arena, "0"), 10, rnd);
                     
                     for (int l = 0; l < k; l++) {
                         MemorySegment ar = getMPFR(h_A, i, l, k, 0, true);
@@ -679,7 +679,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                     }
                 } else {
                     MemorySegment sum = getMPFRVector(h_Y, i, 0, false);
-                    NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, rnd);
+                    NativeSafe.invoke(MPFR_SET_STR, sum, NativeSafe.allocateFrom(arena, "0"), 10, rnd);
                     for (int l = 0; l < k; l++) {
                         NativeSafe.invoke(MPFR_MUL, temp1, getMPFR(h_A, i, l, k, 0, false), getMPFRVector(h_X, l, 0, false), rnd);
                         NativeSafe.invoke(MPFR_ADD, sum, sum, temp1, rnd);
@@ -845,11 +845,11 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             if (isComplex) {
                 Real re = getRealPart(val);
                 Real im = getImagPart(val);
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, true), arena.allocateFrom(re.bigDecimalValue().toPlainString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 1, true), arena.allocateFrom(im.bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, true), NativeSafe.allocateFrom(arena, re.bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 1, true), NativeSafe.allocateFrom(arena, im.bigDecimalValue().toPlainString()), 10, 0);
             } else {
                 Real rv = getRealPart(val);
-                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, false), arena.allocateFrom(rv.bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, getMPFRVector(vec, i, 0, false), NativeSafe.allocateFrom(arena, rv.bigDecimalValue().toPlainString()), 10, 0);
             }
         }
         return vec;
@@ -976,8 +976,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     
             if (isComplex) {
                 org.episteme.core.mathematics.numbers.complex.Complex cs = (org.episteme.core.mathematics.numbers.complex.Complex) scalar;
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, sI, arena.allocateFrom(cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, NativeSafe.allocateFrom(arena, cs.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sI, NativeSafe.allocateFrom(arena, cs.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
     
                 for (int i = 0; i < m * n; i++) {
                     MemorySegment aR = h_A.asSlice((long) i * 2 * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
@@ -988,7 +988,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                 }
             } else {
                 String valStr = (scalar instanceof Real rs) ? rs.bigDecimalValue().toPlainString() : scalar.toString();
-                NativeSafe.invoke(MPFR_SET_STR, sR, arena.allocateFrom(valStr), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, sR, NativeSafe.allocateFrom(arena, valStr), 10, 0);
     
                 for (int i = 0; i < m * n; i++) {
                     MemorySegment ra = h_A.asSlice((long) i * MPFR_LAYOUT.byteSize(), MPFR_LAYOUT);
@@ -1045,7 +1045,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         } else {
             // Always use string for high precision stability to avoid double-precision floor
             String s = val.bigDecimalValue().toPlainString();
-            NativeSafe.invoke(MPFR_SET_STR, mpfr, arena.allocateFrom(s), 10, rnd);
+            NativeSafe.invoke(MPFR_SET_STR, mpfr, NativeSafe.allocateFrom(arena, s), 10, rnd);
         }
     }
 
@@ -1399,14 +1399,14 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             }
 
             if (exponent instanceof org.episteme.core.mathematics.numbers.complex.Complex ce) {
-                NativeSafe.invoke(MPFR_SET_STR, h_ExponentR, arena.allocateFrom(ce.getReal().bigDecimalValue().toPlainString()), 10, rnd);
+                NativeSafe.invoke(MPFR_SET_STR, h_ExponentR, NativeSafe.allocateFrom(arena, ce.getReal().bigDecimalValue().toPlainString()), 10, rnd);
                 if (h_ExponentI != null) {
-                    NativeSafe.invoke(MPFR_SET_STR, h_ExponentI, arena.allocateFrom(ce.getImaginary().bigDecimalValue().toPlainString()), 10, rnd);
+                    NativeSafe.invoke(MPFR_SET_STR, h_ExponentI, NativeSafe.allocateFrom(arena, ce.getImaginary().bigDecimalValue().toPlainString()), 10, rnd);
                 }
             } else {
-                NativeSafe.invoke(MPFR_SET_STR, h_ExponentR, arena.allocateFrom(((org.episteme.core.mathematics.numbers.real.Real)exponent).bigDecimalValue().toPlainString()), 10, rnd);
+                NativeSafe.invoke(MPFR_SET_STR, h_ExponentR, NativeSafe.allocateFrom(arena, ((org.episteme.core.mathematics.numbers.real.Real)exponent).bigDecimalValue().toPlainString()), 10, rnd);
                 if (h_ExponentI != null) {
-                    NativeSafe.invoke(MPFR_SET_STR, h_ExponentI, arena.allocateFrom("0.0"), 10, rnd);
+                    NativeSafe.invoke(MPFR_SET_STR, h_ExponentI, NativeSafe.allocateFrom(arena, "0.0"), 10, rnd);
                 }
             }
 
@@ -1469,10 +1469,10 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             E d = dot(a, b);
             if (isComplex) {
                 org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) d;
-                NativeSafe.invoke(MPFR_SET_STR, dotR, arena.allocateFrom(c.getReal().bigDecimalValue().toPlainString()), 10, 0);
-                NativeSafe.invoke(MPFR_SET_STR, dotI, arena.allocateFrom(c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, dotR, NativeSafe.allocateFrom(arena, c.getReal().bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, dotI, NativeSafe.allocateFrom(arena, c.getImaginary().bigDecimalValue().toPlainString()), 10, 0);
             } else {
-                NativeSafe.invoke(MPFR_SET_STR, dotR, arena.allocateFrom(((org.episteme.core.mathematics.numbers.real.Real)d).bigDecimalValue().toPlainString()), 10, 0);
+                NativeSafe.invoke(MPFR_SET_STR, dotR, NativeSafe.allocateFrom(arena, ((org.episteme.core.mathematics.numbers.real.Real)d).bigDecimalValue().toPlainString()), 10, 0);
             }
             
             MemorySegment normA = NativeSafe.allocate(arena, MPFR_LAYOUT); track(tracker, normA);
@@ -1482,8 +1482,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             
             Real nA = getReal(norm(a));
             Real nB = getReal(norm(b));
-            NativeSafe.invoke(MPFR_SET_STR, normA, arena.allocateFrom(nA.bigDecimalValue().toPlainString()), 10, 0);
-            NativeSafe.invoke(MPFR_SET_STR, normB, arena.allocateFrom(nB.bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, normA, NativeSafe.allocateFrom(arena, nA.bigDecimalValue().toPlainString()), 10, 0);
+            NativeSafe.invoke(MPFR_SET_STR, normB, NativeSafe.allocateFrom(arena, nB.bigDecimalValue().toPlainString()), 10, 0);
             
             // denom = normA * normB
             MemorySegment denom = NativeSafe.allocate(arena, MPFR_LAYOUT); track(tracker, denom);
@@ -1728,7 +1728,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             int maxIter = n * n * 30;
             int iter = 0;
             MemorySegment eps = NativeSafe.allocate(arena, MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, eps, (int) prec);
-            NativeSafe.invoke(MPFR_SET_STR, eps, arena.allocateFrom("1e-50"), 10, rnd);
+            NativeSafe.invoke(MPFR_SET_STR, eps, NativeSafe.allocateFrom(arena, "1e-50"), 10, rnd);
 
             MemorySegment t = NativeSafe.allocate(arena, MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, t, (int) prec);
             MemorySegment c = NativeSafe.allocate(arena, MPFR_LAYOUT); NativeSafe.invoke(MPFR_INIT2, c, (int) prec);
@@ -2400,8 +2400,8 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             MemorySegment h_X = allocateVector(n, arena, tracker, prec, isComplex);
             for (int i = n - 1; i >= 0; i--) {
                 if (isComplex) {
-                    NativeSafe.invoke(MPFR_SET_STR, sumR, arena.allocateFrom("0"), 10, 0);
-                    NativeSafe.invoke(MPFR_SET_STR, sumI, arena.allocateFrom("0"), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, sumR, NativeSafe.allocateFrom(arena, "0"), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, sumI, NativeSafe.allocateFrom(arena, "0"), 10, 0);
                     
                     for (int j = i + 1; j < n; j++) {
                         complexAddMul(sumR, sumI, 
@@ -2419,7 +2419,7 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
                         getMPFR(h_A, i, i, n, 0, true), getMPFR(h_A, i, i, n, 1, true),
                         (int) prec, arena, tracker);
                 } else {
-                    NativeSafe.invoke(MPFR_SET_STR, sum, arena.allocateFrom("0"), 10, 0);
+                    NativeSafe.invoke(MPFR_SET_STR, sum, NativeSafe.allocateFrom(arena, "0"), 10, 0);
                     
                     for (int j = i + 1; j < n; j++) {
                         NativeSafe.invoke(MPFR_MUL, term, getMPFR(h_A, i, j, n, 0, false), getMPFRVector(h_X, j, 0, false), 0);

@@ -275,12 +275,12 @@ if ($Libraries -contains "All" -or $Libraries -contains "FFmpeg") {
     Write-Host "Fetching FFmpeg and OpenCV binaries via Maven..." -ForegroundColor Yellow
     # We download the windows-x86_64 jars which contain the DLLs
     mvn dependency:copy `
-        "-Dartifact=org.bytedeco:ffmpeg:$ffmpegVersion:jar:windows-x86_64" `
+        "-Dartifact=org.bytedeco:ffmpeg:6.1.1-1.5.10:jar:windows-x86_64" `
         "-DoutputDirectory=$tempDir" `
         "-Dmdep.useBaseVersion=true"
         
     mvn dependency:copy `
-        "-Dartifact=org.bytedeco:opencv:$opencvVersion:jar:windows-x86_64" `
+        "-Dartifact=org.bytedeco:opencv:4.9.0-1.5.10:jar:windows-x86_64" `
         "-DoutputDirectory=$tempDir" `
         "-Dmdep.useBaseVersion=true"
         
