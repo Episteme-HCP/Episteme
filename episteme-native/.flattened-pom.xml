@@ -5,10 +5,10 @@
   <parent>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta3.0.13</version>
+    <version>1.0.0-beta3.0.14</version>
   </parent>
   <artifactId>episteme-native</artifactId>
-  <version>1.0.0-beta3.0.13</version>
+  <version>1.0.0-beta3.0.14</version>
   <name>Episteme Native</name>
   <description>Native library integration via Project Panama (FFM API)</description>
   <licenses>
