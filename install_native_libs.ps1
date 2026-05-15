@@ -287,8 +287,17 @@ if ($Libraries -contains "All" -or $Libraries -contains "FFmpeg") {
     $jars = Get-ChildItem -Path $tempDir -Filter "*.jar"
     foreach ($jar in $jars) {
         Write-Host "Extracting DLLs from $($jar.Name)..." -ForegroundColor Yellow
-        # Extract only DLLs to the libs folder
-        tar -xf $jar.FullName -C $InstallDir --wildcards "*.dll"
+        $extractDir = Join-Path $tempDir $jar.BaseName
+        if (!(Test-Path $extractDir)) { New-Item -ItemType Directory -Path $extractDir | Out-Null }
+        
+        # Extract everything from JAR to temp subfolder
+        tar -xf $jar.FullName -C $extractDir
+        
+        # Find all DLLs and copy them to the libs root
+        $dlls = Get-ChildItem -Path $extractDir -Filter "*.dll" -Recurse
+        foreach ($dll in $dlls) {
+            Copy-Item -Path $dll.FullName -Destination $InstallDir -Force
+        }
     }
     Write-Host "[OK] Native DLLs extracted to $InstallDir" -ForegroundColor Green
     

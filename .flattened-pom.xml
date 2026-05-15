@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.episteme-hcp</groupId>
   <artifactId>episteme-parent</artifactId>
-  <version>1.0.0-beta3.0.13</version>
+  <version>1.0.0-beta3.0.14</version>
   <packaging>pom</packaging>
   <name>Episteme Unifying Parent</name>
   <description>Episteme - Unified Scientific Computing Framework (Parent POM)</description>
@@ -96,7 +96,7 @@
     <maven.compiler.source>${target.java.version}</maven.compiler.source>
     <mockito.version>5.11.0</mockito.version>
     <javacpp.version>1.5.10</javacpp.version>
-    <revision>1.0.0-beta3.0.13</revision>
+    <revision>1.0.0-beta3.0.14</revision>
     <hdf5.version>1.14.3-1.5.10</hdf5.version>
     <onnxruntime.version>1.17.1</onnxruntime.version>
     <maven.compiler.target>${target.java.version}</maven.compiler.target>

@@ -239,14 +239,47 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         ZGEMV = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zgemv")
             .map(s -> LINKER.downcallHandle(s, cgemvDesc)).orElse(null);
 
-        FunctionDescriptor cdotcDesc = FunctionDescriptor.ofVoid(
+        FunctionDescriptor cdotcSubDesc = FunctionDescriptor.ofVoid(
                 ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
                 AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
         );
-        CDOTC = NativeFFMLoader.findSymbol(LOOKUP, "cblas_cdotc_sub", "cblas_cdots")
-            .map(s -> LINKER.downcallHandle(s, cdotcDesc)).orElse(null);
-        ZDOTC = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zdotc_sub", "cblas_zdotc")
-            .map(s -> LINKER.downcallHandle(s, cdotcDesc)).orElse(null);
+        
+        // Struct layouts for complex return (Standard CBLAS fallback)
+        StructLayout complexFloatLayout = MemoryLayout.structLayout(
+                ValueLayout.JAVA_FLOAT.withName("real"),
+                ValueLayout.JAVA_FLOAT.withName("imag")
+        );
+        StructLayout complexDoubleLayout = MemoryLayout.structLayout(
+                ValueLayout.JAVA_DOUBLE.withName("real"),
+                ValueLayout.JAVA_DOUBLE.withName("imag")
+        );
+        
+        FunctionDescriptor cdotcStandardDesc = FunctionDescriptor.of(complexFloatLayout,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT);
+        FunctionDescriptor zdotcStandardDesc = FunctionDescriptor.of(complexDoubleLayout,
+                ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT, 
+                AddressLayout.ADDRESS, ValueLayout.JAVA_INT);
+
+        var cdotcSub = NativeFFMLoader.findSymbol(LOOKUP, "cblas_cdotc_sub");
+        if (cdotcSub.isPresent()) {
+            CDOTC = LINKER.downcallHandle(cdotcSub.get(), cdotcSubDesc);
+            USING_CDOTC_SUB = true;
+        } else {
+            var cdotcStd = NativeFFMLoader.findSymbol(LOOKUP, "cblas_cdotc");
+            CDOTC = cdotcStd.map(s -> LINKER.downcallHandle(s, cdotcStandardDesc)).orElse(null);
+            USING_CDOTC_SUB = false;
+        }
+
+        var zdotcSub = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zdotc_sub");
+        if (zdotcSub.isPresent()) {
+            ZDOTC = LINKER.downcallHandle(zdotcSub.get(), cdotcSubDesc);
+            USING_ZDOTC_SUB = true;
+        } else {
+            var zdotcStd = NativeFFMLoader.findSymbol(LOOKUP, "cblas_zdotc");
+            ZDOTC = zdotcStd.map(s -> LINKER.downcallHandle(s, zdotcStandardDesc)).orElse(null);
+            USING_ZDOTC_SUB = false;
+        }
 
         FunctionDescriptor scnrm2Desc = FunctionDescriptor.of(ValueLayout.JAVA_FLOAT,
                 ValueLayout.JAVA_INT, AddressLayout.ADDRESS, ValueLayout.JAVA_INT
@@ -457,6 +490,8 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     private static MethodHandle DDOT;
     private static MethodHandle CDOTC;
     private static MethodHandle ZDOTC;
+    private static boolean USING_CDOTC_SUB = false;
+    private static boolean USING_ZDOTC_SUB = false;
 
     private static MethodHandle SAXPY;
     private static MethodHandle DAXPY;
@@ -2085,18 +2120,37 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(a));
                     MemorySegment segB = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));
-                    MemorySegment res = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, 2);
-                    // Single precision complex dot product (conjugated)
-                    NativeSafe.invoke(CDOTC, n, segB, 1, segA, 1, res);
-                    return createScalar(res.get(ValueLayout.JAVA_FLOAT, 0), res.get(ValueLayout.JAVA_FLOAT, 4), a);
+                    
+                    if (USING_CDOTC_SUB) {
+                        MemorySegment res = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, 2);
+                        // CDOTC calculates sum(conj(x) * y). We want sum(conj(a) * b).
+                        NativeSafe.invoke(CDOTC, n, segA, 1, segB, 1, res);
+                        return createScalar(res.get(ValueLayout.JAVA_FLOAT, 0), res.get(ValueLayout.JAVA_FLOAT, 4), a);
+                    } else {
+                        // Standard CBLAS returns complex struct (usually in registers for float complex)
+                        Object result = NativeSafe.invoke(CDOTC, n, segA, 1, segB, 1);
+                        if (result instanceof MemorySegment res) {
+                            return createScalar(res.get(ValueLayout.JAVA_FLOAT, 0), res.get(ValueLayout.JAVA_FLOAT, 4), a);
+                        }
+                        throw new RuntimeException("CDOTC returned unexpected type: " + (result != null ? result.getClass() : "null"));
+                    }
                 } catch (Throwable t) { throw new RuntimeException("CDOTC failed", t); }
             } else {
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     MemorySegment segB = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(b));
-                    MemorySegment res = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, 2);
-                    NativeSafe.invoke(ZDOTC, n, segB, 1, segA, 1, res);
-                    return createScalar(res.get(ValueLayout.JAVA_DOUBLE, 0), res.get(ValueLayout.JAVA_DOUBLE, 8), a);
+                    
+                    if (USING_ZDOTC_SUB) {
+                        MemorySegment res = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, 2);
+                        NativeSafe.invoke(ZDOTC, n, segA, 1, segB, 1, res);
+                        return createScalar(res.get(ValueLayout.JAVA_DOUBLE, 0), res.get(ValueLayout.JAVA_DOUBLE, 8), a);
+                    } else {
+                        Object result = NativeSafe.invoke(ZDOTC, n, segA, 1, segB, 1);
+                        if (result instanceof MemorySegment res) {
+                            return createScalar(res.get(ValueLayout.JAVA_DOUBLE, 0), res.get(ValueLayout.JAVA_DOUBLE, 8), a);
+                        }
+                        throw new RuntimeException("ZDOTC returned unexpected type: " + (result != null ? result.getClass() : "null"));
+                    }
                 } catch (Throwable t) { throw new RuntimeException("ZDOTC failed", t); }
             }
         }

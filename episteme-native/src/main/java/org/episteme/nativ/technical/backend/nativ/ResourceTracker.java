@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 public final class ResourceTracker implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(ResourceTracker.class);
     private final List<Resource<?>> resources = new ArrayList<>();
+    private final java.util.Set<Long> clearedAddresses = new java.util.HashSet<>();
 
     /**
      * Registers a native resource with a custom cleanup action.
@@ -57,7 +58,7 @@ public final class ResourceTracker implements AutoCloseable {
         resources.clear();
     }
 
-    private static class Resource<T> {
+    private class Resource<T> {
         private final T handle;
         private final Consumer<T> cleaner;
         private boolean released = false;
@@ -72,16 +73,20 @@ public final class ResourceTracker implements AutoCloseable {
                 try {
                     // Panama safety: check if segment is already closed before calling the cleaner
                     if (handle instanceof MemorySegment seg) {
-                         if (!seg.scope().isAlive()) {
+                         long addr = seg.address();
+                         System.err.println("[TRACKER] Releasing segment at 0x" + Long.toHexString(addr) + " (alive=" + seg.scope().isAlive() + ")");
+                         if (!seg.scope().isAlive() || (addr != 0 && clearedAddresses.contains(addr))) {
                              released = true;
                              return;
                          }
+                         if (addr != 0) clearedAddresses.add(addr);
+                    } else {
+                        System.err.println("[TRACKER] Releasing non-segment handle: " + handle);
                     }
                     cleaner.accept(handle);
                 } catch (IllegalStateException e) {
                     if (e.getMessage() != null && e.getMessage().contains("already closed")) {
                         // Segment was likely closed by its Arena before the tracker got to it.
-                        // This is fine in Panama context.
                     } else {
                         throw e;
                     }

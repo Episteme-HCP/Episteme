@@ -47,8 +47,8 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
         }
         this.rows = rows;
         this.cols = cols;
-        this.arena = Arena.ofConfined();
-        this.ownsArena = true;
+        this.arena = Arena.ofAuto();
+        this.ownsArena = false;
         
         long size = (long) rows * cols * Double.BYTES;
         this.data = arena.allocate(size, ValueLayout.JAVA_DOUBLE.byteAlignment());
@@ -156,8 +156,6 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
 
     @Override
     public void close() {
-        if (ownsArena) {
-            arena.close();
-        }
+        // Arena.ofAuto() managed.
     }
 }

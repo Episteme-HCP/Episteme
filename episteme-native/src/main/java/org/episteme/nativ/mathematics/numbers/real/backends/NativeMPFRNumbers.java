@@ -26,10 +26,9 @@ public final class NativeMPFRNumbers {
     private static final Logger logger = LoggerFactory.getLogger(NativeMPFRNumbers.class);
     private static final Linker LINKER = Linker.nativeLinker();
     
-    // Platform-dependent C 'long' size - Windows 'long' is always 32-bit (LLP64), Linux/macOS 'long' is 64-bit (LP64)
-    public static final ValueLayout JAVA_LONG = ValueLayout.JAVA_LONG;
-    public static final ValueLayout C_LONG = (System.getProperty("os.name").toLowerCase().contains("win") && 
-                                              System.getProperty("os.arch").contains("64"))
+    // Platform-dependent C 'long' size - Windows 'long' is always 32-bit (LLP64)
+    public static final ValueLayout C_LONG = (System.getProperty("os.name").toLowerCase().contains("win") || 
+                                              !System.getProperty("os.arch").contains("64"))
                                               ? ValueLayout.JAVA_INT : ValueLayout.JAVA_LONG;
     
     public static Object c_long(long value) {
@@ -177,6 +176,10 @@ public final class NativeMPFRNumbers {
                 MPFR_FREE_STR = lookup(mpfr, "mpfr_free_str", FunctionDescriptor.ofVoid(ADDRESS));
                 
                 AVAILABLE = MPFR_INIT2 != null && MPFR_EXP != null && MPFR_LOG != null && MPFR_SIN != null && MPFR_COS != null;
+                if (AVAILABLE) {
+                    logger.info("Native MPFR Numbers initialized. Platform C_LONG: {} bytes, Layout: {}", 
+                                C_LONG.byteSize(), MPFR_LAYOUT.name().orElse("unknown"));
+                }
             }
         } catch (Throwable t) {
             logger.warn("Failed to initialize Native MPFR Numbers: {}", t.getMessage());
@@ -185,20 +188,21 @@ public final class NativeMPFRNumbers {
 
     static {
         // Define layout dynamically based on C_LONG size
+        // On Windows 64-bit (LLP64), C_LONG is 4 bytes, so we use the 24-byte layout
         if (C_LONG.byteSize() == 8) {
             MPFR_LAYOUT = MemoryLayout.structLayout(
-                C_LONG.withName("prec"),      // offset 0
-                JAVA_INT.withName("sign"),    // offset 8
-                MemoryLayout.paddingLayout(4), // offset 12
-                C_LONG.withName("exp"),       // offset 16
-                ADDRESS.withName("d")         // offset 24
+                C_LONG.withName("prec"),      // offset 0 (8 bytes)
+                JAVA_INT.withName("sign"),    // offset 8 (4 bytes)
+                MemoryLayout.paddingLayout(4), // offset 12 (4 bytes padding)
+                C_LONG.withName("exp"),       // offset 16 (8 bytes)
+                ADDRESS.withName("d")         // offset 24 (8 bytes)
             ).withName("__mpfr_struct_64");
         } else {
             MPFR_LAYOUT = MemoryLayout.structLayout(
                 C_LONG.withName("prec"),      // offset 0 (4 bytes)
                 JAVA_INT.withName("sign"),    // offset 4 (4 bytes)
                 C_LONG.withName("exp"),       // offset 8 (4 bytes)
-                MemoryLayout.paddingLayout(4), // offset 12 (4 bytes padding)
+                MemoryLayout.paddingLayout(4), // offset 12 (4 bytes padding to align pointer)
                 ADDRESS.withName("d")         // offset 16 (8 bytes)
             ).withName("__mpfr_struct_32");
         }

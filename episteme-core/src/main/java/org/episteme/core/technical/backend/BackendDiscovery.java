@@ -139,12 +139,39 @@ public class BackendDiscovery {
                 org.episteme.core.ui.MasterControlDiscovery.getInstance().findClasses("Backend").forEach(info -> {
                     boolean exists = cachedProviders.stream().anyMatch(p -> p.getClass().getName().equals(info.fullName));
                     if (!exists) {
+                        boolean excluded = false;
+                        for (String ex : excludes) {
+                            if (info.fullName.toLowerCase().contains(ex.trim().toLowerCase())) {
+                                excluded = true;
+                                break;
+                            }
+                        }
+                        
+                        if (excluded) {
+                            logger.debug("BackendDiscovery: Skipping excluded class (reflection): {}", info.fullName);
+                            return;
+                        }
+
                         try {
                             Class<?> cls = Class.forName(info.fullName, false, Backend.class.getClassLoader());
                             if (Backend.class.isAssignableFrom(cls)) {
                                 logger.info("BackendDiscovery: Found backend via reflection: {}", info.fullName);
                                 Backend instance = (Backend) cls.getDeclaredConstructor().newInstance();
-                                cachedProviders.add(instance);
+                                
+                                // Re-check name for exclusion after instantiation
+                                boolean nameExcluded = false;
+                                for (String ex : excludes) {
+                                    if (instance.getName().toLowerCase().contains(ex.trim().toLowerCase())) {
+                                        nameExcluded = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (nameExcluded) {
+                                    logger.debug("BackendDiscovery: Skipping excluded backend (reflection/name): {}", instance.getName());
+                                } else {
+                                    cachedProviders.add(instance);
+                                }
                             }
                         } catch (Exception e) {
                             // Skip if cannot instantiate

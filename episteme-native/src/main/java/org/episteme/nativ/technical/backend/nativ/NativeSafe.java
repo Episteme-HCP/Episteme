@@ -65,6 +65,13 @@ public class NativeSafe {
             }
 
             // 1. Primary Attempt: Direct invocation using Panama MethodHandle
+            if (logger.isTraceEnabled()) {
+                if (handle.toString().contains("mpfr_clear")) {
+                    logger.trace("Native Safe: Calling mpfr_clear on 0x{}", Long.toHexString(((MemorySegment)args[0]).address()));
+                } else if (handle.toString().contains("mpfr_init2")) {
+                    logger.trace("Native Safe: Calling mpfr_init2 on 0x{} with precision {}", Long.toHexString(((MemorySegment)args[0]).address()), args[1]);
+                }
+            }
             return handle.invokeWithArguments(args);
         } catch (Throwable t1) {
             // 2. Secondary Attempt: Type Coercion fallback

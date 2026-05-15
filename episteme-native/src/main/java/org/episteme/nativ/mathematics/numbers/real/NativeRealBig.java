@@ -42,16 +42,16 @@ public final class NativeRealBig extends Real {
         this.arena = Arena.ofAuto();
         this.precision = precision;
         this.ptr = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, ptr, (int) precision);
+        NativeSafe.invoke(MPFR_INIT2, ptr, c_long(precision));
         
         // Ensure manual cleanup via MPFR_CLEAR if the arena is not automatically cleaning up correctly
         // but since we use Arena.ofAuto(), GC will handle the MemorySegment, but mpfr_t internal
         // memory (limbs) must be freed via mpfr_clear.
         CLEANER.register(this, () -> {
              try {
-                 // Note: This must be done via a separate static method or lambda that doesn't capture 'this'
-                 // but captures the raw ptr. For simplicity, we assume Arena.ofAuto() enough for now
-                 // or we use a more robust reinterpret if we want deterministic cleanup.
+                 // Deterministic cleanup: mpfr_clear must be called to free internal limbs
+                 // Even if the struct itself is in an Arena, the data it points to is not.
+                 NativeSafe.invoke(MPFR_CLEAR, ptr);
              } catch (Exception e) {}
         });
         
@@ -71,7 +71,7 @@ public final class NativeRealBig extends Real {
         this.arena = Arena.ofAuto();
         this.precision = precision;
         this.ptr = arena.allocate(MPFR_LAYOUT);
-        NativeSafe.invoke(MPFR_INIT2, ptr, (int) precision);
+        NativeSafe.invoke(MPFR_INIT2, ptr, c_long(precision));
     }
 
     public static NativeRealBig of(String value) {
@@ -214,7 +214,7 @@ public final class NativeRealBig extends Real {
     public double doubleValue() {
         if (isNaN()) return Double.NaN;
         if (isInfinite()) {
-            return (((Number) NativeSafe.invoke(MPFR_CMP_SI, this.ptr, 0L)).intValue() > 0) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+            return (((Number) NativeSafe.invoke(MPFR_CMP_SI, this.ptr, c_long(0L))).intValue() > 0) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         }
         return (double) NativeSafe.invoke(MPFR_GET_D, this.ptr, 0); // 0 is rounding mode (usually RNDN)
     }
@@ -437,7 +437,7 @@ public final class NativeRealBig extends Real {
     public String toString() {
         if (isNaN()) return "NaN";
         if (isInfinite()) {
-            return (((Number) NativeSafe.invoke(MPFR_CMP_SI, this.ptr, 0L)).intValue() > 0) ? "Infinity" : "-Infinity";
+            return (((Number) NativeSafe.invoke(MPFR_CMP_SI, this.ptr, c_long(0L))).intValue() > 0) ? "Infinity" : "-Infinity";
         }
         return bigDecimalValue().toPlainString();
     }

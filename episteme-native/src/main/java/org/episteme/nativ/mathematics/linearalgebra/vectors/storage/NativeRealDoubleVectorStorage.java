@@ -33,8 +33,8 @@ public class NativeRealDoubleVectorStorage implements RealDoubleVectorStorage, N
 
     public NativeRealDoubleVectorStorage(int dimension) {
         this.dimension = dimension;
-        this.arena = Arena.ofConfined();
-        this.ownsArena = true;
+        this.arena = Arena.ofAuto();
+        this.ownsArena = false;
         this.data = arena.allocate((long) dimension * Double.BYTES, ValueLayout.JAVA_DOUBLE.byteAlignment());
         data.fill((byte) 0);
     }
@@ -85,9 +85,7 @@ public class NativeRealDoubleVectorStorage implements RealDoubleVectorStorage, N
 
     @Override
     public void close() {
-        if (ownsArena) {
-            arena.close();
-        }
+        // Arena.ofAuto() managed.
     }
 
     @Override
