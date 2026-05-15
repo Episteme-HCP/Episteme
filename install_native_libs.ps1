@@ -9,11 +9,16 @@ param(
     [ValidateSet("All", "MPJ", "HDF5", "FFTW", "Bullet", "OpenBLAS", "EpistemeNative", "FFmpeg")]
     [string[]]$Libraries = @("All"),
     
-    [string]$InstallDir = (Join-Path $PSScriptRoot "libs")
+    [string]$InstallDir = ""
 )
 
 $ErrorActionPreference = "Stop"
-$ScriptDir = $PSScriptRoot
+$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { "." }
+
+# Set default InstallDir if not provided
+if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+    $InstallDir = Join-Path $ScriptDir "libs"
+}
 
 Write-Host "=== Episteme HPC Native Libraries Installer ===" -ForegroundColor Cyan
 Write-Host "Installation Directory: $InstallDir" -ForegroundColor Yellow
@@ -265,23 +270,27 @@ if ($Libraries -contains "All" -or $Libraries -contains "FFmpeg") {
 
     $version = "1.5.10"
     $ffmpegVersion = "6.1.1-1.5.10"
+    $opencvVersion = "4.9.0-1.5.10"
     
-    Write-Host "Fetching FFmpeg binaries via Maven..." -ForegroundColor Yellow
-    # We download the windows-x86_64 jar which contains the DLLs
+    Write-Host "Fetching FFmpeg and OpenCV binaries via Maven..." -ForegroundColor Yellow
+    # We download the windows-x86_64 jars which contain the DLLs
     mvn dependency:copy `
         "-Dartifact=org.bytedeco:ffmpeg:$ffmpegVersion:jar:windows-x86_64" `
         "-DoutputDirectory=$tempDir" `
-        "-Dmdep.useBaseVersion=true" | Out-Null
+        "-Dmdep.useBaseVersion=true"
         
-    $jarPath = Join-Path $tempDir "ffmpeg-$ffmpegVersion-windows-x86_64.jar"
-    if (Test-Path $jarPath) {
-        Write-Host "Extracting DLLs from JAR..." -ForegroundColor Yellow
+    mvn dependency:copy `
+        "-Dartifact=org.bytedeco:opencv:$opencvVersion:jar:windows-x86_64" `
+        "-DoutputDirectory=$tempDir" `
+        "-Dmdep.useBaseVersion=true"
+        
+    $jars = Get-ChildItem -Path $tempDir -Filter "*.jar"
+    foreach ($jar in $jars) {
+        Write-Host "Extracting DLLs from $($jar.Name)..." -ForegroundColor Yellow
         # Extract only DLLs to the libs folder
-        tar -xf $jarPath -C $InstallDir --wildcards "*.dll"
-        Write-Host "[OK] FFmpeg DLLs extracted to $InstallDir" -ForegroundColor Green
-    } else {
-        Write-Host "[ERROR] Could not find downloaded FFmpeg JAR." -ForegroundColor Red
+        tar -xf $jar.FullName -C $InstallDir --wildcards "*.dll"
     }
+    Write-Host "[OK] Native DLLs extracted to $InstallDir" -ForegroundColor Green
     
     Remove-Item $tempDir -Recurse -Force
 }

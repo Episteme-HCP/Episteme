@@ -67,6 +67,7 @@ public class JSONRPCService {
     private final MeterRegistry meterRegistry;
     private final org.springframework.core.task.TaskExecutor taskExecutor;
     private final java.util.Map<String, TaskState> taskRegistry = new java.util.concurrent.ConcurrentHashMap<>();
+    private File taskDir;
 
     private record TaskState(String id, String status, String result, String error) {}
 
@@ -105,6 +106,35 @@ public class JSONRPCService {
         return requested;
     }
 
+    private void saveTask(TaskState state) {
+        taskRegistry.put(state.id(), state);
+        if (taskDir == null) return;
+        try {
+            File taskFile = new File(taskDir, state.id() + ".json");
+            mapper.writeValue(taskFile, state);
+        } catch (IOException e) {
+            LOG.error("Failed to persist task state for {}", state.id(), e);
+        }
+    }
+
+    private TaskState getTask(String taskId) {
+        TaskState state = taskRegistry.get(taskId);
+        if (state != null) return state;
+        
+        if (taskDir == null) return null;
+        File taskFile = new File(taskDir, taskId + ".json");
+        if (taskFile.exists()) {
+            try {
+                state = mapper.readValue(taskFile, TaskState.class);
+                taskRegistry.put(taskId, state);
+                return state;
+            } catch (IOException e) {
+                LOG.error("Failed to load task state for {}", taskId, e);
+            }
+        }
+        return null;
+    }
+
     public String handle(String jsonBody) {
         try {
             JsonNode request = mapper.readTree(jsonBody);
@@ -138,6 +168,12 @@ public class JSONRPCService {
     }
 
     private String initialize(JsonNode params, JsonNode id) throws IOException {
+        // Initialize task directory
+        this.taskDir = new File(dataRoot, "tasks");
+        if (!taskDir.exists()) {
+            taskDir.mkdirs();
+        }
+
         var response = mapper.createObjectNode();
         response.put("jsonrpc", "2.0");
         response.set("id", id);
@@ -572,19 +608,20 @@ public class JSONRPCService {
         String jobId = java.util.UUID.randomUUID().toString();
         
         // Execute simulation in a background thread to avoid blocking the SSE transport
-        taskRegistry.put(jobId, new TaskState(jobId, "RUNNING", null, null));
+        saveTask(new TaskState(jobId, "RUNNING", null, null));
         taskExecutor.execute(() -> {
             LOG.info("Starting simulation job {} of type {}", jobId, type);
             try {
-                // Simulation logic would go here
+                // IMPORTANT: All native allocations (Arena.ofConfined) MUST happen inside this thread boundary
+                // to avoid IllegalStateException in Project Panama.
                 Thread.sleep(5000); // Simulate work
-                taskRegistry.put(jobId, new TaskState(jobId, "COMPLETED", "Simulation of " + type + " finished successfully at " + java.time.Instant.now(), null));
+                saveTask(new TaskState(jobId, "COMPLETED", "Simulation of " + type + " finished successfully at " + java.time.Instant.now(), null));
                 LOG.info("Simulation job {} completed", jobId);
             } catch (InterruptedException e) {
-                taskRegistry.put(jobId, new TaskState(jobId, "FAILED", null, "Simulation interrupted"));
+                saveTask(new TaskState(jobId, "FAILED", null, "Simulation interrupted"));
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
-                taskRegistry.put(jobId, new TaskState(jobId, "FAILED", null, e.getMessage()));
+                saveTask(new TaskState(jobId, "FAILED", null, e.getMessage()));
             }
         });
 
@@ -611,7 +648,7 @@ public class JSONRPCService {
 
     private String executeGetTaskStatus(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
         String taskId = args.get("taskId").asText();
-        TaskState state = taskRegistry.get(taskId);
+        TaskState state = getTask(taskId);
         
         if (state == null) {
             return error(response.get("id"), -32003, "Task not found: " + taskId);
@@ -642,7 +679,7 @@ public class JSONRPCService {
         String uri = params.get("uri").asText();
         if (uri.startsWith("episteme://tasks/")) {
             String taskId = uri.substring("episteme://tasks/".length());
-            TaskState state = taskRegistry.get(taskId);
+            TaskState state = getTask(taskId);
             if (state == null) {
                 return error(response.get("id"), -32003, "Resource not found: " + uri);
             }
