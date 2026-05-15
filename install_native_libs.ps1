@@ -6,7 +6,7 @@
 
 param(
     [Parameter(Position=0)]
-    [ValidateSet("All", "MPJ", "HDF5", "FFTW", "Bullet", "OpenBLAS", "EpistemeNative")]
+    [ValidateSet("All", "MPJ", "HDF5", "FFTW", "Bullet", "OpenBLAS", "EpistemeNative", "FFmpeg")]
     [string[]]$Libraries = @("All"),
     
     [string]$InstallDir = (Join-Path $PSScriptRoot "libs")
@@ -256,11 +256,37 @@ if ($Libraries -contains "All" -or $Libraries -contains "OpenBLAS") {
     }
 }
 
-# 6. Episteme Native (Consolidated)
-if ($Libraries -contains "All" -or $Libraries -contains "EpistemeNative") {
-    Write-Host "`n--- Episteme Native (Consolidated) ---" -ForegroundColor Cyan
-    Write-Host "[INFO] This library is built locally using build_native.ps1" -ForegroundColor Yellow
+# 6. FFmpeg (JavaCV)
+if ($Libraries -contains "All" -or $Libraries -contains "FFmpeg") {
+    Write-Host "`n--- Installing FFmpeg (JavaCV Natives) ---" -ForegroundColor Cyan
+    $tempDir = Join-Path $env:TEMP "episteme_ffmpeg"
+    if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
+    New-Item -ItemType Directory -Path $tempDir | Out-Null
+
+    $version = "1.5.10"
+    $ffmpegVersion = "6.1.1-1.5.10"
+    
+    Write-Host "Fetching FFmpeg binaries via Maven..." -ForegroundColor Yellow
+    # We download the windows-x86_64 jar which contains the DLLs
+    mvn dependency:copy `
+        "-Dartifact=org.bytedeco:ffmpeg:$ffmpegVersion:jar:windows-x86_64" `
+        "-DoutputDirectory=$tempDir" `
+        "-Dmdep.useBaseVersion=true" | Out-Null
+        
+    $jarPath = Join-Path $tempDir "ffmpeg-$ffmpegVersion-windows-x86_64.jar"
+    if (Test-Path $jarPath) {
+        Write-Host "Extracting DLLs from JAR..." -ForegroundColor Yellow
+        # Extract only DLLs to the libs folder
+        tar -xf $jarPath -C $InstallDir --wildcards "*.dll"
+        Write-Host "[OK] FFmpeg DLLs extracted to $InstallDir" -ForegroundColor Green
+    } else {
+        Write-Host "[ERROR] Could not find downloaded FFmpeg JAR." -ForegroundColor Red
+    }
+    
+    Remove-Item $tempDir -Recurse -Force
 }
+
+# 7. Episteme Native (Consolidated)
 
 Write-Host "`n[OK] Installation/Configuration complete!" -ForegroundColor Green
 Write-Host "Please restart your terminal to apply environment variable changes." -ForegroundColor White

@@ -1,53 +1,45 @@
-# Stage 1: Build
+# Phase 1: Build the Java Server
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean install -DskipTests -pl episteme-server -am
 
-# Copy all poms and dependencies
-COPY pom.xml .
-COPY episteme-core/pom.xml episteme-core/
-COPY episteme-natural/pom.xml episteme-natural/
-COPY episteme-social/pom.xml episteme-social/
-COPY episteme-native/pom.xml episteme-native/
-COPY episteme-server/pom.xml episteme-server/
+# Phase 2: Production Image
+FROM eclipse-temurin:21-jre-jammy
 
-# Pre-fetch dependencies
-RUN mvn dependency:go-offline -B
-
-# Copy source code
-COPY episteme-core episteme-core
-COPY episteme-natural episteme-natural
-COPY episteme-social episteme-social
-COPY episteme-native episteme-native
-COPY episteme-server episteme-server
-
-# Build the server and all its dependencies (including native backends)
-RUN mvn clean install -pl episteme-server -am -DskipTests -Dmaven.compiler.release=21 -Dmaven.compiler.compilerArgs="--enable-preview"
-
-# Stage 2: Run
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-
-# Install native dependencies required by Panama/FFM backends
+# Install Python and System Dependencies
 RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
     libopenblas0 \
     libmpfr6 \
     libhdf5-103 \
-    libfftw3-double3 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Set non-root user for security (industrial standard)
-RUN groupadd -r episteme && useradd -r -g episteme episteme
-RUN mkdir -p /app/data && chown episteme:episteme /app/data
+WORKDIR /app
+
+# Setup User
+RUN useradd -m -u 1000 episteme
 USER episteme
+ENV PATH="/home/episteme/.local/bin:${PATH}"
 
-# Copy the executable jar from the build stage
-COPY --from=build /app/episteme-server/target/episteme-server-*.jar app.jar
+# Copy Java Artifact
+COPY --from=build --chown=episteme:episteme /app/episteme-server/target/episteme-server-*.jar /app/server.jar
 
-# Expose port for MCP (HTTP/SSE)
-EXPOSE 8080
+# Copy Agent Code
+COPY --chown=episteme:episteme agent/ /app/agent/
+RUN pip3 install --no-cache-dir -r /app/agent/requirements.txt
 
-# Environment variables for industrial tuning
-ENV JAVA_OPTS="-Xms512m -Xmx1536m -XX:MaxDirectMemorySize=512m -Djava.security.egd=file:/dev/./urandom --add-modules jdk.incubator.vector"
+# Copy Entrypoint
+COPY --chown=episteme:episteme docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-# Run the server
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+# Expose Gradio Port
+EXPOSE 7860
+
+# Environment Variables
+ENV MCP_SERVER_URL=http://localhost:8080/mcp/message
+ENV GRADIO_SERVER_NAME="0.0.0.0"
+
+ENTRYPOINT ["/app/entrypoint.sh"]

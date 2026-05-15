@@ -556,7 +556,14 @@ public class EpistemeMasterControl extends Application {
         for (int i = 0; i < libs.length; i++) {
             String[] lib = libs[i];
             boolean avail = false;
-            try { Class.forName(lib[1]); avail = true; } catch (Exception e) {}
+            try { 
+                Class.forName(lib[1]); 
+                avail = true; 
+            } catch (Throwable t) {
+                // If the class exists but fails to initialize (e.g. missing native libs), 
+                // we treat it as unavailable rather than crashing the dashboard.
+                avail = false; 
+            }
             
             String name = i18n.get(lib[0], lib[0].replace("lib.", "").replace(".name", ""));
             String desc = lib.length > 2 ? i18n.get(lib[2], "") : "";
