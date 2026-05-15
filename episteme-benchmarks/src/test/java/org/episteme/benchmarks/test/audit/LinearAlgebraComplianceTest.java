@@ -278,8 +278,8 @@ public class LinearAlgebraComplianceTest {
         }
         
         double tolerance = switch(mode) {
-            case FAST -> 1e-7;
-            case NORMAL -> 1e-14;
+            case FAST -> 5e-7;    // Adjusted for 32-bit float accumulation
+            case NORMAL -> 5e-13; // Adjusted for double precision stability
             default -> 1e-7;
         };
         

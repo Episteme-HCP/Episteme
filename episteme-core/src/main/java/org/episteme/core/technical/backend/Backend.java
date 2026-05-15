@@ -101,9 +101,16 @@ public interface Backend {
      * @return list of algorithm providers (may be empty, never null)
      */
     default List<AlgorithmProvider> getAlgorithmProviders() {
-        Object backend = createBackend();
-        if (backend instanceof AlgorithmProvider) {
-            return List.of((AlgorithmProvider) backend);
+        if (!isAvailable()) {
+            return List.of();
+        }
+        try {
+            Object backend = createBackend();
+            if (backend instanceof AlgorithmProvider) {
+                return List.of((AlgorithmProvider) backend);
+            }
+        } catch (Throwable t) {
+            System.err.println("[Backend] Failed to retrieve algorithm providers from " + getName() + ": " + t.getMessage());
         }
         return List.of();
     }

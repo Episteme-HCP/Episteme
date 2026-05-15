@@ -14,63 +14,67 @@ public class BenchmarkRegistry {
 
     public static List<RunnableBenchmark> discover() {
         List<RunnableBenchmark> all = new ArrayList<>();
-        // Use context class loader to ensure visibility across modules
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        if (loader == null) loader = BenchmarkRegistry.class.getClassLoader();
+        ClassLoader tempLoader = Thread.currentThread().getContextClassLoader();
+        if (tempLoader == null) tempLoader = BenchmarkRegistry.class.getClassLoader();
+        final ClassLoader loader = tempLoader;
         
+        String excludeFilter = System.getProperty("org.episteme.audit.exclude", "");
+        String[] excludes = excludeFilter.isEmpty() ? new String[0] : excludeFilter.split(",");
+
         try {
             // 1. Discover explicit benchmarks
             ServiceLoader<RunnableBenchmark> benchLoader = ServiceLoader.load(RunnableBenchmark.class, loader);
-            Iterator<RunnableBenchmark> benchIterator = benchLoader.iterator();
-            while (true) {
+            benchLoader.stream().forEach(provider -> {
                 try {
-                    if (!benchIterator.hasNext()) break;
-                    RunnableBenchmark b = benchIterator.next();
+                    String className = provider.type().getName();
+                    for (String ex : excludes) {
+                        if (className.toLowerCase().contains(ex.trim().toLowerCase())) return;
+                    }
+                    
+                    RunnableBenchmark b = provider.get();
                     if (b instanceof SystematicBenchmark) {
-                        expandSystematic((SystematicBenchmark<?>) b, all, loader);
+                        expandSystematic((SystematicBenchmark<?>) b, all, loader, excludes);
                     } else {
-                        // For explicit non-systematic benchmarks, we usually just add them once,
-                        // unless they explicitly want multiple modes. 
-                        // Here we just add them as is.
                         all.add(b);
                     }
                 } catch (Throwable e) {
                     System.err.println("[WARN] Skipping bad explicit benchmark: " + e.getMessage());
                 }
-            }
- 
+            });
+
             // 2. Discover all generic AlgorithmProviders and wrap them
             ServiceLoader<org.episteme.core.technical.algorithm.AlgorithmProvider> providerLoader = 
                     ServiceLoader.load(org.episteme.core.technical.algorithm.AlgorithmProvider.class, loader);
-            Iterator<org.episteme.core.technical.algorithm.AlgorithmProvider> providerIterator = providerLoader.iterator();
-            while (true) {
+            
+            providerLoader.stream().forEach(provider -> {
                 try {
-                    if (!providerIterator.hasNext()) break;
-                    org.episteme.core.technical.algorithm.AlgorithmProvider p = providerIterator.next();
+                    String className = provider.type().getName();
+                    for (String ex : excludes) {
+                        if (className.toLowerCase().contains(ex.trim().toLowerCase())) return;
+                    }
+
+                    org.episteme.core.technical.algorithm.AlgorithmProvider p = provider.get();
                     
-                    // Avoid duplicates if already covered by systematic expansion
+                    // Avoid duplicates
                     final String pClassName = p.getClass().getName();
                     final String pType = p.getAlgorithmType();
                     
                     if (all.stream().anyMatch(b -> {
                         org.episteme.core.technical.algorithm.AlgorithmProvider existing = b.getAlgorithmProviderInstance();
                         if (existing == null) return false;
-                        
-                        // Check if it's the same provider implementation class and algorithm type
                         return existing.getClass().getName().equals(pClassName) && 
                                (pType == null || pType.equals(existing.getAlgorithmType()));
                     })) {
-                        continue;
+                        return;
                     }
                     
-                    // Wrap with multiple modes
                     for (org.episteme.core.mathematics.context.MathContext.RealPrecision mode : org.episteme.core.mathematics.context.MathContext.RealPrecision.values()) {
                         all.add(wrapProvider(p, mode));
                     }
                 } catch (Throwable e) {
                     System.err.println("[WARN] Skipping bad algorithm provider: " + e.getMessage());
                 }
-            }
+            });
         } catch (Throwable t) {
             System.err.println("[ERROR] Critical failure during benchmark discovery: " + t.getMessage());
         }
@@ -140,41 +144,54 @@ public class BenchmarkRegistry {
         };
     }
 
-    private static <P extends org.episteme.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list, ClassLoader loader) {
+    private static <P extends org.episteme.core.technical.algorithm.AlgorithmProvider> void expandSystematic(SystematicBenchmark<P> base, List<RunnableBenchmark> list, ClassLoader loader, String[] excludes) {
         System.out.println("[DEBUG]   - Expanding systematic benchmark: " + base.getNameBase() + " using provider class: " + base.getProviderClass().getName());
         try {
             ServiceLoader<P> sLoader = ServiceLoader.load(base.getProviderClass(), loader);
-            Iterator<P> iterator = sLoader.iterator();
-            boolean found = false;
-            while (true) {
+            final boolean[] found = {false};
+            
+            sLoader.stream().forEach(provider -> {
                 try {
-                    if (!iterator.hasNext()) break;
-                    P p = iterator.next();
-                    found = true;
+                    String className = provider.type().getName();
+                    for (String ex : excludes) {
+                        if (className.toLowerCase().contains(ex.trim().toLowerCase())) return;
+                    }
+                    
+                    P p = provider.get();
+                    found[0] = true;
                     addSystematicInstance(base, p, list);
                 } catch (Throwable e) {
                     System.err.println("[WARN] Skipping bad systematic provider: " + e.getMessage());
                 }
-            }
+            });
             
             // Fallback: search in general AlgorithmProvider list if no specific providers found
-            if (!found) {
+            if (!found[0]) {
                 System.out.println("[DEBUG]   - No direct providers for " + base.getProviderClass().getSimpleName() + ". Attempting fallback discovery from general AlgorithmProviders...");
                 ServiceLoader<org.episteme.core.technical.algorithm.AlgorithmProvider> genLoader = 
                         ServiceLoader.load(org.episteme.core.technical.algorithm.AlgorithmProvider.class, loader);
-                for (org.episteme.core.technical.algorithm.AlgorithmProvider p : genLoader) {
-                    if (base.getProviderClass().isInstance(p)) {
-                        @SuppressWarnings("unchecked")
-                        P casted = (P) p;
-                        for (org.episteme.core.mathematics.context.MathContext.RealPrecision mode : org.episteme.core.mathematics.context.MathContext.RealPrecision.values()) {
-                            addSystematicInstance(base, casted, list, mode);
+                
+                genLoader.stream().forEach(provider -> {
+                    if (base.getProviderClass().isAssignableFrom(provider.type())) {
+                        try {
+                            String className = provider.type().getName();
+                            for (String ex : excludes) {
+                                if (className.toLowerCase().contains(ex.trim().toLowerCase())) return;
+                            }
+                            
+                            P casted = (P) provider.get();
+                            for (org.episteme.core.mathematics.context.MathContext.RealPrecision mode : org.episteme.core.mathematics.context.MathContext.RealPrecision.values()) {
+                                addSystematicInstance(base, casted, list, mode);
+                            }
+                            found[0] = true;
+                        } catch (Throwable e) {
+                            System.err.println("[WARN] Skipping bad fallback provider: " + e.getMessage());
                         }
-                        found = true;
                     }
-                }
+                });
             }
             
-            if (!found) {
+            if (!found[0]) {
                 System.out.println("[DEBUG]   - Discovery finished with 0 providers for " + base.getProviderClass().getSimpleName());
             }
         } catch (Throwable t) {

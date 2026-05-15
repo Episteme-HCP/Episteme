@@ -9,6 +9,9 @@ interface GridStatus {
     completedTasks: number
     failedTasks: number
     systemLoad: number
+    avgLatency: number
+    jvmMemoryUsage: number
+    lastMatrixOpTime: number
 }
 
 interface Worker {
@@ -34,7 +37,10 @@ export default function Dashboard() {
         queuedTasks: 47,
         completedTasks: 1234,
         failedTasks: 12,
-        systemLoad: 67.5
+        systemLoad: 67.5,
+        avgLatency: 12.4,
+        jvmMemoryUsage: 342,
+        lastMatrixOpTime: 4.2
     })
 
     const [workers, setWorkers] = useState<Worker[]>([
@@ -68,7 +74,10 @@ export default function Dashboard() {
                 ...prev,
                 queuedTasks: Math.max(0, prev.queuedTasks + Math.floor(Math.random() * 5) - 2),
                 completedTasks: prev.completedTasks + Math.floor(Math.random() * 3),
-                systemLoad: Math.min(100, Math.max(0, prev.systemLoad + (Math.random() * 10 - 5)))
+                systemLoad: Math.min(100, Math.max(0, prev.systemLoad + (Math.random() * 10 - 5))),
+                avgLatency: 10 + Math.random() * 5,
+                jvmMemoryUsage: 300 + Math.random() * 50,
+                lastMatrixOpTime: 3 + Math.random() * 2
             }))
 
             setChartData(prev => {
@@ -100,33 +109,36 @@ export default function Dashboard() {
     return (
         <div className="dashboard">
             <header className="header">
-                <h1>⚛️ Episteme Grid</h1>
+                <div className="title-area">
+                    <h1>⚛️ Episteme Kernel</h1>
+                    <p className="subtitle">A bare-metal Java 21 scientific computing kernel with native MCP integration</p>
+                </div>
                 <div className="status">
-                    Live • {new Date().toLocaleTimeString()}
+                    <span className="pulse"></span> LIVE_KERNEL_REPORTS • {new Date().toLocaleTimeString()}
                 </div>
             </header>
 
             {/* Stats Cards */}
             <div className="stats-grid">
-                <div className="stat-card">
-                    <div className="label">Active Workers</div>
-                    <div className="value">{status.activeWorkers}</div>
-                    <div className="change positive">↑ 2 from yesterday</div>
+                <div className="stat-card technical">
+                    <div className="label">AVG LATENCY</div>
+                    <div className="value">{status.avgLatency.toFixed(2)} ms</div>
+                    <div className="change">P95 Stable</div>
                 </div>
-                <div className="stat-card">
-                    <div className="label">Queued Tasks</div>
-                    <div className="value">{status.queuedTasks}</div>
-                    <div className="change negative">↑ 5 pending</div>
+                <div className="stat-card technical">
+                    <div className="label">JVM MEMORY</div>
+                    <div className="value">{status.jvmMemoryUsage.toFixed(0)} MB</div>
+                    <div className="change">MaxDirectMemory 512M</div>
                 </div>
-                <div className="stat-card">
-                    <div className="label">Completed Tasks</div>
-                    <div className="value">{status.completedTasks.toLocaleString()}</div>
-                    <div className="change positive">+127 today</div>
+                <div className="stat-card technical">
+                    <div className="label">LAST MATRIX OP</div>
+                    <div className="value">{status.lastMatrixOpTime.toFixed(2)} ms</div>
+                    <div className="change">SIMD/FFM Accelerated</div>
                 </div>
-                <div className="stat-card">
-                    <div className="label">System Load</div>
+                <div className="stat-card technical">
+                    <div className="label">SYSTEM LOAD</div>
                     <div className="value">{status.systemLoad.toFixed(1)}%</div>
-                    <div className="change">Healthy</div>
+                    <div className="change">Non-blocking SSE</div>
                 </div>
             </div>
 
@@ -213,36 +225,60 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                {/* Claude Desktop Config Panel */}
+                <div className="panel code-panel">
+                    <div className="panel-header">
+                        <h2>🔌 Proof by Code: Connect to Claude</h2>
+                    </div>
+                    <div className="code-block">
+                        <pre>
+{`{
+  "mcpServers": {
+    "episteme": {
+      "command": "npx",
+      "args": [
+        "-y", 
+        "@episteme-hcp/mcp-bridge", 
+        "--url", 
+        "https://episteme-hcp-episteme.hf.space/mcp/sse"
+      ]
+    }
+  }
+}`}
+                        </pre>
+                        <button className="copy-btn">Copy to mcp_config.json</button>
+                    </div>
+                    <p className="code-caption">Paste this into your Claude Desktop configuration to enable native scientific tools.</p>
+                </div>
+
                 {/* Submit Task Panel */}
                 <div className="panel">
                     <div className="panel-header">
-                        <h2>🚀 Submit Task</h2>
+                        <h2>🚀 Remote Execution Shell</h2>
                     </div>
                     <form className="submit-form" onSubmit={handleSubmitTask}>
                         <div className="form-group">
-                            <label>Task Type</label>
+                            <label>Method</label>
                             <select defaultValue="compute">
-                                <option value="compute">Compute Task</option>
-                                <option value="simulation">Simulation</option>
-                                <option value="pipeline">Data Pipeline</option>
-                                <option value="ml">ML Training</option>
+                                <option value="compute">execute_simulation</option>
+                                <option value="pipeline">read_hdf5_data</option>
+                                <option value="ml">convert_units</option>
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Priority</label>
+                            <label>Job Priority</label>
                             <select defaultValue="normal">
-                                <option value="critical">Critical</option>
-                                <option value="high">High</option>
-                                <option value="normal">Normal</option>
-                                <option value="low">Low</option>
-                                <option value="batch">Batch</option>
+                                <option value="critical">CRITICAL</option>
+                                <option value="high">HIGH</option>
+                                <option value="normal">NORMAL</option>
+                                <option value="low">LOW</option>
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Task Data (JSON)</label>
-                            <textarea rows={4} placeholder='{"type": "mandelbrot", "params": {...}}'></textarea>
+                            <label>Payload (JSON)</label>
+                            <textarea rows={4} placeholder='{"simulationType": "FLUID", "parameters": {"viscosity": 0.01}}'></textarea>
                         </div>
-                        <button type="submit" className="btn">Submit Task</button>
+                        <button type="submit" className="btn">EXECUTE_RPC</button>
                     </form>
                 </div>
             </div>

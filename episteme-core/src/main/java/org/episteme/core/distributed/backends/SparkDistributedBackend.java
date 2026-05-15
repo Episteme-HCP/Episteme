@@ -9,6 +9,7 @@ import org.episteme.core.technical.backend.distributed.DistributedBackend;
 import org.episteme.core.technical.backend.distributed.DistributedContext;
 import org.episteme.core.distributed.SparkDistributedContext;
 import com.google.auto.service.AutoService;
+import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
@@ -19,7 +20,7 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService(AlgorithmProvider.class)
+@AutoService({Backend.class, AlgorithmProvider.class})
 public class SparkDistributedBackend implements DistributedBackend {
 
     private boolean available;

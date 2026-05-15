@@ -69,19 +69,23 @@ public class MCPToolRegistry {
             "{\"type\": \"object\", \"properties\": {}}");
         registerTool("execute_simulation", "Start a scientific simulation task",
             "{\"type\": \"object\", \"properties\": {\"simulationType\": {\"type\": \"string\", \"enum\": [\"FLUID\", \"NBODY\", \"SIR\", \"MIGRATION\"]}, \"parameters\": {\"type\": \"object\"}}, \"required\": [\"simulationType\"]}");
+
+        registerTool("get_task_status", "Check the status and result of a long-running task",
+            "{\"type\": \"object\", \"properties\": {\"taskId\": {\"type\": \"string\"}}, \"required\": [\"taskId\"]}");
         
-        // Dynamic discovery of AlgorithmProviders
+        /* 
+        // Dynamic discovery of AlgorithmProviders is disabled for security on production (Hugging Face)
+        // We favor explicit registration to ensure a rigid and audited contract.
         var providers = context.getBeansOfType(org.episteme.core.technical.algorithm.AlgorithmProvider.class);
         for (var provider : providers.values()) {
             if (provider.isAvailable()) {
                 String toolName = provider.getName().toLowerCase().replace(" ", "_").replace("/", "_");
                 String description = String.format("Execute scientific algorithm: %s (%s)", provider.getName(), provider.getAlgorithmType());
-                // For now, we use a generic schema. In a full implementation, 
-                // we'd use reflection or a schema-defining interface.
                 String schema = "{\"type\": \"object\", \"properties\": {\"params\": {\"type\": \"object\"}}}";
                 registerTool(toolName, description, schema);
             }
         }
+        */
 
         LOG.info("Registered {} dynamic MCP tools from grid algorithms", tools.size());
     }

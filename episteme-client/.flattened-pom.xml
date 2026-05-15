@@ -5,10 +5,10 @@
   <parent>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta3</version>
+    <version>1.0.0-beta3.0.13</version>
   </parent>
   <artifactId>episteme-client</artifactId>
-  <version>1.0.0-beta3</version>
+  <version>1.0.0-beta3.0.13</version>
   <name>Episteme Client Applications</name>
   <description>JavaFX client applications for the Episteme Grid (Whiteboard, Monitor, Browser)</description>
   <licenses>

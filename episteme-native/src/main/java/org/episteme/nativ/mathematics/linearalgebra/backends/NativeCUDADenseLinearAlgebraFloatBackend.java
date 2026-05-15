@@ -114,7 +114,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f), d_A, n, d_C, m));
             
             float[] result = new float[m * n];
-            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, m * n);
+            MemorySegment segC = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, m * n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC, d_C, (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
             return fromFloatArray(result, n, m, (Ring<E>) a.getScalarRing());
@@ -130,7 +130,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) n * 4, tracker);
             MemorySegment d_B = malloc((long) n * 4, tracker);
-            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_FLOAT);
+            MemorySegment d_Res = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT);
             
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b)), (long) n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
@@ -146,7 +146,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) n * 8, tracker);
             MemorySegment d_B = malloc((long) n * 8, tracker);
-            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+            MemorySegment d_Res = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, 2);
             
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatVec(a)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_B, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatVec(b)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
@@ -164,7 +164,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) n * 4, tracker);
-            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_FLOAT);
+            MemorySegment d_Res = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT);
             
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
@@ -178,7 +178,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
             MemorySegment d_A = malloc((long) n * 8, tracker);
-            MemorySegment d_Res = arena.allocate(ValueLayout.JAVA_FLOAT);
+            MemorySegment d_Res = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT);
             
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatVec(a)), (long) n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
@@ -223,7 +223,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 d_C, rows));
             
             float[] result = new float[rows * cols * 2];
-            MemorySegment host = arena.allocate(ValueLayout.JAVA_FLOAT, (long) rows * cols * 2);
+            MemorySegment host = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) rows * cols * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, host, d_C, (long) rows * cols * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(host, ValueLayout.JAVA_FLOAT, 0, result, 0, rows * cols * 2);
             return fromComplexFloatArray(result, cols, rows, (Ring<E>) a.getScalarRing());
@@ -317,7 +317,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, beta), d_B, n, d_C, n));
             
             float[] result = new float[m * n];
-            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, m * n);
+            MemorySegment segC = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, m * n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC, d_C, (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
             return fromFloatArray(result, m, n, (Ring<E>) a.getScalarRing());
@@ -342,7 +342,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, br, bi), d_B, n, d_C, n));
             
             float[] result = new float[m * n * 2];
-            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, m * n * 2);
+            MemorySegment segC = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, m * n * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC, d_C, (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n * 2);
             return fromComplexFloatArray(result, m, n, (Ring<E>) a.getScalarRing());
@@ -381,7 +381,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f), d_Y, 1));
             
             float[] result = new float[m];
-            MemorySegment segY = arena.allocate(ValueLayout.JAVA_FLOAT, m);
+            MemorySegment segY = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, m);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY, d_Y, (long) m * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segY, ValueLayout.JAVA_FLOAT, 0, result, 0, m);
             
@@ -413,7 +413,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, new float[]{0.0f, 0.0f}), d_Y, 1));
             
             float[] result = new float[m * 2];
-            MemorySegment segY = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * 2);
+            MemorySegment segY = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segY, d_Y, (long) m * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segY, ValueLayout.JAVA_FLOAT, 0, result, 0, m * 2);
             
@@ -448,7 +448,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f), d_C, n));
             
             float[] result = new float[m * n];
-            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
+            MemorySegment segC = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC, d_C, (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
             
@@ -474,7 +474,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, new float[]{1.0f, 0.0f}), d_B, n, d_A, k, 
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, new float[]{0.0f, 0.0f}), d_C, n));
             float[] result = new float[m * n * 2];
-            MemorySegment segC = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+            MemorySegment segC = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segC, d_C, (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segC, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n * 2);
             return fromComplexFloatArray(result, m, n, (Ring<E>) a.getScalarRing());
@@ -502,7 +502,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aT), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGETRF_BUFFER_SIZE, handle, m, n, d_A, m, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 4, tracker);
@@ -510,7 +510,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGETRF, handle, m, n, d_A, m, d_Work, d_Ipiv, d_Info));
             
             float[] packed = new float[m * n];
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
+            MemorySegment segA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, packed, 0, m * n);
             
@@ -570,7 +570,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aData), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGEQRF_BUFFER_SIZE, handle, m, n, d_A, m, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 4, tracker);
@@ -578,7 +578,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGEQRF, handle, m, n, d_A, m, d_Tau, d_Work, workSize, d_Info));
             
             float[] result = new float[m * n];
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
+            MemorySegment segA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) m * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n);
             
@@ -626,7 +626,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aData), (long) m * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGESVD_BUFFER_SIZE, handle, m, n, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 4, tracker);
@@ -635,7 +635,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGESVD, handle, (int)'A', (int)'A', m, n, d_A, m, d_S, d_U, m, d_VT, n, d_Work, workSize, MemorySegment.NULL, d_Info));
             
             float[] sArr = new float[Math.min(m, n)];
-            MemorySegment segS = arena.allocate(ValueLayout.JAVA_FLOAT, Math.min(m, n));
+            MemorySegment segS = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, Math.min(m, n));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segS, d_S, (long) Math.min(m, n) * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segS, ValueLayout.JAVA_FLOAT, 0, sArr, 0, Math.min(m, n));
             
@@ -680,7 +680,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment handle = CUDAManager.getCusolverHandle();
             
             // 1. Get workspace size
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGETRF_BUFFER_SIZE, handle, n, n, d_A, n, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 4, tracker);
@@ -692,7 +692,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGETRS, handle, 0, n, 1, d_A, n, d_Ipiv, d_B, n, d_Info));
             
             float[] result = new float[n];
-            MemorySegment segB = arena.allocate(ValueLayout.JAVA_FLOAT, n);
+            MemorySegment segB = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segB, d_B, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segB, ValueLayout.JAVA_FLOAT, 0, result, 0, n);
             
@@ -736,7 +736,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             
             MemorySegment handle = CUDAManager.getCusolverHandle();
             
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGETRF_BUFFER_SIZE, handle, n, n, d_A, n, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 4, tracker);
@@ -745,7 +745,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SGETRS, handle, 0, n, m, d_A, n, d_Ipiv, d_B, n, d_Info));
             
             float[] result = new float[n * m];
-            MemorySegment segB = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * m);
+            MemorySegment segB = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n * m);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segB, d_B, (long) n * m * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segB, ValueLayout.JAVA_FLOAT, 0, result, 0, n * m);
             
@@ -791,7 +791,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f), d_A, n, d_B, 1));
             
             float[] result = new float[n];
-            MemorySegment hostB = arena.allocate(ValueLayout.JAVA_FLOAT, n);
+            MemorySegment hostB = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostB, d_B, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostB, ValueLayout.JAVA_FLOAT, 0, result, 0, n);
             return fromFloatVec(result, (Ring<E>) a.getScalarRing());
@@ -820,7 +820,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
                 NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f), d_A, n, d_B, 1));
             
             float[] result = new float[n * 2];
-            MemorySegment hostB = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * 2);
+            MemorySegment hostB = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostB, d_B, (long) n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostB, ValueLayout.JAVA_FLOAT, 0, result, 0, n * 2);
             return fromComplexFloatVec(result, (Ring<E>) a.getScalarRing());
@@ -842,7 +842,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) n * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SPOTRF_BUFFER_SIZE, handle, 0, n, d_A, n, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 4, tracker);
@@ -850,7 +850,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SPOTRF, handle, 0, n, d_A, n, d_Work, workSize, d_Info));
             
             float[] result = new float[n * n];
-            MemorySegment hostA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n);
+            MemorySegment hostA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n * n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostA, d_A, (long) n * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostA, ValueLayout.JAVA_FLOAT, 0, result, 0, n * n);
             
@@ -873,7 +873,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a)), (long) n * n * 4, CUDAManager.CUDA_MEMCPY_H_TO_D));
             
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             // JobV=VECTORS(1), Uplo=LOWER(0)
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_SSYEVD_BUFFER_SIZE, handle, 1, 0, n, d_A, n, d_W, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
@@ -883,8 +883,8 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             
             float[] vData = new float[n * n];
             float[] wData = new float[n];
-            MemorySegment hostA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n);
-            MemorySegment hostW = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n);
+            MemorySegment hostA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n * n);
+            MemorySegment hostW = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostA, d_A, (long) n * n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostW, d_W, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostA, ValueLayout.JAVA_FLOAT, 0, vData, 0, n * n);
@@ -1067,13 +1067,13 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             }
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aT), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGETRF_BUFFER_SIZE, handle, m, n, d_A, m, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 8, tracker);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGETRF, handle, m, n, d_A, m, d_Work, d_Ipiv, d_Info));
             float[] packed = new float[m * n * 2];
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+            MemorySegment segA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, packed, 0, m * n * 2);
             float[] result = new float[m * n * 2];
@@ -1110,13 +1110,13 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment d_Info = malloc(4, tracker);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aData), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGEQRF_BUFFER_SIZE, handle, m, n, d_A, m, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 8, tracker);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGEQRF, handle, m, n, d_A, m, d_Tau, d_Work, workSize, d_Info));
             float[] result = new float[m * n * 2];
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+            MemorySegment segA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) m * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, result, 0, m * n * 2);
             Ring<E> ring = (Ring<E>) a.getScalarRing();
@@ -1138,13 +1138,13 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment d_Info = malloc(4, tracker);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aData), (long) n * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CPOTRF_BUFFER_SIZE, handle, 0, n, d_A, n, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 8, tracker);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CPOTRF, handle, 0, n, d_A, n, d_Work, workSize, d_Info));
             float[] result = new float[n * n * 2];
-            MemorySegment segA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n * 2);
+            MemorySegment segA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n * n * 2);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segA, d_A, (long) n * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segA, ValueLayout.JAVA_FLOAT, 0, result, 0, n * n * 2);
             Ring<E> ring = (Ring<E>) a.getScalarRing();
@@ -1165,15 +1165,15 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment d_Info = malloc(4, tracker);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aData), (long) n * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CHEEVD_BUFFER_SIZE, handle, 1, 0, n, d_A, n, d_W, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 8, tracker);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CHEEVD, handle, 1, 0, n, d_A, n, d_W, d_Work, workSize, d_Info));
             float[] vData = new float[n * n * 2];
             float[] wData = new float[n];
-            MemorySegment hostA = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n * n * 2);
-            MemorySegment hostW = arena.allocate(ValueLayout.JAVA_FLOAT, (long) n);
+            MemorySegment hostA = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n * n * 2);
+            MemorySegment hostW = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) n);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostA, d_A, (long) n * n * 8, CUDAManager.CUDA_MEMCPY_D_TO_H));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, hostW, d_W, (long) n * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(hostA, ValueLayout.JAVA_FLOAT, 0, vData, 0, n * n * 2);
@@ -1201,13 +1201,13 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
             MemorySegment d_Info = malloc(4, tracker);
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, d_A, NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, aData), (long) m * n * 8, CUDAManager.CUDA_MEMCPY_H_TO_D));
             MemorySegment handle = CUDAManager.getCusolverHandle();
-            MemorySegment pWorkSize = arena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment pWorkSize = NativeSafe.allocate(arena, ValueLayout.JAVA_INT);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGESVD_BUFFER_SIZE, handle, m, n, pWorkSize));
             int workSize = pWorkSize.get(ValueLayout.JAVA_INT, 0);
             MemorySegment d_Work = malloc((long) workSize * 8, tracker);
             checkCusolver((int) NativeSafe.invoke(CUDAManager.CUSOLVER_CGESVD, handle, (int)'A', (int)'A', m, n, d_A, m, d_S, d_U, m, d_VT, n, d_Work, workSize, MemorySegment.NULL, d_Info));
             float[] sArr = new float[Math.min(m, n)];
-            MemorySegment segS = arena.allocate(ValueLayout.JAVA_FLOAT, Math.min(m, n));
+            MemorySegment segS = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, Math.min(m, n));
             checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMCPY, segS, d_S, (long) Math.min(m, n) * 4, CUDAManager.CUDA_MEMCPY_D_TO_H));
             MemorySegment.copy(segS, ValueLayout.JAVA_FLOAT, 0, sArr, 0, Math.min(m, n));
             Ring<E> ring = (Ring<E>) a.getScalarRing();

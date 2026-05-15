@@ -7,6 +7,7 @@ COPY pom.xml .
 COPY episteme-core/pom.xml episteme-core/
 COPY episteme-natural/pom.xml episteme-natural/
 COPY episteme-social/pom.xml episteme-social/
+COPY episteme-native/pom.xml episteme-native/
 COPY episteme-server/pom.xml episteme-server/
 
 # Pre-fetch dependencies
@@ -16,19 +17,27 @@ RUN mvn dependency:go-offline -B
 COPY episteme-core episteme-core
 COPY episteme-natural episteme-natural
 COPY episteme-social episteme-social
+COPY episteme-native episteme-native
 COPY episteme-server episteme-server
 
-# Build only the server and its dependencies
-# Note: We skip tests and use -pl/-am to avoid building episteme-native which requires OpenCL/CUDA
-# We add --enable-preview for Vector API / Panama compatibility in Java 21/25
+# Build the server and all its dependencies (including native backends)
 RUN mvn clean install -pl episteme-server -am -DskipTests -Dmaven.compiler.release=21 -Dmaven.compiler.compilerArgs="--enable-preview"
 
 # Stage 2: Run
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+# Install native dependencies required by Panama/FFM backends
+RUN apt-get update && apt-get install -y \
+    libopenblas0 \
+    libmpfr6 \
+    libhdf5-103 \
+    libfftw3-double3 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set non-root user for security (industrial standard)
-RUN addgroup -S episteme && adduser -S episteme -G episteme
+RUN groupadd -r episteme && useradd -r -g episteme episteme
+RUN mkdir -p /app/data && chown episteme:episteme /app/data
 USER episteme
 
 # Copy the executable jar from the build stage
@@ -38,7 +47,7 @@ COPY --from=build /app/episteme-server/target/episteme-server-*.jar app.jar
 EXPOSE 8080
 
 # Environment variables for industrial tuning
-ENV JAVA_OPTS="-Xms512m -Xmx2g -Djava.security.egd=file:/dev/./urandom --add-modules jdk.incubator.vector"
+ENV JAVA_OPTS="-Xms512m -Xmx1536m -XX:MaxDirectMemorySize=512m -Djava.security.egd=file:/dev/./urandom --add-modules jdk.incubator.vector"
 
 # Run the server
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

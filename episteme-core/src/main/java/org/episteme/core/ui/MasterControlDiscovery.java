@@ -153,10 +153,10 @@ public class MasterControlDiscovery {
 
         if (allDiscoveredClasses == null) {
             try {
-                // Wait for background scan if not finished
-                allDiscoveredClasses = discoveryFuture.get(5, java.util.concurrent.TimeUnit.SECONDS);
+                // Wait for background scan if not finished (increased timeout to 15s)
+                allDiscoveredClasses = discoveryFuture.get(15, java.util.concurrent.TimeUnit.SECONDS);
             } catch (Exception e) {
-                logger.error("Background discovery failed or timed out", e);
+                logger.error("Background discovery failed or timed out after 15s", e);
                 allDiscoveredClasses = new ArrayList<>();
             }
         }
@@ -238,13 +238,13 @@ public class MasterControlDiscovery {
 
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         
-        // Filter paths to keep only Episteme-related or potential directories
+        // Filter paths to keep only directories or JARs that are not system-related
         List<String> filteredPaths = allPaths.stream()
             .filter(p -> {
                 String lp = p.toLowerCase();
-                if (lp.contains("episteme")) return true;
-                if (new java.io.File(p).isDirectory()) return true;
-                return false;
+                // We keep everything that isn't a known system JAR to be safe
+                if (isSystemJar(lp)) return false;
+                return true;
             })
             .collect(java.util.stream.Collectors.toList());
 

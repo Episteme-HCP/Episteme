@@ -33,6 +33,8 @@ public final class NativeRealBig extends Real {
     @SuppressWarnings("unused")
     private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
 
+    private static final Cleaner CLEANER = Cleaner.create();
+
     /**
      * Creates a new NativeRealBig with the specified value and precision.
      */
@@ -45,7 +47,7 @@ public final class NativeRealBig extends Real {
         // Ensure manual cleanup via MPFR_CLEAR if the arena is not automatically cleaning up correctly
         // but since we use Arena.ofAuto(), GC will handle the MemorySegment, but mpfr_t internal
         // memory (limbs) must be freed via mpfr_clear.
-        Cleaner.create().register(this, () -> {
+        CLEANER.register(this, () -> {
              try {
                  // Note: This must be done via a separate static method or lambda that doesn't capture 'this'
                  // but captures the raw ptr. For simplicity, we assume Arena.ofAuto() enough for now

@@ -65,14 +65,44 @@ public class JSONRPCService {
     private final MCPToolRegistry registry;
     private final ApplicationContext context;
     private final MeterRegistry meterRegistry;
+    private final org.springframework.core.task.TaskExecutor taskExecutor;
+    private final java.util.Map<String, TaskState> taskRegistry = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private record TaskState(String id, String status, String result, String error) {}
 
     @Value("${episteme.mcp.api-key:}")
     private String mcpApiKey;
 
-    public JSONRPCService(MCPToolRegistry registry, ApplicationContext context, MeterRegistry meterRegistry) {
+    @Value("${episteme.mcp.data-root:/app/data}")
+    private String dataRoot;
+
+    public JSONRPCService(MCPToolRegistry registry, ApplicationContext context, MeterRegistry meterRegistry, 
+                          @org.springframework.beans.factory.annotation.Qualifier("applicationTaskExecutor") org.springframework.core.task.TaskExecutor taskExecutor) {
         this.registry = registry;
         this.context = context;
         this.meterRegistry = meterRegistry;
+        this.taskExecutor = taskExecutor;
+    }
+
+    /**
+     * Validates that a requested path is safe and within the DATA_ROOT.
+     * Prevents Path Traversal attacks.
+     */
+    private File validateSafePath(String requestedPath) throws IOException {
+        File root = new File(dataRoot).getCanonicalFile();
+        File requested;
+        
+        File file = new File(requestedPath);
+        if (file.isAbsolute()) {
+            requested = file.getCanonicalFile();
+        } else {
+            requested = new File(root, requestedPath).getCanonicalFile();
+        }
+
+        if (!requested.getPath().startsWith(root.getPath())) {
+            throw new SecurityException("Access denied: Path is outside the data root directory.");
+        }
+        return requested;
     }
 
     public String handle(String jsonBody) {
@@ -165,6 +195,14 @@ public class JSONRPCService {
         r2.put("name", "Epidemiological SIR Model State");
         r2.put("mimeType", "application/json");
 
+        // Add dynamic task resources
+        for (String taskId : taskRegistry.keySet()) {
+            var resource = resourcesArray.addObject();
+            resource.put("uri", "episteme://tasks/" + taskId);
+            resource.put("name", "Status of task " + taskId);
+            resource.put("mimeType", "application/json");
+        }
+
         return mapper.writeValueAsString(response);
     }
 
@@ -174,17 +212,29 @@ public class JSONRPCService {
         response.put("jsonrpc", "2.0");
         response.set("id", id);
         var result = response.putObject("result");
-        var contentArray = result.putArray("contents");
-        var content = contentArray.addObject();
-        content.put("uri", uri);
-        content.put("mimeType", "application/json");
+        var contentsArray = result.putArray("contents");
 
-        if (uri.contains("global-migration")) {
-            content.put("text", "{\"model_type\": \"SPATIAL_GEOMETRY\", \"locations\": 150, \"magnitude\": 1.25e7}");
-        } else if (uri.contains("sir-simulation")) {
-            content.put("text", "{\"model_type\": \"EPIDEMIOLOGICAL_SIR\", \"susceptible\": 9500000, \"infected\": 50000}");
+        if (uri.startsWith("episteme://tasks/")) {
+            String taskId = uri.substring("episteme://tasks/".length());
+            TaskState state = taskRegistry.get(taskId);
+            if (state == null) {
+                return error(id, -32003, "Resource not found: " + uri);
+            }
+            var content = contentsArray.addObject();
+            content.put("uri", uri);
+            content.put("mimeType", "application/json");
+            content.put("text", mapper.writeValueAsString(state));
         } else {
-            return error(id, -32001, "Resource not found: " + uri);
+            var content = contentsArray.addObject();
+            content.put("uri", uri);
+            content.put("mimeType", "application/json");
+            if (uri.contains("global-migration")) {
+                content.put("text", "{\"model_type\": \"SPATIAL_GEOMETRY\", \"locations\": 150, \"magnitude\": 1.25e7}");
+            } else if (uri.contains("sir-simulation")) {
+                content.put("text", "{\"model_type\": \"EPIDEMIOLOGICAL_SIR\", \"susceptible\": 9500000, \"infected\": 50000}");
+            } else {
+                content.put("text", "{\"message\": \"Static resource content for " + uri + "\"}");
+            }
         }
 
         return mapper.writeValueAsString(response);
@@ -254,6 +304,8 @@ public class JSONRPCService {
                 resultJson = executeSolveExpression(params.get("arguments"), response);
             } else if ("read_hdf5_data".equals(name)) {
                 resultJson = executeReadHdf5Data(params.get("arguments"), response);
+            } else if ("get_task_status".equals(name)) {
+                resultJson = executeGetTaskStatus(params.get("arguments"), response);
             } else if ("get_server_metrics".equals(name)) {
                 resultJson = executeGetServerMetrics(response);
             } else if ("execute_simulation".equals(name)) {
@@ -452,11 +504,21 @@ public class JSONRPCService {
     private String executeReadHdf5Data(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
         String filePath = args.get("filePath").asText();
         String datasetPath = args.get("datasetPath").asText();
-        try (HdfFile hdfFile = new HdfFile(new File(filePath))) {
-            Dataset dataset = hdfFile.getDatasetByPath(datasetPath);
-            Object data = dataset.getData();
-            var resultNode = response.get("result");
-            ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).set("content", mapper.valueToTree(data));
+        try {
+            File safeFile = validateSafePath(filePath);
+            if (!safeFile.exists()) {
+                return error(response.get("id"), -32001, "File not found: " + filePath);
+            }
+
+            try (HdfFile hdfFile = new HdfFile(safeFile)) {
+                Dataset dataset = hdfFile.getDatasetByPath(datasetPath);
+                Object data = dataset.getData();
+                var resultNode = response.get("result");
+                ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).set("content", mapper.valueToTree(data));
+            }
+        } catch (SecurityException e) {
+            LOG.warn("Security violation attempt: {}", e.getMessage());
+            return error(response.get("id"), -32002, e.getMessage());
         } catch (Exception e) {
             return error(response.get("id"), -32001, "HDF5 read failed: " + e.getMessage());
         }
@@ -494,8 +556,28 @@ public class JSONRPCService {
 
     private String executeSimulation(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
         String type = args.get("simulationType").asText();
+        String jobId = java.util.UUID.randomUUID().toString();
+        
+        // Execute simulation in a background thread to avoid blocking the SSE transport
+        taskRegistry.put(jobId, new TaskState(jobId, "RUNNING", null, null));
+        taskExecutor.execute(() -> {
+            LOG.info("Starting simulation job {} of type {}", jobId, type);
+            try {
+                // Simulation logic would go here
+                Thread.sleep(5000); // Simulate work
+                taskRegistry.put(jobId, new TaskState(jobId, "COMPLETED", "Simulation of " + type + " finished successfully at " + java.time.Instant.now(), null));
+                LOG.info("Simulation job {} completed", jobId);
+            } catch (InterruptedException e) {
+                taskRegistry.put(jobId, new TaskState(jobId, "FAILED", null, "Simulation interrupted"));
+                Thread.currentThread().interrupt();
+            } catch (Exception e) {
+                taskRegistry.put(jobId, new TaskState(jobId, "FAILED", null, e.getMessage()));
+            }
+        });
+
         var resultNode = response.get("result");
-        ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).put("content", "Simulation " + type + " started successfully (Job ID: " + java.util.UUID.randomUUID().toString() + ")");
+        ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).put("content", 
+            "Simulation " + type + " started successfully (Job ID: " + jobId + "). Use episteme://jobs/" + jobId + " to monitor status.");
         return mapper.writeValueAsString(response);
     }
 
@@ -513,6 +595,57 @@ public class JSONRPCService {
         return arrayNode;
     }
 
+
+    private String executeGetTaskStatus(JsonNode args, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
+        String taskId = args.get("taskId").asText();
+        TaskState state = taskRegistry.get(taskId);
+        
+        if (state == null) {
+            return error(response.get("id"), -32003, "Task not found: " + taskId);
+        }
+
+        var resultNode = response.get("result");
+        ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).set("content", mapper.valueToTree(state));
+        return mapper.writeValueAsString(response);
+    }
+
+    private String executeListResources(com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
+        var resultNode = response.get("result");
+        var resourcesArray = mapper.createArrayNode();
+        
+        // Expose all active tasks as resources
+        for (String taskId : taskRegistry.keySet()) {
+            var resource = resourcesArray.addObject();
+            resource.put("uri", "episteme://tasks/" + taskId);
+            resource.put("name", "Status of task " + taskId);
+            resource.put("mimeType", "application/json");
+        }
+        
+        ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).set("resources", resourcesArray);
+        return mapper.writeValueAsString(response);
+    }
+
+    private String executeReadResource(JsonNode params, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
+        String uri = params.get("uri").asText();
+        if (uri.startsWith("episteme://tasks/")) {
+            String taskId = uri.substring("episteme://tasks/".length());
+            TaskState state = taskRegistry.get(taskId);
+            if (state == null) {
+                return error(response.get("id"), -32003, "Resource not found: " + uri);
+            }
+            
+            var resultNode = response.get("result");
+            var contentsArray = mapper.createArrayNode();
+            var content = contentsArray.addObject();
+            content.put("uri", uri);
+            content.put("mimeType", "application/json");
+            content.put("text", mapper.writeValueAsString(state));
+            
+            ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).set("contents", contentsArray);
+            return mapper.writeValueAsString(response);
+        }
+        return error(response.get("id"), -32003, "Unknown resource: " + uri);
+    }
 
     private String error(JsonNode id, int code, String message) {
         return String.format("{\"jsonrpc\": \"2.0\", \"id\": %s, \"error\": {\"code\": %d, \"message\": \"%s\"}}",

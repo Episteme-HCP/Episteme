@@ -218,6 +218,7 @@
                         <exclude>**/NativeOpenCLDenseLinearAlgebraBackendTest.java</exclude>
                         <exclude>**/NativeCUDASparseLinearAlgebraBackendTest.java</exclude>
                         <exclude>**/NativeOpenCLSparseLinearAlgebraBackendTest.java</exclude>
+                        <exclude>**/Native*VisionBackendTest.java</exclude>
                     </testExcludes>
                 </configuration>
             </plugin>

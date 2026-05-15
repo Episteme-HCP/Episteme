@@ -240,7 +240,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
 
     @Override
     public String getType() {
-        return "math";
+        return "linear-algebra";
     }
 
     @Override

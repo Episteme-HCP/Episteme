@@ -74,45 +74,65 @@ public class BackendDiscovery {
             String excludeFilter = System.getProperty("org.episteme.audit.exclude", "");
             String[] excludes = excludeFilter.isEmpty() ? new String[0] : excludeFilter.split(",");
 
-            loader.stream().forEach(provider -> {
-                String className = provider.type().getName();
-                boolean excluded = false;
-                for (String ex : excludes) {
-                    if (className.toLowerCase().contains(ex.trim().toLowerCase())) {
-                        excluded = true;
-                        break;
-                    }
-                }
-                
-                if (excluded) {
-                    logger.debug("BackendDiscovery: Skipping excluded class: {}", className);
-                    return;
+            Iterator<ServiceLoader.Provider<Backend>> iterator = loader.stream().iterator();
+            while (true) {
+                ServiceLoader.Provider<Backend> provider;
+                try {
+                    if (!iterator.hasNext()) break;
+                    provider = iterator.next();
+                } catch (ServiceConfigurationError e) {
+                    logger.error("BackendDiscovery: Stale or invalid SPI entry found during iteration: {}", e.getMessage());
+                    continue; // Try next one
+                } catch (Throwable t) {
+                    logger.error("BackendDiscovery: Unexpected error during SPI iteration: {}", t.getMessage());
+                    break; 
                 }
 
                 try {
-                    logger.info("BackendDiscovery: Initializing provider: {}", className);
-                    Backend backend = provider.get();
-                    logger.info("BackendDiscovery: Successfully initialized: {}", className);
+                    String className = provider.type().getName();
                     
-                    // Also check name for exclusion
-                    boolean nameExcluded = false;
+                    boolean excluded = false;
                     for (String ex : excludes) {
-                        if (backend.getName().toLowerCase().contains(ex.trim().toLowerCase())) {
-                            nameExcluded = true;
+                        if (className.toLowerCase().contains(ex.trim().toLowerCase())) {
+                            excluded = true;
                             break;
                         }
                     }
-
-                    if (nameExcluded) {
-                        logger.debug("BackendDiscovery: Skipping excluded backend (by name): {}", backend.getName());
-                    } else {
-                        cachedProviders.add(backend);
-                        logger.debug("Discovered Backend: {} (Priority: {})", backend.getName(), backend.getPriority());
+                    
+                    if (excluded) {
+                        logger.debug("BackendDiscovery: Skipping excluded class: {}", className);
+                        continue;
                     }
+
+                    try {
+                        logger.info("BackendDiscovery: Initializing provider: {}", className);
+                        Backend backend = provider.get();
+                        
+                        // Also check name for exclusion
+                        boolean nameExcluded = false;
+                        for (String ex : excludes) {
+                            if (backend.getName().toLowerCase().contains(ex.trim().toLowerCase())) {
+                                nameExcluded = true;
+                                break;
+                            }
+                        }
+
+                        if (nameExcluded) {
+                            logger.debug("BackendDiscovery: Skipping excluded backend (by name): {}", backend.getName());
+                        } else {
+                            cachedProviders.add(backend);
+                            logger.debug("Discovered Backend: {} (Priority: {})", backend.getName(), backend.getPriority());
+                        }
+                        logger.info("BackendDiscovery: Successfully initialized: {}", className);
+                    } catch (Throwable t) {
+                        logger.warn("Skipping bad Backend provider [{}]: {}", className, t.getMessage());
+                    }
+                } catch (ServiceConfigurationError e) {
+                    logger.error("BackendDiscovery: Stale or invalid SPI entry found for class: {}", e.getMessage());
                 } catch (Throwable t) {
-                    logger.warn("Skipping bad Backend provider [{}]: {}", className, t.getMessage());
+                    logger.error("BackendDiscovery: Unexpected error during provider processing: {}", t.getMessage());
                 }
-            });
+            }
 
             // 2. Reflection Fallback (using MasterControlDiscovery if available)
             try {

@@ -287,9 +287,21 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         private org.ejml.simple.SimpleMatrix toEjmlMatrix(Matrix<E> m) {
-            org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(m.rows(), m.cols());
-            for (int i = 0; i < m.rows(); i++)
-                for (int j = 0; j < m.cols(); j++) {
+            int rows = m.rows();
+            int cols = m.cols();
+            
+            // Optimization: Direct array access if possible
+            if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rdm) {
+                org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage storage = rdm.getDoubleStorage();
+                double[] data = storage.getData();
+                if (data != null) {
+                    return org.ejml.simple.SimpleMatrix.wrap(org.ejml.data.DMatrixRMaj.wrap(rows, cols, data.clone()));
+                }
+            }
+            
+            org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(rows, cols);
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++) {
                     E val = m.get(i, j);
                     if (val instanceof Real) {
                         ejml.set(i, j, ((Real) val).doubleValue());
@@ -309,6 +321,13 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         private Matrix<E> fromEjmlMatrix(org.ejml.simple.SimpleMatrix ejml) {
             int rows = ejml.getNumRows();
             int cols = ejml.getNumCols();
+            double[] data = ejml.getDDRM().data;
+            
+            // Optimization: Direct wrap if using Reals
+            if (field instanceof org.episteme.core.mathematics.sets.Reals) {
+                return (Matrix<E>) org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(data.clone(), rows, cols, (org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<org.episteme.core.mathematics.numbers.real.Real>)(Object)this);
+            }
+            
             DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(rows, cols, field.zero());
             for (int i = 0; i < rows; i++)
                 for (int j = 0; j < cols; j++)
@@ -317,8 +336,16 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         }
 
         private org.ejml.simple.SimpleMatrix toEjmlVector(Vector<E> v) {
-            org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(v.dimension(), 1);
-            for (int i = 0; i < v.dimension(); i++) {
+            int dim = v.dimension();
+            
+            // Optimization: Direct array access for RealDoubleVector
+            if (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector rdv) {
+                double[] data = rdv.toDoubleArray(); // This is already a clone or direct access depending on impl
+                return org.ejml.simple.SimpleMatrix.wrap(org.ejml.data.DMatrixRMaj.wrap(dim, 1, data));
+            }
+
+            org.ejml.simple.SimpleMatrix ejml = new org.ejml.simple.SimpleMatrix(dim, 1);
+            for (int i = 0; i < dim; i++) {
                 E val = v.get(i);
                 if (val instanceof Real) {
                     ejml.set(i, 0, ((Real) val).doubleValue());
@@ -338,14 +365,21 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
         @SuppressWarnings("unchecked")
         private Vector<E> fromEjmlVector(org.ejml.simple.SimpleMatrix ejml) {
             int size = ejml.getNumRows();
+            double[] data = ejml.getDDRM().data;
+
+            // Optimization: Direct wrap if using Reals
+            if (field instanceof org.episteme.core.mathematics.sets.Reals) {
+                return (Vector<E>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data.clone());
+            }
+
             Class<?> componentType = field.zero().getClass();
             if (field.zero() instanceof Real) componentType = Real.class;
             else if (field.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
             
-            E[] data = (E[]) java.lang.reflect.Array.newInstance(componentType, size);
+            E[] arr = (E[]) java.lang.reflect.Array.newInstance(componentType, size);
             for (int i = 0; i < size; i++)
-                data[i] = fromDouble(ejml.get(i, 0));
-            return new GenericVector<>(new DenseVectorStorage<>(data), this, field);
+                arr[i] = fromDouble(data[i]);
+            return new GenericVector<>(new DenseVectorStorage<>(arr), this, field);
         }
 
         @Override public Vector<E> add(Vector<E> a, Vector<E> b) { return fromEjmlVector(toEjmlVector(a).plus(toEjmlVector(b))); }

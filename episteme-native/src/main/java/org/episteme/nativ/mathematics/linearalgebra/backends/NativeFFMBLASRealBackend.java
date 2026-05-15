@@ -28,7 +28,7 @@ public class NativeFFMBLASRealBackend extends AbstractNativeFFMBLASBackend<Real>
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring instanceof Reals;
+        return ring instanceof Reals || (ring != null && ring.zero() instanceof Real);
     }
 
     @Override

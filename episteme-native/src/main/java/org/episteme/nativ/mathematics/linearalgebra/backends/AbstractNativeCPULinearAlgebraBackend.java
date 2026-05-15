@@ -378,7 +378,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
     @Override
     public String getType() {
-        return "math";
+        return "linear-algebra";
     }
 
     @Override
@@ -435,8 +435,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             res = ring instanceof Complexes || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         }
         
-        System.out.println(String.format("[DEBUG] Backend %s isCompatible(%s)? %b (this.ring=%s)", 
-            getName(), ring.getClass().getSimpleName(), res, this.ring.getClass().getSimpleName()));
+        // logger.debug("Backend {} isCompatible({})? {} (this.ring={})", getName(), ring.getClass().getSimpleName(), res, this.ring.getClass().getSimpleName());
         return res;
     }
 
@@ -488,7 +487,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     if (CTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS ctrsm not available");
                     segA = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<Complex>) A));
                     segB = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<Complex>) b));
-                    MemorySegment alpha = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+                    MemorySegment alpha = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, 2);
                     alpha.set(ValueLayout.JAVA_FLOAT, 0, 1.0f);
                     alpha.set(ValueLayout.JAVA_FLOAT, 4, 0.0f);
                     NativeSafe.invoke(CTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
@@ -500,7 +499,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     if (ZTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS ztrsm not available");
                     segA = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>) A));
                     segB = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<Complex>) b));
-                    MemorySegment alpha = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                    MemorySegment alpha = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, 2);
                     alpha.set(ValueLayout.JAVA_DOUBLE, 0, 1.0);
                     alpha.set(ValueLayout.JAVA_DOUBLE, 8, 0.0);
                     NativeSafe.invoke(ZTRSM_HANDLE, CblasRowMajor, side, uplo, trans, diag, n, 1, alpha, segA, n, segB, 1);
@@ -861,7 +860,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(a));
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray(b));
-                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m);
+                MemorySegment rSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m);
                 NativeSafe.invoke(SGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, 1.0f, aSeg, n, bSeg, 1, 0.0f, rSeg, 1);
                 float[] result = rSeg.toArray(ValueLayout.JAVA_FLOAT);
                 org.episteme.core.mathematics.numbers.real.Real[] res = new org.episteme.core.mathematics.numbers.real.Real[m];
@@ -879,7 +878,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray(a));
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray(b));
-                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * 2);
+                MemorySegment rSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * 2);
                 MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
                 MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
                 NativeSafe.invoke(CGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, alpha, aSeg, n, bSeg, 1, beta, rSeg, 1);
@@ -900,7 +899,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = getMemorySegment(a, arena);
                 MemorySegment bSeg = getMemorySegment(b, arena);
-                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m);
+                MemorySegment rSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) m);
                 
                 NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, 1.0, aSeg, n, bSeg, 1, 0.0, rSeg, 1);
                 
@@ -936,7 +935,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 double[] bData = toComplexDoubleArray(b);
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, aData);
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, bData);
-                MemorySegment rSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * 2);
+                MemorySegment rSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) m * 2);
                 
                 MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
                 MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
@@ -1204,7 +1203,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
                     MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toFloatArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
-                    MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n);
+                    MemorySegment cSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n);
                     NativeSafe.invoke(SGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0f, aSeg, k, bSeg, n, 0.0f, cSeg, n);
                     float[] cData = cSeg.toArray(ValueLayout.JAVA_FLOAT);
                     org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[m * n];
@@ -1222,7 +1221,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a));
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b));
-                MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n);
+                MemorySegment cSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) m * n);
                 NativeSafe.invoke(DGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, aSeg, k, bSeg, n, 0.0, cSeg, n);
                 double[] cData = cSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 return (Matrix<E>)(Object) RealDoubleMatrix.of(cData, m, n);
@@ -1237,7 +1236,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
                     MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
-                    MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_FLOAT, (long) m * n * 2);
+                    MemorySegment cSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, (long) m * n * 2);
                     MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 1.0f, 0.0f);
                     MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, 0.0f, 0.0f);
                     NativeSafe.invoke(CGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, aSeg, k, bSeg, n, beta, cSeg, n);
@@ -1255,7 +1254,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
-                MemorySegment cSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
+                MemorySegment cSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) m * n * 2);
                 MemorySegment alpha = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 1.0, 0.0);
                 MemorySegment beta = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, 0.0, 0.0);
                 NativeSafe.invoke(ZGEMM_HANDLE, CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, aSeg, k, bSeg, n, beta, cSeg, n);
@@ -1280,7 +1279,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             if (n != m) return pseudoInverse(a);
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
                 
                 int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
                 if (info != 0) throw new ArithmeticException("Matrix is singular or dgetrf failed: " + info);
@@ -1296,7 +1295,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             if (n != m) return pseudoInverse(a);
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
                 
                 int info = (int) NativeSafe.invoke(ZGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
                 if (info != 0) throw new ArithmeticException("Matrix is singular or zgetrf failed: " + info);
@@ -1326,7 +1325,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Vector<Real>)(Object)b));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
                 
                 int info = (int) NativeSafe.invoke(DGESV_HANDLE, LAPACK_ROW_MAJOR, n, 1, aSeg, n, ipiv, bSeg, 1);
                 if (info < 0) throw new IllegalArgumentException("DGESV: Illegal value at " + (-info));
@@ -1340,7 +1339,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<Complex>)(Object)b));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
                 
                 int info = (int) NativeSafe.invoke(ZGESV_HANDLE, LAPACK_ROW_MAJOR, n, 1, aSeg, n, ipiv, bSeg, 1);
                 if (info < 0) throw new IllegalArgumentException("ZGESV: Illegal value at " + (-info));
@@ -1428,7 +1427,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
                 int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
                 if (info < 0) throw new IllegalArgumentException("DGETRF: Illegal value at " + (-info));
                 if (info > 0) return ring.zero();
@@ -1445,7 +1444,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             if (ZGETRF_HANDLE == null) throw new UnsupportedOperationException("ZGETRF not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) n);
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
                 int info = (int) NativeSafe.invoke(ZGETRF_HANDLE, LAPACK_ROW_MAJOR, n, n, aSeg, n, ipiv);
                 if (info < 0) throw new IllegalArgumentException("ZGETRF: Illegal value at " + (-info));
                 if (info > 0) return ring.zero();
@@ -1472,7 +1471,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(n, m));
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) Math.min(n, m));
                 int info = (int) NativeSafe.invoke(DGETRF_HANDLE, LAPACK_ROW_MAJOR, n, m, aSeg, Math.max(n, m), ipiv);
                 if (info < 0) throw new IllegalArgumentException("DGETRF failed: " + info);
                 
@@ -1517,7 +1516,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             if (ZGETRF_HANDLE == null) throw new UnsupportedOperationException("ZGETRF not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
-                MemorySegment ipiv = arena.allocate(ValueLayout.JAVA_INT, (long) Math.min(n, m));
+                MemorySegment ipiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) Math.min(n, m));
                 int info = (int) NativeSafe.invoke(ZGETRF_HANDLE, LAPACK_ROW_MAJOR, n, m, aSeg, Math.max(n, m), ipiv);
                 if (info < 0) throw new IllegalArgumentException("ZGETRF failed: " + info);
                 
@@ -1572,7 +1571,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>)(Object)a));
-                MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+                MemorySegment wSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) n);
                 
                 int info = (int) NativeSafe.invoke(DSYEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
                 if (info < 0) throw new IllegalArgumentException("DSYEV failed: " + info);
@@ -1590,7 +1589,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             if (ZHEEV_HANDLE == null) throw new UnsupportedOperationException("ZHEEV not available");
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Matrix<Complex>)(Object)a));
-                MemorySegment wSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, (long) n);
+                MemorySegment wSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) n);
                 
                 int info = (int) NativeSafe.invoke(ZHEEV_HANDLE, LAPACK_ROW_MAJOR, (byte) 'V', (byte) 'U', n, aSeg, n, wSeg);
                 if (info < 0) throw new IllegalArgumentException("ZHEEV failed: " + info);
@@ -1696,7 +1695,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 try (Arena arena = Arena.ofConfined()) {
                     MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
                     MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_FLOAT, toComplexFloatArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
-                    MemorySegment resSeg = arena.allocate(ValueLayout.JAVA_FLOAT, 2);
+                    MemorySegment resSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_FLOAT, 2);
                     NativeSafe.invoke(CDOTC_HANDLE, n, aSeg, 1, bSeg, 1, resSeg);
                     float[] res = resSeg.toArray(ValueLayout.JAVA_FLOAT);
                     return castScalar(org.episteme.core.mathematics.numbers.complex.Complex.of(org.episteme.core.mathematics.numbers.real.RealFloat.of(res[0]), org.episteme.core.mathematics.numbers.real.RealFloat.of(res[1])), ring);
@@ -1706,7 +1705,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment aSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a));
                 MemorySegment bSeg = NativeSafe.allocateFrom(arena, ValueLayout.JAVA_DOUBLE, toComplexDoubleArray((Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b));
-                MemorySegment resSeg = arena.allocate(ValueLayout.JAVA_DOUBLE, 2);
+                MemorySegment resSeg = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, 2);
                 NativeSafe.invoke(ZDOTC_HANDLE, n, aSeg, 1, bSeg, 1, resSeg);
                 double[] res = resSeg.toArray(ValueLayout.JAVA_DOUBLE);
                 return castScalar(org.episteme.core.mathematics.numbers.complex.Complex.of(res[0], res[1]), ring);

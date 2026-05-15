@@ -79,11 +79,8 @@ public class StandardAlgorithmService implements AlgorithmService {
                 if (provider.isAvailable() && seenKeys.add(key)) {
                     available.add(provider);
                 }
-            } catch (ServiceConfigurationError | Exception e) {
-                logger.warn("Skipping bad provider entry: {}", e.getMessage());
             } catch (Throwable t) {
-                logger.error("Critical error during provider discovery: {}", t.getMessage());
-                break;
+                logger.warn("Skipping bad provider entry {}: {}", (providerClass != null ? providerClass.getSimpleName() : "unknown"), t.getMessage());
             }
         }
 
@@ -103,7 +100,9 @@ public class StandardAlgorithmService implements AlgorithmService {
                     }
                 }
             }
-        } catch (Exception e) {}
+        } catch (Throwable t) {
+            logger.warn("Error during backend algorithm discovery: {}", t.getMessage());
+        }
         
         // Path 3: Direct Reflection (for AlgorithmProviders not linked to a Backend)
         try {
@@ -123,8 +122,8 @@ public class StandardAlgorithmService implements AlgorithmService {
                             }
                         }
                     }
-                } catch (Exception e) {
-                    // Skip
+                } catch (Throwable t) {
+                    // Skip bad reflection entry
                 }
             });
         } catch (NoClassDefFoundError e) {

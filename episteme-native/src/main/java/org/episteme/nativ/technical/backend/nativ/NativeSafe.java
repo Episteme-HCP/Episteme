@@ -6,6 +6,7 @@
 package org.episteme.nativ.technical.backend.nativ;
 
 import java.lang.foreign.Arena;
+import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
@@ -275,6 +276,18 @@ public class NativeSafe {
         return seg;
     }
 
+    public static MemorySegment allocate(Arena arena, MemoryLayout layout, long count) {
+        return arena.allocate(layout.byteSize() * count, layout.byteAlignment());
+    }
+
+    public static MemorySegment allocate(Arena arena, MemoryLayout layout) {
+        return arena.allocate(layout);
+    }
+
+    public static MemorySegment allocate(Arena arena, long size) {
+        return arena.allocate(size);
+    }
+
     public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfFloat layout, float... elements) {
         return allocateFromArray(arena, layout, elements);
     }
@@ -292,7 +305,7 @@ public class NativeSafe {
     }
 
     public static MemorySegment allocateFrom(Arena arena, ValueLayout.OfByte layout, byte... elements) {
-        MemorySegment seg = arena.allocate(layout, elements.length);
+        MemorySegment seg = allocate(arena, layout, elements.length);
         MemorySegment.copy(MemorySegment.ofArray(elements), 0, seg, 0, (long)elements.length * layout.byteSize());
         return seg;
     }

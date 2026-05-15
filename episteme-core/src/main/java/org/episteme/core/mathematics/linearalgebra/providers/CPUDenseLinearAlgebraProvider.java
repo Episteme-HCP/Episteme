@@ -818,22 +818,30 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     private static double[] toDoubleArray(Matrix<?> m) {
         int rows = m.rows();
         int cols = m.cols();
-        double[] data = new double[rows * cols];
-        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
-            return ((org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) m).toDoubleArray();
+        
+        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rdm) {
+            org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage storage = rdm.getDoubleStorage();
+            double[] data = storage.getData();
+            if (data != null) return data;
+            return storage.toDoubleArray();
         }
+        
         if (m.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
             try {
                 return (double[]) m.getClass().getMethod("getInternalData").invoke(m);
             } catch (Exception e) {}
         }
+        
         if (m instanceof GenericMatrix) {
             org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<?> storage = 
                 ((GenericMatrix<?>) m).getStorage();
-            if (storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage) {
-                return ((org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage) storage).getData();
+            if (storage instanceof org.episteme.core.mathematics.linearalgebra.matrices.storage.RealDoubleMatrixStorage rdms) {
+                double[] data = rdms.getData();
+                if (data != null) return data;
             }
         }
+        
+        double[] data = new double[rows * cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Object val = m.get(i, j);

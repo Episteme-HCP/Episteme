@@ -28,7 +28,7 @@ public class NativeFFMBLASComplexBackend extends AbstractNativeFFMBLASBackend<Co
 
     @Override
     public boolean isCompatible(Ring<?> ring) {
-        return ring instanceof Complexes;
+        return ring instanceof Complexes || (ring != null && ring.zero() instanceof Complex);
     }
 
     @Override

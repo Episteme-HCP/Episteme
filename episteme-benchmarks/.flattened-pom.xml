@@ -5,10 +5,10 @@
   <parent>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta3</version>
+    <version>1.0.0-beta3.0.13</version>
   </parent>
   <artifactId>episteme-benchmarks</artifactId>
-  <version>1.0.0-beta3</version>
+  <version>1.0.0-beta3.0.13</version>
   <name>Episteme Benchmarking Suite</name>
   <description>Benchmarking and performance analysis suite for Episteme. Comparison with EJML, Colt, JBlas, Apache Commons Math</description>
   <licenses>
@@ -293,7 +293,7 @@
         <version>3.2.5</version>
         <configuration>
           <skipTests>${skipTests}</skipTests>
-          <argLine>--enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED</argLine>
+          <argLine>--enable-preview --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED</argLine>
           <useManifestOnlyJar>false</useManifestOnlyJar>
         </configuration>
       </plugin>

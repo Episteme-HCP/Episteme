@@ -5,10 +5,10 @@
   <parent>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta3</version>
+    <version>1.0.0-beta3.0.13</version>
   </parent>
   <artifactId>episteme-database</artifactId>
-  <version>1.0.0-beta3</version>
+  <version>1.0.0-beta3.0.13</version>
   <name>Episteme Database</name>
   <description>Automatic and transparent persistence for Episteme models.</description>
   <licenses>

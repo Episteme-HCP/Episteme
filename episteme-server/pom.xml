@@ -107,6 +107,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Episteme Native (for Panama FFM and SIMD backends) -->
+        <dependency>
+            <groupId>io.github.episteme-hcp</groupId>
+            <artifactId>episteme-native</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Database (PG + H2) -->
         <dependency>
             <groupId>org.postgresql</groupId>
