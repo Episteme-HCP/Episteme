@@ -1,4 +1,4 @@
-@echo off
+@echo on
 rem Episteme Centralized Environment Setup (Windows)
 rem Called by other scripts to standardize library paths and variables.
 
@@ -14,35 +14,42 @@ rem --- Java Version Setup (JDK 25 preferred) ---
 set "VALID_JAVA=0"
 
 if defined JAVA_HOME (
+    rem Clean up quotes and trailing backslashes
     set "JAVA_HOME=%JAVA_HOME:"=%"
+    
+    echo [INFO] Checking existing JAVA_HOME: %JAVA_HOME%
+    
     if exist "%JAVA_HOME%\bin\java.exe" (
-        "%JAVA_HOME%\bin\java.exe" -version 2>&1 | findstr "21 25" >nul && set "VALID_JAVA=1"
-    )
-)
-
-if "%VALID_JAVA%"=="0" (
-    echo [WARNING] No compatible JDK 21+ found in JAVA_HOME. Searching...
-    if exist "C:\Program Files\Java\jdk-25" (
-        set "JAVA_HOME=C:\Program Files\Java\jdk-25"
-        set "VALID_JAVA=1"
-        echo [INFO] Auto-detected JDK 25 at: C:\Program Files\Java\jdk-25
-    )
-)
-
-if "%VALID_JAVA%"=="0" (
-    if exist "C:\Program Files\Eclipse Adoptium\jdk-25*" (
-        for /d %%d in ("C:\Program Files\Eclipse Adoptium\jdk-25*") do (
-            set "JAVA_HOME=%%d"
+        "%JAVA_HOME%\bin\java.exe" -version 2>&1 | findstr "21. 25." >nul && (
             set "VALID_JAVA=1"
-            echo [INFO] Auto-detected JDK 25 at: %%d
+            echo [INFO] Detected compatible Java version (21+).
         )
     )
 )
 
 if "%VALID_JAVA%"=="0" (
-    echo [ERROR] No compatible JDK 21 or 25 or higher was found.
+    echo [WARNING] No compatible JDK (21+) found in JAVA_HOME. Searching for JDK 25...
+    if exist "C:\Program Files\Java\jdk-25" (
+        set "JAVA_HOME=C:\Program Files\Java\jdk-25"
+        set "VALID_JAVA=1"
+        echo [INFO] Auto-detected JDK 25 at: C:\Program Files\Java\jdk-25
+    ) else (
+        if exist "C:\Program Files\Eclipse Adoptium\jdk-25*" (
+            for /d %%d in ("C:\Program Files\Eclipse Adoptium\jdk-25*") do (
+                set "JAVA_HOME=%%d"
+                set "VALID_JAVA=1"
+                echo [INFO] Auto-detected JDK 25 at: %%d
+                goto :found_jdk
+            )
+        )
+    )
+)
+
+:found_jdk
+if "%VALID_JAVA%"=="0" (
+    echo [ERROR] No compatible JDK (21 or 25+) was found.
     echo [ERROR] Current JAVA_HOME: %JAVA_HOME%
-    echo [ERROR] Please install JDK 25 or set JAVA_HOME to a valid JDK 21 plus installation.
+    echo [ERROR] Please install JDK 25 or set JAVA_HOME to a valid JDK 21+ installation.
     pause
     exit /b 1
 )

@@ -1,4 +1,5 @@
 @echo off
+call "%~dp0scripts\setup\env_setup.bat"
 setlocal
 
 rem --- Argument Parsing ---
@@ -91,4 +92,6 @@ if defined USE_SHADED_JAR (
 
 echo.
 pause
+
 endlocal
+

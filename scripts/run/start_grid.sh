@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$0")/scripts/setup/env_setup.sh"
+source "$(dirname "$0")/../../scripts/setup/env_setup.sh"
 
 # VLC and Native Libs Setup
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -19,12 +19,22 @@ if [ -d "/Applications/VLC.app/Contents/MacOS/lib" ]; then
     export VLC_PLUGIN_PATH="/Applications/VLC.app/Contents/MacOS/plugins"
 fi
 
-# Launcher for Episteme Demos Suite
+# Start Episteme Grid with Docker Compose
+echo "Starting Episteme Grid..."
+echo ""
+echo "This will start:"
+echo "  - 1x Episteme Server (port 50051)"
+echo "  - 5x Episteme Workers"
+echo "  - Prometheus (port 9090)"
+echo "  - Grafana (port 3000)"
+echo ""
 
-APP_CLASS=org.episteme.ui.EpistemeDemoApp
-LIB_DIR=launchers\lib
-MODULE_PATH="episteme-featured-apps/target/classes:episteme-core/target/classes:episteme-natural/target/classes:episteme-social/target/classes"
+docker-compose up -d --build
 
-echo "Starting Episteme Demos Suite..."
-java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "${LIB_DIR}/javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "${MODULE_PATH}:${LIB_DIR}/*" ${APP_CLASS} "$@"
+echo ""
+echo "Grid is starting! Check status with: docker-compose ps"
+echo ""
+echo "Grafana Dashboard: http://localhost:3000 (admin/episteme)"
+echo "Prometheus:        http://localhost:9090"
+echo "gRPC Server:       localhost:50051"
 
