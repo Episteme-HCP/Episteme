@@ -1,0 +1,5 @@
+<unit id="yardSquared" name="yard squared" unitType="area" parentSI="meterSquared"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>36 inches squared</description>
+    <unit ref="yard" power="2"/>
+</unit>

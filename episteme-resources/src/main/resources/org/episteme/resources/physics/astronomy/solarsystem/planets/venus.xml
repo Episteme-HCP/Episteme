@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Venus</name>
+    <mass>4.8685</mass>
+    <volume>92.843</volume>
+    <equatorial-radius>6051.8</equatorial-radius>
+    <polar-radius>6051.8</polar-radius>
+    <volumetric-mean-radius>6051.8</volumetric-mean-radius>
+    <ellipticity>0.000</ellipticity>
+    <mean-density>5243</mean-density>
+    <surface-gravity>8.87</surface-gravity>
+    <surface-acceleration>8.87</surface-acceleration>
+    <escape-velocity>10.36</escape-velocity>
+    <GM>0.3249</GM>
+    <bond-albedo>0.750</bond-albedo>
+    <visual-geometric-albedo>0.65</visual-geometric-albedo>
+    <visual-magnitude>-4.40</visual-magnitude>
+    <solar-irradiance>2613.9</solar-irradiance>
+    <black-body-temperature>231.7</black-body-temperature>
+    <moment-of-inertia>0.33</moment-of-inertia>
+    <J2>4.458</J2>
+    <number-of-natural-satellites>0</number-of-natural-satellites>
+    <planetary-ring-system>No</planetary-ring-system>
+    <semi-major-axis>108.21</semi-major-axis>
+    <sidereal-orbit-period>224.701</sidereal-orbit-period>
+    <tropical-orbit-period>224.695</tropical-orbit-period>
+    <perihelion>107.48</perihelion>
+    <aphelion>108.94</aphelion>
+    <synodic-period>583.92</synodic-period>
+    <mean-orbital-velocity>35.02</mean-orbital-velocity>
+    <maximum-orbital-velocity>35.26</maximum-orbital-velocity>
+    <minimum-orbital-velocity>34.79</minimum-orbital-velocity>
+    <orbit-inclination>3.39</orbit-inclination>
+    <orbit-eccentricity>0.0067</orbit-eccentricity>
+    <sidereal-rotation-period>-5832.5</sidereal-rotation-period>
+    <length-of-day>2802.0</length-of-day>
+    <obliquity-to-orbit>177.36</obliquity-to-orbit>
+    <surface-pressure>92</surface-pressure>
+    <average-temperature>737</average-temperature>
+    <atmospheric-composition>96.5% Carbon Dioxide (CO2); 3.5% Nitrogen (N2)</atmospheric-composition>
+</natural-satellite>

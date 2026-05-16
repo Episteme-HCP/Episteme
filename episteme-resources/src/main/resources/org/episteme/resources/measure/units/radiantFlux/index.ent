@@ -1,0 +1,7 @@
+
+<!ENTITY watt.xml SYSTEM "../radiantFlux/watt.xml">
+
+<!ENTITY radiantFlux.elements	"
+&watt.xml;
+">
+

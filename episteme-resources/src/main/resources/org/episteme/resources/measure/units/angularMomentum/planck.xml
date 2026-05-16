@@ -1,0 +1,4 @@
+<unit id="planck" name="planck" unitType="angularMomentum" parentSI="jouleSecond" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>An MKS unit of action</description>
+</unit>

@@ -1,0 +1,4 @@
+<unitType id="heatTransmission" name="heat transmission">
+    <dimension name="mass" power="1" preserve="no"/>
+    <dimension name="time" power="-2" preserve="no"/>
+</unitType>

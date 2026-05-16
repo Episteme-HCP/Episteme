@@ -1,0 +1,5 @@
+<unit id="centimeterPerYear" name="centimeterPerYear" unitType="speed" parentSI="meterPerSecond"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <unit ref="centimeter" power="1"/>
+    <unit ref="year" power="-1"/>
+</unit>

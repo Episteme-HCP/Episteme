@@ -1,0 +1,4 @@
+<unit id="henryPerMeter" name="henry per meter" abbreviation="H/m" unitType="magneticPermeability" parentSI="SELF"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>henry per meter</description>
+</unit>

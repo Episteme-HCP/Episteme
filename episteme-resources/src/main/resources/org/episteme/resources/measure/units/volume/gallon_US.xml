@@ -1,0 +1,4 @@
+<unit id="gallon_US" name="US gallon" abbreviation="gal" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="3.785411784E-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>US liquid gallon. 1 US gallon = 4 US liquid quarts</description>
+</unit>

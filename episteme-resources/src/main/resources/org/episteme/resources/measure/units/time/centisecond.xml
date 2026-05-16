@@ -1,0 +1,4 @@
+<unit id="centisecond" name="centisecond" abbreviation="csec" unitType="time" parentSI="second" multiplierToSI="0.01"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1/100 of a second</description>
+</unit>

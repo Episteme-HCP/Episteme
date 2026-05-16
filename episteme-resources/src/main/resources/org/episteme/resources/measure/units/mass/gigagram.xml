@@ -1,0 +1,4 @@
+<unit id="gigagram" name="gigagram" abbreviation="Gg" unitType="mass" parentSI="kilogram" multiplierToSI="1.0E+6"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1000000 kg.</description>
+</unit>

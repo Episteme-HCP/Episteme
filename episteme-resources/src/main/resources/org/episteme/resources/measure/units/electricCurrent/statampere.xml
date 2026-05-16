@@ -1,0 +1,4 @@
+<unit id="statampere" name="statampere" unitType="electricCurrent" parentSI="ampere" multiplierToSI="3.3356E-10"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Unit of current which is part of the CGS electrostatic system</description>
+</unit>

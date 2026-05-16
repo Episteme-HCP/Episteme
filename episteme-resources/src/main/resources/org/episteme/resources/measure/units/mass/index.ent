@@ -1,0 +1,61 @@
+
+<!ENTITY atomicMassUnit.xml SYSTEM "../mass/atomicMassUnit.xml">
+<!ENTITY centigram.xml SYSTEM "../mass/centigram.xml">
+<!ENTITY dalton.xml SYSTEM "../mass/dalton.xml">
+<!ENTITY decigram.xml SYSTEM "../mass/decigram.xml">
+<!ENTITY decitonne.xml SYSTEM "../mass/decitonne.xml">
+<!ENTITY dekagram.xml SYSTEM "../mass/dekagram.xml">
+<!ENTITY gigagram.xml SYSTEM "../mass/gigagram.xml">
+<!ENTITY gigatonne.xml SYSTEM "../mass/gigatonne.xml">
+<!ENTITY gram.xml SYSTEM "../mass/gram.xml">
+<!ENTITY hectogram.xml SYSTEM "../mass/hectogram.xml">
+<!ENTITY kilodalton.xml SYSTEM "../mass/kilodalton.xml">
+<!ENTITY kilogram.xml SYSTEM "../mass/kilogram.xml">
+<!ENTITY kilotonne.xml SYSTEM "../mass/kilotonne.xml">
+<!ENTITY megadalton.xml SYSTEM "../mass/megadalton.xml">
+<!ENTITY megagram.xml SYSTEM "../mass/megagram.xml">
+<!ENTITY megatonne.xml SYSTEM "../mass/megatonne.xml">
+<!ENTITY microgram.xml SYSTEM "../mass/microgram.xml">
+<!ENTITY millidalton.xml SYSTEM "../mass/millidalton.xml">
+<!ENTITY milligram.xml SYSTEM "../mass/milligram.xml">
+<!ENTITY nanogram.xml SYSTEM "../mass/nanogram.xml">
+<!ENTITY ounce.xml SYSTEM "../mass/ounce.xml">
+<!ENTITY petagram.xml SYSTEM "../mass/petagram.xml">
+<!ENTITY picogram.xml SYSTEM "../mass/picogram.xml">
+<!ENTITY pound.xml SYSTEM "../mass/pound.xml">
+<!ENTITY stone.xml SYSTEM "../mass/stone.xml">
+<!ENTITY teragram.xml SYSTEM "../mass/teragram.xml">
+<!ENTITY ton.xml SYSTEM "../mass/ton.xml">
+<!ENTITY tonne.xml SYSTEM "../mass/tonne.xml">
+
+<!ENTITY mass.elements	"
+&atomicMassUnit.xml;
+&centigram.xml;
+&dalton.xml;
+&decigram.xml;
+&decitonne.xml;
+&dekagram.xml;
+&gigagram.xml;
+&gigatonne.xml;
+&gram.xml;
+&hectogram.xml;
+&kilodalton.xml;
+&kilogram.xml;
+&kilotonne.xml;
+&megadalton.xml;
+&megagram.xml;
+&megatonne.xml;
+&microgram.xml;
+&millidalton.xml;
+&milligram.xml;
+&nanogram.xml;
+&ounce.xml;
+&petagram.xml;
+&picogram.xml;
+&pound.xml;
+&stone.xml;
+&teragram.xml;
+&ton.xml;
+&tonne.xml;
+">
+

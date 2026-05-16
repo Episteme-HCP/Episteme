@@ -1,0 +1,11 @@
+
+<!ENTITY kilogramPerHectarePerYear.xml SYSTEM "../arealMassFlux/kilogramPerHectarePerYear.xml">
+<!ENTITY kilogramPerMeterSquaredPerSecond.xml SYSTEM "../arealMassFlux/kilogramPerMeterSquaredPerSecond.xml">
+<!ENTITY kilogramPerMeterSquaredPerYear.xml SYSTEM "../arealMassFlux/kilogramPerMeterSquaredPerYear.xml">
+
+<!ENTITY arealMassFlux.elements	"
+&kilogramPerHectarePerYear.xml;
+&kilogramPerMeterSquaredPerSecond.xml;
+&kilogramPerMeterSquaredPerYear.xml;
+">
+

@@ -1,0 +1,4 @@
+<unit id="kilogramMeterSquaredPerSecond" name="kilogram meter squared per second" abbreviation="kgm^2/s"
+      unitType="angularMomentum" parentSI="jouleSecond" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

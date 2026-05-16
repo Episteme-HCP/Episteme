@@ -1,0 +1,4 @@
+<unit id="decibar" name="decibar" abbreviation="dbar" unitType="pressure" parentSI="pascal" multiplierToSI="1.0E+4"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 bar = 10 kilopascals</description>
+</unit>

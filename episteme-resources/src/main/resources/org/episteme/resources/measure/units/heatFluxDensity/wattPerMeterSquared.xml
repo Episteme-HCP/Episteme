@@ -1,0 +1,4 @@
+<unit id="wattPerMeterSquared" name="Watt per meter squared" abbreviation="W/m^2" unitType="heatFluxDensity"
+      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Watt per square meter</description>
+</unit>

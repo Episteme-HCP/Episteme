@@ -1,0 +1,13 @@
+
+<!ENTITY microsievert.xml SYSTEM "../doseEquivalent/microsievert.xml">
+<!ENTITY millisievert.xml SYSTEM "../doseEquivalent/millisievert.xml">
+<!ENTITY nanosievert.xml SYSTEM "../doseEquivalent/nanosievert.xml">
+<!ENTITY sievert.xml SYSTEM "../doseEquivalent/sievert.xml">
+
+<!ENTITY doseEquivalent.elements	"
+&microsievert.xml;
+&millisievert.xml;
+&nanosievert.xml;
+&sievert.xml;
+">
+

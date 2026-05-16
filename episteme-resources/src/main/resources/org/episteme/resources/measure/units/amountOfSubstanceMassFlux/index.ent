@@ -1,0 +1,9 @@
+
+<!ENTITY nanomolePerGramPerSecond.xml SYSTEM "../amountOfSubstanceMassFlux/nanomolePerGramPerSecond.xml">
+<!ENTITY molePerKilogramPerSecond.xml SYSTEM "../amountOfSubstanceMassFlux/molePerKilogramPerSecond.xml">
+
+<!ENTITY amountOfSubstanceMassFlux.elements	"
+&nanomolePerGramPerSecond.xml;
+&molePerKilogramPerSecond.xml;
+">
+

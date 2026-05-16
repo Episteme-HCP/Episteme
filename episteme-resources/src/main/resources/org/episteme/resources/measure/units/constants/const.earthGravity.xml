@@ -1,0 +1,3 @@
+<unit id="const.earthGravity" name="earth gravity" abbreviation="g" unitType="acceleration"
+      parentSI="meterPerSecondSquared" multiplierToSI="9.80665" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

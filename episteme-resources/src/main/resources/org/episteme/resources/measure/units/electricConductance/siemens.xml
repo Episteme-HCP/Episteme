@@ -1,0 +1,4 @@
+<unit id="siemens" name="siemens" abbreviation="S" unitType="electricConductance" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>siemens</description>
+</unit>

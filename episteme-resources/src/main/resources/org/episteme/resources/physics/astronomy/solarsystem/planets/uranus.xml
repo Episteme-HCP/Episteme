@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Uranus</name>
+    <mass>86.832</mass>
+    <volume>6833</volume>
+    <equatorial-radius>25559</equatorial-radius>
+    <polar-radius>24973</polar-radius>
+    <volumetric-mean-radius>25362</volumetric-mean-radius>
+    <ellipticity>0.02293</ellipticity>
+    <mean-density>1270</mean-density>
+    <surface-gravity>8.87</surface-gravity>
+    <surface-acceleration>8.69</surface-acceleration>
+    <escape-velocity>21.3</escape-velocity>
+    <GM>5.794</GM>
+    <bond-albedo>0.300</bond-albedo>
+    <visual-geometric-albedo>0.51</visual-geometric-albedo>
+    <visual-magnitude>-7.19</visual-magnitude>
+    <solar-irradiance>3.71</solar-irradiance>
+    <black-body-temperature>58.2</black-body-temperature>
+    <moment-of-inertia>0.225</moment-of-inertia>
+    <J2>3343.43</J2>
+    <number-of-natural-satellites>25</number-of-natural-satellites>
+    <planetary-ring-system>Yes</planetary-ring-system>
+    <semi-major-axis>2,872.46</semi-major-axis>
+    <sidereal-orbit-period>30685.4</sidereal-orbit-period>
+    <tropical-orbit-period>30588.740</tropical-orbit-period>
+    <perihelion>2741.30</perihelion>
+    <aphelion>3003.62</aphelion>
+    <synodic-period>369.66</synodic-period>
+    <mean-orbital-velocity>6.81</mean-orbital-velocity>
+    <maximum-orbital-velocity>6.81</maximum-orbital-velocity>
+    <minimum-orbital-velocity>6.49</minimum-orbital-velocity>
+    <orbit-inclination>0.772</orbit-inclination>
+    <orbit-eccentricity>0.0457</orbit-eccentricity>
+    <sidereal-rotation-period>-17.24</sidereal-rotation-period>
+    <length-of-day>17.24</length-of-day>
+    <obliquity-to-orbit>97.77</obliquity-to-orbit>
+    <surface-pressure>1000</surface-pressure>
+    <average-temperature>76</average-temperature>
+    <atmospheric-composition>Molecular hydrogen (H2) - 82.5% (3.3%); Helium (He) - 15.2% (3.3%); Methane (CH4) -
+        ~2.3%
+    </atmospheric-composition>
+</natural-satellite>

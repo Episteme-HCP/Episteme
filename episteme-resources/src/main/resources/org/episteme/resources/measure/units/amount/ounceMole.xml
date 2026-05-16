@@ -1,0 +1,3 @@
+<unit id="ounceMole" name="ounce mole" abbreviation="ozmol" unitType="amount" parentSI="mole" multiplierToSI="28.34952"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

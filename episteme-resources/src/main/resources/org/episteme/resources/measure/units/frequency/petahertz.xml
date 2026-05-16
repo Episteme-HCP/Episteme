@@ -1,0 +1,4 @@
+<unit id="petahertz" name="petahertz" abbreviation="PHz" unitType="frequency" parentSI="hertz" multiplierToSI="1.0E+15"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 PHz = 10^15 Hz</description>
+</unit>

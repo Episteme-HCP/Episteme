@@ -1,0 +1,5 @@
+<unit id="gallonPerSecond" name="gallon per second" abbreviation="gal/s" unitType="volumetricRate"
+      parentSI="meterCubedPerSecond" multiplierToSI="3.785411784E-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>US gallons per second</description>
+</unit>

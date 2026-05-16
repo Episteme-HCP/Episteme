@@ -1,0 +1,4 @@
+<unit id="statcoulomb" name="statcoulomb" unitType="electricCharge" parentSI="coulomb" multiplierToSI="3.3356E-10"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Unit of charge which is part of the CGS electrostatic system</description>
+</unit>

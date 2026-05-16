@@ -1,0 +1,19 @@
+<!ELEMENT	unitList (unitType+)>
+<!ELEMENT	unitType (alternative*, dimension+)>
+<!ATTLIST	unitType
+id 	CDATA	#REQUIRED
+name 	CDATA	#REQUIRED
+>
+<!ELEMENT	alternative 	(#PCDATA)>
+<!ATTLIST	alternative
+id 	CDATA	#IMPLIED
+type 	CDATA	#REQUIRED
+>
+<!ELEMENT	dimension 	EMPTY>
+<!ATTLIST	dimension
+id 	CDATA	#IMPLIED
+name 	CDATA	#REQUIRED
+power 	CDATA	#REQUIRED
+preserve (yes|no)	"no"
+>
+

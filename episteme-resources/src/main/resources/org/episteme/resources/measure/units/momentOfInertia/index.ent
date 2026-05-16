@@ -1,0 +1,7 @@
+
+<!ENTITY kilogramMeterSquared.xml SYSTEM "../momentOfInertia/kilogramMeterSquared.xml">
+
+<!ENTITY momentOfInertia.elements	"
+&kilogramMeterSquared.xml;
+">
+

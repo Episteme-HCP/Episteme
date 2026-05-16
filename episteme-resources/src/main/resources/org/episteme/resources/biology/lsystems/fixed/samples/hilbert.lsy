@@ -1,0 +1,29 @@
+/*
+---------------------------------------------------------------------
+VIRTUAL PLANTS
+==============
+
+University of applied sciences Biel
+
+hosted by Claude Schwab
+
+programmed by Rene Gressly
+
+March - July 1999
+
+This is an input file for the VirtualPlants application.
+
+Hilbert curve
+---------------------------------------------------------------------
+*/
+
+depth = 2
+angle = 90
+length = 0.5
+thickness = 0.05
+
+axiom = A
+rule = A -> B-F+CFC+F-D&F^D-F+&&CFC+F+B//
+rule = B -> A&F^CFB^F^D^^-F-D^|F^B|FC^F^A//
+rule = C -> |D^|F^B-F+C^F^A&&FA&F^C+F+B^F^D//
+rule = D -> |CFB-F+B|FA&F^A&&FB-F+B|FC//

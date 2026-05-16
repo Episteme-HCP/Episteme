@@ -1,0 +1,5 @@
+<unit id="weberPerCentimeterSquared" name="weber per centimeter squared" abbreviation="Wb/cm^2"
+      unitType="magneticFluxDensity" parentSI="tesla" multiplierToSI="1.0E+4"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 Wb/cm^2 = 10000 T</description>
+</unit>

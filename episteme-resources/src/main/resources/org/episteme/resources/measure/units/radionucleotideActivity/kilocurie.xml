@@ -1,0 +1,4 @@
+<unit id="kilocurie" name="kilocurie" abbreviation="kCi" unitType="radionucleotideActivity" parentSI="becquerel"
+      multiplierToSI="3.7E+13" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 kCi = 37 TBq</description>
+</unit>

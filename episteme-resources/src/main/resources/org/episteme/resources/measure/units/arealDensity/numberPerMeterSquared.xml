@@ -1,0 +1,4 @@
+<unit id="numberPerMeterSquared" name="number per meter squared" abbreviation="#/m^2" unitType="arealDensity"
+      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>number per meter squared</description>
+</unit>

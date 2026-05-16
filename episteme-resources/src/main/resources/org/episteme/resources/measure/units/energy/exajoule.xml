@@ -1,0 +1,3 @@
+<unit id="exajoule" name="exajoule" abbreviation="EJ" unitType="energy" parentSI="joule" multiplierToSI="1.0E+18"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

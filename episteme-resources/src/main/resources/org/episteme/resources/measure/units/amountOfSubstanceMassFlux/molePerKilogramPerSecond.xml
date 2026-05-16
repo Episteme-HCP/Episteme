@@ -1,0 +1,4 @@
+<unit id="molePerKilogramPerSecond" name="mole per kilogram per second" abbreviation="mol/kg s"
+      unitType="amountOfSubstanceMassFlux" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

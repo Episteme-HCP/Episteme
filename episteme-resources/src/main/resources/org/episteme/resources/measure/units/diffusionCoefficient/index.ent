@@ -1,0 +1,7 @@
+
+<!ENTITY meterSquaredPerSecond.xml SYSTEM "../diffusionCoefficient/meterSquaredPerSecond.xml">
+
+<!ENTITY diffusionCoefficient.elements	"
+&meterSquaredPerSecond.xml;
+">
+

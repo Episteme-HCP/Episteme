@@ -1,0 +1,4 @@
+<unit id="dekasecond" name="dekasecond" abbreviation="dasec" unitType="time" parentSI="second" multiplierToSI="10"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>10 seconds</description>
+</unit>

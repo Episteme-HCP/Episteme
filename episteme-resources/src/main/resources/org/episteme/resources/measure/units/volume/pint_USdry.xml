@@ -1,0 +1,4 @@
+<unit id="pint_USdry" name="US dry pint" abbreviation="pt" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="5.50611E-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 US dry pint = 1/2 US dry quart</description>
+</unit>

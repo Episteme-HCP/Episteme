@@ -1,0 +1,5 @@
+<unit id="literPerMinute" name="liter per minute" abbreviation="l/min" unitType="volumetricRate"
+      parentSI="meterCubedPerSecond" multiplierToSI="1.6666666666666667E-5"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>liters per minute</description>
+</unit>

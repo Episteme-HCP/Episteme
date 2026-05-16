@@ -1,0 +1,4 @@
+<unit id="weberPerMeterSquared" name="weber per meter squared" abbreviation="Wb/m^2" unitType="magneticFluxDensity"
+      parentSI="tesla" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 Wb/m^2 = 1 T</description>
+</unit>

@@ -1,0 +1,4 @@
+<unit id="numberPerKilometerSquared" name="number per kilometer squared" abbreviation="#/km^2" unitType="arealDensity"
+      parentSI="numberPerMeterSquared" multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>number per kilometer squared</description>
+</unit>

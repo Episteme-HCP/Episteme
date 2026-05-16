@@ -1,0 +1,4 @@
+<unit id="wattPerAmpere" name="watt per ampere" abbreviation="W/A" unitType="electricPotential" parentSI="volt"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 W/A = 1 V</description>
+</unit>

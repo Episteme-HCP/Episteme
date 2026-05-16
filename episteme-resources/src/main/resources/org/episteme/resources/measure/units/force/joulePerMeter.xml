@@ -1,0 +1,3 @@
+<unit id="joulePerMeter" name="joule per meter" abbreviation="J/m" unitType="force" parentSI="newton" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

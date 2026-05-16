@@ -1,0 +1,19 @@
+
+<!ENTITY gramPerMeterSquared.xml SYSTEM "../arealMassDensity/gramPerMeterSquared.xml">
+<!ENTITY kilogramPerCentimeterSquared.xml SYSTEM "../arealMassDensity/kilogramPerCentimeterSquared.xml">
+<!ENTITY kilogramPerHectare.xml SYSTEM "../arealMassDensity/kilogramPerHectare.xml">
+<!ENTITY kilogramPerMeterSquared.xml SYSTEM "../arealMassDensity/kilogramPerMeterSquared.xml">
+<!ENTITY milligramPerMeterSquared.xml SYSTEM "../arealMassDensity/milligramPerMeterSquared.xml">
+<!ENTITY ouncePerFootSquared.xml SYSTEM "../arealMassDensity/ouncePerFootSquared.xml">
+<!ENTITY tonnePerHectare.xml SYSTEM "../arealMassDensity/tonnePerHectare.xml">
+
+<!ENTITY arealMassDensity.elements	"
+&gramPerMeterSquared.xml;
+&kilogramPerCentimeterSquared.xml;
+&kilogramPerHectare.xml;
+&kilogramPerMeterSquared.xml;
+&milligramPerMeterSquared.xml;
+&ouncePerFootSquared.xml;
+&tonnePerHectare.xml;
+">
+

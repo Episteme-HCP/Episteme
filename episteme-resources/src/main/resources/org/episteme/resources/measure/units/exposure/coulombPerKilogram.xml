@@ -1,0 +1,4 @@
+<unit id="coulombPerKilogram" name="coulomb per kilogram" abbreviation="C/kg" unitType="exposure" parentSI="SELF"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>SI unit for exposure</description>
+</unit>

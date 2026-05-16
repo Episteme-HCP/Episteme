@@ -1,0 +1,4 @@
+<unit id="nanocurie" name="nanocurie" abbreviation="nCi" unitType="radionucleotideActivity" parentSI="becquerel"
+      multiplierToSI="37" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 nCi = 37 Bq</description>
+</unit>

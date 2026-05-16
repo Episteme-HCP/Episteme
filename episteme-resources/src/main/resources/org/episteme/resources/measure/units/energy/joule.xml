@@ -1,0 +1,4 @@
+<unit id="joule" name="joule" abbreviation="J" unitType="energy" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>joule = N*m</description>
+</unit>

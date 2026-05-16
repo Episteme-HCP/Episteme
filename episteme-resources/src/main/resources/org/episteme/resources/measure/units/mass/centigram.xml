@@ -1,0 +1,4 @@
+<unit id="centigram" name="centigram" abbreviation="cg" unitType="mass" parentSI="kilogram" multiplierToSI="1.0E-5"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>0.00001 kg.</description>
+</unit>

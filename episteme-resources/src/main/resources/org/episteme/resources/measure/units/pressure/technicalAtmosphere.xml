@@ -1,0 +1,4 @@
+<unit id="technicalAtmosphere" name="technical atmosphere" abbreviation="at" unitType="pressure" parentSI="pascal"
+      multiplierToSI="98066.5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Unit of pressure equal to 1 kg of force per square centimeter</description>
+</unit>

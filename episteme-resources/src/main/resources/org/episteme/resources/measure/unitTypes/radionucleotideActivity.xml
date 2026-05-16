@@ -1,0 +1,3 @@
+<unitType id="radionucleotideActivity" name="radionucleotideActivity">
+    <dimension name="time" power="-1" preserve="no"/>
+</unitType>

@@ -1,0 +1,4 @@
+<unit id="milliwatt" name="milliwatt" abbreviation="mW" unitType="power" parentSI="watt" multiplierToSI="1.0E-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>milliwatt</description>
+</unit>

@@ -1,0 +1,226 @@
+Active codes
+AED United Arab Emirates dirham 
+AFN Afghan afghani 
+ALL Albanian lek 
+AMD Armenian dram 
+ANG Netherlands Antillian guilder 
+AOA Angolan kwanza 
+ARS Argentine peso 
+AUD Australian dollar 
+AWG Aruban guilder 
+AZM Azerbaijani manat 
+BAM Bosnia-Herzegovina convertible mark 
+BBD Barbadian dollar 
+BDT Bangladeshi taka 
+BGN Bulgarian lev (since 1999-07-05) 
+BHD Bahraini dinar 
+BIF Burundi franc 
+BMD Bermuda dollar 
+BND Brunei dollar 
+BOB Bolivian boliviano 
+BOV Bolivian Mvdol (Funds code) 
+BRL Brazilian real 
+BSD Bahamian dollar 
+BTN Bhutan ngultrum 
+BWP Botswana pula 
+BYR Belarusian ruble 
+BZD Belize dollar 
+CAD Canadian dollar 
+CDF Congolese franc 
+CHF Swiss franc 
+CLF Chilean Unidades de fomento (Funds code) 
+CLP Chilean peso 
+CNY Yuan renminbi (PR China) 
+COP Colombian peso 
+COU Colombian unidad de valor real (added to the COP) 
+CRC Costa Rican colón 
+CSD Serbian dinar 
+CUC Cuban convertible peso (replaced USD as additional national currency in November 2004) 
+CUP Cuban peso (still in use) 
+CVE Cape Verde escudo 
+CYP Cyprus pound 
+CZK Czech koruna 
+DJF Djibouti franc 
+DKK Danish krone 
+DOP Dominican peso 
+DZD Algerian dinar 
+EEK Estonian kroon 
+EGP Egyptian pound 
+ERN Eritrea nakfa 
+ETB Ethiopian birr 
+EUR EU euro 
+FJD Fijian dollar 
+FKP Falkland Islands pound 
+GBP Pound sterling 
+GEL Georgian lari 
+GGP Guernsey pound 
+GHC Ghana cedi 
+GIP Gibraltar pound 
+GMD Gambian dalasi 
+GNF Guinea franc 
+GTQ Guatemalan quetzal 
+GWP Guinea-Bissau peso 
+GYD Guyanese dollar 
+HKD Hong Kong dollar 
+HNL Honduran lempira 
+HRK Croatian kuna 
+HTG Haitian gourde 
+HUF Hungarian forint 
+IDR Indonesian rupiah 
+ILS New Israeli shekel 
+INR Indian rupee 
+IQD Iraqi dinar 
+IRR Iranian Rial 
+ISK Icelandic króna 
+JMD Jamaican dollar 
+JOD Jordanian dinar 
+JPY Japanese yen 
+KES Kenyan shilling 
+KGS Kyrgyzstan som 
+KHR Cambodian riel 
+KMF Comoro franc 
+KPW North Korean won 
+KRW South Korean won 
+KWD Kuwaiti dinar 
+KYD Cayman Islands dollar 
+KZT Kazakhstan tenge 
+LAK Lao kip 
+LBP Lebanese pound 
+LKR Sri Lankan rupee 
+LRD Liberian dollar 
+LSL Lesotho loti 
+LTL Lithuanian litas 
+LVL Latvian lat 
+LYD Libyan dinar 
+MAD Moroccan dirham 
+MDL Moldovan leu 
+MGA Malagasy ariary 
+MGF Malagasy franc 
+MKD Macedonian (Former Yug. Rep.) denar 
+MMK Myanmar kyat 
+MNT Mongolian tugrik 
+MOP Macau pataca 
+MRO Mauritanian ouguiya 
+MTL Maltese Lira 
+MUR Mauritius Rupee 
+MVR Maldives Rufiyaa 
+MWK Malawi Kwacha 
+MXN Mexican peso 
+MXV Mexican Unidad de Inversión (UDI) (Funds code) 
+MYR Malaysian Ringgit 
+MZM Mozambique Metical 
+NAD Namibian Dollar 
+NGN Nigerian Naira 
+NIO Nicaraguan Córdoba Oro 
+NOK Norwegian Krone 
+NPR Nepalese Rupee 
+NZD New Zealand Dollar 
+OMR Omani Rial 
+PAB Panama Balboa 
+PEN Peruvian Nuevo Sol 
+PGK Papua New Guinea Kina 
+PHP Philippine peso 
+PKR Pakistani Rupee 
+PLN Polish Zloty 
+PYG Paraguay Guarani 
+QAR Qatari Rial 
+ROL Romanian Leu 
+RUB Russian Ruble 
+RWF Rwanda Franc 
+SAR Saudi Riya 
+SBD Solomon Islands Dollar 
+SCR Seychelles Rupee 
+SDD Sudanese Dinar 
+SEK Swedish Krona 
+SGD Singapore Dollar 
+SHP Saint Helena Pound 
+SIT Slovene Tolar 
+SKK Slovak Koruna 
+SLL Sierra Leonean Leone 
+SOS Somali Shilling 
+SRD Suriname dollar (since 2004-01-01) 
+STD São Tomé and Príncipe dobra 
+SVC El Salvador colón 
+SYP Syrian pound 
+SZL Swaziland Lilangeni 
+THB Thai Baht 
+TJS Tajikistani Somoni 
+TMM Turkmenistan Manat 
+TND Tunisian Dinar 
+TOP Tongan Pa'anga 
+TPE Timor Escudo 
+TRL Turkish Lira 
+TRY New Turkish Lira (effective on 2005-01-01) 
+TTD Trinidad and Tobago Dollar 
+TWD New Taiwan Dollar 
+TZS Tanzanian Shilling 
+UAH Ukrainian Hryvnia 
+UGX Uganda Shilling 
+USD United States Dollar 
+USN United States Dollar (Next day) (Funds code) 
+USS United States Dollar (Same day) (Funds code) (one source claims it is no longer used, but it is still on the ISO 4217-MA list) 
+UYU Peso Uruguayo 
+UZS Uzbekistan Sum 
+VEB Venezuelan bolívar 
+VND Viet Nam Dong 
+VUV Vanuatu Vatu 
+WST Samoa Tala 
+XAF CFA Franc BEAC 
+XAG Silver Ounce 
+XAU Gold Ounce 
+XBA European Composite Unit (EURCO) (Bonds market unit) 
+XBB European Monetary Unit (E.M.U.-6) (Bonds market unit) 
+XBC European Unit of Account 9 (E.U.A.-9) (Bonds market unit) 
+XBD European Unit of Account 17 (E.U.A.-17) (Bonds market unit) 
+XCD East Caribbean Dollar 
+XDR Special Drawing Rights (IMF) 
+XFO Gold-Franc (Special settlement currency) 
+XFU UIC Franc (Special settlement currency) 
+XOF CFA Franc BCEAO 
+XPD Palladium Ounce 
+XPF CFP Franc 
+XPT Platinum Ounce 
+XTS Code reserved for testing purposes 
+XXX No currency 
+YER Yemeni Rial 
+ZAR South African Rand 
+ZMK Zambian Kwacha 
+ZWD Zimbabwe Dollar 
+
+Obsolete Currency Codes
+ADP Andorran Peseta (Euro) 
+AFA Afghani (replaced by AFN) 
+AON Angolan New Kwanza (replaced by AOA) 
+AOR Angolan Kwanza Readjustado (replaced by AOA) 
+ATS Austrian Schilling (Euro) 
+BEC Belgian Franc (convertible) 
+BEF Belgian Franc (Euro) 
+BEL Belgian Franc (financial) 
+BGL Bulgarian Lev (before 1999-07-05) 
+CSK Czechoslovakia Koruna 
+DDM Mark der DDR (East Germany) 
+DEM Deutsche Mark (Euro) 
+ECS Ecuador Sucre (replaced by USD) 
+ECV Ecuador Unidad de Valor Constante (Funds code) (discontinued) 
+ESA Spanish Peseta (account A) 
+ESB Spanish Peseta (account B) 
+ESP Spanish Peseta (Euro) 
+FIM Finnish Markka (Euro) 
+FRF French Franc (Euro) 
+GRD Greek Drachma (Euro) 
+IEP Irish Pound (Euro) 
+ITL Italian Lira (Euro) 
+LUF Luxembourg Franc (Euro) 
+MXP Mexican Peso (replaced by MXN) 
+NLG Netherlands Guilder (Euro) 
+PLZ Polish Zloty (replaced by PLN) 
+PTE Portuguese Escudo (Euro) 
+RUR Russian Ruble (replaced by RUB) 
+SRG Suriname Guilder (replaced by SRD) 
+SUR Soviet Union Rouble 
+XEU European Currency Unit (replaced by EUR) 
+YUD New Yugoslavian Dinar (replaced by YUM) 
+YUM Yugoslavian Dinar (Serbian dinar - CSD) 
+ZAL South African financial rand (Funds code) (discontinued) 
+ZRN New Zaire (replaced by CDF) 
+ZRZ Zaire (replaced by ZRN, then by CDF) 

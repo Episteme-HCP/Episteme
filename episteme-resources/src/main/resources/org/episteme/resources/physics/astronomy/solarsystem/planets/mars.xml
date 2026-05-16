@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Mars</name>
+    <mass>0.64185</mass>
+    <volume>16.318</volume>
+    <equatorial-radius>3397</equatorial-radius>
+    <polar-radius>3375</polar-radius>
+    <volumetric-mean-radius>3390</volumetric-mean-radius>
+    <ellipticity>0.00648</ellipticity>
+    <mean-density>3933</mean-density>
+    <surface-gravity>3.71</surface-gravity>
+    <surface-acceleration>3.69</surface-acceleration>
+    <escape-velocity>5.03</escape-velocity>
+    <GM>0.04283</GM>
+    <bond-albedo>0.250</bond-albedo>
+    <visual-geometric-albedo>0.150</visual-geometric-albedo>
+    <visual-magnitude>-1.52</visual-magnitude>
+    <solar-irradiance>589.2</solar-irradiance>
+    <black-body-temperature>210.1</black-body-temperature>
+    <moment-of-inertia>0.366</moment-of-inertia>
+    <J2>1960.45</J2>
+    <number-of-natural-satellites>2</number-of-natural-satellites>
+    <planetary-ring-system>No</planetary-ring-system>
+    <semi-major-axis>227.92</semi-major-axis>
+    <sidereal-orbit-period>686.980</sidereal-orbit-period>
+    <tropical-orbit-period>686.973</tropical-orbit-period>
+    <perihelion>206.62</perihelion>
+    <aphelion>249.23</aphelion>
+    <synodic-period>779.94</synodic-period>
+    <mean-orbital-velocity>24.13</mean-orbital-velocity>
+    <maximum-orbital-velocity>26.50</maximum-orbital-velocity>
+    <minimum-orbital-velocity>21.97</minimum-orbital-velocity>
+    <orbit-inclination>1.850</orbit-inclination>
+    <orbit-eccentricity>0.0935</orbit-eccentricity>
+    <sidereal-rotation-period>24.6229</sidereal-rotation-period>
+    <length-of-day>24.6597</length-of-day>
+    <obliquity-to-orbit>25.19</obliquity-to-orbit>
+    <surface-pressure>0.00636</surface-pressure>
+    <average-temperature>210</average-temperature>
+    <atmospheric-composition>Carbon Dioxide (CO2) - 95.32%; Nitrogen (N2) - 2.7%; Argon (Ar) - 1.6%; Oxygen (O2) -
+        0.13%; Carbon Monoxide (CO) - 0.08%
+    </atmospheric-composition>
+</natural-satellite>

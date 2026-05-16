@@ -1,0 +1,4 @@
+<unit id="abfarad" name="abfarad" unitType="capacitance" parentSI="farad" multiplierToSI="1.0E+9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Part of the CGS absolute electromagnetic system. 1 abfarad = 1 gigafarad</description>
+</unit>

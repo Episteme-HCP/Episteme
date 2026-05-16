@@ -1,0 +1,15 @@
+
+<!ENTITY caloriePerKelvin.xml SYSTEM "../entropy/caloriePerKelvin.xml">
+<!ENTITY clausius.xml SYSTEM "../entropy/clausius.xml">
+<!ENTITY joulePerKelvin.xml SYSTEM "../entropy/joulePerKelvin.xml">
+<!ENTITY kilocaloriePerKelvin.xml SYSTEM "../entropy/kilocaloriePerKelvin.xml">
+<!ENTITY kilojoulePerKelvin.xml SYSTEM "../entropy/kilojoulePerKelvin.xml">
+
+<!ENTITY entropy.elements	"
+&caloriePerKelvin.xml;
+&clausius.xml;
+&joulePerKelvin.xml;
+&kilocaloriePerKelvin.xml;
+&kilojoulePerKelvin.xml;
+">
+

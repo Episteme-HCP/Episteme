@@ -1,0 +1,4 @@
+<unit id="candelaPerMeterSquared" name="candela per meter squared" abbreviation="cd/m^2" unitType="luminance"
+      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>candela Per Square Meter</description>
+</unit>

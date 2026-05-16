@@ -1,0 +1,4 @@
+<unit id="gallon_imperial" name="imperial gallon" abbreviation="gal" unitType="volume" parentSI="meterCubed"
+      multiplierToSI="4.54609E-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Imperial gallon. 1 imperial gallon = 4 imperial quarts</description>
+</unit>

@@ -1,0 +1,7 @@
+
+<!ENTITY joulePerKilogramPerKelvin.xml SYSTEM "../specificEntropy/joulePerKilogramPerKelvin.xml">
+
+<!ENTITY specificEntropy.elements	"
+&joulePerKilogramPerKelvin.xml;
+">
+

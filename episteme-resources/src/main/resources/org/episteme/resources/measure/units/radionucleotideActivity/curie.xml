@@ -1,0 +1,4 @@
+<unit id="curie" name="curie" abbreviation="Ci" unitType="radionucleotideActivity" parentSI="becquerel"
+      multiplierToSI="3.7E+10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 Ci = 37 GBq</description>
+</unit>

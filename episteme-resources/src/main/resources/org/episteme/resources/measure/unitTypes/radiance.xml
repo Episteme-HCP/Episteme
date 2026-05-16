@@ -1,0 +1,5 @@
+<unitType id="radiance" name="radiance">
+    <dimension name="mass" power="1" preserve="no"/>
+    <dimension name="time" power="-3" preserve="no"/>
+    <dimension name="angle" power="-2" preserve="no"/>
+</unitType>

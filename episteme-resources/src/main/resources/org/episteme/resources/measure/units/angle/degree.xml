@@ -1,0 +1,4 @@
+<unit id="degree" name="degree" abbreviation="deg" unitType="angle" parentSI="radian" multiplierToSI="1.74532925E-2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>360 degrees = (2pi) radians</description>
+</unit>

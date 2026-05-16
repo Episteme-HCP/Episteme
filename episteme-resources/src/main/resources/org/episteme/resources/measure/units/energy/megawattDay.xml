@@ -1,0 +1,4 @@
+<unit id="megawattDay" name="megawatt day" abbreviation="MW d" unitType="energy" parentSI="joule"
+      multiplierToSI="8.64E+10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 megawatt day = 86.4 GJ</description>
+</unit>

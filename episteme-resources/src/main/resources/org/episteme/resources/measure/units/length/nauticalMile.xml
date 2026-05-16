@@ -1,0 +1,4 @@
+<unit id="nauticalMile" name="nauticalMile" unitType="length" parentSI="meter" multiplierToSI="1852"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>natical mile</description>
+</unit>

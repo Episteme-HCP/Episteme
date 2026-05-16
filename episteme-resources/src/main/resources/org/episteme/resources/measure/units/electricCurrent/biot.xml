@@ -1,0 +1,4 @@
+<unit id="biot" name="biot" abbreviation="Bi" unitType="electricCurrent" parentSI="ampere" multiplierToSI="10"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>CGS unit of electrical current</description>
+</unit>

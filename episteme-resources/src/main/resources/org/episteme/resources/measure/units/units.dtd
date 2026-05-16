@@ -1,0 +1,15 @@
+<!ELEMENT	unitList (unit+)>
+<!ELEMENT	unit (annotation?)>
+<!ATTLIST	unit
+id 	CDATA	#REQUIRED
+name 	CDATA	#REQUIRED
+abbreviation	CDATA	#IMPLIED
+unitType	CDATA	#REQUIRED
+parentSI	CDATA	#REQUIRED
+multiplierToSI	CDATA	#REQUIRED
+constantToSI	CDATA	#REQUIRED
+>
+<!ELEMENT	annotation 	(documentation | appinfo)*>
+<!ELEMENT	documentation	ANY>
+<!ELEMENT	appinfo		ANY>
+

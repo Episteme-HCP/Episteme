@@ -1,0 +1,3 @@
+<unit id="electronvoltPerAngstrom" name="electronvolt per Angstrom" unitType="force" parentSI="newton"
+      multiplierToSI="1.60218E-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

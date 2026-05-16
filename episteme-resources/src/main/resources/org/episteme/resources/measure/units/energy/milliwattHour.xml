@@ -1,0 +1,4 @@
+<unit id="milliwattHour" name="milliwatt hour" abbreviation="mW h" unitType="energy" parentSI="joule"
+      multiplierToSI="3.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>3.6 J</description>
+</unit>

@@ -1,0 +1,93 @@
+
+<!ENTITY angstrom.xml SYSTEM "../length/angstrom.xml">
+<!ENTITY astronomicalUnit.xml SYSTEM "../length/astronomicalUnit.xml">
+<!ENTITY bohr.xml SYSTEM "../length/bohr.xml">
+<!ENTITY cable.xml SYSTEM "../length/cable.xml">
+<!ENTITY centimeter.xml SYSTEM "../length/centimeter.xml">
+<!ENTITY chain.xml SYSTEM "../length/chain.xml">
+<!ENTITY decimeter.xml SYSTEM "../length/decimeter.xml">
+<!ENTITY dekameter.xml SYSTEM "../length/dekameter.xml">
+<!ENTITY exameter.xml SYSTEM "../length/exameter.xml">
+<!ENTITY fathom.xml SYSTEM "../length/fathom.xml">
+<!ENTITY femtometer.xml SYSTEM "../length/femtometer.xml">
+<!ENTITY foot.xml SYSTEM "../length/foot.xml">
+<!ENTITY foot_Gold_Coast.xml SYSTEM "../length/foot_Gold_Coast.xml">
+<!ENTITY foot_US.xml SYSTEM "../length/foot_US.xml">
+<!ENTITY furlong.xml SYSTEM "../length/furlong.xml">
+<!ENTITY gigameter.xml SYSTEM "../length/gigameter.xml">
+<!ENTITY hectometer.xml SYSTEM "../length/hectometer.xml">
+<!ENTITY inch.xml SYSTEM "../length/inch.xml">
+<!ENTITY kilofoot.xml SYSTEM "../length/kilofoot.xml">
+<!ENTITY kilometer.xml SYSTEM "../length/kilometer.xml">
+<!ENTITY kiloyard.xml SYSTEM "../length/kiloyard.xml">
+<!ENTITY lightDay.xml SYSTEM "../length/lightDay.xml">
+<!ENTITY lightMinute.xml SYSTEM "../length/lightMinute.xml">
+<!ENTITY lightSecond.xml SYSTEM "../length/lightSecond.xml">
+<!ENTITY lightYear.xml SYSTEM "../length/lightYear.xml">
+<!ENTITY link.xml SYSTEM "../length/link.xml">
+<!ENTITY link_Clarke.xml SYSTEM "../length/link_Clarke.xml">
+<!ENTITY megameter.xml SYSTEM "../length/megameter.xml">
+<!ENTITY meter.xml SYSTEM "../length/meter.xml">
+<!ENTITY microinch.xml SYSTEM "../length/microinch.xml">
+<!ENTITY micrometer.xml SYSTEM "../length/micrometer.xml">
+<!ENTITY micron.xml SYSTEM "../length/micron.xml">
+<!ENTITY mile.xml SYSTEM "../length/mile.xml">
+<!ENTITY millimeter.xml SYSTEM "../length/millimeter.xml">
+<!ENTITY nanometer.xml SYSTEM "../length/nanometer.xml">
+<!ENTITY nauticalMile.xml SYSTEM "../length/nauticalMile.xml">
+<!ENTITY petameter.xml SYSTEM "../length/petameter.xml">
+<!ENTITY rod.xml SYSTEM "../length/rod.xml">
+<!ENTITY terameter.xml SYSTEM "../length/terameter.xml">
+<!ENTITY yard.xml SYSTEM "../length/yard.xml">
+<!ENTITY yard_Indian.xml SYSTEM "../length/yard_Indian.xml">
+<!ENTITY yard_Sears.xml SYSTEM "../length/yard_Sears.xml">
+<!ENTITY yottameter.xml SYSTEM "../length/yottameter.xml">
+<!ENTITY zettameter.xml SYSTEM "../length/zettameter.xml">
+
+<!ENTITY length.elements	"
+&angstrom.xml;
+&astronomicalUnit.xml;
+&bohr.xml;
+&cable.xml;
+&centimeter.xml;
+&chain.xml;
+&decimeter.xml;
+&dekameter.xml;
+&exameter.xml;
+&fathom.xml;
+&femtometer.xml;
+&foot.xml;
+&foot_Gold_Coast.xml;
+&foot_US.xml;
+&furlong.xml;
+&gigameter.xml;
+&hectometer.xml;
+&inch.xml;
+&kilofoot.xml;
+&kilometer.xml;
+&kiloyard.xml;
+&lightDay.xml;
+&lightMinute.xml;
+&lightSecond.xml;
+&lightYear.xml;
+&link.xml;
+&link_Clarke.xml;
+&megameter.xml;
+&meter.xml;
+&microinch.xml;
+&micrometer.xml;
+&micron.xml;
+&mile.xml;
+&millimeter.xml;
+&nanometer.xml;
+&nauticalMile.xml;
+&petameter.xml;
+&rod.xml;
+&terameter.xml;
+&yard.xml;
+&yard_Indian.xml;
+&yard_Sears.xml;
+&yottameter.xml;
+&zettameter.xml;
+">
+

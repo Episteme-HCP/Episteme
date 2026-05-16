@@ -1,0 +1,7 @@
+
+<!ENTITY katalPerMeterCubed.xml SYSTEM "../catalyticActivityConcentration/katalPerMeterCubed.xml">
+
+<!ENTITY catalyticActivityConcentration.elements	"
+&katalPerMeterCubed.xml;
+">
+

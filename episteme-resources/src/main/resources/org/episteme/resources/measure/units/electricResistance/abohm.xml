@@ -1,0 +1,4 @@
+<unit id="abohm" name="abohm" unitType="electricResistance" parentSI="ohm" multiplierToSI="1.0E-9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Part of the CGS absolute electromagnetic system. 1 abohm = 1 nanoohm</description>
+</unit>

@@ -1,0 +1,4 @@
+<unitType id="magneticFieldStrength" name="magneticFieldStrength">
+    <dimension name="current" power="1" preserve="no"/>
+    <dimension name="length" power="-1" preserve="no"/>
+</unitType>

@@ -1,0 +1,3 @@
+<unit id="kilometerPerHour" name="kilometer per hour" abbreviation="km/h" unitType="speed" parentSI="meterPerSecond"
+      multiplierToSI="0.27777777777777777777777777777778" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

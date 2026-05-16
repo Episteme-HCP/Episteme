@@ -1,0 +1,3 @@
+<unit id="const.gas" name="Gas constant" abbreviation="R" unitType="molarEntropy" parentSI="joulePerMolePerKelvin"
+      multiplierToSI="8.314510" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

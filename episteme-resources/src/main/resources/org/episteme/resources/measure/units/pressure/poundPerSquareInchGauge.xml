@@ -1,0 +1,9 @@
+<unit id="poundPerSquareInchGauge" name="Pound per square inch gauge" abbreviation="psig" unitType="pressure"
+      parentSI="pascal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <unit ref="inch" power="-2"/>
+    <unit ref="pound" power="1"/>
+    <unit ref="earthGravity" power="1"/>
+    <description>Fluid pressure (liquid and gas) as measured on a pressure gauge without the inclusion of atmospheric
+        pressure
+    </description>
+</unit>

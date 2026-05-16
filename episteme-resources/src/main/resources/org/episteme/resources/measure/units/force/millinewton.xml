@@ -1,0 +1,3 @@
+<unit id="millinewton" name="millinewton" abbreviation="mN" unitType="force" parentSI="newton" multiplierToSI="1.0E-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

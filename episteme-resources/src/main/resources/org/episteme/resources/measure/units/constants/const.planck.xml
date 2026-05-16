@@ -1,0 +1,3 @@
+<unit id="const.planck" name="Planck constant" abbreviation="h" unitType="angularMomentum" parentSI="jouleSecond"
+      multiplierToSI="6.6260755E-34" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

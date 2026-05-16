@@ -1,0 +1,5 @@
+<unit id="tonnePerYear" name="tonne per year" unitType="massFlux" parentSI="kilogramPerSecond"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <unit ref="tonne" power="1"/>
+    <unit ref="year" power="-1"/>
+</unit>

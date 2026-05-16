@@ -1,0 +1,4 @@
+<unit id="kilovolt" name="kilovolt" abbreviation="kV" unitType="electricPotential" parentSI="volt" multiplierToSI="1000"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>kilovolt</description>
+</unit>

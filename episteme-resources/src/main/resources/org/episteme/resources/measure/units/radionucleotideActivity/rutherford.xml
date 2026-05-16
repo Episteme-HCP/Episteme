@@ -1,0 +1,4 @@
+<unit id="rutherford" name="rutherford" abbreviation="Rd" unitType="radionucleotideActivity" parentSI="becquerel"
+      multiplierToSI="1.0E+6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 rutherford = 1 MBq</description>
+</unit>

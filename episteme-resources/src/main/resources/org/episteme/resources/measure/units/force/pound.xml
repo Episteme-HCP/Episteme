@@ -1,0 +1,4 @@
+<unit id="pound" name="pound" abbreviation="lbf" unitType="force" parentSI="newton" multiplierToSI="4.448198"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 pound of force (lbf) = 1 pound of mass (lbm) * gravitational acceleration</description>
+</unit>

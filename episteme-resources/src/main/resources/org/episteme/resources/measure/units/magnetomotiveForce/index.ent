@@ -1,0 +1,9 @@
+
+<!ENTITY ampereTurn.xml SYSTEM "../magnetomotiveForce/ampereTurn.xml">
+<!ENTITY gilbert.xml SYSTEM "../magnetomotiveForce/gilbert.xml">
+
+<!ENTITY magnetomotiveForce.elements	"
+&ampereTurn.xml;
+&gilbert.xml;
+">
+

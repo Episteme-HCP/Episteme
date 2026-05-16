@@ -1,0 +1,4 @@
+<unit id="rydberg" name="Rydberg" abbreviation="E_R" unitType="energy" parentSI="joule" multiplierToSI="2.1798741E-18"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Unit of energy equivalent to 0.5 Hartree</description>
+</unit>

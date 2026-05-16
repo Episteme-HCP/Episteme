@@ -1,0 +1,4 @@
+<unit id="megagram" name="megagram" abbreviation="Mg" unitType="mass" parentSI="kilogram" multiplierToSI="1.0E+3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1000 kg</description>
+</unit>

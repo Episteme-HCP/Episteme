@@ -1,0 +1,4 @@
+<unit id="therm" name="therm" abbreviation="thm" unitType="energy" parentSI="joule" multiplierToSI="1.0550559E+8"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 therm = 100000 btu</description>
+</unit>

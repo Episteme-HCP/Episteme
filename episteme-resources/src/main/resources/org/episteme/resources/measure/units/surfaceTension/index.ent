@@ -1,0 +1,7 @@
+
+<!ENTITY newtonPerMeter.xml SYSTEM "../surfaceTension/newtonPerMeter.xml">
+
+<!ENTITY surfaceTension.elements	"
+&newtonPerMeter.xml;
+">
+

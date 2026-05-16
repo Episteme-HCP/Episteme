@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Earth</name>
+    <mass>5.9736</mass>
+    <volume>108.321</volume>
+    <equatorial-radius>6378.1</equatorial-radius>
+    <polar-radius>6356.8</polar-radius>
+    <volumetric-mean-radius>6371.0</volumetric-mean-radius>
+    <ellipticity>0.00335</ellipticity>
+    <mean-density>5515</mean-density>
+    <surface-gravity>9.798</surface-gravity>
+    <surface-acceleration>9.780</surface-acceleration>
+    <escape-velocity>11.186</escape-velocity>
+    <GM>0.3986</GM>
+    <bond-albedo>0.306</bond-albedo>
+    <visual-geometric-albedo>0.367</visual-geometric-albedo>
+    <visual-magnitude>-3.86</visual-magnitude>
+    <solar-irradiance>1367.6</solar-irradiance>
+    <black-body-temperature>254.3</black-body-temperature>
+    <moment-of-inertia>0.3308</moment-of-inertia>
+    <J2>1082.63</J2>
+    <number-of-natural-satellites>1</number-of-natural-satellites>
+    <planetary-ring-system>No</planetary-ring-system>
+    <semi-major-axis>149.60</semi-major-axis>
+    <sidereal-orbit-period>365.256</sidereal-orbit-period>
+    <tropical-orbit-period>365.242</tropical-orbit-period>
+    <perihelion>147.09</perihelion>
+    <aphelion>152.10</aphelion>
+    <synodic-period></synodic-period>
+    <mean-orbital-velocity>29.78</mean-orbital-velocity>
+    <maximum-orbital-velocity>30.29</maximum-orbital-velocity>
+    <minimum-orbital-velocity>29.29</minimum-orbital-velocity>
+    <orbit-inclination>0.000</orbit-inclination>
+    <orbit-eccentricity>0.0167</orbit-eccentricity>
+    <sidereal-rotation-period>23.9345</sidereal-rotation-period>
+    <length-of-day>24.0000</length-of-day>
+    <obliquity-to-orbit>23.45</obliquity-to-orbit>
+    <surface-pressure>1.014</surface-pressure>
+    <average-temperature>288</average-temperature>
+    <atmospheric-composition>78.084% Nitrogen (N2); 20.946% Oxygen (O2)</atmospheric-composition>
+</natural-satellite>

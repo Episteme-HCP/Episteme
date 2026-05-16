@@ -1,0 +1,4 @@
+<unit id="pond" name="pond" abbreviation="p" unitType="force" parentSI="newton" multiplierToSI="9.80665E-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Gravitational force on a mass of 1g</description>
+</unit>

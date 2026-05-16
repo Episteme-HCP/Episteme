@@ -1,0 +1,3 @@
+<unit id="joulePerMeterCubed" name="Joule per meter cubed" abbreviation="J/m^3" unitType="energyDensity" parentSI="SELF"
+      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

@@ -1,0 +1,4 @@
+<unit id="candelaPerCentimeterSquared" name="candela per centimeter squared" abbreviation="cd/cm^2" unitType="luminance"
+      parentSI="candelaPerMeterSquared" multiplierToSI="1.0E+4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 cd/cm^2 = 1 sb</description>
+</unit>

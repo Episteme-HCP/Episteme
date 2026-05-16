@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Pluto</name>
+    <mass>0.0125</mass>
+    <volume>0.715</volume>
+    <equatorial-radius>1195</equatorial-radius>
+    <polar-radius>1195</polar-radius>
+    <volumetric-mean-radius>1195</volumetric-mean-radius>
+    <ellipticity>0.0000</ellipticity>
+    <mean-density>1750</mean-density>
+    <surface-gravity>0.58</surface-gravity>
+    <surface-acceleration>0.58</surface-acceleration>
+    <escape-velocity>1.1</escape-velocity>
+    <GM>0.00083</GM>
+    <bond-albedo>0.5</bond-albedo>
+    <visual-geometric-albedo>0.6</visual-geometric-albedo>
+    <visual-magnitude>-1.0</visual-magnitude>
+    <solar-irradiance>0.89</solar-irradiance>
+    <black-body-temperature>37.5</black-body-temperature>
+    <moment-of-inertia></moment-of-inertia>
+    <J2></J2>
+    <number-of-natural-satellites>1</number-of-natural-satellites>
+    <planetary-ring-system>No</planetary-ring-system>
+    <semi-major-axis>5869.66</semi-major-axis>
+    <sidereal-orbit-period>90465</sidereal-orbit-period>
+    <tropical-orbit-period>90588</tropical-orbit-period>
+    <perihelion>4434.99</perihelion>
+    <aphelion>7304.33</aphelion>
+    <synodic-period>366.73</synodic-period>
+    <mean-orbital-velocity>4.72</mean-orbital-velocity>
+    <maximum-orbital-velocity>6.10</maximum-orbital-velocity>
+    <minimum-orbital-velocity>3.71</minimum-orbital-velocity>
+    <orbit-inclination>17.16</orbit-inclination>
+    <orbit-eccentricity>0.2444</orbit-eccentricity>
+    <sidereal-rotation-period>-153.2928</sidereal-rotation-period>
+    <length-of-day>153.2820</length-of-day>
+    <obliquity-to-orbit>122.53</obliquity-to-orbit>
+    <surface-pressure>3E-6</surface-pressure>
+    <average-temperature>50</average-temperature>
+    <atmospheric-composition>Methane (CH4); Nitrogen (N2)</atmospheric-composition>
+</natural-satellite>

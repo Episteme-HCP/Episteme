@@ -1,0 +1,4 @@
+<unit id="kilocaloriePerMolePerKelvin" name="kilocalorie per mole per Kelvin" abbreviation="kcal/mol K"
+      unitType="molarEntropy" parentSI="joulePerMolePerKelvin" multiplierToSI="4.184E+03"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

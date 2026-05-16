@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>star</type>
+        <name>sun</name>
+    </general>
+    <parameter>
+        <diameter>1391940.0</diameter>
+        <!-- km -->
+        <rotationperiod>24.6</rotationperiod>
+        <!-- day -->
+        <orbiteccentricity>0</orbiteccentricity>
+        <orbitinclinationtoecliptic>0</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <inclinationofequatortoorbit>0</inclinationofequatortoorbit>
+        <!-- ° -->
+        <volume>1304000</volume>
+        <mass>1.989e33</mass>
+        <!-- g -->
+        <density>1.41</density>
+        <!-- g/cm3 -->
+        <surfacegravity>0</surfacegravity>
+        <!-- m/s2 -->
+        <escapevelocity>617.7</escapevelocity>
+        <!-- km/s -->
+        <meantempatsolidsurface>6400</meantempatsolidsurface>
+        <!-- Kelvin -->
+        <majoratmosphericconstitutents>H,He,N,O,Ne</majoratmosphericconstitutents>
+    </parameter>
+</celestialobject>

@@ -1,0 +1,4 @@
+<unit id="abcoulomb" name="abcoulomb" unitType="electricCharge" parentSI="coulomb" multiplierToSI="10"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Unit of charge which is part of the CGS absolute electromagnetic system</description>
+</unit>

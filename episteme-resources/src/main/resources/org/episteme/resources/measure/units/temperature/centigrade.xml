@@ -1,0 +1,4 @@
+<unit id="centigrade" name="centigrade" abbreviation="C" unitType="temperature" parentSI="kelvin" multiplierToSI="1"
+      constantToSI="273.15" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Older name for degree Celsius</description>
+</unit>

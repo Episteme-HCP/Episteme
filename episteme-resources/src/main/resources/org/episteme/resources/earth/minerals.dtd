@@ -1,0 +1,14 @@
+<!-- entities -->
+
+<!-- the top level element -->
+<!ELEMENT mineral(name, class, formula, structure, habit)>
+
+<!-- elements -->
+<!ELEMENT name         (#PCDATA)>
+<!ELEMENT class        (#PCDATA)>
+<!ELEMENT formula      (#PCDATA)>
+<!ELEMENT structure    (#PCDATA)>
+<!ELEMENT habit        (#PCDATA)>
+
+
+

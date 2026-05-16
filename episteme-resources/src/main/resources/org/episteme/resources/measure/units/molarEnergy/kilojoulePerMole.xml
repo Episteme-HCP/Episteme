@@ -1,0 +1,4 @@
+<unit id="kilojoulePerMole" name="kilojoule per mole" abbreviation="kJ/mol" unitType="molarEnergy"
+      parentSI="joulePerMole" multiplierToSI="1000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Molar energy</description>
+</unit>

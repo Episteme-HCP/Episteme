@@ -1,0 +1,5 @@
+<unit id="month" name="month" unitType="time" parentSI="second" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>28 days (ugh). Do not use for accurate work</description>
+    <unit ref="day" power="1"/>
+    <multiplier>28</multiplier>
+</unit>

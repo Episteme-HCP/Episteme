@@ -1,0 +1,4 @@
+<unit id="kilogram" name="kilogram" abbreviation="kgf" unitType="force" parentSI="newton" multiplierToSI="9.80665"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 kilogram force = 1 kilogram mass * gravitational acceleration</description>
+</unit>

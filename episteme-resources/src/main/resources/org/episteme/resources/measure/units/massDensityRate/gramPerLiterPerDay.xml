@@ -1,0 +1,6 @@
+<unit id="gramPerLiterPerDay" name="gram per liter per day" unitType="massDensityRate"
+      parentSI="kilogramPerMeterCubedPerSecond" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <unit ref="gram" power="1"/>
+    <unit ref="liter" power="-1"/>
+    <unit ref="day" power="-1"/>
+</unit>

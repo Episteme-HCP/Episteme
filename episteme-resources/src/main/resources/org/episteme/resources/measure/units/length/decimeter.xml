@@ -1,0 +1,4 @@
+<unit id="decimeter" name="decimeter" abbreviation="dm" unitType="length" parentSI="meter" multiplierToSI="0.1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>0.1 meters</description>
+</unit>

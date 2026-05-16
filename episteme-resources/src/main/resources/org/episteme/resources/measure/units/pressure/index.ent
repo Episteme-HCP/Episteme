@@ -1,0 +1,61 @@
+
+<!ENTITY atmosphere.xml SYSTEM "../pressure/atmosphere.xml">
+<!ENTITY bar.xml SYSTEM "../pressure/bar.xml">
+<!ENTITY barye.xml SYSTEM "../pressure/barye.xml">
+<!ENTITY centibar.xml SYSTEM "../pressure/centibar.xml">
+<!ENTITY centimeterOfMercury.xml SYSTEM "../pressure/centimeterOfMercury.xml">
+<!ENTITY decibar.xml SYSTEM "../pressure/decibar.xml">
+<!ENTITY dynePerCmSquared.xml SYSTEM "../pressure/dynePerCmSquared.xml">
+<!ENTITY gigapascal.xml SYSTEM "../pressure/gigapascal.xml">
+<!ENTITY hectobar.xml SYSTEM "../pressure/hectobar.xml">
+<!ENTITY hectopascal.xml SYSTEM "../pressure/hectopascal.xml">
+<!ENTITY inchOfMercury.xml SYSTEM "../pressure/inchOfMercury.xml">
+<!ENTITY kilobar.xml SYSTEM "../pressure/kilobar.xml">
+<!ENTITY kilogramPerCentimeterSquared.xml SYSTEM "../pressure/kilogramPerCentimeterSquared.xml">
+<!ENTITY kilogramPerMeterSquared.xml SYSTEM "../pressure/kilogramPerMeterSquared.xml">
+<!ENTITY kilopascal.xml SYSTEM "../pressure/kilopascal.xml">
+<!ENTITY megabar.xml SYSTEM "../pressure/megabar.xml">
+<!ENTITY megapascal.xml SYSTEM "../pressure/megapascal.xml">
+<!ENTITY microbar.xml SYSTEM "../pressure/microbar.xml">
+<!ENTITY millibar.xml SYSTEM "../pressure/millibar.xml">
+<!ENTITY millimeterOfMercury.xml SYSTEM "../pressure/millimeterOfMercury.xml">
+<!ENTITY nanobar.xml SYSTEM "../pressure/nanobar.xml">
+<!ENTITY newtonPerMeterSquared.xml SYSTEM "../pressure/newtonPerMeterSquared.xml">
+<!ENTITY pascal.xml SYSTEM "../pressure/pascal.xml">
+<!ENTITY poundPerFootSquared.xml SYSTEM "../pressure/poundPerFootSquared.xml">
+<!ENTITY poundPerSquareInchAbsolute.xml SYSTEM "../pressure/poundPerSquareInchAbsolute.xml">
+<!ENTITY poundPerSquareInchGauge.xml SYSTEM "../pressure/poundPerSquareInchGauge.xml">
+<!ENTITY technicalAtmosphere.xml SYSTEM "../pressure/technicalAtmosphere.xml">
+<!ENTITY torr.xml SYSTEM "../pressure/torr.xml">
+
+<!ENTITY pressure.elements	"
+&atmosphere.xml;
+&bar.xml;
+&barye.xml;
+&centibar.xml;
+&centimeterOfMercury.xml;
+&decibar.xml;
+&dynePerCmSquared.xml;
+&gigapascal.xml;
+&hectobar.xml;
+&hectopascal.xml;
+&inchOfMercury.xml;
+&kilobar.xml;
+&kilogramPerCentimeterSquared.xml;
+&kilogramPerMeterSquared.xml;
+&kilopascal.xml;
+&megabar.xml;
+&megapascal.xml;
+&microbar.xml;
+&millibar.xml;
+&millimeterOfMercury.xml;
+&nanobar.xml;
+&newtonPerMeterSquared.xml;
+&pascal.xml;
+&poundPerFootSquared.xml;
+&poundPerSquareInchAbsolute.xml;
+&poundPerSquareInchGauge.xml;
+&technicalAtmosphere.xml;
+&torr.xml;
+">
+

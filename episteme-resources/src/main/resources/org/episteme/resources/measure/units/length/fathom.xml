@@ -1,0 +1,4 @@
+<unit id="fathom" name="fathom" unitType="length" parentSI="meter" multiplierToSI="1.8288"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>6 feet</description>
+</unit>

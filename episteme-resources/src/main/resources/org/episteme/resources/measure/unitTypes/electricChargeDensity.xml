@@ -1,0 +1,5 @@
+<unitType id="electricChargeDensity" name="electric charge density">
+    <dimension name="length" power="-3" preserve="no"/>
+    <dimension name="current" power="1" preserve="no"/>
+    <dimension name="time" power="1" preserve="no"/>
+</unitType>

@@ -1,0 +1,13 @@
+
+<!ENTITY centimeterPerSecondSquared.xml SYSTEM "../acceleration/centimeterPerSecondSquared.xml">
+<!ENTITY footPerSecondSquared.xml SYSTEM "../acceleration/footPerSecondSquared.xml">
+<!ENTITY galileo.xml SYSTEM "../acceleration/galileo.xml">
+<!ENTITY meterPerSecondSquared.xml SYSTEM "../acceleration/meterPerSecondSquared.xml">
+
+<!ENTITY acceleration.elements	"
+&centimeterPerSecondSquared.xml;
+&footPerSecondSquared.xml;
+&galileo.xml;
+&meterPerSecondSquared.xml; 
+">
+

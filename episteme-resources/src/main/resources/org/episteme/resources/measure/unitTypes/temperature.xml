@@ -1,0 +1,3 @@
+<unitType id="temperature" name="thermodynamic temperature">
+    <dimension name="temp" power="1" preserve="no"/>
+</unitType>

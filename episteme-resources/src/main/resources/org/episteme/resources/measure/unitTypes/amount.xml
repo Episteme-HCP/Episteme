@@ -1,0 +1,3 @@
+<unitType id="amount" name="amount of substance">
+    <dimension name="amount" power="1" preserve="no"/>
+</unitType>

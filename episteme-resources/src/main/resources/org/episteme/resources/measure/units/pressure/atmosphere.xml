@@ -1,0 +1,4 @@
+<unit id="atmosphere" name="atmosphere" abbreviation="atm" unitType="pressure" parentSI="pascal" multiplierToSI="101325"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 atmosphere = 101325 pascals</description>
+</unit>

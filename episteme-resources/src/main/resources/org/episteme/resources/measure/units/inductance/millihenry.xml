@@ -1,0 +1,4 @@
+<unit id="millihenry" name="millihenry" abbreviation="mH" unitType="inductance" parentSI="henry" multiplierToSI="1.0E-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>0.001 henry</description>
+</unit>

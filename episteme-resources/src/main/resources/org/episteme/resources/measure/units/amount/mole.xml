@@ -1,0 +1,4 @@
+<unit id="mole" name="mole" abbreviation="mol" unitType="amount" parentSI="SELF" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>SI unit of substance amount</description>
+</unit>

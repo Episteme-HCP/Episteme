@@ -1,0 +1,1 @@
+<!ELEMENT oxydoreduction* (halfequation , potential)>

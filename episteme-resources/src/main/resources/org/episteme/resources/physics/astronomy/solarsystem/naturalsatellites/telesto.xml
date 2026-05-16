@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<celestialobject>
+    <general>
+        <type>moon</type>
+        <name>telesto</name>
+        <parent>saturn</parent>
+    </general>
+    <parameter>
+        <diameter>30</diameter>
+        <!-- km -->
+        <rotationperiod>1.888</rotationperiod>
+        <!-- day -->
+        <orbitperiod>1.888</orbitperiod>
+        <!-- day -->
+        <orbiteccentricity>0.0009</orbiteccentricity>
+        <orbitinclinationtoecliptic>1.143</orbitinclinationtoecliptic>
+        <!-- ° -->
+        <distance>294673</distance>
+        <!-- km -->
+    </parameter>
+</celestialobject>

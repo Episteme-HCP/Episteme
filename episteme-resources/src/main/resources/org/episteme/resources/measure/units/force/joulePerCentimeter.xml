@@ -1,0 +1,3 @@
+<unit id="joulePerCentimeter" name="joule per centimeter" abbreviation="J/cm" unitType="force" parentSI="newton"
+      multiplierToSI="100" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

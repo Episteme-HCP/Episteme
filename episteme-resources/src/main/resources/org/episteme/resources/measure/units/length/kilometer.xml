@@ -1,0 +1,4 @@
+<unit id="kilometer" name="kilometer" abbreviation="km" unitType="length" parentSI="meter" multiplierToSI="1000"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1000 meters</description>
+</unit>

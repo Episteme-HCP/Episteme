@@ -1,0 +1,3 @@
+<unit id="centipoise" name="centipoise" abbreviation="cP" unitType="dynamicViscosity" parentSI="pascalSecond"
+      multiplierToSI="0.001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</unit>

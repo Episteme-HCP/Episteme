@@ -1,0 +1,4 @@
+<unit id="hectopascal" name="hectopascal" abbreviation="hPa" unitType="pressure" parentSI="pascal" multiplierToSI="100"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>hectopascal</description>
+</unit>

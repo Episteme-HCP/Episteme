@@ -1,0 +1,4 @@
+<unit id="joulePerSecond" name="Joule per second" abbreviation="J/s" unitType="power" parentSI="watt" multiplierToSI="1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 J/s = 1 W</description>
+</unit>

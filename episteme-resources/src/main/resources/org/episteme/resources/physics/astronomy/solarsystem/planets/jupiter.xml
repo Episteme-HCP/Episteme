@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE naturalsatellite SYSTEM "naturalsatellites.dtd">
+<natural-satellite>
+    <name>Jupiter</name>
+    <mass>1898.6</mass>
+    <volume>143128</volume>
+    <equatorial-radius>71492</equatorial-radius>
+    <polar-radius>66854</polar-radius>
+    <volumetric-mean-radius>69911</volumetric-mean-radius>
+    <ellipticity>0.06487</ellipticity>
+    <mean-density>1326</mean-density>
+    <surface-gravity>24.79</surface-gravity>
+    <surface-acceleration>23.12</surface-acceleration>
+    <escape-velocity>59.5</escape-velocity>
+    <GM>126.686</GM>
+    <bond-albedo>0.343</bond-albedo>
+    <visual-geometric-albedo>0.52</visual-geometric-albedo>
+    <visual-magnitude>-9.40</visual-magnitude>
+    <solar-irradiance>50.50</solar-irradiance>
+    <black-body-temperature>110.0</black-body-temperature>
+    <moment-of-inertia>0.254</moment-of-inertia>
+    <J2>14736</J2>
+    <number-of-natural-satellites>60</number-of-natural-satellites>
+    <planetary-ring-system>Yes</planetary-ring-system>
+    <semi-major-axis>778.57</semi-major-axis>
+    <sidereal-orbit-period>4332.589</sidereal-orbit-period>
+    <tropical-orbit-period>4330.595</tropical-orbit-period>
+    <perihelion>740.52</perihelion>
+    <aphelion>816.62</aphelion>
+    <synodic-period>398.88</synodic-period>
+    <mean-orbital-velocity>13.07</mean-orbital-velocity>
+    <maximum-orbital-velocity>13.72</maximum-orbital-velocity>
+    <minimum-orbital-velocity>12.44</minimum-orbital-velocity>
+    <orbit-inclination>1.304</orbit-inclination>
+    <orbit-eccentricity>0.0489</orbit-eccentricity>
+    <sidereal-rotation-period>9.9250</sidereal-rotation-period>
+    <length-of-day>9.9259</length-of-day>
+    <obliquity-to-orbit>3.13</obliquity-to-orbit>
+    <surface-pressure>1000</surface-pressure>
+    <average-temperature>165</average-temperature>
+    <atmospheric-composition>Molecular hydrogen (H2) - 89.8% (2.0%); Helium (He) - 10.2%
+        (2.0%)
+    </atmospheric-composition>
+</natural-satellite>

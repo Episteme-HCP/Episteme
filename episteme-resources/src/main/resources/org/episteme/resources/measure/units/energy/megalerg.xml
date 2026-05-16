@@ -1,0 +1,4 @@
+<unit id="megalerg" name="megalerg" unitType="energy" parentSI="joule" multiplierToSI="0.1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>1 megalerg = 1000000 ergs</description>
+</unit>
