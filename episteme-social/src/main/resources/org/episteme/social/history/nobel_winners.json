@@ -1,0 +1,50 @@
+{
+    "metadata": {
+        "title": "Nobel Prize Winners",
+        "source": "Nobel Foundation",
+        "updated": "2025-11-28T16:10:00",
+        "ai_tags": [
+            "history",
+            "science",
+            "awards"
+        ]
+    },
+    "prizes": [
+        {
+            "year": 1901,
+            "category": "Physics",
+            "laureates": [
+                {
+                    "id": "1",
+                    "firstname": "Wilhelm Conrad",
+                    "surname": "Röntgen",
+                    "motivation": "in recognition of the extraordinary services he has rendered by the discovery of the remarkable rays subsequently named after him"
+                }
+            ]
+        },
+        {
+            "year": 1903,
+            "category": "Physics",
+            "laureates": [
+                {
+                    "id": "4",
+                    "firstname": "Henri",
+                    "surname": "Becquerel",
+                    "motivation": "in recognition of the extraordinary services he has rendered by his discovery of spontaneous radioactivity"
+                },
+                {
+                    "id": "5",
+                    "firstname": "Pierre",
+                    "surname": "Curie",
+                    "motivation": "in recognition of the extraordinary services they have rendered by their joint researches on the radiation phenomena discovered by Professor Henri Becquerel"
+                },
+                {
+                    "id": "6",
+                    "firstname": "Marie",
+                    "surname": "Curie",
+                    "motivation": "in recognition of the extraordinary services they have rendered by their joint researches on the radiation phenomena discovered by Professor Henri Becquerel"
+                }
+            ]
+        }
+    ]
+}

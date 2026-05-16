@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Silvere\Encours\Developpement\Episteme\episteme-native\src\main\cpp\audio\miniaudio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Silvere\Encours\Developpement\Episteme\episteme-native\src\main\cpp\audio\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{49443174-7A1D-3C5B-9ABC-7C0683B55FFA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

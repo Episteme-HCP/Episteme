@@ -1,0 +1,45 @@
+# Phase 1: Build the Java Server
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean install -DskipTests -pl episteme-server -am
+
+# Phase 2: Production Image
+FROM eclipse-temurin:21-jre-jammy
+
+# Install Python and System Dependencies
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
+    libopenblas0 \
+    libmpfr6 \
+    libhdf5-103 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Setup User
+RUN useradd -m -u 1000 episteme
+USER episteme
+ENV PATH="/home/episteme/.local/bin:${PATH}"
+
+# Copy Java Artifact
+COPY --from=build --chown=episteme:episteme /app/episteme-server/target/episteme-server-*.jar /app/server.jar
+
+# Copy Agent Code
+COPY --chown=episteme:episteme agent/ /app/agent/
+RUN pip3 install --no-cache-dir -r /app/agent/requirements.txt
+
+# Copy Entrypoint
+COPY --chown=episteme:episteme docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Expose Gradio Port
+EXPOSE 7860
+
+# Environment Variables
+ENV MCP_SERVER_URL=http://localhost:8080/mcp/message
+ENV GRADIO_SERVER_NAME="0.0.0.0"
+
+ENTRYPOINT ["/app/entrypoint.sh"]

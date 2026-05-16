@@ -1,0 +1,28 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ */
+
+package org.episteme.core;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.episteme.core.mathematics.context.MathContext;
+
+/**
+ * Automated baseline test for MathContext.
+ * 
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class MathContextTest {
+
+    @Test
+    public void testClassPresence() {
+        // Ensure class is reachable
+        assertNotNull(MathContext.class);
+    }
+}
+

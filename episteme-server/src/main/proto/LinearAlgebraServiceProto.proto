@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package org.episteme.computing.remote;
+
+option java_multiple_files = true;
+option java_package = "org.episteme.server.server.proto";
+option java_outer_classname = "LinearAlgebraServiceProto";
+
+import "common_types.proto";
+
+service MatrixService {
+  // Matrix operations
+  rpc MatrixMultiply (MatrixRequest) returns (MatrixResponse);
+  rpc MatrixAdd (MatrixRequest) returns (MatrixResponse);
+  rpc MatrixSubtract (MatrixRequest) returns (MatrixResponse);
+  rpc MatrixTranspose (SingleMatrixRequest) returns (MatrixResponse);
+  rpc MatrixInverse (SingleMatrixRequest) returns (MatrixResponse);
+  rpc MatrixScale (ScaleRequest) returns (MatrixResponse);
+  rpc MatrixDeterminant (SingleMatrixRequest) returns (ScalarResponse);
+  
+  // Vector operations
+  rpc VectorAdd (VectorRequest) returns (VectorResponse);
+  rpc VectorSubtract (VectorRequest) returns (VectorResponse);
+  rpc VectorScale (VectorScaleRequest) returns (VectorResponse);
+  rpc VectorDot (VectorRequest) returns (ScalarResponse);
+  rpc VectorNorm (SingleVectorRequest) returns (ScalarResponse);
+  
+  // Matrix-Vector operations
+  rpc MatrixVectorMultiply (MatrixVectorRequest) returns (VectorResponse);
+  rpc LinearSolve (MatrixVectorRequest) returns (VectorResponse);
+
+  // Decompositions
+  rpc MatrixLU (SingleMatrixRequest) returns (LUResponse);
+  rpc MatrixQR (SingleMatrixRequest) returns (QRResponse);
+  rpc MatrixSVD (SingleMatrixRequest) returns (SVDResponse);
+  rpc MatrixCholesky (SingleMatrixRequest) returns (CholeskyResponse);
+  rpc MatrixEigen (SingleMatrixRequest) returns (EigenResponse);
+  // Iterative Solvers
+  rpc BiCGSTAB (IterativeSolverRequest) returns (VectorResponse);
+  rpc ConjugateGradient (IterativeSolverRequest) returns (VectorResponse);
+  rpc GMRES (GMRESRequest) returns (VectorResponse);
+
+  // New methods for compliance
+  rpc MatrixTrace (SingleMatrixRequest) returns (ScalarResponse);
+  rpc SolveTriangular (TriangularSolveRequest) returns (VectorResponse);
+}
+
+message TriangularSolveRequest {
+  MatrixData matrix = 1;
+  VectorData vector = 2;
+  bool lower = 3;
+  bool unit = 4;
+  bool transpose = 5;
+  bool conjugate = 6;
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message LUResponse {
+  MatrixData l = 1;
+  MatrixData u = 2;
+  VectorData p = 3; // Pivots
+}
+
+message QRResponse {
+  MatrixData q = 1;
+  MatrixData r = 2;
+}
+
+message SVDResponse {
+  MatrixData u = 1;
+  VectorData s = 2;
+  MatrixData v = 3;
+}
+
+message CholeskyResponse {
+  MatrixData l = 1;
+}
+
+message EigenResponse {
+  MatrixData v = 1; // Eigenvectors
+  VectorData d = 2; // Eigenvalues
+}
+
+message MatrixRequest {
+  MatrixData matrix_a = 1;
+  MatrixData matrix_b = 2;
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message SingleMatrixRequest {
+  MatrixData matrix = 1;
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message ScaleRequest {
+  double scalar = 1;
+  MatrixData matrix = 2;
+  double imaginary = 3;
+  bool is_complex = 4;
+  string hp_scalar = 5; // For high-precision scalars (RealBig)
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message MatrixResponse {
+  MatrixData result = 1;
+}
+
+message MatrixData {
+  int32 rows = 1;
+  int32 cols = 2;
+  bytes data = 3; // Raw double data (Zero-copy payload)
+  bool is_complex = 4;
+  repeated string hp_data = 5; // For high-precision elements (RealBig)
+}
+
+message VectorRequest {
+  VectorData vector_a = 1;
+  VectorData vector_b = 2;
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message SingleVectorRequest {
+  VectorData vector = 1;
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message VectorScaleRequest {
+  VectorData vector = 1;
+  double scalar = 2;
+  double imaginary = 3;
+  bool is_complex = 4;
+  string hp_scalar = 5; // For high-precision scalars
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message VectorResponse {
+  VectorData result = 1;
+}
+
+message VectorData {
+  int32 size = 1;
+  bytes data = 2; // Raw double data
+  bool is_complex = 3;
+  repeated string hp_data = 4; // For high-precision elements
+}
+
+message MatrixVectorRequest {
+  MatrixData matrix = 1;
+  VectorData vector = 2;
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message ScalarResponse {
+  double value = 1;
+  double imaginary = 2;
+  bool is_complex = 3;
+  string hp_value = 4; // For high-precision result
+}
+message IterativeSolverRequest {
+  MatrixData matrix = 1;
+  VectorData b = 2;
+  VectorData x0 = 3;
+  ScalarResponse tolerance = 4;
+  int32 max_iterations = 5;
+  org.episteme.computing.common.NumericalContext context = 10;
+}
+
+message GMRESRequest {
+  MatrixData matrix = 1;
+  VectorData b = 2;
+  VectorData x0 = 3;
+  ScalarResponse tolerance = 4;
+  int32 max_iterations = 5;
+  int32 restart = 6;
+  org.episteme.computing.common.NumericalContext context = 10;
+}

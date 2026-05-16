@@ -1,0 +1,78 @@
+target/
+bin/
+**/bin/
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.iml
+.idea/
+.settings/
+.classpath
+.project
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+z _ a n a t o m y _ s o u r c e /  
+ Z - A n a t o m y - P C - V e r s i o n . z i p  
+ Z - A n a t o m y - P C - V e r s i o n . z i p  
+ z _ a n a t o m y _ s o u r c e /  
+ 
+
+!libs/mpi.jar
+!libs/mpj.jar
+!libs/MPJ/lib/*.jar
+!launchers/packaged/**/*.jar
+!episteme-natural/lib/fbx_loader/*.jar
+!episteme-native/libs/jzy3d-*
+!episteme-core/libs/jzy3d-*
+!episteme-native/libs/mpfr*
+!libs/episteme-jni*
+!libs/ffmpeg-*.jar
+
+# Certificates
+certs/*.key
+certs/*.pem
+certs/*.srl
+
+# Large Data & Reports
+*.h5
+*.pdf
+!docs/**/*.pdf
+
+# VM / Docker temp files
+/tmp/
+build_log*.txt
+FETCH_HEAD
+
+# Native Build Artifacts
+build_vision/
+*.obj
+*.exp
+*.lib
+**/build/
+**/Release/
+**/Debug/
+**/x64/
+
+# Local Data & Logs
+data/
+*.log
+episteme-server/server_run_log.txt
+episteme-server/server_run_log_utf8.txt
+
+# Node / Dashboard
+node_modules/
+.next/
+dist/
+build/
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+

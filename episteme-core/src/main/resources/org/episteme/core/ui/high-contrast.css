@@ -1,0 +1,31 @@
+.root {
+    -fx-base: black;
+    -fx-background: black;
+    -fx-control-inner-background: black;
+    -fx-text-base-color: #FFFF00;
+    -fx-accent: #00FF00;
+    -fx-focus-color: #FFFF00;
+}
+
+.label {
+    -fx-text-fill: #FFFF00 !important;
+}
+
+.button {
+    -fx-border-color: #FFFF00;
+    -fx-border-width: 2px;
+}
+
+.header-label-box, .header-title {
+    -fx-text-fill: #00FF00 !important;
+}
+
+.zebra-row-odd {
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #333300;
+    -fx-border-width: 0 0 1 0;
+}
+
+.zebra-row-even {
+    -fx-background-color: black;
+}

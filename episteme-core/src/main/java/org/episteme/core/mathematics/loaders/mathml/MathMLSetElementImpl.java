@@ -1,0 +1,76 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.episteme.core.mathematics.loaders.mathml;
+
+import org.w3c.dom.mathml.MathMLBvarElement;
+import org.w3c.dom.mathml.MathMLSetElement;
+
+
+/**
+ * Implements a MathML <code>set</code> element.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class MathMLSetElementImpl extends MathMLContentContainerImpl
+    implements MathMLSetElement {
+    /**
+     * Constructs a MathML <code>set</code> element.
+     *
+     * @param owner         the MathML document that owns this element
+     * @param qualifiedName the qualified name of the element
+     */
+    public MathMLSetElementImpl(MathMLDocumentImpl owner, String qualifiedName) {
+        super(owner, qualifiedName);
+    }
+
+    /**
+     * Returns whether the set is defined explicitly (by enumeration).
+     *
+     * @return true if explicit, false if defined by constraint
+     */
+    public boolean getIsExplicit() {
+        return !(getFirstChild() instanceof MathMLBvarElement);
+    }
+
+    /**
+     * Returns the type of the set.
+     *
+     * @return the set type
+     */
+    public String getType() {
+        return getAttribute("type");
+    }
+
+    /**
+     * Sets the type of the set.
+     *
+     * @param type the set type to set
+     */
+    public void setType(String type) {
+        setAttribute("type", type);
+    }
+}
+

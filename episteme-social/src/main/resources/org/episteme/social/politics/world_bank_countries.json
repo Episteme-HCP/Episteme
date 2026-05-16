@@ -1,0 +1,68 @@
+[
+    {
+        "name": "United States",
+        "code": "USA",
+        "population": 331002651,
+        "gdp": 23000000000000
+    },
+    {
+        "name": "China",
+        "code": "CHN",
+        "population": 1439323776,
+        "gdp": 17700000000000
+    },
+    {
+        "name": "India",
+        "code": "IND",
+        "population": 1380004385,
+        "gdp": 3170000000000
+    },
+    {
+        "name": "European Union",
+        "code": "EU",
+        "population": 447700000,
+        "gdp": 17000000000000
+    },
+    {
+        "name": "Brazil",
+        "code": "BRA",
+        "population": 212559417,
+        "gdp": 1600000000000
+    },
+    {
+        "name": "Nigeria",
+        "code": "NGA",
+        "population": 206139589,
+        "gdp": 440000000000
+    },
+    {
+        "name": "Russia",
+        "code": "RUS",
+        "population": 145934462,
+        "gdp": 1700000000000
+    },
+    {
+        "name": "Japan",
+        "code": "JPN",
+        "population": 126476461,
+        "gdp": 4900000000000
+    },
+    {
+        "name": "Germany",
+        "code": "DEU",
+        "population": 83783942,
+        "gdp": 4200000000000
+    },
+    {
+        "name": "United Kingdom",
+        "code": "GBR",
+        "population": 67886011,
+        "gdp": 3100000000000
+    },
+    {
+        "name": "France",
+        "code": "FRA",
+        "population": 65273511,
+        "gdp": 2900000000000
+    }
+]

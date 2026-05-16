@@ -1,0 +1,752 @@
+mvn : WARNING: A restricted method in java.lang.System has been called
+Au caractère Ligne:1 : 1
++ mvn test-compile -pl episteme-core -am 2>&1 | Tee-Object -FilePath ep ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: A rest...has been called:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module 
+(file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/jansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by 
+com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper 
+(file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of class 
+com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Episteme Unifying Parent                                           [pom]
+[INFO] Episteme Core Engine                                               [jar]
+[INFO] 
+[INFO] ------------< io.github.episteme-hcp:episteme-parent >-------------
+[INFO] Building Episteme Unifying Parent 1.0.0-beta2                      [1/2]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.4.1:enforce (ban-conflicting-log4j-bridges) @ episteme-parent ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-mpi) @ episteme-parent ---
+[INFO] pom.xml not found in mpi.jar
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\libs\mpi.jar to C:\Users\silve\.m2\repository\org\mpjexpress\mpi\0.44\mpi-0.44.jar
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-mpj) @ episteme-parent ---
+[INFO] pom.xml not found in mpj.jar
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\libs\mpj.jar to C:\Users\silve\.m2\repository\org\mpjexpress\mpj\0.44\mpj-0.44.jar
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-jfbx) @ episteme-parent ---
+[INFO] pom.xml not found in java-fbx-loader-v1.0.jar
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-natural\lib\fbx_loader\java-fbx-loader-v1.0.jar to C:\Users\silve\.m2\repository\com\github\studygameengines\java-fbx-loader\1.0\java-fbx-loader-1.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-jzy3d-all) @ episteme-parent ---
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-native\libs\jzy3d-all-2.2.2-SNAPSHOT.pom to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-all\2.2.2-SNAPSHOT\jzy3d-all-2.2.2-SNAPSHOT.pom
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-jzy3d-core) @ episteme-parent ---
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-native\libs\jzy3d-core-2.2.2-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-core\2.2.2-SNAPSHOT\jzy3d-core-2.2.2-SNAPSHOT.jar
+[INFO] Installing C:\Users\silve\AppData\Local\Temp\mvninstall2116605394384263202.pom to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-core\2.2.2-SNAPSHOT\jzy3d-core-2.2.2-SNAPSHOT.pom
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-jzy3d-native-javafx) @ episteme-parent ---
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-native\libs\jzy3d-native-jogl-javafx-2.2.2-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-native-jogl-javafx\2.2.2-SNAPSHOT\jzy3d-native-jogl-javafx-2.2.2-SNAPSHOT.jar
+[INFO] Installing C:\Users\silve\AppData\Local\Temp\mvninstall4271379606084303307.pom to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-native-jogl-javafx\2.2.2-SNAPSHOT\jzy3d-native-jogl-javafx-2.2.2-SNAPSHOT.pom
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-jzy3d-native-awt) @ episteme-parent ---
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-native\libs\jzy3d-native-jogl-awt-2.2.2-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-native-jogl-awt\2.2.2-SNAPSHOT\jzy3d-native-jogl-awt-2.2.2-SNAPSHOT.jar
+[INFO] Installing C:\Users\silve\AppData\Local\Temp\mvninstall15526417957266761253.pom to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-native-jogl-awt\2.2.2-SNAPSHOT\jzy3d-native-jogl-awt-2.2.2-SNAPSHOT.pom
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-jzy3d-emul-gl) @ episteme-parent ---
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-core\libs\jzy3d-emul-gl-awt-2.2.2-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-emul-gl-awt\2.2.2-SNAPSHOT\jzy3d-emul-gl-awt-2.2.2-SNAPSHOT.jar
+[INFO] Installing C:\Users\silve\AppData\Local\Temp\mvninstall15268392040218386908.pom to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-emul-gl-awt\2.2.2-SNAPSHOT\jzy3d-emul-gl-awt-2.2.2-SNAPSHOT.pom
+[INFO] 
+[INFO] --- install:3.1.2:install-file (install-jzy3d-core-awt) @ episteme-parent ---
+[INFO] Installing C:\Silvere\Encours\Developpement\Episteme\episteme-core\libs\jzy3d-core-awt-2.2.2-SNAPSHOT.jar to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-core-awt\2.2.2-SNAPSHOT\jzy3d-core-awt-2.2.2-SNAPSHOT.jar
+[INFO] Installing C:\Users\silve\AppData\Local\Temp\mvninstall6837136995687578072.pom to C:\Users\silve\.m2\repository\org\jzy3d\jzy3d-core-awt\2.2.2-SNAPSHOT\jzy3d-core-awt-2.2.2-SNAPSHOT.pom
+[INFO] 
+[INFO] --- flatten:1.6.0:flatten (flatten) @ episteme-parent ---
+[INFO] Generating flattened POM of project io.github.episteme-hcp:episteme-parent:pom:1.0.0-beta2...
+[INFO] 
+[INFO] -------------< io.github.episteme-hcp:episteme-core >--------------
+[INFO] Building Episteme Core Engine 1.0.0-beta2                          [2/2]
+[INFO]   from episteme-core\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.4.1:enforce (ban-conflicting-log4j-bridges) @ episteme-core ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO] 
+[INFO] --- os:1.7.1:detect (default) @ episteme-core ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ episteme-core ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 11 resources from src\main\resources to target\classes
+[INFO] The encoding used to copy filtered properties files have not been set. This means that the same encoding will be used to copy filtered properties files as when copying other filtered resources. This might not be what you want! Run your build with --debug to see which files might be affected. Read more at https://maven.apache.org/plugins/maven-resources-plugin/examples/filtering-properties-files.html
+[INFO] 
+[INFO] --- flatten:1.6.0:flatten (flatten) @ episteme-core ---
+[INFO] Generating flattened POM of project io.github.episteme-hcp:episteme-core:jar:1.0.0-beta2...
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ episteme-core ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 1255 source files with javac [forked debug release 25] to target\classes
+[WARNING] Unable to autodetect 'javac' path, using 'javac' from the environment.
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\backends\ColtBackend.java:[59] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\backends\CommonsMathBackend.java:[55] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\backends\EJMLBackend.java:[59] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\backends\JBlasBackend.java:[59] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\providers\CARMALinearAlgebraProvider.java:[23] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\providers\CPUDenseLinearAlgebraProvider.java:[55] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\providers\CPUSparseLinearAlgebraProvider.java:[57] Service provider org.episteme.core.mathematics.linearalgebra.backends.LinearAlgebraBackend is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\providers\CPUSparseLinearAlgebraProvider.java:[57] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[WARNING] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\main\java\org\episteme\core\mathematics\linearalgebra\providers\DistributedLinearAlgebraProvider.java:[32] Service provider org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider is generic, so it can't be named exactly by @AutoService. If this is OK, add @SuppressWarnings("rawtypes").
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ episteme-core ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ episteme-core ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 904 source files with javac [forked debug release 25] to target\test-classes
+[WARNING] Unable to autodetect 'javac' path, using 'javac' from the environment.
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\MathContextTest.java:[11,44] error: cannot access MathContext
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\context\MathContext.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\context\MathContext.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\IntervalNDTest.java:[26,54] error: cannot access IntervalND
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\intervals\IntervalND.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\intervals\IntervalND.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\PolynomialTest.java:[30,55] error: cannot access Polynomial
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\functions\Polynomial.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\functions\Polynomial.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebraTest.java:[27,53] error: cannot access CliffordAlgebra
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebra.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebra.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[29,45] error: cannot access Function
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\Function.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\Function.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fft\FFTProviderTest.java:[3,59] error: cannot access MulticoreFFTProvider
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\MulticoreFFTProvider.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\MulticoreFFTProvider.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fft\FFTProviderTest.java:[4,59] error: cannot access StandardFFTProvider
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\StandardFFTProvider.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\StandardFFTProvider.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fft\FFTProviderTest.java:[13,18] error: cannot access FFTProvider
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\FFTProvider.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\FFTProvider.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\series\TaylorSeriesTest.java:[28,45] error: cannot access DifferentiableFunction
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\DifferentiableFunction.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\DifferentiableFunction.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[29,45] error: cannot access ScalarField
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\ScalarField.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\ScalarField.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[30,45] error: cannot access VectorField
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\VectorField.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\VectorField.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\methodology\InstrumentTest.java:[8,31] error: cannot access ComplexInstrument
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\ComplexInstrument.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\ComplexInstrument.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\technical\algorithm\linearalgebra\DistributedIntegrationTest.java:[7,36] error: cannot access DistributedCompute
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\DistributedCompute.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\DistributedCompute.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\technical\algorithm\linearalgebra\DistributedIntegrationTest.java:[9,36] error: cannot access LocalDistributedContext
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\LocalDistributedContext.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\LocalDistributedContext.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\ui\TestDevice.java:[26,31] error: cannot access AbstractDevice
+  bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\AbstractDevice.class
+    unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\AbstractDevice.class
+    Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[7,46] error: cannot find symbol
+  symbol:   class ComputationGraph
+  location: package org.episteme.core.mathematics.ml.neural
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[8,46] error: cannot find symbol
+  symbol:   class Layer
+  location: package org.episteme.core.mathematics.ml.neural
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[32,38] error: cannot find symbol
+  symbol:   class Layer
+  location: class GraphVerification
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[34,137] error: cannot find symbol
+  symbol:   class GraphNode
+  location: package org.episteme.core.mathematics.ml.neural.autograd
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[34,63] error: cannot find symbol
+  symbol:   class GraphNode
+  location: package org.episteme.core.mathematics.ml.neural.autograd
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[36,75] error: cannot find symbol
+  symbol:   class GraphNode
+  location: package org.episteme.core.mathematics.ml.neural.autograd
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\distributed\DistributedContextTest.java:[8,54] error: package org.episteme.core.technical.backend.distributed does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\io\SciencesDatabaseTest.java:[4,44] error: package org.episteme.core.methodology.loaders does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[29,53] error: cannot find symbol
+  symbol:   class Natural
+  location: package org.episteme.core.mathematics.numbers.integers
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[30,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[31,41] error: cannot find symbol
+  symbol:   class Naturals
+  location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[32,41] error: cannot find symbol
+  symbol:   class Reals
+  location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[33,53] error: cannot find symbol
+  symbol:   class Semiring
+  location: package org.episteme.core.mathematics.structures.rings
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[47,35] error: cannot find symbol
+  symbol:   class Semiring
+  location: class ExactVsApproximateTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[62,46] error: cannot find symbol
+  symbol:   class Semiring
+  location: class ExactVsApproximateTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\IntervalNDTest.java:[28,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\PolynomialTest.java:[28,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\PolynomialTest.java:[29,41] error: cannot find symbol
+  symbol:   class Reals
+  location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebraTest.java:[26,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[26,50] error: cannot find symbol
+  symbol:   class Matrix
+  location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[27,50] error: cannot find symbol
+  symbol:   class Vector
+  location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[28,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[29,41] error: cannot find symbol
+  symbol:   class Reals
+  location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[30,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[31,58] error: cannot find symbol
+  symbol:   class DenseVector
+  location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[32,50] error: cannot find symbol
+  symbol:   class Vector
+  location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\integration\LebesgueIntegrationTest.java:[26,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\integration\LebesgueIntegrationTest.java:[27,50] error: cannot find symbol
+  symbol:   class Vector
+  location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\integration\LebesgueIntegrationTest.java:[28,58] error: cannot find symbol
+  symbol:   class DenseVector
+  location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\series\InfiniteSeriesTest.java:[27,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\series\TaylorSeriesTest.java:[27,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\special\SpecialFunctionsTest.java:[26,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[31,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[32,50] error: cannot find symbol
+  symbol:   class Vector
+  location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[33,58] error: cannot find symbol
+  symbol:   class DenseVector
+  location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[35,45] error: cannot find symbol
+  symbol:   class PointND
+  location: package org.episteme.core.mathematics.geometry
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[41,25] error: cannot find symbol
+  symbol:   class Real
+  location: class VectorCalculusTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[42,25] error: cannot find symbol
+  symbol:   class Real
+  location: class VectorCalculusTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\discrete\DijkstraTest.java:[26,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\discrete\DiscreteTest.java:[26,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\geometry\ReproVector.java:[26,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[3,59] error: cannot find symbol
+  symbol:   class DenseMatrix
+  location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[4,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[5,41] error: cannot find symbol
+  symbol:   class Reals
+  location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[6,44] error: cannot find symbol
+  symbol:   class OperationContext
+  location: package org.episteme.core.technical.algorithm
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[7,44] error: cannot find symbol
+  symbol:   class ProviderSelector
+  location: package org.episteme.core.technical.algorithm
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[8,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[26,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[27,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[28,53] error: cannot find symbol
+  symbol:   class Field
+  location: package org.episteme.core.mathematics.structures.rings
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[29,59] error: cannot find symbol
+  symbol:   class DenseMatrix
+  location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[30,58] error: cannot find symbol
+  symbol:   class DenseVector
+  location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[2,59] error: cannot find symbol
+  symbol:   class RealDoubleMatrix
+  location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[4,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[5,49] error: cannot find symbol
+  symbol:   class RealDouble
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[158,37] error: cannot find symbol
+  symbol:   class Matrix
+  location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[158,44] error: cannot find symbol
+  symbol:   class Real
+  location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[168,59] error: cannot find symbol
+  symbol:   class Matrix
+  location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[168,66] error: cannot find symbol
+  symbol:   class Real
+  location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[28,59] error: cannot find symbol
+  symbol:   class GenericMatrix
+  location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[29,59] error: cannot find symbol
+  symbol:   class RealDoubleMatrix
+  location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[31,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[32,41] error: cannot find symbol
+  symbol:   class Reals
+  location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[33,29] error: cannot find symbol
+  symbol:   class PerformanceLogger
+  location: package org.episteme.core.util
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[3,59] error: cannot find symbol
+  symbol:   class RealDoubleMatrix
+  location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[4,58] error: cannot find symbol
+  symbol:   class RealDoubleVector
+  location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[5,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[6,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[29,59] error: cannot find symbol
+  symbol:   class DenseMatrix
+  location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[30,58] error: cannot find symbol
+  symbol:   class DenseVector
+  location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[31,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[32,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[33,41] error: cannot find symbol
+  symbol:   class Reals
+  location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\tensors\backends\TensorBackendTest.java:[8,58] error: cannot find symbol
+  symbol:   class TensorBackend
+  location: package org.episteme.core.mathematics.linearalgebra.tensors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[8,50] error: cannot find symbol
+  symbol:   class Tensor
+  location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[9,46] error: cannot find symbol
+  symbol:   class Layer
+  location: package org.episteme.core.mathematics.ml.neural
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[10,53] error: package org.episteme.core.mathematics.ml.neural.layers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[11,53] error: package org.episteme.core.mathematics.ml.neural.layers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[12,53] error: package org.episteme.core.mathematics.ml.neural.layers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[13,49] error: cannot find symbol
+  symbol:   class Real
+  location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\LogicTest.java:[29,48] error: cannot find symbol
+  symbol:   class PossibleWorlds
+  location: package org.episteme.core.mathematics.logic.modal
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\LogicTest.java:[30,51] error: cannot find symbol
+  symbol:   class CTL
+  location: package org.episteme.core.mathematics.logic.temporal
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\proof\FormalProofTest.java:[27,52] error: cannot find symbol
+  symbol:   class Formula
+  location: package org.episteme.core.mathematics.logic.predicate
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\proof\ProofTest.java:[26,52] error: cannot find symbol
+  symbol:   class Formula
+  location: package org.episteme.core.mathematics.logic.predicate
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ml\neural\autograd\GraphNodeTest.java:[3,58] error: cannot find symbol
+  symbol:   class DenseTensor
+  location: package org.episteme.core.mathematics.linearalgebra.tensors
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Episteme Unifying Parent 1.0.0-beta2:
+[INFO] 
+[INFO] Episteme Unifying Parent ........................... SUCCESS [  4.372 s]
+[INFO] Episteme Core Engine ............................... FAILURE [02:55 min]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  03:04 min
+[INFO] Finished at: 2026-05-09T01:35:24+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project episteme-core: Compilation failure: Compilation failure: 
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\MathContextTest.java:[11,44] error: cannot access MathContext
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\context\MathContext.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\context\MathContext.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\IntervalNDTest.java:[26,54] error: cannot access IntervalND
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\intervals\IntervalND.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\intervals\IntervalND.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\PolynomialTest.java:[30,55] error: cannot access Polynomial
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\functions\Polynomial.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\functions\Polynomial.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebraTest.java:[27,53] error: cannot access CliffordAlgebra
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebra.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebra.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[29,45] error: cannot access Function
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\Function.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\Function.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fft\FFTProviderTest.java:[3,59] error: cannot access MulticoreFFTProvider
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\MulticoreFFTProvider.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\MulticoreFFTProvider.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fft\FFTProviderTest.java:[4,59] error: cannot access StandardFFTProvider
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\StandardFFTProvider.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\providers\StandardFFTProvider.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fft\FFTProviderTest.java:[13,18] error: cannot access FFTProvider
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\FFTProvider.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\fft\FFTProvider.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\series\TaylorSeriesTest.java:[28,45] error: cannot access DifferentiableFunction
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\DifferentiableFunction.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\DifferentiableFunction.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[29,45] error: cannot access ScalarField
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\ScalarField.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\ScalarField.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[30,45] error: cannot access VectorField
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\VectorField.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\mathematics\analysis\VectorField.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\methodology\InstrumentTest.java:[8,31] error: cannot access ComplexInstrument
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\ComplexInstrument.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\ComplexInstrument.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\technical\algorithm\linearalgebra\DistributedIntegrationTest.java:[7,36] error: cannot access DistributedCompute
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\DistributedCompute.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\DistributedCompute.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\technical\algorithm\linearalgebra\DistributedIntegrationTest.java:[9,36] error: cannot access LocalDistributedContext
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\LocalDistributedContext.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\distributed\LocalDistributedContext.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\ui\TestDevice.java:[26,31] error: cannot access AbstractDevice
+[ERROR]   bad class file: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\AbstractDevice.class
+[ERROR]     unable to access file: java.nio.file.NoSuchFileException: C:\Silvere\Encours\Developpement\Episteme\episteme-core\target\classes\org\episteme\core\device\AbstractDevice.class
+[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[7,46] error: cannot find symbol
+[ERROR]   symbol:   class ComputationGraph
+[ERROR]   location: package org.episteme.core.mathematics.ml.neural
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[8,46] error: cannot find symbol
+[ERROR]   symbol:   class Layer
+[ERROR]   location: package org.episteme.core.mathematics.ml.neural
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[32,38] error: cannot find symbol
+[ERROR]   symbol:   class Layer
+[ERROR]   location: class GraphVerification
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[34,137] error: cannot find symbol
+[ERROR]   symbol:   class GraphNode
+[ERROR]   location: package org.episteme.core.mathematics.ml.neural.autograd
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[34,63] error: cannot find symbol
+[ERROR]   symbol:   class GraphNode
+[ERROR]   location: package org.episteme.core.mathematics.ml.neural.autograd
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\computing\ai\verification\GraphVerification.java:[36,75] error: cannot find symbol
+[ERROR]   symbol:   class GraphNode
+[ERROR]   location: package org.episteme.core.mathematics.ml.neural.autograd
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\distributed\DistributedContextTest.java:[8,54] error: package org.episteme.core.technical.backend.distributed does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\io\SciencesDatabaseTest.java:[4,44] error: package org.episteme.core.methodology.loaders does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[29,53] error: cannot find symbol
+[ERROR]   symbol:   class Natural
+[ERROR]   location: package org.episteme.core.mathematics.numbers.integers
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[30,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[31,41] error: cannot find symbol
+[ERROR]   symbol:   class Naturals
+[ERROR]   location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[32,41] error: cannot find symbol
+[ERROR]   symbol:   class Reals
+[ERROR]   location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[33,53] error: cannot find symbol
+[ERROR]   symbol:   class Semiring
+[ERROR]   location: package org.episteme.core.mathematics.structures.rings
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[47,35] error: cannot find symbol
+[ERROR]   symbol:   class Semiring
+[ERROR]   location: class ExactVsApproximateTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ExactVsApproximateTest.java:[62,46] error: cannot find symbol
+[ERROR]   symbol:   class Semiring
+[ERROR]   location: class ExactVsApproximateTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\IntervalNDTest.java:[28,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\PolynomialTest.java:[28,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\PolynomialTest.java:[29,41] error: cannot find symbol
+[ERROR]   symbol:   class Reals
+[ERROR]   location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\algebra\algebras\CliffordAlgebraTest.java:[26,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[26,50] error: cannot find symbol
+[ERROR]   symbol:   class Matrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[27,50] error: cannot find symbol
+[ERROR]   symbol:   class Vector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[28,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\VectorFunctionTest.java:[29,41] error: cannot find symbol
+[ERROR]   symbol:   class Reals
+[ERROR]   location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[30,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[31,58] error: cannot find symbol
+[ERROR]   symbol:   class DenseVector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\fem\FEMTest.java:[32,50] error: cannot find symbol
+[ERROR]   symbol:   class Vector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\integration\LebesgueIntegrationTest.java:[26,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\integration\LebesgueIntegrationTest.java:[27,50] error: cannot find symbol
+[ERROR]   symbol:   class Vector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\integration\LebesgueIntegrationTest.java:[28,58] error: cannot find symbol
+[ERROR]   symbol:   class DenseVector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\series\InfiniteSeriesTest.java:[27,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\series\TaylorSeriesTest.java:[27,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\special\SpecialFunctionsTest.java:[26,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[31,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[32,50] error: cannot find symbol
+[ERROR]   symbol:   class Vector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[33,58] error: cannot find symbol
+[ERROR]   symbol:   class DenseVector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[35,45] error: cannot find symbol
+[ERROR]   symbol:   class PointND
+[ERROR]   location: package org.episteme.core.mathematics.geometry
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[41,25] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class VectorCalculusTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\analysis\vectorcalculus\VectorCalculusTest.java:[42,25] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class VectorCalculusTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\discrete\DijkstraTest.java:[26,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\discrete\DiscreteTest.java:[26,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\geometry\ReproVector.java:[26,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[3,59] error: cannot find symbol
+[ERROR]   symbol:   class DenseMatrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[4,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[5,41] error: cannot find symbol
+[ERROR]   symbol:   class Reals
+[ERROR]   location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[6,44] error: cannot find symbol
+[ERROR]   symbol:   class OperationContext
+[ERROR]   location: package org.episteme.core.technical.algorithm
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[7,44] error: cannot find symbol
+[ERROR]   symbol:   class ProviderSelector
+[ERROR]   location: package org.episteme.core.technical.algorithm
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\FallbackMechanismTest.java:[8,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[26,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[27,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[28,53] error: cannot find symbol
+[ERROR]   symbol:   class Field
+[ERROR]   location: package org.episteme.core.mathematics.structures.rings
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[29,59] error: cannot find symbol
+[ERROR]   symbol:   class DenseMatrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraTest.java:[30,58] error: cannot find symbol
+[ERROR]   symbol:   class DenseVector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[2,59] error: cannot find symbol
+[ERROR]   symbol:   class RealDoubleMatrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[4,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[5,49] error: cannot find symbol
+[ERROR]   symbol:   class RealDouble
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[158,37] error: cannot find symbol
+[ERROR]   symbol:   class Matrix
+[ERROR]   location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[158,44] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[168,59] error: cannot find symbol
+[ERROR]   symbol:   class Matrix
+[ERROR]   location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\LinearAlgebraVerificationTest.java:[168,66] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: class LinearAlgebraVerificationTest
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[28,59] error: cannot find symbol
+[ERROR]   symbol:   class GenericMatrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[29,59] error: cannot find symbol
+[ERROR]   symbol:   class RealDoubleMatrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[31,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[32,41] error: cannot find symbol
+[ERROR]   symbol:   class Reals
+[ERROR]   location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\MatrixTest.java:[33,29] error: cannot find symbol
+[ERROR]   symbol:   class PerformanceLogger
+[ERROR]   location: package org.episteme.core.util
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[3,59] error: cannot find symbol
+[ERROR]   symbol:   class RealDoubleMatrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[4,58] error: cannot find symbol
+[ERROR]   symbol:   class RealDoubleVector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[5,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolveTest.java:[6,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[29,59] error: cannot find symbol
+[ERROR]   symbol:   class DenseMatrix
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.matrices
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[30,58] error: cannot find symbol
+[ERROR]   symbol:   class DenseVector
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.vectors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[31,60] error: package org.episteme.core.mathematics.linearalgebra.providers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[32,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\SolverTest.java:[33,41] error: cannot find symbol
+[ERROR]   symbol:   class Reals
+[ERROR]   location: package org.episteme.core.mathematics.sets
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\linearalgebra\tensors\backends\TensorBackendTest.java:[8,58] error: cannot find symbol
+[ERROR]   symbol:   class TensorBackend
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.tensors
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[8,50] error: cannot find symbol
+[ERROR]   symbol:   class Tensor
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[9,46] error: cannot find symbol
+[ERROR]   symbol:   class Layer
+[ERROR]   location: package org.episteme.core.mathematics.ml.neural
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[10,53] error: package org.episteme.core.mathematics.ml.neural.layers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[11,53] error: package org.episteme.core.mathematics.ml.neural.layers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[12,53] error: package org.episteme.core.mathematics.ml.neural.layers does not exist
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\loaders\SerializationTest.java:[13,49] error: cannot find symbol
+[ERROR]   symbol:   class Real
+[ERROR]   location: package org.episteme.core.mathematics.numbers.real
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\LogicTest.java:[29,48] error: cannot find symbol
+[ERROR]   symbol:   class PossibleWorlds
+[ERROR]   location: package org.episteme.core.mathematics.logic.modal
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\LogicTest.java:[30,51] error: cannot find symbol
+[ERROR]   symbol:   class CTL
+[ERROR]   location: package org.episteme.core.mathematics.logic.temporal
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\proof\FormalProofTest.java:[27,52] error: cannot find symbol
+[ERROR]   symbol:   class Formula
+[ERROR]   location: package org.episteme.core.mathematics.logic.predicate
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\logic\proof\ProofTest.java:[26,52] error: cannot find symbol
+[ERROR]   symbol:   class Formula
+[ERROR]   location: package org.episteme.core.mathematics.logic.predicate
+[ERROR] C:\Silvere\Encours\Developpement\Episteme\episteme-core\src\test\java\org\episteme\core\mathematics\ml\neural\autograd\GraphNodeTest.java:[3,58] error: cannot find symbol
+[ERROR]   symbol:   class DenseTensor
+[ERROR]   location: package org.episteme.core.mathematics.linearalgebra.tensors
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :episteme-core

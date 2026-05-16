@@ -1,0 +1,39 @@
+# Episteme CPU Server Node Dockerfile
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install base dependencies and Java 25 EA
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    curl \
+    netcat-openbsd \
+    && wget https://download.java.net/java/early_access/jdk25/11/GPL/openjdk-25-ea+11_linux-x64_bin.tar.gz -O /tmp/jdk25.tar.gz \
+    && mkdir -p /usr/lib/jvm/java-25-openjdk-amd64 \
+    && tar -xzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/java-25-openjdk-amd64 --strip-components=1 \
+    && rm /tmp/jdk25.tar.gz \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+WORKDIR /app
+
+# The build context should be the root of the project.
+# We assume 'mvn package -DskipTests' was run on the host or in an Alpine builder stage prior.
+COPY episteme-server/target/episteme-server-*.jar /app/server.jar
+COPY episteme-server/target/lib /app/lib
+
+# Copy certs if available
+COPY certs /app/certs
+
+# Expose gRPC port
+EXPOSE 50051
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD nc -z localhost 50051 || exit 1
+
+# Run server
+ENTRYPOINT ["java", "--add-modules", "jdk.incubator.vector", "--enable-native-access=ALL-UNNAMED", "-cp", "server.jar:lib/*", "org.episteme.server.server.EpistemeApplication"]
+CMD []

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.episteme-hcp</groupId>
+        <artifactId>episteme-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>episteme-natural</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Episteme Natural</name>
+    <description>Episteme Natural Sciences Layer - Physics, Chemistry, Biology, Earth, Medicine, Computing</description>
+
+    <properties>
+    </properties>
+
+    <!-- Force IDE resync -->
+    <dependencies>
+        <!-- Core module -->
+        <dependency>
+            <groupId>io.github.episteme-hcp</groupId>
+            <artifactId>episteme-core</artifactId>
+        </dependency>
+
+        <!-- JSON Support -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sbml.jsbml</groupId>
+            <artifactId>jsbml</artifactId>
+            <version>1.6.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j2-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ode4j</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+
+        <!-- JAXB (Jakarta XML Binding) -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+        <!-- Quantum Computing: Amazon Braket -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>braket</artifactId>
+            <version>2.35.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.studygameengines</groupId>
+            <artifactId>java-fbx-loader</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- JBullet Physics -->
+        <dependency>
+            <groupId>cz.advel.jbullet</groupId>
+            <artifactId>jbullet</artifactId>
+        </dependency>
+
+        <!-- Quantum Computing: Strange -->
+        <dependency>
+            <groupId>org.redfx</groupId>
+            <artifactId>strange</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
+        <!-- Quantum Computing: Quantum4J -->
+        <dependency>
+            <groupId>com.quantum4j</groupId>
+            <artifactId>quantum4j</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>episteme.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>episteme.properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>org.episteme.natural</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                    <compilerArgs>
+                        <arg>--add-modules</arg>
+                        <arg>jdk.incubator.vector</arg>
+                        <arg>--enable-preview</arg>
+                        <arg>-Xpkginfo:always</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <excludes>
+                        <!-- Medical/Consultation files remain in episteme-social -->
+                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>--add-modules jdk.incubator.vector --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>optimal</id>
+            <dependencies>
+               <!-- ... other optimal deps ... -->
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

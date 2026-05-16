@@ -1,0 +1,108 @@
+/* main.css - Structural styles for Episteme Dashboard */
+
+.header-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+.dashboard-description {
+    -fx-font-style: italic;
+    -fx-wrap-text: true;
+}
+
+.form-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+/* ListView Striping (Theme-aware) */
+.list-cell:odd {
+    -fx-background-color: -fx-background;
+}
+
+.list-cell:even {
+    -fx-background-color: derive(-fx-background, -5%);
+}
+
+/* Empty Cells - Hide them */
+.list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-opacity: 0;
+}
+
+.zebra-row-odd {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.zebra-row-even {
+    -fx-background-color: derive(-fx-control-inner-background, -5%);
+}
+
+/* Accordion Custom Styling */
+.accordion .titled-pane > .title {
+    -fx-font-size: 13px;
+    -fx-padding: 8 12;
+}
+
+.accordion .titled-pane:expanded > .title {
+    -fx-border-color: -fx-accent;
+    -fx-border-width: 0 0 0 5;
+}
+
+/* Selection State */
+.list-cell:filled:selected,
+.list-cell:filled:selected:hover {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+/* Status Colors */
+.status-connected { -fx-text-fill: #27ae60; -fx-font-weight: bold; }
+.status-disconnected { -fx-text-fill: #c0392b; -fx-font-weight: bold; }
+
+/* Dashboard UI Redesign Classes */
+.header-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+.description-label {
+    -fx-font-size: 11.5px;
+    -fx-font-style: italic;
+    -fx-wrap-text: true;
+    -fx-opacity: 0.8;
+}
+
+.tab-header {
+    -fx-padding: 0 0 15 0;
+    -fx-border-color: derive(-fx-base, -10%);
+    -fx-border-width: 0 0 1 0;
+}
+
+.status-label-available {
+    -fx-text-fill: #27ae60;
+    -fx-font-weight: bold;
+}
+
+.status-label-unavailable {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+}
+.app-row {
+    -fx-padding: 10 15;
+    -fx-background-radius: 5;
+    -fx-alignment: center-left;
+}
+
+.app-row:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+}
+
+.app-row-striped {
+    -fx-background-color: rgba(0, 0, 0, 0.02);
+}
+
+.app-row-striped:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.07);
+}

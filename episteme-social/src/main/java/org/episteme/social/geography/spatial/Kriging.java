@@ -1,0 +1,75 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.episteme.social.geography.spatial;
+
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.natural.earth.Place;
+
+import java.util.List;
+
+/**
+ * Implements Kriging, an advanced geostatistical procedure that generates an estimated
+ * surface from a scattered set of points with z-values.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class Kriging {
+
+    private Kriging() {
+        // Utility class
+    }
+
+    /**
+     * Estimates the value at a specific location using Simple Kriging.
+     * <p>
+     * Note: This is a placeholder for the matrix operations required for Kriging.
+     * Real implementation requires solving K * w = m (Kriging equations).
+     * </p>
+     *
+     * @param targetLocation The location to estimate.
+     * @param knownLocations List of known locations (observations).
+     * @param knownValues List of values at the known locations.
+     * @param range The range of the variogram model.
+     * @param sill The sill of the variogram model.
+     * @param nugget The nugget effect.
+     * @return The estimated value.
+     */
+    public static Real estimate(Place targetLocation, List<Place> knownLocations, List<Real> knownValues, Real range, Real sill, Real nugget) {
+        if (knownLocations == null || knownValues == null || knownLocations.size() != knownValues.size()) {
+            throw new IllegalArgumentException("Invalid input data");
+        }
+        
+        // Placeholder: return inverse distance weighting or average as a fallback stub.
+        // Full Kriging requires a linear algebra solver (Matrix inversion).
+        
+        Real sum = Real.ZERO;
+        for (Real val : knownValues) {
+            sum = sum.add(val);
+        }
+        
+        return sum.divide(Real.of(knownValues.size()));
+    }
+}

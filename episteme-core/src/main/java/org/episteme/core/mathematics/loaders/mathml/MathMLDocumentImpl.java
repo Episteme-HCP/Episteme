@@ -1,0 +1,410 @@
+/*
+ * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
+ * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package org.episteme.core.mathematics.loaders.mathml;
+
+import org.apache.xerces.dom.DocumentImpl;
+import org.apache.xerces.dom.DocumentTypeImpl;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.mathml.MathMLDocument;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import java.util.Hashtable;
+
+
+/**
+ * Implements a MathML document.
+ *
+ * @author Silvere Martin-Michiellot
+ * @author Gemini AI (Google DeepMind)
+ * @since 1.0
+ */
+public class MathMLDocumentImpl extends DocumentImpl implements MathMLDocument {
+    /** The public identifier for the MathML 2.0 DTD. */
+    private static final String DOCTYPE_PUBLIC = "-//W3C//DTD MathML 2.0//EN";
+
+    /** The system identifier for the MathML 2.0 DTD. */
+    private static final String DOCTYPE_SYSTEM = "http://www.w3.org/TR/MathML2/dtd/mathml2.dtd";
+
+    /** Map of MathML element names to their corresponding implementation classes. */
+    private static final Hashtable<String, Class<?>> _elementTypesMathML;
+
+    /** The constructor signature used for instantiating MathML elements. */
+    private static final Class<?>[] _elemClassSigMathML = new Class<?>[] {
+            MathMLDocumentImpl.class, String.class
+        };
+
+    static {
+        _elementTypesMathML = new Hashtable<>(160);
+        _elementTypesMathML.put("math", MathMLMathElementImpl.class);
+        _elementTypesMathML.put("annotation", MathMLAnnotationElementImpl.class);
+        _elementTypesMathML.put("xml-annotation",
+            MathMLXMLAnnotationElementImpl.class);
+
+        // presentation
+        _elementTypesMathML.put("mi", MathMLPresentationTokenImpl.class);
+        _elementTypesMathML.put("mn", MathMLPresentationTokenImpl.class);
+        _elementTypesMathML.put("msub", MathMLScriptElementImpl.class);
+        _elementTypesMathML.put("msup", MathMLScriptElementImpl.class);
+        _elementTypesMathML.put("msubsup", MathMLScriptElementImpl.class);
+        _elementTypesMathML.put("munder", MathMLUnderOverElementImpl.class);
+        _elementTypesMathML.put("mover", MathMLUnderOverElementImpl.class);
+        _elementTypesMathML.put("munderover", MathMLUnderOverElementImpl.class);
+        _elementTypesMathML.put("mfrac", MathMLFractionElementImpl.class);
+        _elementTypesMathML.put("msqrt", MathMLRadicalElementImpl.class);
+        _elementTypesMathML.put("mroot", MathMLRadicalElementImpl.class);
+        _elementTypesMathML.put("mrow", MathMLPresentationContainerImpl.class);
+        _elementTypesMathML.put("mpadded", MathMLPaddedElementImpl.class);
+        _elementTypesMathML.put("mfenced", MathMLFencedElementImpl.class);
+        _elementTypesMathML.put("menclose", MathMLEncloseElementImpl.class);
+        _elementTypesMathML.put("mglyph", MathMLGlyphElementImpl.class);
+        _elementTypesMathML.put("maligngroup", MathMLAlignGroupElementImpl.class);
+        _elementTypesMathML.put("malignmark", MathMLAlignMarkElementImpl.class);
+        _elementTypesMathML.put("mtext", MathMLPresentationTokenImpl.class);
+        _elementTypesMathML.put("mspace", MathMLSpaceElementImpl.class);
+        _elementTypesMathML.put("ms", MathMLStringLitElementImpl.class);
+        _elementTypesMathML.put("mphantom",
+            MathMLPresentationContainerImpl.class);
+        _elementTypesMathML.put("maction", MathMLActionElementImpl.class);
+        _elementTypesMathML.put("merror", MathMLPresentationContainerImpl.class);
+
+        // content
+        _elementTypesMathML.put("apply", MathMLApplyElementImpl.class);
+        _elementTypesMathML.put("ci", MathMLCiElementImpl.class);
+        _elementTypesMathML.put("cn", MathMLCnElementImpl.class);
+        _elementTypesMathML.put("csymbol", MathMLCsymbolElementImpl.class);
+        _elementTypesMathML.put("bvar", MathMLBvarElementImpl.class);
+        _elementTypesMathML.put("condition", MathMLConditionElementImpl.class);
+        _elementTypesMathML.put("uplimit", MathMLContentContainerImpl.class);
+        _elementTypesMathML.put("lowlimit", MathMLContentContainerImpl.class);
+        _elementTypesMathML.put("domainofapplication",
+            MathMLContentContainerImpl.class);
+        _elementTypesMathML.put("degree", MathMLContentContainerImpl.class);
+        _elementTypesMathML.put("otherwise", MathMLContentContainerImpl.class);
+
+        // matrices
+        _elementTypesMathML.put("vector", MathMLVectorElementImpl.class);
+        _elementTypesMathML.put("matrix", MathMLMatrixElementImpl.class);
+        _elementTypesMathML.put("matrixrow", MathMLMatrixrowElementImpl.class);
+
+        // arithmetic
+        _elementTypesMathML.put("plus", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("minus", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("times", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("divide", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("quotient", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("rem", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("power", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("root", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("min", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("max", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("gcd", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("lcm", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("floor", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("ceiling", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("factorial", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("conjugate", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("abs", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arg", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("real", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("imaginary", MathMLFunctionImpl.class);
+
+        // calculus
+        _elementTypesMathML.put("int", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("diff", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("partialdiff", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("divergence", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("grad", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("curl", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("laplacian", MathMLUnaryOpImpl.class);
+
+        // functional
+        _elementTypesMathML.put("inverse", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("compose", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("ident", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("domain", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("codomain", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("image", MathMLPredefinedSymbolImpl.class);
+
+        // sequences
+        _elementTypesMathML.put("sum", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("product", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("limit", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("tendsto", MathMLTendsToElementImpl.class);
+
+        // logic
+        _elementTypesMathML.put("and", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("or", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("xor", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("not", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("implies", MathMLBinaryRelImpl.class);
+        _elementTypesMathML.put("forall", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("exists", MathMLPredefinedSymbolImpl.class);
+
+        // relations
+        _elementTypesMathML.put("eq", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("neq", MathMLBinaryRelImpl.class);
+        _elementTypesMathML.put("gt", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("lt", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("geq", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("leq", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("equivalent", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("approx", MathMLBinaryRelImpl.class);
+        _elementTypesMathML.put("factorof", MathMLBinaryRelImpl.class);
+
+        // set theory
+        _elementTypesMathML.put("set", MathMLSetElementImpl.class);
+        _elementTypesMathML.put("list", MathMLListElementImpl.class);
+        _elementTypesMathML.put("union", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("intersect", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("cartesianproduct", MathMLNaryOpImpl.class);
+        _elementTypesMathML.put("in", MathMLBinaryRelImpl.class);
+        _elementTypesMathML.put("notin", MathMLBinaryRelImpl.class);
+        _elementTypesMathML.put("subset", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("prsubset", MathMLNaryRelImpl.class);
+        _elementTypesMathML.put("notsubset", MathMLBinaryRelImpl.class);
+        _elementTypesMathML.put("notprsubset", MathMLBinaryRelImpl.class);
+        _elementTypesMathML.put("setdiff", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("card", MathMLFunctionImpl.class);
+
+        // functions
+        _elementTypesMathML.put("exp", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("ln", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("log", MathMLFunctionImpl.class);
+
+        // trig functions
+        _elementTypesMathML.put("sin", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("cos", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("tan", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("csc", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("sec", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("cot", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("sinh", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("cosh", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("tanh", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("csch", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("sech", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("coth", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arcsin", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arccos", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arctan", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arccsc", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arcsec", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arccot", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arcsinh", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arccosh", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arctanh", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arccsch", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arcsech", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("arccoth", MathMLFunctionImpl.class);
+
+        // statistics
+        _elementTypesMathML.put("mean", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("mode", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("median", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("moment", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("momentabout", MathMLContentContainerImpl.class);
+        _elementTypesMathML.put("sdev", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("variance", MathMLPredefinedSymbolImpl.class);
+
+        // linear algebra
+        _elementTypesMathML.put("determinant", MathMLFunctionImpl.class);
+        _elementTypesMathML.put("transpose", MathMLUnaryOpImpl.class);
+        _elementTypesMathML.put("selector", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("vectorproduct", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("scalarproduct", MathMLBinaryOpImpl.class);
+        _elementTypesMathML.put("outerproduct", MathMLBinaryOpImpl.class);
+
+        // symbols
+        _elementTypesMathML.put("integers", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("reals", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("rationals", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("naturalnumbers",
+            MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("complexes", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("primes", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("exponentiale", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("imaginaryi", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("notanumber", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("true", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("false", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("emptyset", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("pi", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("eulergamma", MathMLPredefinedSymbolImpl.class);
+        _elementTypesMathML.put("infinity", MathMLPredefinedSymbolImpl.class);
+
+        // deprecated
+        _elementTypesMathML.put("fn", MathMLFnElementImpl.class);
+        _elementTypesMathML.put("reln", MathMLContentContainerImpl.class);
+    }
+
+/**
+     * Creates a new MathMLDocumentImpl object.
+     */
+    public MathMLDocumentImpl() {
+        super();
+    }
+
+    /**
+     * Returns the Document Type Definition (DTD) associated with this document.
+     *
+     * @return the document type
+     */
+    public DocumentType getDoctype() {
+        if (docType == null) {
+            docType = new DocumentTypeImpl(this, "math", DOCTYPE_PUBLIC,
+                    DOCTYPE_SYSTEM);
+        }
+
+        return docType;
+    }
+
+    /**
+     * Returns the root element of the MathML document.
+     * If no root element exists, a new "math" element is created.
+     *
+     * @return the root element
+     */
+    public Element getDocumentElement() {
+        Node math;
+
+        math = super.getDocumentElement();
+
+        if (math == null) {
+            math = new MathMLMathElementImpl(this, "math");
+            appendChild(math);
+        }
+
+        return (Element) math;
+    }
+
+    /**
+     * Creates an element of the given qualified name and namespace URI (Xerces specific).
+     *
+     * @param namespaceURI  the namespace URI of the element to create
+     * @param qualifiedName the qualified name of the element type to instantiate
+     * @param localpart     the local part of the qualified name
+     *
+     * @return a new Element object
+     *
+     * @throws DOMException if the element cannot be created
+     */
+    public Element createElementNS(String namespaceURI, String qualifiedName,
+        String localpart) throws DOMException {
+        return createElementNS(namespaceURI, qualifiedName);
+    }
+
+    /**
+     * Creates an element of the given qualified name and namespace URI.
+     * Special handling is provided for MathML elements to instantiate specific implementation classes.
+     *
+     * @param namespaceURI  the namespace URI of the element to create
+     * @param qualifiedName the qualified name of the element type to instantiate
+     *
+     * @return a new Element object
+     *
+     * @throws DOMException if the element cannot be created
+     * @throws IllegalStateException if an internal error occurs during instantiation
+     */
+    public Element createElementNS(String namespaceURI, String qualifiedName)
+        throws DOMException {
+        if (MathMLElementImpl.mathmlURI.equals(namespaceURI)) {
+            String localName;
+            Class<?> elemClass;
+            Constructor<?> cnst;
+
+            int index = qualifiedName.indexOf(':');
+
+            if (index < 0) {
+                localName = qualifiedName;
+            } else {
+                localName = qualifiedName.substring(index + 1);
+            }
+
+            elemClass = (Class<?>) _elementTypesMathML.get(localName);
+
+            if (elemClass != null) {
+                try {
+                    cnst = elemClass.getConstructor(_elemClassSigMathML);
+
+                    return (Element) cnst.newInstance(new Object[] {
+                            this, qualifiedName
+                        });
+                } catch (Exception except) {
+                    Throwable thrw;
+
+                    if (except instanceof InvocationTargetException) {
+                        thrw = ((InvocationTargetException) except).getTargetException();
+                    } else {
+                        thrw = except;
+                    }
+
+                    System.out.println("Exception " +
+                        thrw.getClass().getName());
+                    System.out.println(thrw.getMessage());
+
+                    throw new IllegalStateException("Tag '" + qualifiedName +
+                        "' associated with an Element class that failed to construct.");
+                }
+            } else {
+                return new MathMLElementImpl(this, qualifiedName);
+            }
+        } else {
+            return super.createElementNS(namespaceURI, qualifiedName);
+        }
+    }
+
+    /**
+     * Returns the referrer of the document.
+     *
+     * @return the referrer URL, or null if not applicable
+     */
+    public String getReferrer() {
+        return null;
+    }
+
+    /**
+     * Returns the domain of the document.
+     *
+     * @return the domain name, or null if not applicable
+     */
+    public String getDomain() {
+        return null;
+    }
+
+    /**
+     * Returns the URI of the document.
+     *
+     * @return the document URI, or null if not applicable
+     */
+    public String getURI() {
+        return null;
+    }
+}
+

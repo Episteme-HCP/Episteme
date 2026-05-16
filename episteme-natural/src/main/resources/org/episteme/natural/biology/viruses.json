@@ -1,0 +1,72 @@
+[
+  {
+    "name": "SARS-CoV-2",
+    "scientificName": "Severe acute respiratory syndrome coronavirus 2",
+    "family": "Coronaviridae",
+    "genomeType": "RNA",
+    "hostRange": ["humans", "bats", "pangolins"]
+  },
+  {
+    "name": "HIV-1",
+    "scientificName": "Human immunodeficiency virus 1",
+    "family": "Retroviridae",
+    "genomeType": "RNA",
+    "hostRange": ["humans"]
+  },
+  {
+    "name": "Influenza A",
+    "scientificName": "Influenza A virus",
+    "family": "Orthomyxoviridae",
+    "genomeType": "RNA",
+    "hostRange": ["humans", "birds", "pigs"]
+  },
+  {
+    "name": "Hepatitis B",
+    "scientificName": "Hepatitis B virus",
+    "family": "Hepadnaviridae",
+    "genomeType": "DNA",
+    "hostRange": ["humans", "primates"]
+  },
+  {
+    "name": "Rabies",
+    "scientificName": "Rabies lyssavirus",
+    "family": "Rhabdoviridae",
+    "genomeType": "RNA",
+    "hostRange": ["mammals"]
+  },
+  {
+    "name": "Ebola",
+    "scientificName": "Zaire ebolavirus",
+    "family": "Filoviridae",
+    "genomeType": "RNA",
+    "hostRange": ["humans", "primates", "bats"]
+  },
+  {
+    "name": "Measles",
+    "scientificName": "Measles morbillivirus",
+    "family": "Paramyxoviridae",
+    "genomeType": "RNA",
+    "hostRange": ["humans"]
+  },
+  {
+    "name": "HPV-16",
+    "scientificName": "Human papillomavirus 16",
+    "family": "Papillomaviridae",
+    "genomeType": "DNA",
+    "hostRange": ["humans"]
+  },
+  {
+    "name": "Dengue",
+    "scientificName": "Dengue virus",
+    "family": "Flaviviridae",
+    "genomeType": "RNA",
+    "hostRange": ["humans", "mosquitoes"]
+  },
+  {
+    "name": "Zika",
+    "scientificName": "Zika virus",
+    "family": "Flaviviridae",
+    "genomeType": "RNA",
+    "hostRange": ["humans", "mosquitoes", "primates"]
+  }
+]

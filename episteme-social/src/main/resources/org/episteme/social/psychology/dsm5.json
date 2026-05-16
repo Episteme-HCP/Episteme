@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "title": "Diagnostic and Statistical Manual of Mental Disorders (DSM-5)",
+    "version": "5.0",
+    "year": 2013,
+    "source": "American Psychiatric Association",
+    "license": "Educational Use Only",
+    "ai_tags": ["psychology", "psychiatry", "diagnosis", "medical"]
+  },
+  "categories": [
+    {
+      "id": "neurodevelopmental",
+      "name": "Neurodevelopmental Disorders",
+      "disorders": [
+        {
+          "code": "319",
+          "name": "Intellectual Disability",
+          "criteria": ["Deficits in intellectual functions", "Deficits in adaptive functioning"]
+        },
+        {
+          "code": "299.00",
+          "name": "Autism Spectrum Disorder",
+          "criteria": ["Persistent deficits in social communication", "Restricted, repetitive patterns of behavior"]
+        },
+        {
+          "code": "314.01",
+          "name": "Attention-Deficit/Hyperactivity Disorder (ADHD)",
+          "subtypes": ["Combined", "Predominantly Inattentive", "Predominantly Hyperactive-Impulsive"]
+        }
+      ]
+    },
+    {
+      "id": "schizophrenia_spectrum",
+      "name": "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "disorders": [
+        {
+          "code": "295.90",
+          "name": "Schizophrenia",
+          "criteria": ["Delusions", "Hallucinations", "Disorganized speech"]
+        },
+        {
+          "code": "295.70",
+          "name": "Schizoaffective Disorder"
+        }
+      ]
+    },
+    {
+      "id": "bipolar",
+      "name": "Bipolar and Related Disorders",
+      "disorders": [
+        {
+          "code": "296.xx",
+          "name": "Bipolar I Disorder"
+        },
+        {
+          "code": "296.89",
+          "name": "Bipolar II Disorder"
+        }
+      ]
+    },
+    {
+      "id": "depressive",
+      "name": "Depressive Disorders",
+      "disorders": [
+        {
+          "code": "296.xx",
+          "name": "Major Depressive Disorder"
+        },
+        {
+          "code": "300.4",
+          "name": "Persistent Depressive Disorder (Dysthymia)"
+        }
+      ]
+    },
+    {
+      "id": "anxiety",
+      "name": "Anxiety Disorders",
+      "disorders": [
+        {
+          "code": "300.02",
+          "name": "Generalized Anxiety Disorder"
+        },
+        {
+          "code": "300.01",
+          "name": "Panic Disorder"
+        },
+        {
+          "code": "300.29",
+          "name": "Specific Phobia"
+        }
+      ]
+    }
+  ]
+}

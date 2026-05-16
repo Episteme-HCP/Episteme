@@ -1,0 +1,139 @@
+{
+    "acids": [
+        {
+            "name": "Hydrochloric acid",
+            "formula": "HCl",
+            "pKa": -7.0,
+            "strong": true
+        },
+        {
+            "name": "Sulfuric acid",
+            "formula": "H2SO4",
+            "pKa": -3.0,
+            "strong": true
+        },
+        {
+            "name": "Nitric acid",
+            "formula": "HNO3",
+            "pKa": -1.4,
+            "strong": true
+        },
+        {
+            "name": "Acetic acid",
+            "formula": "CH3COOH",
+            "pKa": 4.76,
+            "strong": false
+        },
+        {
+            "name": "Formic acid",
+            "formula": "HCOOH",
+            "pKa": 3.75,
+            "strong": false
+        },
+        {
+            "name": "Citric acid",
+            "formula": "C6H8O7",
+            "pKa": 3.13,
+            "strong": false
+        },
+        {
+            "name": "Carbonic acid",
+            "formula": "H2CO3",
+            "pKa": 6.35,
+            "strong": false
+        },
+        {
+            "name": "Phosphoric acid",
+            "formula": "H3PO4",
+            "pKa": 2.15,
+            "strong": false
+        },
+        {
+            "name": "Benzoic acid",
+            "formula": "C6H5COOH",
+            "pKa": 4.20,
+            "strong": false
+        },
+        {
+            "name": "Lactic acid",
+            "formula": "C3H6O3",
+            "pKa": 3.86,
+            "strong": false
+        }
+    ],
+    "bases": [
+        {
+            "name": "Sodium hydroxide",
+            "formula": "NaOH",
+            "pKb": -0.56,
+            "strong": true
+        },
+        {
+            "name": "Potassium hydroxide",
+            "formula": "KOH",
+            "pKb": -0.70,
+            "strong": true
+        },
+        {
+            "name": "Ammonia",
+            "formula": "NH3",
+            "pKb": 4.75,
+            "strong": false
+        },
+        {
+            "name": "Methylamine",
+            "formula": "CH3NH2",
+            "pKb": 3.36,
+            "strong": false
+        },
+        {
+            "name": "Pyridine",
+            "formula": "C5H5N",
+            "pKb": 8.77,
+            "strong": false
+        },
+        {
+            "name": "Aniline",
+            "formula": "C6H5NH2",
+            "pKb": 9.37,
+            "strong": false
+        }
+    ],
+    "indicators": [
+        {
+            "name": "Phenolphthalein",
+            "pHLow": 8.2,
+            "pHHigh": 10.0,
+            "colorAcid": "#FFFFFF",
+            "colorBase": "#FF1493"
+        },
+        {
+            "name": "Methyl orange",
+            "pHLow": 3.1,
+            "pHHigh": 4.4,
+            "colorAcid": "#FF4500",
+            "colorBase": "#FFD700"
+        },
+        {
+            "name": "Bromothymol blue",
+            "pHLow": 6.0,
+            "pHHigh": 7.6,
+            "colorAcid": "#FFD700",
+            "colorBase": "#0000FF"
+        },
+        {
+            "name": "Litmus",
+            "pHLow": 5.0,
+            "pHHigh": 8.0,
+            "colorAcid": "#FF0000",
+            "colorBase": "#0000FF"
+        },
+        {
+            "name": "Universal indicator",
+            "pHLow": 1.0,
+            "pHHigh": 14.0,
+            "colorAcid": "#FF0000",
+            "colorBase": "#800080"
+        }
+    ]
+}
