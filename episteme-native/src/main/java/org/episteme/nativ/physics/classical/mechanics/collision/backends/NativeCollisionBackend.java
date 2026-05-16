@@ -24,6 +24,7 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * Native implementation of {@link MechanicsBackend} for general collision processing.
  * Acts as a bridge to native optimized collision kernels.
  */
+@SuppressWarnings("rawtypes")
 @AutoService({MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
 public class NativeCollisionBackend implements NativeCollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
 
@@ -140,7 +141,6 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
 
     @Override
     public int detectSphereCollisions(float[] positions, float[] radii, int n, int[] collisions) {
-        if (!IS_AVAILABLE) return 0;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
             java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, positions);
             java.lang.foreign.MemorySegment radSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, radii);
@@ -153,7 +153,6 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
 
     @Override
     public void resolveCollisions(float[] positions, float[] velocities, float[] masses, int n, int[] collisions, int numCollisions) {
-        if (!IS_AVAILABLE) return;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
             java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, positions);
             java.lang.foreign.MemorySegment velSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, velocities);
@@ -167,7 +166,6 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
 
     @Override
     public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
-        if (!IS_AVAILABLE) return 0;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
             java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, positions);
             java.lang.foreign.MemorySegment radSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, radii);
@@ -180,7 +178,6 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
 
     @Override
     public void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
-        if (!IS_AVAILABLE) return;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
             java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, positions);
             java.lang.foreign.MemorySegment velSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, velocities);
@@ -210,7 +207,7 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
 
     @Override
     public int detectSphereCollisions(java.lang.foreign.MemorySegment positions, java.lang.foreign.MemorySegment radii, int n, java.lang.foreign.MemorySegment collisions, java.lang.foreign.ValueLayout layout) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native library 'episteme-native' not loaded");
+        if (!IS_AVAILABLE) return NativeCollisionProvider.super.detectSphereCollisions(positions, radii, n, collisions, layout);
         if (layout instanceof java.lang.foreign.ValueLayout.OfFloat) {
              return detectSphereCollisionsFloat(positions, radii, n, collisions);
         }
@@ -223,7 +220,10 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
 
     @Override
     public void resolveCollisions(java.lang.foreign.MemorySegment positions, java.lang.foreign.MemorySegment velocities, java.lang.foreign.MemorySegment masses, int n, java.lang.foreign.MemorySegment collisions, int numCollisions, java.lang.foreign.ValueLayout layout) {
-        if (!IS_AVAILABLE) throw new UnsupportedOperationException("Native library 'episteme-native' not loaded");
+        if (!IS_AVAILABLE) {
+            NativeCollisionProvider.super.resolveCollisions(positions, velocities, masses, n, collisions, numCollisions, layout);
+            return;
+        }
         if (layout instanceof java.lang.foreign.ValueLayout.OfFloat) {
              resolveCollisionsFloat(positions, velocities, masses, n, collisions, numCollisions);
              return;

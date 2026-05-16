@@ -36,7 +36,7 @@ import java.util.Arrays;
  * OpenCL implementation of Dense Linear Algebra Provider for Double precision.
  * Requires fp64 support on the GPU device.
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, GPUBackend.class})
 public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<E>> implements LinearAlgebraProvider<E>, NativeBackend, GPUBackend {
     @Override public boolean isLoaded() { return isAvailable(); }

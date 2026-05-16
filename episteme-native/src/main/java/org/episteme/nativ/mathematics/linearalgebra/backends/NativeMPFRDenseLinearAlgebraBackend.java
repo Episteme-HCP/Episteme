@@ -41,6 +41,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixS
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
@@ -523,12 +524,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
         Real b2 = getReal(b.get(1));
         Real b3 = getReal(b.get(2));
         
-        E[] res = (E[]) new Object[] {
+        List<E> res = java.util.Arrays.asList(
             castScalar(a2.multiply(b3).subtract(a3.multiply(b2)), a.getScalarRing()),
             castScalar(a3.multiply(b1).subtract(a1.multiply(b3)), a.getScalarRing()),
             castScalar(a1.multiply(b2).subtract(a2.multiply(b1)), a.getScalarRing())
-        };
-        return Vector.of(java.util.Arrays.asList(res), a.getScalarRing());
+        );
+        return Vector.of(res, a.getScalarRing());
     }
 
 
