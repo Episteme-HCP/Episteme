@@ -500,7 +500,6 @@ public class EpistemeMasterControl extends Application {
             }
         ));
         content.getChildren().add(new Separator());
-        content.getChildren().add(new Separator());
 
         // --- SPI Categories ---
         String[] types = {
@@ -527,7 +526,7 @@ public class EpistemeMasterControl extends Application {
         };
         
         boolean first = true;
-        // Skip index 0 (Math) because it's now in Algorithms tab
+        // Skip index 0 (Mathematics) as it's now in Algorithms tab
         for (int i = 1; i < types.length; i++) {
             // Check visibility using both SPI and Scanned results
             boolean hasProviders = !BackendDiscovery.getInstance().getProvidersByType(types[i]).isEmpty();
@@ -789,8 +788,6 @@ public class EpistemeMasterControl extends Application {
         return row;
     }
 
-
-
     private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
         VBox cat = new VBox(0);
         Label titleLbl = new Label(title);
@@ -826,7 +823,6 @@ public class EpistemeMasterControl extends Application {
         return cat;
     }
 
-
     private Tab createLoadersTab(I18N i18n) {
         VBox content = new VBox(25);
         content.setPadding(new Insets(30));
@@ -842,6 +838,7 @@ public class EpistemeMasterControl extends Application {
         Map<String, List<AppEntry>> grouped = new TreeMap<>();
         
         // 1. SPI Loaders (ResourceReader/Writer)
+        try {
             java.util.ServiceLoader.load(org.episteme.core.io.ResourceReader.class).forEach(r -> {
                 String cat = r.getCategory();
                 // Heuristic: Group by discipline if category is generic
@@ -1084,6 +1081,17 @@ public class EpistemeMasterControl extends Application {
             fade.setOnFinished(e -> statusLabel.setVisible(false));
             fade.play();
         }
+    }
+
+    private String extractDisciplineFromPackage(String className) {
+        if (className.contains(".chemistry.")) return "Chemistry";
+        if (className.contains(".physics.")) return "Physics";
+        if (className.contains(".biology.")) return "Biology";
+        if (className.contains(".mathematics.")) return "Mathematics";
+        if (className.contains(".geography.")) return "Geography";
+        if (className.contains(".social.")) return "Social Sciences";
+        if (className.contains(".native.")) return "Native Systems";
+        return "Scientific Systems";
     }
 
     public static void main(String[] args) { launch(args); }
