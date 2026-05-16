@@ -34,11 +34,13 @@ git add episteme-server/
 git add episteme-natural/
 git add episteme-social/
 git add episteme-native/
-git add libs/mpj.jar
+git add agent/
+git add docker/
 
-# Remove heavy 3D models rejected by Hugging Face
-Write-Host "Pruning heavy 3D assets..." -ForegroundColor Yellow
+# Remove heavy 3D models and textures rejected by Hugging Face
+Write-Host "Pruning heavy 3D assets and textures..." -ForegroundColor Yellow
 git rm -rf --cached episteme-natural/src/main/resources/org/episteme/natural/medicine/anatomy/models/*.fbx 2>$null
+git rm -rf --cached episteme-natural/src/main/resources/org/episteme/natural/physics/astronomy/*.jpg 2>$null
 
 # 5. Commit the lean version
 Write-Host "Committing lean version..." -ForegroundColor Yellow

@@ -9,12 +9,11 @@ echo ==========================================
 
 set MAVEN_OPTS=--add-modules jdk.incubator.vector --enable-preview --enable-native-access=ALL-UNNAMED
 
-rem --- Java Version Setup (Project requires JDK 25+) ---
-set "JDK25_PATH=C:\Program Files\Java\jdk-25"
-if exist "%JDK25_PATH%\bin\java.exe" (
-    echo [INFO] JDK 25 detected at %JDK25_PATH%.
-    set "JAVA_HOME=%JDK25_PATH%"
-    set "PATH=%JDK25_PATH%\bin;%PATH%"
+rem --- Java Version Setup (Project requires JDK 21/25+) ---
+if not "%JAVA_HOME%"=="" (
+    echo [INFO] Using JAVA_HOME: %JAVA_HOME%
+) else (
+    echo [WARNING] JAVA_HOME not set. Using system default java.
 )
 
 echo [1/3] Auditing FAST Mode (Float 32-bit)...

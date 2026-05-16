@@ -44,7 +44,7 @@ jobs:
       continue-on-error: true
       run: |
         mvn exec:java -pl episteme-benchmarks -Dexec.mainClass="org.episteme.benchmarks.cli.BenchmarkCLI" \
-        -Dexec.args="--run-all --export-file benchmark-results.json"
+        -Dexec.args="--run-all --dry-run --export-file benchmark-results.json"
 
     - name: Upload Benchmark Results
       uses: actions/upload-artifact@v4
