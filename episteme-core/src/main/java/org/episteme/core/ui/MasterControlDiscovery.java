@@ -43,6 +43,7 @@ public class MasterControlDiscovery {
     private static final MasterControlDiscovery INSTANCE = new MasterControlDiscovery();
     private final Map<String, List<ClassInfo>> classCache = new HashMap<>();
     private List<ClassInfo> allDiscoveredClasses = null;
+    private static final String CACHE_FILE = ".discovery_cache";
     private final java.util.concurrent.CompletableFuture<List<ClassInfo>> discoveryFuture;
 
     public static MasterControlDiscovery getInstance() {
@@ -220,7 +221,14 @@ public class MasterControlDiscovery {
     }
 
     private List<ClassInfo> scanAllEpistemeClasses() {
-        logger.info("Performing one-time full Episteme class discovery...");
+        // Try to load from cache first
+        List<ClassInfo> cached = loadCache();
+        if (cached != null) {
+            logger.info("Loaded {} Episteme classes from cache", cached.size());
+            return cached;
+        }
+
+        logger.info("Performing full Episteme class discovery...");
         long start = System.currentTimeMillis();
         
         Set<String> processed = new HashSet<>();
@@ -238,12 +246,13 @@ public class MasterControlDiscovery {
 
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         
-        // Filter paths to keep only directories or JARs that are not system-related
+        // Filter paths to keep only directories or JARs that are relevant
         List<String> filteredPaths = allPaths.stream()
             .filter(p -> {
                 String lp = p.toLowerCase();
-                // We keep everything that isn't a known system JAR to be safe
                 if (isSystemJar(lp)) return false;
+                // Skip common non-project folders to save time
+                if (lp.contains("node_modules") || lp.contains(".git") || lp.contains(".idea") || lp.contains(".gemini")) return false;
                 return true;
             })
             .collect(java.util.stream.Collectors.toList());
@@ -255,9 +264,7 @@ public class MasterControlDiscovery {
             if (file.isDirectory()) {
                 scanDirectoryRecursive(file, "", results, processed, tccl);
             } else if (file.getName().endsWith(".jar")) {
-                if (!isSystemJar(file.getName())) {
-                    scanJarRecursive(file, results, processed, tccl);
-                }
+                scanJarRecursive(file, results, processed, tccl);
             }
         }
 
@@ -265,43 +272,45 @@ public class MasterControlDiscovery {
         try {
             java.io.File current = new java.io.File(System.getProperty("user.dir")).getAbsoluteFile();
             java.io.File root = current;
-            
-            // Traverse up until we find a directory that looks like the project root (contains episteme-core)
             while (root != null && !new java.io.File(root, "episteme-core").exists()) {
                 root = root.getParentFile();
             }
             
             if (root != null) {
-                logger.info("Dev Mode: Scanning Episteme project root at {}", root.getAbsolutePath());
                 java.io.File[] modules = root.listFiles(java.io.File::isDirectory);
                 if (modules != null) {
                     for (java.io.File module : modules) {
                         java.io.File targetClasses = new java.io.File(module, "target/classes");
                         if (targetClasses.exists() && targetClasses.isDirectory()) {
-                            logger.info("Dev Mode: Scanning module classes at {}", targetClasses.getAbsolutePath());
                             scanDirectoryRecursive(targetClasses, "", results, processed, tccl);
-                        }
-                        // Also check for JARs in target if classes directory is missing
-                        java.io.File targetDir = new java.io.File(module, "target");
-                        if (targetDir.exists() && targetDir.isDirectory()) {
-                             java.io.File[] jars = targetDir.listFiles(f -> f.getName().endsWith(".jar") && f.getName().startsWith("episteme-") && !f.getName().contains("sources"));
-                             if (jars != null) {
-                                 for (java.io.File jar : jars) {
-                                     logger.info("Dev Mode: Scanning module JAR at {}", jar.getAbsolutePath());
-                                     scanJarRecursive(jar, results, processed, tccl);
-                                 }
-                             }
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            logger.warn("Dev discovery failed: {}", e.getMessage());
-        }
+        } catch (Exception e) {}
 
         long end = System.currentTimeMillis();
         logger.info("Discovered {} Episteme classes in {} ms", results.size(), (end - start));
+        saveCache(results);
         return results;
+    }
+
+    private List<ClassInfo> loadCache() {
+        java.io.File file = new java.io.File(CACHE_FILE);
+        if (!file.exists()) return null;
+        try (java.io.ObjectInputStream ois = new java.io.ObjectInputStream(new java.io.FileInputStream(file))) {
+            return (List<ClassInfo>) ois.readObject();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private void saveCache(List<ClassInfo> classes) {
+        try (java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(new java.io.FileOutputStream(CACHE_FILE))) {
+            oos.writeObject(classes);
+        } catch (Exception e) {
+            logger.warn("Failed to save discovery cache: {}", e.getMessage());
+        }
     }
 
     private void scanDirectoryRecursive(java.io.File directory, String packageName, List<ClassInfo> results,
@@ -617,7 +626,8 @@ public class MasterControlDiscovery {
         }
     }
 
-    public static class ClassInfo {
+    public static class ClassInfo implements java.io.Serializable {
+        private static final long serialVersionUID = 1L;
         public final String simpleName;
         public final String fullName;
         public final String description;

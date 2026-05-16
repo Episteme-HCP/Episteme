@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$0")/scripts/setup/env_setup.sh"
+source "$(dirname "$0")/../../scripts/setup/env_setup.sh"
 
 # VLC and Native Libs Setup
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -19,12 +19,12 @@ if [ -d "/Applications/VLC.app/Contents/MacOS/lib" ]; then
     export VLC_PLUGIN_PATH="/Applications/VLC.app/Contents/MacOS/plugins"
 fi
 
-# Launcher for Episteme Demos Suite
-
+cd "$(dirname "$0")/.."
 APP_CLASS=org.episteme.ui.EpistemeDemoApp
-LIB_DIR=launchers\lib
-MODULE_PATH="episteme-featured-apps/target/classes:episteme-core/target/classes:episteme-natural/target/classes:episteme-social/target/classes"
+LIB_DIR=launchers/libs/libs
+MODULES_DIR=launchers/libs
+MODULE_PATH="${MODULES_DIR}/episteme-featured-apps-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/episteme-core-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/episteme-natural-1.0.0-SNAPSHOT.jar:${MODULES_DIR}/episteme-social-1.0.0-SNAPSHOT.jar"
 
-echo "Starting Episteme Demos Suite..."
-java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "${LIB_DIR}/javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "${MODULE_PATH}:${LIB_DIR}/*" ${APP_CLASS} "$@"
+echo "Starting Episteme Demo Suite..."
+java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "$(dirname "$0")/libs/javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "${MODULE_PATH}:${LIB_DIR}/*" ${APP_CLASS} "$@"
 

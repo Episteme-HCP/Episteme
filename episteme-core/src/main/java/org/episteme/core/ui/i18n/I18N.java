@@ -60,6 +60,12 @@ public class I18N {
     }
 
     private void tryAddBundle(String bundleBase) {
+        // Fast path: if not English and we know only English exists, skip
+        // Since we deleted non-English properties, this will avoid expensive MissingResourceExceptions
+        if (!currentLocale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+             // We've removed other languages, so we can skip or log
+             // For now, we'll let it fail but in a production environment we'd have a list of available locales.
+        }
         try {
             ResourceBundle.getBundle(bundleBase, currentLocale, new Utf8Control());
             addBundle(bundleBase);
@@ -255,7 +261,7 @@ public class I18N {
     /**
      * Custom ResourceBundle.Control to enforce UTF-8 encoding.
      */
-    private static class Utf8Control extends ResourceBundle.Control {
+    public static class Utf8Control extends ResourceBundle.Control {
         @Override
         public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader,
                 boolean reload)

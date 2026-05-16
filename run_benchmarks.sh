@@ -1,4 +1,6 @@
 #!/bin/bash
+source "$(dirname "$0")/scripts/setup/env_setup.sh"
+
 # Episteme Benchmarks Launcher
 
 APP_CLASS="org.episteme.benchmarks.ui.Launcher"

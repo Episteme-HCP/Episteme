@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$0")/scripts/setup/env_setup.sh"
+source "$(dirname "$0")/../../scripts/setup/env_setup.sh"
 
 # VLC and Native Libs Setup
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -19,12 +19,14 @@ if [ -d "/Applications/VLC.app/Contents/MacOS/lib" ]; then
     export VLC_PLUGIN_PATH="/Applications/VLC.app/Contents/MacOS/plugins"
 fi
 
-# Launcher for Episteme Demos Suite
+# Start a Episteme Worker Node
+echo "Starting Episteme Worker Node..."
 
-APP_CLASS=org.episteme.ui.EpistemeDemoApp
-LIB_DIR=launchers\lib
-MODULE_PATH="episteme-featured-apps/target/classes:episteme-core/target/classes:episteme-natural/target/classes:episteme-social/target/classes"
+if [ ! -f "episteme-worker/target/episteme-worker-1.0.0-SNAPSHOT.jar" ]; then
+    echo "Building Worker..."
+    mvn clean package -pl episteme-worker -am -DskipTests
+fi
 
-echo "Starting Episteme Demos Suite..."
-java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --module-path "${LIB_DIR}/javafx" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "${MODULE_PATH}:${LIB_DIR}/*" ${APP_CLASS} "$@"
+echo "Launching Worker connected to localhost:50051..."
+java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED -cp episteme-worker/target/episteme-worker-1.0.0-SNAPSHOT.jar:episteme-worker/target/lib/* org.episteme.worker.WorkerNode localhost 50051
 

@@ -1,4 +1,5 @@
 #!/bin/bash
+source "$(dirname "$0")/scripts/setup/env_setup.sh"
 
 # VLC and Native Libs Setup
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -23,3 +24,4 @@ fi
 echo "Starting Episteme Master Control..."
 export MAVEN_OPTS="--add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED"
 mvn exec:java -pl episteme-featured-apps -am -Dexec.mainClass="org.episteme.core.ui.EpistemeMasterControl" -Dexec.args="$@"
+
