@@ -483,10 +483,20 @@ public class EpistemeMasterControl extends Application {
             i18n.get("mastercontrol.libraries.cat.standards", "Standards"),
             new String[][] {
                 {"lib.jsr385.name", "javax.measure.Unit", "lib.jsr385.desc"},
-                {"lib.indriya.name", "tech.units.indriya.format.SimpleUnitFormat", "lib.indriya.desc"},
-                {"lib.graphstream.name", "org.graphstream.graph.Graph", "lib.graphstream.desc"},
-                {"lib.jgrapht.name", "org.jgrapht.Graph", "lib.jgrapht.desc"},
-                {"lib.javacv.name", "org.bytedeco.javacv.FFmpegFrameGrabber", "lib.javacv.desc"}
+                {"lib.indriya.name", "tech.units.indriya.format.SimpleUnitFormat", "lib.indriya.desc"}
+            }
+        ));
+        content.getChildren().add(new Separator());
+
+        // --- INTERNAL FRAMEWORK PROVIDERS ---
+        content.getChildren().add(createManualLibraryCategory(i18n, 
+            i18n.get("mastercontrol.libraries.cat.framework_providers", "Framework Providers"),
+            new String[][] {
+                {"lib.core.dense.name", "org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider", "lib.core.dense.desc"},
+                {"lib.core.sparse.name", "org.episteme.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider", "lib.core.sparse.desc"},
+                {"lib.core.distributed.name", "org.episteme.core.technical.backend.distributed.DistributedBackend", "lib.core.distributed.desc"},
+                {"lib.core.mpi.name", "org.episteme.core.distributed.backends.MPIDistributedBackend", "lib.core.mpi.desc"},
+                {"lib.core.spark.name", "org.episteme.core.distributed.backends.SparkDistributedBackend", "lib.core.spark.desc"}
             }
         ));
         content.getChildren().add(new Separator());
@@ -500,7 +510,6 @@ public class EpistemeMasterControl extends Application {
             BackendDiscovery.TYPE_DISTRIBUTED, BackendDiscovery.TYPE_GRAPH, BackendDiscovery.TYPE_MAP
         };
         String[] labels = {
-            i18n.get("category.math", "Mathematics"),
             i18n.get("category.la", "Linear Algebra"),
             i18n.get("category.tensor", "Tensor Computing"),
             i18n.get("category.plotting", "Visualization"),
@@ -517,7 +526,8 @@ public class EpistemeMasterControl extends Application {
         };
         
         boolean first = true;
-        for (int i = 0; i < types.length; i++) {
+        // Skip index 0 (Mathematics) as it's now in Algorithms tab
+        for (int i = 1; i < types.length; i++) {
             // Check visibility using both SPI and Scanned results
             boolean hasProviders = !BackendDiscovery.getInstance().getProvidersByType(types[i]).isEmpty();
             if (!hasProviders) {
@@ -764,10 +774,10 @@ public class EpistemeMasterControl extends Application {
         name.setPrefWidth(250);
         name.getStyleClass().add("font-medium");
 
-        Label priority = new Label(String.valueOf(b.getPriority()));
-        priority.setPrefWidth(120);
-        priority.getStyleClass().add(b.isAvailable() ? "status-label-available" : "status-label-unavailable");
-        priority.setAlignment(Pos.CENTER);
+        Label status = new Label(b.isAvailable() ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "NOT FOUND"));
+        status.setPrefWidth(120);
+        status.getStyleClass().add(b.isAvailable() ? "status-label-available" : "status-label-unavailable");
+        status.setAlignment(Pos.CENTER);
 
         Label desc = new Label(b.getDescription());
         desc.setOpacity(0.7);
@@ -777,8 +787,6 @@ public class EpistemeMasterControl extends Application {
         row.getChildren().addAll(name, status, desc);
         return row;
     }
-
-
 
     private VBox createBackendCategory(I18N i18n, String type, String title, String description) {
         VBox cat = new VBox(0);
@@ -796,16 +804,16 @@ public class EpistemeMasterControl extends Application {
         hName.setPrefWidth(250);
         hName.getStyleClass().add("font-bold");
         
-        Label hPriority = new Label(i18n.get("mastercontrol.libraries.col.priority", "Priority"));
-        hPriority.setPrefWidth(120);
-        hPriority.getStyleClass().add("font-bold");
-        hPriority.setAlignment(Pos.CENTER);
+        Label hStatus = new Label(i18n.get("mastercontrol.libraries.col.status", "Status"));
+        hStatus.setPrefWidth(120);
+        hStatus.getStyleClass().add("font-bold");
+        hStatus.setAlignment(Pos.CENTER);
         
         Label hDesc = new Label(i18n.get("mastercontrol.libraries.col.description", "Description"));
         hDesc.getStyleClass().add("font-bold");
         HBox.setHgrow(hDesc, Priority.ALWAYS);
         
-        tableHeader.getChildren().addAll(hName, hPriority, hDesc);
+        tableHeader.getChildren().addAll(hName, hStatus, hDesc);
         cat.getChildren().add(tableHeader);
         
         List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
@@ -814,7 +822,6 @@ public class EpistemeMasterControl extends Application {
         }
         return cat;
     }
-
 
     private Tab createLoadersTab(I18N i18n) {
         VBox content = new VBox(25);
@@ -834,10 +841,17 @@ public class EpistemeMasterControl extends Application {
         try {
             java.util.ServiceLoader.load(org.episteme.core.io.ResourceReader.class).forEach(r -> {
                 String cat = r.getCategory();
+                // Heuristic: Group by discipline if category is generic
+                if (cat == null || cat.equalsIgnoreCase("Scientific System") || cat.equalsIgnoreCase("Social Science")) {
+                    cat = extractDisciplineFromPackage(r.getClass().getName());
+                }
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(i18n.get(r.getName(), r.getName()), r.getClass().getName(), i18n.get(r.getDescription(), r.getDescription())));
             });
             java.util.ServiceLoader.load(org.episteme.core.io.ResourceWriter.class).forEach(w -> {
                 String cat = w.getCategory();
+                if (cat == null || cat.equalsIgnoreCase("Scientific System") || cat.equalsIgnoreCase("Social Science")) {
+                    cat = extractDisciplineFromPackage(w.getClass().getName());
+                }
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(i18n.get(w.getName(), w.getName()), w.getClass().getName(), i18n.get(w.getDescription(), w.getDescription())));
             });
         } catch (Exception e) {}
@@ -1067,6 +1081,17 @@ public class EpistemeMasterControl extends Application {
             fade.setOnFinished(e -> statusLabel.setVisible(false));
             fade.play();
         }
+    }
+
+    private String extractDisciplineFromPackage(String className) {
+        if (className.contains(".chemistry.")) return "Chemistry";
+        if (className.contains(".physics.")) return "Physics";
+        if (className.contains(".biology.")) return "Biology";
+        if (className.contains(".mathematics.")) return "Mathematics";
+        if (className.contains(".geography.")) return "Geography";
+        if (className.contains(".social.")) return "Social Sciences";
+        if (className.contains(".native.")) return "Native Systems";
+        return "Scientific Systems";
     }
 
     public static void main(String[] args) { launch(args); }
