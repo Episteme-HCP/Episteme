@@ -774,7 +774,7 @@ public class EpistemeMasterControl extends Application {
         desc.setWrapText(true);
         HBox.setHgrow(desc, Priority.ALWAYS);
 
-        row.getChildren().addAll(name, priority, desc);
+        row.getChildren().addAll(name, status, desc);
         return row;
     }
 
