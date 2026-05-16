@@ -27,7 +27,7 @@ public class NativeRealDoubleVectorStorage implements RealDoubleVectorStorage, N
         this.dimension = dimension;
         this.arena = arena;
         this.ownsArena = false;
-        this.data = arena.allocate((long) dimension * Double.BYTES, ValueLayout.JAVA_DOUBLE.byteAlignment());
+        this.data = org.episteme.nativ.technical.backend.nativ.NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, dimension);
         data.fill((byte) 0);
     }
 
@@ -35,7 +35,7 @@ public class NativeRealDoubleVectorStorage implements RealDoubleVectorStorage, N
         this.dimension = dimension;
         this.arena = Arena.ofAuto();
         this.ownsArena = false;
-        this.data = arena.allocate((long) dimension * Double.BYTES, ValueLayout.JAVA_DOUBLE.byteAlignment());
+        this.data = org.episteme.nativ.technical.backend.nativ.NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, dimension);
         data.fill((byte) 0);
     }
 

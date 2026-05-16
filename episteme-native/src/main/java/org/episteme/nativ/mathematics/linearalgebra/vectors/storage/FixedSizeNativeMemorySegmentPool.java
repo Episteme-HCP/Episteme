@@ -61,7 +61,7 @@ public class FixedSizeNativeMemorySegmentPool implements org.episteme.nativ.util
     public MemorySegment acquire() {
         MemorySegment segment = pool.poll();
         if (segment == null) {
-            segment = arena.allocate(segmentSize, ValueLayout.JAVA_DOUBLE.byteAlignment());
+            segment = org.episteme.nativ.technical.backend.nativ.NativeSafe.allocate(arena, segmentSize);
             allocatedCount.incrementAndGet();
             logger.debug("Allocated new native segment of {} bytes. Total: {}", 
                 segmentSize, allocatedCount.get());

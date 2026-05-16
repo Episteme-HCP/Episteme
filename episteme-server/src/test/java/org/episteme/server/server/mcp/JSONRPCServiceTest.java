@@ -9,7 +9,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +26,7 @@ class JSONRPCServiceTest {
 
     @BeforeEach
     void setUp() {
-        MCPToolRegistry registry = new MCPToolRegistry(mock(ApplicationContext.class));
+        MCPToolRegistry registry = new MCPToolRegistry();
         registry.init();
         // Use a SyncTaskExecutor for predictable testing
         org.springframework.core.task.SyncTaskExecutor taskExecutor = new org.springframework.core.task.SyncTaskExecutor();

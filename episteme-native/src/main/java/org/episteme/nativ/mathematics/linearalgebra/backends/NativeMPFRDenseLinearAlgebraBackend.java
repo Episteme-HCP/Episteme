@@ -271,7 +271,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E trace(Matrix<E> a) {
         checkSquare(a);
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
@@ -315,7 +314,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E dot(Vector<E> a, Vector<E> b) {
         checkDimensionsDot(a, b);
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
@@ -378,7 +376,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E norm(Vector<E> a) {
         boolean isComplex = ((Object)a.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         long prec = getPrecision();
@@ -500,7 +497,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> cross(Vector<E> a, Vector<E> b) {
         if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
         
@@ -512,12 +508,12 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
             Complex b2 = (Complex) (Object) b.get(1);
             Complex b3 = (Complex) (Object) b.get(2);
             
-            E[] res = (E[]) new Object[] {
+            List<E> res = java.util.Arrays.asList(
                 castScalar(a2.multiply(b3).subtract(a3.multiply(b2)), a.getScalarRing()),
                 castScalar(a3.multiply(b1).subtract(a1.multiply(b3)), a.getScalarRing()),
                 castScalar(a1.multiply(b2).subtract(a2.multiply(b1)), a.getScalarRing())
-            };
-            return Vector.of(java.util.Arrays.asList(res), a.getScalarRing());
+            );
+            return Vector.of(res, a.getScalarRing());
         }
 
         Real a1 = getReal(a.get(0));
@@ -537,7 +533,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
 
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> projection(Vector<E> a, Vector<E> b) {
         E dAB = dot(a, b);
         E dBB = dot(b, b);

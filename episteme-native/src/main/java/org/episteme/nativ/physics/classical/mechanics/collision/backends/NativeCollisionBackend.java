@@ -144,7 +144,7 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
             java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, positions);
             java.lang.foreign.MemorySegment radSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, radii);
-            java.lang.foreign.MemorySegment colSeg = arena.allocate(java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
+            java.lang.foreign.MemorySegment colSeg = NativeSafe.allocate(arena, java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
             int count = detectSphereCollisions(posSeg, radSeg, n, colSeg, java.lang.foreign.ValueLayout.JAVA_FLOAT);
             java.lang.foreign.MemorySegment.copy(colSeg, java.lang.foreign.ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
             return count;
@@ -171,7 +171,7 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
             java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, positions);
             java.lang.foreign.MemorySegment radSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, radii);
-            java.lang.foreign.MemorySegment colSeg = arena.allocate(java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
+            java.lang.foreign.MemorySegment colSeg = NativeSafe.allocate(arena, java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
             int count = detectSphereCollisions(posSeg, radSeg, n, colSeg, java.lang.foreign.ValueLayout.JAVA_DOUBLE);
             java.lang.foreign.MemorySegment.copy(colSeg, java.lang.foreign.ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
             return count;

@@ -66,7 +66,7 @@ public class NativeMemorySegmentPool implements MemorySegmentPool {
         // Find pool for this size or slightly larger (simplification for now: exact size)
         Deque<MemorySegment> pool = pools.computeIfAbsent(sizeBytes, k -> new ArrayDeque<>());
         if (pool.isEmpty()) {
-            return arena.allocate(sizeBytes);
+            return org.episteme.nativ.technical.backend.nativ.NativeSafe.allocate(arena, sizeBytes);
         }
         return pool.pop();
     }

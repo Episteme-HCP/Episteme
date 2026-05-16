@@ -24,6 +24,7 @@
     <module>episteme-client</module>
     <module>episteme-database</module>
     <module>episteme-jni</module>
+    <module>episteme-demos</module>
   </modules>
   <licenses>
     <license>
