@@ -538,7 +538,6 @@ public final class OpenCLKernels {
         "    int i = get_global_id(0); if (i < n) a[i] *= norm_inv;\n" +
         "}\n";
     
-    // TODO: Add more float kernels as needed (Sparse, etc.)
 
     public static final String SPARSE_FLOAT_KERNELS =
         "__kernel void spmv_csr_float(int num_rows, __global const int* ptr, __global const int* indices, __global const float* values, __global const float* x, __global float* y) {\n" +

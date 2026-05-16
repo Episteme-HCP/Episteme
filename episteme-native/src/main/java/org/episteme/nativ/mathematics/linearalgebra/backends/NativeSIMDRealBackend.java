@@ -19,7 +19,6 @@ import com.google.auto.service.AutoService;
 /**
  * Concrete Native SIMD provider for Real numbers.
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class, AlgorithmProvider.class})
 public class NativeSIMDRealBackend extends AbstractNativeSIMDLinearAlgebraBackend<Real> {
 

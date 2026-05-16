@@ -517,7 +517,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     float[] result = segB.toArray(ValueLayout.JAVA_FLOAT);
                     Real[] realRes = new Real[n];
                     for (int i = 0; i < n; i++) realRes[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(result[i]);
-                    return (Vector<E>) Vector.of(java.util.Arrays.asList(realRes), Reals.getInstance());
+                    return (Vector<E>) (Vector<?>) Vector.of(java.util.Arrays.asList(realRes), Reals.getInstance());
                 } else {
                     if (DTRSM_HANDLE == null) throw new UnsupportedOperationException("CBLAS dtrsm not available");
                     segA = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray((Matrix<Real>) A));
@@ -824,7 +824,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
 
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
         if (!AVAILABLE) throw new UnsupportedOperationException("Native library not available");
         
@@ -832,23 +831,15 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real || ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                @SuppressWarnings("unchecked")
-                Vector<E> res = (Vector<E>) multiplyRealFloat((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
-                return res;
+                return (Vector<E>) (Vector<?>) multiplyRealFloat((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
             }
-            @SuppressWarnings("unchecked")
-            Vector<E> res = (Vector<E>) (Object) multiplyReal((Matrix<Real>)(Object)a, (Vector<Real>)(Object)b);
-            return res;
+            return (Vector<E>) (Object) multiplyReal((Matrix<Real>)(Object)a, (Vector<Real>)(Object)b);
         } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex || ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             E zero = ring.zero();
             if (zero instanceof org.episteme.core.mathematics.numbers.complex.Complex && ((org.episteme.core.mathematics.numbers.complex.Complex)zero).getReal() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-                @SuppressWarnings("unchecked")
-                Vector<E> res = (Vector<E>) multiplyComplexFloat((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
-                return res;
+                return (Vector<E>) (Vector<?>) multiplyComplexFloat((Matrix<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)a, (Vector<org.episteme.core.mathematics.numbers.complex.Complex>)(Object)b);
             }
-            @SuppressWarnings("unchecked")
-            Vector<E> res = (Vector<E>) (Object) multiplyComplex((Matrix<Complex>)(Object)a, (Vector<Complex>)(Object)b);
-            return res;
+            return (Vector<E>) (Object) multiplyComplex((Matrix<Complex>)(Object)a, (Vector<Complex>)(Object)b);
         }
         throw new UnsupportedOperationException("Unsupported ring type for NativeCPU multiply: " + ring.getClass().getName());
     }
@@ -1120,7 +1111,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Matrix<E> subtract(Matrix<E> a, Matrix<E> b) {
         Ring<E> ring = a.getScalarRing();
         int rows = a.rows();
@@ -1130,9 +1120,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             double[] bd = toDoubleArray((Matrix<Real>)(Object)b);
             double[] rd = new double[ad.length];
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
-            @SuppressWarnings("unchecked")
-            Matrix<E> result = (Matrix<E>)(Object) RealDoubleMatrix.of(rd, rows, cols);
-            return result;
+            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(rd, rows, cols);
         } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
             double[] ad = toComplexDoubleArray((Matrix<Complex>)(Object)a);
             double[] bd = toComplexDoubleArray((Matrix<Complex>)(Object)b);
@@ -1146,7 +1134,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Matrix<E> scale(E scalar, Matrix<E> a) {
         Ring<E> ring = a.getScalarRing();
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.Real) {

@@ -109,12 +109,16 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
         if (workerProcess != null && workerProcess.isAlive()) return;
         
         try {
-            String scriptPath = "scripts/NativePythonWorker.py";
+            String scriptPath = "scripts/run/NativePythonWorker.py";
             // Check if file exists relative to execution root or common locations
             File scriptFile = new File(scriptPath);
             if (!scriptFile.exists()) {
-                 // Try to locate it based on workspace structure
-                 scriptFile = new File("../scripts/NativePythonWorker.py");
+                // Try legacy location
+                scriptFile = new File("scripts/NativePythonWorker.py");
+                if (!scriptFile.exists()) {
+                     // Try to locate it based on workspace structure
+                     scriptFile = new File("../scripts/NativePythonWorker.py");
+                }
             }
 
             ProcessBuilder pb = new ProcessBuilder(pythonExecutable, scriptFile.getAbsolutePath());

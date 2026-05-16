@@ -49,6 +49,7 @@
     <module>episteme-client</module>
     <module>episteme-database</module>
     <module>episteme-jni</module>
+    <module>episteme-demos</module>
   </modules>
   <scm>
     <connection>scm:git:git://github.com/Episteme-HCP/Episteme.git</connection>

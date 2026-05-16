@@ -34,8 +34,7 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
         this.cols = cols;
         this.arena = arena;
         
-        long size = (long) rows * cols * Double.BYTES;
-        this.data = arena.allocate(size, ValueLayout.JAVA_DOUBLE.byteAlignment());
+        this.data = org.episteme.nativ.technical.backend.nativ.NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) rows * cols);
         data.fill((byte) 0);
     }
 
@@ -47,8 +46,7 @@ public class NativeRealDoubleMatrixStorage implements RealDoubleMatrixStorage, N
         this.cols = cols;
         this.arena = Arena.ofAuto();
         
-        long size = (long) rows * cols * Double.BYTES;
-        this.data = arena.allocate(size, ValueLayout.JAVA_DOUBLE.byteAlignment());
+        this.data = org.episteme.nativ.technical.backend.nativ.NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, (long) rows * cols);
         data.fill((byte) 0);
     }
 

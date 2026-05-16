@@ -84,7 +84,7 @@ if defined USE_SHADED_JAR (
         echo [INFO] Dependencies not found in target, copying...
         call mvn dependency:copy-dependencies -pl episteme-benchmarks -am -DoutputDirectory=target/lib -DincludeScope=runtime -DskipTests
     )
-    java --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %* %EXTRA_ARGS%
+    java -Xmx4g --add-modules jdk.incubator.vector --enable-native-access=ALL-UNNAMED -cp "%MODULE_PATH%;%DEPENDENCY_DIR%\*;%LIB_DIR%\*;%MPJ_JAR%" %APP_CLASS% %* %EXTRA_ARGS%
 )
 
 )

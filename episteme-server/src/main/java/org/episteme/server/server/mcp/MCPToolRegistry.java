@@ -44,10 +44,7 @@ public class MCPToolRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(MCPToolRegistry.class);
     private final Map<String, ToolDefinition> tools = new ConcurrentHashMap<>();
 
-    private final org.springframework.context.ApplicationContext context;
-
-    public MCPToolRegistry(org.springframework.context.ApplicationContext context) {
-        this.context = context;
+    public MCPToolRegistry() {
     }
 
     @PostConstruct

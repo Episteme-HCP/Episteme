@@ -70,10 +70,10 @@ public class NativeTensor<T> implements Tensor<T> {
         long byteSize;
         if (type == Float.class) {
             byteSize = size * Float.BYTES;
-            this.segment = arena.allocate(byteSize, Float.BYTES);
+            this.segment = NativeSafe.allocate(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, size);
         } else if (type == Double.class || type == Real.class) {
             byteSize = size * Double.BYTES;
-            this.segment = arena.allocate(byteSize, Double.BYTES);
+            this.segment = NativeSafe.allocate(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, size);
         } else {
             throw new IllegalArgumentException("NativeTensor only supports Float, Double, and Real, got: " + type.getSimpleName());
         }

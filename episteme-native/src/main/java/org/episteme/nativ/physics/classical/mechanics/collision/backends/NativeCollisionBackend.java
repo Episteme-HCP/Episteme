@@ -5,6 +5,8 @@
 
 package org.episteme.nativ.physics.classical.mechanics.collision.backends;
 
+import org.episteme.nativ.technical.backend.nativ.NativeSafe;
+
 import com.google.auto.service.AutoService;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
@@ -140,9 +142,9 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
     public int detectSphereCollisions(float[] positions, float[] radii, int n, int[] collisions) {
         if (!IS_AVAILABLE) return 0;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
-            java.lang.foreign.MemorySegment posSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_FLOAT, positions);
-            java.lang.foreign.MemorySegment radSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_FLOAT, radii);
-            java.lang.foreign.MemorySegment colSeg = arena.allocate(java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
+            java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, positions);
+            java.lang.foreign.MemorySegment radSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, radii);
+            java.lang.foreign.MemorySegment colSeg = NativeSafe.allocate(arena, java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
             int count = detectSphereCollisions(posSeg, radSeg, n, colSeg, java.lang.foreign.ValueLayout.JAVA_FLOAT);
             java.lang.foreign.MemorySegment.copy(colSeg, java.lang.foreign.ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
             return count;
@@ -153,10 +155,10 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
     public void resolveCollisions(float[] positions, float[] velocities, float[] masses, int n, int[] collisions, int numCollisions) {
         if (!IS_AVAILABLE) return;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
-            java.lang.foreign.MemorySegment posSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_FLOAT, positions);
-            java.lang.foreign.MemorySegment velSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_FLOAT, velocities);
-            java.lang.foreign.MemorySegment massSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_FLOAT, masses);
-            java.lang.foreign.MemorySegment colSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_INT, collisions);
+            java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, positions);
+            java.lang.foreign.MemorySegment velSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, velocities);
+            java.lang.foreign.MemorySegment massSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_FLOAT, masses);
+            java.lang.foreign.MemorySegment colSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_INT, collisions);
             resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions, java.lang.foreign.ValueLayout.JAVA_FLOAT);
             java.lang.foreign.MemorySegment.copy(posSeg, java.lang.foreign.ValueLayout.JAVA_FLOAT, 0, positions, 0, n * 3);
             java.lang.foreign.MemorySegment.copy(velSeg, java.lang.foreign.ValueLayout.JAVA_FLOAT, 0, velocities, 0, n * 3);
@@ -167,9 +169,9 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
     public int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions) {
         if (!IS_AVAILABLE) return 0;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
-            java.lang.foreign.MemorySegment posSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_DOUBLE, positions);
-            java.lang.foreign.MemorySegment radSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_DOUBLE, radii);
-            java.lang.foreign.MemorySegment colSeg = arena.allocate(java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
+            java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, positions);
+            java.lang.foreign.MemorySegment radSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, radii);
+            java.lang.foreign.MemorySegment colSeg = NativeSafe.allocate(arena, java.lang.foreign.ValueLayout.JAVA_INT, (long) n * n * 2);
             int count = detectSphereCollisions(posSeg, radSeg, n, colSeg, java.lang.foreign.ValueLayout.JAVA_DOUBLE);
             java.lang.foreign.MemorySegment.copy(colSeg, java.lang.foreign.ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
             return count;
@@ -180,10 +182,10 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
     public void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions) {
         if (!IS_AVAILABLE) return;
         try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
-            java.lang.foreign.MemorySegment posSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_DOUBLE, positions);
-            java.lang.foreign.MemorySegment velSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_DOUBLE, velocities);
-            java.lang.foreign.MemorySegment massSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_DOUBLE, masses);
-            java.lang.foreign.MemorySegment colSeg = arena.allocateFrom(java.lang.foreign.ValueLayout.JAVA_INT, collisions);
+            java.lang.foreign.MemorySegment posSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, positions);
+            java.lang.foreign.MemorySegment velSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, velocities);
+            java.lang.foreign.MemorySegment massSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_DOUBLE, masses);
+            java.lang.foreign.MemorySegment colSeg = NativeSafe.allocateFrom(arena, java.lang.foreign.ValueLayout.JAVA_INT, collisions);
             resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions, java.lang.foreign.ValueLayout.JAVA_DOUBLE);
             java.lang.foreign.MemorySegment.copy(posSeg, java.lang.foreign.ValueLayout.JAVA_DOUBLE, 0, positions, 0, n * 3);
             java.lang.foreign.MemorySegment.copy(velSeg, java.lang.foreign.ValueLayout.JAVA_DOUBLE, 0, velocities, 0, n * 3);
@@ -276,3 +278,6 @@ public class NativeCollisionBackend implements NativeCollisionProvider, Mechanic
         return new org.episteme.core.technical.backend.cpu.CPUExecutionContext();
     }
 }
+
+
+

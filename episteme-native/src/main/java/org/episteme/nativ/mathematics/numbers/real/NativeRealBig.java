@@ -231,7 +231,7 @@ public final class NativeRealBig extends Real {
             
             if (strPtr.equals(MemorySegment.NULL)) return BigDecimal.ZERO;
 
-            String digits = NativeSafe.getString(strPtr.reinterpret(bufSize), 0L);
+            String digits = strPtr.reinterpret(bufSize).getUtf8String(0);
             long exp = (C_LONG.byteSize() == 4) ? expPtr.get(ValueLayout.JAVA_INT, 0L) : expPtr.get(ValueLayout.JAVA_LONG, 0L);
             
             if (digits == null || digits.isEmpty() || digits.equals("0")) return BigDecimal.ZERO;
