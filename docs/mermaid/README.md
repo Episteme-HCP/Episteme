@@ -101,40 +101,32 @@ graph TD
 
 ```mermaid
 classDiagram
-    namespace API {
-        class ComputeContext {
-            +selectBackend()
-            +compute()
-        }
-        class AlgorithmProvider {
-            <<interface>>
-            +getPriority()
-            +isAvailable()
-        }
+    class ComputeContext {
+        +selectBackend()
+        +compute()
     }
-    
-    namespace SPI {
-        class Backend {
-            <<interface>>
-            +getName()
-            +isAvailable()
-        }
-        class ComputeBackend {
-            <<interface>>
-        }
-        class AudioBackend {
-            <<interface>>
-        }
+    class AlgorithmProvider {
+        <<interface>>
+        +getPriority()
+        +isAvailable()
     }
-    
-    namespace Implementations {
-        class OpenCLBackend
-        class CUDABackend
-        class NativeSIMDBackend
-        class NativeAudioBackend
-        class OpenCLNBodyProvider
-        class CUDANBodyProvider
+    class Backend {
+        <<interface>>
+        +getName()
+        +isAvailable()
     }
+    class ComputeBackend {
+        <<interface>>
+    }
+    class AudioBackend {
+        <<interface>>
+    }
+    class OpenCLBackend
+    class CUDABackend
+    class NativeSIMDBackend
+    class NativeAudioBackend
+    class OpenCLNBodyProvider
+    class CUDANBodyProvider
     
     ComputeContext --> Backend : Manages
     Backend <|-- ComputeBackend
