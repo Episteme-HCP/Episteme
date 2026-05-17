@@ -126,7 +126,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
     }
 
     private void spmv_internal(int m, int k, int nnz, MemorySegment d_rowPtr, MemorySegment d_colIdx, MemorySegment d_val, MemorySegment d_x, MemorySegment d_y, Arena arena, ResourceTracker tracker) throws Throwable {
-        spmv_internal(m, k, nnz, d_rowPtr, d_colIdx, d_val, d_x, d_y, arena, tracker, 1); // Default to double (CUDA_R_64F = 1)
+        spmv_internal(m, k, nnz, d_rowPtr, d_colIdx, d_val, d_x, d_y, arena, tracker, CUDA_R_64F); // Default to double (CUDA_R_64F = 1)
     }
 
     private void spmv_internal(int m, int k, int nnz, MemorySegment d_rowPtr, MemorySegment d_colIdx, MemorySegment d_val, MemorySegment d_x, MemorySegment d_y, Arena arena, ResourceTracker tracker, int dataType) throws Throwable {
@@ -284,7 +284,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         int m = sa.rows(); int n = sa.cols(); int nnz = sa.getNnz();
         boolean isComplex = isComplex(sa);
         int elemSize = isComplex ? 16 : 8;
-        int dataType = isComplex ? 5 : 1; // CUDA_C_64F : CUDA_R_64F
+        int dataType = isComplex ? 5 : CUDA_R_64F; // CUDA_C_64F : CUDA_R_64F
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
@@ -337,7 +337,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         int m = a.rows(); int n = a.cols();
         boolean isComplex = isComplex(a);
         int elemSize = isComplex ? 16 : 8;
-        int dataType = isComplex ? 5 : 1;
+        int dataType = isComplex ? 5 : CUDA_R_64F;
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
@@ -457,8 +457,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
                 checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMSET, d_x, 0, (long)n * elemSize));
             }
 
-            int dataType = isComplex ? 5 : 1; // 5=CUDA_C_64F, 1=CUDA_R_64F
-            MemorySegment handle = CUDAManager.getCublasHandle();
+            int dataType = isComplex ? 5 : CUDA_R_64F; // 5=CUDA_C_64F, 1=CUDA_R_64F
             MemorySegment res = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, 2);
 
             // r = b - Ax
@@ -533,7 +532,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
                 checkCuda((int) NativeSafe.invoke(CUDAManager.CUDA_MEMSET, d_x, 0, (long)n * elemSize));
             }
 
-            int dataType = isComplex ? 5 : 1;
+            int dataType = isComplex ? 5 : CUDA_R_64F;
             MemorySegment res = NativeSafe.allocate(arena, ValueLayout.JAVA_DOUBLE, 2);
 
             // r = b - Ax
@@ -677,7 +676,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
         int m = sa.rows(); int n = sa.cols(); int nnz = sa.getNnz();
         boolean isComplex = isComplex(sa);
         int elemSize = isComplex ? 16 : 8;
-        int dataType = isComplex ? 5 : 1;
+        int dataType = isComplex ? 5 : CUDA_R_64F;
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
@@ -743,6 +742,7 @@ public class NativeCUDASparseLinearAlgebraDoubleBackend<E extends FieldElement<E
     @Override public String getType() { return "math"; }
 
     @Override
+    @SuppressWarnings("deprecation")
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext();
     }

@@ -156,27 +156,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
      * Computes the matrix exponential e^A.
      */
     default Matrix<E> exp(Matrix<E> a) {
-        try {
-            EigenResult<E> eigen = eigen(a);
-            // exp(A) = V * exp(D) * V^-1
-            // This only works if A is diagonalizable.
-            // For general case, should use Pade approximation or Taylor series.
-            // But for now, eigenvalue based is better than nothing.
-            Matrix<E> V = eigen.V();
-            Vector<E> D = eigen.D();
-            
-            // exp(D)
-            E[] expD = (E[]) new Object[D.dimension()];
-            for (int i = 0; i < D.dimension(); i++) {
-                // This is tricky because we need a way to compute scalar exp
-                // For now, let's just use the provider's scalar methods if available
-                // Actually, let's just throw for now until we have a better way to handle scalar math on E
-                throw new UnsupportedOperationException("Matrix exp not fully implemented in default provider");
-            }
-            return null; // Placeholder
-        } catch (Exception e) {
-            throw new UnsupportedOperationException(getName() + " does not support exp()", e);
-        }
+        throw new UnsupportedOperationException(getName() + " does not support exp()");
     }
 
     /**
@@ -202,6 +182,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.A
     /**
      * Returns the condition number of the matrix (L2 norm).
      */
+    @SuppressWarnings("unchecked")
     default E conditionNumber(Matrix<E> a) {
         SVDResult<E> svd = svd(a);
         Vector<E> s = svd.S();

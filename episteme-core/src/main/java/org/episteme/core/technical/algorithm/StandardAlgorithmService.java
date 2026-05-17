@@ -64,6 +64,9 @@ public class StandardAlgorithmService implements AlgorithmService {
     }
 
     private <P extends AlgorithmProvider> List<P> discoverProviders(Class<P> providerClass) {
+        if (providerClass == null) {
+            return new ArrayList<>();
+        }
         Set<String> seenKeys = new HashSet<>();
         List<P> available = new ArrayList<>();
 
@@ -80,7 +83,7 @@ public class StandardAlgorithmService implements AlgorithmService {
                     available.add(provider);
                 }
             } catch (Throwable t) {
-                logger.warn("Skipping bad provider entry {}: {}", (providerClass != null ? providerClass.getSimpleName() : "unknown"), t.getMessage());
+                logger.warn("Skipping bad provider entry {}: {}", providerClass.getSimpleName(), t.getMessage());
             }
         }
 
@@ -113,7 +116,7 @@ public class StandardAlgorithmService implements AlgorithmService {
                         String key = cls.getName(); // Simple key for pre-instantiation check
                         boolean exists = seenKeys.stream().anyMatch(k -> k.startsWith(key + ":"));
                         if (!exists) {
-                            P provider = (P) cls.getDeclaredConstructor().newInstance();
+                            P provider = providerClass.cast(cls.getDeclaredConstructor().newInstance());
                             if (isFiltered(provider.getName())) return;
                             String fullKey = provider.getClass().getName() + ":" + provider.getName();
                             if (provider.isAvailable() && seenKeys.add(fullKey)) {

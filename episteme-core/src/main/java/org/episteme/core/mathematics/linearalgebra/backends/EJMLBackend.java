@@ -318,6 +318,7 @@ public class EJMLBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             return ejml;
         }
 
+        @SuppressWarnings("unchecked")
         private Matrix<E> fromEjmlMatrix(org.ejml.simple.SimpleMatrix ejml) {
             int rows = ejml.getNumRows();
             int cols = ejml.getNumCols();

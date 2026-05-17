@@ -147,7 +147,7 @@ public class MasterControlLibrariesUITest {
             }
         }
         // Not strictly required for all but good to check if at least one exists
-        // assertTrue(foundAuto, "At least one selector should have AUTO option");
+        System.out.println("At least one selector has AUTO option: " + foundAuto);
 
         // Dump for debug
         Set<Label> allLabels = robot.lookup(".label").queryAllAs(Label.class);

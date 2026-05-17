@@ -5,15 +5,15 @@ COPY . .
 RUN mvn clean install -DskipTests -pl episteme-server -am
 
 # Phase 2: Production Image
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:25-jre-noble
 
 # Install Python and System Dependencies
 RUN apt-get update && apt-get install -y \
-    python3.11 \
+    python3 \
     python3-pip \
     libopenblas0 \
     libmpfr6 \
-    libhdf5-103 \
+    libhdf5-103-1t64 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

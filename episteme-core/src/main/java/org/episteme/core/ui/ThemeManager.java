@@ -94,9 +94,6 @@ public class ThemeManager {
         }
     }
 
-    private boolean isHighContrast() {
-        return "High Contrast".equalsIgnoreCase(currentTheme) || "HighContrast".equalsIgnoreCase(currentTheme);
-    }
 
     /**
      * Called when the locale changes.

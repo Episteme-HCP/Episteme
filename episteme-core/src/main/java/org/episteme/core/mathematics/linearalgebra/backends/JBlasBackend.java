@@ -284,7 +284,6 @@ public class JBlasBackend<E> implements CPUBackend, LinearAlgebraProvider<E> {
             return (E) (Object) val;
         }
 
-        @SuppressWarnings("unchecked")
         private Matrix<E> fromJBlasMatrix(org.jblas.DoubleMatrix jm) {
             int rows = jm.rows;
             int cols = jm.columns;

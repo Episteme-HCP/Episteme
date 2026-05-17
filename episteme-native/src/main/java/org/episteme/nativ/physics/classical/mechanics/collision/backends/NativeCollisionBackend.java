@@ -24,7 +24,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * Native implementation of {@link MechanicsBackend} for general collision processing.
  * Acts as a bridge to native optimized collision kernels.
  */
-@SuppressWarnings("rawtypes")
 @AutoService({MechanicsBackend.class, ComputeBackend.class, Backend.class, SimulationProvider.class})
 public class NativeCollisionBackend implements NativeCollisionProvider, MechanicsBackend, CPUBackend, NativeBackend, SimulationProvider {
 

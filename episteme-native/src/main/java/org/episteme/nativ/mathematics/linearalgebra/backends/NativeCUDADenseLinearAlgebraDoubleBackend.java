@@ -1281,6 +1281,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
     @Override public String getType() { return "math"; }
 
     @Override
+    @SuppressWarnings("deprecation")
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext();
     }

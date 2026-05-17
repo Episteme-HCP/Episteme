@@ -101,7 +101,7 @@
     <hdf5.version>1.14.3-1.5.10</hdf5.version>
     <onnxruntime.version>1.17.1</onnxruntime.version>
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
-    <extra.compiler.args>--enable-preview</extra.compiler.args>
+    <extra.compiler.args></extra.compiler.args>
     <openblas.version>0.3.26-${javacpp.version}</openblas.version>
     <indriya.version>2.2</indriya.version>
     <maven.jar.finalName>${project.artifactId}-${project.version}</maven.jar.finalName>
@@ -595,8 +595,10 @@
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
-              <arg>--enable-preview</arg>
               <arg>-Xpkginfo:always</arg>
+              <arg>-Xlint:unchecked</arg>
+              <arg>-Xlint:deprecation</arg>
+              <arg>-Xlint:rawtypes</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -908,8 +910,10 @@
           <compilerArgs>
             <arg>--add-modules</arg>
             <arg>jdk.incubator.vector</arg>
-            <arg>--enable-preview</arg>
             <arg>-Xpkginfo:always</arg>
+            <arg>-Xlint:unchecked</arg>
+            <arg>-Xlint:deprecation</arg>
+            <arg>-Xlint:rawtypes</arg>
           </compilerArgs>
         </configuration>
       </plugin>

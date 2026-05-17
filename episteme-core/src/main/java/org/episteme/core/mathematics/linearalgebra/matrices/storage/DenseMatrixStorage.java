@@ -25,8 +25,6 @@ package org.episteme.core.mathematics.linearalgebra.matrices.storage;
 
 import java.util.List;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.complex.Complex;
 
 /**
  * Dense row-major matrix storage.

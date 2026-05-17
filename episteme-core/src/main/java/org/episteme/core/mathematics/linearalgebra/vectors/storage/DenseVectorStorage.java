@@ -25,8 +25,6 @@ package org.episteme.core.mathematics.linearalgebra.vectors.storage;
 
 import java.util.Arrays;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.complex.Complex;
 
 /**
  * Dense storage for vectors using a standard array.

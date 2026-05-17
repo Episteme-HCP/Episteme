@@ -4,8 +4,6 @@
  */
 
 package org.episteme.core.mathematics.linearalgebra;
-import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.mathematics.numbers.real.Real;
 
 /**
  * Marker interface for Linear Algebra Providers specialized for Sparse Matrices.

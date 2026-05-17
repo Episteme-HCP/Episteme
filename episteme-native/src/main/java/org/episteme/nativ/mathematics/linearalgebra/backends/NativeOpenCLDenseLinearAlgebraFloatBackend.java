@@ -16,7 +16,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
@@ -28,9 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 import org.episteme.core.mathematics.structures.rings.FieldElement;
-
-import java.util.List;
-import java.util.Arrays;
 
 /**
  * OpenCL implementation of Dense Linear Algebra Provider for Float precision.

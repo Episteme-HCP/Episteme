@@ -19,7 +19,6 @@ import com.google.auto.service.AutoService;
 /**
  * Concrete Native SIMD provider for Complex numbers.
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, SIMDBackend.class, AlgorithmProvider.class})
 public class NativeSIMDComplexBackend extends AbstractNativeSIMDLinearAlgebraBackend<Complex> {
 

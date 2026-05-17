@@ -440,6 +440,7 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return new org.episteme.core.technical.backend.ExecutionContext() {
             @Override

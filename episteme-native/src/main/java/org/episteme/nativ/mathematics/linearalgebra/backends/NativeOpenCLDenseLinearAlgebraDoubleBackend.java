@@ -16,7 +16,6 @@ import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealDouble;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
-import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
@@ -28,9 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 import org.episteme.core.mathematics.structures.rings.FieldElement;
-
-import java.util.List;
-import java.util.Arrays;
 
 /**
  * OpenCL implementation of Dense Linear Algebra Provider for Double precision.
@@ -385,8 +381,14 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         E d = dot(a, b);
         E nA = norm(a);
         E nB = norm(b);
-        double cosTheta = extractDouble(d) / (extractDouble(nA) * extractDouble(nA));
+        double cosTheta = extractDouble(d) / (extractDouble(nA) * extractDouble(nB));
         return (E) RealDouble.of(Math.acos(Math.max(-1.0, Math.min(1.0, cosTheta))));
+    }
+
+    @Override
+    public Matrix<E> add(Matrix<E> a, Matrix<E> b) {
+        if (isComplex(a)) return elementWiseComplex(a, b, complexVecAddKernel);
+        return elementWise(a, b, vecAddKernel);
     }
 
     @Override

@@ -16,7 +16,6 @@ import org.jocl.*;
 import static org.jocl.CL.*;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLManager;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
-import org.episteme.core.technical.backend.BackendDiscovery;
 
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.core.technical.backend.ComputeBackend;

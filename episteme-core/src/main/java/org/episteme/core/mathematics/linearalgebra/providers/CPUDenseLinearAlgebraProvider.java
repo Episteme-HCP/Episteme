@@ -1216,25 +1216,26 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         }
 
         public static Vector<Real> solve(LUResult<Real> lu, Vector<Real> b) {
-            CPUDenseLinearAlgebraProvider<Real> provider = new CPUDenseLinearAlgebraProvider<>();
-            int n = lu.L().rows();
-            Real[] pb = new Real[n];
+            try (CPUDenseLinearAlgebraProvider<Real> provider = new CPUDenseLinearAlgebraProvider<>()) {
+                int n = lu.L().rows();
+                Real[] pb = new Real[n];
 
-            for (int i = 0; i < n; i++) {
-                Object pVal = lu.P().get(i);
-                int pIdx;
-                if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
-                else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
-                else pIdx = i;
-                pb[i] = b.get(pIdx);
+                for (int i = 0; i < n; i++) {
+                    Object pVal = lu.P().get(i);
+                    int pIdx;
+                    if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+                    else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
+                    else pIdx = i;
+                    pb[i] = b.get(pIdx);
+                }
+                
+                Vector<Real> pbv = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(pb), Reals.getInstance());
+                
+                // Forward substitution L*y = Pb
+                Vector<Real> y = provider.solveTriangular(lu.L(), pbv, false, false, false, true);
+                // Backward substitution U*x = y
+                return provider.solveTriangular(lu.U(), y, true, false, false, false);
             }
-            
-            Vector<Real> pbv = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(pb), Reals.getInstance());
-            
-            // Forward substitution L*y = Pb
-            Vector<Real> y = provider.solveTriangular(lu.L(), pbv, false, false, false, true);
-            // Backward substitution U*x = y
-            return provider.solveTriangular(lu.U(), y, true, false, false, false);
         }
 
         public static Real determinant(Matrix<Real> a) {
