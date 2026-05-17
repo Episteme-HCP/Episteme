@@ -19,12 +19,9 @@ import org.episteme.core.technical.algorithm.AlgorithmManager;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.BackendDiscovery;
-import org.episteme.core.ui.Viewer;
 import org.episteme.core.ui.i18n.I18N;
-import org.episteme.core.ui.ThemeManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Episteme Master Control - The central dashboard for the Episteme environment.
@@ -610,6 +607,7 @@ public class EpistemeMasterControl extends Application {
         return row;
     }
 
+    @SuppressWarnings("unchecked")
     private Tab createAlgorithmsTab(I18N i18n) {
         VBox content = new VBox(25);
         content.setPadding(new Insets(30));
@@ -938,6 +936,7 @@ public class EpistemeMasterControl extends Application {
         accordion.getPanes().add(new TitledPane("(" + totalCount + ") " + i18n.get(key, defaultTitle), container));
     }
 
+    @SuppressWarnings("unused")
     private AppEntry[] convert(List<MasterControlDiscovery.ClassInfo> infos) {
         return infos.stream().map(i -> new AppEntry(i.simpleName, i.fullName, i.description)).toArray(AppEntry[]::new);
     }
@@ -1056,6 +1055,7 @@ public class EpistemeMasterControl extends Application {
         @Override public String toString() { return name; }
     }
 
+    @SuppressWarnings("unused")
     private void showStatus(String message, boolean error) {
         Alert alert = new Alert(error ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION);
         alert.setTitle(I18N.getInstance().get("mastercontrol.status.title", "System Status"));

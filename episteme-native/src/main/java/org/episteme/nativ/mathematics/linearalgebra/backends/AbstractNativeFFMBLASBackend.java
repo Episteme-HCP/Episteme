@@ -15,17 +15,12 @@ import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
-import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
-import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
-import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 import org.episteme.nativ.technical.backend.nativ.NativeSegmentProxy;
-import org.episteme.core.mathematics.sets.Complexes;
-import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeRealDoubleMatrixStorage;
 import org.episteme.nativ.mathematics.linearalgebra.vectors.storage.NativeRealDoubleVectorStorage;
 import org.episteme.nativ.mathematics.linearalgebra.matrices.NativeRealDoubleMatrix;
@@ -39,7 +34,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.episteme.core.technical.algorithm.AlgorithmProvider;
+
 
 /**
  * Abstract base for High-Performance Native BLAS Backend using Project Panama (FFM).
@@ -513,10 +508,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     private static MethodHandle CTRSM;
     private static MethodHandle ZTRSM;
     
-    private static MethodHandle STRTRS;
-    private static MethodHandle DTRTRS;
-    private static MethodHandle CTRTRS;
-    private static MethodHandle ZTRTRS;
+
     
     // LAPACK Method Handles
     private static MethodHandle SGESV;
@@ -674,6 +666,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         }
     }
 
+    @SuppressWarnings("unused")
     private Vector<E> createDenseVector(float[] data, int dimension, Object ref) {
         org.episteme.core.mathematics.context.MathContext.checkCancelled();
         java.util.List<E> list = new java.util.ArrayList<>(data.length);
@@ -686,6 +679,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         );
     }
 
+    @SuppressWarnings("unused")
     private Vector<E> createDenseVector(double[] data, int dimension, Object ref) {
         org.episteme.core.mathematics.context.MathContext.checkCancelled();
         return (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(data);
@@ -1648,6 +1642,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         
 
 
+    @SuppressWarnings("unused")
     private Matrix<E> createDenseMatrixGeneric(E[][] data, Ring<E> ring) {
         int rows = data.length;
         int cols = data[0].length;
@@ -2328,7 +2323,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     public Vector<E> divide(Vector<E> v, E scalar) {
         if (isComplex(v)) {
             try {
-                Object sc = scalar;
+
                 if (scalar.getClass().getName().equals("org.episteme.core.mathematics.numbers.complex.Complex")) {
                     return multiply(v, (E) scalar.getClass().getMethod("reciprocal").invoke(scalar));
                 }

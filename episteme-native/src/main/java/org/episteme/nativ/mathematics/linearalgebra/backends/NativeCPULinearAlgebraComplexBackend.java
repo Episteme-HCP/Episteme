@@ -18,7 +18,6 @@ import com.google.auto.service.AutoService;
 /**
  * Concrete Native CPU-BLAS provider for Complex numbers.
  */
-@SuppressWarnings("rawtypes")
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class, AlgorithmProvider.class})
 public class NativeCPULinearAlgebraComplexBackend extends AbstractNativeCPULinearAlgebraBackend<Complex> {
 

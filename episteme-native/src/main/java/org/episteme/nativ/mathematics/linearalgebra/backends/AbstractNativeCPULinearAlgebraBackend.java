@@ -19,8 +19,6 @@ import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.episteme.core.technical.backend.Backend;
-import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
@@ -33,14 +31,11 @@ import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.sets.Complexes;
-import org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix;
-import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage;
 
 import org.episteme.core.technical.algorithm.AutoTuningManager;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
-import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 
 /**
  * Standalone Native Linear Algebra backend using bundled episteme_native library.
@@ -49,6 +44,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeSafe;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
+@SuppressWarnings("unused")
 public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final System.Logger logger = System.getLogger(AbstractNativeCPULinearAlgebraBackend.class.getName());
@@ -440,7 +436,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
         return new org.episteme.core.technical.backend.ExecutionContext() {
             @Override

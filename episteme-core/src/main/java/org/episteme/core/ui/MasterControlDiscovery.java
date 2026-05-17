@@ -295,6 +295,7 @@ public class MasterControlDiscovery {
         return results;
     }
 
+    @SuppressWarnings("unchecked")
     private List<ClassInfo> loadCache() {
         java.io.File file = new java.io.File(CACHE_FILE);
         if (!file.exists()) return null;
@@ -430,6 +431,7 @@ public class MasterControlDiscovery {
         }
     }
 
+    @SuppressWarnings("unused")
     private void scanDirectory(java.io.File directory, String packageName, String suffix, List<ClassInfo> results,
             Set<String> processed, ClassLoader classLoader) {
         java.io.File[] files = directory.listFiles();
@@ -500,6 +502,7 @@ public class MasterControlDiscovery {
         }
     }
 
+    @SuppressWarnings("unused")
     private void scanJar(java.io.File jarFile, String suffix, List<ClassInfo> results, Set<String> processed, ClassLoader classLoader) {
         try (java.util.jar.JarFile jar = new java.util.jar.JarFile(jarFile)) {
             Enumeration<java.util.jar.JarEntry> entries = jar.entries();

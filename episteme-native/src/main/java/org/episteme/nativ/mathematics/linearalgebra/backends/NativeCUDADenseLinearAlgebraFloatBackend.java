@@ -17,7 +17,6 @@ import org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealFloat;
-import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.structures.rings.FieldElement;
 import org.episteme.core.technical.backend.Backend;
@@ -252,6 +251,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         return (E) (Object) RealFloat.create(val);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public Vector<E> cross(Vector<E> a, Vector<E> b) {
         if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
@@ -1190,6 +1190,7 @@ public class NativeCUDADenseLinearAlgebraFloatBackend<E extends FieldElement<E>>
         } catch (Throwable t) { throw new RuntimeException("CUDA complex float eigen failed", t); }
     }
 
+    @SuppressWarnings("unused")
     private SVDResult<E> svdComplex(Matrix<E> a) {
         int m = a.rows(); int n = a.cols();
         float[] aData = toComplexFloatArray(a);

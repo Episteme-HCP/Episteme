@@ -6,7 +6,6 @@
 package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import java.lang.foreign.*;
-import java.lang.invoke.MethodHandle;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
@@ -380,6 +379,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
         return (E) RealDouble.of(val);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public Vector<E> cross(Vector<E> a, Vector<E> b) {
         if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");

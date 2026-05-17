@@ -17,14 +17,10 @@ import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealDoubleMatrix
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.SIMDRealFloatMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
-import com.google.auto.service.AutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.episteme.core.technical.backend.Backend;
-import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.simd.SIMDBackend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
-import org.episteme.core.technical.backend.HardwareAccelerator;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import org.episteme.core.technical.backend.Operation;
@@ -204,6 +200,7 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
         return 0.0;
     }
 
+    @SuppressWarnings("unused")
     private org.episteme.core.mathematics.numbers.real.Real getReal(Object obj) {
         if (obj == null) return org.episteme.core.mathematics.numbers.real.Real.ZERO;
         if (obj instanceof org.episteme.core.mathematics.numbers.real.Real r) return r;
@@ -1038,7 +1035,6 @@ public abstract class AbstractNativeSIMDLinearAlgebraBackend<E> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
-        Ring<E> ring = a.getScalarRing();
         int m = a.rows();
         int n = a.cols();
         

@@ -10,12 +10,9 @@ import java.lang.foreign.*;
 import org.episteme.nativ.technical.backend.nativ.NativeSafe;
 import java.lang.invoke.MethodHandle;
 import java.util.List;
-import java.util.ArrayList;
 import static org.episteme.nativ.mathematics.numbers.real.backends.NativeMPFRNumbers.*;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
-import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.episteme.core.mathematics.sets.Reals;
 import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
@@ -27,7 +24,7 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
-import org.episteme.nativ.technical.backend.nativ.NativeSafe;
+
 import org.episteme.nativ.mathematics.numbers.real.NativeRealBig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixS
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "null"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
@@ -710,8 +707,6 @@ public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProv
     @Override public Matrix<E> cbrt(Matrix<E> m) { return applyTranscendental(m, "cbrt", MPFR_CBRT); }
 
     private Matrix<E> applyTranscendental(Matrix<E> m, String op, MethodHandle realFunc) {
-        int rows = m.rows();
-        int cols = m.cols();
         boolean isComplex = ((Object)m.getScalarRing().zero()) instanceof org.episteme.core.mathematics.numbers.complex.Complex;
         if (isComplex) {
             return applyMPFRComplex(m, op);

@@ -338,6 +338,7 @@ public class NativeOpenCLDenseLinearAlgebraDoubleBackend<E extends FieldElement<
         }
     }
 
+    @SuppressWarnings("unused")
     private double extractDouble(Object val) {
         if (val instanceof Complex c) return c.real();
         if (val instanceof Real r) return r.doubleValue();
