@@ -101,7 +101,7 @@
     <hdf5.version>1.14.3-1.5.10</hdf5.version>
     <onnxruntime.version>1.17.1</onnxruntime.version>
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
-    <extra.compiler.args></extra.compiler.args>
+    <extra.compiler.args>-g</extra.compiler.args>
     <openblas.version>0.3.26-${javacpp.version}</openblas.version>
     <indriya.version>2.2</indriya.version>
     <maven.jar.finalName>${project.artifactId}-${project.version}</maven.jar.finalName>
@@ -599,6 +599,7 @@
               <arg>-Xlint:unchecked</arg>
               <arg>-Xlint:deprecation</arg>
               <arg>-Xlint:rawtypes</arg>
+              <arg>${extra.compiler.args}</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -914,6 +915,7 @@
             <arg>-Xlint:unchecked</arg>
             <arg>-Xlint:deprecation</arg>
             <arg>-Xlint:rawtypes</arg>
+            <arg>${extra.compiler.args}</arg>
           </compilerArgs>
         </configuration>
       </plugin>
@@ -1072,9 +1074,22 @@
       </build>
       <properties>
         <maven.compiler.release>21</maven.compiler.release>
+        <extra.compiler.args>--enable-preview</extra.compiler.args>
         <maven.jar.finalName>${project.artifactId}-${project.version}-jdk21</maven.jar.finalName>
         <artifact.suffix>-jdk21</artifact.suffix>
         <artifact.classifier>jdk21</artifact.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdk21-preview</id>
+      <activation>
+        <property>
+          <name>target.java.version</name>
+          <value>21</value>
+        </property>
+      </activation>
+      <properties>
+        <extra.compiler.args>--enable-preview</extra.compiler.args>
       </properties>
     </profile>
     <profile>

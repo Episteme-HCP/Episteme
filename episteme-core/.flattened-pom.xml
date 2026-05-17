@@ -301,6 +301,7 @@
             <arg>--add-modules</arg>
             <arg>jdk.incubator.vector</arg>
             <arg>-Xpkginfo:always</arg>
+            <arg>${extra.compiler.args}</arg>
           </compilerArgs>
           <testExcludes>
             <exclude>**/CPUDenseLinearAlgebraProviderTest.java</exclude>

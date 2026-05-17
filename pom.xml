@@ -106,7 +106,7 @@
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
     <argLine></argLine>
-    <extra.compiler.args></extra.compiler.args>
+    <extra.compiler.args>-g</extra.compiler.args>
     <mainClass></mainClass>
     <artifact.classifier></artifact.classifier>
     <artifact.suffix></artifact.suffix>
@@ -768,6 +768,7 @@
             <arg>-Xlint:unchecked</arg>
             <arg>-Xlint:deprecation</arg>
             <arg>-Xlint:rawtypes</arg>
+            <arg>${extra.compiler.args}</arg>
           </compilerArgs>
         </configuration>
       </plugin>
@@ -797,6 +798,7 @@
               <arg>-Xlint:unchecked</arg>
               <arg>-Xlint:deprecation</arg>
               <arg>-Xlint:rawtypes</arg>
+              <arg>${extra.compiler.args}</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -1105,6 +1107,7 @@
         <artifact.classifier>jdk21</artifact.classifier>
         <artifact.suffix>-jdk21</artifact.suffix>
         <maven.jar.finalName>${project.artifactId}-${project.version}-jdk21</maven.jar.finalName>
+        <extra.compiler.args>--enable-preview</extra.compiler.args>
       </properties>
       <build>
         <plugins>
@@ -1117,6 +1120,18 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>jdk21-preview</id>
+      <activation>
+        <property>
+          <name>target.java.version</name>
+          <value>21</value>
+        </property>
+      </activation>
+      <properties>
+        <extra.compiler.args>--enable-preview</extra.compiler.args>
+      </properties>
     </profile>
     <profile>
       <id>release-jdk25</id>

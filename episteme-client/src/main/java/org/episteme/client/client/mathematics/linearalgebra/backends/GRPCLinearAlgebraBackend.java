@@ -69,6 +69,8 @@ import java.util.concurrent.TimeUnit;
 @AutoService({LinearAlgebraBackend.class, LinearAlgebraProvider.class, org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider.class, org.episteme.core.technical.backend.ComputeBackend.class, Backend.class})
 public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider<E>, LinearAlgebraBackend<E> {
     
+    private static final java.util.Map<String, ManagedChannel> sharedChannels = new java.util.concurrent.ConcurrentHashMap<>();
+
     private ManagedChannel channel;
     private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
     private final Field<E> field;
@@ -111,16 +113,43 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
         java.util.Map<String, Object> serviceConfig = new java.util.HashMap<>();
         serviceConfig.put("methodConfig", java.util.List.of(methodConfig));
 
-        try {
-            this.channel = ManagedChannelBuilder.forAddress(host, port)
-                    .defaultServiceConfig(serviceConfig)
-                    .enableRetry()
-                    .usePlaintext()
-                    .build();
-            this.blockingStub = MatrixServiceGrpc.newBlockingStub(channel);
-        } catch (Exception e) {
-            this.channel = null;
-            this.blockingStub = null;
+        synchronized (sharedChannels) {
+            ManagedChannel existing = sharedChannels.get(serverAddress);
+            if (existing == null || existing.isShutdown()) {
+                try {
+                    existing = ManagedChannelBuilder.forAddress(host, port)
+                            .defaultServiceConfig(serviceConfig)
+                            .enableRetry()
+                            .usePlaintext()
+                            .build();
+                    sharedChannels.put(serverAddress, existing);
+                    
+                    // Register JVM shutdown hook for the shared channel
+                    final ManagedChannel chan = existing;
+                    final String addr = serverAddress;
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        synchronized (sharedChannels) {
+                            sharedChannels.remove(addr);
+                        }
+                        if (chan != null && !chan.isShutdown()) {
+                            try {
+                                chan.shutdown().awaitTermination(2, TimeUnit.SECONDS);
+                                if (!chan.isTerminated()) {
+                                    chan.shutdownNow();
+                                }
+                            } catch (Exception ignored) {}
+                        }
+                    }));
+                } catch (Exception e) {
+                    existing = null;
+                }
+            }
+            this.channel = existing;
+            if (this.channel != null) {
+                this.blockingStub = MatrixServiceGrpc.newBlockingStub(this.channel);
+            } else {
+                this.blockingStub = null;
+            }
         }
     }
 
@@ -220,6 +249,9 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     @Override
     public void shutdown() {
         if (channel != null) {
+            synchronized (sharedChannels) {
+                sharedChannels.remove(serverAddress);
+            }
             try {
                 channel.shutdown().awaitTermination(2, TimeUnit.SECONDS);
                 if (!channel.isTerminated()) {

@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Setup User
-RUN useradd -m -u 1000 episteme
+RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu && useradd -m -u 1000 episteme
 USER episteme
 ENV PATH="/home/episteme/.local/bin:${PATH}"
 
