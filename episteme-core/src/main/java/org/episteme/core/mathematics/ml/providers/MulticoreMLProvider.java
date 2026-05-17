@@ -30,6 +30,121 @@ public class MulticoreMLProvider implements MLProvider {
         return true;
     }
 
+    // ========== FLOAT PRECISION ==========
+
+    @Override
+    public int[] kMeans(float[][] data, int k, int maxIterations) {
+        int n = data.length;
+        int d = data[0].length;
+        
+        float[][] centroids = new float[k][d];
+        Random rand = new Random(42);
+        for (int i = 0; i < k; i++) {
+            int idx = rand.nextInt(n);
+            System.arraycopy(data[idx], 0, centroids[i], 0, d);
+        }
+        
+        int[] assignments = new int[n];
+        
+        for (int iter = 0; iter < maxIterations; iter++) {
+            float[][] finalCentroids = centroids;
+            IntStream.range(0, n).parallel().forEach(i -> {
+                float minDist = Float.MAX_VALUE;
+                int bestCluster = 0;
+                for (int j = 0; j < k; j++) {
+                    float dist = euclideanDistanceFloat(data[i], finalCentroids[j]);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        bestCluster = j;
+                    }
+                }
+                assignments[i] = bestCluster;
+            });
+            
+            float[][] newCentroids = new float[k][d];
+            int[] counts = new int[k];
+            
+            for (int i = 0; i < n; i++) {
+                int cluster = assignments[i];
+                counts[cluster]++;
+                for (int j = 0; j < d; j++) {
+                    newCentroids[cluster][j] += data[i][j];
+                }
+            }
+            
+            for (int i = 0; i < k; i++) {
+                if (counts[i] > 0) {
+                    for (int j = 0; j < d; j++) {
+                        centroids[i][j] = newCentroids[i][j] / counts[i];
+                    }
+                }
+            }
+        }
+        
+        return assignments;
+    }
+
+    @Override
+    public float[][] pca(float[][] data, int nComponents) {
+        int n = data.length;
+        int d = data[0].length;
+        
+        float[] mean = new float[d];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < d; j++) {
+                mean[j] += data[i][j];
+            }
+        }
+        for (int j = 0; j < d; j++) {
+            mean[j] /= n;
+        }
+        
+        float[][] centered = new float[n][d];
+        float[] finalMean = mean; 
+        
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int j = 0; j < d; j++) {
+                centered[i][j] = data[i][j] - finalMean[j];
+            }
+        });
+
+        float[][] covariance = new float[d][d];
+        
+        IntStream.range(0, d).parallel().forEach(i -> {
+            for (int j = i; j < d; j++) {
+                float sum = 0.0f;
+                for (int k = 0; k < n; k++) {
+                    sum += centered[k][i] * centered[k][j];
+                }
+                float val = sum / (n - 1);
+                covariance[i][j] = val;
+                covariance[j][i] = val;
+            }
+        });
+
+        JacobiResultFloat result = jacobiFloat(covariance);
+        
+        Integer[] indices = new Integer[d];
+        for (int i = 0; i < d; i++) indices[i] = i;
+        Arrays.sort(indices, (a, b) -> Float.compare(result.eigenvalues[b], result.eigenvalues[a]));
+        
+        int k = Math.min(nComponents, d);
+        float[][] projection = new float[n][k];
+        
+        IntStream.range(0, n).parallel().forEach(i -> {
+            for (int comp = 0; comp < k; comp++) {
+                int originalColIndex = indices[comp];
+                float sum = 0.0f;
+                for (int j = 0; j < d; j++) {
+                    sum += centered[i][j] * result.eigenvectors[j][originalColIndex];
+                }
+                projection[i][comp] = sum;
+            }
+        });
+        
+        return projection;
+    }
+
     // ========== DOUBLE PRECISION ==========
 
     @Override
@@ -297,6 +412,15 @@ public class MulticoreMLProvider implements MLProvider {
 
     // ========== HELPER METHODS ==========
 
+    private float euclideanDistanceFloat(float[] a, float[] b) {
+        float sum = 0.0f;
+        for (int i = 0; i < a.length; i++) {
+            float diff = a[i] - b[i];
+            sum += diff * diff;
+        }
+        return (float) Math.sqrt(sum);
+    }
+
     private double euclideanDistance(double[] a, double[] b) {
         double sum = 0.0;
         for (int i = 0; i < a.length; i++) {
@@ -315,6 +439,85 @@ public class MulticoreMLProvider implements MLProvider {
         return sum.sqrt();
     }
     
+    // --- Jacobi Algorithm (Float) ---
+    
+    private static class JacobiResultFloat {
+        float[] eigenvalues;
+        float[][] eigenvectors;
+    }
+
+    private JacobiResultFloat jacobiFloat(float[][] A) {
+        int n = A.length;
+        float[][] V = new float[n][n];
+        float[] d = new float[n];
+        
+        for (int i = 0; i < n; i++) {
+            V[i][i] = 1.0f;
+            d[i] = A[i][i];
+        }
+        
+        float[][] B = new float[n][n];
+        for(int i=0; i<n; i++) System.arraycopy(A[i], 0, B[i], 0, n);
+        
+        int maxIter = 100;
+        for (int iter = 0; iter < maxIter; iter++) {
+            float maxOffDiag = 0.0f;
+            int p = 0, q = 0;
+            
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    if (Math.abs(B[i][j]) > maxOffDiag) {
+                        maxOffDiag = Math.abs(B[i][j]);
+                        p = i; q = j;
+                    }
+                }
+            }
+            
+            if (maxOffDiag < 1e-7f) break;
+            
+            float phi;
+            if (Math.abs(B[p][p] - B[q][q]) < 1e-7f) {
+                phi = (float) (Math.PI / 4);
+            } else {
+                phi = 0.5f * (float) Math.atan(2 * B[p][q] / (B[p][p] - B[q][q]));
+            }
+            
+            float c = (float) Math.cos(phi);
+            float s = (float) Math.sin(phi);
+            
+            float Bpp = B[p][p];
+            float Bqq = B[q][q];
+            float Bpq = B[p][q];
+            
+            B[p][p] = c*c*Bpp - 2*s*c*Bpq + s*s*Bqq;
+            B[q][q] = s*s*Bpp + 2*s*c*Bpq + c*c*Bqq;
+            B[p][q] = 0; B[q][p] = 0;
+            
+            for (int i = 0; i < n; i++) {
+                if (i != p && i != q) {
+                    float Bip = B[i][p];
+                    float Biq = B[i][q];
+                    B[i][p] = c*Bip - s*Biq;
+                    B[p][i] = B[i][p];
+                    B[i][q] = s*Bip + c*Biq;
+                    B[q][i] = B[i][q];
+                }
+                
+                float Vip = V[i][p];
+                float Viq = V[i][q];
+                V[i][p] = c*Vip - s*Viq;
+                V[i][q] = s*Vip + c*Viq;
+            }
+        }
+        
+        for(int i=0; i<n; i++) d[i] = B[i][i];
+        
+        JacobiResultFloat res = new JacobiResultFloat();
+        res.eigenvalues = d;
+        res.eigenvectors = V;
+        return res;
+    }
+
     // --- Jacobi Algorithm (Double) ---
     
     private static class JacobiResult {

@@ -15,6 +15,8 @@ import java.util.function.ToDoubleFunction;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
+import org.episteme.core.technical.function.ToFloatFunction;
+
 /**
  * Native multicore Monte Carlo integration provider.
  * Implements smart dispatch between native primitive engine and Java high-precision engine.
@@ -25,6 +27,28 @@ import java.util.stream.IntStream;
  */
 @AutoService(AlgorithmProvider.class)
 public class MulticoreMonteCarloProvider implements MonteCarloProvider {
+
+    @Override
+    public float integrate(ToFloatFunction<float[]> function, float[] lowerBounds, 
+                          float[] upperBounds, int samples) {
+        int dimensions = lowerBounds.length;
+        
+        double sum = IntStream.range(0, samples)
+            .parallel()
+            .mapToDouble(i -> {
+                float[] point = new float[dimensions];
+                ThreadLocalRandom rng = ThreadLocalRandom.current();
+                for (int d = 0; d < dimensions; d++) {
+                    point[d] = lowerBounds[d] + rng.nextFloat() * (upperBounds[d] - lowerBounds[d]);
+                }
+                return function.applyAsFloat(point);
+            })
+            .sum();
+        
+        float volume = 1.0f;
+        for (int d = 0; d < dimensions; d++) volume *= (upperBounds[d] - lowerBounds[d]);
+        return (float) ((sum / samples) * volume);
+    }
 
     @Override
     public double integrate(ToDoubleFunction<double[]> function, double[] lowerBounds, 
@@ -85,6 +109,11 @@ public class MulticoreMonteCarloProvider implements MonteCarloProvider {
     @Override
     public double estimatePi(int samples) {
         return estimatePiParallel(samples, true);
+    }
+
+    @Override
+    public float estimatePiFloat(int samples) {
+        return (float) estimatePiParallel(samples, true);
     }
 
     @Override

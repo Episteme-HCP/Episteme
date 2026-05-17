@@ -31,6 +31,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.Parameter;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,7 @@ import java.util.List;
  * Visualizes the hierarchical relationship between scientific domains and entities.
  * Supports navigation from subatomic to social scales.
  */
+@AutoService(Viewer.class)
 public final class KnowledgeNavigatorViewer extends AbstractViewer {
 
     private final Pane graphPane = new Pane();

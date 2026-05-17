@@ -157,6 +157,113 @@ public class MulticoreFEMProvider implements FEMProvider {
     }
 
     @Override
+    public float[] solvePoisson(Mesh mesh, org.episteme.core.technical.function.ToFloatFunction<float[]> sourceTerm) {
+        int nNodes = mesh.getNodes().size();
+        mesh.indexNodes();
+
+        float[][] kData = new float[nNodes][nNodes];
+        float[] fData = new float[nNodes];
+
+        for (Element element : mesh.getElements()) {
+            List<Node> nodes = element.getNodes();
+            int nElemNodes = nodes.size();
+
+            for (QuadraturePoint qp : element.getQuadraturePoints()) {
+                Vector<Real> xi = qp.getCoordinates();
+                float weight = qp.getWeight().floatValue();
+
+                Matrix<Real> J = element.computeJacobian(xi);
+                float detJ = Math.abs(J.determinant().floatValue());
+                Matrix<Real> invJ = J.inverse();
+
+                Vector<Real> globalPoint = computeGlobalCoordinates(element, xi);
+                float[] globalPointP = new float[globalPoint.dimension()];
+                for (int i = 0; i < globalPointP.length; i++) globalPointP[i] = globalPoint.get(i).floatValue();
+
+                for (int i = 0; i < nElemNodes; i++) {
+                    int globalI = nodes.get(i).getGlobalIndex();
+                    Vector<Real> gradNi_local = element.getShapeFunctions().get(i).gradient(xi);
+                    Vector<Real> gradNi_global = invJ.transpose().multiply(gradNi_local);
+
+                    float Ni = element.getShapeFunctions().get(i).evaluate(xi).floatValue();
+                    float fVal = sourceTerm.applyAsFloat(globalPointP);
+                    fData[globalI] += Ni * fVal * detJ * weight;
+
+                    for (int j = 0; j < nElemNodes; j++) {
+                        int globalJ = nodes.get(j).getGlobalIndex();
+                        Vector<Real> gradNj_local = element.getShapeFunctions().get(j).gradient(xi);
+                        Vector<Real> gradNj_global = invJ.transpose().multiply(gradNj_local);
+
+                        float dotProd = 0;
+                        for (int k = 0; k < gradNi_global.dimension(); k++) {
+                            dotProd += gradNi_global.get(k).floatValue() * gradNj_global.get(k).floatValue();
+                        }
+                        
+                        kData[globalI][globalJ] += dotProd * detJ * weight;
+                    }
+                }
+            }
+        }
+
+        int[] fixedNodes = { 0, nNodes - 1 };
+        for (int nodeIdx : fixedNodes) {
+            if (nodeIdx < 0 || nodeIdx >= nNodes) continue;
+            for (int j = 0; j < nNodes; j++) kData[nodeIdx][j] = 0;
+            kData[nodeIdx][nodeIdx] = 1.0f;
+            fData[nodeIdx] = 0;
+        }
+
+        // For float precision, we can fallback to double or use a float solver if available.
+        // Let's use the double implementation for now to keep it simple but working.
+        double[][] kDouble = new double[nNodes][nNodes];
+        double[] fDouble = new double[nNodes];
+        for(int i=0; i<nNodes; i++) {
+            for(int j=0; j<nNodes; j++) kDouble[i][j] = kData[i][j];
+            fDouble[i] = fData[i];
+        }
+
+        // We can't easily call our own solvePoisson(Mesh, ToDoubleFunction) because of the sourceTerm type.
+        // But we can solve the system directly.
+        // Reuse logic from solvePoisson(double)
+        double[] doubleRes = solveSystem(kDouble, fDouble);
+        float[] floatRes = new float[nNodes];
+        for(int i=0; i<nNodes; i++) floatRes[i] = (float) doubleRes[i];
+        return floatRes;
+    }
+
+    private double[] solveSystem(double[][] kData, double[] fData) {
+        int nNodes = fData.length;
+        org.episteme.core.technical.algorithm.OperationContext ctx = 
+            new org.episteme.core.technical.algorithm.OperationContext.Builder()
+                .dataSize((long) nNodes * nNodes)
+                .build();
+        org.episteme.core.mathematics.numbers.real.DoubleField ring = 
+            org.episteme.core.mathematics.numbers.real.DoubleField.INSTANCE;
+        
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Double> provider = 
+            org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry()
+            .selectLinearAlgebraProvider(ctx, ring);
+
+        List<List<Double>> kList = new ArrayList<>(nNodes);
+        for (double[] row : kData) {
+            List<Double> rowList = new ArrayList<>(nNodes);
+            for (double v : row) rowList.add(v);
+            kList.add(rowList);
+        }
+        
+        List<Double> fList = new ArrayList<>(nNodes);
+        for (double v : fData) fList.add(v);
+
+        Matrix<Double> K = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(kList, ring);
+        Vector<Double> F = new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(fList, ring);
+
+        Vector<Double> result = provider.solve(K, F);
+        double[] doubleResult = new double[nNodes];
+        for (int i = 0; i < nNodes; i++) doubleResult[i] = result.get(i);
+        return doubleResult;
+    }
+
+    @Override
     public double[] solvePoisson(Mesh mesh, java.util.function.ToDoubleFunction<double[]> sourceTerm) {
         int nNodes = mesh.getNodes().size();
         mesh.indexNodes();
@@ -215,36 +322,7 @@ public class MulticoreFEMProvider implements FEMProvider {
             fData[nodeIdx] = 0;
         }
 
-        // Solve using high-performance provider
-        org.episteme.core.technical.algorithm.OperationContext ctx = 
-            new org.episteme.core.technical.algorithm.OperationContext.Builder()
-                .dataSize((long) nNodes * nNodes)
-                .build();
-        org.episteme.core.mathematics.numbers.real.DoubleField ring = 
-            org.episteme.core.mathematics.numbers.real.DoubleField.INSTANCE;
-        
-        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<Double> provider = 
-            org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry()
-            .selectLinearAlgebraProvider(ctx, ring);
-
-        List<List<Double>> kList = new ArrayList<>(nNodes);
-        for (double[] row : kData) {
-            List<Double> rowList = new ArrayList<>(nNodes);
-            for (double v : row) rowList.add(v);
-            kList.add(rowList);
-        }
-        
-        List<Double> fList = new ArrayList<>(nNodes);
-        for (double v : fData) fList.add(v);
-
-        Matrix<Double> K = new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(kList, ring);
-        Vector<Double> F = new org.episteme.core.mathematics.linearalgebra.vectors.DenseVector<>(fList, ring);
-
-        Vector<Double> result = provider.solve(K, F);
-        
-        double[] doubleResult = new double[nNodes];
-        for (int i = 0; i < nNodes; i++) doubleResult[i] = result.get(i);
-        return doubleResult;
+        return solveSystem(kData, fData);
     }
 
     @Override

@@ -1,7 +1,0 @@
-
-<!ENTITY faradPerMeter.xml SYSTEM "../electricPermittivity/faradPerMeter.xml">
-
-<!ENTITY electricPermittivity.elements	"
-&faradPerMeter.xml;
-">
-

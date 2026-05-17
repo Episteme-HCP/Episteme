@@ -6,12 +6,12 @@
 package org.episteme.nativ.physics.loaders.hdf5;
 
 import org.episteme.core.mathematics.linearalgebra.Tensor;
-import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeRealDoubleMatrixStorage;
 
 
 /**
  * Adapter to save Tensors to HDF5 files.
- * Currently supports Rank-2 Tensors (Matrices) by converting to NativeDoubleMatrixStorage.
+ * Currently supports Rank-2 Tensors (Matrices) by converting to NativeRealDoubleMatrixStorage.
  * Future versions will support N-Dimensional arrays directly.
  */
 import org.episteme.core.ui.i18n.I18N;
@@ -20,7 +20,7 @@ import org.episteme.core.io.AbstractResourceWriter;
 
 /**
  * Adapter to save Tensors to HDF5 files.
- * Currently supports Rank-2 Tensors (Matrices) by converting to NativeDoubleMatrixStorage.
+ * Currently supports Rank-2 Tensors (Matrices) by converting to NativeRealDoubleMatrixStorage.
  * Future versions will support N-Dimensional arrays directly.
  */
 public class NativeHDF5TensorWriter extends AbstractResourceWriter<Tensor<?>> {
@@ -75,8 +75,8 @@ public class NativeHDF5TensorWriter extends AbstractResourceWriter<Tensor<?>> {
         int rows = resource.shape()[0];
         int cols = resource.shape()[1];
 
-        // Convert Tensor to NativeDoubleMatrixStorage using its own confined arena
-        try (NativeDoubleMatrixStorage matrix = new NativeDoubleMatrixStorage(rows, cols)) {
+        // Convert Tensor to NativeRealDoubleMatrixStorage using its own confined arena
+        try (NativeRealDoubleMatrixStorage matrix = new NativeRealDoubleMatrixStorage(rows, cols)) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                     Object val = resource.get(i, j);

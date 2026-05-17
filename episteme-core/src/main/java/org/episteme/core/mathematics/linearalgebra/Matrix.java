@@ -181,6 +181,26 @@ public interface Matrix<E> extends Ring<Matrix<E>>, Module<Matrix<E>, E> {
     }
 
     /**
+     * Applies a mapping function to each element of this matrix.
+     * 
+     * @param mapper the function to apply
+     * @return a new matrix with mapped elements
+     */
+    default Matrix<E> map(java.util.function.Function<E, E> mapper) {
+        int rows = rows();
+        int cols = cols();
+        Ring<E> ring = getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, ring.zero());
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                storage.set(i, j, mapper.apply(get(i, j)));
+            }
+        }
+        return new GenericMatrix<>(storage, getProvider(), ring);
+    }
+
+    /**
      * Returns the sum of this matrix and another.
      */
     Matrix<E> add(Matrix<E> other);

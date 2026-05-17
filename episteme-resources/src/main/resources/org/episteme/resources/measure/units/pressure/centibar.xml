@@ -1,4 +1,0 @@
-<unit id="centibar" name="centibar" abbreviation="cbar" unitType="pressure" parentSI="pascal" multiplierToSI="1.0E+3"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 centibar = 1 kilopascal</description>
-</unit>

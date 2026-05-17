@@ -25,11 +25,11 @@ package org.episteme.core.mathematics.linearalgebra.providers;
 
 import org.episteme.core.Episteme;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.episteme.core.mathematics.structures.rings.Field;
+import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
@@ -41,6 +41,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixS
 import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
 import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.sets.Reals;
 import com.google.auto.service.AutoService;
 
@@ -59,7 +60,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     @SuppressWarnings("unchecked")
     public CPUDenseLinearAlgebraProvider(Field<E> field) {
-        this.field = (field != null) ? field : (Field<E>) org.episteme.core.mathematics.sets.Reals.getInstance();
+        this.field = (field != null) ? field : (Field<E>) (Object) org.episteme.core.mathematics.sets.Reals.getInstance();
     }
 
     /**
@@ -99,15 +100,121 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     public String getId() {
         return "cpu-dense";
     }
+    @Override public Matrix<E> exp(Matrix<E> a) { return elementWiseTranscendental(a, "exp"); }
+    @Override public Matrix<E> log(Matrix<E> a) { return elementWiseTranscendental(a, "log"); }
+    @Override public Matrix<E> log10(Matrix<E> a) { return elementWiseTranscendental(a, "log10"); }
+    @Override public Matrix<E> sin(Matrix<E> a) { return elementWiseTranscendental(a, "sin"); }
+    @Override public Matrix<E> cos(Matrix<E> a) { return elementWiseTranscendental(a, "cos"); }
+    @Override public Matrix<E> tan(Matrix<E> a) { return elementWiseTranscendental(a, "tan"); }
+    @Override public Matrix<E> asin(Matrix<E> a) { return elementWiseTranscendental(a, "asin"); }
+    @Override public Matrix<E> acos(Matrix<E> a) { return elementWiseTranscendental(a, "acos"); }
+    @Override public Matrix<E> atan(Matrix<E> a) { return elementWiseTranscendental(a, "atan"); }
+    @Override public Matrix<E> sinh(Matrix<E> a) { return elementWiseTranscendental(a, "sinh"); }
+    @Override public Matrix<E> cosh(Matrix<E> a) { return elementWiseTranscendental(a, "cosh"); }
+    @Override public Matrix<E> tanh(Matrix<E> a) { return elementWiseTranscendental(a, "tanh"); }
+    @Override public Matrix<E> sqrt(Matrix<E> a) { return elementWiseTranscendental(a, "sqrt"); }
+    @Override public Matrix<E> cbrt(Matrix<E> a) { return elementWiseTranscendental(a, "cbrt"); }
 
     @Override
-    public String getType() {
-        return "math";
+    @SuppressWarnings("unchecked")
+    public Matrix<E> pow(Matrix<E> a, E exponent) {
+        int m = a.rows();
+        int n = a.cols();
+        Ring<E> r = a.getScalarRing();
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(m, n, r.zero());
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                E val = a.get(i, j);
+                E res;
+                if (val instanceof org.episteme.core.mathematics.numbers.real.Real && exponent instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                    res = (E)((org.episteme.core.mathematics.numbers.real.Real)val).pow((org.episteme.core.mathematics.numbers.real.Real)exponent);
+                } else if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex && exponent instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+                    res = (E)((org.episteme.core.mathematics.numbers.complex.Complex)val).pow((org.episteme.core.mathematics.numbers.complex.Complex)exponent);
+                } else {
+                    throw new UnsupportedOperationException("pow not supported for " + val.getClass().getSimpleName());
+                }
+                storage.set(i, j, res);
+            }
+        }
+        return new GenericMatrix<E>(storage, this, (r instanceof Field) ? (Field<E>)r : null);
     }
 
     @Override
-    public String getDescription() {
-        return "Core CPU Dense Linear Algebra Provider";
+    public E trace(Matrix<E> a) {
+        int n = Math.min(a.rows(), a.cols());
+        Ring<E> ring = a.getScalarRing();
+        E sum = ring.zero();
+        for (int i = 0; i < n; i++) {
+            sum = ring.add(sum, a.get(i, i));
+        }
+        return sum;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Matrix<E> elementWiseTranscendental(Matrix<E> a, String op) {
+        int m = a.rows();
+        int n = a.cols();
+        Ring<E> r = a.getScalarRing();
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(m, n, r.zero());
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                E val = a.get(i, j);
+                E res;
+                if (val instanceof org.episteme.core.mathematics.numbers.real.Real) {
+                    org.episteme.core.mathematics.numbers.real.Real rb = (org.episteme.core.mathematics.numbers.real.Real)val;
+                    res = switch(op) {
+                        case "exp" -> (E)rb.exp();
+                        case "log" -> (E)rb.log();
+                        case "log10" -> (E)rb.log10();
+                        case "sin" -> (E)rb.sin();
+                        case "cos" -> (E)rb.cos();
+                        case "tan" -> (E)rb.tan();
+                        case "asin" -> (E)rb.asin();
+                        case "acos" -> (E)rb.acos();
+                        case "atan" -> (E)rb.atan();
+                        case "sinh" -> (E)rb.sinh();
+                        case "cosh" -> (E)rb.cosh();
+                        case "tanh" -> (E)rb.tanh();
+                        case "sqrt" -> (E)rb.sqrt();
+                        case "cbrt" -> (E)rb.cbrt();
+                        default -> throw new UnsupportedOperationException(op);
+                    };
+                } else if (val instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
+                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex)val;
+                    res = switch(op) {
+                        case "exp" -> (E)c.exp();
+                        case "log" -> (E)c.log();
+                        case "log10" -> (E)c.log10();
+                        case "sin" -> (E)c.sin();
+                        case "cos" -> (E)c.cos();
+                        case "tan" -> (E)c.tan();
+                        case "asin" -> (E)c.asin();
+                        case "acos" -> (E)c.acos();
+                        case "atan" -> (E)c.atan();
+                        case "sinh" -> (E)c.sinh();
+                        case "cosh" -> (E)c.cosh();
+                        case "tanh" -> (E)c.tanh();
+                        case "sqrt" -> (E)c.sqrt();
+                        case "cbrt" -> (E)c.cbrt();
+                        default -> throw new UnsupportedOperationException(op);
+                    };
+                } else {
+                    throw new UnsupportedOperationException(op + " not supported for " + val.getClass().getSimpleName());
+                }
+                storage.set(i, j, res);
+            }
+        }
+        return new GenericMatrix<E>(storage, this, (r instanceof Field) ? (Field<E>)r : null);
+    }
+
+    @Override
+    public java.util.Map<String, String> getMetadata() {
+        return java.util.Map.of("capabilities", "Transpose,Add,Subtract,Scale,Multiply,Inverse,Determinant,Solve,Dot,Norm,LU,QR,Cholesky,SVD,Eigen,Exp,Sin");
+    }
+
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        return true; 
     }
 
     @Override
@@ -122,103 +229,117 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Vector dimensions must match");
         }
 
+        final Ring<E> r = a.getScalarRing();
+        final Class<?> componentType;
+        if (r.zero() instanceof Real) componentType = Real.class;
+        else if (r.zero() instanceof Complex) componentType = Complex.class;
+        else componentType = r.zero().getClass();
+
         if (a.dimension() < PARALLEL_THRESHOLD) {
             @SuppressWarnings("unchecked")
-            E[] data = (E[]) new Object[a.dimension()];
+            E[] data = (E[]) java.lang.reflect.Array.newInstance(componentType, a.dimension());
             for (int i = 0; i < a.dimension(); i++) {
-                data[i] = field.add(a.get(i), b.get(i));
+                data[i] = ((Ring<E>) r).add(a.get(i), b.get(i));
             }
             return new GenericVector<>(
-                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, field);
+                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(data), this, (Ring<E>) r);
         } else {
-            return Episteme.computeParallel(() -> java.util.stream.IntStream.range(0, a.dimension())
+            return Episteme.computeParallel(() -> {
+                List<E> list = java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
-                    .mapToObj(i -> field.add(a.get(i), b.get(i)))
-                    .collect(java.util.stream.Collectors.collectingAndThen(
-                            java.util.stream.Collectors.toList(),
-                            list -> {
-                                @SuppressWarnings("unchecked")
-                                E[] arr = (E[]) list.toArray();
-                                return new GenericVector<>(
-                                        new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
-                                                arr),
-                                        this, field);
-                            })));
+                    .mapToObj(i -> ((Ring<E>) r).add(a.get(i), b.get(i)))
+                    .collect(Collectors.toList());
+                @SuppressWarnings("unchecked")
+                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, list.size()));
+                return new GenericVector<>(
+                        new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),
+                        this, (Ring<E>) r);
+            });
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Vector<E> subtract(Vector<E> a, Vector<E> b) {
         if (a.dimension() != b.dimension()) {
             throw new IllegalArgumentException("Vector dimensions must match");
         }
+        if (isReal(a) && isReal(b)) {
+            double[] ad = toDoubleArray(a);
+            double[] bd = toDoubleArray(b);
+            double[] rd = new double[ad.length];
+            for (int i = 0; i < ad.length; i++) rd[i] = ad[i] - bd[i];
+            return (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(rd);
+        }
+
+        final Ring<E> r = a.getScalarRing();
+        final Class<?> componentType;
+        if (r.zero() instanceof Real) componentType = Real.class;
+        else if (r.zero() instanceof Complex) componentType = Complex.class;
+        else componentType = r.zero().getClass();
+
         if (a.dimension() < PARALLEL_THRESHOLD) {
-            List<E> result = new ArrayList<>(a.dimension());
+            List<E> result = new java.util.ArrayList<>(a.dimension());
             for (int i = 0; i < a.dimension(); i++) {
-                E negB = field.negate(b.get(i));
-                result.add(field.add(a.get(i), negB));
+                E negB = ((Ring<E>) r).negate(b.get(i));
+                result.add(((Ring<E>) r).add(a.get(i), negB));
             }
+            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, result.size()));
             return new GenericVector<>(
-                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(result), this,
-                    field);
+                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this,
+                    (Ring<E>) r);
         } else {
-            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
-            return IntStream.range(0, a.dimension())
+            return org.episteme.core.Episteme.computeParallel(() -> {
+                List<E> list = java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
-                        if (i % 512 == 0) ctx.checkCancelled();
-                        E negB = field.negate(b.get(i));
-                        return field.add(a.get(i), negB);
+                        if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
+                        E negB = ((Ring<E>) r).negate(b.get(i));
+                        return ((Ring<E>) r).add(a.get(i), negB);
                     })
-                    .collect(Collectors.collectingAndThen(
-                            Collectors.toList(),
-                            list -> {
-                                @SuppressWarnings("unchecked")
-                                E[] arr = (E[]) list.toArray();
-                                return new GenericVector<>(
-                                        new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
-                                                arr),
-                                        this, field);
-                            }));
+                    .collect(java.util.stream.Collectors.toList());
+                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, list.size()));
+                return new GenericVector<>(
+                        new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr),
+                        this, (Ring<E>) r);
+            });
         }
     }
 
     @Override
     public Vector<E> multiply(Vector<E> vector, E scalar) {
-        if (vector.dimension() < PARALLEL_THRESHOLD) {
-            List<E> result = new ArrayList<>(vector.dimension());
-            for (int i = 0; i < vector.dimension(); i++) {
-                result.add(field.multiply(vector.get(i), scalar));
-            }
-            // return new GenericVector(result.toArray(newFieldsElement[0]...), this,
-            // field);
-            // Handling array creation generically is hard without class token.
-            // DenseVector dealt with List. GenericVector takes Array.
-            // We can create Array from List if we have type?
-            // E is generic.
-            // We can convert List to Array if we cast.
+        final Ring<E> ring = vector.getScalarRing();
+        final Class<?> componentType;
+        if (ring.zero() instanceof Real) componentType = Real.class;
+        else if (ring.zero() instanceof Complex) componentType = Complex.class;
+        else componentType = ring.zero().getClass();
 
+        if (vector.dimension() < PARALLEL_THRESHOLD) {
+            List<E> result = new java.util.ArrayList<>(vector.dimension());
+            for (int i = 0; i < vector.dimension(); i++) {
+                result.add(((Ring<E>)ring).multiply(vector.get(i), scalar));
+            }
             @SuppressWarnings("unchecked")
-            E[] arr = (E[]) result.toArray(); // Safe if result contains E
+            E[] arr = result.toArray((E[]) java.lang.reflect.Array.newInstance(componentType, result.size()));
             return new GenericVector<>(
-                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, field);
+                    new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(arr), this, (Ring<E>)ring);
         } else {
-            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
-            return IntStream.range(0, vector.dimension())
+            final Class<?> finalType = componentType;
+            return java.util.stream.IntStream.range(0, vector.dimension())
                     .parallel()
                     .mapToObj(i -> {
-                        if (i % 512 == 0) ctx.checkCancelled();
-                        return field.multiply(vector.get(i), scalar);
+                        if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
+                        return ((Ring<E>)ring).multiply(vector.get(i), scalar);
                     })
-                    .collect(Collectors.collectingAndThen(
-                            Collectors.toList(),
+                    .collect(java.util.stream.Collectors.collectingAndThen(
+                            java.util.stream.Collectors.toList(),
                             list -> {
                                 @SuppressWarnings("unchecked")
-                                E[] arr = (E[]) list.toArray();
+                                E[] arr = list.toArray((E[]) java.lang.reflect.Array.newInstance(finalType, list.size()));
                                 return new GenericVector<>(
                                         new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(
                                                 arr),
-                                        this, field);
+                                        this, (Ring<E>)ring);
                             }));
         }
     }
@@ -230,52 +351,123 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             throw new IllegalArgumentException("Vector dimensions must match");
         }
         
-        if (field instanceof org.episteme.core.mathematics.sets.Reals && 
-            !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+        if (isReal(a) && isReal(b)) {
             double sum = 0.0;
             int dim = a.dimension();
+            double[] aData = toDoubleArray(a);
+            double[] bData = toDoubleArray(b);
             for (int i = 0; i < dim; i++) {
-                sum += ((Real) a.get(i)).doubleValue() * ((Real) b.get(i)).doubleValue();
+                sum += aData[i] * bData[i];
             }
-            return (E) (Object) Real.of(sum);
+            if (field.zero() instanceof Real) {
+                return (E) Real.of(sum);
+            }
         }
 
+        final Ring<E> r = a.getScalarRing();
         if (a.dimension() < PARALLEL_THRESHOLD) {
-            E sum = field.zero();
+            E sum = ((Field<E>) r).zero();
             for (int i = 0; i < a.dimension(); i++) {
-                E product = field.multiply(a.get(i), b.get(i));
-                sum = field.add(sum, product);
+                E product = ((Field<E>) r).multiply(conjugate(a.get(i)), b.get(i));
+                sum = ((Field<E>) r).add(sum, product);
             }
             return sum;
         } else {
-            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
-            return IntStream.range(0, a.dimension())
+            return org.episteme.core.Episteme.computeParallel(() -> java.util.stream.IntStream.range(0, a.dimension())
                     .parallel()
                     .mapToObj(i -> {
-                        if (i % 512 == 0) ctx.checkCancelled();
-                        return field.multiply(a.get(i), b.get(i));
+                        if (i % 512 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
+                        return ((Field<E>) r).multiply(conjugate(a.get(i)), b.get(i));
                     })
-                    .reduce(field.zero(), field::add);
+                    .reduce(((Field<E>) r).zero(), ((Field<E>) r)::add));
         }
     }
 
     @Override
     @SuppressWarnings({"unchecked", "restricted"})
     public E norm(Vector<E> a) {
-        if (field instanceof org.episteme.core.mathematics.sets.Reals && 
-            !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+        if (isReal(a)) {
             double sumSq = 0.0;
             int dim = a.dimension();
+            double[] aData = toDoubleArray(a);
             for (int i = 0; i < dim; i++) {
-                double val = ((Real) a.get(i)).doubleValue();
+                double val = aData[i];
                 sumSq += val * val;
             }
-            return (E) (Object) Real.of(Math.sqrt(sumSq));
+            if (field.zero() instanceof Real) {
+                return (E) Real.of(Math.sqrt(sumSq));
+            }
         }
 
         E dotProduct = dot(a, a);
-        return sqrt(dotProduct, field);
+        return sqrt(dotProduct, (Field<E>) a.getScalarRing());
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> normalize(Vector<E> a) {
+        E n = norm(a);
+        if (n == null) return a;
+        try {
+            if (n instanceof Real r && r.doubleValue() == 0.0) return a;
+            if (n instanceof Complex c && c.real() == 0.0 && c.imaginary() == 0.0) return a;
+            return multiply(a, ((Field<E>) a.getScalarRing()).inverse(n));
+        } catch (Exception e) {
+            return a;
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> cross(Vector<E> a, Vector<E> b) {
+        if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");
+        Ring<E> r = a.getScalarRing();
+        E a1 = a.get(0); E a2 = a.get(1); E a3 = a.get(2);
+        E b1 = b.get(0); E b2 = b.get(1); E b3 = b.get(2);
+        E c1 = r.subtract(r.multiply(a2, b3), r.multiply(a3, b2));
+        E c2 = r.subtract(r.multiply(a3, b1), r.multiply(a1, b3));
+        E c3 = r.subtract(r.multiply(a1, b2), r.multiply(a2, b1));
+        return (Vector<E>) org.episteme.core.mathematics.linearalgebra.Vector.of(java.util.Arrays.asList(c1, c2, c3), r);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public E angle(Vector<E> a, Vector<E> b) {
+        E d = dot(a, b);
+        E nA = norm(a);
+        E nB = norm(b);
+        Ring<E> r = a.getScalarRing();
+        try {
+            E denom = r.multiply(nA, nB);
+            if (denom instanceof Real real && real.doubleValue() == 0.0) return r.zero();
+            if (denom instanceof Complex complex && complex.real() == 0.0 && complex.imaginary() == 0.0) return r.zero();
+            E cosTheta = ((Field<E>)r).divide(d, denom);
+            double cosVal = (cosTheta instanceof Real real) ? real.doubleValue() : ((Complex) cosTheta).real();
+            double angle = Math.acos(Math.max(-1.0, Math.min(1.0, cosVal)));
+            if (r.zero() instanceof Real) return (E) Real.of(angle);
+            if (r.zero() instanceof Complex) return (E) Complex.of(angle);
+            return r.zero();
+        } catch (Exception e) {
+            return r.zero();
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Vector<E> projection(Vector<E> a, Vector<E> b) {
+        E dAB = dot(a, b);
+        E dBB = dot(b, b);
+        Ring<E> r = a.getScalarRing();
+        try {
+            if (dBB instanceof Real real && real.doubleValue() == 0.0) return a;
+            if (dBB instanceof Complex complex && complex.real() == 0.0 && complex.imaginary() == 0.0) return a;
+            E factor = ((Field<E>)r).divide(dAB, dBB);
+            return multiply(b, factor);
+        } catch (Exception e) {
+            return a;
+        }
+    }
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -300,9 +492,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     resData[i] = dataA[i] + dataB[i];
                 }
             } else {
-                org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+                
                 IntStream.range(0, rows).parallel().forEach(i -> {
-                    ctx.checkCancelled();
+                    org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                     int offset = i * cols;
                     for (int j = 0; j < cols; j++) {
                         resData[offset + j] = dataA[offset + j] + dataB[offset + j];
@@ -312,24 +504,24 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rows, cols);
         }
 
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
+        Ring<E> ring = a.getScalarRing();
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), ((Field<E>)ring).zero());
 
         if (a.rows() * a.cols() < PARALLEL_THRESHOLD) {
             for (int i = 0; i < a.rows(); i++) {
                 for (int j = 0; j < a.cols(); j++) {
-                    storage.set(i, j, field.add(a.get(i, j), b.get(i, j)));
+                    storage.set(i, j, ((Field<E>)ring).add(a.get(i, j), b.get(i, j)));
                 }
             }
         } else {
-            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
-                ctx.checkCancelled();
+                org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                 for (int j = 0; j < a.cols(); j++) {
-                    storage.set(i, j, field.add(a.get(i, j), b.get(i, j)));
+                    storage.set(i, j, ((Field<E>)ring).add(a.get(i, j), b.get(i, j)));
                 }
             });
         }
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<>(storage, this, (Field<E>)ring);
     }
 
     @Override
@@ -355,9 +547,9 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                     resData[i] = dataA[i] - dataB[i];
                 }
             } else {
-                org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+                
                 IntStream.range(0, rows).parallel().forEach(i -> {
-                    ctx.checkCancelled();
+                    org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                     int offset = i * cols;
                     for (int j = 0; j < cols; j++) {
                         resData[offset + j] = dataA[offset + j] - dataB[offset + j];
@@ -367,102 +559,88 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rows, cols);
         }
 
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
+        Ring<E> ring = a.getScalarRing();
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), ((Field<E>)ring).zero());
 
         if (a.rows() * a.cols() < PARALLEL_THRESHOLD) {
             for (int i = 0; i < a.rows(); i++) {
                 for (int j = 0; j < a.cols(); j++) {
-                    E negB = field.negate(b.get(i, j));
-                    storage.set(i, j, field.add(a.get(i, j), negB));
+                    E negB = ((Field<E>)ring).negate(b.get(i, j));
+                    storage.set(i, j, ((Field<E>)ring).add(a.get(i, j), negB));
                 }
             }
         } else {
-            org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
             IntStream.range(0, a.rows()).parallel().forEach(i -> {
-                ctx.checkCancelled();
+                org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                 for (int j = 0; j < a.cols(); j++) {
-                    E negB = field.negate(b.get(i, j));
-                    storage.set(i, j, field.add(a.get(i, j), negB));
+                    E negB = ((Field<E>)ring).negate(b.get(i, j));
+                    storage.set(i, j, ((Field<E>)ring).add(a.get(i, j), negB));
                 }
             });
         }
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<>(storage, this, (Field<E>)ring);
     }
 
     @Override
-    @SuppressWarnings({"preview", "restricted"})
+    @SuppressWarnings({"unchecked", "restricted"})
     public Matrix<E> multiply(Matrix<E> a, Matrix<E> b) {
+        if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix") && b.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
+            return a.multiply(b);
+        }
+
         if (a.cols() != b.rows()) {
-            throw new IllegalArgumentException("Matrix inner dimensions must match");
+            throw new IllegalArgumentException("Matrix inner dimensions must match: " + a.cols() + " != " + b.rows());
         }
 
-        // Generic Strassen for large power-of-two square matrices
-        if (a.rows() >= 512 && a.cols() >= 512 && b.cols() >= 512
-                && isSquarePowerOfTwo(a) && isSquarePowerOfTwo(b) && a.rows() == b.rows()) {
-            return strassenRecursive(a, b);
+        if (isReal(a) && isReal(b)) {
+            int rows = a.rows();
+            int cols = b.cols();
+            int k = a.cols();
+            double[] aData = toDoubleArray(a);
+            double[] bData = toDoubleArray(b);
+
+            double[] cData = new double[rows * cols];
+            staticTiledMultiply(aData, bData, cData, rows, k, cols);
+
+            return (Matrix<E>) (Matrix<?>) org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(cData, rows, cols);
         }
 
-        return standardMultiply(a, b, field, this);
-    }
+        int m = a.rows();
+        int n = b.cols();
+        int k = a.cols();
+        final Field<E> f = (Field<E>) a.getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(m, n, f.zero());
 
-    private boolean isSquarePowerOfTwo(Matrix<E> m) {
-        return m.rows() == m.cols() && (m.rows() & (m.rows() - 1)) == 0;
-    }
+        long start = System.nanoTime();
+        boolean parallel = m * n * k > 500000;
 
-    private Matrix<E> strassenRecursive(Matrix<E> A, Matrix<E> B) {
-        org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
-        int n = A.rows();
-        if (n <= 512) {
-            return standardMultiply(A, B, field, this);
-        }
-
-        int newSize = n / 2;
-
-        Matrix<E> A11 = A.getSubMatrix(0, newSize, 0, newSize);
-        Matrix<E> A12 = A.getSubMatrix(0, newSize, newSize, n);
-        Matrix<E> A21 = A.getSubMatrix(newSize, n, 0, newSize);
-        Matrix<E> A22 = A.getSubMatrix(newSize, n, newSize, n);
-
-        Matrix<E> B11 = B.getSubMatrix(0, newSize, 0, newSize);
-        Matrix<E> B12 = B.getSubMatrix(0, newSize, newSize, n);
-        Matrix<E> B21 = B.getSubMatrix(newSize, n, 0, newSize);
-        Matrix<E> B22 = B.getSubMatrix(newSize, n, newSize, n);
-
-        Matrix<E> M1 = strassenRecursive(add(A11, A22), add(B11, B22));
-        Matrix<E> M2 = strassenRecursive(add(A21, A22), B11);
-        Matrix<E> M3 = strassenRecursive(A11, subtract(B12, B22));
-        Matrix<E> M4 = strassenRecursive(A22, subtract(B21, B11));
-        Matrix<E> M5 = strassenRecursive(add(A11, A12), B22);
-        Matrix<E> M6 = strassenRecursive(subtract(A21, A11), add(B11, B12));
-        Matrix<E> M7 = strassenRecursive(subtract(A12, A22), add(B21, B22));
-
-        Matrix<E> C11 = add(subtract(add(M1, M4), M5), M7);
-        Matrix<E> C12 = add(M3, M5);
-        Matrix<E> C21 = add(M2, M4);
-        Matrix<E> C22 = add(subtract(add(M1, M3), M2), M6);
-
-        return combineSubMatrices(C11, C12, C21, C22);
-    }
-
-    private Matrix<E> combineSubMatrices(Matrix<E> C11, Matrix<E> C12, Matrix<E> C21, Matrix<E> C22) {
-        int n = C11.rows() * 2;
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(n, n, field.zero());
-
-        copySubMatrixToStorage(storage, C11, 0, 0);
-        copySubMatrixToStorage(storage, C12, 0, n / 2);
-        copySubMatrixToStorage(storage, C21, n / 2, 0);
-        copySubMatrixToStorage(storage, C22, n / 2, n / 2);
-
-        return new GenericMatrix<>(storage, this, field);
-    }
-
-    private void copySubMatrixToStorage(DenseMatrixStorage<E> storage, Matrix<E> sub, int rowOffset, int colOffset) {
-        for (int i = 0; i < sub.rows(); i++) {
-            for (int j = 0; j < sub.cols(); j++) {
-                storage.set(rowOffset + i, colOffset + j, sub.get(i, j));
+        if (parallel) {
+            IntStream.range(0, m).parallel().forEach(i -> {
+                for (int j = 0; j < n; j++) {
+                    E sum = f.zero();
+                    for (int l = 0; l < k; l++) {
+                        sum = f.add(sum, f.multiply(a.get(i, l), b.get(l, j)));
+                    }
+                    storage.set(i, j, sum);
+                }
+            });
+        } else {
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    E sum = f.zero();
+                    for (int l = 0; l < k; l++) {
+                        sum = f.add(sum, f.multiply(a.get(i, l), b.get(l, j)));
+                    }
+                    storage.set(i, j, sum);
+                }
             }
         }
+
+        org.episteme.core.util.PerformanceLogger.log("CPU:GenericMultiply", a.getClass().getSimpleName(), System.nanoTime() - start);
+        return new GenericMatrix<>(storage, this, f);
     }
+
 
     @SuppressWarnings({"unchecked", "restricted"})
     public static <E> Matrix<E> standardMultiply(Matrix<E> a, Matrix<E> b, Field<E> field, LinearAlgebraProvider<E> provider) {
@@ -503,29 +681,30 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rowsA, colsB);
         }
 
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), b.cols(), field.zero());
+        Field<E> f = (field != null) ? field : (Field<E>) a.getScalarRing();
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), b.cols(), f.zero());
         long start = System.nanoTime();
         try {
             if (a.rows() < 10) {
                 for (int i = 0; i < a.rows(); i++) {
                     for (int j = 0; j < b.cols(); j++) {
-                        E sum = field.zero();
+                        E sum = f.zero();
                         for (int k = 0; k < a.cols(); k++) {
-                            E product = field.multiply(a.get(i, k), b.get(k, j));
-                            sum = field.add(sum, product);
+                            E product = f.multiply(a.get(i, k), b.get(k, j));
+                            sum = f.add(sum, product);
                         }
                         storage.set(i, j, sum);
                     }
                 }
             } else {
-                org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+                
                 IntStream.range(0, a.rows()).parallel().forEach(i -> {
-                    if (i % 64 == 0) ctx.checkCancelled();
+                    if (i % 64 == 0) org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
                     for (int j = 0; j < b.cols(); j++) {
-                        E sum = field.zero();
+                        E sum = f.zero();
                         for (int k = 0; k < a.cols(); k++) {
-                            E product = field.multiply(a.get(i, k), b.get(k, j));
-                            sum = field.add(sum, product);
+                            E product = f.multiply(a.get(i, k), b.get(k, j));
+                            sum = f.add(sum, product);
                         }
                         storage.set(i, j, sum);
                     }
@@ -545,11 +724,19 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
 
     private static boolean isReal(Matrix<?> m) {
         if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
-            // RealDoubleMatrix is ALWAYS double precision. 
-            // If we are in EXACT mode, we MUST treat it as a generic matrix to avoid downcasting.
             return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
         }
         if (m.getScalarRing() instanceof org.episteme.core.mathematics.sets.Reals) {
+            return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        }
+        return false;
+    }
+
+    private static boolean isReal(Vector<?> v) {
+        if (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) {
+            return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        }
+        if (v.getScalarRing() instanceof org.episteme.core.mathematics.sets.Reals) {
             return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
         }
         return false;
@@ -565,9 +752,7 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (m.getClass().getName().endsWith("SIMDRealDoubleMatrix")) {
             try {
                 return (double[]) m.getClass().getMethod("getInternalData").invoke(m);
-            } catch (Exception e) {
-                // Fallback handled below
-            }
+            } catch (Exception e) {}
         }
         if (m instanceof GenericMatrix) {
             org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage<?> storage = 
@@ -576,25 +761,35 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
                 return ((org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage) storage).getData();
             }
         }
-        // Fallback: full copy
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Object val = m.get(i, j);
-                if (val instanceof Real) {
-                    data[i * cols + j] = ((Real) val).doubleValue();
-                } else if (val instanceof Number) {
-                    data[i * cols + j] = ((Number) val).doubleValue();
-                }
+                if (val instanceof Real) data[i * cols + j] = ((Real) val).doubleValue();
+                else if (val instanceof Number) data[i * cols + j] = ((Number) val).doubleValue();
             }
+        }
+        return data;
+    }
+
+    private static double[] toDoubleArray(Vector<?> v) {
+        int n = v.dimension();
+        double[] data = new double[n];
+        if (v instanceof org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) {
+            return ((org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector) v).toDoubleArray();
+        }
+        for (int i = 0; i < n; i++) {
+            Object val = v.get(i);
+            if (val instanceof Real) data[i] = ((Real) val).doubleValue();
+            else if (val instanceof Number) data[i] = ((Number) val).doubleValue();
         }
         return data;
     }
 
     private static void staticTiledMultiply(double[] A, double[] B, double[] C, int M, int K, int N) {
         final int BLOCK_SIZE = 64; 
-        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        
         IntStream.range(0, (M + BLOCK_SIZE - 1) / BLOCK_SIZE).parallel().forEach(bi -> {
-            ctx.checkCancelled();
+            org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             int i0 = bi * BLOCK_SIZE;
             int iMax = Math.min(i0 + BLOCK_SIZE, M);
             for (int k0 = 0; k0 < K; k0 += BLOCK_SIZE) {
@@ -643,15 +838,15 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
         }
 
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), field.zero());
-        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
+        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.cols(), a.rows(), ((Field<E>)a.getScalarRing()).zero());
+        
         IntStream.range(0, a.rows()).parallel().forEach(i -> {
-            ctx.checkCancelled();
+            org.episteme.core.mathematics.context.MathContext.checkCurrentCancelled();
             for (int j = 0; j < a.cols(); j++) {
                 storage.set(j, i, a.get(i, j));
             }
         });
-        return new GenericMatrix<>(storage, this, field);
+        return new GenericMatrix<>(storage, this, (Field<E>) a.getScalarRing());
     }
 
     @Override
@@ -661,448 +856,121 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             double s = ((Real) scalar).doubleValue();
             int rows = a.rows();
             int cols = a.cols();
-            double[] data = toDoubleArray(a);
-            double[] resData = new double[rows * cols];
-            for (int i = 0; i < rows * cols; i++) {
-                resData[i] = data[i] * s;
+            double[] data = toDoubleArray(a).clone();
+            for (int i = 0; i < data.length; i++) {
+                data[i] *= s;
             }
-            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, rows, cols);
+            return (Matrix<E>) (Matrix<?>) org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix.of(data, rows, cols);
         }
 
         if (a.getClass().getName().endsWith("SIMDRealDoubleMatrix") && scalar instanceof Real) {
             try {
                 return (Matrix<E>) a.getClass().getMethod("scale", double.class).invoke(a, ((Real) scalar).doubleValue());
-            } catch (Exception e) {
-                // Fallback handled below
-            }
+            } catch (Exception e) {}
         }
 
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(a.rows(), a.cols(), field.zero());
-        org.episteme.core.mathematics.context.MathContext ctx = org.episteme.core.mathematics.context.MathContext.getCurrent();
-        IntStream.range(0, a.rows()).parallel().forEach(i -> {
-            ctx.checkCancelled();
-            for (int j = 0; j < a.cols(); j++) {
-                storage.set(i, j, field.multiply(a.get(i, j), scalar));
+        int m = a.rows();
+        int n = a.cols();
+        final Field<E> f = (Field<E>) a.getScalarRing();
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(m, n, f.zero());
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                storage.set(i, j, f.multiply(scalar, a.get(i, j)));
             }
-        });
-        return new GenericMatrix<>(storage, this, field);
+        }
+        return new GenericMatrix<>(storage, this, f);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> multiply(Matrix<E> a, Vector<E> b) {
-        if (a.cols() != b.dimension()) {
-            throw new IllegalArgumentException("Matrix columns must match vector dimension");
-        }
-        int rows = a.rows();
-        int cols = a.cols();
-        
         if (isReal(a)) {
-            double[] mat = toDoubleArray(a);
-            double[] vec = new double[cols];
-            for (int i = 0; i < cols; i++) vec[i] = ((Real)b.get(i)).doubleValue();
-            
+            int rows = a.rows();
+            int cols = a.cols();
+            double[] aData = toDoubleArray(a);
+            double[] bData = toDoubleArray(b);
             double[] res = new double[rows];
             for (int i = 0; i < rows; i++) {
-                double sum = 0;
-                int rowOffset = i * cols;
+                double sum = 0.0;
                 for (int j = 0; j < cols; j++) {
-                    sum += mat[rowOffset + j] * vec[j];
+                    sum += aData[i * cols + j] * bData[j];
                 }
                 res[i] = sum;
             }
             return (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(res);
         }
-        
-        java.util.List<E> result = new java.util.ArrayList<>(rows);
-        for (int i = 0; i < rows; i++) {
-            E sum = field.zero();
-            for (int j = 0; j < cols; j++) {
-                sum = field.add(sum, field.multiply(a.get(i, j), b.get(j)));
+
+        int m = a.rows();
+        int n = a.cols();
+        final Field<E> f = (Field<E>) a.getScalarRing();
+        Class<?> componentType = f.zero().getClass();
+        if (f.zero() instanceof Real) componentType = Real.class;
+        else if (f.zero() instanceof Complex) componentType = Complex.class;
+
+        E[] resArray = (E[]) java.lang.reflect.Array.newInstance(componentType, m);
+        for (int i = 0; i < m; i++) {
+            E sum = f.zero();
+            for (int j = 0; j < n; j++) {
+                sum = f.add(sum, f.multiply(a.get(i, j), b.get(j)));
             }
-            result.add(sum);
+            resArray[i] = sum;
         }
-        return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(result, field);
+        return new GenericVector<>(
+                new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, f);
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "restricted"})
+    @SuppressWarnings("unchecked")
     public Matrix<E> inverse(Matrix<E> a) {
         if (a.rows() != a.cols()) {
-            return pseudoInverse(a);
+             // Moore-Penrose Pseudo-inverse via Normal Equations
+             Matrix<E> at = transpose(a);
+             if (a.rows() > a.cols()) {
+                 return multiply(inverse(multiply(at, a)), at);
+             } else {
+                 return multiply(at, inverse(multiply(a, at)));
+             }
         }
-        int n = a.rows();
-
         if (isReal(a)) {
-            double[] data = toDoubleArray(a);
-            double[] aug = new double[n * 2 * n];
-            // Initialize augmented matrix [A | I]
-            for (int i = 0; i < n; i++) {
-                System.arraycopy(data, i * n, aug, i * 2 * n, n);
-                aug[i * 2 * n + n + i] = 1.0;
-            }
-
-            // Gauss-Jordan elimination with partial pivoting
-            int rowSize = 2 * n;
-            for (int k = 0; k < n; k++) {
-                int pivot = k;
-                double maxVal = Math.abs(aug[k * rowSize + k]);
-                for (int i = k + 1; i < n; i++) {
-                    double val = Math.abs(aug[i * rowSize + k]);
-                    if (val > maxVal) {
-                        maxVal = val;
-                        pivot = i;
-                    }
-                }
-
-                if (pivot != k) {
-                    for (int j = k; j < rowSize; j++) {
-                        double temp = aug[k * rowSize + j];
-                        aug[k * rowSize + j] = aug[pivot * rowSize + j];
-                        aug[pivot * rowSize + j] = temp;
-                    }
-                }
-
-                double pivotVal = aug[k * rowSize + k];
-                if (Math.abs(pivotVal) < 1e-18) throw new ArithmeticException("Matrix is singular");
-
-                for (int j = k; j < rowSize; j++) aug[k * rowSize + j] /= pivotVal;
-
-                for (int i = 0; i < n; i++) {
-                    if (i != k) {
-                        double factor = aug[i * rowSize + k];
-                        int offsetI = i * rowSize;
-                        int offsetK = k * rowSize;
-                        for (int j = k; j < rowSize; j++) {
-                            aug[offsetI + j] -= factor * aug[offsetK + j];
-                        }
-                    }
-                }
-            }
-
-            double[] resData = new double[n * n];
-            for (int i = 0; i < n; i++) {
-                System.arraycopy(aug, i * rowSize + n, resData, i * n, n);
-            }
-            return (Matrix<E>) (Matrix<?>) RealDoubleMatrix.of(resData, n, n);
+            return (Matrix<E>) (Object) JavaLU.inverse((Matrix<Real>) (Object) a);
         }
-
-        List<List<E>> aug = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            List<E> row = new ArrayList<>();
-            for (int j = 0; j < n; j++)
-                row.add(a.get(i, j));
-            for (int j = 0; j < n; j++)
-                row.add(i == j ? field.one() : field.zero());
-            aug.add(row);
-        }
-
-        for (int col = 0; col < n; col++) {
-            int pivotRow = col;
-            if (field instanceof org.episteme.core.mathematics.sets.Reals) {
-                double maxVal = Math
-                        .abs(((org.episteme.core.mathematics.numbers.real.Real) aug.get(col).get(col)).doubleValue());
-                for (int i = col + 1; i < n; i++) {
-                    double val = Math
-                            .abs(((org.episteme.core.mathematics.numbers.real.Real) aug.get(i).get(col)).doubleValue());
-                    if (val > maxVal) {
-                        maxVal = val;
-                        pivotRow = i;
-                    }
-                }
-            }
-            if (pivotRow != col) {
-                List<E> temp = aug.get(col);
-                aug.set(col, aug.get(pivotRow));
-                aug.set(pivotRow, temp);
-            }
-
-            E pivot = aug.get(col).get(col);
-            if (pivot.equals(field.zero()))
-                throw new ArithmeticException("Singular matrix");
-
-            for (int j = 0; j < 2 * n; j++)
-                aug.get(col).set(j, field.divide(aug.get(col).get(j), pivot));
-
-            for (int i = 0; i < n; i++) {
-                if (i != col) {
-                    E factor = aug.get(i).get(col);
-                    for (int j = 0; j < 2 * n; j++) {
-                        E val = aug.get(i).get(j);
-                        E sub = field.multiply(factor, aug.get(col).get(j));
-                        aug.get(i).set(j, field.add(val, field.negate(sub)));
-                    }
-                }
-            }
-        }
-
-        DenseMatrixStorage<E> storage = new DenseMatrixStorage<>(n, n, field.zero());
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                storage.set(i, j, aug.get(i).get(n + j));
-            }
-        }
-        return new GenericMatrix<>(storage, this, field);
+        return GenericLU.inverse(a, (Field<E>) (Object) a.getScalarRing(), this);
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "preview", "restricted"})
+    @SuppressWarnings("unchecked")
     public E determinant(Matrix<E> a) {
-        if (a.rows() != a.cols())
-            throw new ArithmeticException("Must be square");
-        int n = a.rows();
-        if (n == 1)
-            return a.get(0, 0);
-
+        if (a.rows() != a.cols()) {
+            throw new IllegalArgumentException("Matrix must be square");
+        }
         if (isReal(a)) {
-            double[] mat = toDoubleArray(a);
-            double det = 1.0;
-            for (int col = 0; col < n; col++) {
-                int pivotRow = col;
-                double maxVal = Math.abs(mat[col * n + col]);
-                for (int i = col + 1; i < n; i++) {
-                    double val = Math.abs(mat[i * n + col]);
-                    if (val > maxVal) {
-                        maxVal = val;
-                        pivotRow = i;
-                    }
-                }
-
-                if (pivotRow != col) {
-                    for (int j = col; j < n; j++) {
-                        double temp = mat[col * n + j];
-                        mat[col * n + j] = mat[pivotRow * n + j];
-                        mat[pivotRow * n + j] = temp;
-                    }
-                    det = -det;
-                }
-
-                double pivot = mat[col * n + col];
-                if (Math.abs(pivot) < 1e-60) return (E) (Object) Real.ZERO;
-
-                det *= pivot;
-                for (int i = col + 1; i < n; i++) {
-                    double factor = mat[i * n + col] / pivot;
-                    int offsetI = i * n;
-                    int offsetCol = col * n;
-                    for (int j = col + 1; j < n; j++) {
-                        mat[offsetI + j] -= factor * mat[offsetCol + j];
-                    }
-                }
-            }
-            return (E) (Object) Real.of(det);
+            return (E) (Object) JavaLU.determinant((Matrix<Real>) (Object) a);
         }
-
-        if (n == 2) {
-            return field.add(field.multiply(a.get(0, 0), a.get(1, 1)),
-                    field.negate(field.multiply(a.get(0, 1), a.get(1, 0))));
-        }
-
-        List<List<E>> mat = new ArrayList<>();
-        // ... (remaining generic code)
-        for (int i = 0; i < n; i++) {
-            List<E> row = new ArrayList<>();
-            for (int j = 0; j < n; j++)
-                row.add(a.get(i, j));
-            mat.add(row);
-        }
-
-        E det = field.one();
-        for (int col = 0; col < n; col++) {
-            int pivotRow = col;
-            for (int i = col + 1; i < n; i++) {
-                if (!mat.get(i).get(col).equals(field.zero())) {
-                    pivotRow = i;
-                    break;
-                }
-            }
-            if (pivotRow != col) {
-                List<E> temp = mat.get(col);
-                mat.set(col, mat.get(pivotRow));
-                mat.set(pivotRow, temp);
-                det = field.negate(det);
-            }
-            E pivot = mat.get(col).get(col);
-            if (pivot.equals(field.zero()))
-                return field.zero();
-            det = field.multiply(det, pivot);
-            for (int i = col + 1; i < n; i++) {
-                E factor = field.divide(mat.get(i).get(col), pivot);
-                for (int j = col; j < n; j++) {
-                    E val = mat.get(i).get(j);
-                    E sub = field.multiply(factor, mat.get(col).get(j));
-                    mat.get(i).set(j, field.add(val, field.negate(sub)));
-                }
-            }
-        }
-        return det;
+        return GenericLU.determinant(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(Matrix<E> a, Vector<E> b) {
+        if (a.rows() != b.dimension()) {
+            throw new IllegalArgumentException("Matrix rows and vector dimension must match");
+        }
         if (a.rows() != a.cols()) {
-            // Rectangular: Least Squares via pseudo-inverse x = A+ * b
-            return multiply(pseudoInverse(a), b);
+            if (isReal(a) && isReal(b)) {
+                return (Vector<E>) (Object) JavaQR.solve(JavaQR.decompose((Matrix<Real>) (Object) a), (Vector<Real>) (Object) b);
+            }
+            return GenericQR.solve(GenericQR.decompose(a, (Field<E>) a.getScalarRing(), this), b, (Field<E>) a.getScalarRing(), this);
         }
-        int n = a.rows();
-
-        if (isReal(a)) {
-            double[] mat = toDoubleArray(a);
-            double[] rhs = new double[n];
-            for (int i = 0; i < n; i++) rhs[i] = ((Real) b.get(i)).doubleValue();
-
-            // LU Decomposition (in-place) with Partial Pivoting
-            int[] pivots = new int[n];
-            for (int i = 0; i < n; i++) pivots[i] = i;
-
-            for (int i = 0; i < n; i++) {
-                int maxRow = i;
-                double maxVal = Math.abs(mat[i * n + i]);
-                for (int k = i + 1; k < n; k++) {
-                    double val = Math.abs(mat[k * n + i]);
-                    if (val > maxVal) {
-                        maxVal = val;
-                        maxRow = k;
-                    }
-                }
-
-                // Swap rows
-                if (maxRow != i) {
-                    int tmpP = pivots[i]; pivots[i] = pivots[maxRow]; pivots[maxRow] = tmpP;
-                    for (int k = 0; k < n; k++) {
-                        double tmp = mat[i * n + k];
-                        mat[i * n + k] = mat[maxRow * n + k];
-                        mat[maxRow * n + k] = tmp;
-                    }
-                    double tmpR = rhs[i]; rhs[i] = rhs[maxRow]; rhs[maxRow] = tmpR;
-                }
-
-                double pivotVal = mat[i * n + i];
-                if (Math.abs(pivotVal) < 1e-18) throw new ArithmeticException("Matrix is singular");
-
-                for (int k = i + 1; k < n; k++) {
-                    double factor = mat[k * n + i] / pivotVal;
-                    mat[k * n + i] = factor;
-                    for (int j = i + 1; j < n; j++) {
-                        mat[k * n + j] -= factor * mat[i * n + j];
-                    }
-                    rhs[k] -= factor * rhs[i];
-                }
-            }
-
-            // Back Substitution
-            double[] res = new double[n];
-            for (int i = n - 1; i >= 0; i--) {
-                double sum = 0.0;
-                for (int j = i + 1; j < n; j++) {
-                    sum += mat[i * n + j] * res[j];
-                }
-                res[i] = (rhs[i] - sum) / mat[i * n + i];
-            }
-
-            E[] resArray = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            for (int i = 0; i < n; i++) resArray[i] = (E)(Object) Real.of(res[i]);
-            return new GenericVector<>(new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
+        if (isReal(a) && isReal(b)) {
+            return (Vector<E>) JavaLU.solve((Matrix<Real>) a, (Vector<Real>) b);
         }
-
-        List<List<E>> aug = new ArrayList<>();
-        // ... (remaining generic code)
-        for (int i = 0; i < n; i++) {
-            List<E> row = new ArrayList<>();
-            for (int j = 0; j < n; j++)
-                row.add(a.get(i, j));
-            row.add(b.get(i));
-            aug.add(row);
-        }
-
-        for (int col = 0; col < n; col++) {
-            int pivotRow = col;
-            if (field instanceof org.episteme.core.mathematics.sets.Reals) {
-                // Partial Pivoting for Reals (Numerical Stability)
-                double maxVal = Math
-                        .abs(((org.episteme.core.mathematics.numbers.real.Real) aug.get(col).get(col)).doubleValue());
-                for (int i = col + 1; i < n; i++) {
-                    double val = Math
-                            .abs(((org.episteme.core.mathematics.numbers.real.Real) aug.get(i).get(col)).doubleValue());
-                    if (val > maxVal) {
-                        maxVal = val;
-                        pivotRow = i;
-                    }
-                }
-            } else {
-                // Fallback for generic fields: Swap if current is zero
-                if (field.zero().equals(aug.get(col).get(col))) {
-                    for (int i = col + 1; i < n; i++) {
-                        if (!field.zero().equals(aug.get(i).get(col))) {
-                            pivotRow = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (pivotRow != col) {
-                List<E> temp = aug.get(col);
-                aug.set(col, aug.get(pivotRow));
-                aug.set(pivotRow, temp);
-            }
-            E pivot = aug.get(col).get(col);
-            if (pivot.equals(field.zero()))
-                throw new ArithmeticException("Singular");
-            E pivotInv = field.divide(field.one(), pivot);
-            for (int j = col; j <= n; j++)
-                aug.get(col).set(j, field.multiply(aug.get(col).get(j), pivotInv));
-            for (int i = 0; i < n; i++) {
-                if (i != col) {
-                    E factor = aug.get(i).get(col);
-                    for (int j = col; j <= n; j++) {
-                        E val = aug.get(i).get(j);
-                        E sub = field.multiply(factor, aug.get(col).get(j));
-                        aug.get(i).set(j, field.add(val, field.negate(sub)));
-                    }
-                }
-            }
-        }
-
-        List<E> res = new ArrayList<>();
-        for (int i = 0; i < n; i++)
-            res.add(aug.get(i).get(n));
-        E[] resArray = (E[]) res
-                .toArray();
-        return new GenericVector<>(
-                new org.episteme.core.mathematics.linearalgebra.vectors.storage.DenseVectorStorage<>(resArray), this, field);
+        return GenericLU.solve(a, b, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
     public int getPriority() {
-        return 50; // Default priority
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public QRResult<E> qr(Matrix<E> a) {
-        if (a.getScalarRing() instanceof Reals) {
-            return (QRResult<E>) JavaQR.decompose((Matrix<Real>) a);
-        }
-        return GenericQR.decompose(a, field);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public SVDResult<E> svd(Matrix<E> a) {
-        if (a.getScalarRing() instanceof Reals) {
-            return (SVDResult<E>) JavaSVD.decompose((Matrix<Real>) a);
-        }
-        return GenericSVD.decompose(a, field);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public EigenResult<E> eigen(Matrix<E> a) {
-        if (a.getScalarRing() instanceof Reals) {
-            return (EigenResult<E>) JavaEigen.decompose((Matrix<Real>) a);
-        }
-        return GenericEigen.decompose(a, field);
+        return 50;
     }
 
     @Override
@@ -1111,7 +979,16 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (LUResult<E>) JavaLU.decompose((Matrix<Real>) a);
         }
-        return GenericLU.decompose(a, field);
+        return GenericLU.decompose(a, (Field<E>) a.getScalarRing(), this);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public QRResult<E> qr(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            return (QRResult<E>) JavaQR.decompose((Matrix<Real>) a);
+        }
+        return GenericQR.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
@@ -1120,461 +997,81 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
         if (a.getScalarRing() instanceof Reals) {
             return (CholeskyResult<E>) JavaCholesky.decompose((Matrix<Real>) a);
         }
-        return GenericCholesky.decompose(a, field);
+        return GenericCholesky.decompose(a, (Field<E>) a.getScalarRing(), this);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public SVDResult<E> svd(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            return (SVDResult<E>) JavaSVD.decompose((Matrix<Real>) a);
+        }
+        return GenericSVD.decompose(a, (Field<E>) a.getScalarRing(), this);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public EigenResult<E> eigen(Matrix<E> a) {
+        if (a.getScalarRing() instanceof Reals) {
+            return (EigenResult<E>) JavaEigen.decompose((Matrix<Real>) a);
+        }
+        return GenericEigen.decompose(a, (Field<E>) a.getScalarRing(), this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(LUResult<E> lu, Vector<E> b) {
-        if (field instanceof Reals) {
+        if (b.getScalarRing() instanceof Reals) {
             return (Vector<E>) JavaLU.solve((LUResult<Real>) lu, (Vector<Real>) b);
         }
-        return GenericLU.solve(lu, b, field);
+        return GenericLU.solve(lu, b, (Field<E>) b.getScalarRing(), this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(QRResult<E> qr, Vector<E> b) {
-        if (field instanceof Reals) {
+        if (b.getScalarRing() instanceof Reals) {
             return (Vector<E>) JavaQR.solve((QRResult<Real>) qr, (Vector<Real>) b);
         }
-        return GenericQR.solve(qr, b, field);
+        return GenericQR.solve(qr, b, (Field<E>) b.getScalarRing(), this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b) {
-        if (field instanceof Reals) {
+        if (b.getScalarRing() instanceof Reals) {
             return (Vector<E>) JavaCholesky.solve((CholeskyResult<Real>) cholesky, (Vector<Real>) b);
         }
-        return GenericCholesky.solve(cholesky, b, field);
+        return GenericCholesky.solve(cholesky, b, (Field<E>) b.getScalarRing(), this);
     }
 
-    private Matrix<E> pseudoInverse(Matrix<E> a) {
-        SVDResult<E> svd = svd(a);
-        // A+ = V * S+ * UT (using economy dimensions)
-        int m = a.rows();
-        int n = a.cols();
-        int k = svd.S().dimension();
-        
-        // Create S+ (pseudo-inverse of diagonal S) as k x k
-        DenseMatrixStorage<E> sPlusStorage = new DenseMatrixStorage<>(k, k, field.zero());
-        for (int i = 0; i < k; i++) {
-            E sVal = svd.S().get(i);
-            if (absValue(sVal) > 1e-12) {
-                sPlusStorage.set(i, i, field.divide(field.one(), sVal));
-            }
-        }
-        Matrix<E> sPlus = new GenericMatrix<>(sPlusStorage, this, field);
-        
-        // V is n x n, we need first k columns to match sPlus (k x k)
-        Matrix<E> vEco = svd.V().getSubMatrix(0, n, 0, k);
-        
-        // U is m x m, we need first k columns (m x k) so UT is (k x m)
-        Matrix<E> uEco = svd.U().getSubMatrix(0, m, 0, k);
-        
-        return multiply(multiply(vEco, sPlus), transpose(uEco));
-    }
 
-    // --- Generic Field Decompositions ---
+    // Decompositions now use the top-level generic solvers imported from org.episteme.core.mathematics.linearalgebra.matrices.solvers
 
-    private static class GenericLU {
-        public static <E> LUResult<E> decompose(Matrix<E> matrix, Field<E> field) {
-            int n = matrix.rows();
-            if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
-
-            @SuppressWarnings("unchecked")
-            E[][] data = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
-            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) data[i][j] = matrix.get(i, j);
-
-            int[] perm = new int[n];
-            for (int i = 0; i < n; i++) perm[i] = i;
-
-            for (int k = 0; k < n; k++) {
-                int maxRow = k;
-                double maxVal = absValue(data[k][k]);
-                for (int i = k + 1; i < n; i++) {
-                    double val = absValue(data[i][k]);
-                    if (val > maxVal) {
-                        maxVal = val;
-                        maxRow = i;
-                    }
-                }
-
-                if (maxRow != k) {
-                    E[] temp = data[k];
-                    data[k] = data[maxRow];
-                    data[maxRow] = temp;
-                    int tempPerm = perm[k];
-                    perm[k] = perm[maxRow];
-                    perm[maxRow] = tempPerm;
-                }
-
-                E diagonal = data[k][k];
-                if (diagonal.equals(field.zero())) continue;
-
-                for (int i = k + 1; i < n; i++) {
-                    E factor = field.divide(data[i][k], diagonal);
-                    data[i][k] = factor;
-                    for (int j = k + 1; j < n; j++) {
-                        data[i][j] = field.add(data[i][j], field.negate(field.multiply(factor, data[k][j])));
-                    }
-                }
-            }
-
-            @SuppressWarnings("unchecked")
-            E[][] lData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
-            @SuppressWarnings("unchecked")
-            E[][] uData = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
-            
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (i > j) { lData[i][j] = data[i][j]; uData[i][j] = field.zero(); }
-                    else if (i == j) { lData[i][j] = field.one(); uData[i][j] = data[i][j]; }
-                    else { lData[i][j] = field.zero(); uData[i][j] = data[i][j]; }
-                }
-            }
-
-            double[] pDouble = new double[n];
-            for (int i = 0; i < n; i++) pDouble[i] = perm[i];
-
-            @SuppressWarnings("unchecked")
-            Vector<E> pVec = (Vector<E>) (Vector<?>) org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(pDouble);
-            return new LUResult<E>(
-                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(lData, field),
-                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<E>(uData, field),
-                pVec
-            );
-        }
-
-        public static <E> Vector<E> solve(LUResult<E> lu, Vector<E> b, Field<E> field) {
-            int n = lu.L().rows();
-            @SuppressWarnings("unchecked")
-            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            @SuppressWarnings("unchecked")
-            E[] pb = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-
-            for (int i = 0; i < n; i++) {
-                Object pVal = lu.P().get(i);
-                int pIdx;
-                if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
-                else if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
-                else pIdx = i;
-                pb[i] = b.get(pIdx);
-            }
-
-            @SuppressWarnings("unchecked")
-            E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            for (int i = 0; i < n; i++) {
-                E sum = field.zero();
-                for (int j = 0; j < i; j++) {
-                    sum = field.add(sum, field.multiply(lu.L().get(i, j), y[j]));
-                }
-                y[i] = field.add(pb[i], field.negate(sum));
-            }
-
-            for (int i = n - 1; i >= 0; i--) {
-                E sum = field.zero();
-                for (int j = i + 1; j < n; j++) {
-                    sum = field.add(sum, field.multiply(lu.U().get(i, j), x[j]));
-                }
-                y[i] = field.add(y[i], field.negate(sum));
-                x[i] = field.divide(y[i], lu.U().get(i, i));
-            }
-
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
-        }
-    }
-
-    private static class GenericQR {
-        public static <E> QRResult<E> decompose(Matrix<E> matrix, Field<E> field) {
-            int m = matrix.rows();
-            int n = matrix.cols();
-
-            @SuppressWarnings("unchecked")
-            E[][] Q = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m, n);
-            @SuppressWarnings("unchecked")
-            E[][] R = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
-            
-            for (int j = 0; j < n; j++) {
-                @SuppressWarnings("unchecked")
-                E[] v = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), m);
-                for (int i = 0; i < m; i++) v[i] = matrix.get(i, j);
-                
-                for (int i = 0; i < j; i++) {
-                    E rij = dot(Q, v, i, m, field);
-                    R[i][j] = rij;
-                    for (int k = 0; k < m; k++) {
-                        v[k] = field.add(v[k], field.negate(field.multiply(rij, Q[k][i])));
-                    }
-                }
-                
-                E rjj = norm(v, field);
-                R[j][j] = rjj;
-                if (!rjj.equals(field.zero())) {
-                    for (int k = 0; k < m; k++) Q[k][j] = field.divide(v[k], rjj);
-                } else {
-                    for (int k = 0; k < m; k++) Q[k][j] = field.zero();
-                }
-            }
-
-            return new QRResult<>(
-                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(Q, field),
-                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(R, field)
-            );
-        }
-
-        private static <E> E dot(E[][] Q, E[] v, int col, int m, Field<E> field) {
-            E sum = field.zero();
-            for (int i = 0; i < m; i++) {
-                sum = field.add(sum, field.multiply(conjugate(Q[i][col], field), v[i]));
-            }
-            return sum;
-        }
-
-        private static <E> E norm(E[] v, Field<E> field) {
-            E sum = field.zero();
-            for (E val : v) {
-                sum = field.add(sum, field.multiply(conjugate(val, field), val));
-            }
-            return sqrt(sum, field);
-        }
-
-        public static <E> Vector<E> solve(QRResult<E> qr, Vector<E> b, Field<E> field) {
-            int m = qr.Q().rows();
-            int n = qr.R().cols();
-            
-            @SuppressWarnings("unchecked")
-            E[] qtb = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            for (int i = 0; i < n; i++) {
-                E sum = field.zero();
-                for (int j = 0; j < m; j++) {
-                    sum = field.add(sum, field.multiply(conjugate(qr.Q().get(j, i), field), b.get(j)));
-                }
-                qtb[i] = sum;
-            }
-            
-            @SuppressWarnings("unchecked")
-            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            for (int i = n - 1; i >= 0; i--) {
-                E sum = qtb[i];
-                for (int j = i + 1; j < n; j++) {
-                    sum = field.add(sum, field.negate(field.multiply(qr.R().get(i, j), x[j])));
-                }
-                x[i] = field.divide(sum, qr.R().get(i, i));
-            }
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
-        }
-    }
-
-    private static class GenericCholesky {
-        public static <E> CholeskyResult<E> decompose(Matrix<E> matrix, Field<E> field) {
-            int n = matrix.rows();
-            @SuppressWarnings("unchecked")
-            E[][] L = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
-            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) L[i][j] = field.zero();
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j <= i; j++) {
-                    E sum = field.zero();
-                    if (j == i) {
-                        for (int k = 0; k < j; k++) {
-                            sum = field.add(sum, field.multiply(L[j][k], conjugate(L[j][k], field)));
-                        }
-                        L[j][j] = sqrt(field.add(matrix.get(j, j), field.negate(sum)), field);
-                    } else {
-                        for (int k = 0; k < j; k++) {
-                            sum = field.add(sum, field.multiply(L[i][k], conjugate(L[j][k], field)));
-                        }
-                        L[i][j] = field.divide(field.add(matrix.get(i, j), field.negate(sum)), L[j][j]);
-                    }
-                }
-            }
-            return new CholeskyResult<>(new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(L, field));
-        }
-
-        public static <E> Vector<E> solve(CholeskyResult<E> cholesky, Vector<E> b, Field<E> field) {
-            int n = cholesky.L().rows();
-            @SuppressWarnings("unchecked")
-            E[] y = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            @SuppressWarnings("unchecked")
-            E[] x = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-
-            for (int i = 0; i < n; i++) {
-                E sum = field.zero();
-                for (int j = 0; j < i; j++) sum = field.add(sum, field.multiply(cholesky.L().get(i, j), y[j]));
-                y[i] = field.divide(field.add(b.get(i), field.negate(sum)), cholesky.L().get(i, i));
-            }
-            for (int i = n - 1; i >= 0; i--) {
-                E sum = field.zero();
-                for (int j = i + 1; j < n; j++) sum = field.add(sum, field.multiply(conjugate(cholesky.L().get(j, i), field), x[j]));
-                x[i] = field.divide(field.add(y[i], field.negate(sum)), conjugate(cholesky.L().get(i, i), field));
-            }
-            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), field);
-        }
-    }
-
-    // --- Helper math methods for generic fields ---
-
-    private static double absValue(Object element) {
-        if (element instanceof Real) return ((Real) element).doubleValue();
-        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) 
-            return ((org.episteme.core.mathematics.numbers.complex.Complex) element).abs().doubleValue();
-        if (element instanceof Number) return ((Number) element).doubleValue();
-        return 0.0;
-    }
 
     @SuppressWarnings("unchecked")
-    private static <E> E conjugate(E element, Field<E> field) {
-        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
-            return (E) ((org.episteme.core.mathematics.numbers.complex.Complex) element).conjugate();
+    private E conjugate(E element) {
+        if (element instanceof Complex) {
+            return (E) ((Complex) element).conjugate();
         }
         return element;
     }
 
     @SuppressWarnings("unchecked")
-    private static <E> E sqrt(E element, Field<E> field) {
-        if (element instanceof org.episteme.core.mathematics.numbers.real.Real) {
-            return (E) ((org.episteme.core.mathematics.numbers.real.Real) element).sqrt();
+    private E sqrt(E element, Field<E> field) {
+        if (element instanceof Real) {
+            return (E) ((Real) element).sqrt();
         }
-        if (element instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
-            return (E) ((org.episteme.core.mathematics.numbers.complex.Complex) element).sqrt();
+        if (element instanceof Complex) {
+            return (E) ((Complex) element).sqrt();
         }
         try {
             java.lang.reflect.Method m = element.getClass().getMethod("sqrt");
             return (E) m.invoke(element);
         } catch (Exception e) {}
-        throw new UnsupportedOperationException("sqrt not supported for type: " + element.getClass().getName());
+        return element;
     }
-
-    private static class GenericEigen {
-        public static <E> EigenResult<E> decompose(Matrix<E> matrix, Field<E> field) {
-            int n = matrix.rows();
-            if (n != matrix.cols()) throw new IllegalArgumentException("Matrix must be square");
-
-            @SuppressWarnings("unchecked")
-            E[][] A = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
-            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) A[i][j] = matrix.get(i, j);
-
-            @SuppressWarnings("unchecked")
-            E[][] V = (E[][]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n, n);
-            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) V[i][j] = (i == j) ? field.one() : field.zero();
-
-            int maxSweeps = 50;
-            double eps = 1e-15;
-
-            for (int sweep = 0; sweep < maxSweeps; sweep++) {
-                double offDiag = 0;
-                int p = 0, q = 0;
-                double maxOff = -1.0;
-
-                for (int i = 0; i < n; i++) {
-                    for (int j = i + 1; j < n; j++) {
-                        double val = absValue(A[i][j]);
-                        offDiag += val;
-                        if (val > maxOff) {
-                            maxOff = val;
-                            p = i;
-                            q = j;
-                        }
-                    }
-                }
-
-                if (offDiag < eps) break;
-
-                // Jacobi rotation for A[p][p], A[p][q], A[q][q]
-                // For generic fields, we'll use a simplified version for now
-                // approximating rotation if possible, or using a basic numeric approach
-                // since exact trig for generic FieldElement isn't always available.
-                // However, Reals and Complex have sqrt/atan2.
-                
-                E app = A[p][p];
-                E aqq = A[q][q];
-                E apq = A[p][q];
-
-                // Simplified Jacobi for generic: tan(2theta) = 2*apq / (aqq - app)
-                // For Reals it's standard. For others, we might need more abstractions.
-                // But we can use the bridging methods.
-                
-                // theta calculation
-                E diff = field.add(aqq, field.negate(app));
-                E twoApq = field.add(apq, apq);
-                
-                // This part is tricky generically. I'll rely on the Number bridge if available
-                // or use a simplified iterative step.
-                
-                double tau = absValue(diff) < 1e-18 ? 0.0 : absValue(twoApq) / absValue(diff);
-                double t = tau / (1.0 + Math.sqrt(1.0 + tau * tau));
-                double c = 1.0 / Math.sqrt(1.0 + t * t);
-                double s = t * c;
-
-                // For Complex/Real, we can use these c, s values directly if we convert back
-                @SuppressWarnings("unchecked")
-                E cE = (E) Real.of(c);
-                @SuppressWarnings("unchecked")
-                E sE = (E) Real.of(s);
-                
-                // Apply rotation to A
-                for (int i = 0; i < n; i++) {
-                    E ap = A[p][i];
-                    E aq = A[q][i];
-                    A[p][i] = field.add(field.multiply(cE, ap), field.negate(field.multiply(sE, aq)));
-                    A[q][i] = field.add(field.multiply(sE, ap), field.multiply(cE, aq));
-                }
-                for (int i = 0; i < n; i++) {
-                    E ap = A[i][p];
-                    E aq = A[i][q];
-                    A[i][p] = field.add(field.multiply(cE, ap), field.negate(field.multiply(sE, aq)));
-                    A[i][q] = field.add(field.multiply(sE, ap), field.multiply(cE, aq));
-                }
-                // Accumulate V
-                for (int i = 0; i < n; i++) {
-                    E vp = V[i][p];
-                    E vq = V[i][q];
-                    V[i][p] = field.add(field.multiply(cE, vp), field.negate(field.multiply(sE, vq)));
-                    V[i][q] = field.add(field.multiply(sE, vp), field.multiply(cE, vq));
-                }
-            }
-
-            @SuppressWarnings("unchecked")
-            E[] eigenvalues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), n);
-            for (int i = 0; i < n; i++) eigenvalues[i] = A[i][i];
-
-            return new EigenResult<>(
-                new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(V, field),
-                org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(eigenvalues), field)
-            );
-        }
-    }
-
-    private static class GenericSVD {
-        public static <E> SVDResult<E> decompose(Matrix<E> matrix, Field<E> field) {
-            // SVD via AT*A for generic field (simplified)
-            int m = matrix.rows();
-            int n = matrix.cols();
-            
-            Matrix<E> selfAdj = matrix.multiply(matrix.transpose()); // m x m
-            EigenResult<E> eigen = GenericEigen.decompose(selfAdj, field);
-            
-            @SuppressWarnings("unchecked")
-            E[] sValues = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), Math.min(m, n));
-            for (int i = 0; i < sValues.length; i++) {
-                sValues[i] = (E) eigen.D().get(i); // Eigen S is already E (or castable)
-            }
-            
-            // U = eigenvectors of A*A*
-            Matrix<E> U = eigen.V();
-            
-            // V = eigenvectors of A**A (if needed) or derive from U, S, A
-            // For simplicity in generic, we'll do A**A for V too
-            Matrix<E> selfAdjV = matrix.transpose().multiply(matrix); // n x n
-            EigenResult<E> eigenV = GenericEigen.decompose(selfAdjV, field);
-            Matrix<E> V = eigenV.V();
-
-            return new SVDResult<E>(U, org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(sValues), field), V);
-        }
-    }
-
+    
     private static class JavaLU {
         public static LUResult<Real> decompose(Matrix<Real> matrix) {
             int n = matrix.rows();
@@ -1669,6 +1166,59 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
             }
 
             return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(x), Reals.getInstance());
+        }
+
+        public static Real determinant(Matrix<Real> a) {
+            LUResult<Real> lu = decompose(a);
+            Real det = Real.ONE;
+            int n = a.rows();
+            for (int i = 0; i < n; i++) det = det.multiply(lu.U().get(i, i));
+            
+            // Correct Permutation Parity using Cycle Decomposition (March 24 Standard)
+            int swaps = 0;
+            boolean[] visited = new boolean[n];
+            int[] p = new int[n];
+            for (int i = 0; i < n; i++) {
+                Object pVal = lu.P().get(i);
+                if (pVal instanceof Real) p[i] = (int) ((Real) pVal).doubleValue();
+                else p[i] = ((Number) pVal).intValue();
+            }
+            
+            for (int i = 0; i < n; i++) {
+                if (!visited[i]) {
+                    int curr = i;
+                    int cycleSize = 0;
+                    while (!visited[curr]) {
+                        visited[curr] = true;
+                        curr = p[curr];
+                        cycleSize++;
+                    }
+                    if (cycleSize > 1) {
+                        swaps += (cycleSize - 1);
+                    }
+                }
+            }
+            
+            if (swaps % 2 != 0) det = det.negate();
+            return det;
+        }
+
+        public static Matrix<Real> inverse(Matrix<Real> a) {
+            int n = a.rows();
+            LUResult<Real> lu = decompose(a);
+            Real[][] inv = new Real[n][n];
+            for (int j = 0; j < n; j++) {
+                Real[] e = new Real[n];
+                for (int i = 0; i < n; i++) e[i] = (i == j) ? Real.ONE : Real.ZERO;
+                Vector<Real> ev = org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(java.util.Arrays.asList(e), Reals.getInstance());
+                Vector<Real> x = solve(lu, ev);
+                for (int i = 0; i < n; i++) inv[i][j] = x.get(i);
+            }
+            return new org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix<>(inv, Reals.getInstance());
+        }
+
+        public static Vector<Real> solve(Matrix<Real> a, Vector<Real> b) {
+            return solve(decompose(a), b);
         }
     }
 

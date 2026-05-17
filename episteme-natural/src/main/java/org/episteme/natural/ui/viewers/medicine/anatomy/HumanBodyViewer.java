@@ -26,6 +26,8 @@ package org.episteme.natural.ui.viewers.medicine.anatomy;
 import javafx.application.Platform;
 import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import org.episteme.core.ui.Parameter;
 import javafx.geometry.Insets;
@@ -64,6 +66,7 @@ import java.text.MessageFormat;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class HumanBodyViewer extends AbstractViewer {
 
     @Override

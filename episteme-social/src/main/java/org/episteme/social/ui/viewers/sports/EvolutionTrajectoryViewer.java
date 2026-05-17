@@ -28,12 +28,15 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.social.sports.TrajectoryDataSet;
 
 /**
  * High-precision performance tracking viewer for human evolution trajectories.
  * Visualizes cycles (Sleep/Vigilance) and performance trends.
  */
+@AutoService(Viewer.class)
 public final class EvolutionTrajectoryViewer extends AbstractViewer {
 
     private final LineChart<Number, Number> chart;

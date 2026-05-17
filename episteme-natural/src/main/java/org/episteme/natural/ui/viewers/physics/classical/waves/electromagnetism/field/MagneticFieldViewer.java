@@ -106,7 +106,7 @@ public class MagneticFieldViewer extends org.episteme.core.ui.AbstractViewer {
             for (int y = -r; y <= r; y++) {
                 for (int z = -r; z <= r; z++) {
                     double px = x * gridSpacing, py = y * gridSpacing, pz = z * gridSpacing;
-                    double[][] f = provider.computeTensor(new org.episteme.core.mathematics.geometry.Vector4D(time, px, py, pz));
+                    double[][] f = provider.computeTensorDouble(new org.episteme.core.mathematics.geometry.Vector4D(time, px, py, pz));
                     double bx = f[2][3], by = -f[1][3], bz = f[1][2];
                     double mag = Math.sqrt(bx*bx + by*by + bz*bz);
                     if (mag > 1e-10) addArrow(px, py, pz, bx, by, bz, mag);
@@ -129,7 +129,7 @@ public class MagneticFieldViewer extends org.episteme.core.ui.AbstractViewer {
         double x = sx, y = sy, z = sz, step = 8.0 * (fwd ? 1 : -1);
         Point3D last = new Point3D(x, y, z);
         for (int i=0; i<steps; i++) {
-            double[][] f = provider.computeTensor(new org.episteme.core.mathematics.geometry.Vector4D(time, x, y, z));
+            double[][] f = provider.computeTensorDouble(new org.episteme.core.mathematics.geometry.Vector4D(time, x, y, z));
             double bx = f[2][3], by = -f[1][3], bz = f[1][2], mag = Math.sqrt(bx*bx + by*by + bz*bz);
             if (mag < 1e-12) break;
             x += (bx/mag)*step; y += (by/mag)*step; z += (bz/mag)*step;

@@ -6,6 +6,8 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.episteme.core.mathematics.numbers.real.Real;
 import java.util.function.Function;
  
+import org.episteme.core.technical.function.ToFloatFunction;
+
 /**
  * Native multicore Genetic Algorithm provider.
  * Implements parallel evolution using Java 8+ Streams (placeholder for JNI).
@@ -17,6 +19,11 @@ import java.util.function.Function;
 @AutoService(AlgorithmProvider.class)
 public class MulticoreGeneticAlgorithmProvider implements GeneticAlgorithmProvider {
  
+    @Override
+    public float[] solve(ToFloatFunction<float[]> fitnessFunction, int dimensions, int populationSize, int generations, float mutationRate) {
+        throw new UnsupportedOperationException("Native multicore genetic algorithm for float[] is not yet implemented.");
+    }
+
     @Override
     public double[] solve(java.util.function.ToDoubleFunction<double[]> fitnessFunction, int dimensions, int populationSize, int generations, double mutationRate) {
         // As per instruction, if native optimizations are missing, an exception is thrown

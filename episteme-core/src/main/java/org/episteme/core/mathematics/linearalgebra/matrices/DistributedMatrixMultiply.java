@@ -6,7 +6,6 @@
 package org.episteme.core.mathematics.linearalgebra.matrices;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.distributed.DistributedCompute;
 
 /**
@@ -22,7 +21,7 @@ public class DistributedMatrixMultiply {
      * Multiplies two matrices using a tiled algorithm distributed across the current context.
      * Uses a simple block-based distribution.
      */
-    public static Matrix<Real> multiply(TiledMatrix A, TiledMatrix B) {
+    public static <E> Matrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B) {
         if (A.cols() != B.rows()) {
             throw new IllegalArgumentException("Matrix dimensions mismatch");
         }
@@ -36,7 +35,7 @@ public class DistributedMatrixMultiply {
         
         // Result tiles
         @SuppressWarnings("unchecked")
-        Matrix<Real>[][] resTiles = new Matrix[m][n];
+        Matrix<E>[][] resTiles = new Matrix[m][n];
 
         // Perform tiled matrix multiplication
         for (int i = 0; i < A.getNumTileRows(); i++) {
@@ -51,13 +50,17 @@ public class DistributedMatrixMultiply {
         }
 
         // We should wrap this in a customized structure or convert back to RealDoubleMatrix
-        return assemble(resTiles, A.rows(), B.cols());
+        return assemble(resTiles, A.rows(), B.cols(), A.getScalarRing());
     }
 
-    private static Matrix<Real> computeTileLocal(TiledMatrix A, TiledMatrix B, int i, int j, int p) {
-        Matrix<Real> sum = null;
+    private static <E> Matrix<E> computeTileLocal(TiledMatrix<E> A, TiledMatrix<E> B, int i, int j, int p) {
+        Matrix<E> sum = null;
         for (int k = 0; k < p; k++) {
-            Matrix<Real> prod = A.getTile(i, k).multiply(B.getTile(k, j));
+            Matrix<E> aTile = A.getTile(i, k);
+            Matrix<E> bTile = B.getTile(k, j);
+            if (aTile == null || bTile == null) continue;
+            
+            Matrix<E> prod = aTile.multiply(bTile);
             if (sum == null) {
                 sum = prod;
             } else {
@@ -67,10 +70,36 @@ public class DistributedMatrixMultiply {
         return sum;
     }
 
-    private static Matrix<Real> assemble(Matrix<Real>[][] tiles, int rows, int cols) {
-        // Implementation to merge tiles back into a single matrix if needed
-        // For now, return a new GenericMatrix or similar
-        // Ideally, we'd have a TiledMatrix that can be used directly for further operations
-        return org.episteme.core.mathematics.linearalgebra.Matrix.of(new Real[rows][cols], org.episteme.core.mathematics.sets.Reals.getInstance()); // Placeholder
+    private static <E> Matrix<E> assemble(Matrix<E>[][] tiles, int rows, int cols, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        if (tiles == null || tiles.length == 0 || tiles[0].length == 0) {
+            return Matrix.zeros(rows, cols, ring);
+        }
+
+        int tileRows = tiles[0][0].rows();
+        int tileCols = tiles[0][0].cols();
+        
+        org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E> storage = 
+            new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<>(rows, cols, ring.zero());
+        
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[i].length; j++) {
+                Matrix<E> tile = tiles[i][j];
+                if (tile == null) continue;
+                
+                int rOffset = i * tileRows;
+                int cOffset = j * tileCols;
+                
+                for (int r = 0; r < tile.rows(); r++) {
+                    for (int c = 0; c < tile.cols(); c++) {
+                        storage.set(rOffset + r, cOffset + c, tile.get(r, c));
+                    }
+                }
+            }
+        }
+        
+        org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> provider = 
+            org.episteme.core.Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(ring);
+            
+        return new GenericMatrix<>(storage, provider, ring);
     }
 }

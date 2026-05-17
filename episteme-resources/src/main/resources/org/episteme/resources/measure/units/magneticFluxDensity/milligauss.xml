@@ -1,3 +1,0 @@
-<unit id="milligauss" name="milligauss" abbreviation="mG" unitType="magneticFluxDensity" parentSI="tesla"
-      multiplierToSI="1.0E-7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -65,6 +65,36 @@ public class MulticoreNBodyProvider implements NBodyProvider {
     }
 
     @Override
+    public void computeForces(float[] positions, float[] masses, float[] forces, float G, float softening) {
+        int n = masses.length;
+        for (int i = 0; i < forces.length; i++) forces[i] = 0.0f;
+        
+        for (int i = 0; i < n; i++) {
+            int idx_i = i * 3;
+            float xi = positions[idx_i], yi = positions[idx_i + 1], zi = positions[idx_i + 2];
+            float mi = masses[i];
+            
+            for (int j = i + 1; j < n; j++) {
+                int idx_j = j * 3;
+                float dx = positions[idx_j] - xi;
+                float dy = positions[idx_j + 1] - yi;
+                float dz = positions[idx_j + 2] - zi;
+                float r2 = dx * dx + dy * dy + dz * dz + softening * softening;
+                float invR = 1.0f / (float) Math.sqrt(r2);
+                float f = (G / r2) * invR;
+                
+                float fx = f * dx, fy = f * dy, fz = f * dz;
+                forces[idx_i] += fx * masses[j];
+                forces[idx_i + 1] += fy * masses[j];
+                forces[idx_i + 2] += fz * masses[j];
+                forces[idx_j] -= fx * mi;
+                forces[idx_j + 1] -= fy * mi;
+                forces[idx_j + 2] -= fz * mi;
+            }
+        }
+    }
+
+    @Override
     public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
         int n = masses.length;
         
@@ -94,6 +124,24 @@ public class MulticoreNBodyProvider implements NBodyProvider {
                 forces[idx_j + 1] -= fy * mi;
                 forces[idx_j + 2] -= fz * mi;
             }
+        }
+    }
+
+    @Override
+    public void stepFloat(float[] positions, float[] velocities, float[] masses, int numBodies, float G, float dt, float softening) {
+        float[] forces = new float[numBodies * 3];
+        computeForces(positions, masses, forces, 1.0f, softening);
+        
+        for (int i = 0; i < numBodies; i++) {
+            int i3 = i * 3;
+            float invM = 1.0f / masses[i];
+            velocities[i3] += forces[i3] * invM * dt;
+            velocities[i3 + 1] += forces[i3 + 1] * invM * dt;
+            velocities[i3 + 2] += forces[i3 + 2] * invM * dt;
+            
+            positions[i3] += velocities[i3] * dt;
+            positions[i3 + 1] += velocities[i3 + 1] * dt;
+            positions[i3 + 2] += velocities[i3 + 2] * dt;
         }
     }
 

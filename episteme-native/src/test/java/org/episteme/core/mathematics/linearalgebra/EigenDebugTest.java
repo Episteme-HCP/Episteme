@@ -19,8 +19,8 @@ public class EigenDebugTest {
             }
         }
         RealDoubleMatrix a = RealDoubleMatrix.of(data);
-        org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraBackend backend = new org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraBackend();
-        org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> res = backend.eigen(a);
+        try (org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraRealBackend backend = new org.episteme.nativ.mathematics.linearalgebra.backends.NativeCPULinearAlgebraRealBackend()) {
+            org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> res = backend.eigen(a);
         
         StringBuilder sb = new StringBuilder("EIGENVALUES:\n");
         for (int i = 0; i < res.getEigenvalues().dimension(); i++) {
@@ -28,5 +28,6 @@ public class EigenDebugTest {
             sb.append("Eig: ").append(val).append("\n");
         }
         throw new RuntimeException(sb.toString());
+        }
     }
 }

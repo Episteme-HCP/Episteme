@@ -57,6 +57,18 @@ public class MCPToolRegistry {
             "{\"type\": \"object\", \"properties\": {\"value\": {\"type\": \"number\"}, \"from\": {\"type\": \"string\"}, \"to\": {\"type\": \"string\"}}, \"required\": [\"value\", \"from\", \"to\"]}");
         registerTool("get_constant", "Retrieve scientific constants (e.g., PI, SPEED_OF_LIGHT, EARTH_MASS)",
             "{\"type\": \"object\", \"properties\": {\"category\": {\"type\": \"string\", \"enum\": [\"MATH\", \"PHYSICS\", \"EARTH\", \"GEOGRAPHY\", \"HISTORY\"]}, \"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}");
+        registerTool("calculate_matrix", "Perform matrix operations (add, subtract, multiply)", 
+            "{\"type\": \"object\", \"properties\": {\"matrixA\": {\"type\": \"array\", \"items\": {\"type\": \"array\", \"items\": {\"type\": \"number\"}}}, \"matrixB\": {\"type\": \"array\", \"items\": {\"type\": \"array\", \"items\": {\"type\": \"number\"}}}, \"op\": {\"type\": \"string\", \"enum\": [\"ADD\", \"SUBTRACT\", \"MULTIPLY\"]}}, \"required\": [\"matrixA\", \"matrixB\", \"op\"]}");
+        registerTool("simplify_expression", "Simplify a mathematical expression (e.g., 'x + x' -> '2x')",
+            "{\"type\": \"object\", \"properties\": {\"expression\": {\"type\": \"string\"}}, \"required\": [\"expression\"]}");
+        registerTool("solve_expression", "Find a root for f(x) = 0 using numerical methods (Brent)",
+            "{\"type\": \"object\", \"properties\": {\"expression\": {\"type\": \"string\"}, \"guessMin\": {\"type\": \"number\"}, \"guessMax\": {\"type\": \"number\"}}, \"required\": [\"expression\", \"guessMin\", \"guessMax\"]}");
+        registerTool("read_hdf5_data", "Read a dataset from an HDF5 scientific file",
+            "{\"type\": \"object\", \"properties\": {\"filePath\": {\"type\": \"string\"}, \"datasetPath\": {\"type\": \"string\"}}, \"required\": [\"filePath\", \"datasetPath\"]}");
+        registerTool("get_server_metrics", "Retrieve real-time server and grid performance metrics",
+            "{\"type\": \"object\", \"properties\": {}}");
+        registerTool("execute_simulation", "Start a scientific simulation task",
+            "{\"type\": \"object\", \"properties\": {\"simulationType\": {\"type\": \"string\", \"enum\": [\"FLUID\", \"NBODY\", \"SIR\", \"MIGRATION\"]}, \"parameters\": {\"type\": \"object\"}}, \"required\": [\"simulationType\"]}");
         
         // Dynamic discovery of AlgorithmProviders
         var providers = context.getBeansOfType(org.episteme.core.technical.algorithm.AlgorithmProvider.class);

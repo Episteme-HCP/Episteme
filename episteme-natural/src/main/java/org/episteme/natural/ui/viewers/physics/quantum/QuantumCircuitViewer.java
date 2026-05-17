@@ -43,10 +43,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.google.auto.service.AutoService;
+import org.episteme.core.ui.Viewer;
+
 /**
  * Professional Quantum Circuit Simulator.
  * Visualizes qubit superposition and measurement probabilities.
  */
+@AutoService(Viewer.class)
 public final class QuantumCircuitViewer extends AbstractViewer {
 
     private int numQubits = 3;

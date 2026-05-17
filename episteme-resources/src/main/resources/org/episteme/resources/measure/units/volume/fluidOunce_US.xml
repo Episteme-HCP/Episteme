@@ -1,4 +1,0 @@
-<unit id="fluidOunce_US" name="US fluid ounce" abbreviation="fl oz" unitType="volume" parentSI="meterCubed"
-      multiplierToSI="2.9573531E-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>16 US fluid ounces = 1 US liquid pint</description>
-</unit>

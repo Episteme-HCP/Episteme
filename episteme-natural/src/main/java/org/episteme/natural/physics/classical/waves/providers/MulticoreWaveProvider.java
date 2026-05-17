@@ -51,6 +51,25 @@ public class MulticoreWaveProvider implements WaveProvider {
     }
 
     @Override
+    public void solve(float[][] u, float[][] uPrev, int width, int height, float c, float damping) {
+        float[][] uNext = new float[width][height];
+        float c2 = c * c;
+
+        IntStream.range(1, width - 1).parallel().forEach(x -> {
+            for (int y = 1; y < height - 1; y++) {
+                float laplacian = u[x + 1][y] + u[x - 1][y] + u[x][y + 1] + u[x][y - 1] - 4 * u[x][y];
+                uNext[x][y] = 2 * u[x][y] - uPrev[x][y] + c2 * laplacian;
+                uNext[x][y] *= (1.0f - damping);
+            }
+        });
+
+        for (int x = 0; x < width; x++) {
+            System.arraycopy(u[x], 0, uPrev[x], 0, height);
+            System.arraycopy(uNext[x], 0, u[x], 0, height);
+        }
+    }
+
+    @Override
     public void solve(double[][] u, double[][] uPrev, int width, int height, double c, double damping) {
         double[][] uNext = new double[width][height];
         double c2 = c * c;

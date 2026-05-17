@@ -33,6 +33,8 @@ import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.NumericParameter;
 import org.episteme.core.ui.Simulatable;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ import java.util.List;
  * Chemical Reaction Kinetics Viewer.
  * Simulates and visualizes concentration changes over time (A -> B).
  */
+@AutoService(Viewer.class)
 public final class ReactionKineticsViewer extends AbstractViewer implements Simulatable {
 
     private final LineChart<Number, Number> chart;

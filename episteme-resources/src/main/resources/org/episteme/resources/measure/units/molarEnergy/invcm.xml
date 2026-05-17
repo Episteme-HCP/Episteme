@@ -1,6 +1,0 @@
-<unit id="invcm" name="inverse cm (spectroscopy)" abbreviation="cm-1" unitType="molarEnergy"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <multiplier>2.859144</multiplier>
-    <unit ref="caloriePerMole"/>
-    &gt;
-</unit>

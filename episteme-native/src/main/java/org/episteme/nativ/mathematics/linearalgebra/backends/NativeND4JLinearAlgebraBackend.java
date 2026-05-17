@@ -19,6 +19,8 @@ import com.google.auto.service.AutoService;
 import org.episteme.core.technical.backend.Backend;
 import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
+import org.episteme.core.technical.backend.HardwareAccelerator;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -40,6 +42,12 @@ import org.nd4j.linalg.inverse.InvertMatrix;
 public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Real>, NativeBackend, CPUBackend {
     private static final Logger logger = LoggerFactory.getLogger(NativeND4JLinearAlgebraBackend.class);
 
+
+
+    public NativeND4JLinearAlgebraBackend() {
+        // available field is deprecated in favor of static IS_AVAILABLE
+    }
+
     @Override
     public int getPriority() {
         return 50; // Lower than NativeCPULinearAlgebraBackend (100)
@@ -47,7 +55,14 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
 
     @Override
     public String getName() {
-        return "ND4J (Native Wrapper)";
+        return "ND4J (Native-Dense)";
+    }
+
+    @Override
+    public HardwareAccelerator getAcceleratorType() {
+        // ND4J can use GPU but here it is declared as CPUBackend.
+        // We return CPU for now as it's the default native-platform behavior.
+        return HardwareAccelerator.CPU;
     }
 
     @Override
@@ -89,7 +104,7 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     private static final boolean IS_AVAILABLE;
     static {
         boolean avail = false;
-        if (true) { // Disabling now handled by Backend.isAvailable()
+        if (!Boolean.getBoolean("episteme.backend.disable.nd4j")) {
             try {
                 Class.forName("org.nd4j.linalg.factory.Nd4j");
                 // Test actual ND4J initialization
@@ -125,7 +140,8 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
 
     @Override
     public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
-        return ring instanceof org.episteme.core.mathematics.sets.Reals;
+        if (!(ring instanceof org.episteme.core.mathematics.sets.Reals)) return false;
+        return !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
     }
 
     @Override
@@ -137,11 +153,22 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
     }
 
     private INDArray toINDArray(Matrix<Real> m) {
-        if (m instanceof RealDoubleMatrix) {
-            RealDoubleMatrix rdm = (RealDoubleMatrix) m;
-            // Use explicit 'c' ordering (row-major) to match RealDoubleMatrix.toDoubleArray()
+        if (m instanceof org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) {
+            org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix rdm = (org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix) m;
             return Nd4j.create(rdm.toDoubleArray(), new int[]{m.rows(), m.cols()}, 'c');
         }
+        
+        // Float path optimization
+        if (m.getScalarRing().zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
+             float[] data = new float[m.rows() * m.cols()];
+             for(int r=0; r<m.rows(); r++) {
+                 for(int c=0; c<m.cols(); c++) {
+                     data[r*m.cols() + c] = m.get(r,c).floatValue();
+                 }
+             }
+             return Nd4j.create(data, new int[]{m.rows(), m.cols()}, 'c');
+        }
+
         double[][] data = new double[m.rows()][m.cols()];
         for(int r=0; r<m.rows(); r++) {
             for(int c=0; c<m.cols(); c++) {
@@ -540,6 +567,21 @@ public class NativeND4JLinearAlgebraBackend implements LinearAlgebraProvider<Rea
             logger.warn("ND4J Native eig failed: {}. Falling back to Jacobi (as approximate).", e.getMessage());
             return jacobi(a);
         }
+    }
+
+    @Override
+    public Real trace(Matrix<Real> a) {
+        System.out.println("[DEBUG] ND4J trace() called");
+        if (!isAvailable()) throw new UnsupportedOperationException(getName() + " not available");
+        // ND4J doesn't have a direct trace() on INDArray in all versions, 
+        // but we can sum the diagonal.
+        INDArray arr = toINDArray(a);
+        int n = Math.min(a.rows(), a.cols());
+        double sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += arr.getDouble(i, i);
+        }
+        return Real.of(sum);
     }
 
     private EigenResult<Real> jacobi(Matrix<Real> a) {

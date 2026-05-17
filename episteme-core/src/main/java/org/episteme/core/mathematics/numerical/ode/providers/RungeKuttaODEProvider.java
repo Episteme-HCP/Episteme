@@ -27,7 +27,37 @@ public class RungeKuttaODEProvider implements ODEProvider {
     }
 
     @Override
-    public double[] solve(BiFunction<Double, double[], double[]> f, double[] y0, double t0, double t1, int steps) {
+    public float[] solve(java.util.function.BiFunction<Float, float[], float[]> f, float[] y0, float t0, float t1, int steps) {
+        int dim = y0.length;
+        float[] y = y0.clone();
+        float t = t0;
+        float h = (t1 - t0) / steps;
+
+        for (int i = 0; i < steps; i++) {
+            float[] k1 = f.apply(t, y);
+            
+            float[] yk2 = new float[dim];
+            for (int j = 0; j < dim; j++) yk2[j] = y[j] + h * k1[j] * 0.5f;
+            float[] k2 = f.apply(t + h * 0.5f, yk2);
+            
+            float[] yk3 = new float[dim];
+            for (int j = 0; j < dim; j++) yk3[j] = y[j] + h * k2[j] * 0.5f;
+            float[] k3 = f.apply(t + h * 0.5f, yk3);
+            
+            float[] yk4 = new float[dim];
+            for (int j = 0; j < dim; j++) yk4[j] = y[j] + h * k3[j];
+            float[] k4 = f.apply(t + h, yk4);
+            
+            for (int j = 0; j < dim; j++) {
+                y[j] += (h / 6.0f) * (k1[j] + 2.0f * k2[j] + 2.0f * k3[j] + k4[j]);
+            }
+            t += h;
+        }
+        return y;
+    }
+
+    @Override
+    public double[] solve(java.util.function.BiFunction<Double, double[], double[]> f, double[] y0, double t0, double t1, int steps) {
         int dim = y0.length;
         double[] y = y0.clone();
         double t = t0;

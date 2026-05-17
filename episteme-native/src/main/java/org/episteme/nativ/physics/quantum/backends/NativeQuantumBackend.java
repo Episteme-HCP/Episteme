@@ -189,7 +189,7 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
 
     @Override
     public String getAlgorithmType() {
-        return "Quantum Simulation (QuEST/Aer)";
+        return "Quantum Computing";
     }
 
     @Override
@@ -220,6 +220,6 @@ public class NativeQuantumBackend implements NativeBackend, QuantumBackend, Algo
     }
     @Override
     public String getName() {
-        return "Native Quantum Backend (QuEST/Qiskit)";
+        return "Episteme Native Quantum (QuEST)";
     }
 }

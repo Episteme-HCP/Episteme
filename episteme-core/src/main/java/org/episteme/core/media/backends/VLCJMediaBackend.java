@@ -43,7 +43,7 @@ public class VLCJMediaBackend implements VideoBackend, AudioBackend, VisionBacke
 
     @Override
     public String getAlgorithmType() {
-        return "Audio/Video/Vision Engine (VLCJ)";
+        return "Video Engine";
     }
 
     @Override
@@ -117,11 +117,24 @@ public class VLCJMediaBackend implements VideoBackend, AudioBackend, VisionBacke
     public boolean isAvailable() { 
         if (availableCache != null) return availableCache;
         try {
+            // Check if vlcj classes are present
             Class.forName("uk.co.caprica.vlcj.factory.MediaPlayerFactory");
-            // Try to initialize factory to check native libs
-            new uk.co.caprica.vlcj.factory.MediaPlayerFactory().release();
-            availableCache = true;
-            return true;
+            
+            // Minimal discovery check without heavy factory initialization if possible,
+            // but for absolute certainty we try a quick discovery.
+            boolean found = new uk.co.caprica.vlcj.factory.discovery.NativeDiscovery().discover();
+            if (!found) {
+                // Secondary check: look for libvlc directly in suspected paths
+                String jnaPath = System.getProperty("jna.library.path", "");
+                if (jnaPath.contains("vlc") || jnaPath.contains("libs")) {
+                     // Might be there but discovery failed; try factory as last resort
+                     new uk.co.caprica.vlcj.factory.MediaPlayerFactory().release();
+                     found = true;
+                }
+            }
+            
+            availableCache = found;
+            return found;
         } catch (Throwable t) {
             availableCache = false;
             return false;

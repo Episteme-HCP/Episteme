@@ -30,7 +30,19 @@ public class DistributedCannonAlgorithm {
      * @param B Right matrix (tiled)
      * @return Result matrix C
      */
-    public static TiledMatrix multiply(TiledMatrix A, TiledMatrix B) {
+    public static <E> TiledMatrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B) {
+        return multiply(A, B, null);
+    }
+
+    /**
+     * Performs distributed matrix multiplication C = A × B using Cannon's algorithm with a leaf provider.
+     *
+     * @param A Left matrix (tiled)
+     * @param B Right matrix (tiled)
+     * @param leafProvider Provider for tile-level multiplication
+     * @return Result matrix C
+     */
+    public static <E> TiledMatrix<E> multiply(TiledMatrix<E> A, TiledMatrix<E> B, org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider<E> leafProvider) {
         if (A.cols() != B.rows()) {
             throw new IllegalArgumentException("Matrix dimensions incompatible");
         }
@@ -48,7 +60,7 @@ public class DistributedCannonAlgorithm {
         }
 
         // Create result tiled matrix
-        TiledMatrix C = new TiledMatrix(A, A.getTileSize(), A.getTileSize());
+        TiledMatrix<E> C = new TiledMatrix<E>(A.rows(), B.cols(), A.getTileSize(), A.getScalarRing());
 
         System.out.println("[Cannon] Executing on " + sqrtP + "x" + sqrtP + " grid.");
 
@@ -71,16 +83,12 @@ public class DistributedCannonAlgorithm {
                     
                     computeTasks.add(ctx.submit(() -> {
                         int kIndex = (row + col + currentStep) % k;
-                        Matrix<Real> aTile = A.getTile(row, kIndex);
-                        Matrix<Real> bTile = B.getTile(kIndex, col);
-                        Matrix<Real> product = aTile.multiply(bTile);
+                        Matrix<E> aTile = A.getTile(row, kIndex);
+                        Matrix<E> bTile = B.getTile(kIndex, col);
+                        Matrix<E> product = (leafProvider != null) ? leafProvider.multiply(aTile, bTile) : aTile.multiply(bTile);
 
-                        Matrix<Real> current = C.getTile(row, col);
-                        if (current != null) {
-                            C.setTile(row, col, current.add(product));
-                        } else {
-                            C.setTile(row, col, product);
-                        }
+                        // Thread-safe update of the tile in C
+                        C.updateTile(row, col, product);
                         return null;
                     }));
                 }

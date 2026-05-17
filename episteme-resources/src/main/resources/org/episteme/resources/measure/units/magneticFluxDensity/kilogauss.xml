@@ -1,3 +1,0 @@
-<unit id="kilogauss" name="kilogauss" abbreviation="kGs" unitType="magneticFluxDensity" parentSI="tesla"
-      multiplierToSI="0.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -105,6 +105,16 @@ public class WorldBankReader extends AbstractResourceReader<Country> {
         return instance;
     }
 
+    public double getGlobalGDP() {
+        try {
+            Map<String, Double> data = fetchIndicator("WLD", "NY.GDP.MKTP.CD");
+            if (data.containsKey("WLD")) return data.get("WLD");
+        } catch (Exception e) {
+            LOG.warn("Failed to fetch global GDP from WB: {}", e.getMessage());
+        }
+        return 100e12; // Fallback
+    }
+
     @Override
     public String getCategory() {
         return org.episteme.core.ui.i18n.I18N.getInstance().get("category.politics", "Politics");

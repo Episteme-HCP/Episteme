@@ -87,6 +87,14 @@ public class GenericMatrix<E> implements Matrix<E> {
         this.ring = ring;
     }
 
+    /**
+     * Returns a new view of this matrix with a different provider.
+     */
+    public GenericMatrix<E> withProvider(LinearAlgebraProvider<E> provider) {
+        this.provider = provider;
+        return this;
+    }
+
     public void set(int row, int col, E value) {
         storage.set(row, col, value);
     }
@@ -186,12 +194,14 @@ public class GenericMatrix<E> implements Matrix<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public E trace() {
-        E sum = ring.zero();
-        for (int i = 0; i < Math.min(rows(), cols()); i++) {
-            sum = ring.add(sum, get(i, i));
-        }
-        return sum;
+        OperationContext ctx = new OperationContext.Builder()
+                .dataSize((long) this.rows() * this.cols())
+                .addHint(Hint.MAT_TRACE)
+                .build();
+        return org.episteme.core.technical.algorithm.ProviderSelector.execute(LinearAlgebraProvider.class, ctx,
+            p -> ((LinearAlgebraProvider<E>) p).trace(this));
     }
 
     @Override
@@ -338,8 +348,11 @@ public class GenericMatrix<E> implements Matrix<E> {
     @Override
     public Matrix<E> one() {
         // Identity
+        Class<?> ct = ring.zero().getClass();
+        if (org.episteme.core.mathematics.numbers.real.Real.class.isAssignableFrom(ct)) ct = org.episteme.core.mathematics.numbers.real.Real.class;
+        if (org.episteme.core.mathematics.numbers.complex.Complex.class.isAssignableFrom(ct)) ct = org.episteme.core.mathematics.numbers.complex.Complex.class;
         @SuppressWarnings("unchecked")
-        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ring.zero().getClass(), rows(), cols());
+        E[][] data = (E[][]) java.lang.reflect.Array.newInstance(ct, rows(), cols());
         GenericMatrix<E> m = (GenericMatrix<E>) Matrix.of(data, ring);
         // Implementation detail: create storage directly.
         return m; // simplified

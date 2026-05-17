@@ -1,1 +1,0 @@
-<!ELEMENT acidbasecouple* (name , formula, constant, pka)>

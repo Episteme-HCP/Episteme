@@ -1,4 +1,0 @@
-<unitType id="massPerUnitLength" name="mass per unit length">
-    <dimension name="mass" power="1" preserve="no"/>
-    <dimension name="length" power="-1" preserve="no"/>
-</unitType>

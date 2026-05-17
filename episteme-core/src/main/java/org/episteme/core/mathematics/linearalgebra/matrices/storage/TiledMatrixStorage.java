@@ -6,7 +6,6 @@
 package org.episteme.core.mathematics.linearalgebra.matrices.storage;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.numbers.real.Real;
 
 /**
  * Storage implementation for tiled matrices.
@@ -19,9 +18,9 @@ import org.episteme.core.mathematics.numbers.real.Real;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class TiledMatrixStorage implements MatrixStorage<Real> {
+public class TiledMatrixStorage<E> implements MatrixStorage<E> {
 
-    private final Matrix<Real>[][] tiles;
+    private final Matrix<E>[][] tiles;
     private final int rows;
     private final int cols;
     private final int tileRows;
@@ -36,7 +35,7 @@ public class TiledMatrixStorage implements MatrixStorage<Real> {
      * @param tileRows Rows per tile
      * @param tileCols Columns per tile
      */
-    public TiledMatrixStorage(Matrix<Real>[][] tiles, int rows, int cols, 
+    public TiledMatrixStorage(Matrix<E>[][] tiles, int rows, int cols, 
                              int tileRows, int tileCols) {
         this.tiles = tiles;
         this.rows = rows;
@@ -56,21 +55,21 @@ public class TiledMatrixStorage implements MatrixStorage<Real> {
     }
 
     @Override
-    public Real get(int row, int col) {
+    public E get(int row, int col) {
         int tileI = row / tileRows;
         int tileJ = col / tileCols;
         int localI = row % tileRows;
         int localJ = col % tileCols;
         
         if (tiles[tileI][tileJ] == null) {
-            return org.episteme.core.mathematics.numbers.real.RealDouble.ZERO;
+            return null; // Should be handled by caller or initialized
         }
         
         return tiles[tileI][tileJ].get(localI, localJ);
     }
 
     @Override
-    public void set(int row, int col, Real value) {
+    public void set(int row, int col, E value) {
         throw new UnsupportedOperationException("TiledMatrixStorage does not support direct element mutation. Use setTile() instead.");
     }
 
@@ -81,7 +80,7 @@ public class TiledMatrixStorage implements MatrixStorage<Real> {
      * @param tileCol Tile column index
      * @return The tile matrix
      */
-    public Matrix<Real> getTile(int tileRow, int tileCol) {
+    public Matrix<E> getTile(int tileRow, int tileCol) {
         return tiles[tileRow][tileCol];
     }
 
@@ -92,14 +91,14 @@ public class TiledMatrixStorage implements MatrixStorage<Real> {
      * @param tileCol Tile column index
      * @param tile The tile matrix to set
      */
-    public void setTile(int tileRow, int tileCol, Matrix<Real> tile) {
+    public void setTile(int tileRow, int tileCol, Matrix<E> tile) {
         tiles[tileRow][tileCol] = tile;
     }
 
     @Override
-    public MatrixStorage<Real> clone() {
+    public MatrixStorage<E> clone() {
         @SuppressWarnings("unchecked")
-        Matrix<Real>[][] newTiles = new Matrix[tiles.length][tiles[0].length];
+        Matrix<E>[][] newTiles = (Matrix<E>[][]) new Matrix[tiles.length][tiles[0].length];
         
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
@@ -110,7 +109,7 @@ public class TiledMatrixStorage implements MatrixStorage<Real> {
             }
         }
         
-        return new TiledMatrixStorage(newTiles, rows, cols, tileRows, tileCols);
+        return new TiledMatrixStorage<E>(newTiles, rows, cols, tileRows, tileCols);
     }
 }
 

@@ -124,6 +124,7 @@ public class EpistemeMasterControl extends Application {
                 createThemesTab(i18n),
                 createComputingTab(i18n),
                 createLibrariesTab(i18n),
+                createAlgorithmsTab(i18n),
                 createLoadersTab(i18n),
                 createAppsTab(i18n),
                 createDevicesTab(i18n));
@@ -133,9 +134,10 @@ public class EpistemeMasterControl extends Application {
         tabPane.getTabs().get(2).setId("tab-themes");
         tabPane.getTabs().get(3).setId("tab-computing");
         tabPane.getTabs().get(4).setId("tab-libraries");
-        tabPane.getTabs().get(5).setId("tab-loaders");
-        tabPane.getTabs().get(6).setId("tab-apps");
-        tabPane.getTabs().get(7).setId("tab-devices");
+        tabPane.getTabs().get(5).setId("tab-algorithms");
+        tabPane.getTabs().get(6).setId("tab-loaders");
+        tabPane.getTabs().get(7).setId("tab-apps");
+        tabPane.getTabs().get(8).setId("tab-devices");
 
         // Restore selected tab from preferences if not preserving current state
         if (selectedIndex == 0) {
@@ -180,17 +182,23 @@ public class EpistemeMasterControl extends Application {
         content.setPadding(new Insets(40));
         content.setAlignment(Pos.CENTER);
 
-        // --- ATOM GRAPHIC ---
-        StackPane atomIcon = new StackPane();
-        javafx.scene.shape.Circle nucleus = new javafx.scene.shape.Circle(15, javafx.scene.paint.Color.ORANGERED);
-        nucleus.setEffect(new javafx.scene.effect.DropShadow(10, javafx.scene.paint.Color.ORANGERED));
-
-        atomIcon.getChildren().addAll(createOrbit(60, 20, 0), createOrbit(60, 20, 60), createOrbit(60, 20, 120),
-                nucleus);
+        // --- PROJECT LOGO ---
+        javafx.scene.image.ImageView projectIcon = new javafx.scene.image.ImageView();
+        try {
+            javafx.scene.image.Image icon = new javafx.scene.image.Image(getClass().getResourceAsStream("/org/episteme/core/ui/master_control_logo.png"));
+            projectIcon.setImage(icon);
+            projectIcon.setFitWidth(128);
+            projectIcon.setPreserveRatio(true);
+            projectIcon.setSmooth(true);
+            projectIcon.setEffect(new javafx.scene.effect.DropShadow(15, javafx.scene.paint.Color.web("#2196F3", 0.3)));
+        } catch (Exception e) {
+            System.err.println("Warning: Could not load project icon for General tab.");
+        }
 
         // --- TITLE ---
         Label title = new Label(i18n.get("mastercontrol.general.title", "Episteme Master Control"));
-        title.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-size: 32px; -fx-font-weight: bold;
+        title.getStyleClass().add("font-bold");
+        title.setStyle("-fx-font-size: 36px;");
 
         Label subtitle = new Label(
                 i18n.get("mastercontrol.general.subtitle", "Universal Scientific Computing Environment"));
@@ -208,25 +216,18 @@ public class EpistemeMasterControl extends Application {
         VBox authorsBox = new VBox(5);
         authorsBox.setAlignment(Pos.CENTER);
         Label authorsHeader = new Label(i18n.get("mastercontrol.general.authors", "Authors"));
-        authorsHeader.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-underline: true;
+        authorsHeader.getStyleClass().add("font-bold");
         authorsBox.getChildren().add(authorsHeader);
 
         for (String author : Episteme.AUTHORS) {
             authorsBox.getChildren().add(new Label(author));
         }
 
-        content.getChildren().addAll(atomIcon, title, subtitle, new Separator(), infoGrid, new Separator(), authorsBox);
+        content.getChildren().addAll(projectIcon, title, subtitle, new Separator(), infoGrid, new Separator(), authorsBox);
         return new Tab(i18n.get("mastercontrol.tab.general", "General"), content);
     }
 
-    private javafx.scene.Node createOrbit(double rx, double ry, double rotate) {
-        javafx.scene.shape.Ellipse orbit = new javafx.scene.shape.Ellipse(rx, ry);
-        orbit.setFill(null);
-        orbit.setStroke(javafx.scene.paint.Color.LIGHTBLUE);
-        orbit.setStrokeWidth(2);
-        orbit.setRotate(rotate);
-        return orbit;
-    }
+
 
     private static class GridUtils {
         static class Builder {
@@ -316,8 +317,9 @@ public class EpistemeMasterControl extends Application {
         VBox content = new VBox(20);
         content.setPadding(new Insets(20));
 
-        Label header = new Label(i18n.get("mastercontrol.computing.header", "Computing Management"));
-        header.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
+        Label title = new Label(i18n.get("mastercontrol.computing.title", "Computing Management"));
+        title.getStyleClass().add("header-label");
+ // Replaced inline style: -fx-font-weight: bold; -fx-font-size: 18px;
 
         GridPane grid = new GridPane();
         grid.setHgap(30);
@@ -393,7 +395,7 @@ public class EpistemeMasterControl extends Application {
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
         gpuVal.getStyleClass().add(gpuAvail ? "status-connected" : "status-disconnected");
 
-        // --- Auto-Tuning Mode ---
+        // --- GPU Auto-Tuning Mode ---
         ComboBox<org.episteme.core.technical.algorithm.AutoTuningManager.Mode> tuningBox = new ComboBox<>();
         tuningBox.getItems().addAll(org.episteme.core.technical.algorithm.AutoTuningManager.Mode.values());
         tuningBox.setValue(org.episteme.core.technical.algorithm.AutoTuningManager.getMode());
@@ -403,30 +405,72 @@ public class EpistemeMasterControl extends Application {
         VBox tuningInfo = createInfoBox(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning Mode"),
                 i18n.get("mastercontrol.computing.desc.autotuning", "ON (Force Tuning), OFF (Standard Priorities), AUTO (Learning)"));
 
+        // --- Parallel Threads ---
+        Spinner<Integer> threadsSpinner = new Spinner<>(1, 256, org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMaxThreads());
+        threadsSpinner.setEditable(true);
+        threadsSpinner.setPrefWidth(150);
+        threadsSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMaxThreads(newVal);
+                Episteme.savePreferences();
+            }
+        });
+        VBox threadsInfo = createInfoBox(i18n.get("mastercontrol.computing.threads", "Max Parallel Threads"),
+                i18n.get("mastercontrol.computing.desc.threads", "Max CPU threads for parallel algorithms"));
+
+        // --- Linear Algebra Epsilon ---
+        TextField epsilonField = new TextField(String.valueOf(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getEpsilonDouble()));
+        epsilonField.setPrefWidth(150);
+        epsilonField.setOnAction(e -> {
+            try {
+                double val = Double.parseDouble(epsilonField.getText());
+                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setEpsilonDouble(val);
+                Episteme.savePreferences();
+            } catch (NumberFormatException ex) {
+                epsilonField.setText(String.valueOf(org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getEpsilonDouble()));
+            }
+        });
+        VBox epsilonInfo = createInfoBox(i18n.get("mastercontrol.computing.epsilon", "LA Epsilon (Double)"),
+                i18n.get("mastercontrol.computing.desc.epsilon", "Tolerance for linear algebra convergence"));
+
+        // --- Max Iterations ---
+        Spinner<Integer> itersSpinner = new Spinner<>(1, 1000000, org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getMaxIterations());
+        itersSpinner.setEditable(true);
+        itersSpinner.setPrefWidth(150);
+        itersSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().setMaxIterations(newVal);
+                Episteme.savePreferences();
+            }
+        });
+        VBox itersInfo = createInfoBox(i18n.get("mastercontrol.computing.iterations", "LA Max Iterations"),
+                i18n.get("mastercontrol.computing.desc.iterations", "Maximum iterations for iterative solvers (e.g. GMRES)"));
+
         grid.addRow(0, createHeaderLabel(i18n.get("mastercontrol.computing.mode", "Compute Mode")), modeBox, modeInfo);
         grid.addRow(1, createHeaderLabel(i18n.get("mastercontrol.computing.autotuning", "Auto-Tuning")), tuningBox, tuningInfo);
-        grid.addRow(2, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")),
-                floatBox,
-                floatInfo);
-        grid.addRow(3, createHeaderLabel(i18n.get("mastercontrol.computing.int_precision", "Integer Precision")),
-                intBox,
-                intInfo);
-        grid.addRow(4, createHeaderLabel(i18n.get("mastercontrol.computing.gpu", "GPU Support")), gpuVal);
-        grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.precision", "Decimal Precision")),
-                precSpinner,
-                precInfo);
-        grid.addRow(6, createHeaderLabel(i18n.get("mastercontrol.computing.rounding", "Rounding Mode")), roundBox,
-                roundInfo);
-        
+        grid.addRow(2, createHeaderLabel(i18n.get("mastercontrol.computing.threads", "Max Threads")), threadsSpinner, threadsInfo);
+        grid.addRow(3, createHeaderLabel(i18n.get("mastercontrol.computing.gpu", "GPU Support")), gpuVal);
+        grid.addRow(4, new Separator());
+        grid.addRow(5, createHeaderLabel(i18n.get("mastercontrol.computing.float_precision", "Float Precision")), floatBox, floatInfo);
+        grid.addRow(6, createHeaderLabel(i18n.get("mastercontrol.computing.int_precision", "Integer Precision")), intBox, intInfo);
+        grid.addRow(7, createHeaderLabel(i18n.get("mastercontrol.computing.precision", "Decimal Precision")), precSpinner, precInfo);
+        grid.addRow(8, createHeaderLabel(i18n.get("mastercontrol.computing.rounding", "Rounding Mode")), roundBox, roundInfo);
+        grid.addRow(9, new Separator());
+        grid.addRow(10, createHeaderLabel(i18n.get("mastercontrol.computing.epsilon", "LA Epsilon")), epsilonField, epsilonInfo);
+        grid.addRow(11, createHeaderLabel(i18n.get("mastercontrol.computing.iterations", "LA Max Iterations")), itersSpinner, itersInfo);
+
         // Linear Algebra provider selection is handled transparently by Factory/ComputeMode
-        
-        content.getChildren().addAll(header, grid);
+        ScrollPane scroll = new ScrollPane(grid);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        content.getChildren().addAll(title, scroll);
         return new Tab(i18n.get("mastercontrol.tab.computing", "Computing"), content);
     }
 
     private Label createHeaderLabel(String text) {
         Label l = new Label(text);
-        l.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
+        l.getStyleClass().addAll("font-bold", "text-dark", "form-label"); 
         return l;
     }
 
@@ -438,9 +482,77 @@ public class EpistemeMasterControl extends Application {
         help.setTooltip(new Tooltip(tooltipText));
         help.getStyleClass().add("mastercontrol-help");
         Label text = new Label(tooltipText);
-        text.getStyleClass().add("mastercontrol-description");
+        text.getStyleClass().add("description-label");
         box.getChildren().add(text);
         return box;
+    }
+
+    private Tab createAlgorithmsTab(I18N i18n) {
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(20));
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        Label headerTitle = new Label(i18n.get("mastercontrol.algorithms.header", "Algorithm Providers"));
+        headerTitle.getStyleClass().add("header-title");
+        content.getChildren().add(headerTitle);
+
+        Label helpText = new Label(i18n.get("mastercontrol.algorithms.explain.text",
+                "Algorithms are modular compute engines available to the framework.\n" +
+                        "They are automatically selected based on precision and auto-tuning settings."));
+        helpText.getStyleClass().add("text-dark");
+        helpText.setWrapText(true);
+        content.getChildren().add(helpText);
+
+        java.util.Map<String, List<org.episteme.core.technical.algorithm.AlgorithmProvider>> grouped = new TreeMap<>();
+        for (org.episteme.core.technical.algorithm.AlgorithmProvider p : org.episteme.core.technical.algorithm.AlgorithmManager.getProviders(org.episteme.core.technical.algorithm.AlgorithmProvider.class)) {
+            String category = capitalize(p.getAlgorithmType());
+            
+            // Map "General" to "Core Algorithms" for display
+            if ("General".equals(category)) {
+                category = "Core Algorithms";
+            }
+
+            grouped.computeIfAbsent(category, k -> new ArrayList<>()).add(p);
+        }
+
+        Accordion accordion = new Accordion();
+        for (Map.Entry<String, List<org.episteme.core.technical.algorithm.AlgorithmProvider>> entry : grouped.entrySet()) {
+            String category = entry.getKey();
+            List<org.episteme.core.technical.algorithm.AlgorithmProvider> providers = entry.getValue();
+
+            VBox paneBox = new VBox(10);
+            paneBox.setPadding(new Insets(10));
+            GridPane grid = new GridPane();
+            grid.setHgap(35);
+            grid.setVgap(12);
+
+            int r = 0;
+            for (org.episteme.core.technical.algorithm.AlgorithmProvider p : providers) {
+                Label nameLabel = new Label(p.getName());
+                nameLabel.getStyleClass().addAll("font-bold", "text-dark");
+
+                Label descLabel = new Label(p.description());
+                descLabel.getStyleClass().add("description-label");
+                descLabel.setWrapText(true);
+                descLabel.setMaxWidth(400);
+                
+                String stateText = p.isAvailable() ? "Available" : "Not Available";
+                Label stateLabel = new Label(p.isAvailable() ? i18n.get("master.available", "Available") : i18n.get("master.not_available", "N/A"));
+                stateLabel.getStyleClass().add(p.isAvailable() ? "status-label-available" : "status-label-unavailable");
+
+                grid.addRow(r++, nameLabel, stateLabel, descLabel);
+            }
+            paneBox.getChildren().add(grid);
+
+            TitledPane pane = new TitledPane(category + " (" + providers.size() + ")", paneBox);
+            accordion.getPanes().add(pane);
+        }
+
+        content.getChildren().add(accordion);
+        return new Tab(i18n.get("mastercontrol.tab.algorithms", "Algorithms"), scroll);
     }
 
     private Tab createLibrariesTab(I18N i18n) {
@@ -519,7 +631,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.chemistry.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -588,7 +700,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.quantum.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -652,7 +764,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.geography.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -717,7 +829,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.network.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -781,7 +893,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.audio.desc", "High-performance FFT, Spectrograms, and Playback"));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -855,7 +967,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat." + catKey + ".desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
 
         GridPane grid = new GridPane();
         grid.setHgap(35);
@@ -874,10 +986,10 @@ public class EpistemeMasterControl extends Application {
         String desc = i18n.get("lib." + nameKey + ".desc", descKey); // Could fallback to hardcoded if needed
 
         Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
+        nameLabel.getStyleClass().addAll("font-bold", "text-dark"); // Replaced inline style: -fx-font-weight: bold; -fx-text-fill: black;
 
         Label descLabel = new Label(desc);
-        descLabel.getStyleClass().add("mastercontrol-description");
+        descLabel.getStyleClass().add("description-label");
         descLabel.setWrapText(true);
         descLabel.setMaxWidth(500);
 
@@ -894,7 +1006,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.math.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -956,7 +1068,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.hardware.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -1014,7 +1126,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.tensors.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
         GridPane grid = new GridPane();
@@ -1094,7 +1206,7 @@ public class EpistemeMasterControl extends Application {
         header.getStyleClass().add("header-title");
 
         Label desc = new Label(i18n.get("mastercontrol.libraries.cat.vis.desc", ""));
-        desc.getStyleClass().add("mastercontrol-description");
+        desc.getStyleClass().add("description-label");
         box.getChildren().add(desc);
 
 
@@ -1230,7 +1342,7 @@ public class EpistemeMasterControl extends Application {
 
         if (description != null && !description.isEmpty()) {
             Label desc = new Label(description);
-            desc.getStyleClass().add("mastercontrol-description");
+            desc.getStyleClass().add("description-label");
             box.getChildren().add(desc);
         }
 
@@ -1304,6 +1416,24 @@ public class EpistemeMasterControl extends Application {
             }
         }
         
+        // Also discover non-SPI loaders via legacy scanning
+        List<MasterControlDiscovery.ClassInfo> legacyLoaders = MasterControlDiscovery.getInstance().findClasses("Loader");
+        java.util.Set<String> existingClasses = new java.util.HashSet<>();
+        for (org.episteme.core.io.ResourceIO<?> l : allLoaders) existingClasses.add(l.getClass().getName());
+
+        for (MasterControlDiscovery.ClassInfo info : legacyLoaders) {
+            if (!existingClasses.contains(info.fullName)) {
+                try {
+                    Class<?> cls = Class.forName(info.fullName, false, Thread.currentThread().getContextClassLoader());
+                    org.episteme.core.io.ResourceIO<?> loader = (org.episteme.core.io.ResourceIO<?>) cls.getDeclaredConstructor().newInstance();
+                    allLoaders.add(loader);
+                    existingClasses.add(info.fullName);
+                } catch (Exception e) {
+                    // Ignore non-instantiable loaders
+                }
+            }
+        }
+
         // Group into Readers and Writers
         Map<String, List<ResourceIO<?>>> readerCategories = new TreeMap<>();
         Map<String, List<ResourceIO<?>>> writerCategories = new TreeMap<>();
@@ -1312,7 +1442,7 @@ public class EpistemeMasterControl extends Application {
 
         for (ResourceIO<?> loader : allLoaders) {
             try {
-                String category = loader.getCategory();
+                String category = capitalize(loader.getCategory());
                 if ("category.other".equals(category)) {
                     category = getCategoryFromPackage(loader.getClass().getName());
                 }
@@ -1498,6 +1628,36 @@ public class EpistemeMasterControl extends Application {
         List<AppEntry> demos = flattenProviders(grouped.get(MasterControlDiscovery.ProviderType.DEMO));
         List<AppEntry> viewers = flattenProviders(grouped.get(MasterControlDiscovery.ProviderType.VIEWER));
 
+        // Also discover non-SPI Apps/Demos/Viewers via legacy scanning
+        List<MasterControlDiscovery.ClassInfo> legacyApps = MasterControlDiscovery.getInstance().findClasses("App");
+        List<MasterControlDiscovery.ClassInfo> legacyDemos = MasterControlDiscovery.getInstance().findClasses("Demo");
+        List<MasterControlDiscovery.ClassInfo> legacyViewers = MasterControlDiscovery.getInstance().findClasses("Viewer");
+        
+        java.util.Set<String> existingApps = new java.util.HashSet<>();
+        for (AppEntry a : apps) existingApps.add(a.className);
+        for (AppEntry d : demos) existingApps.add(d.className);
+        for (AppEntry v : viewers) existingApps.add(v.className);
+
+        for (MasterControlDiscovery.ClassInfo info : legacyApps) {
+            if (!existingApps.contains(info.fullName)) {
+                apps.add(new AppEntry(info.simpleName, info.fullName, info.description));
+                existingApps.add(info.fullName);
+            }
+        }
+        for (MasterControlDiscovery.ClassInfo info : legacyDemos) {
+            if (!existingApps.contains(info.fullName)) {
+                demos.add(new AppEntry(info.simpleName, info.fullName, info.description));
+                existingApps.add(info.fullName);
+            }
+        }
+        for (MasterControlDiscovery.ClassInfo info : legacyViewers) {
+            if (!existingApps.contains(info.fullName)) {
+                viewers.add(new AppEntry(info.simpleName, info.fullName, info.description));
+                existingApps.add(info.fullName);
+            }
+        }
+
+
         // Create panes
         TitledPane appsPane = new TitledPane(
                 i18n.get("mastercontrol.apps.category.apps", "Scientific Applications") + " (" + apps.size() + ")",
@@ -1563,7 +1723,7 @@ public class EpistemeMasterControl extends Application {
                     Label name = new Label(item.name);
                     name.getStyleClass().add("font-bold"); // Replaced inline style: -fx-font-weight: bold;
                     Label desc = new Label(item.description);
-                    desc.getStyleClass().add("mastercontrol-description");
+                    desc.getStyleClass().add("description-label");
                     box.getChildren().addAll(name, desc);
                     setGraphic(box);
                 }
@@ -1690,17 +1850,17 @@ public class EpistemeMasterControl extends Application {
         boolean available = provider.isAvailable();
 
         Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().add("font-bold");
+        nameLabel.getStyleClass().addAll("font-bold", "text-dark");
 
         Label descLabel = new Label(providerDesc);
-        descLabel.getStyleClass().add("mastercontrol-description");
+        descLabel.getStyleClass().add("description-label");
         descLabel.setWrapText(true);
         descLabel.setMaxWidth(400);
 
         Label statusLabel = new Label(available
                 ? i18n.get("mastercontrol.libraries.available", "Available")
                 : i18n.get("mastercontrol.libraries.not_available", "Not Available"));
-        statusLabel.setStyle("-fx-text-fill: " + (available ? "#27ae60" : "#c0392b") + "; -fx-font-weight: bold;");
+        statusLabel.getStyleClass().add(available ? "status-label-available" : "status-label-unavailable");
 
         CheckBox deactivateBox = new CheckBox(i18n.get("mastercontrol.libraries.deactivate", "Deactivate"));
         deactivateBox.setSelected(PREFS.isBackendDeactivated(provider.getId()));
@@ -1713,6 +1873,12 @@ public class EpistemeMasterControl extends Application {
 
 
 
+    private String capitalize(String s) {
+        if (s == null || s.isEmpty()) return s;
+        if (s.startsWith("category.")) return s; // Don't capitalize i18n keys
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
 }
+
 
 

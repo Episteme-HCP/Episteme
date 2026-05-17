@@ -1,4 +1,0 @@
-<unit id="ounce" name="ounce" abbreviation="ozf" unitType="force" parentSI="newton" multiplierToSI="0.278014"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 ounce of force = 1 ounce of mass * gravitational acceleration</description>
-</unit>

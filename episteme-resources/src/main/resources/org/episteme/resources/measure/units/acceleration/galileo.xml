@@ -1,4 +1,0 @@
-<unit id="galileo" name="galileo" abbreviation="Gal" unitType="acceleration" parentSI="meterPerSecondSquared"
-      multiplierToSI="0.01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>CGS unit for acceleration</description>
-</unit>

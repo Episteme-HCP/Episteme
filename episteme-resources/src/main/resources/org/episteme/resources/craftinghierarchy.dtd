@@ -1,9 +1,0 @@
-<!-- entities -->
-
-<!-- the top level element -->
-<!ELEMENT discovery (name, requirements)>
-
-<!-- elements -->
-<!ELEMENT name                            (#PCDATA)>
-<!ELEMENT requirements                    (#PCDATA)>
-

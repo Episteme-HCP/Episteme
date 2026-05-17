@@ -1,7 +1,0 @@
-
-<!ENTITY siemensPerMeter.xml SYSTEM "../electricConductivity/siemensPerMeter.xml">
-
-<!ENTITY electricConductivity.elements	"
-&siemensPerMeter.xml;
-">
-

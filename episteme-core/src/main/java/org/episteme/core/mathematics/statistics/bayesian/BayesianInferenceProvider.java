@@ -22,13 +22,47 @@ public interface BayesianInferenceProvider extends AlgorithmProvider {
     interface BayesNodeData {
         String getName();
         List<String> getStates();
+        @Deprecated
         Map<Map<String, String>, Map<String, Double>> getCPT();
+        
+        default Map<Map<String, String>, Map<String, Float>> getCPTFloat() {
+             Map<Map<String, String>, Map<String, Double>> cpt = getCPT();
+             Map<Map<String, String>, Map<String, Float>> res = new java.util.HashMap<>();
+             for (var entry : cpt.entrySet()) {
+                 Map<String, Float> inner = new java.util.HashMap<>();
+                 for (var state : entry.getValue().entrySet()) {
+                     inner.put(state.getKey(), state.getValue().floatValue());
+                 }
+                 res.put(entry.getKey(), inner);
+             }
+             return res;
+        }
+        
+        default Map<Map<String, String>, Map<String, Real>> getCPTReal() {
+             Map<Map<String, String>, Map<String, Double>> cpt = getCPT();
+             Map<Map<String, String>, Map<String, Real>> res = new java.util.HashMap<>();
+             for (var entry : cpt.entrySet()) {
+                 Map<String, Real> inner = new java.util.HashMap<>();
+                 for (var state : entry.getValue().entrySet()) {
+                     inner.put(state.getKey(), Real.of(state.getValue()));
+                 }
+                 res.put(entry.getKey(), inner);
+             }
+             return res;
+        }
     }
 
     /**
      * Performs inference on a Bayesian network using Real precision.
      */
     Real query(String target, String targetState, Map<String, String> evidence, List<BayesNodeData> nodes);
+
+    /**
+     * Performs inference on a Bayesian network using float precision.
+     */
+    default float queryFloat(String target, String targetState, Map<String, String> evidence, List<BayesNodeData> nodes) {
+        return query(target, targetState, evidence, nodes).floatValue();
+    }
 
     /**
      * Performs inference on a Bayesian network using double precision.

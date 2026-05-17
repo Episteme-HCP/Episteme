@@ -137,19 +137,35 @@ public class PythonQuantumBackend implements QuantumBackend, QuantumAlgorithmPro
         if (workerProcess == null) throw new RuntimeException("Python worker not available");
 
         try {
-            // Simplified JSON construction for demo, ideally use Jackson
+            // Use a simple JSON-like structure. Ideally use a library.
+            String qasmEscaped = circuit.toQASM().replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
             String request = String.format("{\"command\": \"exec_qasm\", \"params\": {\"qasm\": \"%s\", \"shots\": %d, \"backend\": \"%s\"}}\n",
-                circuit.toQASM().replace("\"", "\\\"").replace("\n", "\\n"), shots, backendName);
+                qasmEscaped, shots, backendName);
             
             workerIn.println(request);
+            
+            // Wait for response with a simple busy-wait loop to avoid indefinite blocking on a dead process
+            long startWait = System.currentTimeMillis();
+            while (!workerOut.ready() && System.currentTimeMillis() - startWait < 30000) { // 30s timeout
+                if (!workerProcess.isAlive()) throw new IOException("Python worker process died unexpectedly.");
+                Thread.sleep(100);
+            }
+            
+            if (!workerOut.ready()) {
+                throw new IOException("Python worker timed out after 30 seconds.");
+            }
+
             String responseLine = workerOut.readLine();
-            if (responseLine == null) throw new EOFException("Worker process died");
+            if (responseLine == null) throw new EOFException("Worker process output stream closed.");
 
             return parseRobustResult(responseLine);
         } catch (Exception e) { 
-            workerProcess.destroyForcibly();
-            workerProcess = null;
-            throw new RuntimeException("Quantum execution failed over persistent bridge", e); 
+            LOG.error("Quantum execution failed over persistent bridge: {}", e.getMessage());
+            if (workerProcess != null) {
+                workerProcess.destroyForcibly();
+                workerProcess = null;
+            }
+            throw new RuntimeException("Quantum execution failed over persistent bridge: " + e.getMessage(), e); 
         }
     }
 

@@ -1,3 +1,0 @@
-<unit id="kilogramPerMeterSquared" name="kilogram per meter squared" abbreviation="kg/m^2" unitType="arealMassDensity"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

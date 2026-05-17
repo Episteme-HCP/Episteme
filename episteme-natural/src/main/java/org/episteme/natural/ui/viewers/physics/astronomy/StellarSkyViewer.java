@@ -54,6 +54,9 @@ import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.google.auto.service.AutoService;
+import org.episteme.core.ui.Viewer;
+
 /**
  * Stellar Sky Viewer.
  * Refactored to be 100% parameter-based.
@@ -62,6 +65,7 @@ import java.time.format.DateTimeFormatter;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class StellarSkyViewer extends AbstractViewer {
 
     private static final int WIDTH = 1100;

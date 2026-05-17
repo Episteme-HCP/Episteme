@@ -17,9 +17,22 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface NBodyProvider extends AlgorithmProvider {
 
+    void computeForces(float[] positions, float[] masses, float[] forces, float G, float softening);
+
     void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening);
 
     void computeForces(Real[] positions, Real[] masses, Real[] forces, Real G, Real softening);
+
+    default void stepFloat(float[] positions, float[] velocities, float[] masses, int numBodies, float G, float dt, float softening) {
+        float[] forces = new float[numBodies * 3];
+        computeForces(positions, masses, forces, G, softening);
+        for (int i = 0; i < numBodies; i++) {
+            for (int k = 0; k < 3; k++) {
+                velocities[i * 3 + k] += forces[i * 3 + k] / masses[i] * dt;
+                positions[i * 3 + k] += velocities[i * 3 + k] * dt;
+            }
+        }
+    }
 
     default void step(double[] positions, double[] velocities, double[] masses, int numBodies, double G, double dt, double softening) {
         double[] forces = new double[numBodies * 3];

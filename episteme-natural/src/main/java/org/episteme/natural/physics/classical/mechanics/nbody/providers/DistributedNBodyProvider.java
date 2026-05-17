@@ -44,6 +44,11 @@ public class DistributedNBodyProvider implements NBodyProvider {
     }
 
     @Override
+    public void computeForces(float[] positions, float[] masses, float[] forces, float G, float softening) {
+        throw new UnsupportedOperationException("Distributed N-Body currently only supports primitive double precision.");
+    }
+
+    @Override
     public void computeForces(double[] positions, double[] masses, double[] forces, double G, double softening) {
         org.episteme.core.technical.backend.distributed.DistributedContext ctx = org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().getDistributedContext();
         
@@ -161,6 +166,11 @@ public class DistributedNBodyProvider implements NBodyProvider {
                  throw e;
              }
         }
+    }
+
+    @Override
+    public void stepFloat(float[] positions, float[] velocities, float[] masses, int numBodies, float G, float dt, float softening) {
+        throw new UnsupportedOperationException("Distributed stepFloat not implemented.");
     }
 
     @Override

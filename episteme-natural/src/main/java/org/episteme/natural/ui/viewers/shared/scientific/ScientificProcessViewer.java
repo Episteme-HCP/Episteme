@@ -33,10 +33,14 @@ import org.episteme.core.mathematics.numbers.real.Real;
 
 import java.util.*;
 
+import com.google.auto.service.AutoService;
+import org.episteme.core.ui.Viewer;
+
 /**
  * Universal viewer for natural scientific processes.
  * Visualizes multiple time-series trajectories (Temperature, Energy, Concentration).
  */
+@AutoService(Viewer.class)
 public final class ScientificProcessViewer extends AbstractViewer {
 
     private final VBox chartContainer = new VBox(10);

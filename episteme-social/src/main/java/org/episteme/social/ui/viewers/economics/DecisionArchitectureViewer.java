@@ -30,11 +30,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.social.economics.models.StrategicModel;
 
 /**
  * Visualizes game theory matrices, decision trees, and Pareto optimality.
  */
+@AutoService(Viewer.class)
 public final class DecisionArchitectureViewer extends AbstractViewer {
 
     private final TabPane tabs = new TabPane();

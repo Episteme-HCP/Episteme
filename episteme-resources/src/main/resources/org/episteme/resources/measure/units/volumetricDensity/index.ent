@@ -1,7 +1,0 @@
-
-<!ENTITY numberPerMeterCubed.xml SYSTEM "../volumetricDensity/numberPerMeterCubed.xml">
-
-<!ENTITY volumetricDensity.elements	"
-&numberPerMeterCubed.xml;
-">
-

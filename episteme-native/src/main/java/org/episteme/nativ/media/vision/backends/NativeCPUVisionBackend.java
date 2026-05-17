@@ -56,12 +56,17 @@ public class NativeCPUVisionBackend implements VisionBackend, CPUBackend, Native
 
     @Override
     public String getBackendName() {
-        return "Native CPU Vision Backend (Pure Java FFM)";
+        return "Native CPU Vision Backend (Panama)";
+    }
+
+    @Override
+    public String getName() {
+        return getBackendName();
     }
 
     @Override
     public String getDescription() {
-        return "Native high-performance vision backend using Project Panama (Foreign Memory API) on CPU without external C++ libraries.";
+        return "High-performance Computer Vision backend using Project Panama (FFM API) for optimized CPU image operations.";
     }
 
     @Override

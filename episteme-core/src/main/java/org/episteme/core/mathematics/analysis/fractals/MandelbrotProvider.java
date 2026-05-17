@@ -17,8 +17,13 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface MandelbrotProvider extends AlgorithmProvider {
 
+    int[][] compute(float xMin, float xMax, float yMin, float yMax, int width, int height, int maxIterations);
     int[][] compute(double xMin, double xMax, double yMin, double yMax, int width, int height, int maxIterations);
     int[][] compute(Real xMin, Real xMax, Real yMin, Real yMax, int width, int height, int maxIterations);
+
+    float[][] computeSmooth(float xMin, float xMax, float yMin, float yMax, int width, int height, int maxIterations);
+    double[][] computeSmooth(double xMin, double xMax, double yMin, double yMax, int width, int height, int maxIterations);
+    Real[][] computeSmooth(Real xMin, Real xMax, Real yMin, Real yMax, int width, int height, int maxIterations);
 
     @Override
     default String getName() {

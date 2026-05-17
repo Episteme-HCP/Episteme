@@ -1,4 +1,0 @@
-<unit id="decisecond" name="decisecond" abbreviation="dsec" unitType="time" parentSI="second" multiplierToSI="0.1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1/10 of a second</description>
-</unit>

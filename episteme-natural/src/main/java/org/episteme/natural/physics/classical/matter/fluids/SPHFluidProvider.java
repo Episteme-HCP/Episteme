@@ -17,6 +17,10 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface SPHFluidProvider extends AlgorithmProvider {
 
+    void step(float[] positions, float[] velocities, float[] densities, float[] pressures, float[] forces,
+            int numParticles, float dt, float mass, float restDensity, float stiffness, float viscosity,
+            float smoothingRadius, float[] gravity);
+
     void step(double[] positions, double[] velocities, double[] densities, double[] pressures, double[] forces,
             int numParticles, double dt, double mass, double restDensity, double stiffness, double viscosity,
             double smoothingRadius, double[] gravity);

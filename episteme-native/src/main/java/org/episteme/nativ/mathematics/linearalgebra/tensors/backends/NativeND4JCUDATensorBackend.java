@@ -23,9 +23,7 @@ public class NativeND4JCUDATensorBackend extends ND4JBaseTensorBackend {
 
     @Override
     protected org.episteme.core.technical.backend.ExecutionContext doGetContext() {
-        @SuppressWarnings("deprecation")
-        org.episteme.core.technical.backend.ExecutionContext context = new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext();
-        return context;
+        return new org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext(null, null);
     }
 
     @Override
@@ -56,7 +54,7 @@ public class NativeND4JCUDATensorBackend extends ND4JBaseTensorBackend {
 
     @Override
     public String getName() {
-        return "ND4J CUDA (GPU)";
+        return "ND4J-CUDA (GPU-Tensor)";
     }
 
     @Override

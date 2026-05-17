@@ -1,5 +1,0 @@
-<unit id="fahrenheit" name="fahrenheit" abbreviation="F" unitType="temperature" parentSI="kelvin"
-      multiplierToSI="0.55555555555555555" constantToSI="-17.777777777777777777"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Unit of temperature</description>
-</unit>

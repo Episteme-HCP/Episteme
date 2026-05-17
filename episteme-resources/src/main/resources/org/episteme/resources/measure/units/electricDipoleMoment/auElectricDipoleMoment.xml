@@ -1,4 +1,0 @@
-<unit id="auElectricDipoleMoment" name="electric dipole moment (au)" abbreviation="d_0" unitType="electricDipoleMoment"
-      parentSI="coulombMeter" multiplierToSI="8.47835793E-30" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Electric dipole moment in atomic units</description>
-</unit>

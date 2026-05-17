@@ -17,6 +17,8 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface WaveProvider extends AlgorithmProvider {
 
+    void solve(float[][] u, float[][] uPrev, int width, int height, float c, float damping);
+
     void solve(double[][] u, double[][] uPrev, int width, int height, double c, double damping);
 
     void solve(Real[][] u, Real[][] uPrev, int width, int height, Real c, Real damping);

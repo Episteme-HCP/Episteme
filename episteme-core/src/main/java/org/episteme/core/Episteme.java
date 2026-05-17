@@ -125,6 +125,14 @@ public final class Episteme {
             // Save other preferred backends
             prefs.set("linear.algebra.backend", config.getBackendId());
             
+            // Save Linear Algebra Constants
+            prefs.set("math.linearalgebra.epsilon.double", String.valueOf(config.getEpsilonDouble()));
+            prefs.set("math.linearalgebra.epsilon.float", String.valueOf(config.getEpsilonFloat()));
+            prefs.set("math.linearalgebra.stability.threshold", String.valueOf(config.getStabilityThreshold()));
+            prefs.set("math.linearalgebra.max_iterations", String.valueOf(config.getMaxIterations()));
+            prefs.set("math.linearalgebra.gmres.restart", String.valueOf(config.getGmresRestart()));
+            prefs.set("math.linearalgebra.precision.bits", String.valueOf(config.getPrecisionBits()));
+            
             prefs.save();
         } catch (Exception e) {
             System.err.println("Failed to save preferences: " + e.getMessage());
@@ -153,6 +161,14 @@ public final class Episteme {
             if (intStr != null) {
                 config.setIntPrecision(org.episteme.core.mathematics.context.NumericalConfiguration.IntPrecision.valueOf(intStr));
             }
+
+            // Load Linear Algebra Constants
+            config.setEpsilonDouble(Double.parseDouble(prefs.get("math.linearalgebra.epsilon.double", "1e-12")));
+            config.setEpsilonFloat(Float.parseFloat(prefs.get("math.linearalgebra.epsilon.float", "1e-7")));
+            config.setStabilityThreshold(Double.parseDouble(prefs.get("math.linearalgebra.stability.threshold", "1e-15")));
+            config.setMaxIterations(Integer.parseInt(prefs.get("math.linearalgebra.max_iterations", "1000")));
+            config.setGmresRestart(Integer.parseInt(prefs.get("math.linearalgebra.gmres.restart", "30")));
+            config.setPrecisionBits(Integer.parseInt(prefs.get("math.linearalgebra.precision.bits", "256")));
 
             try {
                 String precStr = prefs.get("math.precision");

@@ -2,10 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.episteme</groupId>
+  <groupId>io.github.silveremartin-dev</groupId>
   <artifactId>episteme-parent</artifactId>
-  <version>1.0.0-beta1</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
+
   <name>Episteme Unifying Parent</name>
   <description>Episteme - Unified Scientific Computing Framework (Parent POM)</description>
   <url>https://github.com/silveremartin-dev/Episteme</url>
@@ -31,7 +32,17 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <scm>
+    <connection>scm:git:git://github.com/silveremartin-dev/Episteme.git</connection>
+    <developerConnection>scm:git:ssh://github.com:silveremartin-dev/Episteme.git</developerConnection>
+    <url>https://github.com/silveremartin-dev/Episteme/tree/main</url>
+  </scm>
   <distributionManagement>
+    <snapshotRepository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/silveremartin-dev/Episteme</url>
+    </snapshotRepository>
     <repository>
       <id>github</id>
       <name>GitHub Packages</name>
@@ -58,22 +69,17 @@
     </developer>
   </developers>
   <properties>
+    <revision>1.0.0-beta2</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- JSR-385 Units of Measurement -->
     <uom.version>2.2</uom.version>
     <indriya.version>2.2</indriya.version>
-    <!-- Logging -->
     <slf4j.version>2.0.9</slf4j.version>
     <logback.version>1.5.16</logback.version>
-    <!-- Testing -->
     <junit.version>5.10.1</junit.version>
     <assertj.version>3.25.1</assertj.version>
-    <!-- Web/JSON -->
     <javalin.version>6.1.3</javalin.version>
     <jackson.version>2.16.1</jackson.version>
-    <!-- GPU/Performance -->
     <jcuda.version>11.8.0</jcuda.version>
-    <!-- UI (JavaFX) -->
     <javafx.version>21.0.1</javafx.version>
     <mockito.version>5.11.0</mockito.version>
     <micrometer.version>1.12.2</micrometer.version>
@@ -84,7 +90,6 @@
     <ode4j.version>0.5.4</ode4j.version>
     <auto-service.version>1.1.1</auto-service.version>
     <jmh.version>1.37</jmh.version>
-    <!-- Native Libraries -->
     <javacpp.version>1.5.10</javacpp.version>
     <javacv.version>1.5.10</javacv.version>
     <opencv.version>4.9.0-1.5.10</opencv.version>
@@ -94,29 +99,35 @@
     <!-- Platform targeting to avoid downloading all binaries (e.g. Windows DLLs in Docker) -->
     <javacpp.platform>${os.detected.classifier}</javacpp.platform>
     
-    <maven.compiler.release>25</maven.compiler.release>
-    <maven.compiler.source>25</maven.compiler.source>
-    <maven.compiler.target>25</maven.compiler.target>
+    <target.java.version>25</target.java.version>
+    <maven.compiler.release>${target.java.version}</maven.compiler.release>
+    <maven.compiler.source>${target.java.version}</maven.compiler.source>
+    <maven.compiler.target>${target.java.version}</maven.compiler.target>
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
     <argLine></argLine>
+    <extra.compiler.args></extra.compiler.args>
+    <mainClass></mainClass>
+    <artifact.classifier></artifact.classifier>
+    <artifact.suffix></artifact.suffix>
+    <maven.jar.finalName>${project.artifactId}-${project.version}</maven.jar.finalName>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <!-- Internal modules -->
       <dependency>
-        <groupId>org.episteme</groupId>
+        <groupId>io.github.silveremartin-dev</groupId>
         <artifactId>episteme-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.episteme</groupId>
+        <groupId>io.github.silveremartin-dev</groupId>
         <artifactId>episteme-natural</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.episteme</groupId>
+        <groupId>io.github.silveremartin-dev</groupId>
         <artifactId>episteme-database</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -295,12 +306,6 @@
       <dependency>
         <groupId>org.jcuda</groupId>
         <artifactId>jcusparse</artifactId>
-        <version>${jcuda.version}</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.jcuda</groupId>
-        <artifactId>jcuda-nvrtc</artifactId>
         <version>${jcuda.version}</version>
         <optional>true</optional>
       </dependency>
@@ -568,6 +573,40 @@
       </extension>
     </extensions>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <inherited>false</inherited>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
       <!-- Globally ban conflicting Log4j bridges -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -717,21 +756,43 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <fork>false</fork>
+          <compilerArgs>
+            <arg>--add-modules</arg>
+            <arg>jdk.incubator.vector</arg>
+            <arg>--enable-preview</arg>
+            <arg>-Xpkginfo:always</arg>
+            <arg>${extra.compiler.args}</arg>
+          </compilerArgs>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.3.2</version>
+          <configuration>
+            <failOnError>false</failOnError>
+            <retryOnError>true</retryOnError>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
           <configuration>
             <release>${maven.compiler.release}</release>
-            <fork>true</fork>
+            <fork>false</fork>
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
+              <arg>--enable-preview</arg>
               <arg>-Xpkginfo:always</arg>
+              <arg>${extra.compiler.args}</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
@@ -810,6 +871,7 @@
             </additionalOptions>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>kr.motd.maven</groupId>
           <artifactId>os-maven-plugin</artifactId>
@@ -819,6 +881,19 @@
           <groupId>org.xolstice.maven.plugins</groupId>
           <artifactId>protobuf-maven-plugin</artifactId>
           <version>0.6.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.5.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>2.16.2</version>
+          <configuration>
+            <generateBackupPoms>false</generateBackupPoms>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -862,6 +937,7 @@
       <name>Jzy3d Snapshots</name>
       <url>https://maven.jzy3d.org/snapshots/</url>
     </repository>
+
   </repositories>
   <profiles>
     <profile>
@@ -920,34 +996,7 @@
         <os.detected.classifier>windows-x86_64</os.detected.classifier>
       </properties>
     </profile>
-    <profile>
-      <id>legacy</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <release>${maven.compiler.release}</release>
-              <compilerArgs>
-                <arg>--add-modules</arg>
-                <arg>jdk.incubator.vector</arg>
-                <arg>-Xpkginfo:always</arg>
-              </compilerArgs>
-              <testExcludes>
-                <exclude>module-info.java</exclude>
-              </testExcludes>
-              <excludes>
-                <exclude>module-info.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
+
     <profile>
       <id>jpms</id>
       <build>
@@ -967,6 +1016,161 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+    </profile>
+
+    <profile>
+      <id>ossrh</id>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+          <id>ossrh</id>
+          <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.4.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>ossrh</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.0</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.6.3</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Multi-JDK Release Profiles (Centralised from submodules) -->
+    <profile>
+      <id>release-jdk21</id>
+      <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <artifact.classifier>jdk21</artifact.classifier>
+        <artifact.suffix>-jdk21</artifact.suffix>
+        <maven.jar.finalName>${project.artifactId}-${project.version}-jdk21</maven.jar.finalName>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <finalName>${maven.jar.finalName}</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>release-jdk25</id>
+      <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+        <artifact.classifier>jdk25</artifact.classifier>
+        <artifact.suffix>-jdk25</artifact.suffix>
+        <maven.jar.finalName>${project.artifactId}-${project.version}-jdk25</maven.jar.finalName>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <finalName>${maven.jar.finalName}</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Fat Jar Profile using Maven Shade -->
+    <profile>
+      <id>fat-jar</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <shadedClassifierName>fat</shadedClassifierName>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+                  <transformers>
+                    <!-- Manifest for Executable Jars -->
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <mainClass>${mainClass}</mainClass>
+                    </transformer>
+                    <!-- Services Resource Transformer for SPI (AutoService) compatibility -->
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                  </transformers>
+                  <filters>
+                    <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                      </excludes>
+                    </filter>
+                  </filters>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

@@ -1,4 +1,0 @@
-<unit id="kayser" name="kayser" abbreviation="K" unitType="waveNumber" parentSI="numberPerMeter" multiplierToSI="100"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>CGS unit for wave number</description>
-</unit>

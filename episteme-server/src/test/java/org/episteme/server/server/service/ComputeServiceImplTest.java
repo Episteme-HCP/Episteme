@@ -8,14 +8,12 @@ package org.episteme.server.server.service;
 import io.grpc.ManagedChannel;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
-import io.grpc.stub.StreamObserver;
 import io.grpc.testing.GrpcCleanupRule;
 import org.episteme.server.server.proto.*;
 import org.episteme.server.server.repository.JobRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -39,6 +37,7 @@ public class ComputeServiceImplTest {
     private ComputeServiceImpl service;
     private ComputeServiceGrpc.ComputeServiceBlockingStub blockingStub;
 
+    @SuppressWarnings("null")
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);

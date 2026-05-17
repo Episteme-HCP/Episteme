@@ -13,6 +13,12 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
+import jcuda.driver.*;
+// Removed static import to prevent premature class loading failure
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
+import org.episteme.nativ.technical.backend.gpu.cuda.CUDAExecutionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.nio.DoubleBuffer;
@@ -28,8 +34,40 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, GPUBackend.class, NativeBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, VisionAlgorithmProvider.class, GPUBackend.class, NativeBackend.class})
 public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
+
+    private static final Logger logger = LoggerFactory.getLogger(NativeCUDAVisionBackend.class);
+    private static CUcontext globalContext;
+    private static CUdevice globalDevice;
+    private static volatile boolean initialized = false;
+
+    private static synchronized void initCUDA() {
+        if (initialized) return;
+        try {
+            // Check if JCuda is even on the classpath first
+            Class.forName("jcuda.driver.JCudaDriver");
+            
+            JCudaDriver.setExceptionsEnabled(true);
+            checkCuda(JCudaDriver.cuInit(0));
+            CUdevice device = new CUdevice();
+            checkCuda(JCudaDriver.cuDeviceGet(device, 0));
+            CUcontext context = new CUcontext();
+            checkCuda(JCudaDriver.cuCtxCreate(context, 0, device));
+            globalContext = context;
+            globalDevice = device;
+            initialized = true;
+        } catch (Throwable t) {
+            logger.warn("Failed to initialize CUDA Vision backend (JCuda): {}", t.getMessage());
+            initialized = false;
+        }
+    }
+
+    private static void checkCuda(int result) {
+        if (result != CUresult.CUDA_SUCCESS) {
+            throw new RuntimeException("CUDA Error: " + CUresult.stringFor(result));
+        }
+    }
 
     @Override
     public boolean isLoaded() {
@@ -41,18 +79,13 @@ public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, Nativ
         return "cuda";
     }
 
-    @Override public String getType() { return "Computer Vision"; }
+    @Override public String getType() { return "vision"; }
     @Override public String getId() { return "native-cuda-vision"; }
     @Override public String getDescription() { return "GPU-accelerated image processing using NVIDIA CUDA."; }
     @Override
     public boolean isAvailable() {
-        try {
-            Class.forName("jcuda.driver.JCudaDriver");
-            return true; 
-        } catch (Throwable t) {
-            // Silently fail for availability check, but we could log here if needed
-            return false;
-        }
+        if (!initialized) initCUDA();
+        return initialized;
     }
 
     @Override
@@ -110,7 +143,8 @@ public class NativeCUDAVisionBackend implements VisionBackend, GPUBackend, Nativ
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return null;
+        if (!isAvailable()) return null;
+        return new CUDAExecutionContext(globalContext, globalDevice);
     }
 
     public SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {

@@ -10,23 +10,16 @@ import org.episteme.core.mathematics.linearalgebra.Tensor;
 import org.episteme.core.mathematics.linearalgebra.tensors.DenseTensor;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.backend.ExecutionContext;
-import org.episteme.core.mathematics.linearalgebra.tensors.backends.CPUDenseTensorBackend;
+
 
 /**
  * Abstract base for ND4J-backed Tensor backends.
  * <p>
  * Sub-classes target specific ND4J device backends (native CPU, CUDA GPU).
- * If ND4J is not available, falls back to the pure-Java
- * {@link CPUDenseTensorBackend}.
  * </p>
- *
- * @author Silvere Martin-Michiellot
- * @author Gemini AI (Google DeepMind)
- * @since 1.0
  */
 public abstract class ND4JBaseTensorBackend implements TensorBackend {
 
-    protected static final CPUDenseTensorBackend fallback = new CPUDenseTensorBackend();
     protected final boolean isAvailable;
 
     protected ND4JBaseTensorBackend() {
@@ -70,38 +63,47 @@ public abstract class ND4JBaseTensorBackend implements TensorBackend {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Tensor<T> zeros(Class<T> elementType, int... shape) {
-        if (!isAvailable || !Real.class.isAssignableFrom(elementType)) {
-            return fallback.zeros(elementType, shape);
+        if (!isAvailable) {
+            throw new UnsupportedOperationException("ND4J backend is not available");
+        }
+        if (!Real.class.isAssignableFrom(elementType)) {
+            throw new UnsupportedOperationException("ND4J backend only supports Real (double) tensors");
         }
         try {
             long[] longShape = convertShape(shape);
             org.nd4j.linalg.api.ndarray.INDArray ndArray = org.nd4j.linalg.factory.Nd4j.zeros(longShape);
             return (Tensor<T>) fromINDArray(ndArray);
         } catch (Exception e) {
-            return fallback.zeros(elementType, shape);
+            throw new RuntimeException("ND4J zeros operation failed", e);
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Tensor<T> ones(Class<T> elementType, int... shape) {
-        if (!isAvailable || !Real.class.isAssignableFrom(elementType)) {
-            return fallback.ones(elementType, shape);
+        if (!isAvailable) {
+            throw new UnsupportedOperationException("ND4J backend is not available");
+        }
+        if (!Real.class.isAssignableFrom(elementType)) {
+            throw new UnsupportedOperationException("ND4J backend only supports Real (double) tensors");
         }
         try {
             long[] longShape = convertShape(shape);
             org.nd4j.linalg.api.ndarray.INDArray ndArray = org.nd4j.linalg.factory.Nd4j.ones(longShape);
             return (Tensor<T>) fromINDArray(ndArray);
         } catch (Exception e) {
-            return fallback.ones(elementType, shape);
+             throw new RuntimeException("ND4J ones operation failed", e);
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Tensor<T> create(T[] data, int... shape) {
-        if (!isAvailable || data.length == 0 || !(data[0] instanceof Real)) {
-            return fallback.create(data, shape);
+        if (!isAvailable) {
+            throw new UnsupportedOperationException("ND4J backend is not available");
+        }
+        if (data.length == 0 || !(data[0] instanceof Real)) {
+             throw new UnsupportedOperationException("ND4J backend only supports Real (double) tensors");
         }
         try {
             double[] doubleData = new double[data.length];
@@ -112,7 +114,7 @@ public abstract class ND4JBaseTensorBackend implements TensorBackend {
             org.nd4j.linalg.api.ndarray.INDArray ndArray = org.nd4j.linalg.factory.Nd4j.create(doubleData, longShape);
             return (Tensor<T>) fromINDArray(ndArray);
         } catch (Exception e) {
-            return fallback.create(data, shape);
+             throw new RuntimeException("ND4J tensor creation failed", e);
         }
     }
 

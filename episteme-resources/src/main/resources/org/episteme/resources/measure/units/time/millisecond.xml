@@ -1,4 +1,0 @@
-<unit id="millisecond" name="millisecond" abbreviation="msec" unitType="time" parentSI="second" multiplierToSI="0.001"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1/1000 of a second</description>
-</unit>

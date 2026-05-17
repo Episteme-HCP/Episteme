@@ -91,7 +91,7 @@ public class ProviderRegistry {
     }
 
     public <E> LinearAlgebraProvider<E> getDenseLinearAlgebraProvider(Ring<E> ring) {
-        return getLinearAlgebraProvider(ring);
+        return selectLinearAlgebraProvider(new OperationContext.Builder().addHint(OperationContext.Hint.DENSE).build(), ring);
     }
 
     /**
@@ -132,20 +132,20 @@ public class ProviderRegistry {
             return new SparseMatrixStorage<>(rows, cols, ring.zero());
         }
 
-        // Specialized path for Real
+        // Try SPI factories (Native, CUDA, etc.) first for better specialization
+        for (MatrixStorageFactory factory : matrixStorageFactories) {
+            MatrixStorage<E> s = factory.createDense(rows, cols, ring);
+            if (s != null) return s;
+        }
+
+        // Specialized path for Real only if not in high precision
         if (ring.getClass().getName().contains("Reals") && !MathContext.getCurrent().isHighPrecision()) {
             @SuppressWarnings({"unchecked", "restricted"})
             MatrixStorage<E> specialized = (MatrixStorage<E>) (MatrixStorage<?>) new org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage(rows, cols);
             return specialized;
         }
         
-        // Try SPI factories (Native, CUDA, etc.)
-        for (MatrixStorageFactory factory : matrixStorageFactories) {
-            MatrixStorage<E> s = factory.createDense(rows, cols, ring);
-            if (s != null) return s;
-        }
-        
-        return new DenseMatrixStorage<>(rows, cols, ring.zero());
+        return new DenseMatrixStorage<>(rows, cols, ring);
     }
 
     /**
@@ -156,6 +156,6 @@ public class ProviderRegistry {
             return new SparseVectorStorage<E>(dim, ring.zero());
         }
         // Native vector storage could be added here similar to matrix
-        return new DenseVectorStorage<E>(dim);
+        return new DenseVectorStorage<E>(dim, ring);
     }
 }

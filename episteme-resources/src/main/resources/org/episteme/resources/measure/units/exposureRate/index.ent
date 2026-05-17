@@ -1,7 +1,0 @@
-
-<!ENTITY amperePerKilogram.xml SYSTEM "../exposureRate/amperePerKilogram.xml">
-
-<!ENTITY exposureRate.elements	"
-&amperePerKilogram.xml;
-">
-

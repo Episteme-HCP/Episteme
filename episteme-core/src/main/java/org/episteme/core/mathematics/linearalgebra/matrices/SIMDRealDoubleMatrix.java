@@ -12,12 +12,12 @@ import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
-import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
 import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
+import org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider;
+
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.HeapRealDoubleMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.MatrixStorage;
-import org.episteme.core.mathematics.linearalgebra.vectors.GenericVector;
 
 /**
  * SIMD-accelerated Matrix implementation using JDK Vector API.
@@ -115,13 +115,78 @@ public class SIMDRealDoubleMatrix extends GenericMatrix<Real> implements AutoClo
         return applyOp(VectorOperators.COS, (d) -> Math.cos(d));
     }
 
+    public Matrix<Real> tan() {
+        return applyOp(VectorOperators.TAN, (d) -> Math.tan(d));
+    }
+
+    public Matrix<Real> asin() {
+        return applyOp(VectorOperators.ASIN, (d) -> Math.asin(d));
+    }
+
+    public Matrix<Real> acos() {
+        return applyOp(VectorOperators.ACOS, (d) -> Math.acos(d));
+    }
+
+    public Matrix<Real> atan() {
+        return applyOp(VectorOperators.ATAN, (d) -> Math.atan(d));
+    }
+
+    public Matrix<Real> sinh() {
+        return applyOp(VectorOperators.SINH, (d) -> Math.sinh(d));
+    }
+
+    public Matrix<Real> cosh() {
+        return applyOp(VectorOperators.COSH, (d) -> Math.cosh(d));
+    }
+
+    public Matrix<Real> tanh() {
+        return applyOp(VectorOperators.TANH, (d) -> Math.tanh(d));
+    }
+
+    public Matrix<Real> asinh() {
+        return applyOp(null, (x) -> Math.log(x + Math.sqrt(x * x + 1.0)));
+    }
+
+    public Matrix<Real> acosh() {
+        return applyOp(null, (x) -> Math.log(x + Math.sqrt(x * x - 1.0)));
+    }
+
+    public Matrix<Real> atanh() {
+        return applyOp(null, (x) -> 0.5 * Math.log((1.0 + x) / (1.0 - x)));
+    }
+
+    public Matrix<Real> cbrt() {
+        return applyOp(VectorOperators.CBRT, (d) -> Math.cbrt(d));
+    }
+
+    public Matrix<Real> log10() {
+        return applyOp(VectorOperators.LOG10, (d) -> Math.log10(d));
+    }
+
+    public Matrix<Real> powScalar(double exponent) {
+        double[] res = new double[data.length];
+        int i = 0;
+        final VectorSpecies<Double> species = SPECIES;
+        DoubleVector vExp = DoubleVector.broadcast(species, exponent);
+        for (; i < species.loopBound(data.length); i += species.length()) {
+            var v = DoubleVector.fromArray(species, this.data, i);
+            v.lanewise(VectorOperators.POW, vExp).intoArray(res, i);
+        }
+        for (; i < data.length; i++) {
+            res[i] = Math.pow(data[i], exponent);
+        }
+        return new SIMDRealDoubleMatrix(storage.rows(), storage.cols(), res);
+    }
+
     private Matrix<Real> applyOp(jdk.incubator.vector.VectorOperators.Unary op, java.util.function.DoubleUnaryOperator scalarFallback) {
         double[] res = new double[data.length];
         int i = 0;
         final VectorSpecies<Double> species = SPECIES;
-        for (; i < species.loopBound(data.length); i += species.length()) {
-            var v = DoubleVector.fromArray(species, this.data, i);
-            v.lanewise(op).intoArray(res, i);
+        if (op != null) {
+            for (; i < species.loopBound(data.length); i += species.length()) {
+                var v = DoubleVector.fromArray(species, this.data, i);
+                v.lanewise(op).intoArray(res, i);
+            }
         }
         for (; i < data.length; i++) {
             res[i] = scalarFallback.applyAsDouble(data[i]);

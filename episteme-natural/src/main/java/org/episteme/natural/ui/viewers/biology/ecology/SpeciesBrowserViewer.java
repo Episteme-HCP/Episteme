@@ -35,6 +35,8 @@ import javafx.scene.image.Image;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.StringParameter;
 import org.episteme.core.ui.BooleanParameter;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
@@ -47,6 +49,7 @@ import javafx.application.Platform;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class SpeciesBrowserViewer extends AbstractViewer {
 
     private String searchQuery = "Panthera leo";

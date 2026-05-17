@@ -1,4 +1,0 @@
-<unit id="kilogramCalorie" name="kilogram-calorie" unitType="energy" parentSI="joule" multiplierToSI="4186.8"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 kilogram-calorie = 1 kilocalorie</description>
-</unit>

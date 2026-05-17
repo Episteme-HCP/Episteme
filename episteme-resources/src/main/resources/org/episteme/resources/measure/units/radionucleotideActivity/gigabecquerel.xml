@@ -1,4 +1,0 @@
-<unit id="gigabecquerel" name="gigabecquerel" abbreviation="GBq" unitType="radionucleotideActivity" parentSI="becquerel"
-      multiplierToSI="1.0E+9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 GBq = 10^9 Bq</description>
-</unit>

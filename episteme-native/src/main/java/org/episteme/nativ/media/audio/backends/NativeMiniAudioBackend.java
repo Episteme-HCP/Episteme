@@ -14,7 +14,6 @@ import org.episteme.core.technical.backend.Operation;
 import org.episteme.core.technical.backend.cpu.CPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.core.media.audio.AudioAlgorithmProvider;
-import org.episteme.core.media.audio.AudioBuffer;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 
 import java.lang.foreign.*;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@SuppressWarnings({"unused"})
 @AutoService({Backend.class, ComputeBackend.class, AudioBackend.class, NativeBackend.class, CPUBackend.class, AudioAlgorithmProvider.class})
 public class NativeMiniAudioBackend implements AudioBackend, NativeBackend, CPUBackend { 
 

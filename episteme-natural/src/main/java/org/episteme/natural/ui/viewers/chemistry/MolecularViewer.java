@@ -33,6 +33,8 @@ import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.NumericParameter;
 import org.episteme.core.ui.BooleanParameter;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ import java.util.List;
  * High-performance 3D Molecular Viewer.
  * Visualizes atoms, bonds, and electron density with premium aesthetics.
  */
+@AutoService(Viewer.class)
 public final class MolecularViewer extends AbstractViewer {
 
     private final Canvas canvas = new Canvas(800, 600);

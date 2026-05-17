@@ -5,9 +5,7 @@
 
 package org.episteme.core.technical.algorithm;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.slf4j.Logger;
@@ -48,19 +46,16 @@ public final class AlgorithmManager {
                 // Not a test environment
             }
 
-            // Trigger benchmark if no results found
-            Path path = Paths.get(System.getProperty("user.home"), ".episteme", "benchmarks.json");
-            if (!Files.exists(path) && !Boolean.getBoolean("episteme.benchmark.skip") && !isTest) {
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(5000); // Wait for system to stabilize
-                        AutoTuningRunner.runAll();
-                        AutoTuningManager.loadResults();
-                    } catch (Exception e) {
-                        logger.warn("Auto-benchmark (tuning) failed: {}", e.getMessage());
-                    }
-                }, "Episteme-AutoTuning").start();
+            if (isTest) {
+                service = new TestingAlgorithmService(java.util.List.of(), true);
+                logger.info("AlgorithmManager initialized in TEST mode (Standard fallback enabled)");
+            } else {
+                service = new StandardAlgorithmService();
+                logger.info("AlgorithmManager initialized in PRODUCTION mode");
             }
+
+            // Auto-tuning is now triggered manually via the UI to avoid startup slowness.
+            // A dedicated button should be added to the Master Control interface.
             Runtime.getRuntime().addShutdownHook(new Thread(AlgorithmManager::shutdown, "Episteme-Shutdown"));
         } catch (Throwable t) {
             System.err.println("[CRITICAL] AlgorithmManager static init failed: " + t.getMessage());

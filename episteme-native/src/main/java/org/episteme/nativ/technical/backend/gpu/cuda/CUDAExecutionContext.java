@@ -64,4 +64,32 @@ public class CUDAExecutionContext implements ExecutionContext {
     public void close() {
         // Resource management should be handled by the backend
     }
+
+    /**
+     * Creates a context from raw native handles. 
+     * Useful for Panama/FFM integration.
+     */
+    public static CUDAExecutionContext fromNative(long contextHandle, int deviceOrdinal) {
+        CUcontext ctx = new CUcontext();
+        try {
+            java.lang.reflect.Field field = jcuda.NativePointerObject.class.getDeclaredField("nativePointer");
+            field.setAccessible(true);
+            field.setLong(ctx, contextHandle);
+        } catch (Exception e) {
+            // Fallback: if reflection fails, the context might be unusable for JCuda calls
+            // but the handles still exist.
+        }
+        
+        CUdevice dev = new CUdevice();
+        try {
+            // CUdevice usually wraps an int in JCuda.
+            java.lang.reflect.Field field = CUdevice.class.getDeclaredField("nativeValue");
+            field.setAccessible(true);
+            field.setInt(dev, deviceOrdinal);
+        } catch (Exception e) {
+            // Fallback
+        }
+        
+        return new CUDAExecutionContext(ctx, dev);
+    }
 }

@@ -103,6 +103,54 @@ public class MulticoreLatticeBoltzmannProvider implements LatticeBoltzmannProvid
     }
 
     @Override
+    public void evolve(float[][][] f, boolean[][] obstacle, float omega) {
+        int nx = f.length;
+        int ny = f[0].length;
+        float[][][] nextF = new float[nx][ny][9];
+        float[] Fw = { 4.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 9.0f, 1.0f / 36.0f, 1.0f / 36.0f, 1.0f / 36.0f, 1.0f / 36.0f };
+
+        IntStream.range(0, nx).parallel().forEach(x -> {
+            for (int y = 0; y < ny; y++) {
+                if (obstacle != null && obstacle[x][y]) {
+                    for (int i = 0; i < 9; i++) {
+                        int nextX = (x + CX[i] + nx) % nx;
+                        int nextY = (y + CY[i] + ny) % ny;
+                        nextF[nextX][nextY][OPP[i]] = f[x][y][i];
+                    }
+                    continue;
+                }
+
+                float rho = 0, uxIdx = 0, uyIdx = 0;
+                for (int i = 0; i < 9; i++) {
+                    rho += f[x][y][i];
+                    uxIdx += f[x][y][i] * CX[i];
+                    uyIdx += f[x][y][i] * CY[i];
+                }
+
+                float ux = rho > 0 ? uxIdx / rho : 0;
+                float uy = rho > 0 ? uyIdx / rho : 0;
+                float u2 = ux * ux + uy * uy;
+
+                for (int i = 0; i < 9; i++) {
+                    float cu = 3.0f * (ux * CX[i] + uy * CY[i]);
+                    float feq = rho * Fw[i] * (1.0f + cu + 0.5f * cu * cu - 1.5f * u2);
+                    float fnew = f[x][y][i] + omega * (feq - f[x][y][i]);
+
+                    int nextX = (x + CX[i] + nx) % nx;
+                    int nextY = (y + CY[i] + ny) % ny;
+                    nextF[nextX][nextY][i] = fnew;
+                }
+            }
+        });
+
+        for (int x = 0; x < nx; x++) {
+            for (int y = 0; y < ny; y++) {
+                System.arraycopy(nextF[x][y], 0, f[x][y], 0, 9);
+            }
+        }
+    }
+
+    @Override
     public void evolve(double[][][] f, boolean[][] obstacle, double omega) {
         int nx = f.length;
         int ny = f[0].length;

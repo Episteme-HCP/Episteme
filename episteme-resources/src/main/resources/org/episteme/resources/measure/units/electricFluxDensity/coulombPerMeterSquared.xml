@@ -1,4 +1,0 @@
-<unit id="coulombPerMeterSquared" name="CoulombPerMeterSquared" abbreviation="C/m^2" unitType="electricFluxDensity"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>The SI unit of charge per area</description>
-</unit>

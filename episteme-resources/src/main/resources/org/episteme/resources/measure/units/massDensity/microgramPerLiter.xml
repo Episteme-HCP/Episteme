@@ -1,3 +1,0 @@
-<unit id="microgramPerLiter" name="microgramPerLiter" unitType="massDensity" parentSI="kilogramPerMeterCubed"
-      multiplierToSI="1.0E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

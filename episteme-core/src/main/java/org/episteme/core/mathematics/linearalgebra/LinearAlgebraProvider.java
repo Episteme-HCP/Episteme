@@ -36,7 +36,7 @@ import org.episteme.core.technical.algorithm.OperationContext;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
+public interface LinearAlgebraProvider<E> extends AlgorithmProvider, java.lang.AutoCloseable {
 
     /**
      * Checks if this provider is compatible with the given ring.
@@ -78,6 +78,34 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
         throw new UnsupportedOperationException(getName() + " does not support norm()");
     }
 
+    /**
+     * Returns the normalized vector (unit vector).
+     */
+    default Vector<E> normalize(Vector<E> a) {
+        throw new UnsupportedOperationException(getName() + " does not support normalize()");
+    }
+
+    /**
+     * Returns the cross product of two 3D vectors.
+     */
+    default Vector<E> cross(Vector<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException(getName() + " does not support cross()");
+    }
+
+    /**
+     * Returns the angle between two vectors in radians.
+     */
+    default E angle(Vector<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException(getName() + " does not support angle()");
+    }
+
+    /**
+     * Returns the projection of vector a onto vector b.
+     */
+    default Vector<E> projection(Vector<E> a, Vector<E> b) {
+        throw new UnsupportedOperationException(getName() + " does not support projection()");
+    }
+
     // --- Matrix Operations ---
     default Matrix<E> add(Matrix<E> a, Matrix<E> b) {
         throw new UnsupportedOperationException(getName() + " does not support Matrix add()");
@@ -103,14 +131,45 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
     default Matrix<E> transpose(Matrix<E> a) {
         throw new UnsupportedOperationException(getName() + " does not support transpose()");
     }
+    /**
+     * Solves the triangular system Ax = b.
+     * @param A the triangular matrix
+     * @param b the right-hand side vector
+     * @param upper true if A is upper triangular, false if lower
+     * @param transpose true if solving A^T x = b
+     * @param unit true if A is unit triangular (diagonal is all ones)
+     */
+    default Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean unit) {
+        throw new UnsupportedOperationException(getName() + " does not support solveTriangular()");
+    }
     default Matrix<E> scale(E scalar, Matrix<E> a) {
         throw new UnsupportedOperationException(getName() + " does not support scale()");
     }
+    default Matrix<E> exp(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support exp()"); }
+    default Matrix<E> log(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support log()"); }
+    default Matrix<E> log10(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support log10()"); }
+    default Matrix<E> sin(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support sin()"); }
+    default Matrix<E> cos(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support cos()"); }
+    default Matrix<E> tan(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support tan()"); }
+    default Matrix<E> asin(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support asin()"); }
+    default Matrix<E> acos(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support acos()"); }
+    default Matrix<E> atan(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support atan()"); }
+    default Matrix<E> sinh(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support sinh()"); }
+    default Matrix<E> cosh(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support cosh()"); }
+    default Matrix<E> tanh(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support tanh()"); }
+    default Matrix<E> asinh(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support asinh()"); }
+    default Matrix<E> acosh(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support acosh()"); }
+    default Matrix<E> atanh(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support atanh()"); }
+    default Matrix<E> pow(Matrix<E> a, E exponent) { throw new UnsupportedOperationException(getName() + " does not support pow()"); }
+    default Matrix<E> sqrt(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support sqrt()"); }
+    default Matrix<E> cbrt(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support cbrt()"); }
+    default E trace(Matrix<E> a) { throw new UnsupportedOperationException(getName() + " does not support trace()"); }
 
     /**
      * Computes the QR decomposition of the specified matrix.
      */
     default QRResult<E> qr(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default qr() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support qr()");
     }
 
@@ -118,6 +177,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the Singular Value Decomposition (SVD) of the specified matrix.
      */
     default SVDResult<E> svd(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default svd() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support svd()");
     }
 
@@ -125,6 +185,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the eigenvalue decomposition of the specified matrix.
      */
     default EigenResult<E> eigen(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default eigen() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support eigen()");
     }
 
@@ -132,6 +193,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the LU decomposition of the specified matrix.
      */
     default LUResult<E> lu(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default lu() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support lu()");
     }
 
@@ -139,6 +201,7 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
      * Computes the Cholesky decomposition of the specified matrix.
      */
     default CholeskyResult<E> cholesky(Matrix<E> a) {
+        System.out.println("[DIAGNOSTIC] Falling back to default cholesky() for provider: " + (this != null ? getName() : "null"));
         throw new UnsupportedOperationException(getName() + " does not support cholesky()");
     }
 
@@ -183,5 +246,10 @@ public interface LinearAlgebraProvider<E> extends AlgorithmProvider {
     @Override
     default String getAlgorithmType() {
         return "Linear Algebra";
+    }
+
+    @Override
+    default void close() {
+        // No-op by default
     }
 }

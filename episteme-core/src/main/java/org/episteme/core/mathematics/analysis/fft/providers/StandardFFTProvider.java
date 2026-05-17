@@ -16,6 +16,34 @@ public class StandardFFTProvider implements FFTProvider {
     }
 
     @Override
+    public float[][] transform(float[] real, float[] imag) {
+        int n = real.length;
+        Complex[] data = new Complex[n];
+        for (int i = 0; i < n; i++) data[i] = Complex.of(real[i], imag[i]);
+        Complex[] res = computeFFT(data, false);
+        float[][] out = new float[2][n];
+        for (int i = 0; i < n; i++) {
+            out[0][i] = (float) res[i].real();
+            out[1][i] = (float) res[i].imaginary();
+        }
+        return out;
+    }
+
+    @Override
+    public float[][] inverseTransform(float[] real, float[] imag) {
+        int n = real.length;
+        Complex[] data = new Complex[n];
+        for (int i = 0; i < n; i++) data[i] = Complex.of(real[i], imag[i]);
+        Complex[] res = computeFFT(data, true);
+        float[][] out = new float[2][n];
+        for (int i = 0; i < n; i++) {
+            out[0][i] = (float) (res[i].real() / n);
+            out[1][i] = (float) (res[i].imaginary() / n);
+        }
+        return out;
+    }
+
+    @Override
     public double[][] transform(double[] real, double[] imag) {
         int n = real.length;
         Complex[] data = new Complex[n];
@@ -102,8 +130,11 @@ public class StandardFFTProvider implements FFTProvider {
         Complex[] r = computeFFT(odd, inverse);
 
         Complex[] y = new Complex[n];
-        double angle = (inverse ? 2 : -2) * Math.PI / n;
-        Complex wn = Complex.of(Math.cos(angle), Math.sin(angle));
+        Real twoPi = Real.PI.multiply(Real.of(2.0));
+        Real angle = twoPi.divide(Real.of(n));
+        if (!inverse) angle = angle.negate();
+        
+        Complex wn = Complex.of(angle.cos(), angle.sin());
         Complex w = Complex.ONE;
 
         for (int k = 0; k < n / 2; k++) {
@@ -117,6 +148,27 @@ public class StandardFFTProvider implements FFTProvider {
     }
 
     // ========== 2D FFT ==========
+    
+    @Override
+    public float[][][] transform2D(float[][] real, float[][] imag) {
+        return computeFFT2DFloat(real, imag, false);
+    }
+
+    @Override
+    public float[][][] inverseTransform2D(float[][] real, float[][] imag) {
+        return computeFFT2DFloat(real, imag, true);
+    }
+
+    @Override
+    public Complex[][] transformComplex2D(Complex[][] data) {
+        return computeFFTComplex2D(data, false);
+    }
+
+    @Override
+    public Complex[][] inverseTransformComplex2D(Complex[][] data) {
+        return computeFFTComplex2D(data, true);
+    }
+
 
     @Override
     public double[][][] transform2D(double[][] real, double[][] imag) {
@@ -215,7 +267,90 @@ public class StandardFFTProvider implements FFTProvider {
         return out;
     }
 
+    private float[][][] computeFFT2DFloat(float[][] real, float[][] imag, boolean inverse) {
+        int rows = real.length;
+        int cols = real[0].length;
+        Complex[][] data = new Complex[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                data[i][j] = Complex.of(real[i][j], imag[i][j]);
+            }
+        }
+
+        for (int i = 0; i < rows; i++) {
+            data[i] = computeFFT(data[i], inverse);
+        }
+
+        Complex[] colData = new Complex[rows];
+        for (int j = 0; j < cols; j++) {
+            for (int i = 0; i < rows; i++) colData[i] = data[i][j];
+            Complex[] transformedCol = computeFFT(colData, inverse);
+            for (int i = 0; i < rows; i++) data[i][j] = transformedCol[i];
+        }
+
+        float[][][] out = new float[2][rows][cols];
+        float scale = (float) (inverse ? 1.0 / (rows * cols) : 1.0);
+        
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                out[0][i][j] = (float) (data[i][j].real() * scale);
+                out[1][i][j] = (float) (data[i][j].imaginary() * scale);
+            }
+        }
+        return out;
+    }
+
+    private Complex[][] computeFFTComplex2D(Complex[][] data, boolean inverse) {
+        int rows = data.length;
+        int cols = data[0].length;
+        Complex[][] result = new Complex[rows][cols];
+        for (int i = 0; i < rows; i++) System.arraycopy(data[i], 0, result[i], 0, cols);
+
+        for (int i = 0; i < rows; i++) {
+            result[i] = computeFFT(result[i], inverse);
+        }
+
+        Complex[] colData = new Complex[rows];
+        for (int j = 0; j < cols; j++) {
+            for (int i = 0; i < rows; i++) colData[i] = result[i][j];
+            Complex[] transformedCol = computeFFT(colData, inverse);
+            for (int i = 0; i < rows; i++) result[i][j] = transformedCol[i];
+        }
+
+        if (inverse) {
+            double scale = 1.0 / (rows * cols);
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    result[i][j] = result[i][j].multiply(Complex.of(scale, 0));
+                }
+            }
+        }
+        return result;
+    }
+
     // ========== 3D FFT ==========
+
+    @Override
+    public float[][][][] transform3D(float[][][] real, float[][][] imag) {
+        return computeFFT3DFloat(real, imag, false);
+    }
+
+    @Override
+    public float[][][][] inverseTransform3D(float[][][] real, float[][][] imag) {
+        return computeFFT3DFloat(real, imag, true);
+    }
+
+    @Override
+    public Complex[][][] transformComplex3D(Complex[][][] data) {
+        return computeFFTComplex3D(data, false);
+    }
+
+    @Override
+    public Complex[][][] inverseTransformComplex3D(Complex[][][] data) {
+        return computeFFTComplex3D(data, true);
+    }
+
 
     @Override
     public double[][][][] transform3D(double[][][] real, double[][][] imag) {
@@ -344,6 +479,107 @@ public class StandardFFTProvider implements FFTProvider {
             }
         }
         return out;
+    }
+
+    private float[][][][] computeFFT3DFloat(float[][][] real, float[][][] imag, boolean inverse) {
+        int n = real.length;
+        int m = real[0].length;
+        int d = real[0][0].length;
+        Complex[][][] data = new Complex[n][m][d];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < d; k++) {
+                    data[i][j][k] = Complex.of(real[i][j][k], imag[i][j][k]);
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                data[i][j] = computeFFT(data[i][j], inverse);
+            }
+        }
+
+        Complex[] buffer = new Complex[m];
+        for (int i = 0; i < n; i++) {
+            for (int k = 0; k < d; k++) {
+                for (int j = 0; j < m; j++) buffer[j] = data[i][j][k];
+                Complex[] res = computeFFT(buffer, inverse);
+                for (int j = 0; j < m; j++) data[i][j][k] = res[j];
+            }
+        }
+
+        buffer = new Complex[n];
+        for (int j = 0; j < m; j++) {
+            for (int k = 0; k < d; k++) {
+                for (int i = 0; i < n; i++) buffer[i] = data[i][j][k];
+                Complex[] res = computeFFT(buffer, inverse);
+                for (int i = 0; i < n; i++) data[i][j][k] = res[i];
+            }
+        }
+
+        float[][][][] out = new float[2][n][m][d];
+        float scale = (float) (inverse ? 1.0 / (n * m * d) : 1.0);
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < d; k++) {
+                    out[0][i][j][k] = (float) (data[i][j][k].real() * scale);
+                    out[1][i][j][k] = (float) (data[i][j][k].imaginary() * scale);
+                }
+            }
+        }
+        return out;
+    }
+
+    private Complex[][][] computeFFTComplex3D(Complex[][][] data, boolean inverse) {
+        int n = data.length;
+        int m = data[0].length;
+        int d = data[0][0].length;
+        Complex[][][] result = new Complex[n][m][d];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                result[i][j] = new Complex[d];
+                System.arraycopy(data[i][j], 0, result[i][j], 0, d);
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                result[i][j] = computeFFT(result[i][j], inverse);
+            }
+        }
+
+        Complex[] buffer = new Complex[m];
+        for (int i = 0; i < n; i++) {
+            for (int k = 0; k < d; k++) {
+                for (int j = 0; j < m; j++) buffer[j] = result[i][j][k];
+                Complex[] res = computeFFT(buffer, inverse);
+                for (int j = 0; j < m; j++) result[i][j][k] = res[j];
+            }
+        }
+
+        buffer = new Complex[n];
+        for (int j = 0; j < m; j++) {
+            for (int k = 0; k < d; k++) {
+                for (int i = 0; i < n; i++) buffer[i] = result[i][j][k];
+                Complex[] res = computeFFT(buffer, inverse);
+                for (int i = 0; i < n; i++) result[i][j][k] = res[i];
+            }
+        }
+
+        if (inverse) {
+            double scale = 1.0 / (n * m * d);
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    for (int k = 0; k < d; k++) {
+                        result[i][j][k] = result[i][j][k].multiply(Complex.of(scale, 0));
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     @Override

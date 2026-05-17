@@ -13,7 +13,8 @@ import org.episteme.core.technical.backend.ComputeBackend;
 import org.episteme.core.technical.backend.gpu.GPUBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import com.google.auto.service.AutoService;
-
+import org.episteme.core.media.vision.VisionAlgorithmProvider;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
 import java.awt.image.BufferedImage;
 import java.nio.DoubleBuffer;
 
@@ -28,8 +29,10 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 2.0
  */
-@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, GPUBackend.class, NativeBackend.class})
+@AutoService({Backend.class, ComputeBackend.class, VisionBackend.class, VisionAlgorithmProvider.class, GPUBackend.class, NativeBackend.class})
 public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, NativeBackend {
+
+    private final NativeOpenCLSparseLinearAlgebraBackend backend = new NativeOpenCLSparseLinearAlgebraBackend();
 
     @Override
     public boolean isLoaded() {
@@ -46,17 +49,12 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
     @Override public String getDescription() { return "GPU-accelerated image processing using OpenCL."; }
     @Override
     public boolean isAvailable() {
-        try {
-            Class.forName("org.jocl.CL");
-            return true;
-        } catch (Throwable t) {
-            return false;
-        }
+        return backend.isAvailable();
     }
 
     @Override
     public void shutdown() {
-        // No explicit resources to release for OpenCL Vision backend.
+        // Shared backend handles its own lifecycle.
     }
 
     @Override
@@ -80,6 +78,11 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
     }
 
     @Override
+    public String getName() {
+        return "OpenCL Vision";
+    }
+
+    @Override
     public int getPriority() {
         return 15; 
     }
@@ -91,7 +94,7 @@ public class NativeOpenCLVisionBackend implements VisionBackend, GPUBackend, Nat
 
     @Override
     public org.episteme.core.technical.backend.ExecutionContext createContext() {
-        return null;
+        return backend.createContext();
     }
 
     public SceneTransitionDetector.Transition detectMotion(float[][] prev, float[][] curr, float threshold) {

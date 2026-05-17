@@ -24,8 +24,8 @@
 package org.episteme.core.mathematics.numbers.real;
 
 import java.math.BigDecimal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.math.MathContext;
+import ch.obermuhlner.math.big.BigDecimalMath;
 
 /**
  * Real number backed by arbitrary-precision {@link BigDecimal}.
@@ -35,14 +35,26 @@ import org.slf4j.LoggerFactory;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-public @SuppressWarnings("unused")
-final class RealBig extends Real {
-    private static final Logger logger = LoggerFactory.getLogger(RealBig.class);
+public final class RealBig extends Real {
 
+    public static final RealBig NaN = new RealBig(null);
+    public static final RealBig ZERO = new RealBig(BigDecimal.ZERO);
+    public static final RealBig ONE = new RealBig(BigDecimal.ONE);
     private final BigDecimal value;
 
     private RealBig(BigDecimal value) {
         this.value = value;
+        if (value == null && this != NaN) {
+             // This might happen if the constructor is called before NaN is initialized?
+             // But RealBig.NaN is static final and usually initialized first.
+        }
+    }
+
+    public static RealBig of(String s) {
+        if (s == null || "NaN".equalsIgnoreCase(s) || "Infinity".equalsIgnoreCase(s) || "-Infinity".equalsIgnoreCase(s)) {
+            return NaN;
+        }
+        return new RealBig(new BigDecimal(s));
     }
 
     public static RealBig create(BigDecimal value) {
@@ -51,22 +63,27 @@ final class RealBig extends Real {
 
     @Override
     public Real add(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             return other;
         }
-        return Real.of(value.add(other.bigDecimalValue()).toString());
+        return RealBig.create(value.add(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real subtract(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             return other.negate();
         }
-        return Real.of(value.subtract(other.bigDecimalValue()).toString());
+        return RealBig.create(value.subtract(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real multiply(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             if (this.isZero()) {
                 return Real.NaN; // 0 * infinity = NaN
@@ -74,226 +91,222 @@ final class RealBig extends Real {
             // sign(this) * infinity
             return (this.value.signum() > 0) ? other : other.negate();
         }
-        return Real.of(value.multiply(other.bigDecimalValue()).toString());
+        return RealBig.create(value.multiply(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real divide(Real other) {
+        if (this.isNaN() || other.isNaN()) return NaN;
         if (other.isInfinite()) {
             return Real.ZERO; // x / infinity = 0
         }
-        return Real.of(value.divide(other.bigDecimalValue(), 
-            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
+        if (other.isZero()) {
+            return Real.NaN; // x / 0 = NaN for now (could be Infinity if directed)
+        }
+        return RealBig.create(value.divide(other.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
+    }
+
+    @Override
+    public Real zero() {
+        return ZERO;
+    }
+
+    @Override
+    public Real one() {
+        return ONE;
     }
 
     @Override
     public Real negate() {
+        if (this.isNaN()) return NaN;
         return RealBig.create(value.negate());
     }
 
     @Override
     public Real abs() {
+        if (this.isNaN()) return NaN;
         return RealBig.create(value.abs());
     }
 
     @Override
     public Real inverse() {
-        return Real.of(BigDecimal.ONE.divide(value, 
-            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
+        if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NaN;
+        return RealBig.create(BigDecimal.ONE.divide(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real sqrt() {
-        return Real.of(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()).toString());
+        if (this.isNaN()) return NaN;
+        // Handle numerical noise: if slightly negative, clamp to zero
+        if (value.signum() < 0) {
+            // Check if it's very close to zero - use a relative epsilon based on current context precision
+            java.math.MathContext mc = org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext();
+            // A safer threshold: 10 * 10^-precision (e.g. 1e-33 for prec=34)
+            // Or better, 1e-(precision-2) as already used but with more explicit logic.
+            BigDecimal threshold = BigDecimal.valueOf(1, Math.max(0, mc.getPrecision() - 2)); 
+            if (value.abs().compareTo(threshold) < 0) {
+                return ZERO;
+            }
+            return Real.NaN;
+        }
+        return RealBig.create(value.sqrt(org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real pow(int exp) {
+        if (this.isNaN()) return NaN;
         return RealBig.create(value.pow(exp));
-    }
-
-    private BigDecimal computeTranscendental(String function, BigDecimal value) {
-        try {
-            TranscendentalProvider provider = org.episteme.core.technical.algorithm.AlgorithmManager.getProvider(TranscendentalProvider.class);
-            if (provider != null && provider.isAvailable()) {
-                return provider.compute(function, value, org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext());
-            } else {
-                logger.info("Transcendental provider missing or unavailable for function {}: {}", function, provider);
-            }
-        } catch (Exception e) {
-            logger.error("Transcendental computation failed: {}", e.getMessage());
-            // Fallback to double math
-        }
-        return null;
-    }
-
-    private BigDecimal computeTranscendental(String function, BigDecimal v1, BigDecimal v2) {
-        try {
-            TranscendentalProvider provider = org.episteme.core.technical.algorithm.AlgorithmManager.getProvider(TranscendentalProvider.class);
-            if (provider != null && provider.isAvailable()) {
-                return provider.compute(function, v1, v2, org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext());
-            } else {
-                logger.info("Transcendental provider missing or unavailable for function {}: {}", function, provider);
-            }
-        } catch (Exception e) {
-            logger.error("Transcendental computation failed: {}", e.getMessage());
-            // Fallback to double math
-        }
-        return null;
     }
 
     @Override
     public Real pow(double exponent) {
-        BigDecimal res = computeTranscendental("pow", value, BigDecimal.valueOf(exponent));
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.pow(value.doubleValue(), exponent));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.pow(value, BigDecimal.valueOf(exponent), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real pow(Real exp) {
-        if (exp.isInfinite()) {
-            if (this.abs().compareTo(Real.ONE) > 0) {
-                return (exp.sign() > 0) ? Real.POSITIVE_INFINITY : Real.ZERO;
-            } else if (this.abs().compareTo(Real.ONE) < 0) {
-                return (exp.sign() > 0) ? Real.ZERO : Real.POSITIVE_INFINITY;
-            } else {
-                return Real.NaN;
-            }
-        }
-        BigDecimal res = computeTranscendental("pow", value, exp.bigDecimalValue());
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.pow(value.doubleValue(), exp.doubleValue()));
+        if (this.isNaN() || exp.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.pow(value, exp.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
-
-    // --- Transcendental Functions ---
 
     @Override
     public Real exp() {
-        BigDecimal res = computeTranscendental("exp", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.exp(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.exp(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real log() {
-        BigDecimal res = computeTranscendental("log", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.log(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NEGATIVE_INFINITY;
+        if (this.sign() < 0) return Real.NaN;
+        return RealBig.create(BigDecimalMath.log(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real log10() {
-        BigDecimal res = computeTranscendental("log10", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.log10(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        if (this.isZero()) return Real.NEGATIVE_INFINITY;
+        if (this.sign() < 0) return Real.NaN;
+        return RealBig.create(BigDecimalMath.log10(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real sin() {
-        BigDecimal res = computeTranscendental("sin", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.sin(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.sin(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real cos() {
-        BigDecimal res = computeTranscendental("cos", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.cos(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.cos(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real tan() {
-        BigDecimal res = computeTranscendental("tan", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.tan(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.tan(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real asin() {
-        BigDecimal res = computeTranscendental("asin", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.asin(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.asin(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real acos() {
-        BigDecimal res = computeTranscendental("acos", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.acos(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.acos(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real atan() {
-        BigDecimal res = computeTranscendental("atan", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.atan(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.atan(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real atan2(Real x) {
-        BigDecimal res = computeTranscendental("atan2", value, x.bigDecimalValue());
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.atan2(value.doubleValue(), x.doubleValue()));
+        if (this.isNaN() || x.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.atan2(value, x.bigDecimalValue(), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real sinh() {
-        BigDecimal res = computeTranscendental("sinh", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.sinh(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.sinh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real cosh() {
-        BigDecimal res = computeTranscendental("cosh", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.cosh(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.cosh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real tanh() {
-        BigDecimal res = computeTranscendental("tanh", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.tanh(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.tanh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real asinh() {
-        BigDecimal res = computeTranscendental("asinh", value);
-        if (res != null) return RealBig.create(res);
-        double d = value.doubleValue();
-        return Real.of(Math.log(d + Math.sqrt(d * d + 1.0)));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.asinh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real acosh() {
-        BigDecimal res = computeTranscendental("acosh", value);
-        if (res != null) return RealBig.create(res);
-        double d = value.doubleValue();
-        return Real.of(Math.log(d + Math.sqrt(d * d - 1.0)));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.acosh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real atanh() {
-        BigDecimal res = computeTranscendental("atanh", value);
-        if (res != null) return RealBig.create(res);
-        double d = value.doubleValue();
-        return Real.of(0.5 * Math.log((1.0 + d) / (1.0 - d)));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.atanh(value, 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real cbrt() {
-        BigDecimal res = computeTranscendental("cbrt", value);
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.cbrt(value.doubleValue()));
+        if (this.isNaN()) return NaN;
+        return RealBig.create(BigDecimalMath.pow(value, BigDecimal.ONE.divide(BigDecimal.valueOf(3), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()), 
+            org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext()));
     }
 
     @Override
     public Real hypot(Real y) {
-        BigDecimal res = computeTranscendental("hypot", value, y.bigDecimalValue());
-        if (res != null) return RealBig.create(res);
-        return Real.of(Math.hypot(value.doubleValue(), y.doubleValue()));
+        if (this.isNaN() || y.isNaN()) return NaN;
+        MathContext mc = org.episteme.core.mathematics.context.MathContext.getCurrent().getJavaMathContext();
+        BigDecimal x2 = value.multiply(value, mc);
+        BigDecimal y2 = y.bigDecimalValue().multiply(y.bigDecimalValue(), mc);
+        return RealBig.create(x2.add(y2, mc).sqrt(mc));
     }
 
     @Override
@@ -313,12 +326,12 @@ final class RealBig extends Real {
 
     @Override
     public Real toDegrees() {
-        return this.multiply(Real.of("180")).divide(Real.PI);
+        return this.multiply(RealBig.create(BigDecimal.valueOf(180))).divide(Real.PI);
     }
 
     @Override
     public Real toRadians() {
-        return this.multiply(Real.PI).divide(Real.of("180"));
+        return this.multiply(Real.PI).divide(RealBig.create(BigDecimal.valueOf(180)));
     }
 
     @Override
@@ -333,7 +346,7 @@ final class RealBig extends Real {
 
     @Override
     public boolean isNaN() {
-        return false; // BigDecimal cannot be NaN
+        return value == null;
     }
 
     @Override
@@ -343,16 +356,18 @@ final class RealBig extends Real {
 
     @Override
     public double doubleValue() {
-        return value.doubleValue();
+        return value == null ? Double.NaN : value.doubleValue();
     }
 
     @Override
     public BigDecimal bigDecimalValue() {
+        if (value == null) return BigDecimal.ZERO; // Or throw? Most places check isNaN
         return value;
     }
 
     @Override
     public int compareTo(Real other) {
+        if (this.isNaN() || other.isNaN()) return this.isNaN() ? (other.isNaN() ? 0 : 1) : -1;
         if (other.isInfinite()) {
             return (other.sign() > 0) ? -1 : 1; // Finite < +Inf, Finite > -Inf
         }
@@ -365,17 +380,19 @@ final class RealBig extends Real {
             return true;
         if (!(obj instanceof Real))
             return false;
-        return value.compareTo(((Real) obj).bigDecimalValue()) == 0;
+        Real other = (Real) obj;
+        if (this.isNaN() || other.isNaN()) return false;
+        return value.compareTo(other.bigDecimalValue()) == 0;
     }
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return value == null ? 0 : value.hashCode();
     }
 
     @Override
     public String toString() {
-        return value.toString();
+        return value == null ? "NaN" : value.toString();
     }
 
     @Override

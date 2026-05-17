@@ -1,4 +1,0 @@
-<unit id="angstrom" name="Angstrom" abbreviation="A" unitType="length" parentSI="meter" multiplierToSI="1.0E-10"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 angstrom = 1E-10 m</description>
-</unit>

@@ -6,7 +6,6 @@
 package org.episteme.nativ.mathematics.linearalgebra.backends;
 
 import org.episteme.core.mathematics.context.MathContext;
-import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.sets.Reals;
@@ -45,19 +44,19 @@ public class MPFRSparseSolverTest {
             SparseMatrix<Real> A = new SparseMatrix<>(storage, Real.ZERO);
             Vector<Real> b = DenseVector.of(Arrays.asList(Real.of(5.0), Real.of(5.0), Real.of(3.0)), Reals.getInstance());
             
-            NativeMPFRSparseLinearAlgebraProvider provider = new NativeMPFRSparseLinearAlgebraProvider();
-            assertTrue(provider.isAvailable(), "MPFR Backend should be available");
-            
-            Vector<Real> x = provider.solve(A, b);
-            
-            logger.info("Solution x: {}", x);
-            
-            // Expected x is [1, 1, 1]
-            for (int i = 0; i < n; i++) {
-                assertThat(x.get(i).doubleValue()).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-15));
-                assertTrue(x.get(i).toString().startsWith("1.0000000000"), "Solution should be accurate to at least 10 decimal places");
+            try (NativeMPFRSparseLinearAlgebraBackend<Real> provider = new NativeMPFRSparseLinearAlgebraBackend<>()) {
+                assertTrue(provider.isAvailable(), "MPFR Backend should be available");
+                
+                Vector<Real> x = provider.solve(A, b);
+                
+                logger.info("Solution x: {}", x);
+                
+                // Expected x is [1, 1, 1]
+                for (int i = 0; i < n; i++) {
+                    assertThat(x.get(i).doubleValue()).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-15));
+                    assertTrue(x.get(i).toString().startsWith("1.0000000000"), "Solution should be accurate to at least 10 decimal places");
+                }
             }
-            
             return null;
         });
     }
@@ -77,20 +76,19 @@ public class MPFRSparseSolverTest {
             SparseMatrix<Real> A = new SparseMatrix<>(storage, Real.ZERO);
             Vector<Real> b = DenseVector.of(Arrays.asList(bVals), Reals.getInstance());
             
-            NativeMPFRSparseLinearAlgebraProvider provider = new NativeMPFRSparseLinearAlgebraProvider();
-            
-            // Set high precision in context (50 digits)
-            // MathContext.exact() is usually very high already, but let's be explicit if possible.
-            // Currently MathContext.getCurrent().getJavaMathContext().getPrecision() is used.
-            
-            Vector<Real> x = provider.solve(A, b);
-            
-            logger.info("High precision solution sample: x[0] = {}", x.get(0));
-            
-            for (int i = 0; i < n; i++) {
-                assertTrue(x.get(i).toString().startsWith("1.0000000000"), "High precision solution should be exactly 1.0");
+            try (NativeMPFRSparseLinearAlgebraBackend<Real> provider = new NativeMPFRSparseLinearAlgebraBackend<>()) {
+                // Set high precision in context (50 digits)
+                // MathContext.exact() is usually very high already, but let's be explicit if possible.
+                // Currently MathContext.getCurrent().getJavaMathContext().getPrecision() is used.
+                
+                Vector<Real> x = provider.solve(A, b);
+                
+                logger.info("High precision solution sample: x[0] = {}", x.get(0));
+                
+                for (int i = 0; i < n; i++) {
+                    assertTrue(x.get(i).toString().startsWith("1.0000000000"), "High precision solution should be exactly 1.0");
+                }
             }
-            
             return null;
         });
     }

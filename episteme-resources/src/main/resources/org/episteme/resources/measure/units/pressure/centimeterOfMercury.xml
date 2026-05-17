@@ -1,4 +1,0 @@
-<unit id="centimeterOfMercury" name="centimeter of mercury" abbreviation="cm Hg" unitType="pressure" parentSI="pascal"
-      multiplierToSI="1333.22" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>10 mm Hg</description>
-</unit>

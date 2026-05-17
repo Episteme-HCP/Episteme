@@ -1,6 +1,0 @@
-<unit id="kilocalorie" name="kilocalorie" abbreviation="kcal" unitType="energy" parentSI="joule" multiplierToSI="4186.8"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>A unit frequently used in chemistry. Sometimes "kcal" is loosely used for "kcal/mole" or molar
-        energy.
-    </description>
-</unit>

@@ -36,7 +36,7 @@ import java.nio.DoubleBuffer;
  * @author Gemini AI (Google DeepMind)
  * @since 1.2
  */
-@AutoService({NBodyProvider.class, GPUBackend.class, ComputeBackend.class, Backend.class, NativeBackend.class})
+@AutoService({ComputeBackend.class, GPUBackend.class, Backend.class, NativeBackend.class, NBodyProvider.class})
 public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, NativeBackend {
 
     @Override
@@ -174,7 +174,43 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         "    f[i*3 + 1] = fy;\n" +
         "    f[i*3 + 2] = fz;\n" +
         "    \n" +
-        "    // Simple Euler Integration step within kernel to save transfers\n" +
+        "    v[i*3 + 0] += (fx / mi) * dt;\n" +
+        "    v[i*3 + 1] += (fy / mi) * dt;\n" +
+        "    v[i*3 + 2] += (fz / mi) * dt;\n" +
+        "    p[i*4 + 0] += v[i*3 + 0] * dt;\n" +
+        "    p[i*4 + 1] += v[i*3 + 1] * dt;\n" +
+        "    p[i*4 + 2] += v[i*3 + 2] * dt;\n" +
+        "}\n";
+
+    private static final String KERNEL_SOURCE_FLOAT = 
+        "__kernel void nbody_forces(__global float* p, __global float* v, __global float* f, int n, float dt, float G) {\n" +
+        "    int i = get_global_id(0);\n" +
+        "    if (i >= n) return;\n" +
+        "    \n" +
+        "    float fx = 0;\n" +
+        "    float fy = 0;\n" +
+        "    float fz = 0;\n" +
+        "    \n" +
+        "    float pix = p[i*4 + 0];\n" +
+        "    float piy = p[i*4 + 1];\n" +
+        "    float piz = p[i*4 + 2];\n" +
+        "    float mi  = p[i*4 + 3];\n" +
+        "    \n" +
+        "    for (int j = 0; j < n; j++) {\n" +
+        "        if (i == j) continue;\n" +
+        "        float dx = p[j*4 + 0] - pix;\n" +
+        "        float dy = p[j*4 + 1] - piy;\n" +
+        "        float dz = p[j*4 + 2] - piz;\n" +
+        "        float mj = p[j*4 + 3];\n" +
+        "        float distSqr = dx*dx + dy*dy + dz*dz + 1e-9f;\n" +
+        "        float dist = sqrt(distSqr);\n" +
+        "        float f = (G * mi * mj) / (distSqr * dist);\n" +
+        "        fx += f * dx; fy += f * dy; fz += f * dz;\n" +
+        "    }\n" +
+        "    f[i*3 + 0] = fx;\n" +
+        "    f[i*3 + 1] = fy;\n" +
+        "    f[i*3 + 2] = fz;\n" +
+        "    \n" +
         "    v[i*3 + 0] += (fx / mi) * dt;\n" +
         "    v[i*3 + 1] += (fy / mi) * dt;\n" +
         "    v[i*3 + 2] += (fz / mi) * dt;\n" +
@@ -230,6 +266,8 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     private boolean initialized = false;
     private cl_program program;
     private cl_kernel kernel;     // O(N²) brute-force
+    private cl_program programFloat;
+    private cl_kernel kernelFloat;
     private cl_program bhProgram;
     private cl_kernel bhKernel;   // O(N log N) Barnes-Hut
 
@@ -268,12 +306,21 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
 
         try {
             OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+            if (ctx == null) {
+                logger.warn("OpenCL NBody init failed: createContext() returned null");
+                initialized = false;
+                return;
+            }
             cl_context context = ctx.getContext();
 
             // Brute-force kernel
             program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE}, null, null);
             clBuildProgram(program, 0, null, null, null, null);
             kernel = clCreateKernel(program, "nbody_forces", null);
+
+            programFloat = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE_FLOAT}, null, null);
+            clBuildProgram(programFloat, 0, null, null, null, null);
+            kernelFloat = clCreateKernel(programFloat, "nbody_forces", null);
 
             // Barnes-Hut kernel
             bhProgram = clCreateProgramWithSource(context, 1, new String[]{BH_KERNEL_SOURCE}, null, null);
@@ -335,12 +382,14 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     public long allocateGPUMemory(long sizeBytes) {
         if (!initialized) initialize();
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         return clCreateBuffer(ctx.getContext(), CL_MEM_READ_WRITE, sizeBytes, null, null).getNativePointer();
     }
 
     @Override
     public void copyToGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_mem mem = new cl_mem();
         java.lang.reflect.Field field;
         try {
@@ -356,6 +405,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     @Override
     public void copyFromGPU(long gpuHandle, DoubleBuffer hostBuffer, long sizeBytes) {
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_mem mem = new cl_mem();
         try {
             java.lang.reflect.Field field = cl_mem.class.getDeclaredField("nativePointer");
@@ -383,7 +433,9 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
     @Override
     public void synchronize() {
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
-        clFinish(ctx.getCommandQueue());
+        if (ctx != null) {
+            clFinish(ctx.getCommandQueue());
+        }
     }
 
     @Override
@@ -417,6 +469,44 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         if (context.hasHint(OperationContext.Hint.BATCH)) base += 20;
         if (context.hasHint(OperationContext.Hint.LOW_LATENCY)) base -= 50;
         return base;
+    }
+
+    @Override
+    public void computeForces(float[] positions, float[] masses, float[] forces, float G, float softening) {
+        if (!initialized) initialize();
+        int n = masses.length;
+        
+        float[] p = new float[n * 4];
+        for (int i = 0; i < n; i++) {
+            p[i*4]   = positions[i*3];
+            p[i*4+1] = positions[i*3+1];
+            p[i*4+2] = positions[i*3+2];
+            p[i*4+3] = masses[i];
+        }
+
+        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
+        cl_context context = ctx.getContext();
+        cl_command_queue queue = ctx.getCommandQueue();
+        
+        cl_mem memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * p.length, Pointer.to(p), null);
+        cl_mem memV = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_float * n * 3, null, null);
+        cl_mem memF = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_float * forces.length, null, null);
+        
+        try {
+            clSetKernelArg(kernelFloat, 0, Sizeof.cl_mem, Pointer.to(memP));
+            clSetKernelArg(kernelFloat, 1, Sizeof.cl_mem, Pointer.to(memV));
+            clSetKernelArg(kernelFloat, 2, Sizeof.cl_mem, Pointer.to(memF));
+            clSetKernelArg(kernelFloat, 3, Sizeof.cl_int, Pointer.to(new int[]{n}));
+            clSetKernelArg(kernelFloat, 4, Sizeof.cl_float, Pointer.to(new float[]{0.0f}));
+            clSetKernelArg(kernelFloat, 5, Sizeof.cl_float, Pointer.to(new float[]{G}));
+            clEnqueueNDRangeKernel(queue, kernelFloat, 1, null, new long[]{n}, null, 0, null, null);
+            clEnqueueReadBuffer(queue, memF, CL_TRUE, 0, Sizeof.cl_float * forces.length, Pointer.to(forces), 0, null, null);
+        } finally {
+            clReleaseMemObject(memP);
+            clReleaseMemObject(memV);
+            clReleaseMemObject(memF);
+        }
     }
 
     @Override
@@ -454,6 +544,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         }
 
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
         cl_mem memP = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * p.length, Pointer.to(p), null);
@@ -504,6 +595,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         }
 
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
         cl_mem memNodes   = clCreateBuffer(context, CL_MEM_READ_ONLY  | CL_MEM_COPY_HOST_PTR, (long) Sizeof.cl_float  * flatNodes.length, Pointer.to(flatNodes), null);
@@ -551,6 +643,7 @@ public class NativeOpenCLNBodyBackend implements NBodyProvider, GPUBackend, Nati
         }
 
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) throw new IllegalStateException("OpenCL context could not be created");
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
 

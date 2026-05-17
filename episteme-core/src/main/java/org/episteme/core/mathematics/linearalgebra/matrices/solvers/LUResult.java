@@ -50,6 +50,7 @@ public record LUResult<E>(Matrix<E> L, Matrix<E> U, Vector<E> P) {
             int pIdx;
             if (pVal instanceof Number) pIdx = ((Number) pVal).intValue();
             else if (pVal instanceof org.episteme.core.mathematics.numbers.real.Real) pIdx = (int) ((org.episteme.core.mathematics.numbers.real.Real) pVal).doubleValue();
+            else if (pVal instanceof org.episteme.core.mathematics.numbers.complex.Complex) pIdx = (int) ((org.episteme.core.mathematics.numbers.complex.Complex) pVal).real();
             else pIdx = i;
             bp[i] = b.get(pIdx);
         }

@@ -1,9 +1,0 @@
-
-<!ENTITY candela.xml SYSTEM "../luminousIntensity/candela.xml">
-<!ENTITY millicandela.xml SYSTEM "../luminousIntensity/millicandela.xml">
-
-<!ENTITY luminousIntensity.elements	"
-&candela.xml;
-&millicandela.xml;
-">
-

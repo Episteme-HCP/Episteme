@@ -1,4 +1,0 @@
-<unit id="ampereSecondMeter" name="Ampere second meter" abbreviation="Asm" unitType="electricDipoleMoment"
-      parentSI="coulombMeter" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Electric dipole moment</description>
-</unit>

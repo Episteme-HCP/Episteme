@@ -1,4 +1,0 @@
-<unit id="katal" name="katal" abbreviation="kat" unitType="catalyticActivity" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>katal</description>
-</unit>

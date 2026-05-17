@@ -1,4 +1,0 @@
-<unit id="farad" name="farad" abbreviation="F" unitType="capacitance" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Charge per volt</description>
-</unit>

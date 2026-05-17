@@ -1,4 +1,0 @@
-<unit id="arcsecond" name="arcsecond" abbreviation="sec" unitType="angle" parentSI="radian"
-      multiplierToSI="4.848136811E-6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 arcsecond = 1/60 arcminute</description>
-</unit>

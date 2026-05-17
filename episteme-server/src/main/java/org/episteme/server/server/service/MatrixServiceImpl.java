@@ -27,9 +27,21 @@ import io.grpc.stub.StreamObserver;
 import java.nio.DoubleBuffer;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.episteme.server.server.proto.*;
+import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.SparseLinearAlgebraProvider;
+import org.episteme.core.mathematics.linearalgebra.Matrix;
+import org.episteme.core.mathematics.linearalgebra.Vector;
+import org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.RealDoubleMatrix;
+import org.episteme.core.mathematics.linearalgebra.matrices.solvers.*;
+import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
 import org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.context.MathContext;
+import org.episteme.core.technical.algorithm.OperationContext;
+import org.episteme.core.technical.algorithm.ProviderSelector;
+import org.episteme.server.server.proto.common.NumericalContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +49,10 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import org.episteme.core.technical.algorithm.AlgorithmProvider;
 
 /**
  * Server-side implementation of the MatrixService via gRPC.
@@ -52,262 +67,498 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(MatrixServiceImpl.class);
 
-    @Override
-    public void matrixMultiply(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
+    /**
+     * Reconciles gRPC NumericalContext into a core MathContext.
+     */
+    private MathContext reconcileContext(NumericalContext proto) {
+        if (proto == null || proto.equals(NumericalContext.getDefaultInstance())) {
+            return MathContext.getCurrent();
+        }
+
+        MathContext context;
+        switch (proto.getRealPrecision()) {
+            case EXACT -> context = MathContext.exact();
+            case FAST -> context = MathContext.fast();
+            default -> context = MathContext.normal();
+        }
+
+        if (proto.getMathContextPrecision() > 0) {
+            context = MathContext.withPrecision(proto.getMathContextPrecision());
+        }
+
+        return context;
+    }
+
+    /**
+     * Executes an operation with governance from NumericalContext.
+     */
+    private <P extends AlgorithmProvider, R> R executeWithContext(NumericalContext context, Class<P> providerClass, Function<P, R> operation) {
         try {
-            LOG.info("Received Matrix Multiplication request");
-
-            // 1. Convert Proto to Episteme Matrices
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrixA = fromProto(request.getMatrixA());
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrixB = fromProto(request.getMatrixB());
-
-            LOG.debug("Multiplying matrices: [{}x{}] * [{}x{}]",
-                    matrixA.rows(), matrixA.cols(), matrixB.rows(), matrixB.cols());
-
-            // 2. Perform Multiplication
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> resultMatrix = matrixA.multiply(matrixB);
-
-            // 3. Convert Result to Proto
-            MatrixData resultData = toProto(resultMatrix);
-
-            MatrixResponse response = MatrixResponse.newBuilder()
-                    .setResult(resultData)
-                    .build();
-
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-
-            LOG.info("Matrix Multiplication completed successfully");
-
+            MathContext mc = reconcileContext(context);
+            return mc.compute(() -> {
+                P prov;
+                try {
+                    // Use metadata from context if available (backend preference)
+                    String backendId = context.getBackendId();
+                    if (!backendId.isEmpty()) {
+                        prov = ProviderSelector.select(
+                                providerClass,
+                                OperationContext.DEFAULT,
+                                p -> p.getName().equalsIgnoreCase(backendId) || p.getClass().getName().contains(backendId)
+                        );
+                    } else if (mc.isHighPrecision()) {
+                        prov = ProviderSelector.select(
+                                providerClass,
+                                OperationContext.DEFAULT,
+                                p -> p.getName().contains("MPFR") || p.getName().contains("Big")
+                        );
+                    } else {
+                        prov = ProviderSelector.select(providerClass);
+                    }
+                } catch (java.util.NoSuchElementException e) {
+                    prov = ProviderSelector.select(providerClass);
+                    LOG.warn("Requested provider/precision not fully matched for {}. Falling back to: {}", 
+                        providerClass.getSimpleName(), prov.getName());
+                }
+                return operation.apply(prov);
+            });
         } catch (Exception e) {
-            LOG.error("Error during matrix multiplication", e);
-            responseObserver.onError(
-                    io.grpc.Status.INTERNAL
-                            .withDescription("Matrix multiplication failed: " + e.getMessage())
-                            .withCause(e)
-                            .asRuntimeException());
+            throw new RuntimeException("Execution failed: " + e.getMessage(), e);
         }
     }
 
     @Override
+    public void matrixMultiply(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
+        try {
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                LOG.debug("Received Matrix Multiplication request");
+
+                Matrix<?> matrixA = fromProto(request.getMatrixA());
+                Matrix<?> matrixB = fromProto(request.getMatrixB());
+
+                LOG.debug("Multiplying matrices: [{}x{}] * [{}x{}] using provider: {}",
+                        matrixA.rows(), matrixA.cols(), matrixB.rows(), matrixB.cols(), prov.getName());
+
+                @SuppressWarnings("unchecked")
+                Matrix<?> resultMatrix = prov.multiply((Matrix<Object>)matrixA, (Matrix<Object>)matrixB);
+
+                responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(resultMatrix)).build());
+                responseObserver.onCompleted();
+
+                LOG.debug("Matrix Multiplication completed successfully");
+                return null;
+            });
+        } catch (Exception e) {
+            handleError("matrixMultiply", e, responseObserver);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public void matrixAdd(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrixA()).add(fromProto(request.getMatrixB()));
-            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> m1 = (Matrix<Object>) fromProto(request.getMatrixA());
+                Matrix<Object> m2 = (Matrix<Object>) fromProto(request.getMatrixB());
+                Matrix<?> result = prov.add(m1, m2);
+                responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
             handleError("matrixAdd", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixSubtract(MatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrixA()).subtract(fromProto(request.getMatrixB()));
-            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> m1 = (Matrix<Object>) fromProto(request.getMatrixA());
+                Matrix<Object> m2 = (Matrix<Object>) fromProto(request.getMatrixB());
+                Matrix<?> result = prov.subtract(m1, m2);
+                responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
             handleError("matrixSubtract", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixTranspose(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrix()).transpose();
-            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Matrix<?> result = prov.transpose(matrix);
+                responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
             handleError("matrixTranspose", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixInverse(SingleMatrixRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = fromProto(request.getMatrix()).inverse();
-            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Matrix<?> result = ((LinearAlgebraProvider<Object>) prov).inverse(matrix);
+                MatrixData protoResult = toProto(result);
+                responseObserver.onNext(MatrixResponse.newBuilder().setResult(protoResult).build());
+                responseObserver.onCompleted();
+                return result;
+            });
         } catch (Exception e) {
             handleError("matrixInverse", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixScale(ScaleRequest request, StreamObserver<MatrixResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrix = fromProto(request.getMatrix());
-            org.episteme.core.mathematics.linearalgebra.Matrix<Real> result = matrix.scale(Real.of(request.getScalar()), matrix);
-            responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Object scalar;
+                if (request.getIsComplex()) {
+                    scalar = Complex.of(request.getScalar(), request.getImaginary());
+                } else if (!request.getHpScalar().isEmpty()) {
+                    scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(request.getHpScalar());
+                } else {
+                    scalar = Real.of(request.getScalar());
+                }
+                Matrix<?> result = prov.scale(scalar, matrix);
+                responseObserver.onNext(MatrixResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
             handleError("matrixScale", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixDeterminant(SingleMatrixRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            double det = fromProto(request.getMatrix()).determinant().doubleValue();
-            responseObserver.onNext(ScalarResponse.newBuilder().setValue(det).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Object det = prov.determinant(matrix);
+                responseObserver.onNext(toProtoScalar(det));
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixDeterminant", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorAdd(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVectorA()).add(fromProto(request.getVectorB()));
-            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
+                Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
+                Vector<?> result = prov.add(v1, v2);
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorAdd", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorSubtract(VectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVectorA()).subtract(fromProto(request.getVectorB()));
-            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
+                Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
+                Vector<?> result = prov.subtract(v1, v2);
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorSubtract", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorScale(VectorScaleRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getVector()).multiply(Real.of(request.getScalar()));
-            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
+                Object scalar;
+                if (request.getIsComplex()) {
+                    scalar = Complex.of(request.getScalar(), request.getImaginary());
+                } else if (!request.getHpScalar().isEmpty()) {
+                    scalar = org.episteme.core.mathematics.numbers.real.RealBig.of(request.getHpScalar());
+                } else {
+                    scalar = Real.of(request.getScalar());
+                }
+                Vector<?> result = prov.multiply(vector, scalar);
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorScale", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorDot(VectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            double dot = fromProto(request.getVectorA()).dot(fromProto(request.getVectorB())).doubleValue();
-            responseObserver.onNext(ScalarResponse.newBuilder().setValue(dot).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Vector<Object> v1 = (Vector<Object>) fromProto(request.getVectorA());
+                Vector<Object> v2 = (Vector<Object>) fromProto(request.getVectorB());
+                Object dot = prov.dot(v1, v2);
+                responseObserver.onNext(toProtoScalar(dot));
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorDot", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void vectorNorm(SingleVectorRequest request, StreamObserver<ScalarResponse> responseObserver) {
         try {
-            double norm = fromProto(request.getVector()).norm().doubleValue();
-            responseObserver.onNext(ScalarResponse.newBuilder().setValue(norm).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
+                Object norm = prov.norm(vector);
+                responseObserver.onNext(toProtoScalar(norm));
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("vectorNorm", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixVectorMultiply(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getMatrix()).multiply(fromProto(request.getVector()));
-            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
+                Vector<?> result = prov.multiply(matrix, vector);
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixVectorMultiply", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void linearSolve(MatrixVectorRequest request, StreamObserver<VectorResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.Vector<Real> result = fromProto(request.getMatrix()).solve(fromProto(request.getVector()));
-            responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Vector<Object> vector = (Vector<Object>) fromProto(request.getVector());
+                Vector<Object> result = prov.solve(matrix, vector);
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("linearSolve", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixLU(SingleMatrixRequest request, StreamObserver<LUResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.LUResult<Real> result = 
-                fromProto(request.getMatrix()).lu();
-            responseObserver.onNext(LUResponse.newBuilder()
-                .setL(toProto(result.L()))
-                .setU(toProto(result.U()))
-                .setP(toProto(result.P()))
-                .build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                LUResult<Object> result = prov.lu(matrix);
+                responseObserver.onNext(LUResponse.newBuilder()
+                    .setL(toProto(result.L()))
+                    .setU(toProto(result.U()))
+                    .setP(toProto(result.P()))
+                    .build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixLU", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixQR(SingleMatrixRequest request, StreamObserver<QRResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.QRResult<Real> result = 
-                fromProto(request.getMatrix()).qr();
-            responseObserver.onNext(QRResponse.newBuilder()
-                .setQ(toProto(result.Q()))
-                .setR(toProto(result.R()))
-                .build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                QRResult<Object> result = prov.qr(matrix);
+                responseObserver.onNext(QRResponse.newBuilder()
+                    .setQ(toProto(result.Q()))
+                    .setR(toProto(result.R()))
+                    .build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixQR", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixSVD(SingleMatrixRequest request, StreamObserver<SVDResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<Real> result = 
-                fromProto(request.getMatrix()).svd();
-            responseObserver.onNext(SVDResponse.newBuilder()
-                .setU(toProto(result.U()))
-                .setS(toProto(result.S()))
-                .setV(toProto(result.V()))
-                .build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                SVDResult<Object> result = prov.svd(matrix);
+                responseObserver.onNext(SVDResponse.newBuilder()
+                    .setU(toProto(result.U()))
+                    .setS(toProto(result.S()))
+                    .setV(toProto(result.V()))
+                    .build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixSVD", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixCholesky(SingleMatrixRequest request, StreamObserver<CholeskyResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<Real> result = 
-                fromProto(request.getMatrix()).cholesky();
-            responseObserver.onNext(CholeskyResponse.newBuilder()
-                .setL(toProto(result.L()))
-                .build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                CholeskyResult<Object> result = prov.cholesky(matrix);
+                responseObserver.onNext(CholeskyResponse.newBuilder()
+                    .setL(toProto(result.L()))
+                    .build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixCholesky", e, responseObserver);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void matrixEigen(SingleMatrixRequest request, StreamObserver<EigenResponse> responseObserver) {
         try {
-            org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<Real> result = 
-                fromProto(request.getMatrix()).eigen();
-            responseObserver.onNext(EigenResponse.newBuilder()
-                .setV(toProto(result.V()))
-                .setD(toProto(result.D()))
-                .build());
-            responseObserver.onCompleted();
+            executeWithContext(request.getContext(), LinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                EigenResult<Object> result = prov.eigen(matrix);
+                responseObserver.onNext(EigenResponse.newBuilder()
+                    .setV(toProto(result.V()))
+                    .setD(toProto(result.D()))
+                    .build());
+                responseObserver.onCompleted();
+                return null;
+            });
         } catch (Exception e) {
-            responseObserver.onError(io.grpc.Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+            handleError("matrixEigen", e, responseObserver);
         }
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void biCGSTAB(IterativeSolverRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            executeWithContext(request.getContext(), SparseLinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Vector<Object> b = (Vector<Object>) fromProto(request.getB());
+                Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
+                Object tol = fromProtoScalar(request.getTolerance());
+                int maxIter = request.getMaxIterations();
+
+                Vector<Object> result = prov.bicgstab(matrix, b, x0, tol, maxIter);
+
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
+        } catch (Exception e) {
+            handleError("biCGSTAB", e, responseObserver);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void conjugateGradient(IterativeSolverRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            executeWithContext(request.getContext(), SparseLinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Vector<Object> b = (Vector<Object>) fromProto(request.getB());
+                Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
+                Object tol = fromProtoScalar(request.getTolerance());
+                int maxIter = request.getMaxIterations();
+
+                Vector<Object> result = prov.conjugateGradient(matrix, b, x0, tol, maxIter);
+
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
+        } catch (Exception e) {
+            handleError("conjugateGradient", e, responseObserver);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void gMRES(GMRESRequest request, StreamObserver<VectorResponse> responseObserver) {
+        try {
+            executeWithContext(request.getContext(), SparseLinearAlgebraProvider.class, prov -> {
+                Matrix<Object> matrix = (Matrix<Object>) fromProto(request.getMatrix());
+                Vector<Object> b = (Vector<Object>) fromProto(request.getB());
+                Vector<Object> x0 = (Vector<Object>) fromProto(request.getX0());
+                Object tol = fromProtoScalar(request.getTolerance());
+                int maxIter = request.getMaxIterations();
+                int restart = request.getRestart();
+
+                Vector<Object> result = prov.gmres(matrix, b, x0, tol, maxIter, restart);
+
+                responseObserver.onNext(VectorResponse.newBuilder().setResult(toProto(result)).build());
+                responseObserver.onCompleted();
+                return null;
+            });
+        } catch (Exception e) {
+            handleError("gMRES", e, responseObserver);
+        }
+    }
+
+    private Object fromProtoScalar(ScalarResponse response) {
+        if (!response.getHpValue().isEmpty()) {
+            return org.episteme.core.mathematics.numbers.real.RealBig.of(response.getHpValue());
+        }
+        if (response.getIsComplex()) {
+            return Complex.of(response.getValue(), response.getImaginary());
+        } else {
+            return Real.of(response.getValue());
+        }
+    }
+
 
     private void handleError(String op, Exception e, StreamObserver<?> responseObserver) {
         LOG.error("Error during " + op, e);
@@ -318,60 +569,240 @@ public class MatrixServiceImpl extends MatrixServiceGrpc.MatrixServiceImplBase {
                         .asRuntimeException());
     }
 
-    private RealDoubleMatrix fromProto(MatrixData proto) {
+    private Matrix<?> fromProto(MatrixData proto) {
         int rows = proto.getRows();
         int cols = proto.getCols();
-        ByteString byteData = proto.getData();
+        boolean isComplex = proto.getIsComplex();
         
-        double[] data = new double[rows * cols];
-        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(data);
-
-        return RealDoubleMatrix.of(data, rows, cols);
-    }
-
-    private RealDoubleVector fromProto(VectorData proto) {
-        int size = proto.getSize();
-        ByteString byteData = proto.getData();
-        double[] data = new double[size];
-        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(data);
-        return RealDoubleVector.of(data);
-    }
-
-    private VectorData toProto(org.episteme.core.mathematics.linearalgebra.Vector<Real> vector) {
-        int size = vector.dimension();
-        ByteBuffer bb = ByteBuffer.allocate(size * 8).order(ByteOrder.LITTLE_ENDIAN);
-        DoubleBuffer db = bb.asDoubleBuffer();
-        for (int i = 0; i < size; i++) {
-            db.put(vector.get(i).doubleValue());
+        if (!proto.getHpDataList().isEmpty()) {
+            List<String> hpData = proto.getHpDataList();
+            org.episteme.core.mathematics.numbers.real.Real[][] raw = new org.episteme.core.mathematics.numbers.real.Real[rows][cols];
+            java.util.concurrent.atomic.AtomicInteger idx = new java.util.concurrent.atomic.AtomicInteger(0);
+            org.episteme.core.mathematics.context.MathContext.exact().compute(() -> {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        int currentIdx = idx.getAndIncrement();
+                        String s = hpData.get(currentIdx);
+                        try {
+                            raw[i][j] = org.episteme.core.mathematics.numbers.real.RealBig.of(s);
+                        } catch (Exception e) {
+                            LOG.error("Failed to parse high-precision string at [{},{}]: '{}'", i, j, s);
+                            throw e;
+                        }
+                    }
+                }
+                return null;
+            });
+            return org.episteme.core.mathematics.linearalgebra.matrices.DenseMatrix.of(raw, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
         }
-        return VectorData.newBuilder()
-                .setSize(size)
-                .setData(ByteString.copyFrom(bb))
-                .build();
+
+        ByteString byteData = proto.getData();
+        int multiplier = isComplex ? 2 : 1;
+        double[] raw = new double[rows * cols * multiplier];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
+
+        if (isComplex) {
+            List<List<Complex>> data = new ArrayList<>(rows);
+            int idx = 0;
+            for (int i = 0; i < rows; i++) {
+                List<Complex> row = new ArrayList<>(cols);
+                for (int j = 0; j < cols; j++) {
+                    row.add(Complex.of(raw[idx++], raw[idx++]));
+                }
+                data.add(row);
+            }
+            return DenseMatrix.of(data, Complex.ZERO);
+        } else {
+            return RealDoubleMatrix.of(raw, rows, cols);
+        }
     }
 
-    private MatrixData toProto(org.episteme.core.mathematics.linearalgebra.Matrix<Real> matrix) {
+    private Vector<?> fromProto(VectorData proto) {
+        int size = proto.getSize();
+        boolean isComplex = proto.getIsComplex();
+
+        if (!proto.getHpDataList().isEmpty()) {
+            List<String> hpData = proto.getHpDataList();
+            List<org.episteme.core.mathematics.numbers.real.Real> data = new ArrayList<>(size);
+            for (String s : hpData) {
+                data.add(org.episteme.core.mathematics.numbers.real.RealBig.of(s));
+            }
+            return org.episteme.core.mathematics.linearalgebra.vectors.DenseVector.of(data, org.episteme.core.mathematics.numbers.real.RealBig.ZERO);
+        }
+
+        ByteString byteData = proto.getData();
+        int multiplier = isComplex ? 2 : 1;
+        double[] raw = new double[size * multiplier];
+        byteData.asReadOnlyByteBuffer().order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer().get(raw);
+
+        if (isComplex) {
+            List<Complex> data = new ArrayList<>(size);
+            int idx = 0;
+            for (int i = 0; i < size; i++) {
+                data.add(Complex.of(raw[idx++], raw[idx++]));
+            }
+            return DenseVector.of(data, Complex.ZERO);
+        } else {
+            return RealDoubleVector.of(raw);
+        }
+    }
+
+    private MatrixData toProto(Matrix<?> matrix) {
         int rows = matrix.rows();
         int cols = matrix.cols();
+        
+        Object zero = matrix.getScalarRing().zero();
+        boolean isComplex = zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        
+        boolean isHPContextM = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        String zeroClass = zero.getClass().getName();
+        boolean isHPRingM = zeroClass.contains("RealBig") || zeroClass.contains("Complex");
+        
+        // Element-level check
+        boolean isHPElementsM = false;
+        if (!isHPRingM && rows > 0 && cols > 0) {
+            Object first = matrix.get(0, 0);
+            if (first != null) {
+                String firstClass = first.getClass().getName();
+                isHPElementsM = firstClass.contains("RealBig") || firstClass.contains("Complex");
+            }
+        }
+        
+        boolean isHPM = isHPContextM || isHPRingM || isHPElementsM;
 
         MatrixData.Builder builder = MatrixData.newBuilder()
                 .setRows(rows)
-                .setCols(cols);
+                .setCols(cols)
+                .setIsComplex(isComplex);
 
-        ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8).order(ByteOrder.LITTLE_ENDIAN);
-        DoubleBuffer db = bb.asDoubleBuffer();
-
-        if (matrix instanceof RealDoubleMatrix rdm) {
-            db.put(rdm.getBuffer());
-        } else {
-            // Generic slow path for views (Transposed, etc.)
+        if (isHPM) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    db.put(matrix.get(i, j).doubleValue());
+                    Object val = matrix.get(i, j);
+                    if (isComplex) {
+                        org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) val;
+                        builder.addHpData(c.getReal().toString());
+                        builder.addHpData(c.getImaginary().toString());
+                    } else {
+                        builder.addHpData(val.toString());
+                    }
                 }
             }
+        } else {
+            int multiplier = isComplex ? 2 : 1;
+            ByteBuffer bb = ByteBuffer.allocate(rows * cols * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
+            DoubleBuffer db = bb.asDoubleBuffer();
+
+            if (matrix instanceof RealDoubleMatrix rdm && !isComplex) {
+                db.put(rdm.getBuffer());
+            } else {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        Object val = matrix.get(i, j);
+                        if (isComplex) {
+                            Complex c = (Complex) val;
+                            db.put(c.real());
+                            db.put(c.imaginary());
+                        } else {
+                            db.put(((Real)val).doubleValue());
+                        }
+                    }
+                }
+            }
+            builder.setData(ByteString.copyFrom(bb));
         }
-        builder.setData(ByteString.copyFrom(bb));
         return builder.build();
+    }
+
+    private VectorData toProto(Vector<?> vector) {
+        int size = vector.dimension();
+        
+        // Correctly detect complex ring
+        Object zero = vector.getScalarRing().zero();
+        boolean isComplex = zero instanceof org.episteme.core.mathematics.numbers.complex.Complex;
+        
+        boolean isHPContextV = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        String zeroClass = zero.getClass().getName();
+        boolean isHPRingV = zeroClass.contains("RealBig") || zeroClass.contains("Complex");
+        
+        // Element-level check
+        boolean isHPElementsV = false;
+        if (!isHPRingV && size > 0) {
+            Object first = vector.get(0);
+            if (first != null) {
+                String firstClass = first.getClass().getName();
+                isHPElementsV = firstClass.contains("RealBig") || firstClass.contains("Complex");
+            }
+        }
+        boolean isHPV = isHPContextV || isHPRingV || isHPElementsV;
+
+        VectorData.Builder builder = VectorData.newBuilder()
+                .setSize(size)
+                .setIsComplex(isComplex);
+
+        if (isHPV) {
+            for (int i = 0; i < size; i++) {
+                Object val = vector.get(i);
+                if (isComplex) {
+                    org.episteme.core.mathematics.numbers.complex.Complex c = (org.episteme.core.mathematics.numbers.complex.Complex) val;
+                    builder.addHpData(c.getReal().toString());
+                    builder.addHpData(c.getImaginary().toString());
+                } else {
+                    builder.addHpData(val.toString());
+                }
+            }
+        } else {
+            int multiplier = isComplex ? 2 : 1;
+            ByteBuffer bb = ByteBuffer.allocate(size * 8 * multiplier).order(ByteOrder.LITTLE_ENDIAN);
+            DoubleBuffer db = bb.asDoubleBuffer();
+            for (int i = 0; i < size; i++) {
+                Object val = vector.get(i);
+                if (isComplex) {
+                    Complex c = (Complex) val;
+                    db.put(c.real());
+                    db.put(c.imaginary());
+                } else {
+                    db.put(((Real)val).doubleValue());
+                }
+            }
+            builder.setData(ByteString.copyFrom(bb));
+        }
+        return builder.build();
+    }
+
+    private ScalarResponse toProtoScalar(Object scalar) {
+        if (scalar instanceof org.episteme.core.mathematics.numbers.complex.Complex c) {
+            boolean isHP = org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+            if (isHP) {
+                return ScalarResponse.newBuilder()
+                        .setHpValue(c.getReal().toString() + ";" + c.getImaginary().toString())
+                        .setIsComplex(true)
+                        .build();
+            }
+            return ScalarResponse.newBuilder()
+                    .setValue(c.getReal().doubleValue())
+                    .setImaginary(c.getImaginary().doubleValue())
+                    .setIsComplex(true)
+                    .build();
+        } else if (scalar instanceof org.episteme.core.mathematics.numbers.real.RealBig rb) {
+            return ScalarResponse.newBuilder()
+                    .setHpValue(rb.toString())
+                    .setIsComplex(false)
+                    .build();
+        } else if (scalar instanceof Real r) {
+            return ScalarResponse.newBuilder()
+                    .setValue(r.doubleValue())
+                    .setIsComplex(false)
+                    .build();
+        } else if (scalar instanceof Number n) {
+            return ScalarResponse.newBuilder()
+                    .setValue(n.doubleValue())
+                    .setIsComplex(false)
+                    .build();
+        }
+        return ScalarResponse.newBuilder()
+                .setValue(0.0)
+                .setIsComplex(false)
+                .build();
     }
 }

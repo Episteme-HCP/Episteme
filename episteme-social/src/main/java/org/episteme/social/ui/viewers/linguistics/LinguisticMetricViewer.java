@@ -30,12 +30,15 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.chart.*;
 import org.episteme.core.ui.AbstractViewer;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.social.linguistics.LinguisticData;
 
 /**
  * Visualizes linguistic structures: syntax trees, Zipf distributions, and sentiment trends.
  */
+@AutoService(Viewer.class)
 public final class LinguisticMetricViewer extends AbstractViewer {
 
     private final TabPane tabs = new TabPane();

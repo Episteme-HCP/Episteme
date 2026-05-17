@@ -14,7 +14,7 @@
 
 .form-label {
     -fx-font-weight: bold;
-    -fx-text-fill: #333333;
+    -fx-text-fill: #333333 !important;
     -fx-font-size: 13px;
 }
 

@@ -1,6 +1,0 @@
-<unitType id="absorbedDose" name="absorbed dose">
-    <alternative type="synonym">Specific energy (imparted)</alternative>
-    <alternative type="synonym">kerma</alternative>
-    <dimension name="length" power="2" preserve="no"/>
-    <dimension name="time" power="-2" preserve="no"/>
-</unitType>

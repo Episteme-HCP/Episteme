@@ -44,7 +44,17 @@ public class MulticoreMaxwellProvider implements MaxwellProvider {
     }
 
     @Override
-    public double[][] computeTensor(Vector4D point) {
+    public float[][] computeTensorFloat(Vector4D point) {
+        double[][] d = computeTensorDouble(point);
+        float[][] f = new float[4][4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) f[i][j] = (float) d[i][j];
+        }
+        return f;
+    }
+
+    @Override
+    public double[][] computeTensorDouble(Vector4D point) {
         double t = point.getCt();
         double x = point.getX();
         double y = point.getY();
@@ -72,7 +82,7 @@ public class MulticoreMaxwellProvider implements MaxwellProvider {
     }
 
     @Override
-    public Real[][] computeTensorReal(Vector4D point) {
+    public Real[][] computeTensor(Vector4D point) {
         Real t = Real.of(point.getCt());
         Real x = Real.of(point.getX());
         Real y = Real.of(point.getY());

@@ -1,4 +1,0 @@
-<unit id="ounce" name="ounce" abbreviation="oz" unitType="mass" parentSI="kilogram" multiplierToSI="0.0283495"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>16 ounces = 1 pound</description>
-</unit>

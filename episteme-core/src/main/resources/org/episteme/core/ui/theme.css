@@ -1,4 +1,4 @@
-﻿/* Episteme Light Theme (Cream/Orange/High Contrast) */
+/* Episteme Light Theme (Cream/Orange/High Contrast) */
 
 .root {
     -fx-base: #fdfbf7;
@@ -18,7 +18,7 @@
 
 /* Labels */
 .label {
-    -fx-text-fill: #2c2c2c; color: #2c2c2c;
+    -fx-text-fill: #2c2c2c !important; color: #2c2c2c !important;
 }
 
 .header-label {
@@ -27,6 +27,14 @@
     -fx-font-weight: bold;
     font-weight: bold;
     -fx-text-fill: #e65100;
+}
+
+.header-title {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #2c3e50;
 }
 
 .header-label-white {
@@ -38,16 +46,28 @@
 }
 
 .description-label {
-    -fx-text-fill: #555555; color: #555555;
+    -fx-text-fill: #555555 !important; color: #555555 !important;
     -fx-font-style: italic;
     font-style: italic;
+}
+
+.dashboard-subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: #444444 !important;
+    -fx-font-style: italic;
+}
+
+.dashboard-description {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666666 !important;
+    -fx-line-spacing: 1.2em;
 }
 
 /* Buttons */
 .button {
     -fx-background-color: #ff9800; background: #ff9800;
     background-color: #ff9800;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
     -fx-background-radius: 4; border-radius: 4;
     -fx-padding: 8 16;
     padding: 8 16;
@@ -87,11 +107,14 @@
 }
 
 .tab-label {
-    -fx-text-fill: #444; color: #444;
+    -fx-text-fill: #2c2c2c !important; color: #2c2c2c !important;
 }
 
-.tab:selected .tab-label {
-    -fx-text-fill: #e65100; color: #e65100;
+.tab:selected .tab-label,
+.tab:selected .label,
+.tab:selected > .tab-container > .label {
+    -fx-text-fill: #e65100 !important;
+    color: #e65100 !important;
 }
 
 /* Charts */
@@ -113,7 +136,7 @@
 }
 
 .axis-label {
-    -fx-text-fill: #444; color: #444;
+    -fx-text-fill: #2c2c2c !important; color: #2c2c2c !important;
 }
 
 .axis-tick-label {
@@ -205,11 +228,25 @@
     padding: 0 0 5 0;
 }
 
+.status-label-available {
+    -fx-text-fill: #27ae60 !important;
+    -fx-font-weight: bold;
+}
+
+.status-label-unavailable {
+    -fx-text-fill: #c0392b !important;
+    -fx-font-weight: bold;
+}
+
+.font-bold { -fx-font-weight: bold; }
+.font-italic { -fx-font-style: italic; }
+.text-dark { -fx-text-fill: #2c2c2c !important; }
+
 .description-label {
     -fx-font-size: 12px;
     font-size: 12px;
-    -fx-text-fill: #7f8c8d;
-    color: #7f8c8d;
+    -fx-text-fill: #7f8c8d !important;
+    color: #7f8c8d !important;
 }
 
 /* Dark viewer backgrounds (ONLY for content areas like sky/space, NOT for panels) */
@@ -222,31 +259,31 @@
 .accent-button-green {
     -fx-background-color: #4CAF50; background: #4CAF50;
     background-color: #4CAF50;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
 }
 
 .accent-button-red {
     -fx-background-color: #e74c3c; background: #e74c3c;
     background-color: #e74c3c;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
 }
 
 .accent-button-blue {
     -fx-background-color: #0f4c75; background: #0f4c75;
     background-color: #0f4c75;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
 }
 
 .accent-button-orange {
     -fx-background-color: #ff9800; background: #ff9800;
     background-color: #ff9800;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
 }
 
 .button-secondary {
     -fx-background-color: #7f8c8d; background: #7f8c8d;
     background-color: #7f8c8d;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
 }
 
 
@@ -275,13 +312,12 @@
     font-size: 28px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: white;
+    -fx-text-fill: white !important;
 }
 
 .header-subtitle {
     -fx-font-size: 14px;
-    font-size: 14px;
-    -fx-text-fill: #eeeeee; color: #eeeeee;
+    -fx-text-fill: rgba(255, 255, 255, 0.85) !important;
 }
 
 .section-box {
@@ -309,11 +345,28 @@
     font-size: 16px;
     -fx-font-weight: bold;
     font-weight: bold;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
 }
 
 .launch-button {
     -fx-background-color: #ff9800; background: #ff9800;
     background-color: #ff9800;
-    -fx-text-fill: white; color: white;
+    -fx-text-fill: white !important; color: white !important;
+}
+
+/* TitledPane & Accordion Fixes */
+.titled-pane > .title {
+    -fx-background-color: #f5f5f5;
+    -fx-text-fill: #2c2c2c !important;
+    -fx-font-weight: bold;
+}
+
+.accordion > .titled-pane > .title {
+    -fx-background-color: #eeeeee;
+}
+
+.titled-pane:expanded > .title {
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: #ff8c00;
+    -fx-border-width: 0 0 0 4;
 }

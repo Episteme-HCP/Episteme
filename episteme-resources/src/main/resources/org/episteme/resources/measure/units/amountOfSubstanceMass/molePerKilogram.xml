@@ -1,3 +1,0 @@
-<unit id="molePerKilogram" name="mole per kilogram" abbreviation="mol/kg" unitType="amountOfSubstanceMass"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,3 +1,0 @@
-<unitType id="magnetomotiveForce" name="magnetomotive force">
-    <dimension name="current" power="1" preserve="no"/>
-</unitType>

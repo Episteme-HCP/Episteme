@@ -34,6 +34,8 @@ import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.RealParameter;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.social.geography.SpatialDataSet;
 import org.episteme.core.mathematics.numbers.real.Real;
 
@@ -43,6 +45,7 @@ import java.util.*;
  * Universal viewer for geographic and spatial fluxes.
  * Supports heatmaps, vector flows, and point data.
  */
+@AutoService(Viewer.class)
 public final class SpatialFluxViewer extends AbstractViewer {
 
     private final Canvas canvas = new Canvas(1000, 700);

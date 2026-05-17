@@ -52,17 +52,31 @@ public abstract class AbstractBackendManager<T extends Backend> {
      * Discovers and registers backends using ServiceLoader.
      */
     public void refresh() {
+        backends.clear();
         ServiceLoader<T> loader = ServiceLoader.load(backendClass);
-        for (T backend : loader) {
-            managerRegister(backend);
+        Iterator<T> iterator = loader.iterator();
+        
+        while (true) {
+            try {
+                if (!iterator.hasNext()) break;
+                T backend = iterator.next();
+                managerRegister(backend);
+            } catch (ServiceConfigurationError | LinkageError | RuntimeException e) {
+                logger.error("Failed to load a provider for {}: {}", backendClass.getSimpleName(), e.getMessage());
+                // Continue to next provider
+            }
         }
-        if (defaultBackend == null) {
+
+        if (defaultBackend == null || !defaultBackend.isAvailable()) {
             defaultBackend = selectBestBackend();
             if (defaultBackend != null) {
                 logger.info("Auto-selected best backend: {} ({}) for {}", 
                     defaultBackend.getName(), defaultBackend.getStatusMessage(), backendClass.getSimpleName());
+            } else if (!backends.isEmpty()) {
+                logger.warn("No available backends found for {}. Registered backends: {}", 
+                    backendClass.getSimpleName(), backends.keySet());
             } else {
-                logger.warn("No available backends found for {}. Check diagnostic logs.", backendClass.getSimpleName());
+                logger.warn("No backends of type {} were discovered at all.", backendClass.getSimpleName());
             }
         }
     }

@@ -52,6 +52,6 @@ public interface TensorProvider extends AlgorithmProvider {
 
     @Override
     default String getAlgorithmType() {
-        return "Tensor Operations";
+        return "Tensors";
     }
 }

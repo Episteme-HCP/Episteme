@@ -1,4 +1,0 @@
-<unit id="are" name="are" unitType="area" parentSI="meterSquared" multiplierToSI="100"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>100 square meters</description>
-</unit>

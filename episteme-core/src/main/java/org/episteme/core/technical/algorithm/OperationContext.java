@@ -79,8 +79,14 @@ public final class OperationContext {
         MAT_CHOLESKY,
         /** LU Decomposition */
         MAT_LU,
-        /** Eigenvalue Decomposition */
-        MAT_EIGEN
+        /** Eigen decomposition hint */
+        MAT_EIGEN,
+        /** Matrix trace hint */
+        MAT_TRACE,
+        /** High precision required (e.g. for RealBig/Complex) */
+        HIGH_PRECISION,
+        /** Complex numbers operation */
+        COMPLEX
     }
 
     public static final OperationContext DEFAULT = new OperationContext.Builder().build();

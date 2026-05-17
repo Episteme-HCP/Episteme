@@ -1,4 +1,0 @@
-<unit id="literPerSecond" name="liter per second" abbreviation="l/s" unitType="volumetricRate"
-      parentSI="meterCubedPerSecond" multiplierToSI="0.001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>liters per second</description>
-</unit>

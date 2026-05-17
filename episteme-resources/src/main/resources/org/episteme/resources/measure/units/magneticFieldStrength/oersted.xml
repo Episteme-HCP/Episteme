@@ -1,4 +1,0 @@
-<unit id="oersted" name="oersted" abbreviation="Oe" unitType="magneticFieldStrength" parentSI="amperePerMeter"
-      multiplierToSI="79.57747" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 Oe = (1000/(4 pi)) A/m</description>
-</unit>

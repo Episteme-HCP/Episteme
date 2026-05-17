@@ -1,4 +1,0 @@
-<unit id="kilopascal" name="kilopascal" abbreviation="kPa" unitType="pressure" parentSI="pascal" multiplierToSI="1000"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>kilo pascal</description>
-</unit>

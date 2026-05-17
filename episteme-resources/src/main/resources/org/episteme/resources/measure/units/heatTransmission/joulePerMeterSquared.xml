@@ -1,3 +1,0 @@
-<unit id="joulePerMeterSquared" name="joule per meter squared" abbreviation="J/m^2" unitType="heatTransmission"
-      parentSI="SELF" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

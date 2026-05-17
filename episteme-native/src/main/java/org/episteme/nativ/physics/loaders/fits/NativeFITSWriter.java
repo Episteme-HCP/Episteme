@@ -15,12 +15,12 @@ import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.episteme.core.io.AbstractResourceWriter;
-import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeDoubleMatrixStorage;
+import org.episteme.nativ.mathematics.linearalgebra.matrices.storage.NativeRealDoubleMatrixStorage;
 
 /**
  * High-performance FITS writer using Panama.
  */
-public class NativeFITSWriter extends AbstractResourceWriter<NativeDoubleMatrixStorage> implements AutoCloseable {
+public class NativeFITSWriter extends AbstractResourceWriter<NativeRealDoubleMatrixStorage> implements AutoCloseable {
 
     private final MemorySegment fitsPtr;
     private final boolean isShared;
@@ -81,21 +81,21 @@ public class NativeFITSWriter extends AbstractResourceWriter<NativeDoubleMatrixS
     @Override public String getName() { return "Native FITS Writer"; }
     @Override public String getDescription() { return "FITS writer using Panama and cfitsio library."; }
     @Override public String getCategory() { return "I/O / Native / Physics"; }
-    @Override public Class<NativeDoubleMatrixStorage> getResourceType() { return NativeDoubleMatrixStorage.class; }
+    @Override public Class<NativeRealDoubleMatrixStorage> getResourceType() { return NativeRealDoubleMatrixStorage.class; }
     @Override public String getResourcePath() { return null; }
-    @Override public String getLongDescription() { return "High-performance FITS writer leveraging Project Panama and cfitsio for fast, zero-copy data persistence from off-heap NativeDoubleMatrixStorage objects into scientific FITS files."; }
+    @Override public String getLongDescription() { return "High-performance FITS writer leveraging Project Panama and cfitsio for fast, zero-copy data persistence from off-heap NativeRealDoubleMatrixStorage objects into scientific FITS files."; }
     @Override public String[] getSupportedVersions() { return new String[] { "4.0" }; }
     @Override public String[] getSupportedExtensions() { return new String[] { ".fits", ".fit" }; }
 
     @Override
-    public void save(NativeDoubleMatrixStorage resource, String destinationId) throws Exception {
+    public void save(NativeRealDoubleMatrixStorage resource, String destinationId) throws Exception {
         Path path = Paths.get(destinationId);
         try (NativeFITSWriter writer = new NativeFITSWriter(path)) {
             writer.writeImage(resource);
         }
     }
 
-    public void writeImage(NativeDoubleMatrixStorage matrix) {
+    public void writeImage(NativeRealDoubleMatrixStorage matrix) {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment status = arena.allocate(ValueLayout.JAVA_INT);
             status.set(ValueLayout.JAVA_INT, 0, 0);

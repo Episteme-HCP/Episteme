@@ -28,6 +28,97 @@ public class MulticoreSPHFluidProvider implements SPHFluidProvider {
     }
 
     @Override
+    public void step(float[] positions, float[] velocities, float[] densities, float[] pressures, float[] forces,
+            int numParticles, float dt, float mass, float restDensity, float stiffness, float viscosity,
+            float smoothingRadius, float[] gravity) {
+
+        // 1. Compute Density and Pressure
+        IntStream.range(0, numParticles).parallel().forEach(i -> {
+            float density = 0;
+            int idx_i = i * 3;
+
+            for (int j = 0; j < numParticles; j++) {
+                int idx_j = j * 3;
+                float dx = positions[idx_i] - positions[idx_j];
+                float dy = positions[idx_i + 1] - positions[idx_j + 1];
+                float dz = positions[idx_i + 2] - positions[idx_j + 2];
+                float r = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+                density += mass * kernelPoly6(r, smoothingRadius);
+            }
+            densities[i] = density;
+            pressures[i] = stiffness * (density - restDensity);
+        });
+
+        // 2. Compute Forces
+        Arrays.fill(forces, 0);
+
+        IntStream.range(0, numParticles).parallel().forEach(i -> {
+            int idx_i = i * 3;
+            float fx = densities[i] * gravity[0], fy = densities[i] * gravity[1], fz = densities[i] * gravity[2];
+
+            for (int j = 0; j < numParticles; j++) {
+                if (i == j) continue;
+
+                int idx_j = j * 3;
+                float dx = positions[idx_i] - positions[idx_j];
+                float dy = positions[idx_i + 1] - positions[idx_j + 1];
+                float dz = positions[idx_i + 2] - positions[idx_j + 2];
+                float r = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                if (r < smoothingRadius && r > 1e-10f) {
+                    float pressureForce = -mass * (pressures[i] + pressures[j])
+                            / (2 * densities[j]) * kernelSpikyGrad(r, smoothingRadius);
+
+                    fx += pressureForce * dx / r;
+                    fy += pressureForce * dy / r;
+                    fz += pressureForce * dz / r;
+
+                    float viscForce = viscosity * mass / densities[j]
+                            * kernelViscosityLaplacian(r, smoothingRadius);
+
+                    fx += viscForce * (velocities[idx_j] - velocities[idx_i]);
+                    fy += viscForce * (velocities[idx_j + 1] - velocities[idx_i + 1]);
+                    fz += viscForce * (velocities[idx_j + 2] - velocities[idx_i + 2]);
+                }
+            }
+            forces[idx_i] = fx;
+            forces[idx_i + 1] = fy;
+            forces[idx_i + 2] = fz;
+        });
+
+        // 3. Integration
+        IntStream.range(0, numParticles).parallel().forEach(i -> {
+            int idx = i * 3;
+            float invDensity = 1.0f / Math.max(densities[i], 1e-10f);
+
+            velocities[idx] += dt * forces[idx] * invDensity;
+            velocities[idx + 1] += dt * forces[idx + 1] * invDensity;
+            velocities[idx + 2] += dt * forces[idx + 2] * invDensity;
+
+            positions[idx] += dt * velocities[idx];
+            positions[idx + 1] += dt * velocities[idx + 1];
+            positions[idx + 2] += dt * velocities[idx + 2];
+        });
+    }
+
+    private float kernelPoly6(float r, float h) {
+        if (r > h) return 0;
+        float h2 = h * h, r2 = r * r, diff = h2 - r2;
+        return (float) (315.0 / (64.0 * Math.PI * Math.pow(h, 9)) * diff * diff * diff);
+    }
+
+    private float kernelSpikyGrad(float r, float h) {
+        if (r > h || r < 1e-10f) return 0;
+        float diff = h - r;
+        return (float) (-45.0 / (Math.PI * Math.pow(h, 6)) * diff * diff);
+    }
+
+    private float kernelViscosityLaplacian(float r, float h) {
+        if (r > h) return 0;
+        return (float) (45.0 / (Math.PI * Math.pow(h, 6)) * (h - r));
+    }
+
+    @Override
     public void step(double[] positions, double[] velocities, double[] densities, double[] pressures, double[] forces,
             int numParticles, double dt, double mass, double restDensity, double stiffness, double viscosity,
             double smoothingRadius, double[] gravity) {

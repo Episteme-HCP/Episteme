@@ -22,33 +22,64 @@ public class TestingAlgorithmService implements AlgorithmService {
     private final List<AlgorithmProvider> allowedProviders;
     private final AlgorithmService delegate = new StandardAlgorithmService();
 
+    private final boolean fallbackAllowed;
+    private final Set<Class<? extends AlgorithmProvider>> blockedFallbackClasses = new HashSet<>();
+
     public TestingAlgorithmService(AlgorithmProvider... providers) {
-        this.allowedProviders = Arrays.asList(providers);
+        this(Arrays.asList(providers), false);
     }
 
     public TestingAlgorithmService(List<AlgorithmProvider> providers) {
+        this(providers, false);
+    }
+
+    public TestingAlgorithmService(List<AlgorithmProvider> providers, boolean fallbackAllowed) {
         this.allowedProviders = new ArrayList<>(providers);
+        this.fallbackAllowed = fallbackAllowed;
+    }
+
+    /**
+     * Blocks fallback for a specific interface, forcing the use of allowedProviders only.
+     */
+    public TestingAlgorithmService blockFallbackFor(Class<? extends AlgorithmProvider> providerClass) {
+        blockedFallbackClasses.add(providerClass);
+        return this;
     }
 
     @Override
     public <P extends AlgorithmProvider> P getProvider(Class<P> providerClass) {
-        return getProviders(providerClass).stream()
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("No allowed provider found for: " + providerClass.getSimpleName()));
+        List<P> providers = getProviders(providerClass);
+        if (providers.isEmpty()) {
+            throw new NoSuchElementException("No allowed provider found for: " + providerClass.getSimpleName());
+        }
+        return providers.get(0);
     }
 
     @Override
     public <P extends AlgorithmProvider> List<P> getProviders(Class<P> providerClass) {
-        return allowedProviders.stream()
+        List<P> result = allowedProviders.stream()
                 .filter(providerClass::isInstance)
                 .map(providerClass::cast)
-                .sorted(Comparator.comparingInt(AlgorithmProvider::getPriority).reversed())
                 .collect(Collectors.toList());
+        
+        if (result.isEmpty() && fallbackAllowed && !blockedFallbackClasses.contains(providerClass)) {
+            return delegate.getProviders(providerClass);
+        }
+        return result;
     }
 
     @Override
     public <P extends AlgorithmProvider, R> R executeWithFallback(Class<P> providerClass, Function<P, R> operation) {
         List<P> providers = getProviders(providerClass);
+        if (providers.isEmpty()) {
+            throw new NoSuchElementException("No allowed provider found for: " + providerClass.getSimpleName());
+        }
+
+        if (!fallbackAllowed) {
+            // Only try the first provider
+            return operation.apply(providers.get(0));
+        }
+
         UnsupportedOperationException lastError = null;
         for (P provider : providers) {
             try {

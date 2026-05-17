@@ -66,10 +66,10 @@ public class SolverTest {
         Matrix<Real> A = DenseMatrix.of(rows, Reals.getInstance());
         Vector<Real> b = new DenseVector<>(bList, Reals.getInstance());
 
-        LinearAlgebraProvider<Real> provider = new CPUDenseLinearAlgebraProvider<>(Reals.getInstance());
-        Vector<Real> x = provider.solve(A, b);
+        try (LinearAlgebraProvider<Real> provider = new CPUDenseLinearAlgebraProvider<>(Reals.getInstance())) {
+            Vector<Real> x = provider.solve(A, b);
 
-        System.out.println("Solution x: " + x);
+            System.out.println("Solution x: " + x);
 
         // Check V3 (Index 2)
         // Check V2 (Index 1) -> Should be 10.0
@@ -83,6 +83,7 @@ public class SolverTest {
         assertEquals(10.0, v2, 1e-6, "V2 should be 10");
         // V3 approx 0.05
         assertEquals(0.04975, v3, 0.01, "V3 should be approx 0.05");
+        }
     }
 }
 

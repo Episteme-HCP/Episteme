@@ -35,6 +35,8 @@ import org.episteme.core.ui.Simulatable;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.RealParameter;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.core.mathematics.analysis.ode.DormandPrinceIntegrator;
 import org.episteme.core.measure.Quantity;
 import org.episteme.core.measure.Quantities;
@@ -50,6 +52,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class LotkaVolterraViewer extends AbstractViewer implements Simulatable {
 
     private RealParameter alphaParam;

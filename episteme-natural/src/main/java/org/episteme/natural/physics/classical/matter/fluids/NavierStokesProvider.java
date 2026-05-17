@@ -17,6 +17,8 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
  */
 public interface NavierStokesProvider extends AlgorithmProvider {
 
+    void solve(float[] density, float[] u, float[] v, float[] w, float dt, float viscosity, int width, int height, int depth);
+
     void solve(double[] density, double[] u, double[] v, double[] w, double dt, double viscosity, int width, int height, int depth);
 
     void solve(Real[] density, Real[] u, Real[] v, Real[] w, Real dt, Real viscosity, int width, int height, int depth);

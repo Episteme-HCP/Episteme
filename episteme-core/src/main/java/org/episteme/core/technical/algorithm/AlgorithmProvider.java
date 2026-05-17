@@ -15,10 +15,14 @@ package org.episteme.core.technical.algorithm;
  */
 public interface AlgorithmProvider {
 
-    /**
-     * Returns the human-readable name of the provider.
-     */
     String getName();
+    
+    /**
+     * Returns a human-readable description of the provider.
+     */
+    default String description() {
+        return getName();
+    }
 
     /**
      * Returns the execution priority (higher is better).
@@ -38,7 +42,7 @@ public interface AlgorithmProvider {
      * Returns the unique category of the algorithm.
      */
     default String getAlgorithmType() {
-        return "generic";
+        return "General";
     }
 
     /**

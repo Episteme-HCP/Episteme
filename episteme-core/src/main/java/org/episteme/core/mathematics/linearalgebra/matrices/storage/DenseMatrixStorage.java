@@ -24,6 +24,9 @@
 package org.episteme.core.mathematics.linearalgebra.matrices.storage;
 
 import java.util.List;
+import org.episteme.core.mathematics.structures.rings.Ring;
+import org.episteme.core.mathematics.numbers.real.Real;
+import org.episteme.core.mathematics.numbers.complex.Complex;
 
 /**
  * Dense row-major matrix storage.
@@ -56,10 +59,20 @@ public class DenseMatrixStorage<E> implements MatrixStorage<E> {
     public DenseMatrixStorage(int rows, int cols, E initialValue) {
         this.rowsCount = rows;
         this.colsCount = cols;
-        this.data = (E[]) new Object[rows * cols];
+        Class<?> componentType = Object.class;
+        if (initialValue != null) {
+            componentType = initialValue.getClass();
+            if (initialValue instanceof Real) componentType = Real.class;
+            else if (initialValue instanceof Complex) componentType = Complex.class;
+        }
+        this.data = (E[]) java.lang.reflect.Array.newInstance(componentType, rows * cols);
         if (initialValue != null) {
             java.util.Arrays.fill(this.data, initialValue);
         }
+    }
+
+    public DenseMatrixStorage(int rows, int cols, Ring<E> ring) {
+        this(rows, cols, ring.zero());
     }
 
     public DenseMatrixStorage(int rows, int cols, E[] flatData) {

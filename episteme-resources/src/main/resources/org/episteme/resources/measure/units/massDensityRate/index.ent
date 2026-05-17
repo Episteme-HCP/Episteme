@@ -1,9 +1,0 @@
-
-<!ENTITY gramPerLiterPerDay.xml SYSTEM "../massDensityRate/gramPerLiterPerDay.xml">
-<!ENTITY kilogramPerMeterCubedPerSecond.xml SYSTEM "../massDensityRate/kilogramPerMeterCubedPerSecond.xml">
-
-<!ENTITY massDensityRate.elements	"
-&gramPerLiterPerDay.xml;
-&kilogramPerMeterCubedPerSecond.xml;
-">
-

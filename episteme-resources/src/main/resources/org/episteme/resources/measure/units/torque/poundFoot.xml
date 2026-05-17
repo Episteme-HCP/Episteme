@@ -1,3 +1,0 @@
-<unit id="poundFoot" name="pound foot" abbreviation="lb ft" unitType="torque" parentSI="newtonMeter"
-      multiplierToSI="1.355818" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

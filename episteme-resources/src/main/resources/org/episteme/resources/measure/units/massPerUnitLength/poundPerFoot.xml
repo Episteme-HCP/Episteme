@@ -1,3 +1,0 @@
-<unit id="poundPerFoot" name="pound per foot" abbreviation="lb/ft" unitType="massPerUnitLength"
-      parentSI="kilogramPerMeter" multiplierToSI="1.488156167979" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

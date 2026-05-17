@@ -88,6 +88,11 @@ public class HeapRealDoubleVectorStorage implements RealDoubleVectorStorage {
     public VectorStorage<Real> copy() {
         return new HeapRealDoubleVectorStorage(data.clone());
     }
+
+    @Override
+    public double[] getData() {
+        return data;
+    }
 }
 
 

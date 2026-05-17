@@ -41,7 +41,8 @@ public class JavaAWTVisionBackend implements VisionBackend, CPUBackend {
     @Override public String getType() { return "vision"; }
     @Override public String getId() { return "java-awt-vision"; }
     @Override public String getBackendName() { return "Java AWT Vision Backend"; }
-    @Override public String getDescription() { return "Standard Java AWT/BufferedImage implementation for image processing."; }
+    @Override public String getName() { return getBackendName(); }
+    @Override public String getDescription() { return "Standard Computer Vision backend using Java AWT BufferedImages for platform-independent image processing."; }
     @Override public boolean isAvailable() { return true; }
     @Override public int getPriority() { return 10; }
     

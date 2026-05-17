@@ -1,5 +1,0 @@
-<unitType id="momentum" name="momentum">
-    <dimension name="mass" power="1" preserve="no"/>
-    <dimension name="length" power="1" preserve="no"/>
-    <dimension name="time" power="-1" preserve="no"/>
-</unitType>

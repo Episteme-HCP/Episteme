@@ -101,6 +101,7 @@ public class HeapRealDoubleMatrixStorage implements RealDoubleMatrixStorage {
      * 
      * @return the raw double data array
      */
+    @Override
     public double[] getData() {
         return data;
     }

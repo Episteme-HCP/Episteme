@@ -45,6 +45,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import com.google.auto.service.AutoService;
+import org.episteme.core.ui.Viewer;
+
 /**
  * 2D Rigid Body Physics Engine Viewer.
  * Refactored to be 100% parameter-based.
@@ -53,6 +56,7 @@ import java.util.Random;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class RigidBodyViewer extends AbstractViewer implements Simulatable {
 
     private static class VisualBodyData {

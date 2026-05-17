@@ -1,5 +1,0 @@
-<unit id="milePerMinute" name="mile per minute" unitType="speed" parentSI="meterPerSecond"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <unit ref="mile" power="1"/>
-    <unit ref="minute" power="-1"/>
-</unit>

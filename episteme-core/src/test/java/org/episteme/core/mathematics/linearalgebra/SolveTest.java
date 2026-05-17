@@ -13,8 +13,7 @@ public class SolveTest {
         RealDoubleMatrix A = RealDoubleMatrix.of(dataA);
         RealDoubleVector B = RealDoubleVector.of(dataB);
         
-        StrassenLinearAlgebraProvider<Real> provider = new StrassenLinearAlgebraProvider<>();
-        try {
+        try (StrassenLinearAlgebraProvider<Real> provider = new StrassenLinearAlgebraProvider<>()) {
             Vector<Real> x = provider.solve(A, B);
             System.out.println("Result: " + x);
             for (int i = 0; i < x.dimension(); i++) {

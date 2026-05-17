@@ -1,7 +1,0 @@
-
-<!ENTITY joulePerKilogram.xml SYSTEM "../specificLatentHeat/joulePerKilogram.xml">
-
-<!ENTITY specificLatentHeat.elements	"
-&joulePerKilogram.xml;
-">
-

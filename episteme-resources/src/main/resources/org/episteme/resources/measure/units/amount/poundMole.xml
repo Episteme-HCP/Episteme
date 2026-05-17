@@ -1,3 +1,0 @@
-<unit id="poundMole" name="pound mole" abbreviation="lbmol" unitType="amount" parentSI="mole" multiplierToSI="453.59237"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

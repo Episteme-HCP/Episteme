@@ -29,6 +29,8 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.social.sociology.DemographicData;
 
 import java.util.List;
@@ -37,6 +39,7 @@ import java.util.List;
  * Visualizes population structures using demographic pyramids.
  * Supports comparison and historical evolution.
  */
+@AutoService(Viewer.class)
 public final class DemographicProfileViewer extends AbstractViewer {
 
     private final BarChart<Number, String> chart;

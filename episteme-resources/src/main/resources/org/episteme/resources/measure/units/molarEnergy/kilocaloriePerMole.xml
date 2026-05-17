@@ -1,3 +1,0 @@
-<unit id="kilocaloriePerMole" name="kilocalorie per mole" abbreviation="kcal/mol" unitType="molarEnergy"
-      parentSI="joulePerMole" multiplierToSI="4.184E+03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,4 +1,0 @@
-<unit id="lambert" name="lambert" abbreviation="Lb" unitType="luminousFluxDensity" parentSI="lux"
-      multiplierToSI="1.0E+4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>CGS unit for illuminance</description>
-</unit>

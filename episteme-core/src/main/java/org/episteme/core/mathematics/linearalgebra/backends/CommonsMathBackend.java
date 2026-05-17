@@ -111,7 +111,7 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
 
     @Override
     public boolean isAvailable() {
-        return commonsAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision();
+        return commonsAvailable && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() && canUseCommons();
     }
 
     @Override
@@ -122,6 +122,7 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
     @Override
     public double score(org.episteme.core.technical.algorithm.OperationContext context) {
         if (!commonsAvailable || !canUseCommons() || org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) return -1.0;
+        if (context.hasHint(org.episteme.core.technical.algorithm.OperationContext.Hint.COMPLEX)) return -1.0;
         return getPriority();
     }
 
@@ -141,9 +142,27 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
     }
 
     private boolean canUseCommons() {
-        return field != null && 
-               (field instanceof org.episteme.core.mathematics.sets.Reals ||
-                Real.class.isAssignableFrom(field.zero().getClass()));
+        if (field == null) return false;
+        Object zero = field.zero();
+        return (field instanceof org.episteme.core.mathematics.sets.Reals ||
+                zero instanceof Real ||
+                zero instanceof Double ||
+                zero instanceof Float ||
+                zero instanceof Integer);
+    }
+
+    @Override
+    public boolean isCompatible(org.episteme.core.mathematics.structures.rings.Ring<?> ring) {
+        if (ring instanceof Field) {
+            Field<?> f = (Field<?>) ring;
+            Object zero = f.zero();
+            return (f instanceof org.episteme.core.mathematics.sets.Reals ||
+                    zero instanceof Real ||
+                    zero instanceof Double ||
+                    zero instanceof Float ||
+                    zero instanceof Integer);
+        }
+        return false;
     }
 
     @Override public Vector<E> add(Vector<E> a, Vector<E> b) { checkCommons(); return commonsImpl.add(a, b); }
@@ -165,6 +184,7 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.SVDResult<E> svd(Matrix<E> a) { checkCommons(); return commonsImpl.svd(a); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.CholeskyResult<E> cholesky(Matrix<E> a) { checkCommons(); return commonsImpl.cholesky(a); }
     @Override public org.episteme.core.mathematics.linearalgebra.matrices.solvers.EigenResult<E> eigen(Matrix<E> a) { checkCommons(); return commonsImpl.eigen(a); }
+    @Override public E trace(Matrix<E> a) { checkCommons(); return commonsImpl.trace(a); }
 
     private void checkCommons() {
         if (commonsImpl == null) {
@@ -192,8 +212,20 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
         private org.apache.commons.math3.linear.RealMatrix toCommonsMatrix(Matrix<E> m) {
             double[][] data = new double[m.rows()][m.cols()];
             for (int i = 0; i < m.rows(); i++)
-                for (int j = 0; j < m.cols(); j++)
-                    data[i][j] = ((Real) m.get(i, j)).doubleValue();
+                for (int j = 0; j < m.cols(); j++) {
+                    E val = m.get(i, j);
+                    if (val instanceof Real) {
+                        data[i][j] = ((Real) val).doubleValue();
+                    } else if (val instanceof Number) {
+                        data[i][j] = ((Number) val).doubleValue();
+                    } else if (val != null) {
+                        try {
+                            data[i][j] = Double.parseDouble(val.toString());
+                        } catch (Exception e) {
+                            throw new ClassCastException("CommonsMathBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                        }
+                    }
+                }
             return org.apache.commons.math3.linear.MatrixUtils.createRealMatrix(data);
         }
 
@@ -210,15 +242,31 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
 
         private org.apache.commons.math3.linear.RealVector toCommonsVector(Vector<E> v) {
             double[] data = new double[v.dimension()];
-            for (int i = 0; i < v.dimension(); i++)
-                data[i] = ((Real) v.get(i)).doubleValue();
+            for (int i = 0; i < v.dimension(); i++) {
+                E val = v.get(i);
+                if (val instanceof Real) {
+                    data[i] = ((Real) val).doubleValue();
+                } else if (val instanceof Number) {
+                    data[i] = ((Number) val).doubleValue();
+                } else if (val != null) {
+                    try {
+                        data[i] = Double.parseDouble(val.toString());
+                    } catch (Exception e) {
+                        throw new ClassCastException("CommonsMathBackend cannot convert " + val.getClass().getName() + " to double: " + val);
+                    }
+                }
+            }
             return org.apache.commons.math3.linear.MatrixUtils.createRealVector(data);
         }
 
         @SuppressWarnings("unchecked")
         private Vector<E> fromCommonsVector(org.apache.commons.math3.linear.RealVector cv) {
             int size = cv.getDimension();
-            E[] data = (E[]) java.lang.reflect.Array.newInstance(field.zero().getClass(), size);
+            Class<?> componentType = field.zero().getClass();
+            if (field.zero() instanceof Real) componentType = Real.class;
+            else if (field.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) componentType = org.episteme.core.mathematics.numbers.complex.Complex.class;
+            
+            E[] data = (E[]) java.lang.reflect.Array.newInstance(componentType, size);
             for (int i = 0; i < size; i++)
                 data[i] = (E) Real.of(cv.getEntry(i));
             return new GenericVector<>(new DenseVectorStorage<>(data), this, field);
@@ -313,5 +361,7 @@ public class CommonsMathBackend<E> implements CPUBackend, LinearAlgebraProvider<
                 vecD
             );
         }
+
+        @Override @SuppressWarnings("unchecked") public E trace(Matrix<E> a) { return (E) Real.of(toCommonsMatrix(a).getTrace()); }
     }
 }

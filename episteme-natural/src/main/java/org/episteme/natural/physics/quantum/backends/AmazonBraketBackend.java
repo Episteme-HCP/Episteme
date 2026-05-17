@@ -22,8 +22,8 @@ import java.util.HashMap;
 public class AmazonBraketBackend implements QuantumBackend, QuantumAlgorithmProvider {
 
     @Override public String getId() { return "amazon-braket"; }
-    @Override public String getName() { return "Amazon Braket (AWS)"; }
-    @Override public String getDescription() { return "Cloud-based quantum execution on AWS Braket."; }
+    @Override public String getName() { return "Amazon Braket (AWS/Mock)"; }
+    @Override public String getDescription() { return "Mock implementation of cloud-based quantum execution on AWS Braket for throughput testing."; }
     @Override public int getPriority() { return 80; }
 
     @Override

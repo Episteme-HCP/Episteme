@@ -1,4 +1,0 @@
-<unit id="kilogramMeter" name="kilogram-meter" abbreviation="kg-m" unitType="energy" parentSI="joule"
-      multiplierToSI="9.80665" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 kilogram-meter = 1 kilogram * gravitational acceleration * 1 meter</description>
-</unit>

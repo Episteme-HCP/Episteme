@@ -33,6 +33,8 @@ import org.episteme.core.ui.ChoiceParameter;
 import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.Simulatable;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.natural.computing.logic.*;
 
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class DigitalLogicViewer extends AbstractViewer implements Simulatable {
 
     private final LogicCircuit circuit = new LogicCircuit();

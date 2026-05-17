@@ -36,6 +36,9 @@ public abstract class Identification implements Identified<Identification>, Seri
     private final String value;
 
     protected Identification(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Identification value cannot be null");
+        }
         this.value = value;
     }
 

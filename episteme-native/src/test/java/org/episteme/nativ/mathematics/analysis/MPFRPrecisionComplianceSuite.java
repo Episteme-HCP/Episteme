@@ -7,14 +7,16 @@ package org.episteme.nativ.mathematics.analysis;
 
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.numbers.real.Real;
-import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.sets.Reals;
-import org.episteme.core.mathematics.linearalgebra.Matrix;
 import org.episteme.core.mathematics.linearalgebra.Vector;
 import org.episteme.core.mathematics.linearalgebra.matrices.SparseMatrix;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.SparseMatrixStorage;
 import org.episteme.core.mathematics.linearalgebra.vectors.DenseVector;
-import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRSparseLinearAlgebraProvider;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
+import org.episteme.core.technical.algorithm.AlgorithmService;
+import org.episteme.core.technical.algorithm.TestingAlgorithmService;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRDenseLinearAlgebraBackend;
+import org.episteme.nativ.mathematics.linearalgebra.backends.NativeMPFRSparseLinearAlgebraBackend;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -50,52 +52,62 @@ public class MPFRPrecisionComplianceSuite {
 
     @Test
     public void test1000DigitPi() {
-        MathContext.withPrecision(1005).compute(() -> {
-            Real halfPi = Real.of(1.0).asin();
-            Real pi = halfPi.multiply(Real.of(2.0));
-            
-            String actual = pi.toString();
-            // logger.info("PI to 1000 digits (sample): {}", actual.substring(0, 100));
-            
-            assertTrue(actual.startsWith(PI_1000.substring(0, 1001)), "PI should match to 1000 digits");
-            return null;
-        });
+        AlgorithmService oldService = AlgorithmManager.getService();
+        AlgorithmManager.setService(new TestingAlgorithmService(new NativeMPFRDenseLinearAlgebraBackend<>()));
+        try {
+            MathContext.withPrecision(1005).compute(() -> {
+                Real halfPi = Real.of(1.0).asin();
+                Real pi = halfPi.multiply(Real.of(2.0));
+                
+                String actual = pi.toString();
+                assertTrue(actual.startsWith(PI_1000.substring(0, 1001)), "PI should match to 1000 digits");
+                return null;
+            });
+        } finally {
+            AlgorithmManager.setService(oldService);
+        }
     }
 
     @Test
     public void test1000DigitSparseSolve() {
-        MathContext.withPrecision(1005).compute(() -> {
-            int n = 3;
-            SparseMatrixStorage<Real> storage = new SparseMatrixStorage<>(n, n, Real.ZERO);
-            // Matrix A:
-            // [ 4, 1, 0 ]
-            // [ 1, 3, 1 ]
-            // [ 0, 1, 2 ]
-            storage.set(0, 0, Real.of(4.0));
-            storage.set(0, 1, Real.of(1.0));
-            storage.set(1, 0, Real.of(1.0));
-            storage.set(1, 1, Real.of(3.0));
-            storage.set(1, 2, Real.of(1.0));
-            storage.set(2, 1, Real.of(1.0));
-            storage.set(2, 2, Real.of(2.0));
-            
-            SparseMatrix<Real> A = new SparseMatrix<>(storage, Real.ZERO);
-            Vector<Real> b = DenseVector.of(Arrays.asList(Real.of(5.0), Real.of(5.0), Real.of(3.0)), Reals.getInstance());
-            
-            NativeMPFRSparseLinearAlgebraProvider provider = new NativeMPFRSparseLinearAlgebraProvider();
-            Vector<Real> x = provider.solve(A, b);
-            
-            // logger.info("Solve solution sample: x[0] = {}", x.get(0));
-            
-            // Expected x = [1, 1, 1]
-            for (int i = 0; i < n; i++) {
-                String val = x.get(i).toString();
-                assertTrue(val.startsWith("1.00000000000000000000000000000000000000000000000000"), "Solution should be 1.0 with high precision");
-                // Check a bit more digits (e.g., 100)
-                assertTrue(val.length() > 100, "Solution string should be long enough for high precision verification");
-            }
-            
-            return null;
-        });
+        NativeMPFRSparseLinearAlgebraBackend<Real> provider = new NativeMPFRSparseLinearAlgebraBackend<>();
+        AlgorithmService oldService = AlgorithmManager.getService();
+        AlgorithmManager.setService(new TestingAlgorithmService(provider));
+        try {
+            MathContext.withPrecision(1005).compute(() -> {
+                int n = 3;
+                SparseMatrixStorage<Real> storage = new SparseMatrixStorage<>(n, n, Real.ZERO);
+                // Matrix A:
+                // [ 4, 1, 0 ]
+                // [ 1, 3, 1 ]
+                // [ 0, 1, 2 ]
+                storage.set(0, 0, Real.of(4.0));
+                storage.set(0, 1, Real.of(1.0));
+                storage.set(1, 0, Real.of(1.0));
+                storage.set(1, 1, Real.of(3.0));
+                storage.set(1, 2, Real.of(1.0));
+                storage.set(2, 1, Real.of(1.0));
+                storage.set(2, 2, Real.of(2.0));
+                
+                SparseMatrix<Real> A = new SparseMatrix<>(storage, Real.ZERO);
+                Vector<Real> b = DenseVector.of(Arrays.asList(Real.of(5.0), Real.of(5.0), Real.of(3.0)), Reals.getInstance());
+                
+                Vector<Real> x = provider.solve(A, b);
+                
+                // logger.info("Solve solution sample: x[0] = {}", x.get(0));
+                
+                // Expected x = [1, 1, 1]
+                for (int i = 0; i < n; i++) {
+                    String val = x.get(i).toString();
+                    assertTrue(val.startsWith("1.00000000000000000000000000000000000000000000000000"), "Solution should be 1.0 with high precision");
+                    // Check a bit more digits (e.g., 100)
+                    assertTrue(val.length() > 100, "Solution string should be long enough for high precision verification");
+                }
+                
+                return null;
+            });
+        } finally {
+            AlgorithmManager.setService(oldService);
+        }
     }
 }

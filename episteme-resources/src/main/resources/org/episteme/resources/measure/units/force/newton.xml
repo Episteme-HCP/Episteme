@@ -1,4 +1,0 @@
-<unit id="newton" name="newton" abbreviation="N" unitType="force" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>newton</description>
-</unit>

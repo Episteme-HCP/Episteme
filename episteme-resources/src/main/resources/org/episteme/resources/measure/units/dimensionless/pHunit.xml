@@ -1,5 +1,0 @@
-<unit id="pHunit" name="pH unit" abbreviation="pH" unitType="dimensionless" parentSI="dimensionless" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>pH is measured in log units so has no dimensions, but this allows the quantityType to be captured
-    </description>
-</unit>

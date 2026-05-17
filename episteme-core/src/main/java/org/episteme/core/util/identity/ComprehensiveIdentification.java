@@ -65,8 +65,28 @@ public interface ComprehensiveIdentification extends Identified<Identification>,
 
     @Override
     default String getName() {
-        String name = (String) getTrait("name");
-        return name != null ? name : getId().toString();
+        Object trait = getTrait("name");
+        String name = null;
+        
+        if (trait instanceof java.util.Optional<?> opt) {
+            Object o = opt.orElse(null);
+            if (o instanceof String s) {
+                name = s;
+            } else if (o != null) {
+                name = o.toString();
+            }
+        } else if (trait instanceof String s) {
+            name = s;
+        } else if (trait != null) {
+            name = trait.toString();
+        }
+
+        if (name != null && !name.isBlank()) {
+            return name;
+        }
+
+        Identification id = getId();
+        return (id != null) ? id.toString() : "Unnamed Entity";
     }
 
     /**

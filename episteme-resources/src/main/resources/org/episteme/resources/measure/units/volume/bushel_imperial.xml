@@ -1,4 +1,0 @@
-<unit id="bushel_imperial" name="imperial bushel" abbreviation="bu" unitType="volume" parentSI="meterCubed"
-      multiplierToSI="0.036369" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 imperial bushel = 8 imperial gallons</description>
-</unit>

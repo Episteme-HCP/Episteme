@@ -10,6 +10,8 @@ import org.episteme.core.technical.algorithm.AlgorithmProvider;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
+import org.episteme.core.technical.function.ToFloatFunction;
+
 /**
  * Interface for Monte Carlo integration and estimation providers.
  * 
@@ -19,11 +21,16 @@ import java.util.function.ToDoubleFunction;
  */
 public interface MonteCarloProvider extends AlgorithmProvider {
 
+    float integrate(ToFloatFunction<float[]> function, float[] lowerBounds, 
+                           float[] upperBounds, int samples);
+
     double integrate(ToDoubleFunction<double[]> function, double[] lowerBounds, 
                            double[] upperBounds, int samples);
 
     Real integrate(Function<Real[], Real> function, Real[] lowerBounds, 
                          Real[] upperBounds, int samples);
+
+    float estimatePiFloat(int samples);
 
     double estimatePi(int samples);
     Real estimatePi(int samples, boolean useReal); // Using boolean to differentiate if needed, or just overload
@@ -46,6 +53,6 @@ public interface MonteCarloProvider extends AlgorithmProvider {
 
     @Override
     default String getAlgorithmType() {
-        return "Monte Carlo Simulation";
+        return "Statistics";
     }
 }

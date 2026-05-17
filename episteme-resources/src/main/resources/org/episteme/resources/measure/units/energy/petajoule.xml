@@ -1,3 +1,0 @@
-<unit id="petajoule" name="petajoule" abbreviation="PJ" unitType="energy" parentSI="joule" multiplierToSI="1.0E+15"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

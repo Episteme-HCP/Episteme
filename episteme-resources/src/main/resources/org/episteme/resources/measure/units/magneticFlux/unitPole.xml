@@ -1,4 +1,0 @@
-<unit id="unitPole" name="unit pole" unitType="magneticFlux" parentSI="weber" multiplierToSI="1.256637E-7"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>A CGS unit of magnetic flux</description>
-</unit>

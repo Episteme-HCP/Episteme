@@ -12,6 +12,7 @@ import org.episteme.core.mathematics.analysis.fft.FFTProvider;
 import org.episteme.core.technical.algorithm.OperationContext;
 import org.episteme.nativ.mathematics.linearalgebra.backends.NativeOpenCLSparseLinearAlgebraBackend;
 import org.episteme.nativ.technical.backend.gpu.opencl.OpenCLExecutionContext;
+import org.episteme.nativ.technical.backend.nativ.ResourceTracker;
 
 import static org.jocl.CL.*;
 import org.jocl.*;
@@ -76,20 +77,30 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         if (initialized) return;
         if (!backend.isAvailable()) throw new IllegalStateException("OpenCL not available");
 
-        try {
+        try (ResourceTracker tracker = new ResourceTracker()) {
             OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+            if (ctx == null) {
+                logger.error("OpenCL context could not be created during FFT initialization.");
+                return;
+            }
             cl_context context = ctx.getContext();
 
             // Create Program
             program = clCreateProgramWithSource(context, 1, new String[]{KERNEL_SOURCE}, null, null);
+            tracker.track(program, CL::clReleaseProgram);
             clBuildProgram(program, 0, null, null, null, null);
 
             // Create Kernel
             kernel = clCreateKernel(program, "dft_naive", null);
+            // If we reach here, we want to KEEP the program and kernel. 
+            // The tracker will close them if we throw an exception before setting initialized = true.
 
             initialized = true;
         } catch (Exception e) {
             logger.error("Failed to initialize OpenCL FFT: {}", e.getMessage());
+            // Cleanup happens via tracker.close() if an exception is thrown
+            program = null;
+            kernel = null;
             throw new RuntimeException("OpenCL initialization error", e);
         }
     }
@@ -135,7 +146,12 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
     public void freeGPUMemory(long gpuHandle) {}
 
     @Override
-    public void synchronize() {}
+    public void synchronize() {
+        OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx != null && ctx.getCommandQueue() != null) {
+            CL.clFinish(ctx.getCommandQueue());
+        }
+    }
 
     @Override
     public void matrixMultiply(DoubleBuffer A, DoubleBuffer B, DoubleBuffer C, int m, int n, int k) {}
@@ -184,16 +200,22 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         if (imag == null) imag = new double[n]; // Handle pure real input
         
         OpenCLExecutionContext ctx = (OpenCLExecutionContext) backend.createContext();
+        if (ctx == null) {
+            logger.warn("OpenCL context not available for FFT execution.");
+            return null;
+        }
         cl_context context = ctx.getContext();
         cl_command_queue queue = ctx.getCommandQueue();
+        
+        if (context == null || queue == null) return null;
 
-        // Allocate Input/Output
-        cl_mem memReal = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(real), null);
-        cl_mem memImag = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(imag), null);
-        cl_mem memOutReal = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
-        cl_mem memOutImag = clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null);
+        try (ResourceTracker tracker = new ResourceTracker()) {
+            // Allocate Input/Output
+            cl_mem memReal = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(real), null), CL::clReleaseMemObject);
+            cl_mem memImag = tracker.track(clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_double * n, Pointer.to(imag), null), CL::clReleaseMemObject);
+            cl_mem memOutReal = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
+            cl_mem memOutImag = tracker.track(clCreateBuffer(context, CL_MEM_READ_WRITE, Sizeof.cl_double * n, null, null), CL::clReleaseMemObject);
 
-        try {
             // Set Arguments
             clSetKernelArg(kernel, 0, Sizeof.cl_mem, Pointer.to(memReal));
             clSetKernelArg(kernel, 1, Sizeof.cl_mem, Pointer.to(memImag));
@@ -213,13 +235,9 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
             clEnqueueReadBuffer(queue, memOutImag, CL_TRUE, 0, Sizeof.cl_double * n, Pointer.to(outImag), 0, null, null);
             
             return new double[][]{outReal, outImag};
-
-        } finally {
-            // Cleanup
-            clReleaseMemObject(memReal);
-            clReleaseMemObject(memImag);
-            clReleaseMemObject(memOutReal);
-            clReleaseMemObject(memOutImag);
+        } catch (Exception e) {
+            logger.error("OpenCL FFT execution failed: {}", e.getMessage());
+            throw new RuntimeException("GPU FFT error", e);
         }
     }
 
@@ -303,6 +321,44 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
             out[k] = Complex.of(res[0][k], res[1][k]);
         }
         return out;
+    }
+
+    @Override
+    public float[][] transform(float[] real, float[] imag) {
+        int n = real.length;
+        double[] r = new double[n];
+        double[] i = new double[n];
+        for (int k = 0; k < n; k++) {
+            r[k] = real[k];
+            i[k] = imag[k];
+        }
+        double[][] res = transform(r, i);
+        float[] fr = new float[n];
+        float[] fi = new float[n];
+        for (int k = 0; k < n; k++) {
+            fr[k] = (float) res[0][k];
+            fi[k] = (float) res[1][k];
+        }
+        return new float[][]{fr, fi};
+    }
+
+    @Override
+    public float[][] inverseTransform(float[] real, float[] imag) {
+        int n = real.length;
+        double[] r = new double[n];
+        double[] i = new double[n];
+        for (int k = 0; k < n; k++) {
+            r[k] = real[k];
+            i[k] = imag[k];
+        }
+        double[][] res = inverseTransform(r, i);
+        float[] fr = new float[n];
+        float[] fi = new float[n];
+        for (int k = 0; k < n; k++) {
+            fr[k] = (float) res[0][k];
+            fi[k] = (float) res[1][k];
+        }
+        return new float[][]{fr, fi};
     }
 
     @Override
@@ -425,6 +481,109 @@ public class NativeOpenCLFFTBackend implements FFTProvider, GPUBackend, NativeBa
         double[][][] i = toDouble3D(imag);
         double[][][][] res = inverseTransform3D(r, i);
         return new Real[][][][]{toReal3D(res[0]), toReal3D(res[1])};
+    }
+
+    @Override
+    public float[][][] transform2D(float[][] real, float[][] imag) {
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = transform2D(r, i);
+        return new float[][][]{toFloat2D(res[0]), toFloat2D(res[1])};
+    }
+
+    @Override
+    public float[][][] inverseTransform2D(float[][] real, float[][] imag) {
+        double[][] r = toDouble2D(real);
+        double[][] i = toDouble2D(imag);
+        double[][][] res = inverseTransform2D(r, i);
+        return new float[][][]{toFloat2D(res[0]), toFloat2D(res[1])};
+    }
+
+    @Override
+    public float[][][][] transform3D(float[][][] real, float[][][] imag) {
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = transform3D(r, i);
+        return new float[][][][]{toFloat3D(res[0]), toFloat3D(res[1])};
+    }
+
+    @Override
+    public float[][][][] inverseTransform3D(float[][][] real, float[][][] imag) {
+        double[][][] r = toDouble3D(real);
+        double[][][] i = toDouble3D(imag);
+        double[][][][] res = inverseTransform3D(r, i);
+        return new float[][][][]{toFloat3D(res[0]), toFloat3D(res[1])};
+    }
+
+    @Override
+    public Complex[][] transformComplex2D(Complex[][] data) {
+        int n0 = data.length, n1 = data[0].length;
+        double[][] r = new double[n0][n1], im = new double[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) { r[i][j] = data[i][j].real(); im[i][j] = data[i][j].imaginary(); }
+        double[][][] res = transform2D(r, im);
+        Complex[][] out = new Complex[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) out[i][j] = Complex.of(res[0][i][j], res[1][i][j]);
+        return out;
+    }
+
+    @Override
+    public Complex[][] inverseTransformComplex2D(Complex[][] data) {
+        int n0 = data.length, n1 = data[0].length;
+        double[][] r = new double[n0][n1], im = new double[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) { r[i][j] = data[i][j].real(); im[i][j] = data[i][j].imaginary(); }
+        double[][][] res = inverseTransform2D(r, im);
+        Complex[][] out = new Complex[n0][n1];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) out[i][j] = Complex.of(res[0][i][j], res[1][i][j]);
+        return out;
+    }
+
+    @Override
+    public Complex[][][] transformComplex3D(Complex[][][] data) {
+        int n0 = data.length, n1 = data[0].length, n2 = data[0][0].length;
+        double[][][] r = new double[n0][n1][n2], im = new double[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) { r[i][j][k] = data[i][j][k].real(); im[i][j][k] = data[i][j][k].imaginary(); }
+        double[][][][] res = transform3D(r, im);
+        Complex[][][] out = new Complex[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) out[i][j][k] = Complex.of(res[0][i][j][k], res[1][i][j][k]);
+        return out;
+    }
+
+    @Override
+    public Complex[][][] inverseTransformComplex3D(Complex[][][] data) {
+        int n0 = data.length, n1 = data[0].length, n2 = data[0][0].length;
+        double[][][] r = new double[n0][n1][n2], im = new double[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) { r[i][j][k] = data[i][j][k].real(); im[i][j][k] = data[i][j][k].imaginary(); }
+        double[][][][] res = inverseTransform3D(r, im);
+        Complex[][][] out = new Complex[n0][n1][n2];
+        for(int i=0; i<n0; i++) for(int j=0; j<n1; j++) for(int k=0; k<n2; k++) out[i][j][k] = Complex.of(res[0][i][j][k], res[1][i][j][k]);
+        return out;
+    }
+
+    private static double[][] toDouble2D(float[][] a) {
+        double[][] r = new double[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            r[i] = new double[a[i].length];
+            for (int j = 0; j < a[i].length; j++) r[i][j] = a[i][j];
+        }
+        return r;
+    }
+    private static double[][][] toDouble3D(float[][][] a) {
+        double[][][] r = new double[a.length][][];
+        for (int i = 0; i < a.length; i++) r[i] = toDouble2D(a[i]);
+        return r;
+    }
+    private static float[][] toFloat2D(double[][] a) {
+        float[][] r = new float[a.length][];
+        for (int i = 0; i < a.length; i++) {
+            r[i] = new float[a[i].length];
+            for (int j = 0; j < a[i].length; j++) r[i][j] = (float) a[i][j];
+        }
+        return r;
+    }
+    private static float[][][] toFloat3D(double[][][] a) {
+        float[][][] r = new float[a.length][][];
+        for (int i = 0; i < a.length; i++) r[i] = toFloat2D(a[i]);
+        return r;
     }
 
     private static double[][] toDouble2D(Real[][] a) {

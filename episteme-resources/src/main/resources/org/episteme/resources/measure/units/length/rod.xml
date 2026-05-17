@@ -1,4 +1,0 @@
-<unit id="rod" name="rod" abbreviation="rd" unitType="length" parentSI="meter" multiplierToSI="5.0292"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 rod = 5.5 yards</description>
-</unit>

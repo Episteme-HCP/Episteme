@@ -35,6 +35,8 @@ import org.episteme.core.ui.NumericParameter;
 import org.episteme.core.ui.BooleanParameter;
 import org.episteme.core.ui.StringParameter;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.core.io.Configuration;
 
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import java.util.stream.Collectors;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class SportsResultsViewer extends AbstractViewer {
 
     private final ObservableList<Team> teams = FXCollections.observableArrayList();

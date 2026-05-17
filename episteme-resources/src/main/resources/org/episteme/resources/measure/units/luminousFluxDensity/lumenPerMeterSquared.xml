@@ -1,4 +1,0 @@
-<unit id="lumenPerMeterSquared" name="lumen per meter squared" abbreviation="lm/m^2" unitType="luminousFluxDensity"
-      parentSI="lux" multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 lm/m^2 = 1 lx</description>
-</unit>

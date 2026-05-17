@@ -1,5 +1,0 @@
-<unit id="ouncePerFootSquared" name="ounce per foot squared" abbreviation="oz/ft^2" unitType="arealMassDensity"
-      parentSI="kilogramPerMeterSquared" multiplierToSI="0.305152"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>ounce per square foot</description>
-</unit>

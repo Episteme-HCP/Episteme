@@ -1,4 +1,0 @@
-<unit id="millihertz" name="millihertz" abbreviation="mHz" unitType="frequency" parentSI="hertz" multiplierToSI="1.0E-3"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>millihertz</description>
-</unit>

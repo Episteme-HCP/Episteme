@@ -1,5 +1,0 @@
-<unit id="molePerMeterCubed" name="mole per meter cubed" abbreviation="mol/m^3"
-      unitType="amountOfSubstanceConcentration" parentSI="SELF" multiplierToSI="1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>mole per cubic meter</description>
-</unit>

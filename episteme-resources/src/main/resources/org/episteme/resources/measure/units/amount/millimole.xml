@@ -1,3 +1,0 @@
-<unit id="millimole" name="millimole" abbreviation="mmol" unitType="amount" parentSI="mole" multiplierToSI="1.0E-3"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

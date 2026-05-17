@@ -18,6 +18,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeBackend;
 import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
 import org.episteme.nativ.physics.classical.mechanics.collision.NativeCollisionProvider;
 import org.episteme.core.measure.units.SI;
+import org.episteme.core.mathematics.numbers.real.Real;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.List;
@@ -198,7 +199,7 @@ public class NativeBulletBackend implements NativeCollisionProvider, MechanicsBa
                 MemorySegment posSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, positions);
                 MemorySegment radSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, radii);
                 MemorySegment colSeg = arena.allocate(ValueLayout.JAVA_INT, (long) n * n * 2);
-                int count = detectSphereCollisions(posSeg, radSeg, n, colSeg);
+                int count = detectSphereCollisions(posSeg, radSeg, n, colSeg, ValueLayout.JAVA_DOUBLE);
                 MemorySegment.copy(colSeg, ValueLayout.JAVA_INT, 0, collisions, 0, count * 2);
                 return count;
             }
@@ -214,7 +215,7 @@ public class NativeBulletBackend implements NativeCollisionProvider, MechanicsBa
                 MemorySegment velSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, velocities);
                 MemorySegment massSeg = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, masses);
                 MemorySegment colSeg = arena.allocateFrom(ValueLayout.JAVA_INT, collisions);
-                resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions);
+                resolveCollisions(posSeg, velSeg, massSeg, n, colSeg, numCollisions, ValueLayout.JAVA_DOUBLE);
                 MemorySegment.copy(posSeg, ValueLayout.JAVA_DOUBLE, 0, positions, 0, n * 3);
                 MemorySegment.copy(velSeg, ValueLayout.JAVA_DOUBLE, 0, velocities, 0, n * 3);
             }
@@ -222,7 +223,31 @@ public class NativeBulletBackend implements NativeCollisionProvider, MechanicsBa
     }
 
     @Override
-    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions) {
+    public int detectSphereCollisions(Real[] positions, Real[] radii, int n, int[] collisions) {
+        double[] posD = new double[positions.length];
+        double[] radD = new double[radii.length];
+        for (int i = 0; i < positions.length; i++) posD[i] = positions[i].doubleValue();
+        for (int i = 0; i < radii.length; i++) radD[i] = radii[i].doubleValue();
+        return detectSphereCollisions(posD, radD, n, collisions);
+    }
+
+    @Override
+    public void resolveCollisions(Real[] positions, Real[] velocities, Real[] masses, int n, int[] collisions, int numCollisions) {
+        double[] posD = new double[positions.length];
+        double[] velD = new double[velocities.length];
+        double[] massD = new double[masses.length];
+        for (int i = 0; i < positions.length; i++) posD[i] = positions[i].doubleValue();
+        for (int i = 0; i < velocities.length; i++) velD[i] = velocities[i].doubleValue();
+        for (int i = 0; i < masses.length; i++) massD[i] = masses[i].doubleValue();
+        
+        resolveCollisions(posD, velD, massD, n, collisions, numCollisions);
+        
+        for (int i = 0; i < positions.length; i++) positions[i] = Real.of(posD[i]);
+        for (int i = 0; i < velocities.length; i++) velocities[i] = Real.of(velD[i]);
+    }
+
+    @Override
+    public int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions, ValueLayout layout) {
         if (!IS_AVAILABLE_FLAG || DETECT_SPHERES == null) throw new UnsupportedOperationException("Bullet native batch collision functions not found in DLL");
         try {
             return (int) DETECT_SPHERES.invokeExact(positions, radii, n, collisions);
@@ -232,7 +257,7 @@ public class NativeBulletBackend implements NativeCollisionProvider, MechanicsBa
     }
 
     @Override
-    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions) {
+    public void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions, ValueLayout layout) {
         if (!IS_AVAILABLE_FLAG || RESOLVE_COLLISIONS == null) throw new UnsupportedOperationException("Bullet native batch collision functions not found in DLL");
         try {
             RESOLVE_COLLISIONS.invokeExact(positions, velocities, masses, n, collisions, numCollisions);

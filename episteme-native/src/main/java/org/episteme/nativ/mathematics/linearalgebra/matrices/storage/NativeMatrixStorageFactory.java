@@ -30,7 +30,7 @@ import com.google.auto.service.AutoService;
 
 /**
  * Native implementation of MatrixStorageFactory.
- * Creates {@link NativeDoubleMatrixStorage} instances for Real numbers.
+ * Creates {@link NativeRealDoubleMatrixStorage} instances for Real numbers.
  */
 @AutoService(MatrixStorageFactory.class)
 public class NativeMatrixStorageFactory implements MatrixStorageFactory {
@@ -39,7 +39,7 @@ public class NativeMatrixStorageFactory implements MatrixStorageFactory {
     @SuppressWarnings("unchecked")
     public <E> MatrixStorage<E> createDense(int rows, int cols, Ring<E> ring) {
         if (ring.getClass().getName().contains("Reals") && !org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
-            return (MatrixStorage<E>) (Object) new NativeDoubleMatrixStorage(rows, cols);
+            return (MatrixStorage<E>) (Object) new NativeRealDoubleMatrixStorage(rows, cols);
         }
         // Or return null to indicate "cannot handle"?
         // For now, let's return null if we can't handle it, and let MatrixFactory fallback.

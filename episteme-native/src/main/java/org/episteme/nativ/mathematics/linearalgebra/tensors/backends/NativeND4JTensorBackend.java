@@ -54,7 +54,7 @@ public class NativeND4JTensorBackend extends ND4JBaseTensorBackend {
 
     @Override
     public String getName() {
-        return "ND4J Native (CPU)";
+        return "ND4J-Native (CPU-Tensor)";
     }
 
     @Override

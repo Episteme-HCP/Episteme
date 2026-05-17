@@ -1,36 +1,14 @@
 package org.episteme.natural.physics.classical.mechanics.collision;
 
+import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import org.episteme.core.technical.backend.Backend;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 /**
  * Interface for high-performance collision detection and physics simulation.
  */
-public interface CollisionProvider extends AlgorithmProvider, Backend {
-    @Override
-    default int getPriority() {
-        return 0;
-    }
-
-    @Override
-    default boolean isAvailable() {
-        return true;
-    }
-
-    @Override
-    default String getType() {
-        return "collision";
-    }
-
-    @Override
-    default Object createBackend() {
-        return this;
-    }
-
-    @Override
-    default void shutdown() {
-        AlgorithmProvider.super.shutdown();
-    }
+public interface CollisionProvider extends AlgorithmProvider {
 
     @Override
     default String getAlgorithmType() {
@@ -46,18 +24,20 @@ public interface CollisionProvider extends AlgorithmProvider, Backend {
      * @param collisions Output array for collision pairs [idA, idB, ...]
      * @return Number of collisions found
      */
+    int detectSphereCollisions(float[] positions, float[] radii, int n, int[] collisions);
+
     int detectSphereCollisions(double[] positions, double[] radii, int n, int[] collisions);
 
-    /**
-     * Resolves collisions by updating velocities.
-     *
-     * @param positions  Positions array
-     * @param velocities Velocities array
-     * @param masses     Masses array
-     * @param n          Number of spheres
-     * @param collisions Collisions array
-     * @param numCollisions Number of collision pairs
-     */
+    int detectSphereCollisions(Real[] positions, Real[] radii, int n, int[] collisions);
+
+    int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions, ValueLayout layout);
+
+    void resolveCollisions(float[] positions, float[] velocities, float[] masses, int n, int[] collisions, int numCollisions);
+
     void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions);
+
+    void resolveCollisions(Real[] positions, Real[] velocities, Real[] masses, int n, int[] collisions, int numCollisions);
+
+    void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions, ValueLayout layout);
 
 }

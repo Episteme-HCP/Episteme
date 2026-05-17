@@ -20,7 +20,7 @@ public interface SparseLinearAlgebraProvider<E> extends LinearAlgebraProvider<E>
 
     @Override
     default String getAlgorithmType() {
-        return "Linear Algebra (Sparse)";
+        return "Linear Algebra";
     }
 
     /**

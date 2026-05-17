@@ -75,6 +75,8 @@ public class BackendDiscovery {
                     logger.debug("Discovered Backend: {} (Priority: {})", backend.getName(), backend.getPriority());
                 } catch (ServiceConfigurationError | Exception e) {
                     logger.warn("Skipping bad Backend provider: {}", e.getMessage());
+                } catch (Throwable t) {
+                    logger.warn("Critical failure loading Backend provider: {}", t.getMessage());
                 }
             }
             logger.info("Backend Discovery complete. {} backends loaded.", cachedProviders.size());

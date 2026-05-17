@@ -51,6 +51,17 @@ public interface RealDoubleMatrixStorage extends MatrixStorage<org.episteme.core
      * Copies the underlying data to a new double array.
      */
     double[] toDoubleArray();
+
+    /**
+     * Returns the underlying data array if available (without cloning).
+     * Exercise caution as modifications to this array will affect the storage.
+     * 
+     * @return the raw double data array, or null if not backed by a heap array
+     */
+    default double[] getData() {
+        return null;
+    }
+
     /**
      * Closes the storage and releases any native resources if applicable.
      */

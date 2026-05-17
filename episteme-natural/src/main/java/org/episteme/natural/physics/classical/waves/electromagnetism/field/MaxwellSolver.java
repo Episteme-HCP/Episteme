@@ -63,12 +63,12 @@ public class MaxwellSolver {
      * @return ElectromagneticTensor at that point
      */
     public ElectromagneticTensor solve(Vector4D point) {
-        double[][] raw = provider.computeTensor(point);
+        Real[][] raw = provider.computeTensor(point);
 
         Real[] flats = new Real[16];
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                flats[i * 4 + j] = Real.of(raw[i][j]);
+                flats[i * 4 + j] = raw[i][j];
             }
         }
 

@@ -33,7 +33,7 @@ import java.math.BigDecimal;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
-final class RealFloat extends Real {
+public final class RealFloat extends Real {
 
     private final float value;
 

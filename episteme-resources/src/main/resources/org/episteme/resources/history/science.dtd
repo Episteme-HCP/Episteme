@@ -1,9 +1,0 @@
-<!-- entities -->
-
-<!-- the top level element -->
-<!ELEMENT discovery (date,subject,discoverers)>
-
-<!-- elements -->
-<!ELEMENT date				(#PCDATA)>
-<!ELEMENT subject				(#PCDATA)>
-<!ELEMENT discoverers			(#PCDATA)>

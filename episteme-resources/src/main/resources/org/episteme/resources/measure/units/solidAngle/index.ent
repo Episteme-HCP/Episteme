@@ -1,7 +1,0 @@
-
-<!ENTITY steradian.xml SYSTEM "../solidAngle/steradian.xml">
-
-<!ENTITY solidAngle.elements	"
-&steradian.xml;
-">
-

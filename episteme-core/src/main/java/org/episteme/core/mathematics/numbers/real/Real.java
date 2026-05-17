@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.structures.rings.FieldElement;
+import org.episteme.core.technical.algorithm.AlgorithmManager;
 
 /**
  * Abstract base class for real numbers (Ã¢â€žÂ).
@@ -42,25 +43,65 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
 
     private static final long serialVersionUID = 1L;
 
+    // --- Structural Identity Methods (resolving interface conflicts) ---
+    @Override
+    public Real zero() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return RealBig.create(java.math.BigDecimal.ZERO);
+        }
+        return zeroE();
+    }
+
+    @Override
+    public Real one() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return RealBig.create(java.math.BigDecimal.ONE);
+        }
+        return oneE();
+    }
+
     /** The real number 0 */
-    public static Real zeroE() { return RealConstants.ZERO; }
+    public static Real zeroE() { 
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
+            RealConstants.BIG_ZERO : RealConstants.DOUBLE_ZERO; 
+    }
     public static final Real ZERO = RealConstants.ZERO;
 
     /** The real number 1 */
-    public static Real oneE() { return RealConstants.ONE; }
+    public static Real oneE() { 
+        return org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision() ? 
+            RealConstants.BIG_ONE : RealConstants.DOUBLE_ONE; 
+    }
     public static final Real ONE = RealConstants.ONE;
 
     /** The real number NaN */
-    public static Real nanE() { return RealConstants.NaN; }
+    public static Real nanE() { 
+        return RealConstants.NaN; 
+    }
     public static final Real NaN = RealConstants.NaN;
 
     /** The real number PI */
-    public static Real piE() { return RealConstants.PI; }
+    public static Real piE() { 
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            Real res = AlgorithmManager.getProvider(RealProvider.class).getConstant("pi");
+            if (res != null) return res;
+            return RealConstants.BIG_PI;
+        }
+        return RealConstants.PI; 
+    }
     public static final Real PI = RealConstants.PI;
 
     /** The real number E */
-    public static Real eE() { return RealConstants.E; }
+    public static Real eE() { 
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().isHighPrecision()) {
+            Real res = AlgorithmManager.getProvider(RealProvider.class).getConstant("e");
+            if (res != null) return res;
+            return RealConstants.BIG_E;
+        }
+        return RealConstants.E;
+    }
     public static final Real E = RealConstants.E;
+
 
     /** The real number 2 */
     public static Real twoE() { return RealConstants.TWO; }
@@ -106,12 +147,15 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         }
         if (Double.isNaN(value))
             return nanE();
+        if (Double.isInfinite(value)) {
+            return value > 0 ? positiveInfinityE() : negativeInfinityE();
+        }
 
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
                 return RealFloat.create((float) value);
             case EXACT:
-                return RealBig.create(BigDecimal.valueOf(value));
+                return AlgorithmManager.getProvider(RealProvider.class).create(BigDecimal.valueOf(value));
             case NORMAL:
             default:
                 return RealDouble.create(value);
@@ -134,12 +178,15 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
         }
         if (Float.isNaN(value))
             return NaN;
+        if (Float.isInfinite(value)) {
+            return value > 0 ? POSITIVE_INFINITY : NEGATIVE_INFINITY;
+        }
 
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
                 return RealFloat.create(value);
             case EXACT:
-                return RealBig.create(BigDecimal.valueOf(value));
+                return AlgorithmManager.getProvider(RealProvider.class).create(BigDecimal.valueOf(value));
             case NORMAL:
             default:
                 return RealDouble.create(value);
@@ -168,7 +215,7 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
             case FAST:
                 return RealFloat.create(value.floatValue());
             case EXACT:
-                return RealBig.create(value);
+                return AlgorithmManager.getProvider(RealProvider.class).create(value);
             case NORMAL:
             default:
                 return RealDouble.create(value.doubleValue());
@@ -182,19 +229,50 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
      * @return the Real instance
      */
     public static Real of(String value) {
+        if (value == null || value.isEmpty()) return Real.ZERO;
+        String v = value.trim();
+        if (v.equalsIgnoreCase("NaN")) return Real.NaN;
+        if (v.equalsIgnoreCase("Infinity") || v.equalsIgnoreCase("+Infinity")) return Real.POSITIVE_INFINITY;
+        if (v.equalsIgnoreCase("-Infinity")) return Real.NEGATIVE_INFINITY;
+
         switch (MathContext.getCurrent().getRealPrecision()) {
             case FAST:
-                return RealFloat.create(Float.parseFloat(value));
+                return RealFloat.create(Float.parseFloat(v));
             case EXACT:
-                return RealBig.create(new BigDecimal(value));
+                return AlgorithmManager.getProvider(RealProvider.class).of(v);
             case NORMAL:
             default:
-                return RealDouble.create(Double.parseDouble(value));
+                return RealDouble.create(Double.parseDouble(v));
         }
     }
 
-    // Package-private constructor
-    Real() {
+    public static Real valueOf(String value) {
+        return of(value);
+    }
+
+    /**
+     * Creates a real number from an int value.
+     * 
+     * @param value the value
+     * @return the Real instance
+     */
+    public static Real of(int value) {
+        return of((double) value);
+    }
+
+    /**
+     * Creates a real number from a long value.
+     * 
+     * @param value the value
+     * @return the Real instance
+     */
+    public static Real of(long value) {
+        return of((double) value);
+    }
+
+
+    // Protected constructor to allow subclassing across packages
+    protected Real() {
     }
 
     // --- Abstract operations ---
@@ -521,16 +599,6 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     }
 
     @Override
-    public Real zero() {
-        return zeroE();
-    }
-
-    @Override
-    public Real one() {
-        return oneE();
-    }
-
-    @Override
     public Real multiply(Real left, Real right) {
         return left.multiply(right);
     }
@@ -563,6 +631,19 @@ public abstract class Real extends Number implements Comparable<Real>, Field<Rea
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    public static org.episteme.core.mathematics.structures.rings.Ring<Real> ring() {
+        return org.episteme.core.mathematics.sets.Reals.getInstance();
+    }
+
+
+    /**
+     * Returns the ring structure for real numbers.
+     * @return this instance (as it implements Field<Real>)
+     */
+    public org.episteme.core.mathematics.structures.rings.Ring<Real> getScalarRing() {
+        return this;
     }
 
 }

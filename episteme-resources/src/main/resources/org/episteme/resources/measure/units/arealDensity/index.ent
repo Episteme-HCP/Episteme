@@ -1,9 +1,0 @@
-
-<!ENTITY numberPerKilometerSquared.xml SYSTEM "../arealDensity/numberPerKilometerSquared.xml">
-<!ENTITY numberPerMeterSquared.xml SYSTEM "../arealDensity/numberPerMeterSquared.xml">
-
-<!ENTITY arealDensity.elements	"
-&numberPerKilometerSquared.xml;
-&numberPerMeterSquared.xml;
-">
-

@@ -1,3 +1,0 @@
-<unit id="kilodalton" name="kilodalton" abbreviation="kDa" unitType="mass" parentSI="kilogram"
-      multiplierToSI="1.6605402E-24" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

@@ -1,3 +1,0 @@
-<unit id="millilambert" name="millilambert" abbreviation="mLb" unitType="luminousFluxDensity" parentSI="lux"
-      multiplierToSI="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>

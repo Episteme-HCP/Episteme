@@ -39,6 +39,11 @@ public class NativeSimulationBackend implements SimulationProvider, CPUBackend, 
     }
 
     @Override
+    public String getType() {
+        return "simulation";
+    }
+
+    @Override
     public int getPriority() {
         return 50; // Higher than ParallelSimulationProvider (20)
     }

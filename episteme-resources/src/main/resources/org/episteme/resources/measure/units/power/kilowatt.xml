@@ -1,4 +1,0 @@
-<unit id="kilowatt" name="kilowatt" abbreviation="kW" unitType="power" parentSI="watt" multiplierToSI="1000"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>kilowatt</description>
-</unit>

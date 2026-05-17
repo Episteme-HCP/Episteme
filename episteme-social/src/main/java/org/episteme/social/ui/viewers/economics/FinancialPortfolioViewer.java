@@ -30,6 +30,8 @@ import javafx.scene.chart.*;
 import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.NumericParameter;
 import org.episteme.core.ui.Parameter;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import org.episteme.social.economics.PortfolioData;
 import org.episteme.social.economics.money.Money;
 
@@ -40,6 +42,7 @@ import java.util.*;
  * Advanced trading-style dashboard for financial portfolios.
  * Supports real-time price tracking, asset allocation charts, and detailed holdings.
  */
+@AutoService(Viewer.class)
 public final class FinancialPortfolioViewer extends AbstractViewer {
 
     private PortfolioData portfolio;

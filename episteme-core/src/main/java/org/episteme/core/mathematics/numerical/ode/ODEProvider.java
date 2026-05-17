@@ -18,7 +18,10 @@ import java.util.function.BiFunction;
  */
 public interface ODEProvider extends AlgorithmProvider {
 
+    float[] solve(BiFunction<Float, float[], float[]> f, float[] y0, float t0, float t1, int steps);
+
     double[] solve(BiFunction<Double, double[], double[]> f, double[] y0, double t0, double t1, int steps);
+
     Real[] solve(BiFunction<Real, Real[], Real[]> f, Real[] y0, Real t0, Real t1, int steps);
 
     @Override

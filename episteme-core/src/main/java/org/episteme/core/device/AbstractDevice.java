@@ -112,7 +112,16 @@ public abstract class AbstractDevice implements Device {
     }
 
     @Override
-    public Optional<Object> getTrait(String key) {
+    public Object getTrait(String key) {
+        return traits.get(key);
+    }
+
+    /**
+     * Returns a trait value wrapped in an Optional.
+     * @param key the trait key
+     * @return an Optional containing the trait value, or empty if not found
+     */
+    public Optional<Object> getTraitOptional(String key) {
         return Optional.ofNullable(traits.get(key));
     }
 

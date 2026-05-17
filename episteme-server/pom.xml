@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.episteme</groupId>
+        <groupId>io.github.silveremartin-dev</groupId>
         <artifactId>episteme-parent</artifactId>
-        <version>1.0.0-beta1</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>episteme-server</artifactId>
@@ -16,6 +16,7 @@
     <description>RPC Server for Distributed Scientific Computing (Coordinator Node)</description>
 
     <properties>
+        <mainClass>org.episteme.server.server.EpistemeApplication</mainClass>
     </properties>
 
     <dependencyManagement>
@@ -82,21 +83,21 @@
 
         <!-- Core Episteme -->
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <!-- Episteme Natural (for loaders: FASTALoader, VizieRLoader) -->
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-natural</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <!-- Episteme Social (for WorldBank and Economic Tools) -->
         <dependency>
-            <groupId>org.episteme</groupId>
+            <groupId>io.github.silveremartin-dev</groupId>
             <artifactId>episteme-social</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -193,7 +194,7 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-inprocess</artifactId>
             <version>1.60.0</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -306,10 +307,13 @@
                         <goals>
                             <goal>compile</goal>
                             <goal>compile-custom</goal>
+                            <goal>test-compile</goal>
+                            <goal>test-compile-custom</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Copy Dependencies into target/lib -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -324,7 +328,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <includeScope>runtime</includeScope>
-                            <excludeGroupIds>org.episteme</excludeGroupIds>
+                            <excludeGroupIds>io.github.silveremartin-dev</excludeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -336,7 +340,7 @@
                 <version>3.5.0</version>
                 <configuration>
                     <mainClass>org.episteme.server.server.EpistemeApplication</mainClass>
-                    <jvmArguments>--add-modules jdk.incubator.vector --enable-preview</jvmArguments>
+                    <jvmArguments>--add-modules jdk.incubator.vector</jvmArguments>
                     <classifier>exec</classifier>
                 </configuration>
                 <executions>
@@ -344,6 +348,27 @@
                         <goals>
                             <goal>repackage</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Add Generated Sources to IDE Path -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/protobuf/java</source>
+                                <source>${project.build.directory}/generated-sources/protobuf/grpc-java</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

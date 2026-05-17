@@ -75,7 +75,7 @@ public class DenseMatrix<E> extends GenericMatrix<E> {
     }
 
     // Internal constructor
-    protected DenseMatrix(MatrixStorage<E> storage, Ring<E> ring) {
+    public DenseMatrix(MatrixStorage<E> storage, Ring<E> ring) {
         super(storage, org.episteme.core.technical.algorithm.AlgorithmManager.getRegistry().selectLinearAlgebraProvider(org.episteme.core.technical.algorithm.OperationContext.DEFAULT, ring), ring);
         this.storage = storage;
         this.ring = ring;

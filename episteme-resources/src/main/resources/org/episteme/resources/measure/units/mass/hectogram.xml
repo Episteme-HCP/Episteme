@@ -1,4 +1,0 @@
-<unit id="hectogram" name="hectogram" abbreviation="hg" unitType="mass" parentSI="kilogram" multiplierToSI="0.1"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>0.1 kg.</description>
-</unit>

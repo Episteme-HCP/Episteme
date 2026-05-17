@@ -1,6 +1,0 @@
-<unitType id="luminousFluxDensity" name="luminous flux density">
-    <alternative type="synonym">illuminance</alternative>
-    <dimension name="luminousIntensity" power="1" preserve="no"/>
-    <dimension name="angle" power="2" preserve="no"/>
-    <dimension name="length" power="-2" preserve="no"/>
-</unitType>

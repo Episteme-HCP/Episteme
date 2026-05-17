@@ -26,6 +26,7 @@ package org.episteme.core.mathematics.numbers.complex;
 import org.episteme.core.mathematics.structures.rings.Field;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.structures.rings.FieldElement;
+import org.episteme.core.mathematics.sets.Complexes;
 
 /**
  * Represents a complex number (Ã¢â€žâ€š), defined as a + bi where a, b are Real
@@ -80,12 +81,29 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
                 Real.of(magnitude * Math.sin(phase)));
     }
 
+    public static Complex valueOf(String realStr, String imagStr) {
+        return new Complex(Real.valueOf(realStr), Real.valueOf(imagStr));
+    }
+
+    public static Complex valueOf(String s) {
+        if (s.contains(";")) {
+            String[] parts = s.split(";");
+            return valueOf(parts[0], parts[1]);
+        }
+        return of(Real.valueOf(s));
+    }
+
+
     public Real getReal() {
         return real;
     }
 
     public Real getImaginary() {
         return imaginary;
+    }
+
+    public boolean isNaN() {
+        return real.isNaN() || imaginary.isNaN();
     }
 
     /**
@@ -121,6 +139,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
     }
 
     public Complex zero() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return new Complex(org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO), 
+                               org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO));
+        }
         return ZERO;
     }
 
@@ -154,6 +176,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
     }
 
     public Complex one() {
+        if (org.episteme.core.mathematics.context.MathContext.getCurrent().getRealPrecision() == org.episteme.core.mathematics.context.MathContext.RealPrecision.EXACT) {
+            return new Complex(org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ONE), 
+                               org.episteme.core.mathematics.numbers.real.RealBig.create(java.math.BigDecimal.ZERO));
+        }
         return ONE;
     }
 
@@ -169,6 +195,14 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
         // 1 / (a + bi) = (a - bi) / (a^2 + b^2)
         Real denominator = real.multiply(real).add(imaginary.multiply(imaginary));
         return new Complex(real.divide(denominator), imaginary.negate().divide(denominator));
+    }
+
+    /**
+     * Alias for inverse() to satisfy certain matrix operation requirements.
+     * @return 1/this
+     */
+    public Complex reciprocal() {
+        return inverse();
     }
 
     public Complex divide(Complex a, Complex b) {
@@ -228,7 +262,10 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
      * @return ln(this)
      */
     public Complex log() {
-        return new Complex(abs().log(), arg());
+        if (this.isNaN()) return Complex.of(Real.NaN, Real.NaN);
+        Real r = abs();
+        if (r.isZero()) return Complex.of(Real.NEGATIVE_INFINITY, Real.ZERO);
+        return new Complex(r.log(), arg());
     }
 
     /**
@@ -390,6 +427,26 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
         return onePlusZ.divide(oneMinusZ).log().multiply(Complex.of(0.5));
     }
 
+    /**
+     * Returns the base-10 logarithm of this complex number.
+     * log10(z) = log(z) / log(10)
+     * 
+     * @return log10(this)
+     */
+    public Complex log10() {
+        return log().divide(Complex.of(Real.of(Math.log(10.0))));
+    }
+
+    /**
+     * Returns the cube root of this complex number.
+     * cbrt(z) = z^(1/3)
+     * 
+     * @return cube root of this
+     */
+    public Complex cbrt() {
+        return pow(1.0 / 3.0);
+    }
+
     @Override
     public String toString() {
         if (imaginary.sign() < 0) {
@@ -436,10 +493,15 @@ public final class Complex implements Field<Complex>, FieldElement<Complex> {
 
     /**
      * Returns the ring structure for complex numbers.
-     * @return this instance (as it implements Field<Complex>)
+     * @return the singleton/context-aware field instance
      */
+    public static org.episteme.core.mathematics.structures.rings.Ring<Complex> ring() {
+        return ZERO;
+    }
+
+
     public org.episteme.core.mathematics.structures.rings.Ring<Complex> getScalarRing() {
-        return this;
+        return Complexes.getInstance();
     }
 }
 

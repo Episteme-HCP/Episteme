@@ -6,11 +6,8 @@
 package org.episteme.core.mathematics.linearalgebra.matrices;
 
 import org.episteme.core.mathematics.linearalgebra.Matrix;
-import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.linearalgebra.matrices.storage.TiledMatrixStorage;
-import org.episteme.core.mathematics.context.MathContext;
 import org.episteme.core.Episteme;
-import org.episteme.core.mathematics.sets.Reals;
 
 
 /**
@@ -21,9 +18,8 @@ import org.episteme.core.mathematics.sets.Reals;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
-
-    private final Matrix<Real>[][] tiles;
+public class TiledMatrix<E> extends GenericMatrix<E> implements AutoCloseable {
+    private final Matrix<E>[][] tiles;
     private final int tileRows;
     private final int tileCols;
     private final int rows;
@@ -34,11 +30,11 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
      * Creates a TiledMatrix from an existing matrix.
      */
     @SuppressWarnings("unchecked")
-    public TiledMatrix(Matrix<Real> original, int tileRows, int tileCols) {
-        super(new TiledMatrixStorage(new Matrix[(original.rows() + tileRows - 1) / tileRows][(original.cols() + tileCols - 1) / tileCols],
+    public TiledMatrix(Matrix<E> original, int tileRows, int tileCols) {
+        super(new TiledMatrixStorage<E>( (Matrix<E>[][]) new Matrix[(original.rows() + tileRows - 1) / tileRows][(original.cols() + tileCols - 1) / tileCols],
                 original.rows(), original.cols(), tileRows, tileCols),
-                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(Reals.getInstance()),
-                Reals.getInstance());
+                original.getProvider(),
+                original.getScalarRing());
         
         this.rows = original.rows();
         this.cols = original.cols();
@@ -48,7 +44,7 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
 
         int numTileRows = (rows + tileRows - 1) / tileRows;
         int numTileCols = (cols + tileCols - 1) / tileCols;
-        this.tiles = new Matrix[numTileRows][numTileCols];
+        this.tiles = (Matrix<E>[][]) new Matrix[numTileRows][numTileCols];
 
         for (int i = 0; i < numTileRows; i++) {
             for (int j = 0; j < numTileCols; j++) {
@@ -61,18 +57,18 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
         }
         
         // Re-initialize storage with actual tiles (since we passed an empty array to super)
-        this.storage = new TiledMatrixStorage(tiles, rows, cols, tileRows, tileCols);
+        this.storage = new TiledMatrixStorage<E>(tiles, rows, cols, tileRows, tileCols);
     }
 
     /**
      * Creates an empty TiledMatrix with specified dimensions.
      */
     @SuppressWarnings("unchecked")
-    public TiledMatrix(int rows, int cols, int tileSize) {
-        super(new TiledMatrixStorage(new Matrix[(rows + tileSize - 1) / tileSize][(cols + tileSize - 1) / tileSize],
+    public TiledMatrix(int rows, int cols, int tileSize, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        super(new TiledMatrixStorage<E>( (Matrix<E>[][]) new Matrix[(rows + tileSize - 1) / tileSize][(cols + tileSize - 1) / tileSize],
                 rows, cols, tileSize, tileSize),
-                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(Reals.getInstance()),
-                Reals.getInstance());
+                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(ring),
+                ring);
         
         this.rows = rows;
         this.cols = cols;
@@ -82,18 +78,18 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
 
         int numTileRows = (rows + tileSize - 1) / tileSize;
         int numTileCols = (cols + tileSize - 1) / tileSize;
-        this.tiles = new Matrix[numTileRows][numTileCols];
+        this.tiles = (Matrix<E>[][]) new Matrix[numTileRows][numTileCols];
 
         // Initialize with zero matrices
         for (int i = 0; i < numTileRows; i++) {
             for (int j = 0; j < numTileCols; j++) {
                 int rSize = Math.min(tileSize, rows - i * tileSize);
                 int cSize = Math.min(tileSize, cols - j * tileSize);
-                tiles[i][j] = Matrix.of(new Real[rSize][cSize], Reals.getInstance());
+                tiles[i][j] = Matrix.zeros(rSize, cSize, ring);
             }
         }
         
-        this.storage = new TiledMatrixStorage(tiles, rows, cols, tileSize, tileSize);
+        this.storage = new TiledMatrixStorage<E>(tiles, rows, cols, tileSize, tileSize);
     }
 
     @Override
@@ -107,7 +103,7 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
     }
 
     @Override
-    public Real get(int row, int col) {
+    public E get(int row, int col) {
         int tileI = row / tileRows;
         int tileJ = col / tileCols;
         int localI = row % tileRows;
@@ -115,25 +111,21 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
         return tiles[tileI][tileJ].get(localI, localJ);
     }
 
-    public void set(int row, int col, Real value) {
+    @Override
+    public void set(int row, int col, E value) {
         int tileI = row / tileRows;
         int tileJ = col / tileCols;
         int localI = row % tileRows;
         int localJ = col % tileCols;
-        // GenericMatrix usually doesn't expose set? We need to cast or assume implementation.
-        // Assuming tiles are GenericMatrix or MutableMatrix.
-        // But Matrix interface doesn't have set() in Episteme 5? 
-        // Wait, MMapMatrix implemented it but it wasn't in interface (no @Override).
-        // Let's implement it here properly.
-        Matrix<Real> tile = tiles[tileI][tileJ];
+        Matrix<E> tile = tiles[tileI][tileJ];
         if (tile instanceof GenericMatrix) {
-             ((GenericMatrix<Real>) tile).set(localI, localJ, value);
+             ((GenericMatrix<E>) tile).set(localI, localJ, value);
         } else {
              throw new UnsupportedOperationException("Tile is immutable or does not support set.");
         }
     }
 
-    public Matrix<Real> getTile(int i, int j) {
+    public Matrix<E> getTile(int i, int j) {
         return tiles[i][j];
     }
 
@@ -149,17 +141,29 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
         return tileSize;
     }
 
-    public void setTile(int i, int j, Matrix<Real> tile) {
+    public void setTile(int i, int j, Matrix<E> tile) {
         tiles[i][j] = tile;
+    }
+
+    /**
+     * Thread-safe update of a tile (adds delta to current tile).
+     */
+    public synchronized void updateTile(int i, int j, Matrix<E> delta) {
+        Matrix<E> current = tiles[i][j];
+        if (current == null) {
+            tiles[i][j] = delta;
+        } else {
+            tiles[i][j] = current.add(delta);
+        }
     }
 
     /**
      * Internal constructor for sub-matrices.
      */
-    private TiledMatrix(Matrix<Real>[][] tiles, int rows, int cols, int tileRows, int tileCols) {
-        super(new TiledMatrixStorage(tiles, rows, cols, tileRows, tileCols),
-                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(Reals.getInstance()),
-                Reals.getInstance());
+    private TiledMatrix(Matrix<E>[][] tiles, int rows, int cols, int tileRows, int tileCols, org.episteme.core.mathematics.structures.rings.Ring<E> ring) {
+        super(new TiledMatrixStorage<E>(tiles, rows, cols, tileRows, tileCols),
+                Episteme.getProviderRegistry().getDenseLinearAlgebraProvider(ring),
+                ring);
         this.tiles = tiles;
         this.rows = rows;
         this.cols = cols;
@@ -173,16 +177,16 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
      * Dimensions are in terms of tiles.
      */
     @SuppressWarnings("unchecked")
-    public TiledMatrix getSubTiledMatrix(int startTileRow, int endTileRow, int startTileCol, int endTileCol) {
+    public TiledMatrix<E> getSubTiledMatrix(int startTileRow, int endTileRow, int startTileCol, int endTileCol) {
         int numRows = endTileRow - startTileRow;
         int numCols = endTileCol - startTileCol;
-        Matrix<Real>[][] subTiles = new Matrix[numRows][numCols];
+        Matrix<E>[][] subTiles = (Matrix<E>[][]) new Matrix[numRows][numCols];
         
         int totalRows = 0;
         int totalCols = 0;
         
         for (int i = 0; i < numRows; i++) {
-            subTiles[i] = new Matrix[numCols];
+            subTiles[i] = (Matrix<E>[]) new Matrix[numCols];
             int currentRowRows = 0;
             for (int j = 0; j < numCols; j++) {
                 subTiles[i][j] = tiles[startTileRow + i][startTileCol + j];
@@ -192,13 +196,13 @@ public class TiledMatrix extends GenericMatrix<Real> implements AutoCloseable {
             totalRows += currentRowRows;
         }
         
-        return new TiledMatrix(subTiles, totalRows, totalCols, tileRows, tileCols);
+        return new TiledMatrix<E>(subTiles, totalRows, totalCols, tileRows, tileCols, getScalarRing());
     }
 
     @Override
     public void close() {
-        for (Matrix<Real>[] row : tiles) {
-            for (Matrix<Real> tile : row) {
+        for (Matrix<E>[] row : tiles) {
+            for (Matrix<E> tile : row) {
                 if (tile instanceof AutoCloseable) {
                     try {
                         ((AutoCloseable) tile).close();

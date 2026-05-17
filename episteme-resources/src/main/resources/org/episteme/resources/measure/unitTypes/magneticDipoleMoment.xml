@@ -1,4 +1,0 @@
-<unitType id="magneticDipoleMoment" name="magnetic dipole moment">
-    <dimension name="length" power="2" preserve="no"/>
-    <dimension name="current" power="1" preserve="no"/>
-</unitType>

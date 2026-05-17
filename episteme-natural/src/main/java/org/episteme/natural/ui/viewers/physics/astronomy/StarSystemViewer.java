@@ -48,6 +48,8 @@ import org.episteme.core.ui.BooleanParameter;
 import org.episteme.core.ui.ChoiceParameter;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.i18n.I18N;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +67,7 @@ import java.util.stream.Collectors;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class StarSystemViewer extends AbstractViewer implements Simulatable {
     
     private final Group root3D = new Group();

@@ -33,6 +33,8 @@ import org.episteme.core.ui.AbstractViewer;
 import org.episteme.core.ui.i18n.I18N;
 import org.episteme.core.ui.Parameter;
 import org.episteme.core.ui.StringParameter;
+import org.episteme.core.ui.Viewer;
+import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,7 @@ import java.util.List;
  * @author Gemini AI (Google DeepMind)
  * @since 1.0
  */
+@AutoService(Viewer.class)
 public class ChemicalReactionViewer extends AbstractViewer {
 
     private String equation = "2H2 + O2 -> 2H2O";

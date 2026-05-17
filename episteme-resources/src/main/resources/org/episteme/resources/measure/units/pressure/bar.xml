@@ -1,4 +1,0 @@
-<unit id="bar" name="bar" unitType="pressure" parentSI="pascal" multiplierToSI="1.0E+5"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>1 bar = 100000 pascals</description>
-</unit>

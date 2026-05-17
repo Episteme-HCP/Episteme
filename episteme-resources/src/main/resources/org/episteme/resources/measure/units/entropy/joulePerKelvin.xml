@@ -1,3 +1,0 @@
-<unit id="joulePerKelvin" name="Joule per Kelvin" abbreviation="J/K" unitType="entropy" parentSI="SELF"
-      multiplierToSI="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-</unit>
