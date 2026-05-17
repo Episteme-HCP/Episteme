@@ -57,7 +57,7 @@ Add Episteme to your `pom.xml`:
 <dependency>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-core</artifactId>
-    <version>1.0.0-beta2</version>
+    <version>1.0.0-beta3</version>
 </dependency>
 ```
 
