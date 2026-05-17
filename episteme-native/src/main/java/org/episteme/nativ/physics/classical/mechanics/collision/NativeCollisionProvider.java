@@ -12,12 +12,16 @@ public interface NativeCollisionProvider extends CollisionProvider {
     /**
      * Performs collision detection between spheres using MemorySegments.
      */
-    int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions, java.lang.foreign.ValueLayout layout);
+    default int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions, java.lang.foreign.ValueLayout layout) {
+        throw new UnsupportedOperationException("Native collision detection is not available.");
+    }
 
     /**
      * Resolves collisions using MemorySegments.
      */
-    void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions, java.lang.foreign.ValueLayout layout);
+    default void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions, java.lang.foreign.ValueLayout layout) {
+        throw new UnsupportedOperationException("Native collision resolution is not available.");
+    }
 
     @Override
     default int detectSphereCollisions(float[] positions, float[] radii, int n, int[] collisions) {

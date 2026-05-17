@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025-2026 - Silvere Martin-Michiellot and Gemini AI (Google DeepMind)
  *
@@ -22,7 +22,7 @@
  */
 
 /**
- * Provides the {@link org.episteme.core.ml.mathml} module.
+ * Provides the {@link org.episteme.core.mathematics.loaders.mathml} module.
  */
 package org.episteme.core.mathematics.loaders.mathml;
 

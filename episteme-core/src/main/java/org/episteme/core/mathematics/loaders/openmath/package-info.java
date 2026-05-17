@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
  *
@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 /**
- * Provides the {@link org.episteme.core.ml.openmath} module.
+ * Provides the {@link org.episteme.core.mathematics.loaders.openmath} module.
  */
 package org.episteme.core.mathematics.loaders.openmath;
 

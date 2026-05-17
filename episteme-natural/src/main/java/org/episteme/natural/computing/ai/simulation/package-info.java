@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Episteme - Java(TM) Tools and Libraries for the Advancement of Sciences.
  * Copyright (C) 2025 - Silvere Martin-Michiellot (silvere.martin@gmail.com)
  *
@@ -21,6 +21,6 @@
  * SOFTWARE.
  */
 /**
- * Provides the {@link org.episteme.core.computing.ai.simulation} module.
+ * Provides the {@link org.episteme.natural.computing.ai.simulation} module.
  */
 package org.episteme.natural.computing.ai.simulation;

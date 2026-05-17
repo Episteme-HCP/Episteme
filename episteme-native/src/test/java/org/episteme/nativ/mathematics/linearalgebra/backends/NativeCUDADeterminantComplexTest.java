@@ -19,7 +19,7 @@ public class NativeCUDADeterminantComplexTest {
     @Test
     @EnabledIf("isCudaAvailable")
     public void testDeterminantComplex() {
-        NativeCUDADenseLinearAlgebraDoubleBackend backend = new NativeCUDADenseLinearAlgebraDoubleBackend();
+        NativeCUDADenseLinearAlgebraDoubleBackend<Complex> backend = new NativeCUDADenseLinearAlgebraDoubleBackend<>();
         Ring<Complex> ring = org.episteme.core.mathematics.sets.Complexes.getInstance();
 
         // A = [[1+i, 2], [3, 4-i]]
