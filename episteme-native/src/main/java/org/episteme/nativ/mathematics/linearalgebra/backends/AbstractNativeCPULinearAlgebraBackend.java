@@ -44,7 +44,7 @@ import org.episteme.nativ.technical.backend.nativ.NativeFFMLoader;
  * @author Gemini AI (Google DeepMind)
  * @since 1.1
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked", "rawtypes"})
 public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
     private static final System.Logger logger = System.getLogger(AbstractNativeCPULinearAlgebraBackend.class.getName());
@@ -891,7 +891,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                 NativeSafe.invoke(DGEMV_HANDLE, CblasRowMajor, CblasNoTrans, m, n, 1.0, aSeg, n, bSeg, 1, 0.0, rSeg, 1);
                 
                 double[] result = rSeg.toArray(ValueLayout.JAVA_DOUBLE);
-                @SuppressWarnings("unchecked")
                 org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> resVal = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(result);
                 return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) resVal;
             }
@@ -908,7 +907,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             }
             rd[i] = sum;
         }
-        @SuppressWarnings("unchecked")
         org.episteme.core.mathematics.linearalgebra.Vector<org.episteme.core.mathematics.numbers.real.Real> resVal = org.episteme.core.mathematics.linearalgebra.vectors.RealDoubleVector.of(rd);
         return (org.episteme.core.mathematics.linearalgebra.Vector<E>)(Object) resVal;
     }
@@ -1079,7 +1077,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
             double[] bd = toDoubleArray((Matrix<org.episteme.core.mathematics.numbers.real.Real>)(Object)b);
             double[] rd = new double[ad.length];
             for (int i = 0; i < ad.length; i++) rd[i] = ad[i] + bd[i];
-            @SuppressWarnings("unchecked")
             Matrix<E> result = (Matrix<E>)(Object) RealDoubleMatrix.of(rd, a.rows(), a.cols());
             return result;
         } else if (ring.zero() instanceof org.episteme.core.mathematics.numbers.complex.Complex) {
@@ -1192,7 +1189,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
                     org.episteme.core.mathematics.numbers.real.Real[] resData = new org.episteme.core.mathematics.numbers.real.Real[m * n];
                     for (int i=0; i<m*n; i++) resData[i] = org.episteme.core.mathematics.numbers.real.RealFloat.of(cData[i]);
                     E[] castedRes = (E[]) resData;
-                    @SuppressWarnings("unchecked")
                     org.episteme.core.mathematics.linearalgebra.Matrix<E> result = new org.episteme.core.mathematics.linearalgebra.matrices.GenericMatrix<E>(new org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixStorage<E>(m, n, castedRes), this, ring);
                     return result;
                 }
@@ -1748,7 +1744,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> normalize(Vector<E> v) {
         E n = norm(v);
         if (n == null) return v;
@@ -2248,7 +2243,6 @@ public abstract class AbstractNativeCPULinearAlgebraBackend<E> implements Linear
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E trace(Matrix<E> a) {
         if (a.rows() != a.cols()) throw new IllegalArgumentException("Matrix must be square");
         Ring<E> ring = a.getScalarRing();

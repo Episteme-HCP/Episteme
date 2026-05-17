@@ -38,7 +38,7 @@ import org.episteme.core.mathematics.linearalgebra.matrices.storage.DenseMatrixS
  * High-performance Arbitrary Precision Linear Algebra backend using libmpfr.
  * Binds directly to MPFR via Project Panama (FFM).
  */
-@SuppressWarnings({"unchecked", "rawtypes", "unused", "null"})
+@SuppressWarnings({"unused", "null"})
 @AutoService({Backend.class, ComputeBackend.class, NativeBackend.class, LinearAlgebraProvider.class, CPUBackend.class})
 public class NativeMPFRDenseLinearAlgebraBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
 
