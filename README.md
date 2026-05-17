@@ -143,7 +143,7 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete design.
 
 ## Documentation
 
-- 📚 **Online API Javadoc**: [https://Episteme-HCP.github.io/Episteme/](https://Episteme-HCP.github.io/Episteme/)
+- 📚 **Online API Javadoc**: [https://episteme-hcp.github.io/Episteme/javadoc/index.html](https://episteme-hcp.github.io/Episteme/javadoc/index.html)
 - [Architecture Guide](docs/ARCHITECTURE.md)
 - [Mathematical Concepts](docs/VISION.md)
 - [API Reference](docs/REST_API.md)

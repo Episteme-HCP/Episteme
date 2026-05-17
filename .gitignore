@@ -76,7 +76,4 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Generated Javadoc
-docs/javadoc/
-
 
