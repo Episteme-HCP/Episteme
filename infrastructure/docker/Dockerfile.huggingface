@@ -1,11 +1,11 @@
 # Phase 1: Build the Java Server
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
 COPY . .
 RUN mvn clean install -DskipTests -pl episteme-server -am
 
 # Phase 2: Production Image
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:25-jre
 
 # Install Python and System Dependencies
 RUN apt-get update && apt-get install -y \

@@ -75,7 +75,7 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn -B clean verify -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar
+        run: mvn -B clean verify -DskipTests -Djacoco.skip=true -Prelease-jdk21,fat-jar -pl '!episteme-native,!episteme-server,!episteme-client,!episteme-worker,!episteme-demos,!episteme-featured-apps,!episteme-benchmarks'
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

@@ -37,14 +37,11 @@ jobs:
 
     - name: Build with Maven
       shell: bash
-      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=21 --file pom.xml
+      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=21 -pl '!episteme-native,!episteme-server,!episteme-client,!episteme-worker,!episteme-demos,!episteme-featured-apps,!episteme-benchmarks' --file pom.xml
 
     - name: Run Benchmarks (CLI)
       shell: bash
-      continue-on-error: true
-      run: |
-        mvn exec:java -pl episteme-benchmarks -Dexec.mainClass="org.episteme.benchmarks.cli.BenchmarkCLI" \
-        -Dexec.args="--run-all --dry-run --export-file benchmark-results.json"
+      run: echo "Benchmarks skipped on JDK 21 because native module is excluded."
 
     - name: Upload Benchmark Results
       uses: actions/upload-artifact@v4

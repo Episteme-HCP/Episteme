@@ -152,7 +152,8 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete design.
 
 ## Requirements
 
-- Java 21+
+- **Java 25** (Required to compile the high-performance native backend module `episteme-native` due to finalized modern Panama FFM APIs).
+- **Java 21+** (Compatible for building and running all core mathematical and social modules: `episteme-core`, `episteme-natural`, `episteme-social`, `episteme-database`, by excluding `episteme-native` via Maven reactor exclusions `-pl '!episteme-native,!episteme-server,!episteme-client,!episteme-worker,!episteme-demos,!episteme-featured-apps,!episteme-benchmarks'`).
 - Maven 3.8+
 - (Optional) CUDA Toolkit 12.0+ for GPU support
 

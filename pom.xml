@@ -106,7 +106,7 @@
     <maven.compiler.target>${target.java.version}</maven.compiler.target>
     <maven.compiler.args>--add-modules=jdk.incubator.vector -Xpkginfo:always</maven.compiler.args>
     <argLine></argLine>
-    <extra.compiler.args>--enable-preview</extra.compiler.args>
+    <extra.compiler.args></extra.compiler.args>
     <mainClass></mainClass>
     <artifact.classifier></artifact.classifier>
     <artifact.suffix></artifact.suffix>
@@ -764,8 +764,10 @@
           <compilerArgs>
             <arg>--add-modules</arg>
             <arg>jdk.incubator.vector</arg>
-            <arg>--enable-preview</arg>
             <arg>-Xpkginfo:always</arg>
+            <arg>-Xlint:unchecked</arg>
+            <arg>-Xlint:deprecation</arg>
+            <arg>-Xlint:rawtypes</arg>
           </compilerArgs>
         </configuration>
       </plugin>
@@ -791,8 +793,10 @@
             <compilerArgs>
               <arg>--add-modules</arg>
               <arg>jdk.incubator.vector</arg>
-              <arg>--enable-preview</arg>
               <arg>-Xpkginfo:always</arg>
+              <arg>-Xlint:unchecked</arg>
+              <arg>-Xlint:deprecation</arg>
+              <arg>-Xlint:rawtypes</arg>
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
