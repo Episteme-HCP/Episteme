@@ -1,0 +1,306 @@
+﻿mvn : WARNING: A restricted method in java.lang.System has been called
+Au caractère Ligne:1 : 1
++ mvn test -pl episteme-benchmarks -Dtest=LinearAlgebraComplianceTest - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: A rest...has been called:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module 
+(file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/jansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by 
+com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper 
+(file:/C:/Program%20Files/Apache/Maven/apache-maven-3.9.5/lib/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of class 
+com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] ----------< io.github.silveremartin-dev:episteme-benchmarks >-----------
+[INFO] Building Episteme Benchmarking Suite 1.0.0-beta2
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.4.1:enforce (ban-conflicting-log4j-bridges) @ episteme-benchmarks ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.dependency.BannedDependencies passed
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ episteme-benchmarks ---
+[INFO] Copying 11 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- flatten:1.6.0:flatten (flatten) @ episteme-benchmarks ---
+[INFO] Generating flattened POM of project io.github.silveremartin-dev:episteme-benchmarks:jar:1.0.0-beta2...
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ episteme-benchmarks ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ episteme-benchmarks ---
+[INFO] skip non existing resourceDirectory C:\Silvere\Encours\Developpement\Episteme\episteme-benchmarks\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ episteme-benchmarks ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ episteme-benchmarks ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+WARNING: Using incubator modules: jdk.incubator.vector
+[INFO] Running org.episteme.benchmarks.test.audit.LinearAlgebraComplianceTest
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Colt (Optimized)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Apache Commons Math (Optimized)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found EJML (Optimized)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Episteme CPU Foundation
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found JBlas (Optimized)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Episteme (CARMA)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Episteme CPU (Dense)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Episteme CPU (Sparse)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Episteme Distributed Linear Algebra Provider (LocalDistributedContext)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Episteme (Standard)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Episteme (Strassen)
+[AuditEngine] ServiceLoader: Attempting next...
+[NativeFFMLoader] Attempting bare lookup for variant: episteme-jni
+[NativeFFMLoader] System lookup failed for episteme-jni: Cannot open library: episteme-jni
+14:59:38.931 [main] INFO  o.e.n.t.b.nativ.NativeFFMLoader - [NativeFFMLoader] Attempting to load library: C:\Silvere\Encours\Developpement\Episteme\libs\episteme-jni.dll
+14:59:38.950 [main] INFO  o.e.n.t.b.nativ.NativeFFMLoader - [NativeFFMLoader] Successfully loaded library: C:\Silvere\Encours\Developpement\Episteme\libs\episteme-jni.dll
+[NativeFFMLoader] Attempting bare lookup for variant: openblas
+[NativeFFMLoader] System lookup failed for openblas: Cannot open library: openblas
+[NativeFFMLoader] Attempting bare lookup for variant: libopenblas
+[NativeFFMLoader] System lookup failed for libopenblas: Cannot open library: libopenblas
+14:59:38.966 [main] INFO  o.e.n.t.b.nativ.NativeFFMLoader - [NativeFFMLoader] Attempting to load library: C:\Silvere\Encours\Developpement\Episteme\libs\libopenblas.dll
+14:59:44.768 [main] INFO  o.e.n.t.b.nativ.NativeFFMLoader - [NativeFFMLoader] Successfully loaded library: C:\Silvere\Encours\Developpement\Episteme\libs\libopenblas.dll
+[NativeFFMLoader] Attempting bare lookup for variant: lapacke
+[NativeFFMLoader] System lookup failed for lapacke: Cannot open library: lapacke
+[NativeFFMLoader] Attempting bare lookup for variant: liblapacke
+[NativeFFMLoader] System lookup failed for liblapacke: Cannot open library: liblapacke
+[NativeFFMLoader] Attempting bare lookup for variant: liblapacke-3
+[NativeFFMLoader] System lookup failed for liblapacke-3: Cannot open library: liblapacke-3
+[NativeFFMLoader] Attempting bare lookup for variant: lapacke-3
+[NativeFFMLoader] System lookup failed for lapacke-3: Cannot open library: lapacke-3
+[NativeFFMLoader] Attempting bare lookup for variant: lapack
+[NativeFFMLoader] System lookup failed for lapack: Cannot open library: lapack
+[NativeFFMLoader] Attempting bare lookup for variant: liblapack
+[NativeFFMLoader] System lookup failed for liblapack: Cannot open library: liblapack
+[NativeFFMLoader] Attempting bare lookup for variant: liblapack-3
+[NativeFFMLoader] System lookup failed for liblapack-3: Cannot open library: liblapack-3
+[NativeFFMLoader] Attempting bare lookup for variant: lapack-3
+[NativeFFMLoader] System lookup failed for lapack-3: Cannot open library: lapack-3
+[NativeFFMLoader] Attempting bare lookup for variant: mkl_rt
+[NativeFFMLoader] System lookup failed for mkl_rt: Cannot open library: mkl_rt
+[NativeFFMLoader] Attempting bare lookup for variant: libmkl_rt
+[NativeFFMLoader] System lookup failed for libmkl_rt: Cannot open library: libmkl_rt
+[NativeFFMLoader] Attempting bare lookup for variant: libmkl_rt-3
+[NativeFFMLoader] System lookup failed for libmkl_rt-3: Cannot open library: libmkl_rt-3
+[NativeFFMLoader] Attempting bare lookup for variant: mkl_rt-3
+[NativeFFMLoader] System lookup failed for mkl_rt-3: Cannot open library: mkl_rt-3
+[NativeFFMLoader] Found symbol: LAPACKE_dgesv
+[NativeFFMLoader] Found symbol: LAPACKE_dgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_dgetri
+[NativeFFMLoader] Found symbol: LAPACKE_dsyev
+[NativeFFMLoader] Found symbol: LAPACKE_dpotrf
+[NativeFFMLoader] Found symbol: LAPACKE_dgeqrf
+[NativeFFMLoader] Found symbol: LAPACKE_dorgqr
+[NativeFFMLoader] Found symbol: LAPACKE_dgesvd
+[NativeFFMLoader] Found symbol: LAPACKE_sgesv
+[NativeFFMLoader] Found symbol: LAPACKE_sgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_zgesv
+[NativeFFMLoader] Found symbol: LAPACKE_zgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_zgetri
+[NativeFFMLoader] Found symbol: LAPACKE_zheev
+[NativeFFMLoader] Found symbol: LAPACKE_zpotrf
+[NativeFFMLoader] Found symbol: LAPACKE_zgeqrf
+[NativeFFMLoader] Found symbol: LAPACKE_zungqr
+[NativeFFMLoader] Found symbol: LAPACKE_zgesvd
+[NativeFFMLoader] Found symbol: LAPACKE_cgesv
+[NativeFFMLoader] Found symbol: LAPACKE_cgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_cgetri
+[NativeFFMLoader] Found symbol: LAPACKE_cheev
+[NativeFFMLoader] Found symbol: LAPACKE_cpotrf
+[NativeFFMLoader] Found symbol: LAPACKE_cgeqrf
+[NativeFFMLoader] Found symbol: LAPACKE_cungqr
+[NativeFFMLoader] Found symbol: LAPACKE_cgesvd
+mai 08, 2026 2:59:45 PM org.episteme.nativ.mathematics.linearalgebra.backends.AbstractNativeCPULinearAlgebraBackend 
+<clinit>
+INFO: Native CPU-BLAS Backend initialized. SVD support: true, Eigen support: true, LAPACK support: true
+[AuditEngine] ServiceLoader: Found Native CPU-BLAS (Complex)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Native CPU-BLAS (Real)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Native CUDA Dense Linear Algebra Backend
+[AuditEngine] ServiceLoader: Attempting next...
+[CUDA-Sparse-Init] Starting...
+[NativeFFMLoader] Attempting bare lookup for variant: cudart
+[NativeFFMLoader] System lookup failed for cudart: Cannot open library: cudart
+[NativeFFMLoader] Attempting bare lookup for variant: libcudart
+[NativeFFMLoader] System lookup failed for libcudart: Cannot open library: libcudart
+[NativeFFMLoader] Attempting bare lookup for variant: libcudart-3
+[NativeFFMLoader] System lookup failed for libcudart-3: Cannot open library: libcudart-3
+[NativeFFMLoader] Attempting bare lookup for variant: cudart-3
+[NativeFFMLoader] System lookup failed for cudart-3: Cannot open library: cudart-3
+[NativeFFMLoader] Attempting bare lookup for variant: cudart64_13
+[NativeFFMLoader] Successfully loaded cudart64_13 from system path
+[NativeFFMLoader] Attempting bare lookup for variant: cusparse
+[NativeFFMLoader] System lookup failed for cusparse: Cannot open library: cusparse
+[NativeFFMLoader] Attempting bare lookup for variant: libcusparse
+[NativeFFMLoader] System lookup failed for libcusparse: Cannot open library: libcusparse
+[NativeFFMLoader] Attempting bare lookup for variant: libcusparse-3
+[NativeFFMLoader] System lookup failed for libcusparse-3: Cannot open library: libcusparse-3
+[NativeFFMLoader] Attempting bare lookup for variant: cusparse-3
+[NativeFFMLoader] System lookup failed for cusparse-3: Cannot open library: cusparse-3
+[NativeFFMLoader] Attempting bare lookup for variant: cusparse64_13
+[NativeFFMLoader] System lookup failed for cusparse64_13: Cannot open library: cusparse64_13
+[NativeFFMLoader] Attempting bare lookup for variant: cusparse64_12
+[NativeFFMLoader] Successfully loaded cusparse64_12 from system path
+[NativeFFMLoader] Attempting bare lookup for variant: cublas
+[NativeFFMLoader] System lookup failed for cublas: Cannot open library: cublas
+[NativeFFMLoader] Attempting bare lookup for variant: libcublas
+[NativeFFMLoader] System lookup failed for libcublas: Cannot open library: libcublas
+[NativeFFMLoader] Attempting bare lookup for variant: libcublas-3
+[NativeFFMLoader] System lookup failed for libcublas-3: Cannot open library: libcublas-3
+[NativeFFMLoader] Attempting bare lookup for variant: cublas-3
+[NativeFFMLoader] System lookup failed for cublas-3: Cannot open library: cublas-3
+[NativeFFMLoader] Attempting bare lookup for variant: cublas64_13
+[NativeFFMLoader] Successfully loaded cublas64_13 from system path
+[CUDA-Sparse-Init] Binding symbols...
+[NativeFFMLoader] Found symbol: cudaMalloc
+[NativeFFMLoader] Found symbol: cudaFree
+[NativeFFMLoader] Found symbol: cudaMemcpy
+[NativeFFMLoader] Found symbol: cudaDeviceSynchronize
+[NativeFFMLoader] Found symbol: cudaGetErrorString
+[NativeFFMLoader] Found symbol: cudaGetDeviceCount
+[NativeFFMLoader] Found symbol: cudaMemset
+[NativeFFMLoader] Found symbol: cusparseCreate
+[NativeFFMLoader] Found symbol: cusparseDestroy
+[NativeFFMLoader] Found symbol: cusparseCreateCsr
+[NativeFFMLoader] Found symbol: cusparseDestroySpMat
+[NativeFFMLoader] Found symbol: cusparseCreateDnMat
+[NativeFFMLoader] Found symbol: cusparseDestroyDnMat
+[NativeFFMLoader] Found symbol: cusparseSpMM_bufferSize
+[NativeFFMLoader] Found symbol: cusparseSpMM
+[NativeFFMLoader] Found symbol: cusparseSpMV_bufferSize
+[NativeFFMLoader] Found symbol: cusparseSpMV
+[NativeFFMLoader] Found symbol: cusparseCreateDnVec
+[NativeFFMLoader] Found symbol: cusparseDestroyDnVec
+[NativeFFMLoader] Found symbol: cublasCreate_v2
+[NativeFFMLoader] Found symbol: cublasDestroy_v2
+[NativeFFMLoader] Found symbol: cublasDgemm_v2
+[NativeFFMLoader] Found symbol: cublasDdot_v2
+[NativeFFMLoader] Found symbol: cublasDaxpy_v2
+[NativeFFMLoader] Found symbol: cublasDscal_v2
+[NativeFFMLoader] Found symbol: cublasDgeam
+[CUDA-Sparse-Init] Invoking cudaGetDeviceCount...
+[CUDA-Sparse-Init] cudaGetDeviceCount result=801, count=0
+14:59:45.736 [main] WARN  o.e.n.m.l.b.NativeCUDASparseLinearAlgebraBackend - No CUDA-capable GPU devices found (result=801, count=0). Backend disabled.
+[AuditEngine] ServiceLoader: Found Native CUDA Sparse Linear Algebra Backend
+[AuditEngine] ServiceLoader: Attempting next...
+14:59:45.748 [main] INFO  o.e.n.m.l.b.AbstractNativeFFMBLASBackend - FFM: Successfully matched native library for FFM backend: java.lang.foreign.SymbolLookup$$Lambda/0x00000000240cfe40@35038141
+[NativeFFMLoader] Found symbol: cblas_sgemm
+[NativeFFMLoader] Found symbol: cblas_sgemv
+[NativeFFMLoader] Found symbol: cblas_sdot
+[NativeFFMLoader] Found symbol: cblas_snrm2
+[NativeFFMLoader] Found symbol: cblas_saxpy
+[NativeFFMLoader] Found symbol: cblas_sscal
+[NativeFFMLoader] Found symbol: cblas_dgemm
+[NativeFFMLoader] Found symbol: cblas_ddot
+[NativeFFMLoader] Found symbol: cblas_dnrm2
+[NativeFFMLoader] Found symbol: cblas_daxpy
+[NativeFFMLoader] Found symbol: cblas_dscal
+[NativeFFMLoader] Found symbol: cblas_dgemv
+[NativeFFMLoader] Found symbol: cblas_cgemm
+[NativeFFMLoader] Found symbol: cblas_zgemm
+[NativeFFMLoader] Found symbol: cblas_cgemv
+[NativeFFMLoader] Found symbol: cblas_zgemv
+[NativeFFMLoader] Found symbol: cblas_cdotc_sub
+[NativeFFMLoader] Found symbol: cblas_zdotc_sub
+[NativeFFMLoader] Found symbol: cblas_scnrm2
+[NativeFFMLoader] Found symbol: cblas_dznrm2
+[NativeFFMLoader] Found symbol: cblas_caxpy
+[NativeFFMLoader] Found symbol: cblas_zaxpy
+[NativeFFMLoader] Found symbol: cblas_cscal
+[NativeFFMLoader] Found symbol: cblas_zscal
+[NativeFFMLoader] Found symbol: LAPACKE_sgesv
+[NativeFFMLoader] Found symbol: LAPACKE_dgesv
+[NativeFFMLoader] Found symbol: LAPACKE_cgesv
+[NativeFFMLoader] Found symbol: LAPACKE_zgesv
+[NativeFFMLoader] Found symbol: LAPACKE_sgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_dgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_cgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_zgetrf
+[NativeFFMLoader] Found symbol: LAPACKE_sgetri
+[NativeFFMLoader] Found symbol: LAPACKE_dgetri
+[NativeFFMLoader] Found symbol: LAPACKE_cgetri
+[NativeFFMLoader] Found symbol: LAPACKE_zgetri
+[NativeFFMLoader] Found symbol: LAPACKE_sgetrs
+[NativeFFMLoader] Found symbol: LAPACKE_dgetrs
+[NativeFFMLoader] Found symbol: LAPACKE_cgetrs
+[NativeFFMLoader] Found symbol: LAPACKE_zgetrs
+[NativeFFMLoader] Found symbol: LAPACKE_sgeqrf
+[NativeFFMLoader] Found symbol: LAPACKE_dgeqrf
+[NativeFFMLoader] Found symbol: LAPACKE_cgeqrf
+[NativeFFMLoader] Found symbol: LAPACKE_zgeqrf
+[NativeFFMLoader] Found symbol: LAPACKE_sorgqr
+[NativeFFMLoader] Found symbol: LAPACKE_dorgqr
+[NativeFFMLoader] Found symbol: LAPACKE_cungqr
+[NativeFFMLoader] Found symbol: LAPACKE_zungqr
+[NativeFFMLoader] Found symbol: LAPACKE_sgesvd
+[NativeFFMLoader] Found symbol: LAPACKE_dgesvd
+[NativeFFMLoader] Found symbol: LAPACKE_cgesvd
+[NativeFFMLoader] Found symbol: LAPACKE_zgesvd
+[NativeFFMLoader] Found symbol: LAPACKE_spotrf
+[NativeFFMLoader] Found symbol: LAPACKE_dpotrf
+[NativeFFMLoader] Found symbol: LAPACKE_cpotrf
+[NativeFFMLoader] Found symbol: LAPACKE_zpotrf
+[NativeFFMLoader] Found symbol: LAPACKE_spotrs
+[NativeFFMLoader] Found symbol: LAPACKE_dpotrs
+[NativeFFMLoader] Found symbol: LAPACKE_cpotrs
+[NativeFFMLoader] Found symbol: LAPACKE_zpotrs
+[NativeFFMLoader] Found symbol: LAPACKE_ssyev
+[NativeFFMLoader] Found symbol: LAPACKE_dsyev
+[NativeFFMLoader] Found symbol: LAPACKE_cheev
+[NativeFFMLoader] Found symbol: LAPACKE_zheev
+[NativeFFMLoader] Found symbol: LAPACKE_sgels
+[NativeFFMLoader] Found symbol: LAPACKE_dgels
+[NativeFFMLoader] Found symbol: LAPACKE_cgels
+[NativeFFMLoader] Found symbol: LAPACKE_zgels
+[NativeFFMLoader] Found symbol: cblas_ctrsm
+[NativeFFMLoader] Found symbol: cblas_ztrsm
+[NativeFFMLoader] Found symbol: cblas_dtrsm
+[NativeFFMLoader] Found symbol: cblas_strsm
+14:59:45.873 [main] INFO  o.e.n.m.l.b.AbstractNativeFFMBLASBackend - FFM: Backend initialized successfully. Multi-precision handles linked.
+[AuditEngine] ServiceLoader: Found Native FFM-BLAS (Complex)
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Native FFM-BLAS (Real)
+[AuditEngine] ServiceLoader: Attempting next...
+[NativeFFMLoader] Attempting bare lookup for variant: mpfr
+[NativeFFMLoader] System lookup failed for mpfr: Cannot open library: mpfr
+14:59:45.898 [main] INFO  o.e.n.t.b.nativ.NativeFFMLoader - [NativeFFMLoader] Attempting to load library: C:\Silvere\Encours\Developpement\Episteme\libs\mpfr.dll
+14:59:45.901 [main] INFO  o.e.n.t.b.nativ.NativeFFMLoader - [NativeFFMLoader] Successfully loaded library: C:\Silvere\Encours\Developpement\Episteme\libs\mpfr.dll
+[AuditEngine] ServiceLoader: Found Native MPFR Dense Linear Algebra Backend
+[AuditEngine] ServiceLoader: Attempting next...
+[AuditEngine] ServiceLoader: Found Native MPFR Sparse Linear Algebra Backend
+[AuditEngine] ServiceLoader: Attempting next...
+14:59:46.006 [main] INFO  org.nd4j.linalg.factory.Nd4jBackend - Loaded [CpuBackend] backend
