@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @param <E> the element type
  */
+@SuppressWarnings("unused")
 public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraProvider<E>, NativeBackend, CPUBackend {
     
     private static final Logger logger = LoggerFactory.getLogger(AbstractNativeFFMBLASBackend.class);
@@ -508,7 +509,10 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     private static MethodHandle CTRSM;
     private static MethodHandle ZTRSM;
     
-
+    private static MethodHandle STRTRS;
+    private static MethodHandle DTRTRS;
+    private static MethodHandle CTRTRS;
+    private static MethodHandle ZTRTRS;
     
     // LAPACK Method Handles
     private static MethodHandle SGESV;
