@@ -25,7 +25,7 @@ USER episteme
 ENV PATH="/home/episteme/.local/bin:${PATH}"
 
 # Copy Java Artifact
-COPY --from=build --chown=episteme:episteme /app/episteme-server/target/episteme-server-*.jar /app/server.jar
+COPY --from=build --chown=episteme:episteme /app/episteme-server/target/episteme-server-*-exec.jar /app/server.jar
 
 # Copy Agent Code
 COPY --chown=episteme:episteme agent/ /app/agent/
