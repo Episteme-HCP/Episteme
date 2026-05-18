@@ -2,8 +2,6 @@ package org.episteme.natural.physics.classical.mechanics.collision;
 
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.technical.algorithm.AlgorithmProvider;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 
 /**
  * Interface for high-performance collision detection and physics simulation.
@@ -30,14 +28,10 @@ public interface CollisionProvider extends AlgorithmProvider {
 
     int detectSphereCollisions(Real[] positions, Real[] radii, int n, int[] collisions);
 
-    int detectSphereCollisions(MemorySegment positions, MemorySegment radii, int n, MemorySegment collisions, ValueLayout layout);
-
     void resolveCollisions(float[] positions, float[] velocities, float[] masses, int n, int[] collisions, int numCollisions);
 
     void resolveCollisions(double[] positions, double[] velocities, double[] masses, int n, int[] collisions, int numCollisions);
 
     void resolveCollisions(Real[] positions, Real[] velocities, Real[] masses, int n, int[] collisions, int numCollisions);
-
-    void resolveCollisions(MemorySegment positions, MemorySegment velocities, MemorySegment masses, int n, MemorySegment collisions, int numCollisions, ValueLayout layout);
 
 }

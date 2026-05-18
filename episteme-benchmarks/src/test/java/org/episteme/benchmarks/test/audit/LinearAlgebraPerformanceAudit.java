@@ -83,7 +83,7 @@ public class LinearAlgebraPerformanceAudit {
                             include = true;
                         }
                     } else if (precisionProp.equals("fast")) {
-                        if (name.contains("float") || className.contains("float") || name.contains("nd4j") || name.contains("ffm")) {
+                        if (!name.contains("mpfr")) {
                             include = true;
                         }
                     }
@@ -256,18 +256,18 @@ public class LinearAlgebraPerformanceAudit {
             return;
         }
 
-        java.io.File[] files = auditResultsDir.listFiles((dir, name) -> name.startsWith("performance_audit_") && name.endsWith(".json"));
+        java.io.File[] files = auditResultsDir.listFiles((dir, name) -> 
+            name.equals("performance_audit_fast.json") || name.equals("performance_audit_normal.json") || name.equals("performance_audit_exact.json")
+        );
         if (files == null || files.length == 0) {
-            System.err.println("[Reconstruct] No performance_audit_*.json files found in " + auditResultsDir.getAbsolutePath());
+            System.err.println("[Reconstruct] No base performance_audit_*.json files found in " + auditResultsDir.getAbsolutePath());
             return;
         }
 
+        String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         List<BenchmarkResult> allResults = new ArrayList<>();
         
         for (java.io.File f : files) {
-            String jsonPath = f.getAbsolutePath();
-            String pdfPath = jsonPath.substring(0, jsonPath.lastIndexOf('.')) + ".pdf";
-            
             System.out.println("[Reconstruct] -> Parsing JSON file: " + f.getName());
             
             // Read JSON file
@@ -340,14 +340,22 @@ public class LinearAlgebraPerformanceAudit {
                 reporter.addResult(r);
             }
             
-            reporter.generatePdfReport(pdfPath, BenchmarkReporter.ReportType.valueOf(mode));
-            System.out.println("[Reconstruct] -> Successfully rebuilt PDF: " + pdfPath);
+            String jsonOutPath = new java.io.File(auditResultsDir, "performance_audit_" + mode.toLowerCase() + "_" + timestamp + ".json").getAbsolutePath();
+            String pdfOutPath = new java.io.File(auditResultsDir, "performance_audit_" + mode.toLowerCase() + "_" + timestamp + ".pdf").getAbsolutePath();
+            
+            // Copy base JSON to timestamped JSON
+            java.nio.file.Files.copy(f.toPath(), java.nio.file.Paths.get(jsonOutPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("[Reconstruct] -> Copied JSON to: " + jsonOutPath);
+            
+            // Generate PDF
+            reporter.generatePdfReport(pdfOutPath, BenchmarkReporter.ReportType.valueOf(mode));
+            System.out.println("[Reconstruct] -> Successfully rebuilt PDF: " + pdfOutPath);
         }
         
         // Let's generate a merged comparative report!
         if (allResults.size() > 0) {
-            String allPdfPath = new java.io.File(auditResultsDir, "performance_audit_all.pdf").getAbsolutePath();
-            System.out.println("[Reconstruct] -> Generating consolidated comparative report: performance_audit_all.pdf");
+            String allPdfPath = new java.io.File(auditResultsDir, "performance_audit_all_" + timestamp + ".pdf").getAbsolutePath();
+            System.out.println("[Reconstruct] -> Generating consolidated comparative report: " + allPdfPath);
             
             BenchmarkReporter reporter = new BenchmarkReporter("Universal Linear Algebra Performance Audit (FAST vs NORMAL vs EXACT)");
             reporter.addMetadata("Environment", "AWS & GCP Combined");

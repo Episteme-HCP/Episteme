@@ -383,11 +383,11 @@ public class BenchmarkReporter {
     }
 
     private void addChartToPdf(Document document, PdfWriter writer, JFreeChart chart) throws DocumentException {
-        java.awt.image.BufferedImage bufferedImage = chart.createBufferedImage(750, 240);
+        java.awt.image.BufferedImage bufferedImage = chart.createBufferedImage(750, 600);
         try {
             Image pdfImage = Image.getInstance(writer, bufferedImage, 1.0f);
             pdfImage.setAlignment(Element.ALIGN_CENTER);
-            pdfImage.scaleToFit(700, 240);
+            pdfImage.scaleToFit(700, 550);
             document.add(pdfImage);
         } catch (IOException e) {
             throw new DocumentException(e);
