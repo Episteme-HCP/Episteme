@@ -95,27 +95,6 @@ episteme/
 └── episteme-benchmarks/    # JMH performance benchmarks
 ```
 
-## Demo Applications
-
-**59 interactive scientific demonstrations** across 4 modules:
-
-| Module | Demos | Examples |
-| --- | --- | --- |
-| episteme-core | 4 | Matrix Viewer, Function Plotter, 3D Surfaces |
-| episteme-natural | 34 | Mandelbrot, Game of Life, Stellar Sky, Pendulum |
-| episteme-social | 11 | GIS Maps, Voting Systems, GDP Models |
-| episteme-featured-apps | 10 | CRISPR, Quantum Circuits, Pandemic Forecaster |
-
-### Launch Demo Launcher
-
-```bash
-# From project root
-mvn exec:java -pl episteme-core -Dexec.mainClass="org.episteme.core.ui.EpistemeDemosApp"
-
-# Or use batch script
-run_demos.bat
-```
-
 ## Data Loaders
 
 External data sources with built-in caching (TTL: 24h):

@@ -37,7 +37,7 @@ jobs:
 
     - name: Build with Maven
       shell: bash
-      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=21 -pl '!episteme-native,!episteme-server,!episteme-client,!episteme-worker,!episteme-demos,!episteme-featured-apps,!episteme-benchmarks' --file pom.xml
+      run: mvn -B -T 1C install -DskipTests -Djacoco.skip=true -Dtarget.java.version=21 -pl '!episteme-native,!episteme-server,!episteme-client,!episteme-worker,!episteme-benchmarks' --file pom.xml
 
     - name: Run Benchmarks (CLI)
       shell: bash

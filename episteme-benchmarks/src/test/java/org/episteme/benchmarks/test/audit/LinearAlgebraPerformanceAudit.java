@@ -33,8 +33,20 @@ public class LinearAlgebraPerformanceAudit {
         
         BenchmarkReporter reporter = new BenchmarkReporter("Universal Linear Algebra Performance Audit (" + precisionProp.toUpperCase() + ")");
         
+        String env = System.getProperty("episteme.audit.environment");
+        if (env == null || env.isEmpty()) {
+            env = System.getenv("COMPUTERNAME");
+            if (env == null || env.isEmpty()) {
+                env = System.getenv("HOSTNAME");
+            }
+            if (env == null || env.isEmpty()) {
+                env = System.getProperty("os.name") + " (" + System.getProperty("os.arch") + ")";
+            }
+        }
+        
         reporter.addMetadata("Description", modeDesc);
         reporter.addMetadata("Precision", precisionProp);
+        reporter.addMetadata("Environment", env);
         reporter.addMetadata("Matrix Size", MATRIX_SIZE + "x" + MATRIX_SIZE);
 
         MathContext targetCtx = MathContext.normal();
@@ -227,5 +239,127 @@ public class LinearAlgebraPerformanceAudit {
         
         System.out.println("[PerfAudit] Total providers discovered: " + providers.size());
         return providers;
+    }
+
+    @Test
+    public void reconstructPdfsFromJsons() throws java.io.IOException {
+        System.out.println("[Reconstruct] Starting live reconstruction of PDFs from JSON results...");
+        
+        java.nio.file.Path rootPath = java.nio.file.Paths.get(System.getProperty("user.dir"));
+        if (rootPath.endsWith("episteme-benchmarks")) {
+            rootPath = rootPath.getParent();
+        }
+        
+        java.io.File auditResultsDir = rootPath.resolve("tmp/audit_results").toFile();
+        if (!auditResultsDir.exists() || !auditResultsDir.isDirectory()) {
+            System.err.println("[Reconstruct] Directory tmp/audit_results does not exist locally: " + auditResultsDir.getAbsolutePath());
+            return;
+        }
+
+        java.io.File[] files = auditResultsDir.listFiles((dir, name) -> name.startsWith("performance_audit_") && name.endsWith(".json"));
+        if (files == null || files.length == 0) {
+            System.err.println("[Reconstruct] No performance_audit_*.json files found in " + auditResultsDir.getAbsolutePath());
+            return;
+        }
+
+        List<BenchmarkResult> allResults = new ArrayList<>();
+        
+        for (java.io.File f : files) {
+            String jsonPath = f.getAbsolutePath();
+            String pdfPath = jsonPath.substring(0, jsonPath.lastIndexOf('.')) + ".pdf";
+            
+            System.out.println("[Reconstruct] -> Parsing JSON file: " + f.getName());
+            
+            // Read JSON file
+            String content = java.nio.file.Files.readString(f.toPath());
+            
+            // Extract title from context
+            String title = "Universal Linear Algebra Performance Audit";
+            java.util.regex.Matcher titleMatcher = java.util.regex.Pattern.compile("\"title\"\\s*:\\s*\"([^\"]+)\"").matcher(content);
+            if (titleMatcher.find()) {
+                title = titleMatcher.group(1);
+            }
+            
+            // Determine precision mode from title
+            String mode = "NORMAL";
+            if (title.toUpperCase().contains("FAST")) mode = "FAST";
+            else if (title.toUpperCase().contains("EXACT")) mode = "EXACT";
+
+            // Extract environment if present or use system fallback
+            String env = "GCP"; // default fallback for target files
+            if (content.contains("GCP")) env = "GCP";
+            else if (content.contains("AWS")) env = "AWS";
+
+            // Extract each run
+            java.util.regex.Matcher runMatcher = java.util.regex.Pattern.compile("\\{\\s*\"name\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"provider\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"domain\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"status\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"metrics\"\\s*:\\s*\\{([^}]+)\\}").matcher(content);
+            
+            List<BenchmarkResult> resultsList = new ArrayList<>();
+            while (runMatcher.find()) {
+                String name = runMatcher.group(1);
+                String provider = runMatcher.group(2);
+                String domain = runMatcher.group(3);
+                String status = runMatcher.group(4);
+                String metricsStr = runMatcher.group(5);
+                
+                Map<String, Object> metricsMap = new LinkedHashMap<>();
+                java.util.regex.Matcher metricMatcher = java.util.regex.Pattern.compile("\"([^\"]+)\"\\s*:\\s*(-?[0-9.]+([eE][+-]?[0-9]+)?)").matcher(metricsStr);
+                while (metricMatcher.find()) {
+                    String mKey = metricMatcher.group(1);
+                    double mVal = Double.parseDouble(metricMatcher.group(2));
+                    metricsMap.put(mKey, mVal);
+                }
+                
+                Map<String, String> envInfo = new HashMap<>();
+                envInfo.put("precision", mode);
+                envInfo.put("Environment", env);
+                
+                BenchmarkResult res = new BenchmarkResult(
+                    "perf-" + name.toLowerCase().replace(" ", "-").replace("(", "").replace(")", ""),
+                    name,
+                    provider,
+                    domain,
+                    status,
+                    System.currentTimeMillis(),
+                    0L, 1L, 0.0, 0.0, 0L,
+                    envInfo,
+                    metricsMap
+                );
+                resultsList.add(res);
+                allResults.add(res);
+            }
+            
+            System.out.println("[Reconstruct] -> Reconstructed " + resultsList.size() + " runs from " + f.getName());
+            
+            BenchmarkReporter reporter = new BenchmarkReporter(title);
+            reporter.addMetadata("Precision", mode.toLowerCase());
+            reporter.addMetadata("Environment", env);
+            reporter.addMetadata("Matrix Size", MATRIX_SIZE + "x" + MATRIX_SIZE);
+            reporter.addMetadata("Reconstructed", "True (Live from JSON)");
+            
+            for (BenchmarkResult r : resultsList) {
+                reporter.addResult(r);
+            }
+            
+            reporter.generatePdfReport(pdfPath, BenchmarkReporter.ReportType.valueOf(mode));
+            System.out.println("[Reconstruct] -> Successfully rebuilt PDF: " + pdfPath);
+        }
+        
+        // Let's generate a merged comparative report!
+        if (allResults.size() > 0) {
+            String allPdfPath = new java.io.File(auditResultsDir, "performance_audit_all.pdf").getAbsolutePath();
+            System.out.println("[Reconstruct] -> Generating consolidated comparative report: performance_audit_all.pdf");
+            
+            BenchmarkReporter reporter = new BenchmarkReporter("Universal Linear Algebra Performance Audit (FAST vs NORMAL vs EXACT)");
+            reporter.addMetadata("Environment", "AWS & GCP Combined");
+            reporter.addMetadata("Matrix Size", MATRIX_SIZE + "x" + MATRIX_SIZE);
+            reporter.addMetadata("Consolidated", "True");
+            
+            for (BenchmarkResult r : allResults) {
+                reporter.addResult(r);
+            }
+            
+            reporter.generatePdfReport(allPdfPath, BenchmarkReporter.ReportType.ALL);
+            System.out.println("[Reconstruct] -> Consolidated PDF generated successfully: " + allPdfPath);
+        }
     }
 }

@@ -121,7 +121,7 @@ public class BenchmarkReporter {
         }
     }
 
-    private void generatePdfReport(String filePath, ReportType type) {
+    public void generatePdfReport(String filePath, ReportType type) {
         Document document = new Document(PageSize.A4.rotate());
         try {
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filePath));
@@ -154,23 +154,51 @@ public class BenchmarkReporter {
             table.addCell("Domain");
             table.addCell("Result Summary");
 
+            boolean opSpecific = isOperationSpecific();
+
             for (BenchmarkResult r : results) {
                 table.addCell(r.provider());
                 table.addCell(r.benchmarkName());
                 table.addCell(r.domain());
                 
-                if (type == ReportType.ALL) {
-                    table.addCell("FAST/NORMAL/EXACT results collected");
+                if (opSpecific) {
+                    int count = 0;
+                    double sumLatency = 0;
+                    if (r.extraMetrics() != null) {
+                        for (String key : r.extraMetrics().keySet()) {
+                            if (key.endsWith(":latency")) {
+                                Object val = r.extraMetrics().get(key);
+                                if (val instanceof Number n && n.doubleValue() > 0) {
+                                    count++;
+                                    sumLatency += n.doubleValue();
+                                }
+                            }
+                        }
+                    }
+                    if (count > 0) {
+                        table.addCell(String.format("%d operations (avg %.3f ms)", count, sumLatency / count));
+                    } else {
+                        table.addCell("No successful operations");
+                    }
                 } else {
-                    Object val = r.extraMetrics().get(type.name() + ":latency");
-                    table.addCell(val != null ? String.format("%.3f ms", ((Number)val).doubleValue()) : "N/A");
+                    if (type == ReportType.ALL) {
+                        table.addCell("FAST/NORMAL/EXACT results collected");
+                    } else {
+                        Object val = r.extraMetrics().get(type.name() + ":latency");
+                        table.addCell(val != null ? String.format("%.3f ms", ((Number)val).doubleValue()) : "N/A");
+                    }
                 }
             }
             document.add(table);
 
             // --- OPERATION COMPARISON PAGES ---
-            java.util.Set<String> allOps = new java.util.LinkedHashSet<>();
-            for (BenchmarkResult r : results) allOps.add(r.benchmarkName());
+            java.util.Set<String> allOps;
+            if (opSpecific) {
+                allOps = getOperations();
+            } else {
+                allOps = new java.util.LinkedHashSet<>();
+                for (BenchmarkResult r : results) allOps.add(r.benchmarkName());
+            }
 
             for (String op : allOps) {
                 document.newPage();
@@ -179,7 +207,7 @@ public class BenchmarkReporter {
                 opHeader.setSpacingAfter(30);
                 document.add(opHeader);
 
-                JFreeChart chart = createComparisonChart(op, type);
+                JFreeChart chart = opSpecific ? createOperationComparisonChart(op, type) : createComparisonChart(op, type);
                 if (chart != null) {
                     addChartToPdf(document, writer, chart);
                 }
@@ -227,7 +255,7 @@ public class BenchmarkReporter {
                 "Provider",
                 "Throughput (Ops/sec)",
                 dataset,
-                PlotOrientation.VERTICAL,
+                PlotOrientation.HORIZONTAL, // Change to HORIZONTAL
                 true, true, false);
 
         chart.setBackgroundPaint(java.awt.Color.WHITE);
@@ -251,6 +279,104 @@ public class BenchmarkReporter {
                 default -> Color.GRAY;
             };
             renderer.setSeriesPaint(0, c);
+        }
+
+        return chart;
+    }
+
+    private boolean isOperationSpecific() {
+        for (BenchmarkResult r : results) {
+            if (r.extraMetrics() != null) {
+                for (String key : r.extraMetrics().keySet()) {
+                    if (key.contains(":") && !key.startsWith("FAST:") && !key.startsWith("NORMAL:") && !key.startsWith("EXACT:")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private java.util.Set<String> getOperations() {
+        java.util.Set<String> ops = new java.util.LinkedHashSet<>();
+        for (BenchmarkResult r : results) {
+            if (r.extraMetrics() != null) {
+                for (String key : r.extraMetrics().keySet()) {
+                    if (key.contains(":") && !key.startsWith("FAST:") && !key.startsWith("NORMAL:") && !key.startsWith("EXACT:")) {
+                        int lastColon = key.lastIndexOf(':');
+                        if (lastColon > 0) {
+                            ops.add(key.substring(0, lastColon));
+                        }
+                    }
+                }
+            }
+        }
+        return ops;
+    }
+
+    private JFreeChart createOperationComparisonChart(String operation, ReportType type) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        boolean hasData = false;
+
+        String[] modes = (type == ReportType.ALL) ? new String[]{"FAST", "NORMAL", "EXACT"} : new String[]{type.name()};
+
+        for (BenchmarkResult r : results) {
+            String resMode = r.environmentInfo() != null ? r.environmentInfo().get("precision") : null;
+            if (resMode == null) {
+                if (reportTitle.contains("FAST")) resMode = "FAST";
+                else if (reportTitle.contains("EXACT")) resMode = "EXACT";
+                else resMode = "NORMAL";
+            }
+            
+            boolean modeMatch = false;
+            for (String m : modes) {
+                if (m.equalsIgnoreCase(resMode)) {
+                    modeMatch = true;
+                    break;
+                }
+            }
+            if (!modeMatch) continue;
+
+            if (r.extraMetrics() != null) {
+                Object valObj = r.extraMetrics().get(operation + ":throughput");
+                if (valObj instanceof Number n) {
+                    double val = n.doubleValue();
+                    if (val > 0) {
+                        dataset.addValue(val, resMode, r.benchmarkName());
+                        hasData = true;
+                    }
+                }
+            }
+        }
+
+        if (!hasData) return null;
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                operation + " Performance Comparison",
+                "Provider",
+                "Throughput (Ops/sec)",
+                dataset,
+                PlotOrientation.HORIZONTAL, // Change to HORIZONTAL so long provider labels are on the left
+                true, true, false);
+
+        chart.setBackgroundPaint(java.awt.Color.WHITE);
+        CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(java.awt.Color.WHITE);
+        plot.setRangeGridlinePaint(java.awt.Color.LIGHT_GRAY);
+
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter());
+        renderer.setShadowVisible(false);
+
+        for (int i = 0; i < dataset.getRowCount(); i++) {
+            String seriesKey = (String) dataset.getRowKey(i);
+            Color c = switch (seriesKey.toUpperCase()) {
+                case "FAST" -> new Color(40, 167, 69);
+                case "NORMAL" -> new Color(0, 123, 255);
+                case "EXACT" -> new Color(220, 53, 69);
+                default -> Color.GRAY;
+            };
+            renderer.setSeriesPaint(i, c);
         }
 
         return chart;

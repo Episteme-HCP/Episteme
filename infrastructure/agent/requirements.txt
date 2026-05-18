@@ -1,6 +1,6 @@
 langchain
 langchain-openai
 gradio
-mcp-client-py
+mcp
 httpx
 python-dotenv
