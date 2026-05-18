@@ -379,7 +379,7 @@ public class NativeCUDADenseLinearAlgebraDoubleBackend<E extends FieldElement<E>
         return (E) RealDouble.of(val);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("rawtypes")
     @Override
     public Vector<E> cross(Vector<E> a, Vector<E> b) {
         if (a.dimension() != 3 || b.dimension() != 3) throw new IllegalArgumentException("Cross product only supported for 3D vectors");

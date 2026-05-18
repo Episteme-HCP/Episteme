@@ -21,8 +21,6 @@ WORKDIR /app
 
 # Setup User
 RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu && useradd -m -u 1000 episteme
-USER episteme
-ENV PATH="/home/episteme/.local/bin:${PATH}"
 
 # Copy Java Artifact
 COPY --from=build --chown=episteme:episteme /app/episteme-server/target/episteme-server-*-exec.jar /app/server.jar
@@ -34,6 +32,13 @@ RUN pip3 install --no-cache-dir --break-system-packages -r /app/agent/requiremen
 # Copy Entrypoint
 COPY --chown=episteme:episteme docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+# Ensure the /app directory itself and all files under it are fully owned by the episteme user
+RUN chown -R episteme:episteme /app
+
+# Switch to standard non-root user for execution
+USER episteme
+ENV PATH="/home/episteme/.local/bin:${PATH}"
 
 # Expose Gradio Port
 EXPOSE 7860

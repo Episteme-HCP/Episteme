@@ -113,10 +113,25 @@ public class BenchmarkCLI {
                 }
             }
             
+            // Global provider exclusion filter
+            String providerName = b.getAlgorithmProvider();
+            if (providerName != null) {
+                boolean shouldExclude = false;
+                for (String excluded : excludedProviders) {
+                    if (providerName.toLowerCase().contains(excluded.toLowerCase())) {
+                        shouldExclude = true;
+                        break;
+                    }
+                }
+                if (shouldExclude) {
+                    System.out.println("[FILTER] Excluding provider: " + providerName + " for benchmark: " + b.getId());
+                    continue;
+                }
+            }
+
             // Provider Filter (only High-Precision for this specialized report)
             if ("Linear Algebra (High-Precision Audit)".equals(b.getDomain())) {
                 String name = b.getAlgorithmProvider();
-                if (excludedProviders.contains(name)) continue;
                 // Consistent exclusion list from HighPrecisionComplianceTest
                 if (name.contains("EJML") || name.contains("Colt") || name.contains("Commons Math") || 
                     name.contains("JBlas") || name.contains("ND4J") || name.contains("CUDA") || 
@@ -266,14 +281,19 @@ public class BenchmarkCLI {
         }
 
         // Generate Files
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String baseName = "docs/benchmark-results/High-Precision_Benchmark_Result_" + timestamp;
+        String outJson = exportFile;
+        String outPdf;
+        if (exportFile.contains(".")) {
+            outPdf = exportFile.substring(0, exportFile.lastIndexOf('.')) + ".pdf";
+        } else {
+            outPdf = exportFile + ".pdf";
+        }
         
         if (generatePdf) {
-            System.out.println("[INFO] Generating PDF: " + baseName + ".pdf");
-            reporter.generateReport(baseName + ".pdf");
+            System.out.println("[INFO] Generating PDF: " + outPdf);
+            reporter.generateReport(outPdf);
         }
-        exportJson(baseName + ".json", expandedResults);
+        exportJson(outJson, expandedResults);
     }
 
     private static void printHelp() {

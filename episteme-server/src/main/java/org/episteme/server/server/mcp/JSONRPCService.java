@@ -659,43 +659,6 @@ public class JSONRPCService {
         return mapper.writeValueAsString(response);
     }
 
-    private String executeListResources(com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
-        var resultNode = response.get("result");
-        var resourcesArray = mapper.createArrayNode();
-        
-        // Expose all active tasks as resources
-        for (String taskId : taskRegistry.keySet()) {
-            var resource = resourcesArray.addObject();
-            resource.put("uri", "episteme://tasks/" + taskId);
-            resource.put("name", "Status of task " + taskId);
-            resource.put("mimeType", "application/json");
-        }
-        
-        ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).set("resources", resourcesArray);
-        return mapper.writeValueAsString(response);
-    }
-
-    private String executeReadResource(JsonNode params, com.fasterxml.jackson.databind.node.ObjectNode response) throws IOException {
-        String uri = params.get("uri").asText();
-        if (uri.startsWith("episteme://tasks/")) {
-            String taskId = uri.substring("episteme://tasks/".length());
-            TaskState state = getTask(taskId);
-            if (state == null) {
-                return error(response.get("id"), -32003, "Resource not found: " + uri);
-            }
-            
-            var resultNode = response.get("result");
-            var contentsArray = mapper.createArrayNode();
-            var content = contentsArray.addObject();
-            content.put("uri", uri);
-            content.put("mimeType", "application/json");
-            content.put("text", mapper.writeValueAsString(state));
-            
-            ((com.fasterxml.jackson.databind.node.ObjectNode)resultNode).set("contents", contentsArray);
-            return mapper.writeValueAsString(response);
-        }
-        return error(response.get("id"), -32003, "Unknown resource: " + uri);
-    }
 
     private String error(JsonNode id, int code, String message) {
         return String.format("{\"jsonrpc\": \"2.0\", \"id\": %s, \"error\": {\"code\": %d, \"message\": \"%s\"}}",

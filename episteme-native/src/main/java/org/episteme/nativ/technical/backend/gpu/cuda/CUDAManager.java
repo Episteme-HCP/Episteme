@@ -198,6 +198,11 @@ public final class CUDAManager {
                 return;
             }
 
+            // Load sub-libraries before binding symbols so they are not null during binding
+            cublasLookup = NativeFFMLoader.loadLibrary("cublas", managerArena).orElse(null);
+            cusparseLookup = NativeFFMLoader.loadLibrary("cusparse", managerArena).orElse(null);
+            cusolverLookup = NativeFFMLoader.loadLibrary("cusolver", managerArena).orElse(null);
+
             bindSymbols();
 
             try (Arena temp = Arena.ofConfined()) {
@@ -216,43 +221,54 @@ public final class CUDAManager {
                     }
                 }
 
-                cublasLookup = NativeFFMLoader.loadLibrary("cublas", managerArena).orElse(null);
-                cusparseLookup = NativeFFMLoader.loadLibrary("cusparse", managerArena).orElse(null);
-                cusolverLookup = NativeFFMLoader.loadLibrary("cusolver", managerArena).orElse(null);
-
                 MemorySegment p = temp.allocate(ValueLayout.ADDRESS);
                 
                 if (CUBLAS_CREATE != null) {
                     try {
-                        if ((int) NativeSafe.invoke(CUBLAS_CREATE, p) == 0) {
+                        int status = (int) NativeSafe.invoke(CUBLAS_CREATE, p);
+                        if (status == 0) {
                             cublasHandle = p.get(ValueLayout.ADDRESS, 0);
+                        } else {
+                            logger.warn("cuBLAS handle creation failed with status code: {}", status);
                         }
                     } catch (Throwable t) {
-                        logger.error("Failed to create cuBLAS handle: {}", t.getMessage());
+                        logger.error("Failed to create cuBLAS handle: {}", t.getMessage(), t);
                     }
+                } else {
+                    logger.warn("CUBLAS_CREATE method handle is null.");
                 }
                 
                 if (CUSPARSE_CREATE != null) {
                     try {
-                        if ((int) NativeSafe.invoke(CUSPARSE_CREATE, p) == 0) {
+                        int status = (int) NativeSafe.invoke(CUSPARSE_CREATE, p);
+                        if (status == 0) {
                             cusparseHandle = p.get(ValueLayout.ADDRESS, 0);
+                        } else {
+                            logger.warn("cuSPARSE handle creation failed with status code: {}", status);
                         }
                     } catch (Throwable t) {
-                        logger.error("Failed to create cuSPARSE handle: {}", t.getMessage());
+                        logger.error("Failed to create cuSPARSE handle: {}", t.getMessage(), t);
                     }
+                } else {
+                    logger.warn("CUSPARSE_CREATE method handle is null.");
                 }
                 
                 if (useCusolver && CUSOLVER_CREATE != null) {
                     try {
-                        if ((int) NativeSafe.invoke(CUSOLVER_CREATE, p) == 0) {
+                        int status = (int) NativeSafe.invoke(CUSOLVER_CREATE, p);
+                        if (status == 0) {
                             cusolverHandle = p.get(ValueLayout.ADDRESS, 0);
                         } else {
+                            logger.warn("cuSolver handle creation failed with status code: {}", status);
                             useCusolver = false;
                         }
                     } catch (Throwable t) {
-                        logger.error("Failed to create cuSolver handle: {}", t.getMessage());
+                        logger.error("Failed to create cuSolver handle: {}", t.getMessage(), t);
                         useCusolver = false;
                     }
+                } else if (useCusolver) {
+                    logger.warn("CUSOLVER_CREATE method handle is null.");
+                    useCusolver = false;
                 }
             }
 
@@ -260,9 +276,11 @@ public final class CUDAManager {
             
             if (available) {
                 logger.info("CUDA Manager initialized successfully. cuSolver: {}, cuSPARSE: {}", useCusolver, (cusparseHandle != null));
+            } else {
+                logger.info("CUDA Manager failed to initialize: cuBLAS handle is null. CUDA backends are disabled.");
             }
         } catch (Throwable t) {
-            logger.error("Failed to initialize CUDA Manager: {}", t.getMessage());
+            logger.error("Failed to initialize CUDA Manager: {}", t.getMessage(), t);
         }
     }
 

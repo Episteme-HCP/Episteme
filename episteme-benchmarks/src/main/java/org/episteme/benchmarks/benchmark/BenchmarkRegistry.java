@@ -5,7 +5,6 @@ import org.episteme.benchmarks.benchmark.benchmarks.SystematicBenchmark;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.Iterator;
 
 /**
  * Registry for dynamic benchmark instances.
@@ -179,6 +178,7 @@ public class BenchmarkRegistry {
                                 if (className.toLowerCase().contains(ex.trim().toLowerCase())) return;
                             }
                             
+                            @SuppressWarnings("unchecked")
                             P casted = (P) provider.get();
                             for (org.episteme.core.mathematics.context.MathContext.RealPrecision mode : org.episteme.core.mathematics.context.MathContext.RealPrecision.values()) {
                                 addSystematicInstance(base, casted, list, mode);

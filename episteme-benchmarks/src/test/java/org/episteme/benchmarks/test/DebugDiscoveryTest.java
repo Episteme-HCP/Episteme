@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class DebugDiscoveryTest {
     @Test
+    @SuppressWarnings("rawtypes")
     public void testDiscovery() {
         try (java.io.PrintWriter out = new java.io.PrintWriter(new java.io.FileWriter("debug_discovery.log"))) {
             out.println("Starting ServiceLoader discovery...");

@@ -4,7 +4,6 @@ package org.episteme.benchmarks.test.audit;
 import org.episteme.core.mathematics.numbers.real.Real;
 import org.episteme.core.mathematics.numbers.real.RealBig;
 import org.episteme.core.mathematics.numbers.complex.Complex;
-import org.episteme.core.mathematics.numbers.real.RealFloat;
 import org.episteme.core.mathematics.structures.rings.Ring;
 import org.episteme.core.mathematics.linearalgebra.LinearAlgebraProvider;
 import org.episteme.core.technical.backend.Backend;
@@ -277,7 +276,9 @@ public class LinearAlgebraComplianceTest {
     private void runStandardAudit(ComplianceResult res, LinearAlgebraProvider<Real> prov, LinearAlgebraProvider<Real> ref) {
         Ring<Real> realRing;
         if (mode == PrecisionMode.FAST) {
-            realRing = (Ring<Real>) (Object) org.episteme.core.mathematics.numbers.real.Real.zeroE().getScalarRing();
+            @SuppressWarnings("unchecked")
+            Ring<Real> casted = (Ring<Real>) (Object) org.episteme.core.mathematics.numbers.real.Real.zeroE().getScalarRing();
+            realRing = casted;
         } else {
             realRing = org.episteme.core.mathematics.sets.Reals.getInstance();
         }
@@ -296,7 +297,9 @@ public class LinearAlgebraComplianceTest {
         if (mode == PrecisionMode.FAST) {
             // Create a Complex ring based on RealFloat
             org.episteme.core.mathematics.numbers.real.Real zf = org.episteme.core.mathematics.numbers.real.Real.zeroE();
-            complexRing = (Ring<Complex>) (Object) Complex.of(zf, zf).getScalarRing();
+            @SuppressWarnings("unchecked")
+            Ring<Complex> casted = (Ring<Complex>) (Object) Complex.of(zf, zf).getScalarRing();
+            complexRing = casted;
         } else {
             complexRing = Complex.of(1.0, 0.0).getScalarRing();
         }

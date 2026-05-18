@@ -73,7 +73,6 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
 
     private ManagedChannel channel;
     private MatrixServiceGrpc.MatrixServiceBlockingStub blockingStub;
-    private final Field<E> field;
     private final String serverAddress;
 
     /**
@@ -94,7 +93,6 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
      */
     public GRPCLinearAlgebraBackend(String host, int port, Field<E> field) {
         this.serverAddress = host + ":" + port;
-        this.field = field;
         
         // Define retry policy
         java.util.Map<String, Object> retryPolicy = new java.util.HashMap<>();
@@ -395,7 +393,6 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public E trace(Matrix<E> a) {
         SingleMatrixRequest request = SingleMatrixRequest.newBuilder()
                 .setMatrix(toProtoMatrix(a))
@@ -411,7 +408,6 @@ public class GRPCLinearAlgebraBackend<E> implements org.episteme.core.mathematic
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Vector<E> solveTriangular(Matrix<E> A, Vector<E> b, boolean upper, boolean transpose, boolean conjugate, boolean unit) {
         TriangularSolveRequest request = TriangularSolveRequest.newBuilder()
                 .setMatrix(toProtoMatrix(A))

@@ -140,6 +140,21 @@ public class NativeFFMLoader {
             } else if (libName.equals("cuda")) {
                 variants.add("cuda");
                 variants.add("cuda.so.1");
+            } else if (libName.equals("cublas")) {
+                variants.add("cublas");
+                variants.add("libcublas.so");
+                variants.add("libcublas.so.12");
+                variants.add("libcublas.so.11");
+            } else if (libName.equals("cusolver")) {
+                variants.add("cusolver");
+                variants.add("libcusolver.so");
+                variants.add("libcusolver.so.12");
+                variants.add("libcusolver.so.11");
+            } else if (libName.equals("cudart")) {
+                variants.add("cudart");
+                variants.add("libcudart.so");
+                variants.add("libcudart.so.12");
+                variants.add("libcudart.so.11");
             } else if (libName.equals("openblas")) {
                 variants.add("openblas");
                 variants.add("libopenblas.so.3");
@@ -162,7 +177,7 @@ public class NativeFFMLoader {
             
             System.err.println("[NativeFFMLoader] Attempting bare lookup for variant: " + variant);
             try {
-                if (!variant.contains(".") && !variant.contains("/") && !variant.contains("\\")) {
+                if (!variant.contains("/") && !variant.contains("\\")) {
                     SymbolLookup lookup = SymbolLookup.libraryLookup(variant, arena);
                     LOADED_LIBS.put(libName, lookup);
                     System.err.println("[NativeFFMLoader] Successfully loaded " + variant + " from system path");

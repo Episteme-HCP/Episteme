@@ -133,6 +133,14 @@ public final class Episteme {
             prefs.set("math.linearalgebra.gmres.restart", String.valueOf(config.getGmresRestart()));
             prefs.set("math.linearalgebra.precision.bits", String.valueOf(config.getPrecisionBits()));
             
+            // Missing context preferences
+            prefs.set("math.real.precision", config.getRealPrecision().name());
+            prefs.set("math.overflow.mode", config.getOverflowMode().name());
+            prefs.set("math.linearalgebra.pivot.threshold", String.valueOf(config.getPivotThreshold()));
+            prefs.set("compute.gpu.threshold", String.valueOf(config.getGpuThreshold()));
+            prefs.set("compute.parallel.threshold", String.valueOf(config.getParallelThreshold()));
+            prefs.set("compute.parallel.max_threads", String.valueOf(config.getMaxThreads()));
+            
             prefs.save();
         } catch (Exception e) {
             System.err.println("Failed to save preferences: " + e.getMessage());
@@ -169,6 +177,22 @@ public final class Episteme {
             config.setMaxIterations(Integer.parseInt(prefs.get("math.linearalgebra.max_iterations", "1000")));
             config.setGmresRestart(Integer.parseInt(prefs.get("math.linearalgebra.gmres.restart", "30")));
             config.setPrecisionBits(Integer.parseInt(prefs.get("math.linearalgebra.precision.bits", "256")));
+
+            // Missing context preferences
+            String realPrecStr = prefs.get("math.real.precision");
+            if (realPrecStr != null) {
+                config.setRealPrecision(org.episteme.core.mathematics.context.MathContext.RealPrecision.valueOf(realPrecStr));
+            }
+
+            String overflowStr = prefs.get("math.overflow.mode");
+            if (overflowStr != null) {
+                config.setOverflowMode(org.episteme.core.mathematics.context.MathContext.OverflowMode.valueOf(overflowStr));
+            }
+
+            config.setPivotThreshold(Double.parseDouble(prefs.get("math.linearalgebra.pivot.threshold", "1e-3")));
+            config.setGpuThreshold(Double.parseDouble(prefs.get("compute.gpu.threshold", "10000000")));
+            config.setParallelThreshold(Integer.parseInt(prefs.get("compute.parallel.threshold", "50000")));
+            config.setMaxThreads(Integer.parseInt(prefs.get("compute.parallel.max_threads", String.valueOf(Runtime.getRuntime().availableProcessors()))));
 
             try {
                 String precStr = prefs.get("math.precision");
@@ -245,31 +269,7 @@ public final class Episteme {
         return org.episteme.core.mathematics.context.MathContext.getNumericalConfiguration().isGpuAvailable();
     }
 
-    /**
-     * Checks if ND4J is available in the classpath or as a backend.
-     */
-    public static boolean isND4JAvailable() {
-        if (isBackendAvailable("linear-algebra", "nd4j") || isBackendAvailable("tensor", "nd4j")) return true;
-        try {
-            Class.forName("org.nd4j.linalg.factory.Nd4j");
-            return true;
-        } catch (Throwable t) {
-            return false;
-        }
-    }
 
-    /**
-     * Checks if Apache Spark is available in the classpath or as a backend.
-     */
-    public static boolean isSparkAvailable() {
-        if (isBackendAvailable("distributed", "spark")) return true;
-        try {
-            Class.forName("org.apache.spark.api.java.JavaSparkContext");
-            return true;
-        } catch (Throwable t) {
-            return false;
-        }
-    }
 
     /**
      * Returns a collection of available compute backend names.
@@ -359,13 +359,11 @@ public final class Episteme {
             String label = type.substring(0, 1).toUpperCase() + type.substring(1).replace("-", " ");
             appendBackends(sb, label, type, getBackendId(type));
         }
-
+        
         // 5. LIBRARIES (Found in Classpath)
         sb.append("\n[LIBRARIES DETECTION]\n");
         checkLibrary(sb, "Kotlin Utils", "kotlin.Unit");
         checkLibrary(sb, "Groovy", "groovy.lang.GroovySystem");
-        checkLibrary(sb, "Apache Spark", "org.apache.spark.api.java.JavaSparkContext");
-        checkLibrary(sb, "ND4J / DL4J", "org.nd4j.linalg.factory.Nd4j");
         checkLibrary(sb, "OpenCL (JOCL)", "org.jocl.CL");
         checkLibrary(sb, "CUDA (JCuda)", "jcuda.Pointer");
         checkLibrary(sb, "Javalin", "io.javalin.Javalin");
@@ -586,9 +584,9 @@ public final class Episteme {
         sb.append("  ").append(label).append(" (Current: ").append(currentId != null ? currentId : "AUTO").append("):\n");
         try {
             java.util.List<org.episteme.core.technical.backend.Backend> list = 
-                 org.episteme.core.technical.backend.BackendManager.staticGetProvidersByType(type);
+                 org.episteme.core.technical.backend.BackendDiscovery.getInstance().getProvidersByType(type);
             if (list == null || list.isEmpty()) {
-                sb.append("    (None registered via SPI)\n");
+                sb.append("    (None registered)\n");
             } else {
                 for (org.episteme.core.technical.backend.Backend p : list) {
                      String marker = (p.getId().equals(currentId)) ? "*" : " ";

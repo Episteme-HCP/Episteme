@@ -196,11 +196,9 @@ public class LinearAlgebraAuditSuite {
         boolean isComplex = ring instanceof org.episteme.core.mathematics.sets.Complexes;
         E large;
         if (ring.zero() instanceof org.episteme.core.mathematics.numbers.real.RealFloat) {
-            @SuppressWarnings("unchecked")
             E casted = (E) org.episteme.core.mathematics.numbers.real.RealFloat.of(16.0f);
             large = casted;
         } else if (ring.zero() instanceof RealBig) {
-            @SuppressWarnings("unchecked")
             E casted = (E) RealBig.create(new java.math.BigDecimal("16.0"));
             large = casted;
         } else if (isComplex) {
@@ -210,11 +208,9 @@ public class LinearAlgebraAuditSuite {
             } else {
                 rVal = Real.of(16.0);
             }
-            @SuppressWarnings("unchecked")
             E casted = (E) Complex.of(rVal);
             large = casted;
         } else {
-            @SuppressWarnings("unchecked")
             E casted = (E) Real.of(16.0);
             large = casted;
         }

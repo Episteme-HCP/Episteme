@@ -309,7 +309,10 @@ public class EpistemeMasterControl extends Application {
         ComboBox<MathContext.RealPrecision> precCombo = new ComboBox<>();
         precCombo.getItems().addAll(MathContext.RealPrecision.values());
         precCombo.setValue(config.getRealPrecision());
-        precCombo.setOnAction(e -> config.setRealPrecision(precCombo.getValue()));
+        precCombo.setOnAction(e -> {
+            config.setRealPrecision(precCombo.getValue());
+            notifySaved(i18n);
+        });
         addPropertyRow(grid, 1, i18n.get("mastercontrol.computing.precision", "Precision Mode"), precCombo, 
             i18n.get("mastercontrol.computing.precision.desc", "Determines the data types used for real numbers (float, double, or arbitrary precision)."));
 
@@ -317,7 +320,10 @@ public class EpistemeMasterControl extends Application {
         ComboBox<MathContext.OverflowMode> overflowCombo = new ComboBox<>();
         overflowCombo.getItems().addAll(MathContext.OverflowMode.values());
         overflowCombo.setValue(config.getOverflowMode());
-        overflowCombo.setOnAction(e -> config.setOverflowMode(overflowCombo.getValue()));
+        overflowCombo.setOnAction(e -> {
+            config.setOverflowMode(overflowCombo.getValue());
+            notifySaved(i18n);
+        });
         addPropertyRow(grid, 2, i18n.get("mastercontrol.computing.overflow", "Overflow Mode"), overflowCombo, 
             i18n.get("mastercontrol.computing.overflow.desc", "Controls how the engine handles numerical overflows (SAFE checks every op, UNSAFE is faster)."));
 
@@ -328,6 +334,7 @@ public class EpistemeMasterControl extends Application {
         deviceCombo.setOnAction(e -> {
             try {
                 config.applyComputeMode(ComputeMode.valueOf(deviceCombo.getValue()));
+                notifySaved(i18n);
             } catch (Exception ex) {}
         });
         addPropertyRow(grid, 3, i18n.get("mastercontrol.computing.device", "Compute Device"), deviceCombo, 
@@ -343,6 +350,7 @@ public class EpistemeMasterControl extends Application {
         digitsSpinner.setEditable(true);
         digitsSpinner.valueProperty().addListener((obs, old, val) -> {
             config.setMathContext(new java.math.MathContext(val, config.getMathContext().getRoundingMode()));
+            notifySaved(i18n);
         });
         addPropertyRow(grid, 6, i18n.get("mastercontrol.computing.precision_digits", "Precision Digits"), digitsSpinner, 
             i18n.get("mastercontrol.computing.precision_digits.desc", "Number of decimal digits to maintain when using EXACT mode."));
@@ -366,23 +374,10 @@ public class EpistemeMasterControl extends Application {
         ComboBox<String> mathCombo = createBackendComboBox(BackendDiscovery.TYPE_MATH, Episteme.getMathBackendId(), id -> {
             Episteme.setMathBackendId(id);
             Episteme.savePreferences();
+            notifySaved(i18n);
         });
         addPropertyRow(grid, 10, i18n.get("mastercontrol.math.backend", "Mathematics Engine"), mathCombo, 
             i18n.get("mastercontrol.math.backend.desc", "Primary engine for linear algebra and algorithm execution."));
-
-        ComboBox<String> plot2DCombo = createBackendComboBox(BackendDiscovery.TYPE_PLOTTING, PREFS.getPreferredBackend("plotting2d"), id -> {
-            PREFS.setPreferredBackend("plotting2d", id);
-            notifySaved(i18n);
-        });
-        addPropertyRow(grid, 11, i18n.get("mastercontrol.plotting.backend_2d", "2D Visualization"), plot2DCombo, 
-            i18n.get("mastercontrol.plotting.backend_2d.desc", "Engine for rendering 2D charts and data plots."));
-
-        ComboBox<String> plot3DCombo = createBackendComboBox(BackendDiscovery.TYPE_PLOTTING, PREFS.getPreferredBackend("plotting3d"), id -> {
-            PREFS.setPreferredBackend("plotting3d", id);
-            notifySaved(i18n);
-        });
-        addPropertyRow(grid, 12, i18n.get("mastercontrol.plotting.backend_3d", "3D Visualization"), plot3DCombo, 
-            i18n.get("mastercontrol.plotting.backend_3d.desc", "Engine for rendering complex 3D surfaces and volumes."));
 
         // --- SECTION 4: LINEAR ALGEBRA THRESHOLDS ---
         grid.add(new Separator(), 0, 13, 3, 1);
@@ -390,6 +385,7 @@ public class EpistemeMasterControl extends Application {
         laLabel.getStyleClass().add("font-bold");
         grid.add(laLabel, 0, 14, 3, 1);
 
+        // 1. LA Double Epsilon
         TextField epsilonField = new TextField(String.valueOf(config.getEpsilonDouble()));
         epsilonField.setOnAction(e -> {
             try { 
@@ -397,24 +393,103 @@ public class EpistemeMasterControl extends Application {
                 notifySaved(i18n);
             } catch (Exception ex) {}
         });
-        addPropertyRow(grid, 15, i18n.get("mastercontrol.computing.epsilon", "LA Epsilon"), epsilonField, 
-            i18n.get("mastercontrol.computing.epsilon.desc", "The threshold below which a number is considered zero in linear algebra operations."));
+        addPropertyRow(grid, 15, i18n.get("mastercontrol.computing.epsilon.double", "LA Double Epsilon"), epsilonField, 
+            i18n.get("mastercontrol.computing.epsilon.double.desc", "The double precision threshold below which a number is considered zero."));
 
+        // 2. LA Float Epsilon
+        TextField epsilonFloatField = new TextField(String.valueOf(config.getEpsilonFloat()));
+        epsilonFloatField.setOnAction(e -> {
+            try { 
+                config.setEpsilonFloat(Float.parseFloat(epsilonFloatField.getText())); 
+                notifySaved(i18n);
+            } catch (Exception ex) {}
+        });
+        addPropertyRow(grid, 16, i18n.get("mastercontrol.computing.epsilon.float", "LA Float Epsilon"), epsilonFloatField, 
+            i18n.get("mastercontrol.computing.epsilon.float.desc", "The float precision threshold below which a number is considered zero."));
+
+        // 3. Stability Threshold
+        TextField stabilityField = new TextField(String.valueOf(config.getStabilityThreshold()));
+        stabilityField.setOnAction(e -> {
+            try { 
+                config.setStabilityThreshold(Double.parseDouble(stabilityField.getText())); 
+                notifySaved(i18n);
+            } catch (Exception ex) {}
+        });
+        addPropertyRow(grid, 17, i18n.get("mastercontrol.computing.stability", "Stability Threshold"), stabilityField, 
+            i18n.get("mastercontrol.computing.stability.desc", "Numerical stability threshold for matrix factorizations (e.g. SVD, QR)."));
+
+        // 4. Pivot Threshold
+        TextField pivotField = new TextField(String.valueOf(config.getPivotThreshold()));
+        pivotField.setOnAction(e -> {
+            try { 
+                config.setPivotThreshold(Double.parseDouble(pivotField.getText())); 
+                notifySaved(i18n);
+            } catch (Exception ex) {}
+        });
+        addPropertyRow(grid, 18, i18n.get("mastercontrol.computing.pivot", "Pivot Threshold"), pivotField, 
+            i18n.get("mastercontrol.computing.pivot.desc", "Minimum value for pivot element selection in LU decomposition."));
+
+        // 5. Max Iterations
         Spinner<Integer> iterSpinner = new Spinner<>(1, 100000, config.getMaxIterations());
         iterSpinner.valueProperty().addListener((obs, old, val) -> {
             config.setMaxIterations(val);
             notifySaved(i18n);
         });
-        addPropertyRow(grid, 16, i18n.get("mastercontrol.computing.iterations", "Max Iterations"), iterSpinner, 
-            i18n.get("mastercontrol.computing.iterations.desc", "Maximum number of iterations allowed for iterative solvers (e.g., GMRES, BiCGSTAB)."));
+        addPropertyRow(grid, 19, i18n.get("mastercontrol.computing.iterations", "Max Iterations"), iterSpinner, 
+            i18n.get("mastercontrol.computing.iterations.desc", "Maximum number of iterations allowed for iterative solvers (e.g. GMRES)."));
 
+        // 6. GMRES Restart
+        Spinner<Integer> restartSpinner = new Spinner<>(5, 1000, config.getGmresRestart());
+        restartSpinner.valueProperty().addListener((obs, old, val) -> {
+            config.setGmresRestart(val);
+            notifySaved(i18n);
+        });
+        addPropertyRow(grid, 20, i18n.get("mastercontrol.computing.restart", "GMRES Restart"), restartSpinner, 
+            i18n.get("mastercontrol.computing.restart.desc", "Dimension of Krylov subspace before restart in GMRES solver."));
+
+        // 7. Internal Precision (Bits)
         Spinner<Integer> bitsSpinner = new Spinner<>(64, 4096, config.getPrecisionBits());
         bitsSpinner.valueProperty().addListener((obs, old, val) -> {
             config.setPrecisionBits(val);
             notifySaved(i18n);
         });
-        addPropertyRow(grid, 17, i18n.get("mastercontrol.computing.bits", "Internal Precision (Bits)"), bitsSpinner, 
-            i18n.get("mastercontrol.computing.bits.desc", "Bit-width for internal calculations in native high-precision backends."));
+        addPropertyRow(grid, 21, i18n.get("mastercontrol.computing.bits", "Internal Precision (Bits)"), bitsSpinner, 
+            i18n.get("mastercontrol.computing.bits.desc", "Bit-width for internal calculations in high-precision backends."));
+
+        // --- SECTION 5: HYBRID & MULTITHREADING LIMITS ---
+        grid.add(new Separator(), 0, 22, 3, 1);
+        Label hybridLabel = new Label(i18n.get("mastercontrol.computing.section.hybrid", "Hybrid Computing & Multithreading"));
+        hybridLabel.getStyleClass().add("font-bold");
+        grid.add(hybridLabel, 0, 23, 3, 1);
+
+        // 8. GPU Threshold
+        TextField gpuThresholdField = new TextField(String.format(java.util.Locale.US, "%.0f", config.getGpuThreshold()));
+        gpuThresholdField.setOnAction(e -> {
+            try { 
+                config.setGpuThreshold(Double.parseDouble(gpuThresholdField.getText())); 
+                notifySaved(i18n);
+            } catch (Exception ex) {}
+        });
+        addPropertyRow(grid, 24, i18n.get("mastercontrol.computing.gpu.threshold", "GPU Threshold"), gpuThresholdField, 
+            i18n.get("mastercontrol.computing.gpu.threshold.desc", "Matrix size threshold above which computation is offloaded to GPU."));
+
+        // 9. Parallel Threshold
+        Spinner<Integer> parallelSpinner = new Spinner<>(100, 10000000, config.getParallelThreshold(), 1000);
+        parallelSpinner.valueProperty().addListener((obs, old, val) -> {
+            config.setParallelThreshold(val);
+            notifySaved(i18n);
+        });
+        addPropertyRow(grid, 25, i18n.get("mastercontrol.computing.parallel.threshold", "Parallel Threshold"), parallelSpinner, 
+            i18n.get("mastercontrol.computing.parallel.threshold.desc", "Data size threshold above which CPU multithreading is used."));
+
+        // 10. Max Threads
+        Spinner<Integer> threadsSpinner = new Spinner<>(1, 256, config.getMaxThreads());
+        threadsSpinner.valueProperty().addListener((obs, old, val) -> {
+            config.setMaxThreads(val);
+            notifySaved(i18n);
+        });
+        addPropertyRow(grid, 26, i18n.get("mastercontrol.computing.max.threads", "Max Threads"), threadsSpinner, 
+            i18n.get("mastercontrol.computing.max.threads.desc", "Maximum number of worker threads allocated to parallel computation."));
 
         content.getChildren().addAll(header, grid);
         scroll.setContent(content);
@@ -507,6 +582,7 @@ public class EpistemeMasterControl extends Application {
             BackendDiscovery.TYPE_DISTRIBUTED, BackendDiscovery.TYPE_GRAPH, BackendDiscovery.TYPE_MAP
         };
         String[] labels = {
+            i18n.get("category.math", "Mathematics"),
             i18n.get("category.la", "Linear Algebra"),
             i18n.get("category.tensor", "Tensor Computing"),
             i18n.get("category.plotting", "Visualization"),
@@ -642,11 +718,10 @@ public class EpistemeMasterControl extends Application {
 
         // 2. Low-level Backends (Legacy/Engines)
         String[] backendTypes = {
-            BackendDiscovery.TYPE_MATH, BackendDiscovery.TYPE_AUDIO,
+            BackendDiscovery.TYPE_AUDIO,
             BackendDiscovery.TYPE_DISTRIBUTED, BackendDiscovery.TYPE_GRAPH, BackendDiscovery.TYPE_MAP
         };
         String[] backendLabels = {
-            i18n.get("category.math", "Mathematics"),
             i18n.get("category.audio", "Audio Processing"),
             i18n.get("category.distributed", "Distributed Systems"),
             i18n.get("category.graph", "Graph Analysis"),
@@ -743,6 +818,29 @@ public class EpistemeMasterControl extends Application {
             }
         }
 
+        if (providers.isEmpty()) return box;
+
+        HBox header = new HBox(15);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(10, 15, 10, 15));
+        header.getStyleClass().add("table-header");
+        
+        Label hName = new Label(i18n.get("mastercontrol.algorithms.col.name", "Algorithm Engine"));
+        hName.setPrefWidth(250);
+        hName.getStyleClass().add("font-bold");
+        
+        Label hPriority = new Label(i18n.get("mastercontrol.algorithms.col.priority", "Priority"));
+        hPriority.setPrefWidth(120);
+        hPriority.getStyleClass().add("font-bold");
+        hPriority.setAlignment(Pos.CENTER);
+        
+        Label hDesc = new Label(i18n.get("mastercontrol.algorithms.col.description", "Description"));
+        hDesc.getStyleClass().add("font-bold");
+        HBox.setHgrow(hDesc, Priority.ALWAYS);
+        
+        header.getChildren().addAll(hName, hPriority, hDesc);
+        box.getChildren().add(header);
+
         for (int i = 0; i < providers.size(); i++) {
             box.getChildren().add(createBackendRow(i18n, providers.get(i), i % 2 == 1, false));
         }
@@ -772,17 +870,23 @@ public class EpistemeMasterControl extends Application {
         name.setPrefWidth(250);
         name.getStyleClass().add("font-medium");
 
-        Label status = new Label(b.isAvailable() ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "NOT FOUND"));
-        status.setPrefWidth(120);
-        status.getStyleClass().add(b.isAvailable() ? "status-label-available" : "status-label-unavailable");
-        status.setAlignment(Pos.CENTER);
+        Label secCol;
+        if (showCheckbox) {
+            secCol = new Label(b.isAvailable() ? i18n.get("status.available", "AVAILABLE") : i18n.get("status.missing", "NOT FOUND"));
+            secCol.getStyleClass().add(b.isAvailable() ? "status-label-available" : "status-label-unavailable");
+        } else {
+            secCol = new Label(b.getPriority() > 0 ? String.valueOf(b.getPriority()) : "NA");
+            secCol.getStyleClass().add("font-mono");
+        }
+        secCol.setPrefWidth(120);
+        secCol.setAlignment(Pos.CENTER);
 
         Label desc = new Label(b.getDescription());
         desc.setOpacity(0.7);
         desc.setWrapText(true);
         HBox.setHgrow(desc, Priority.ALWAYS);
 
-        row.getChildren().addAll(name, status, desc);
+        row.getChildren().addAll(name, secCol, desc);
         return row;
     }
 
@@ -821,6 +925,29 @@ public class EpistemeMasterControl extends Application {
         return cat;
     }
 
+    private VBox createLoaderList(I18N i18n, AppEntry[] entries) {
+        VBox box = new VBox(0);
+        
+        HBox header = new HBox(15);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(10, 15, 10, 15));
+        header.getStyleClass().add("table-header");
+        
+        Label hName = new Label(i18n.get("mastercontrol.loaders.col.name", "Name"));
+        hName.setPrefWidth(250);
+        hName.getStyleClass().add("font-bold");
+        
+        Label hDesc = new Label(i18n.get("mastercontrol.loaders.col.description", "Description"));
+        hDesc.getStyleClass().add("font-bold");
+        HBox.setHgrow(hDesc, Priority.ALWAYS);
+        
+        header.getChildren().addAll(hName, hDesc);
+        box.getChildren().add(header);
+        
+        box.getChildren().add(createAppList(false, entries));
+        return box;
+    }
+
     private Tab createLoadersTab(I18N i18n) {
         VBox content = new VBox(25);
         content.setPadding(new Insets(30));
@@ -838,18 +965,11 @@ public class EpistemeMasterControl extends Application {
         // 1. SPI Loaders (ResourceReader/Writer)
         try {
             java.util.ServiceLoader.load(org.episteme.core.io.ResourceReader.class).forEach(r -> {
-                String cat = r.getCategory();
-                // Heuristic: Group by discipline if category is generic
-                if (cat == null || cat.equalsIgnoreCase("Scientific System") || cat.equalsIgnoreCase("Social Science")) {
-                    cat = extractDisciplineFromPackage(r.getClass().getName());
-                }
+                String cat = extractDisciplineFromPackage(r.getClass().getName());
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(i18n.get(r.getName(), r.getName()), r.getClass().getName(), i18n.get(r.getDescription(), r.getDescription())));
             });
             java.util.ServiceLoader.load(org.episteme.core.io.ResourceWriter.class).forEach(w -> {
-                String cat = w.getCategory();
-                if (cat == null || cat.equalsIgnoreCase("Scientific System") || cat.equalsIgnoreCase("Social Science")) {
-                    cat = extractDisciplineFromPackage(w.getClass().getName());
-                }
+                String cat = extractDisciplineFromPackage(w.getClass().getName());
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(i18n.get(w.getName(), w.getName()), w.getClass().getName(), i18n.get(w.getDescription(), w.getDescription())));
             });
         } catch (Exception e) {}
@@ -862,22 +982,13 @@ public class EpistemeMasterControl extends Application {
                 for (AppEntry e : list) if (e.className.equals(info.fullName)) { exists = true; break; }
             }
             if (!exists) {
-                String catName = "Scientific Systems";
-                if (info.fullName.contains(".chemistry.")) catName = "Chemistry";
-                else if (info.fullName.contains(".physics.")) catName = "Physics";
-                else if (info.fullName.contains(".biology.")) catName = "Biology";
-                else if (info.fullName.contains(".mathematics.")) catName = "Mathematics";
-                else if (info.fullName.contains(".geography.")) catName = "Geography";
-                else if (info.fullName.contains(".social.")) catName = "Social Sciences";
-                else if (info.fullName.contains(".native.")) catName = "Native Systems";
-                
-                String cat = i18n.get("category." + catName.toLowerCase().replace(" ", ""), catName);
+                String cat = extractDisciplineFromPackage(info.fullName);
                 grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(info.simpleName, info.fullName, info.description));
             }
         }
 
         for (Map.Entry<String, List<AppEntry>> entry : grouped.entrySet()) {
-            accordion.getPanes().add(new TitledPane("(" + entry.getValue().size() + ") " + entry.getKey(), createAppList(false, entry.getValue().toArray(new AppEntry[0]))));
+            accordion.getPanes().add(new TitledPane("(" + entry.getValue().size() + ") " + entry.getKey(), createLoaderList(i18n, entry.getValue().toArray(new AppEntry[0]))));
         }
 
         content.getChildren().addAll(header, accordion);
@@ -958,28 +1069,32 @@ public class EpistemeMasterControl extends Application {
         name.setPrefWidth(250);
         name.getStyleClass().add("font-medium");
 
-        boolean available = false;
-        try { Class.forName(app.className); available = true; } catch (Exception e) {}
-
-        Label status = new Label(available ? I18N.getInstance().get("status.available", "AVAILABLE") : I18N.getInstance().get("status.missing", "MISSING"));
-        status.setPrefWidth(120);
-        status.getStyleClass().add(available ? "status-label-available" : "status-label-unavailable");
-        status.setAlignment(Pos.CENTER);
-
         Label desc = new Label(app.description);
         desc.setOpacity(0.7);
         desc.setWrapText(true);
         HBox.setHgrow(desc, Priority.ALWAYS);
 
-        row.getChildren().addAll(name, status, desc);
+        if (showLaunch) {
+            boolean available = false;
+            try { Class.forName(app.className); available = true; } catch (Exception e) {}
 
-        if (available) {
-            row.setOnMouseClicked(e -> {
-                if (e.getClickCount() == 2) {
-                    launchApp(app.className);
-                }
-            });
-            row.setCursor(javafx.scene.Cursor.HAND);
+            Label status = new Label(available ? I18N.getInstance().get("status.available", "AVAILABLE") : I18N.getInstance().get("status.missing", "MISSING"));
+            status.setPrefWidth(120);
+            status.getStyleClass().add(available ? "status-label-available" : "status-label-unavailable");
+            status.setAlignment(Pos.CENTER);
+
+            row.getChildren().addAll(name, status, desc);
+
+            if (available) {
+                row.setOnMouseClicked(e -> {
+                    if (e.getClickCount() == 2) {
+                        launchApp(app.className);
+                    }
+                });
+                row.setCursor(javafx.scene.Cursor.HAND);
+            }
+        } else {
+            row.getChildren().addAll(name, desc);
         }
 
         return row;
@@ -1084,14 +1199,14 @@ public class EpistemeMasterControl extends Application {
     }
 
     private String extractDisciplineFromPackage(String className) {
-        if (className.contains(".chemistry.")) return "Chemistry";
-        if (className.contains(".physics.")) return "Physics";
-        if (className.contains(".biology.")) return "Biology";
-        if (className.contains(".mathematics.")) return "Mathematics";
-        if (className.contains(".geography.")) return "Geography";
-        if (className.contains(".social.")) return "Social Sciences";
-        if (className.contains(".native.")) return "Native Systems";
-        return "Scientific Systems";
+        String[] parts = className.split("\\.");
+        if (parts.length >= 4) {
+            String cat = parts[3];
+            if (cat != null && !cat.isEmpty()) {
+                return cat.substring(0, 1).toUpperCase() + cat.substring(1).toLowerCase();
+            }
+        }
+        return "General";
     }
 
     public static void main(String[] args) { launch(args); }
