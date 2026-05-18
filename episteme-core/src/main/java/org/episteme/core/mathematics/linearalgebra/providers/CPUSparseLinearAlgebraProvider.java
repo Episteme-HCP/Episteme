@@ -334,7 +334,7 @@ public class CPUSparseLinearAlgebraProvider<E> implements LinearAlgebraBackend<E
     public String getId() { return "cpu-sparse"; }
 
     @Override
-    public String getType() { return "math"; }
+    public String getType() { return org.episteme.core.technical.backend.BackendDiscovery.TYPE_LINEAR_ALGEBRA; }
 
     @Override
     public String getDescription() { return "Core CPU Sparse Linear Algebra Provider"; }

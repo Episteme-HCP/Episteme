@@ -560,18 +560,7 @@ public class EpistemeMasterControl extends Application {
         ));
         content.getChildren().add(new Separator());
 
-        // --- INTERNAL FRAMEWORK PROVIDERS ---
-        content.getChildren().add(createManualLibraryCategory(i18n, 
-            i18n.get("mastercontrol.libraries.cat.framework_providers", "Framework Providers"),
-            new String[][] {
-                {"lib.core.dense.name", "org.episteme.core.mathematics.linearalgebra.providers.CPUDenseLinearAlgebraProvider", "lib.core.dense.desc"},
-                {"lib.core.sparse.name", "org.episteme.core.mathematics.linearalgebra.providers.CPUSparseLinearAlgebraProvider", "lib.core.sparse.desc"},
-                {"lib.core.distributed.name", "org.episteme.core.technical.backend.distributed.DistributedBackend", "lib.core.distributed.desc"},
-                {"lib.core.mpi.name", "org.episteme.core.distributed.backends.MPIDistributedBackend", "lib.core.mpi.desc"},
-                {"lib.core.spark.name", "org.episteme.core.distributed.backends.SparkDistributedBackend", "lib.core.spark.desc"}
-            }
-        ));
-        content.getChildren().add(new Separator());
+
 
         // --- SPI Categories ---
         String[] types = {
@@ -918,7 +907,24 @@ public class EpistemeMasterControl extends Application {
         tableHeader.getChildren().addAll(hName, hStatus, hDesc);
         cat.getChildren().add(tableHeader);
         
-        List<Backend> providers = BackendDiscovery.getInstance().getProvidersByType(type);
+        List<Backend> providers = new ArrayList<>(BackendDiscovery.getInstance().getProvidersByType(type));
+        
+        // Add discovered via scanning
+        List<MasterControlDiscovery.ClassInfo> discovered = MasterControlDiscovery.getInstance().findClasses("Backend");
+        for (MasterControlDiscovery.ClassInfo info : discovered) {
+            if (providers.stream().noneMatch(p -> p.getClass().getName().equals(info.fullName))) {
+                try {
+                    Class<?> cls = Class.forName(info.fullName, false, MasterControlDiscovery.class.getClassLoader());
+                    if (Backend.class.isAssignableFrom(cls)) {
+                        Backend instance = (Backend) cls.getDeclaredConstructor().newInstance();
+                        if (instance.getType() != null && instance.getType().equalsIgnoreCase(type)) {
+                            providers.add(instance);
+                        }
+                    }
+                } catch (Exception e) {}
+            }
+        }
+        
         for (int i = 0; i < providers.size(); i++) {
             cat.getChildren().add(createBackendRow(i18n, providers.get(i), i % 2 == 1, true));
         }

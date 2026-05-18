@@ -81,6 +81,16 @@ public class CPUDenseLinearAlgebraProvider<E> implements LinearAlgebraProvider<E
     }
 
     @Override
+    public String getType() {
+        return org.episteme.core.technical.backend.BackendDiscovery.TYPE_LINEAR_ALGEBRA;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Core CPU Dense Linear Algebra Provider";
+    }
+
+    @Override
     public boolean isAvailable() {
         return true;
     }
