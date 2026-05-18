@@ -29,7 +29,7 @@ COPY --from=build --chown=episteme:episteme /app/episteme-server/target/episteme
 
 # Copy Agent Code
 COPY --chown=episteme:episteme agent/ /app/agent/
-RUN pip3 install --no-cache-dir -r /app/agent/requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r /app/agent/requirements.txt
 
 # Copy Entrypoint
 COPY --chown=episteme:episteme docker/entrypoint.sh /app/entrypoint.sh

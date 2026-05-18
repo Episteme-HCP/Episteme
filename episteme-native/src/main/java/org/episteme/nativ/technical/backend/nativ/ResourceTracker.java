@@ -74,14 +74,14 @@ public final class ResourceTracker implements AutoCloseable {
                     // Panama safety: check if segment is already closed before calling the cleaner
                     if (handle instanceof MemorySegment seg) {
                          long addr = seg.address();
-                         System.err.println("[TRACKER] Releasing segment at 0x" + Long.toHexString(addr) + " (alive=" + seg.scope().isAlive() + ")");
+                         logger.trace("[TRACKER] Releasing segment at 0x{} (alive={})", Long.toHexString(addr), seg.scope().isAlive());
                          if (!seg.scope().isAlive() || (addr != 0 && clearedAddresses.contains(addr))) {
                              released = true;
                              return;
                          }
                          if (addr != 0) clearedAddresses.add(addr);
                     } else {
-                        System.err.println("[TRACKER] Releasing non-segment handle: " + handle);
+                        logger.trace("[TRACKER] Releasing non-segment handle: {}", handle);
                     }
                     cleaner.accept(handle);
                 } catch (IllegalStateException e) {
