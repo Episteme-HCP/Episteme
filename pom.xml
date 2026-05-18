@@ -18,13 +18,11 @@
     <module>episteme-native</module>
     <module>episteme-benchmarks</module>
     <module>episteme-resources</module>
-    <module>episteme-featured-apps</module>
     <module>episteme-server</module>
     <module>episteme-worker</module>
     <module>episteme-client</module>
     <module>episteme-database</module>
     <module>episteme-jni</module>
-    <module>episteme-demos</module>
   </modules>
   <licenses>
     <license>
