@@ -17,11 +17,11 @@
 
 /* ListView Striping (Theme-aware) */
 .list-cell:odd {
-    -fx-background-color: -fx-background;
+    -fx-background-color: #f4f4f4;
 }
 
 .list-cell:even {
-    -fx-background-color: derive(-fx-background, -5%);
+    -fx-background-color: #eaeaea;
 }
 
 /* Empty Cells - Hide them */
@@ -31,11 +31,11 @@
 }
 
 .zebra-row-odd {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: #ffffff;
 }
 
 .zebra-row-even {
-    -fx-background-color: derive(-fx-control-inner-background, -5%);
+    -fx-background-color: #f5f5f5;
 }
 
 /* Accordion Custom Styling */
@@ -45,14 +45,14 @@
 }
 
 .accordion .titled-pane:expanded > .title {
-    -fx-border-color: -fx-accent;
+    -fx-border-color: #0096c9;
     -fx-border-width: 0 0 0 5;
 }
 
 /* Selection State */
 .list-cell:filled:selected,
 .list-cell:filled:selected:hover {
-    -fx-background-color: -fx-accent;
+    -fx-background-color: #0096c9;
     -fx-text-fill: white;
 }
 
@@ -76,7 +76,7 @@
 
 .tab-header {
     -fx-padding: 0 0 15 0;
-    -fx-border-color: derive(-fx-base, -10%);
+    -fx-border-color: #dbdbdb;
     -fx-border-width: 0 0 1 0;
 }
 

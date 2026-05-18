@@ -155,6 +155,11 @@ public class NativeFFMLoader {
                 variants.add("libcudart.so");
                 variants.add("libcudart.so.12");
                 variants.add("libcudart.so.11");
+            } else if (libName.equals("cusparse")) {
+                variants.add("cusparse");
+                variants.add("libcusparse.so");
+                variants.add("libcusparse.so.12");
+                variants.add("libcusparse.so.11");
             } else if (libName.equals("openblas")) {
                 variants.add("openblas");
                 variants.add("libopenblas.so.3");

@@ -481,46 +481,6 @@ public final class Episteme {
         org.episteme.core.io.UserPreferences.getInstance().setPreferredBackend(type, id);
     }
 
-    public static String getMathBackendId() {
-        return getBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MATH);
-    }
-
-    public static void setMathBackendId(String id) {
-        setBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MATH, id);
-    }
-
-    public static String getTensorBackendId() {
-        return getBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_TENSOR);
-    }
-
-    public static void setTensorBackendId(String id) {
-        setBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_TENSOR, id);
-    }
-
-    public static String getMapBackendId() {
-        return getBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MAP);
-    }
-
-    public static void setMapBackendId(String id) {
-        setBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MAP, id);
-    }
-
-    public static org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend2D() {
-        return org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().get2D();
-    }
-
-    public static void setPlottingBackend2D(org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
-        org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set2D(backend != null ? backend.getId() : "auto");
-    }
-
-    public static org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend getPlottingBackend3D() {
-        return org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().get3D();
-    }
-
-    public static void setPlottingBackend3D(org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackend backend) {
-        org.episteme.core.ui.viewers.mathematics.analysis.plotting.PlottingBackendManager.getInstance().set3D(backend != null ? backend.getId() : "auto");
-    }
-
     /**
      * Checks if a backend is available by type or ID part.
      */

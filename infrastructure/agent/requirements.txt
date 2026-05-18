@@ -4,3 +4,4 @@ gradio
 mcp
 httpx
 python-dotenv
+langchain-classic

@@ -51,6 +51,36 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
     private static SymbolLookup LAPACK_LOOKUP;
     private static boolean IS_AVAILABLE = false;
     private static boolean initAttempted = false;
+    private static boolean ilp64 = false;
+
+    protected static boolean isIlp64() {
+        return ilp64;
+    }
+
+    protected static ValueLayout lapackIntLayout() {
+        return ilp64 ? ValueLayout.JAVA_LONG : ValueLayout.JAVA_INT;
+    }
+
+    protected static MemorySegment allocateIpiv(Arena arena, long count) {
+        return NativeSafe.allocate(arena, ilp64 ? ValueLayout.JAVA_LONG : ValueLayout.JAVA_INT, count);
+    }
+
+    protected static int getIpivElement(MemorySegment ipivSeg, long index) {
+        return ilp64 ? (int) ipivSeg.getAtIndex(ValueLayout.JAVA_LONG, index) : ipivSeg.getAtIndex(ValueLayout.JAVA_INT, index);
+    }
+
+    protected static int[] ipivToArray(MemorySegment ipivSeg, int count) {
+        int[] arr = new int[count];
+        if (ilp64) {
+            long[] longArr = ipivSeg.toArray(ValueLayout.JAVA_LONG);
+            for (int i = 0; i < count; i++) {
+                arr[i] = (int) longArr[i];
+            }
+        } else {
+            arr = ipivSeg.toArray(ValueLayout.JAVA_INT);
+        }
+        return arr;
+    }
 
     private static synchronized void ensureInitialized() {
         if (initAttempted) return;

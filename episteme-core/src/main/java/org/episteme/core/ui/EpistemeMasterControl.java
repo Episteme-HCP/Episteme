@@ -371,8 +371,8 @@ public class EpistemeMasterControl extends Application {
         backendLabel.getStyleClass().add("font-bold");
         grid.add(backendLabel, 0, 9, 3, 1);
 
-        ComboBox<String> mathCombo = createBackendComboBox(BackendDiscovery.TYPE_MATH, Episteme.getMathBackendId(), id -> {
-            Episteme.setMathBackendId(id);
+        ComboBox<String> mathCombo = createBackendComboBox(BackendDiscovery.TYPE_MATH, Episteme.getBackendId(BackendDiscovery.TYPE_MATH), id -> {
+            Episteme.setBackendId(BackendDiscovery.TYPE_MATH, id);
             Episteme.savePreferences();
             notifySaved(i18n);
         });
@@ -690,7 +690,7 @@ public class EpistemeMasterControl extends Application {
 
         ScrollPane scroll = new ScrollPane(content);
         scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        scroll.getStyleClass().add("transparent-scroll");
 
         VBox header = createTabHeader(
             i18n.get("mastercontrol.tab.algorithms", "Computational Algorithms"),
@@ -926,26 +926,7 @@ public class EpistemeMasterControl extends Application {
     }
 
     private VBox createLoaderList(I18N i18n, AppEntry[] entries) {
-        VBox box = new VBox(0);
-        
-        HBox header = new HBox(15);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(10, 15, 10, 15));
-        header.getStyleClass().add("table-header");
-        
-        Label hName = new Label(i18n.get("mastercontrol.loaders.col.name", "Name"));
-        hName.setPrefWidth(250);
-        hName.getStyleClass().add("font-bold");
-        
-        Label hDesc = new Label(i18n.get("mastercontrol.loaders.col.description", "Description"));
-        hDesc.getStyleClass().add("font-bold");
-        HBox.setHgrow(hDesc, Priority.ALWAYS);
-        
-        header.getChildren().addAll(hName, hDesc);
-        box.getChildren().add(header);
-        
-        box.getChildren().add(createAppList(false, entries));
-        return box;
+        return createAppList(false, false, entries, i18n);
     }
 
     private Tab createLoadersTab(I18N i18n) {
@@ -983,7 +964,23 @@ public class EpistemeMasterControl extends Application {
             }
             if (!exists) {
                 String cat = extractDisciplineFromPackage(info.fullName);
-                grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(info.simpleName, info.fullName, info.description));
+                String desc = info.description;
+                if (desc == null || desc.trim().isEmpty() || "Discovered Class".equalsIgnoreCase(desc)) {
+                    try {
+                        Class<?> cls = Class.forName(info.fullName, false, MasterControlDiscovery.class.getClassLoader());
+                        if (org.episteme.core.io.ResourceReader.class.isAssignableFrom(cls)) {
+                            org.episteme.core.io.ResourceReader r = (org.episteme.core.io.ResourceReader) cls.getDeclaredConstructor().newInstance();
+                            desc = r.getDescription();
+                        } else if (org.episteme.core.io.ResourceWriter.class.isAssignableFrom(cls)) {
+                            org.episteme.core.io.ResourceWriter w = (org.episteme.core.io.ResourceWriter) cls.getDeclaredConstructor().newInstance();
+                            desc = w.getDescription();
+                        }
+                    } catch (Exception e) {}
+                }
+                if (desc == null || desc.trim().isEmpty() || "Discovered Class".equalsIgnoreCase(desc)) {
+                    desc = "Scientific data loader for " + info.simpleName;
+                }
+                grouped.computeIfAbsent(cat, k -> new ArrayList<>()).add(new AppEntry(info.simpleName, info.fullName, desc));
             }
         }
 
@@ -992,7 +989,11 @@ public class EpistemeMasterControl extends Application {
         }
 
         content.getChildren().addAll(header, accordion);
-        return new Tab(i18n.get("mastercontrol.tab.loaders", "Loaders"), content);
+        
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.getStyleClass().add("transparent-scroll");
+        return new Tab(i18n.get("mastercontrol.tab.loaders", "Loaders"), scroll);
     }
 
     private Tab createAppsTab(I18N i18n) {
@@ -1016,7 +1017,11 @@ public class EpistemeMasterControl extends Application {
         if (!accordion.getPanes().isEmpty()) accordion.getPanes().get(0).setExpanded(true);
 
         content.getChildren().addAll(header, accordion);
-        return new Tab(i18n.get("mastercontrol.tab.apps", "Apps"), content);
+        
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.getStyleClass().add("transparent-scroll");
+        return new Tab(i18n.get("mastercontrol.tab.apps", "Apps"), scroll);
     }
 
     private void addAppPane(Accordion accordion, I18N i18n, Map<MasterControlDiscovery.ProviderType, Map<String, List<Viewer>>> grouped, 
@@ -1040,7 +1045,7 @@ public class EpistemeMasterControl extends Application {
                 .map(v -> new AppEntry(v.getName(), v.getClass().getName(), v.getDescription()))
                 .toArray(AppEntry[]::new);
                 
-            catBox.getChildren().addAll(catLabel, createAppList(true, entries));
+            catBox.getChildren().addAll(catLabel, createAppList(true, false, entries, i18n));
             container.getChildren().add(catBox);
         }
 
@@ -1052,15 +1057,41 @@ public class EpistemeMasterControl extends Application {
         return infos.stream().map(i -> new AppEntry(i.simpleName, i.fullName, i.description)).toArray(AppEntry[]::new);
     }
 
-    private VBox createAppList(boolean launch, AppEntry[] entries) {
+    private VBox createAppList(boolean launch, boolean showStatus, AppEntry[] entries, I18N i18n) {
         VBox box = new VBox(0);
+        
+        HBox header = new HBox(15);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(10, 15, 10, 15));
+        header.getStyleClass().add("table-header");
+        
+        Label hName = new Label(i18n.get("mastercontrol.apps.col.name", "Name"));
+        hName.setPrefWidth(250);
+        hName.getStyleClass().add("font-bold");
+        
+        Label hDesc = new Label(i18n.get("mastercontrol.apps.col.description", "Description"));
+        hDesc.getStyleClass().add("font-bold");
+        HBox.setHgrow(hDesc, Priority.ALWAYS);
+        
+        if (showStatus) {
+            Label hStatus = new Label(i18n.get("mastercontrol.apps.col.status", "Status"));
+            hStatus.setPrefWidth(120);
+            hStatus.getStyleClass().add("font-bold");
+            hStatus.setAlignment(Pos.CENTER);
+            header.getChildren().addAll(hName, hStatus, hDesc);
+        } else {
+            header.getChildren().addAll(hName, hDesc);
+        }
+        
+        box.getChildren().add(header);
+        
         for (int i = 0; i < entries.length; i++) {
-            box.getChildren().add(createAppRow(entries[i], i % 2 == 1, launch));
+            box.getChildren().add(createAppRow(entries[i], i % 2 == 1, launch, showStatus));
         }
         return box;
     }
 
-    private HBox createAppRow(AppEntry app, boolean striped, boolean showLaunch) {
+    private HBox createAppRow(AppEntry app, boolean striped, boolean showLaunch, boolean showStatus) {
         HBox row = new HBox(15);
         row.getStyleClass().add("app-row");
         if (striped) row.getStyleClass().add("app-row-striped");
@@ -1074,7 +1105,7 @@ public class EpistemeMasterControl extends Application {
         desc.setWrapText(true);
         HBox.setHgrow(desc, Priority.ALWAYS);
 
-        if (showLaunch) {
+        if (showStatus) {
             boolean available = false;
             try { Class.forName(app.className); available = true; } catch (Exception e) {}
 
@@ -1084,7 +1115,13 @@ public class EpistemeMasterControl extends Application {
             status.setAlignment(Pos.CENTER);
 
             row.getChildren().addAll(name, status, desc);
+        } else {
+            row.getChildren().addAll(name, desc);
+        }
 
+        if (showLaunch) {
+            boolean available = false;
+            try { Class.forName(app.className); available = true; } catch (Exception e) {}
             if (available) {
                 row.setOnMouseClicked(e -> {
                     if (e.getClickCount() == 2) {
@@ -1093,8 +1130,6 @@ public class EpistemeMasterControl extends Application {
                 });
                 row.setCursor(javafx.scene.Cursor.HAND);
             }
-        } else {
-            row.getChildren().addAll(name, desc);
         }
 
         return row;

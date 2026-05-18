@@ -4,7 +4,11 @@ import json
 import os
 import pandas as pd
 from langchain_openai import ChatOpenAI
-from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain.agents import create_openai_functions_agent
+try:
+    from langchain.agents import AgentExecutor
+except ImportError:
+    from langchain_classic.agents import AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.tools import tool
 from dotenv import load_dotenv
