@@ -68,7 +68,7 @@
     </developer>
   </developers>
   <properties>
-    <revision>1.0.0-beta3.0.14</revision>
+    <revision>1.0.0-beta3.0.17</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <uom.version>2.2</uom.version>
     <indriya.version>2.2</indriya.version>

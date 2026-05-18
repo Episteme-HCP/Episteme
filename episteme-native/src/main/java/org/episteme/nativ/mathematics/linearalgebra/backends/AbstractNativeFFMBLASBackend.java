@@ -331,10 +331,10 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
                 AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
         );
-        SGETRI = findLapackSymbol("LAPACKE_sgetri", "lapacke_sgetri", "sgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
-        DGETRI = findLapackSymbol("LAPACKE_dgetri", "lapacke_dgetri", "dgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
-        CGETRI = findLapackSymbol("LAPACKE_cgetri", "lapacke_cgetri", "cgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
-        ZGETRI = findLapackSymbol("LAPACKE_zgetri", "lapacke_zgetri", "zgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+        SGETRI = findLapackSymbol("LAPACKE_sgetri", "lapacke_sgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+        DGETRI = findLapackSymbol("LAPACKE_dgetri", "lapacke_dgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+        CGETRI = findLapackSymbol("LAPACKE_cgetri", "lapacke_cgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
+        ZGETRI = findLapackSymbol("LAPACKE_zgetri", "lapacke_zgetri").map(s -> LINKER.downcallHandle(s, getriDesc)).orElse(null);
 
         FunctionDescriptor getrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -361,10 +361,10 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, 
                 AddressLayout.ADDRESS, ValueLayout.JAVA_INT, AddressLayout.ADDRESS
         );
-        SGEQRF = findLapackSymbol("LAPACKE_sgeqrf", "lapacke_sgeqrf", "sgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
-        DGEQRF = findLapackSymbol("LAPACKE_dgeqrf", "lapacke_dgeqrf", "dgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
-        CGEQRF = findLapackSymbol("LAPACKE_cgeqrf", "lapacke_cgeqrf", "cgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
-        ZGEQRF = findLapackSymbol("LAPACKE_zgeqrf", "lapacke_zgeqrf", "zgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+        SGEQRF = findLapackSymbol("LAPACKE_sgeqrf", "lapacke_sgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+        DGEQRF = findLapackSymbol("LAPACKE_dgeqrf", "lapacke_dgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+        CGEQRF = findLapackSymbol("LAPACKE_cgeqrf", "lapacke_cgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
+        ZGEQRF = findLapackSymbol("LAPACKE_zgeqrf", "lapacke_zgeqrf").map(s -> LINKER.downcallHandle(s, geqrfDesc)).orElse(null);
 
         FunctionDescriptor orgqrDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
@@ -393,10 +393,10 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT,
                 AddressLayout.ADDRESS, ValueLayout.JAVA_INT
         );
-        SPOTRF = findLapackSymbol("LAPACKE_spotrf", "lapacke_spotrf", "spotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
-        DPOTRF = findLapackSymbol("LAPACKE_dpotrf", "lapacke_dpotrf", "dpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
-        CPOTRF = findLapackSymbol("LAPACKE_cpotrf", "lapacke_cpotrf", "cpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
-        ZPOTRF = findLapackSymbol("LAPACKE_zpotrf", "lapacke_zpotrf", "zpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+        SPOTRF = findLapackSymbol("LAPACKE_spotrf", "lapacke_spotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+        DPOTRF = findLapackSymbol("LAPACKE_dpotrf", "lapacke_dpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+        CPOTRF = findLapackSymbol("LAPACKE_cpotrf", "lapacke_cpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
+        ZPOTRF = findLapackSymbol("LAPACKE_zpotrf", "lapacke_zpotrf").map(s -> LINKER.downcallHandle(s, potrfDesc)).orElse(null);
 
         FunctionDescriptor potrsDesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                 ValueLayout.JAVA_INT, ValueLayout.JAVA_BYTE, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,

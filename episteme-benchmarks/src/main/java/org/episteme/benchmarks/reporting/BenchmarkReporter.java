@@ -122,7 +122,7 @@ public class BenchmarkReporter {
     }
 
     public void generatePdfReport(String filePath, ReportType type) {
-        Document document = new Document(PageSize.A4.rotate());
+        Document document = new Document(PageSize.A4);
         try {
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filePath));
             document.open();
@@ -387,7 +387,7 @@ public class BenchmarkReporter {
         try {
             Image pdfImage = Image.getInstance(writer, bufferedImage, 1.0f);
             pdfImage.setAlignment(Element.ALIGN_CENTER);
-            pdfImage.scaleToFit(700, 550);
+            pdfImage.scaleToFit(500, 600);
             document.add(pdfImage);
         } catch (IOException e) {
             throw new DocumentException(e);
