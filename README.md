@@ -50,7 +50,7 @@ Most libraries are "computer-oriented"—built around arrays and pointers. Epist
 *   📦 **Modular & Thin**: Release modules are ~1MB; add only the dependencies and compute backends you need.
 *   🧠 **Autotuning Backends**: Plug-and-play support for CUDA, OpenCL, SIMD, and OpenBLAS. Backends are put into "competition" to ensure the fastest execution for your specific hardware.
 *   🌐 **Distributed Grid**: Integrated worker nodes and gRPC-ready client/server architecture for scaling jobs across entire clusters.
-*   🛠️ **Ready-to-Use**: Includes tens of loaders, viewers, external device drivers, and a suite of demo apps.
+*   🛠️ **Ready-to-Use**: Includes tens of loaders, viewers and external device drivers.
 *   🌍 **I18n Supported**: Fully localized in English, French, German, Spanish, and Chinese (ZN).
 
 ---
