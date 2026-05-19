@@ -103,8 +103,13 @@ public final class ProviderSelector {
      */
     public static <P extends AlgorithmProvider, R> R execute(Class<P> providerClass, OperationContext context, java.util.function.Function<P, R> operation) {
         List<P> rawProviders = AlgorithmManager.getProviders(providerClass);
-        // Copy to avoid ConcurrentModificationException during sorting or iteration
-        List<P> providers = new java.util.ArrayList<>(rawProviders);
+        // Copy and apply global filters to avoid ConcurrentModificationException or executing slow/unsupported fallback providers
+        List<P> providers = new java.util.ArrayList<>();
+        for (P p : rawProviders) {
+            if (!AlgorithmManager.isFiltered(p.getName())) {
+                providers.add(p);
+            }
+        }
         providers.sort(Comparator.comparingDouble((P p) -> p.score(context)).reversed());
 
         Throwable lastError = null;

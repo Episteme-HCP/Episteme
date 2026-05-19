@@ -1,4 +1,4 @@
-# Reimagining Scientific Computing: How We Built 450k Lines of Production-Ready Java in 4 Months
+# Reimagining Scientific Computing: How We Built 450k Lines of Production-Ready Java in 5 Months
 
 ### From Theory to High-Performance Reality
 For decades, scientific computing has been dominated by C and Fortran. While Java offered enterprise-grade stability and scalability, it lacked the "bare-metal" performance required for massive numerical simulations—until now.

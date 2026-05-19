@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class LinearAlgebraPerformanceAudit {
 
-    private static final int MATRIX_SIZE = 5;
+    private static final int MATRIX_SIZE = 512;
 
     @Test
     public void runPerformanceAudit() {
@@ -89,9 +89,20 @@ public class LinearAlgebraPerformanceAudit {
                     }
 
                     if (include) {
+                        if (MATRIX_SIZE >= 1024) {
+                            if (!(name.contains("cuda") || name.contains("opencl") || name.contains("blas") || 
+                                  name.contains("ejml") || name.contains("jblas") || name.contains("simd") || 
+                                  name.contains("nd4j") || name.contains("grpc") || name.contains("distributed"))) {
+                                include = false;
+                                System.out.println("[PerfAudit] -> Skipping slow CPU provider for large matrix size: " + p.getName());
+                            }
+                        }
+                    }
+
+                    if (include) {
                         providers.add(p);
                     } else {
-                        System.out.println("[PerfAudit] -> Skipping provider due to precision constraints: " + p.getName());
+                        System.out.println("[PerfAudit] -> Skipping provider due to precision constraints or size: " + p.getName());
                     }
                 }
             }
@@ -191,13 +202,15 @@ public class LinearAlgebraPerformanceAudit {
 
     private void measure(Map<String, Object> metrics, String op, java.util.function.Supplier<?> test) {
         try {
+            int warmupIters = MATRIX_SIZE >= 1024 ? (MATRIX_SIZE >= 4096 ? 0 : 1) : 3;
+            int measureIters = MATRIX_SIZE >= 1024 ? (MATRIX_SIZE >= 4096 ? 1 : 2) : 10;
+            
             // Warmup
-            for (int i = 0; i < 3; i++) test.get();
+            for (int i = 0; i < warmupIters; i++) test.get();
             long start = System.nanoTime();
-            int iters = 10;
-            for (int i = 0; i < iters; i++) test.get();
+            for (int i = 0; i < measureIters; i++) test.get();
             long end = System.nanoTime();
-            double latency = (end - start) / (1_000_000.0 * iters);
+            double latency = (end - start) / (1_000_000.0 * measureIters);
             metrics.put(op + ":latency", latency);
             metrics.put(op + ":throughput", 1000.0 / Math.max(latency, 1e-9));
         } catch (Throwable t) {

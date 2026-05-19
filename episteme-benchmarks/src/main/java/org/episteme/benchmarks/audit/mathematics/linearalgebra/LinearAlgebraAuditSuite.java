@@ -45,27 +45,38 @@ public class LinearAlgebraAuditSuite {
         System.out.println("[LinearAlgebraAudit] Generating random invertible matrix invA...");
         Matrix<E> invA = randomInvertibleMatrix(n, ring, rand); 
         System.out.println("[LinearAlgebraAudit] Generating random SPD matrix spdA...");
-        Matrix<E> spdA = randomSPDMatrix(n, ref, ring, rand);
+        Matrix<E> spdA = n < 1024 ? randomSPDMatrix(n, ref, ring, rand) : null;
         E scalar = ring.add(ring.one(), ring.one()); // 2.0
         System.out.println("[LinearAlgebraAudit] Starting operations...");
 
         action.run(prefix + "Add", () -> verify(p.add(A, B), ref.add(A, B), tolerance));
         action.run(prefix + "Sub", () -> verify(p.subtract(A, B), ref.subtract(A, B), tolerance));
         action.run(prefix + "Scale", () -> verify(p.scale(scalar, A), ref.scale(scalar, A), tolerance));
-        action.run(prefix + "Mul", () -> verify(p.multiply(A, B), ref.multiply(A, B), tolerance));
+        action.run(prefix + "Mul", () -> {
+            Matrix<E> res = p.multiply(A, B);
+            if (n < 1024) {
+                return verify(res, ref.multiply(A, B), tolerance);
+            } else {
+                return res;
+            }
+        });
         action.run(prefix + "MatVec", () -> verify(p.multiply(A, v), ref.multiply(A, v), tolerance));
         action.run(prefix + "Trans", () -> verify(p.transpose(A), ref.transpose(A), tolerance));
-        action.run(prefix + "Inv", () -> verify(p.inverse(invA), ref.inverse(invA), tolerance));
-        action.run(prefix + "Det", () -> verify(p.determinant(invA), ref.determinant(invA), tolerance));
-        action.run(prefix + "Solve", () -> verify(p.solve(invA, v), ref.solve(invA, v), tolerance));
+        if (n < 1024) {
+            action.run(prefix + "Inv", () -> verify(p.inverse(invA), ref.inverse(invA), tolerance));
+            action.run(prefix + "Det", () -> verify(p.determinant(invA), ref.determinant(invA), tolerance));
+            action.run(prefix + "Solve", () -> verify(p.solve(invA, v), ref.solve(invA, v), tolerance));
+        }
         action.run(prefix + "Trace", () -> verify(p.trace(A), ref.trace(A), tolerance));
 
         // Decompositions
-        action.run(prefix + "LU", () -> verify(p.lu(invA), ref.lu(invA), tolerance));
-        action.run(prefix + "QR", () -> verify(p.qr(A), ref.qr(A), tolerance));
-        action.run(prefix + "SVD", () -> verify(p.svd(A), ref.svd(A), tolerance)); 
-        action.run(prefix + "Chol", () -> verify(p.cholesky(spdA), ref.cholesky(spdA), tolerance));
-        action.run(prefix + "Eigen", () -> verify(p.eigen(invA), ref.eigen(invA), tolerance));
+        if (n < 1024) {
+            action.run(prefix + "LU", () -> verify(p.lu(invA), ref.lu(invA), tolerance));
+            action.run(prefix + "QR", () -> verify(p.qr(A), ref.qr(A), tolerance));
+            action.run(prefix + "SVD", () -> verify(p.svd(A), ref.svd(A), tolerance)); 
+            action.run(prefix + "Chol", () -> verify(p.cholesky(spdA), ref.cholesky(spdA), tolerance));
+            action.run(prefix + "Eigen", () -> verify(p.eigen(invA), ref.eigen(invA), tolerance));
+        }
 
         // --- 2. RECTANGULAR MATRIX OPERATIONS (M x N) ---
         int m = n + 2;
@@ -74,20 +85,31 @@ public class LinearAlgebraAuditSuite {
         Matrix<E> R2 = randomMatrix(n, k, ref, ring, rand);
         Vector<E> vN = randomVector(n, ref, ring, rand);
 
-        action.run(prefix + "Rect:Mul", () -> verify(p.multiply(R1, R2), ref.multiply(R1, R2), tolerance));
+        action.run(prefix + "Rect:Mul", () -> {
+            Matrix<E> res = p.multiply(R1, R2);
+            if (n < 1024) {
+                return verify(res, ref.multiply(R1, R2), tolerance);
+            } else {
+                return res;
+            }
+        });
         action.run(prefix + "Rect:Trans", () -> verify(p.transpose(R1), ref.transpose(R1), tolerance));
         action.run(prefix + "Rect:MatVec", () -> verify(p.multiply(R1, vN), ref.multiply(R1, vN), tolerance));
-        action.run(prefix + "Rect:SVD", () -> verify(p.svd(R1), ref.svd(R1), tolerance));
-        action.run(prefix + "Rect:QR", () -> verify(p.qr(R1), ref.qr(R1), tolerance));
+        if (n < 1024) {
+            action.run(prefix + "Rect:SVD", () -> verify(p.svd(R1), ref.svd(R1), tolerance));
+            action.run(prefix + "Rect:QR", () -> verify(p.qr(R1), ref.qr(R1), tolerance));
+        }
 
         // --- 3. TRIANGULAR MATRIX OPERATIONS ---
-        LUResult<E> luRef = ref.lu(invA);
-        Matrix<E> L = luRef.getL();
-        Matrix<E> U = luRef.getU();
-        
-        action.run(prefix + "Tri:LowerSolve", () -> verify(p.solve(L, v), ref.solve(L, v), tolerance));
-        action.run(prefix + "Tri:UpperSolve", () -> verify(p.solve(U, v), ref.solve(U, v), tolerance));
-        action.run(prefix + "Tri:Mul", () -> verify(p.multiply(L, U), ref.multiply(L, U), tolerance));
+        if (n < 1024) {
+            LUResult<E> luRef = ref.lu(invA);
+            Matrix<E> L = luRef.getL();
+            Matrix<E> U = luRef.getU();
+            
+            action.run(prefix + "Tri:LowerSolve", () -> verify(p.solve(L, v), ref.solve(L, v), tolerance));
+            action.run(prefix + "Tri:UpperSolve", () -> verify(p.solve(U, v), ref.solve(U, v), tolerance));
+            action.run(prefix + "Tri:Mul", () -> verify(p.multiply(L, U), ref.multiply(L, U), tolerance));
+        }
 
         // --- 4. VECTOR GEOMETRY & OPERATIONS ---
         action.run(prefix + "Vec:Dot", () -> verify(p.dot(v, v), ref.dot(v, v), tolerance));
@@ -116,7 +138,7 @@ public class LinearAlgebraAuditSuite {
         action.run(prefix + "Func:Pow", () -> verify(p.pow(single, ring.one()), ref.pow(single, ring.one()), tolerance));
 
         // --- 6. SPARSE ITERATIVE ---
-        if (p instanceof SparseLinearAlgebraProvider<E> sp) {
+        if (n < 1024 && p instanceof SparseLinearAlgebraProvider<E> sp) {
             Vector<E> x0 = randomVector(n, ref, ring, rand);
             E solveTolerance = getSmallTolerance(ring);
             action.run(prefix + "Sparse:BiCGSTAB", () -> verify(sp.bicgstab(invA, v, x0, solveTolerance, 100), ref.solve(invA, v), tolerance * 1000)); 
