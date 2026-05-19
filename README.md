@@ -29,7 +29,7 @@ Developed over a relentless **5-month** sprint, Episteme comprises over **450,00
 Discover Episteme's modular ecosystem, dynamic backend autotuning, and robust scientific applications in our quick overview video:
 
 <p align="center">
-  <video src="https://github.com/user-attachments/assets/2be30ca0-1067-4b53-865a-793f36ea9136" width="750" controls></video>
+  <video src="https://github.com/user-attachments/assets/2be30ca0-1067-4b53-865a-793f36ea9136" width="750" autoplay loop muted playsinline controls></video>
 </p>
 
 *If the video does not play inline, you can [watch or download it directly](https://github.com/user-attachments/assets/2be30ca0-1067-4b53-865a-793f36ea9136).*
