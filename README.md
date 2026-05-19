@@ -29,10 +29,10 @@ Developed over a relentless **5-month** sprint, Episteme comprises over **450,00
 Discover Episteme's modular ecosystem, dynamic backend autotuning, and robust scientific applications in our quick overview video:
 
 <p align="center">
-  <video src="https://github.com/Episteme-HCP/Episteme/blob/main/intro.mp4?raw=true" width="750" controls="controls"></video>
+  <a href="intro.mp4"><img src="intro.gif" alt="Episteme Introduction Video Preview" width="750" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" /></a>
 </p>
 
-*If the video does not play, you can [watch or download it directly](https://github.com/Episteme-HCP/Episteme/blob/main/intro.mp4?raw=true).*
+*📺 Click the animated preview above to watch the full video with sound (opens in the GitHub file player).*
 
 ---
 
