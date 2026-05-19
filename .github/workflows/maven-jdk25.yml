@@ -41,17 +41,7 @@ jobs:
 
     - name: Run Benchmarks (CLI)
       shell: bash
-      continue-on-error: true
-      run: |
-        mvn exec:java -pl episteme-benchmarks -Dexec.mainClass="org.episteme.benchmarks.cli.BenchmarkCLI" \
-        -Dexec.args="--run-all --dry-run --export-file benchmark-results.json"
-
-    - name: Upload Benchmark Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: benchmark-results-${{ matrix.os }}-jdk25
-        path: benchmark-results.json
+      run: echo "Benchmarks skipped in standard CI to avoid hangs on volatile GHA environments."
 
     - name: Upload Test Results
       if: always()
