@@ -65,6 +65,18 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
         return NativeSafe.allocate(arena, ilp64 ? ValueLayout.JAVA_LONG : ValueLayout.JAVA_INT, count);
     }
 
+    protected static MemorySegment allocateIpivFrom(Arena arena, int[] ipiv) {
+        if (ilp64) {
+            long[] longIpiv = new long[ipiv.length];
+            for (int i = 0; i < ipiv.length; i++) {
+                longIpiv[i] = ipiv[i];
+            }
+            return NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_LONG, longIpiv);
+        } else {
+            return NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_INT, ipiv);
+        }
+    }
+
     protected static int getIpivElement(MemorySegment ipivSeg, long index) {
         return ilp64 ? (int) ipivSeg.getAtIndex(ValueLayout.JAVA_LONG, index) : ipivSeg.getAtIndex(ValueLayout.JAVA_INT, index);
     }
@@ -131,6 +143,36 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
             }
 
             bindSymbols();
+
+            // Probing ILP64 vs LP64
+            if (DGETRF != null) {
+                try {
+                    Arena probeArena = Arena.ofConfined();
+                    MemorySegment segA = NativeSafe.allocateFromArray(probeArena, ValueLayout.JAVA_DOUBLE, new double[]{ 2.0 });
+                    MemorySegment probeIpiv = NativeSafe.allocate(probeArena, ValueLayout.JAVA_BYTE, 16L);
+                    probeIpiv.fill((byte) 0xFF);
+                    
+                    int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, 1, 1, segA, 1, probeIpiv);
+                    if (info == 0) {
+                        int checkVal = probeIpiv.getAtIndex(ValueLayout.JAVA_INT, 1L); // offset 4
+                        if (checkVal == 0) {
+                            ilp64 = true;
+                            logger.info("FFM: Detected ILP64 (64-bit integer pivots) active in the native library.");
+                        } else {
+                            ilp64 = false;
+                            logger.info("FFM: Detected LP64 (32-bit integer pivots) active in the native library.");
+                        }
+                    } else {
+                        logger.warn("FFM: DGETRF probe returned info = {}. Defaulting to LP64.", info);
+                    }
+                    probeArena.close();
+                } catch (Throwable t) {
+                    logger.warn("FFM: Failed to probe ILP64 vs LP64 layout. Defaulting to LP64: {}", t.getMessage());
+                    ilp64 = false;
+                }
+            } else {
+                logger.warn("FFM: DGETRF not available for ILP64/LP64 probing. Defaulting to LP64.");
+            }
 
             // Verify essential handles
             IS_AVAILABLE = (DGEMM != null && DGEMV != null && DDOT != null);
@@ -751,7 +793,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                         segB = NativeSafe.allocateFromArray(arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(b));
                     }
                 }
-                MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
+                MemorySegment segIpiv = allocateIpiv(arena, (long) n);
 
                 if (complex) {
                     if (single) {
@@ -975,7 +1017,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
  
          try (Arena arena = Arena.ofConfined()) {
              MemorySegment segA;
-             MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, (long) n);
+             MemorySegment segIpiv = allocateIpiv(arena, (long) n);
              
              if (complex) {
                  if (single) {
@@ -1071,7 +1113,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                      try (ResourceTracker tracker = new ResourceTracker()) {
                          Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
                          MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(A));
-                         MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, n);
+                         MemorySegment segIpiv = allocateIpiv(arena, n);
                          int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info < 0) throw new IllegalArgumentException("CGETRF failed: illegal argument " + (-info));
                          if (info > 0) return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
@@ -1081,7 +1123,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                              float r = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long)(i*n + i)*2);
                              float im = segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long)(i*n + i)*2 + 1);
                              det = det.multiply(org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
-                             int p = segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long)i);
+                             int p = getIpivElement(segIpiv, (long)i);
                              if (p != (i + 1)) swaps++;
                          }
                          if (swaps % 2 != 0) det = det.negate();
@@ -1095,7 +1137,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                      try (ResourceTracker tracker = new ResourceTracker()) {
                          Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
                          MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(A));
-                         MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, n);
+                         MemorySegment segIpiv = allocateIpiv(arena, n);
                          int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info < 0) throw new IllegalArgumentException("ZGETRF failed: illegal argument " + (-info));
                          if (info > 0) return (E) (Object) org.episteme.core.mathematics.numbers.complex.Complex.ZERO;
@@ -1105,7 +1147,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                              double r = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long)(i*n + i)*2);
                              double im = segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long)(i*n + i)*2 + 1);
                              det = det.multiply(org.episteme.core.mathematics.numbers.complex.Complex.of(r, im));
-                             int p = segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long)i);
+                             int p = getIpivElement(segIpiv, (long)i);
                              if (p != (i + 1)) swaps++;
                          }
                          if (swaps % 2 != 0) det = det.negate();
@@ -1120,13 +1162,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                  if (SGETRF != null) {
                      try (Arena arena = Arena.ofConfined()) {
                          MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, toFloatArray(A));
-                         MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, n);
+                         MemorySegment segIpiv = allocateIpiv(arena, n);
                          int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info > 0) return createScalar(0.0, A);
                          float det = 1.0f;
                          for(int i=0; i<n; i++) {
                              det *= segA.getAtIndex(ValueLayout.JAVA_FLOAT, (long) i * n + i);
-                             if (segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != i + 1) det = -det;
+                             if (getIpivElement(segIpiv, (long) i) != i + 1) det = -det;
                          }
                          return createScalar(det, A);
                      } catch (Throwable e) { 
@@ -1137,13 +1179,13 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                  if (DGETRF != null) {
                      try (Arena arena = Arena.ofConfined()) {
                          MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(A));
-                         MemorySegment segIpiv = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, n);
+                         MemorySegment segIpiv = allocateIpiv(arena, n);
                          int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, n, n, segA, n, segIpiv);
                          if (info > 0) return createScalar(0.0, A);
                          double det = 1.0;
                          for(int i=0; i<n; i++) {
                              det *= segA.getAtIndex(ValueLayout.JAVA_DOUBLE, (long) i * n + i);
-                             if (segIpiv.getAtIndex(ValueLayout.JAVA_INT, (long) i) != i + 1) det = -det;
+                             if (getIpivElement(segIpiv, (long) i) != i + 1) det = -det;
                          }
                          return createScalar(det, A);
                      } catch (Throwable e) { 
@@ -2489,7 +2531,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
 
         try (ResourceTracker tracker = new ResourceTracker()) {
             Arena arena = tracker.track(Arena.ofConfined(), Arena::close);
-            MemorySegment pFace = NativeSafe.allocate(arena, ValueLayout.JAVA_INT, Math.min(m, n));
+            MemorySegment pFace = allocateIpiv(arena, Math.min(m, n));
             
             if (complex) {
                 if (single) {
@@ -2497,14 +2539,14 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     int info = (int) NativeSafe.invoke(CGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("CGETRF failed: " + info);
                     float[] resA = segA.toArray(ValueLayout.JAVA_FLOAT);
-                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    int[] ipiv = ipivToArray(pFace, Math.min(m, n));
                     return reconstructLU(resA, ipiv, m, n, a, true);
                 } else {
                     MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toInterlacedDoubleArray(a));
                     int info = (int) NativeSafe.invoke(ZGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("ZGETRF failed: " + info);
                     double[] resA = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    int[] ipiv = ipivToArray(pFace, Math.min(m, n));
                     return reconstructLU(resA, ipiv, m, n, a, true);
                 }
             } else {
@@ -2513,14 +2555,14 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     int info = (int) NativeSafe.invoke(SGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("SGETRF failed: " + info);
                     float[] resA = segA.toArray(ValueLayout.JAVA_FLOAT);
-                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    int[] ipiv = ipivToArray(pFace, Math.min(m, n));
                     return reconstructLU(resA, ipiv, m, n, a, false);
                 } else {
                     MemorySegment segA = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_DOUBLE, toDoubleArray(a));
                     int info = (int) NativeSafe.invoke(DGETRF, LAPACK_ROW_MAJOR, m, n, segA, n, pFace);
                     if (info < 0) throw new ArithmeticException("DGETRF failed: " + info);
                     double[] resA = segA.toArray(ValueLayout.JAVA_DOUBLE);
-                    int[] ipiv = pFace.toArray(ValueLayout.JAVA_INT);
+                    int[] ipiv = ipivToArray(pFace, Math.min(m, n));
                     return reconstructLU(resA, ipiv, m, n, a, false);
                 }
             }
@@ -2749,7 +2791,7 @@ public abstract class AbstractNativeFFMBLASBackend<E> implements LinearAlgebraPr
                     }
                 }
             }
-            MemorySegment segIpiv = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_INT, ipiv);
+            MemorySegment segIpiv = allocateIpivFrom(arena, ipiv);
             MemorySegment segB;
             if (complex) {
                 if (single) segB = NativeSafe.allocateFrom( arena, ValueLayout.JAVA_FLOAT, toInterlacedFloatArray(b));

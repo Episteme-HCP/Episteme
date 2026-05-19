@@ -475,6 +475,14 @@ public final class Episteme {
     }
 
     /**
+     * Gets the preferred map backend ID.
+     * @return the preferred map backend ID
+     */
+    public static String getMapBackendId() {
+        return getBackendId(org.episteme.core.technical.backend.BackendDiscovery.TYPE_MAP);
+    }
+
+    /**
      * Sets the backend for the specified type.
      */
     public static void setBackendId(String type, String id) {

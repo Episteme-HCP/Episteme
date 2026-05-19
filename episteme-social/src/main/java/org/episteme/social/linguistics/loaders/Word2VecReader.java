@@ -89,7 +89,7 @@ public class Word2VecReader extends AbstractResourceReader<Map<String, Vector<Re
                 components[i] = Real.of(Double.parseDouble(values[i + 1]));
             }
             
-            model.put(word, DenseVector.of(Arrays.asList(components), Real.ZERO));
+            model.put(word, Vector.of(Arrays.asList(components), org.episteme.core.mathematics.sets.Reals.getInstance()));
             if (model.size() >= numWords) break;
         }
         return model;

@@ -5,10 +5,10 @@
   <parent>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta3.0.14</version>
+    <version>1.0.0-beta3.0.17</version>
   </parent>
   <artifactId>episteme-server</artifactId>
-  <version>1.0.0-beta3.0.14</version>
+  <version>1.0.0-beta3.0.17</version>
   <name>Episteme Server</name>
   <description>RPC Server for Distributed Scientific Computing (Coordinator Node)</description>
   <licenses>
@@ -264,7 +264,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <release>${maven.compiler.release}</release>
-          <fork>true</fork>
+          <fork>false</fork>
           <compilerArgs>
             <arg>--add-modules</arg>
             <arg>jdk.incubator.vector</arg>

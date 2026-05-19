@@ -64,7 +64,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <release>${maven.compiler.release}</release>
-          <fork>true</fork>
+          <fork>false</fork>
           <annotationProcessorPaths>
             <path>
               <groupId>com.google.auto.service</groupId>

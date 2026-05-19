@@ -89,7 +89,7 @@ public final class Demography implements Serializable {
             next.set(i + 1, pop.multiply(surv));
         }
 
-        return DenseVector.of(next, Reals.getInstance());
+        return Vector.of(next, Reals.getInstance());
     }
 
     /**

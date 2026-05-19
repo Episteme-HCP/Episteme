@@ -5,11 +5,11 @@
   <parent>
     <groupId>io.github.episteme-hcp</groupId>
     <artifactId>episteme-parent</artifactId>
-    <version>1.0.0-beta3.0.14</version>
+    <version>1.0.0-beta3.0.17</version>
   </parent>
   <groupId>io.github.episteme-hcp</groupId>
   <artifactId>episteme-jni</artifactId>
-  <version>1.0.0-beta3.0.14</version>
+  <version>1.0.0-beta3.0.17</version>
   <name>Episteme JNI Backend</name>
   <description>Traditional JNI bindings for legacy native library integration.</description>
   <licenses>
@@ -47,7 +47,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <release>${maven.compiler.release}</release>
-          <fork>true</fork>
+          <fork>false</fork>
           <compilerArgs>
             <arg>--add-modules</arg>
             <arg>jdk.incubator.vector</arg>
