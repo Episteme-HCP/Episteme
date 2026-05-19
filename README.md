@@ -20,7 +20,19 @@ dockerfile: docker/Dockerfile.huggingface
 ---
 
 ## 🚀 The Achievement
-Developed over a relentless **4-month** sprint, Episteme comprises over **450,000+ lines** of production-ready code. This massive engineering undertaking was **built entirely with Antigravity**, demonstrating the power of agentic AI in scaling complex, science-first architectures.
+Developed over a relentless **5-month** sprint, Episteme comprises over **450,000+ lines** of production-ready code. This massive engineering undertaking was **built entirely with Antigravity**, demonstrating the power of agentic AI in scaling complex, science-first architectures.
+
+---
+
+## 📺 Introduction Video
+
+Discover Episteme's modular ecosystem, dynamic backend autotuning, and robust scientific applications in our quick overview video:
+
+<p align="center">
+  <video src="intro.mp4" width="750" controls alt="Episteme Introduction Video"></video>
+</p>
+
+*If the video does not play, you can [watch or download it directly](intro.mp4).*
 
 ---
 
