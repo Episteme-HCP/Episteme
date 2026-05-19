@@ -29,10 +29,14 @@ Developed over a relentless **5-month** sprint, Episteme comprises over **450,00
 Discover Episteme's modular ecosystem, dynamic backend autotuning, and robust scientific applications in our quick overview video:
 
 <p align="center">
-  <video src="intro.mp4" width="750" controls alt="Episteme Introduction Video"></video>
+  <video width="750" controls preload="metadata" playsinline style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+    <source src="https://huggingface.co/spaces/silveremartin/Episteme/resolve/main/intro.mp4" type="video/mp4">
+    <source src="intro.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 </p>
 
-*If the video does not play, you can [watch or download it directly](intro.mp4).*
+*If the video does not play, you can [watch or download it directly](https://huggingface.co/spaces/silveremartin/Episteme/resolve/main/intro.mp4).*
 
 ---
 
